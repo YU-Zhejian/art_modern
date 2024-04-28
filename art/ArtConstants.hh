@@ -1,0 +1,12 @@
+#pragma once
+
+#define MAX_QUAL 93
+#define MIN_QUAL 0
+#define HIGHEST_QUAL 80
+
+#define DEFAULT_INS_RATE_1 0.00009
+#define DEFAULT_DEL_RATE_1 0.00011
+#define DEFAULT_INS_RATE_2 0.00015
+#define DEFAULT_DEL_RATE_2 0.00023
+#define DEFAULT_MAX_INDEL (-1)
+#define DEFAULT_MAX_NUM_N (-1)
