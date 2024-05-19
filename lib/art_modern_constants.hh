@@ -1,5 +1,5 @@
 #pragma once
-#include <ceu_check/ceu_check_os.h>
+#include <ceu_check/ceu_check_os_macro.h>
 
 // Following constants copied from HTSLib <sam.h>.
 /*! @abstract the read is paired in sequencing, no matter whether it is mapped in a pair */

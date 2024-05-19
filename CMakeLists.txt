@@ -4,6 +4,7 @@ project(art_modern LANGUAGES CXX)
 
 # Installation
 include(GNUInstallDirs)
+include(ExternalProject)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 
 # Set C/CXX standard
@@ -34,11 +35,31 @@ endif()
 
 message(STATUS "Inclusion of libceu at ${LIBCEU_SOURCE_PATH}")
 
-add_subdirectory("${LIBCEU_SOURCE_PATH}" __libceu_build)
+ExternalProject_Add(
+        "libceu"
+        PREFIX "${CMAKE_BINARY_DIR}/__libceu"
+        SOURCE_DIR "${LIBCEU_SOURCE_PATH}"
+        BINARY_DIR "${CMAKE_BINARY_DIR}/__libceu_build"
+        INSTALL_DIR "${CMAKE_BINARY_DIR}/__libceu_install"
+        CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/__libceu_install"
+)
+
+include_directories("${CMAKE_BINARY_DIR}/__libceu_install/include")
+link_directories("${CMAKE_BINARY_DIR}/__libceu_install/lib")
+# add_subdirectory("${LIBCEU_SOURCE_PATH}" __libceu_build)
+
 include("${LIBCEU_SOURCE_PATH}/cmake/libceu.cmake")
 add_compile_definitions("HAVE_LIBCEU")
+
+if(CMAKE_VERSION GREATER_EQUAL 3.12)
+    add_compile_definitions(CEU_CM_UNDER_CMAKE)
+else()
+    add_compile_options("-DCEU_CM_UNDER_CMAKE")
+endif()
+
 include("${LIBCEU_SOURCE_PATH}/cmake_collections/enable_debug.cmake")
 
+set(BUILD_SHARED_LIBS OFF) # FIXME: Temporary solution under Linux Mint
 # Boost
 if (NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
@@ -61,6 +82,7 @@ find_package(
         timer
         program_options
         thread
+        log_setup
         log
         unit_test_framework
 )
@@ -76,17 +98,12 @@ file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE}
         lib/art_modern_constants.hh)
 
+
+add_dependencies(art_modern_lib "libceu")
 set(
         ART_MODERN_LINK_LIBS
-        Boost::system
-        Boost::filesystem
-        Boost::regex
-        Boost::timer
-        Boost::thread
-        Boost::log
-        Boost::program_options
+        ${Boost_LIBRARIES}
         art_modern_lib
-        Boost::unit_test_framework
 )
 if(BUILD_SHARED_LIBS)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} ${CEU_LIBRARY_SHARED_CXX})

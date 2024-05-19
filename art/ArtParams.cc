@@ -5,6 +5,8 @@
 #include <fstream>
 
 #include <ceu_check/ceu_check_all.h>
+#include <ceu_ystrlib/ceu_ystrlib_all.h>
+#include <ceu_basic/ceu_c_utils.h>
 
 #include "ArtParams.hh"
 #include "art_modern_constants.hh"
@@ -15,8 +17,13 @@ namespace labw {
 namespace art_modern {
     void print_version()
     {
-        cout << ceu_check_get_full_info() << endl;
+        ceu_ystr_t* full_info = ceu_check_get_full_info();
+        char* full_info_cstr = ceu_ystr_to_cstr(full_info);
+        cout << full_info_cstr << endl;
+        ceu_free_non_null(full_info);
+        ceu_free_non_null(full_info_cstr);
     }
+
     std::vector<double> gen_per_base_mutation_rate(int read_len, double p, int max_num)
     {
         std::vector<double> rate;
