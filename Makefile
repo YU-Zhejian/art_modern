@@ -1,7 +1,10 @@
 
 .PHONY: build
 build:
-	mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=Release -G Ninja .. && ninja -j40 && cd ..
+	mkdir -p build
+	env -C build cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+	env -C build ninja -j40
+	env -C build ctest
 
 .PHONY: fmt
 fmt:

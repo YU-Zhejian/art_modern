@@ -17,12 +17,11 @@ ThreadSafeFileStream::ThreadSafeFileStream(const std::string& filename)
 {
 
     if (!file_.is_open()) {
-        BOOST_LOG_TRIVIAL(fatal) << "Can not open output file: " << filename << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Can not open output file: " << filename;
         exit(EXIT_FAILURE);
     }
 }
 
-void ThreadSafeFileStream::close()
-{
-    file_.close();
-};
+void ThreadSafeFileStream::close() { file_.close(); }
+
+ThreadSafeFileStream::~ThreadSafeFileStream() { ThreadSafeFileStream::close(); }

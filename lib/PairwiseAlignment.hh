@@ -18,7 +18,8 @@ namespace art_modern {
 
     class PairwiseAlignment {
     public:
-        PairwiseAlignment(const std::string& aligned_query, const std::string& aligned_ref);
+        PairwiseAlignment(const std::string& aligned_query,
+            const std::string& aligned_ref);
 
         std::string generate_cigar(bool is_reverse, bool use_m) const;
 
@@ -30,5 +31,5 @@ namespace art_modern {
         std::string _aligned_ref;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

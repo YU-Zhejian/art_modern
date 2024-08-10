@@ -5,14 +5,13 @@
 #include <string>
 #include <vector>
 
-namespace po = boost::program_options;
-
 namespace labw {
 namespace art_modern {
 
     class ArtParams {
     public:
-        bool is_amplicon;
+        ART_SIMULATION_MODE art_simulation_mode;
+        ART_LIB_CONST_MODE art_lib_const_mode;
         int min_qual;
         int max_qual;
         bool mask_n;
@@ -23,11 +22,8 @@ namespace art_modern {
 
         /**
          * @brief a negative value means no limit
-         *
          */
         int max_indel;
-        bool is_mp;
-        bool is_pe;
         bool sep_flag = false;
         bool cigar_use_m = false;
         bool no_sam;
@@ -55,7 +51,7 @@ namespace art_modern {
         std::vector<double> per_base_ins_rate_2;
         std::vector<double> per_base_del_rate_2;
         double err_prob[HIGHEST_QUAL];
-        po::options_description po_desc;
+        boost::program_options::options_description po_desc;
 
         ArtParams();
 
@@ -95,5 +91,5 @@ namespace art_modern {
         void print_help() const;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

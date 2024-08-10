@@ -23,6 +23,7 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libdeflate.cmake")
 include_directories("${CMAKE_CURRENT_LIST_DIR}")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/htslib")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs")
+include_directories("${CMAKE_BINARY_DIR}/include")
 
 if(BUILD_SHARED_LIBS)
     message(NOTICE "Wanting shared htslib.")
@@ -94,7 +95,8 @@ else()
     endif()
 endif()
 
-configure_file("${CMAKE_CURRENT_LIST_DIR}/config_vars.h.in" "${CMAKE_CURRENT_LIST_DIR}/config_vars.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/config_vars.h.in" "${CMAKE_BINARY_DIR}/include/config_vars.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/htslib_version.h.in" "${CMAKE_BINARY_DIR}/include/htslib_version.h")
 
 file(GLOB HTSLIB_SOURCES ${CMAKE_CURRENT_LIST_DIR}/*.c ${CMAKE_CURRENT_LIST_DIR}/cram/*.c
      ${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs/*.c)

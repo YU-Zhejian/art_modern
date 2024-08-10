@@ -7,6 +7,8 @@
 #include <boost/log/trivial.hpp>
 #include <boost/thread.hpp>
 
+#include <htslib/sam.h>
+
 #include "ArtContig.hh"
 #include "ArtSamHeader.hh"
 #include "DumbFileStream.hh"
@@ -23,13 +25,15 @@ namespace art_modern {
 
     void print_banner()
     {
-        cout << endl;
-        cout << "YuZJ Modified ART_Illumina" << endl;
-        cout << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)" << endl;
-        cout << "Originally written by: Weichun Huang <whduke@gmail.com>" << endl;
+        BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina";
+        BOOST_LOG_TRIVIAL(info) << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
+        BOOST_LOG_TRIVIAL(info) << "Originally written by: Weichun Huang <whduke@gmail.com>";
+        BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <Zhejian.23@intl.zju.edu.cn>";
     }
 
-    GeneratedSeq generate_pe(const ArtParams& art_params, const Empdist& qdist, const string& id, const ArtContig& art_contig, const long& t_num_read)
+    GeneratedSeq generate_pe(const ArtParams& art_params, const Empdist& qdist,
+        const string& id, const ArtContig& art_contig,
+        const long& t_num_read)
     {
         ostringstream osID;
         GeneratedSeq generated_seq;
@@ -46,7 +50,9 @@ namespace art_modern {
         read_id_1 = sam_read_id + "/1";
         read_id_2 = sam_read_id + "/2";
 
-        auto arp = art_params.is_mp ? art_contig.generate_read_mp(art_params.is_amplicon) : art_contig.generate_read_pe(art_params.is_amplicon);
+        auto arp = art_params.art_lib_const_mode == ART_LIB_CONST_MODE::MP
+            ? art_contig.generate_read_mp()
+            : art_contig.generate_read_pe();
         if (art_params.mask_n) {
             if (arp.read_1.is_plus_strand) {
                 size_t bpos2 = art_contig._ref_seq.size() - arp.read_2.bpos - art_params.read_len;
@@ -127,10 +133,12 @@ namespace art_modern {
         sam_read_1.pNext = sam_read_2.pos;
         sam_read_2.pNext = sam_read_1.pos;
         if (sam_read_2.pos > sam_read_1.pos) {
-            sam_read_1.tLen = static_cast<int>(sam_read_2.pos + arp.read_2.seq_read.size() - sam_read_1.pos);
+            sam_read_1.tLen = static_cast<int>(
+                sam_read_2.pos + arp.read_2.seq_read.size() - sam_read_1.pos);
             sam_read_2.tLen = -sam_read_1.tLen;
         } else {
-            sam_read_2.tLen = static_cast<int>(sam_read_1.pos + arp.read_1.seq_read.size() - sam_read_2.pos);
+            sam_read_2.tLen = static_cast<int>(
+                sam_read_1.pos + arp.read_1.seq_read.size() - sam_read_2.pos);
             sam_read_1.tLen = -sam_read_2.tLen;
         }
         sam_read_1.printRead(SAMFILE);
@@ -139,7 +147,9 @@ namespace art_modern {
         return generated_seq;
     }
 
-    GeneratedSeq generate_se(const ArtParams& art_params, const Empdist& qdist, const string& id, const ArtContig& art_contig, const long& t_num_read)
+    GeneratedSeq generate_se(const ArtParams& art_params, const Empdist& qdist,
+        const string& id, const ArtContig& art_contig,
+        const long& t_num_read)
     {
         ostringstream osID;
         ostringstream FQFILE;
@@ -149,7 +159,7 @@ namespace art_modern {
 
         osID << id << ':' << art_params.id << t_num_read;
         read_id = osID.str();
-        auto art_read = art_contig.generate_read_se(art_params.is_amplicon);
+        auto art_read = art_contig.generate_read_se();
         if (art_params.mask_n) {
             if (art_read.is_plus_strand) {
                 if (art_contig._masked_pos.count(art_read.bpos) > 0) {
@@ -202,7 +212,8 @@ namespace art_modern {
         return generated_seq;
     }
 
-    string generate_sam_header(const string& id, const string& ref_seq, const ArtParams& art_params)
+    string generate_sam_header(const string& id, const string& ref_seq,
+        const ArtParams& art_params)
     {
         vector<string> sn;
         vector<int> size;
@@ -214,31 +225,38 @@ namespace art_modern {
         return sH.printHeader();
     }
 
-    void generate_all(
-        const string& id, const string& ref_seq, const ArtParams& art_params, const Empdist& qdist, double x_fold)
+    void generate_all(const string& id, const string& ref_seq,
+        const ArtParams& art_params, const Empdist& qdist,
+        double x_fold)
     {
-        // TODO: no_sam not implemented!
         if (x_fold <= 0.0) {
             return;
         }
         ArtContig art_contig(ref_seq, id, art_params);
         if (art_contig._ref_seq.size() < art_params.read_len) {
-            BOOST_LOG_TRIVIAL(warning) << "Warning: the reference sequence " << id << " (length " << art_contig._ref_seq.size() << "bps ) is skipped as it < the defined read length (" << art_params.read_len << " bps)" << endl;
+            BOOST_LOG_TRIVIAL(warning)
+                << "Warning: the reference sequence " << id << " (length "
+                << art_contig._ref_seq.size()
+                << "bps ) is skipped as it < the defined read length ("
+                << art_params.read_len << " bps)";
             return;
         }
-        ThreadSafeFileStream SAMFILE(art_params.samfile(id));
-        if (!art_params.no_sam) {
-            SAMFILE.write(generate_sam_header(id, ref_seq, art_params));
+        std::shared_ptr<FileStreamInterface> SAMFILE_ptr;
+        if (art_params.no_sam) {
+            SAMFILE_ptr = std::make_shared<DumbFileStream>();
+        } else {
+            SAMFILE_ptr = std::make_shared<ThreadSafeFileStream>(art_params.samfile(id));
         }
+
+        SAMFILE_ptr->write(generate_sam_header(id, ref_seq, art_params));
+
         ThreadSafeFileStream FQFILE1(art_params.fqfile1(id));
 
-        FileStreamInterface* FQFILE2_ptr;
-        if (art_params.is_pe) {
-            ThreadSafeFileStream FQFILE2(art_params.fqfile2(id));
-            FQFILE2_ptr = &FQFILE2;
+        std::shared_ptr<FileStreamInterface> FQFILE2_ptr;
+        if (art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
+            FQFILE2_ptr = std::make_shared<ThreadSafeFileStream>(art_params.fqfile2(id));
         } else {
-            DumbFileStream FQFILE2;
-            FQFILE2_ptr = &FQFILE2;
+            FQFILE2_ptr = std::make_shared<DumbFileStream>();
         }
 
         if (art_params.mask_n) {
@@ -257,17 +275,17 @@ namespace art_modern {
             num_cores = 1;
         }
         auto num_read_per_batch = static_cast<int>(t_num_read / num_cores + 1);
-        auto func = [num_read_per_batch, art_params, qdist, id, art_contig, &FQFILE1, FQFILE2_ptr, &SAMFILE]() {
+        auto func = [num_read_per_batch, art_params, qdist, id, art_contig, &FQFILE1,
+                        FQFILE2_ptr, SAMFILE_ptr]() {
             auto current_num_read_per_batch = num_read_per_batch;
             while (current_num_read_per_batch > 0) {
-                auto retv = (art_params.is_pe ? generate_pe : generate_se)(art_params, qdist, id, art_contig, current_num_read_per_batch);
+                auto retv = (art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe : generate_se)(
+                    art_params, qdist, id, art_contig, current_num_read_per_batch);
                 if (!retv.fastq.empty()) {
                     FQFILE1.write(retv.fastq);
                     FQFILE2_ptr->write(retv.fastq2);
-                    if (!art_params.no_sam) {
-                        SAMFILE.write(retv.sam);
-                    }
-                    current_num_read_per_batch -= art_params.is_pe ? 2 : 1;
+                    SAMFILE_ptr->write(retv.sam);
+                    current_num_read_per_batch -= art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
                 }
             }
         };
@@ -283,7 +301,7 @@ namespace art_modern {
 
         FQFILE1.close();
         FQFILE2_ptr->close();
-        SAMFILE.close();
+        SAMFILE_ptr->close();
     }
-}
-}
+} // namespace art_modern
+} // namespace labw

@@ -12,8 +12,9 @@ namespace art_modern {
     // the maxium number of indels is set by cdf_cutoff to save computation time
     void print_banner();
 
-    void generate_all(
-        const std::string& id, const std::string& ref_seq, const ArtParams& art_params, const Empdist& qdist, double x_fold);
+    void generate_all(const std::string& id, const std::string& ref_seq,
+        const ArtParams& art_params, const Empdist& qdist,
+        double x_fold);
 
     class GeneratedSeq {
     public:
@@ -31,6 +32,6 @@ namespace art_modern {
         std::string sam;
     };
 
-}
+} // namespace art_modern
 
-}
+} // namespace labw

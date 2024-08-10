@@ -9,8 +9,7 @@ namespace art_modern {
 
     class ArtSamHeader {
     public:
-        ArtSamHeader(std::vector<std::string> SN,
-            std::vector<int> LN)
+        ArtSamHeader(std::vector<std::string> SN, std::vector<int> LN)
             : SN(std::move(SN))
             , LN(std::move(LN))
         {
@@ -29,5 +28,5 @@ namespace art_modern {
         std::string printHeader() const;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

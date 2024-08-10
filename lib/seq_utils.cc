@@ -9,10 +9,7 @@ using namespace std;
 namespace labw {
 namespace art_modern {
     const map<char, char>& rev_comp_trans {
-        { 'A', 'T' },
-        { 'T', 'A' },
-        { 'C', 'G' },
-        { 'G', 'C' }
+        { 'A', 'T' }, { 'T', 'A' }, { 'C', 'G' }, { 'G', 'C' }
     };
 
     std::string qual_to_str(const std::vector<int>& qual)
@@ -40,5 +37,5 @@ namespace art_modern {
         reverse(rets.begin(), rets.end());
         return rets;
     }
-}
-}
+} // namespace art_modern
+} // namespace labw

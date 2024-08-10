@@ -31,14 +31,24 @@ int main(int argc, char* argv[])
     art_params.print_params();
 
     auto qdist = art_params.read_emp();
-    BOOST_LOG_TRIVIAL(info) << "Checking FAI...";
-    auto seq_file_fai_path = fai_path(art_params.seq_file.c_str());
-    if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
-        if (!fai_build(art_params.seq_file.c_str())) {
-            return 1;
+    if (!art_params.stream) {
+        BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
+        auto seq_file_fai_path = string(fai_path(art_params.seq_file.c_str()));
+        if (!boost::filesystem::exists(
+                boost::filesystem::path(seq_file_fai_path))) {
+            BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
+            if (!fai_build(art_params.seq_file.c_str())) {
+                BOOST_LOG_TRIVIAL(fatal) << "Building FAI failed!";
+                return 1;
+            }
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
+            if (!fai_load_format(art_params.seq_file.c_str(), FAI_FASTA)) {
+                BOOST_LOG_TRIVIAL(fatal) << "Loading FAI failed!";
+                return 1;
+            }
         }
     }
-    free(seq_file_fai_path);
 
     auto fa_reader = std::ifstream(art_params.seq_file);
     FastaIterator fai(fa_reader);
@@ -67,7 +77,8 @@ int main(int argc, char* argv[])
             } else {
                 auto find_result = art_params.sequencing_depth.find(id);
                 if (find_result == art_params.sequencing_depth.end()) {
-                    // BOOST_LOG_TRIVIAL(warning) << "Warning: depth info for contig '" << id << "' not found!";
+                    // BOOST_LOG_TRIVIAL(warning) << "Warning: depth info for contig '" <<
+                    // id << "' not found!";
                     sequencing_depth = 0;
                 } else {
                     sequencing_depth = find_result->second;

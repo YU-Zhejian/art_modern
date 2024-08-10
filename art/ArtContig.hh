@@ -19,11 +19,11 @@ namespace art_modern {
     public:
         ArtContig(std::string ref_seq, std::string id, const ArtParams& art_params);
 
-        ArtRead generate_read_se(bool is_amplicon) const;
+        ArtRead generate_read_se() const;
 
-        ArtReadPair generate_read_pe(bool is_amplicon) const;
+        ArtReadPair generate_read_pe() const;
 
-        ArtReadPair generate_read_mp(bool is_amplicon) const;
+        ArtReadPair generate_read_mp() const;
 
         void mask_n_region(int max_num_n);
 
@@ -45,5 +45,5 @@ namespace art_modern {
         std::set<size_t> _masked_pos;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

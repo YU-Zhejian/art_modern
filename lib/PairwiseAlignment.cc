@@ -14,7 +14,9 @@ namespace art_modern {
 
     const char* PWAException::what() const noexcept
     {
-        return (boost::format("Alignment %s -> %s is of not equal length!") % _aligned_query % _aligned_ref).str().c_str();
+        return (boost::format("Alignment %s -> %s is of not equal length!") % _aligned_query % _aligned_ref)
+            .str()
+            .c_str();
     }
 
     PWAException::PWAException(std::string aligned_query, std::string aligned_ref)
@@ -23,7 +25,8 @@ namespace art_modern {
     {
     }
 
-    std::string PairwiseAlignment::generate_cigar(bool is_reverse, bool use_m) const
+    std::string PairwiseAlignment::generate_cigar(bool is_reverse,
+        bool use_m) const
     {
         std::ostringstream cigar;
 
@@ -32,7 +35,8 @@ namespace art_modern {
         int cigar_len = 0;
         auto ref_len = static_cast<int>(_aligned_ref.length());
 
-        auto _range = is_reverse ? labw::art_modern::range(ref_len - 1, -1, -1) : labw::art_modern::range(0, ref_len, 1);
+        auto _range = is_reverse ? labw::art_modern::range(ref_len - 1, -1, -1)
+                                 : labw::art_modern::range(0, ref_len, 1);
         for (auto i : _range) {
             if (_aligned_ref[i] == _aligned_query[i]) {
                 current_cigar = use_m ? ALN_MATCH : SEQ_MATCH;
@@ -56,7 +60,8 @@ namespace art_modern {
         return cigar.str();
     }
 
-    PairwiseAlignment::PairwiseAlignment(const std::string& aligned_query, const std::string& aligned_ref)
+    PairwiseAlignment::PairwiseAlignment(const std::string& aligned_query,
+        const std::string& aligned_ref)
         : _aligned_query(aligned_query)
         , _aligned_ref(aligned_ref)
     {
@@ -64,5 +69,5 @@ namespace art_modern {
             throw PWAException(aligned_query, aligned_ref);
         }
     }
-}
-}
+} // namespace art_modern
+} // namespace labw

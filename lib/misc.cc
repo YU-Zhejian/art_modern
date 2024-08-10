@@ -29,5 +29,5 @@ namespace art_modern {
         }
         return result;
     }
-}
-}
+} // namespace art_modern
+} // namespace labw

@@ -1,0 +1,4 @@
+---
+BasedOnStyle: webkit
+# OK, old clang-format does not support such
+# InsertNewlineAtEOF: true

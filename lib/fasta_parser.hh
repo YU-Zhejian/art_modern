@@ -12,8 +12,7 @@ namespace art_modern {
         std::string sequence;
     };
 
-    struct EOFException : std::exception {
-    };
+    struct EOFException : std::exception { };
     struct MalformedFastaException : std::exception {
         MalformedFastaException(int lineno, std::string what)
             : _lineno(lineno)
@@ -41,5 +40,5 @@ namespace art_modern {
         int _lineno = 0;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

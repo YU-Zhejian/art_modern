@@ -11,5 +11,7 @@ public:
 
     void close() override;
 
+    ~DumbFileStream() override;
+
 private:
 };

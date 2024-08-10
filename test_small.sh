@@ -20,7 +20,7 @@ build/art_modern \
     --seq_file raw_data/small_test.fa \
     --out_file_prefix tmp/test_small_se_amp \
     --read_len 125 \
-    --is_amplicon \
+    --mode template \
     --fcov 10 \
     --parallel -1
 sam2bam tmp/test_small_se_amp
@@ -33,7 +33,7 @@ build/art_modern \
     --read_len 125 \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 10 \
-    --is_pe \
+    --lc pe \
     --fcov 10 \
     --parallel -1
 sam2bam tmp/test_small_pe
@@ -44,8 +44,8 @@ build/art_modern \
     --seq_file raw_data/small_test.fa \
     --out_file_prefix tmp/test_small_pe_amp \
     --read_len 125 \
-    --is_pe \
-    --is_amplicon \
+    --lc pe \
+    --mode template \
     --fcov 10 \
     --parallel -1
 sam2bam tmp/test_small_pe_amp
@@ -58,7 +58,7 @@ build/art_modern \
     --read_len 125 \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 10 \
-    --is_mp \
+    --lc mp \
     --fcov 10 \
     --parallel -1
 sam2bam tmp/test_small_mp
@@ -69,8 +69,8 @@ build/art_modern \
     --seq_file raw_data/small_test.fa \
     --out_file_prefix tmp/test_small_mp_amp \
     --read_len 125 \
-    --is_mp \
-    --is_amplicon \
+    --lc mp \
+    --mode template \
     --fcov 10 \
     --parallel -1
 sam2bam tmp/test_small_mp_amp

@@ -6,7 +6,8 @@
 using namespace std;
 using namespace labw::art_modern;
 
-Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
+Empdist::Empdist(const std::string& emp_filename_1,
+    const std::string& emp_filename_2, bool sep_qual)
     : _sep_qual(sep_qual)
 {
     read_emp_dist(emp_filename_1, true);
@@ -15,7 +16,8 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
     }
 }
 
-// generate quali vector from dist of one read from pair-end [default first read]
+// generate quali vector from dist of one read from pair-end [default first
+// read]
 std::vector<int> Empdist::get_read_qual(int len, bool first) const
 {
     std::vector<int> read_qual;
@@ -35,7 +37,8 @@ vector<int> Empdist::get_read_qual_sep_1(const string& seq) const
     vector<int> read_qual;
     const auto len = static_cast<int>(seq.size());
     if (a_qual_dist_first.size() < len || t_qual_dist_first.size() < len || g_qual_dist_first.size() < len || c_qual_dist_first.size() < len) {
-        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the length of the read quality profile" << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the "
+                                    "length of the read quality profile";
         exit(EXIT_FAILURE);
     }
 
@@ -69,7 +72,8 @@ vector<int> Empdist::get_read_qual_sep_2(const string& seq) const
     const auto len = static_cast<int>(seq.size());
 
     if (a_qual_dist_second.size() < len || t_qual_dist_second.size() < len || g_qual_dist_second.size() < len || c_qual_dist_second.size() < len) {
-        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the length of the read quality profile" << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the "
+                                    "length of the read quality profile";
         exit(EXIT_FAILURE);
     }
     int cumCC;
@@ -138,7 +142,8 @@ void Empdist::read_emp_dist(istream& input, bool is_first)
         if (read_pos != linenum) {
             linenum = 0;
             if (read_pos != linenum) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal error (1): Wrong format of input distribution." << endl;
+                BOOST_LOG_TRIVIAL(fatal)
+                    << "Fatal error (1): Wrong format of input distribution.";
                 exit(EXIT_FAILURE);
             }
         }
@@ -157,7 +162,8 @@ void Empdist::read_emp_dist(istream& input, bool is_first)
         ss >> read_pos;
 
         if (read_pos != linenum) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal error (2): Wrong format of input distribution." << endl;
+            BOOST_LOG_TRIVIAL(fatal)
+                << "Fatal error (2): Wrong format of input distribution.";
             exit(EXIT_FAILURE);
         }
 
@@ -169,7 +175,8 @@ void Empdist::read_emp_dist(istream& input, bool is_first)
         }
 
         if (count.size() != qual.size()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal error (3): Wrong format of input distribution." << endl;
+            BOOST_LOG_TRIVIAL(fatal)
+                << "Fatal error (3): Wrong format of input distribution.";
             exit(EXIT_FAILURE);
         }
 
@@ -203,7 +210,8 @@ void Empdist::read_emp_dist(istream& input, bool is_first)
             } else if (c_flag) {
                 c_qual_dist_second.push_back(dist);
             } else {
-                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly." << endl;
+                BOOST_LOG_TRIVIAL(fatal)
+                    << "Unexpected Error: Profile was not read in correctly.";
                 exit(EXIT_FAILURE);
             }
         }
@@ -211,17 +219,19 @@ void Empdist::read_emp_dist(istream& input, bool is_first)
 
     if (_sep_qual) {
         if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size() || c_qual_dist_first.size() != t_qual_dist_first.size()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly." << endl;
+            BOOST_LOG_TRIVIAL(fatal)
+                << "Unexpected Error: Profile was not read in correctly.";
             exit(EXIT_FAILURE);
         }
         if (a_qual_dist_second.size() != g_qual_dist_second.size() || g_qual_dist_second.size() != c_qual_dist_second.size() || c_qual_dist_second.size() != t_qual_dist_second.size()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly." << endl;
+            BOOST_LOG_TRIVIAL(fatal)
+                << "Unexpected Error: Profile was not read in correctly.";
             exit(EXIT_FAILURE);
         }
     }
 
     if (linenum == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Profile empty!" << endl;
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Profile empty!";
         exit(EXIT_FAILURE);
     }
 }
@@ -230,7 +240,8 @@ void Empdist::read_emp_dist(const string& infile, bool is_first)
 {
     ifstream distss(infile.c_str());
     if (!distss) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Cannot open the distribution file: '" << infile << "'" << endl;
+        BOOST_LOG_TRIVIAL(fatal)
+            << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
         exit(EXIT_FAILURE);
     }
     read_emp_dist(distss, is_first);

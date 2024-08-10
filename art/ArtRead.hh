@@ -17,10 +17,7 @@ namespace art_modern {
         explicit ArtCustomException(const std::string& cause)
             : _cause(cause) {};
 
-        const char* what() const noexcept override
-        {
-            return _cause.c_str();
-        }
+        const char* what() const noexcept override { return _cause.c_str(); }
 
     private:
         std::string _cause;
@@ -61,5 +58,5 @@ namespace art_modern {
         ArtParams _art_params;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw

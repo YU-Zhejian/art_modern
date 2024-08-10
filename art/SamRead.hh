@@ -21,5 +21,5 @@ namespace art_modern {
         void printRead(std::ostream& fout) const;
     };
 
-}
-}
+} // namespace art_modern
+} // namespace labw
