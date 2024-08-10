@@ -1,5 +1,4 @@
 #pragma once
-#include <ceu_check/ceu_check_os_macro.h>
 
 // Following constants copied from HTSLib <sam.h>.
 /*! @abstract the read is paired in sequencing, no matter whether it is mapped in a pair */
@@ -52,11 +51,3 @@ enum CIGAR {
     //= 7 sequence match yes yes
     // X 8 sequence mismatch yes yes
 };
-
-#ifndef NULL_DEVICE
-#ifdef CEU_ON_WINDOWS_64
-#define NULL_DEVICE "NUL"
-#else
-#define NULL_DEVICE "/dev/null"
-#endif
-#endif

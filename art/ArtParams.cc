@@ -4,10 +4,6 @@
 #include <boost/math/distributions/binomial.hpp>
 #include <fstream>
 
-#include <ceu_check/ceu_check_all.h>
-#include <ceu_ystrlib/ceu_ystrlib_all.h>
-#include <ceu_basic/ceu_c_utils.h>
-
 #include "ArtParams.hh"
 #include "art_modern_constants.hh"
 
@@ -17,11 +13,7 @@ namespace labw {
 namespace art_modern {
     void print_version()
     {
-        ceu_ystr_t* full_info = ceu_check_get_full_info();
-        char* full_info_cstr = ceu_ystr_to_cstr(full_info);
-        cout << full_info_cstr << endl;
-        ceu_free_non_null(full_info);
-        ceu_free_non_null(full_info_cstr);
+        // TODO
     }
 
     std::vector<double> gen_per_base_mutation_rate(int read_len, double p, int max_num)
@@ -79,6 +71,7 @@ void ArtParams::parse_args(const std::vector<std::string>& args)
     is_amplicon = vm.count("is_amplicon");
     is_mp = vm.count("is_mp");
     no_sam = vm.count("no_sam");
+    stream = vm.count("stream");
     is_pe = vm.count("is_pe") || is_mp;
     cigar_use_m = vm.count("cigar_use_m");
     sep_flag = vm.count("sep_flag");
@@ -304,7 +297,7 @@ string ArtParams::fqfile1(const std::string& gene_name) const
 }
 string ArtParams::fqfile2(const string& gene_name) const
 {
-    return is_pe ? out_file_prefix + '/' + gene_name + "_2.fq" : NULL_DEVICE;
+    return is_pe ? out_file_prefix + '/' + gene_name + "_2.fq" : "";
 }
 
 string ArtParams::samfile(const string& gene_name) const
@@ -314,6 +307,13 @@ string ArtParams::samfile(const string& gene_name) const
 
 void ArtParams::print_params() const
 {
+    if (stream) {
+        cout << "                  FASTA parser: Stream." << endl
+             << endl;
+    } else {
+        cout << "                  FASTA parser: HTSLib." << endl
+             << endl;
+    }
     if (!is_pe) {
         cout << "                  Single-end Simulation" << endl
              << endl;
@@ -395,7 +395,7 @@ ArtParams::ArtParams()
         "min_qual", po::value<int>()->default_value(MIN_QUAL), "the minimum base quality score")(
         "max_qual", po::value<int>()->default_value(MAX_QUAL), "the maxiumum base quality score")(
         "max_num_n", po::value<int>()->default_value(DEFAULT_MAX_NUM_N), "the cutoff frequency of 'N' in a window size of the read length for masking genomic regions. Use 1 to mask all regions with 'N'. Use 0 to turn off masking")(
-        "parallel", po::value<int>()->default_value(PARALLEL_ALL), "Parallel level. -1 for disable, 0 for all CPUs, >=1 to specify number of threads.")("parallel_on_read", "Perform read-level parallelism instead of contig-level")("is_amplicon", "For amplicon simulation")("version", "display version info");
+        "parallel", po::value<int>()->default_value(PARALLEL_ALL), "Parallel level. -1 for disable, 0 for all CPUs, >=1 to specify number of threads.")("parallel_on_read", "Perform read-level parallelism instead of contig-level")("is_amplicon", "For amplicon simulation")("version", "display version info")("stream", "If specified, will use streamline FASTA parser (For transcriptome/amplicon); Otherwise will use HTSLib indexed FASTA parser (For genome).");
 }
 
 void ArtParams::print_help() const

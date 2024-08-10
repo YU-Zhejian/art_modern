@@ -6,7 +6,7 @@ function sam2bam() {
     samtools index "${1}"/1.bam
 }
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --seq_file raw_data/small_test.fa \
     --out_file_prefix tmp/test_small_se \
@@ -15,7 +15,7 @@ build/art \
     --parallel -1
 sam2bam tmp/test_small_se
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --seq_file raw_data/small_test.fa \
     --out_file_prefix tmp/test_small_se_amp \
@@ -25,7 +25,7 @@ build/art \
     --parallel -1
 sam2bam tmp/test_small_se_amp
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
     --seq_file raw_data/small_test.fa \
@@ -38,7 +38,7 @@ build/art \
     --parallel -1
 sam2bam tmp/test_small_pe
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
     --seq_file raw_data/small_test.fa \
@@ -50,7 +50,7 @@ build/art \
     --parallel -1
 sam2bam tmp/test_small_pe_amp
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
     --seq_file raw_data/small_test.fa \
@@ -63,7 +63,7 @@ build/art \
     --parallel -1
 sam2bam tmp/test_small_mp
 
-build/art \
+build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
     --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
     --seq_file raw_data/small_test.fa \

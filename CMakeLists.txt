@@ -12,59 +12,26 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
-# LibCEU
-if(DEFINED LIBCEU_SOURCE_PATH AND "${LIBCEU_SOURCE_PATH}" STREQUAL "GET")
-    execute_process(
-            COMMAND
-            git
-            clone
-            https://github.com/YU-Zhejian/libceu
-            "${CMAKE_CURRENT_LIST_DIR}/__libceu"
-    )
-    set(LIBCEU_SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/__libceu")
-endif()
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/deps/libceu/" AND NOT DEFINED LIBCEU_SOURCE_PATH)
-    set(LIBCEU_SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/deps/libceu/")
-endif()
-if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../libceu/" AND NOT DEFINED LIBCEU_SOURCE_PATH)
-    set(LIBCEU_SOURCE_PATH "${CMAKE_CURRENT_LIST_DIR}/../libceu/")
-endif()
-if(NOT EXISTS "${LIBCEU_SOURCE_PATH}")
-    message(FATAL_ERROR "Inclusion of libceu failed.")
-endif()
+# Macros from LibCEU.
+macro(ceu_cm_set_static_target name)
+    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
+    set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
+    set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
+    if(CMAKE_VERSION GREATER_EQUAL 3.13
+            AND NOT BORLAND
+            AND NOT MSVC)
+        target_link_options(
+                "${name}" PRIVATE -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
+                $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> $<$<COMPILE_LANGUAGE:Fortran>:-static-libgfortran>)
+    endif()
+endmacro()
 
-message(STATUS "Inclusion of libceu at ${LIBCEU_SOURCE_PATH}")
 
-ExternalProject_Add(
-        "libceu"
-        PREFIX "${CMAKE_BINARY_DIR}/__libceu"
-        SOURCE_DIR "${LIBCEU_SOURCE_PATH}"
-        BINARY_DIR "${CMAKE_BINARY_DIR}/__libceu_build"
-        INSTALL_DIR "${CMAKE_BINARY_DIR}/__libceu_install"
-        CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}/__libceu_install"
-)
-
-include_directories("${CMAKE_BINARY_DIR}/__libceu_install/include")
-link_directories("${CMAKE_BINARY_DIR}/__libceu_install/lib")
-# add_subdirectory("${LIBCEU_SOURCE_PATH}" __libceu_build)
-
-include("${LIBCEU_SOURCE_PATH}/cmake/libceu.cmake")
-add_compile_definitions("HAVE_LIBCEU")
-
-if(CMAKE_VERSION GREATER_EQUAL 3.12)
-    add_compile_definitions(CEU_CM_UNDER_CMAKE)
-else()
-    add_compile_options("-DCEU_CM_UNDER_CMAKE")
-endif()
-
-include("${LIBCEU_SOURCE_PATH}/cmake_collections/enable_debug.cmake")
-
-set(BUILD_SHARED_LIBS OFF) # FIXME: Temporary solution under Linux Mint
-# Boost
 if (NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif ()
 
+# Boost
 if(BUILD_SHARED_LIBS)
     add_definitions(-DBOOST_ALL_DYN_LINK)
     add_definitions(-DBOOST_LOG_DYN_LINK)
@@ -89,8 +56,7 @@ find_package(
 include_directories(${Boost_INCLUDE_DIRS})
 
 # HTSLib
-#add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
-#include("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib/cmake/htslib.cmake")
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
 
 # Main
 include_directories("lib")
@@ -98,26 +64,25 @@ file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE}
         lib/art_modern_constants.hh)
 
-
-add_dependencies(art_modern_lib "libceu")
 set(
         ART_MODERN_LINK_LIBS
         ${Boost_LIBRARIES}
-        art_modern_lib
+        hts
 )
-if(BUILD_SHARED_LIBS)
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} ${CEU_LIBRARY_SHARED_CXX})
-else()
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} ${CEU_LIBRARY_STATIC_CXX})
-endif()
 
 file(GLOB ART_SOURCE "art/*.cpp" "art/*.cc")
 add_executable(art_modern ${ART_SOURCE})
 
 target_link_libraries(
-        art_modern
+        art_modern_lib
         PUBLIC
         ${ART_MODERN_LINK_LIBS}
+)
+
+target_link_libraries(
+        art_modern
+        PUBLIC
+        art_modern_lib
 )
 enable_testing()
 
@@ -133,6 +98,6 @@ foreach (ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
     get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WLE)
     set(ART_MODERN_TEST_EXEC "art_modern_test_${ART_MODERN_TEST_EXEC}")
     add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
-    target_link_libraries("${ART_MODERN_TEST_EXEC}" ${ART_MODERN_LINK_LIBS})
+    target_link_libraries("${ART_MODERN_TEST_EXEC}" art_modern_lib)
     add_test(COMMAND "${ART_MODERN_TEST_EXEC}" )
 endforeach ()

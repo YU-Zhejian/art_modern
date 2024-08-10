@@ -17,7 +17,7 @@ testsmall: build
 
 .PHONY: testse
 testse: build raw_data
-	build/art \
+	build/art_modern \
 		--qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
 		--qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
 		--seq_file raw_data/MANE.GRCh38.v1.3.refseq_rna.fna \
@@ -28,7 +28,7 @@ testse: build raw_data
 
 .PHONY: testpe
 testpe: raw_data build
-	build/art \
+	build/art_modern \
 		--qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
 		--qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
 		--seq_file raw_data/ce11_chr1.fa \

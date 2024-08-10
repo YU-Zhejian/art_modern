@@ -1,0 +1,5 @@
+#define HTS_CC "${CMAKE_C_COMPILER}"
+#define HTS_CPPFLAGS ""
+#define HTS_CFLAGS "${CMAKE_C_FLAGS}"
+#define HTS_LDFLAGS "${CMAKE_SHARED_LINKER_FLAGS}"
+#define HTS_LIBS "-lz -lm -lbz2 -llzma -ldeflate"

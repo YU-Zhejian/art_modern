@@ -3,8 +3,8 @@
 //
 
 #include "PairwiseAlignment.hh"
-#include "misc.hh"
 #include "art_modern_constants.hh"
+#include "misc.hh"
 #include <boost/format.hpp>
 #include <sstream>
 #include <utility>

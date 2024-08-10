@@ -9,10 +9,11 @@
 
 #include "ArtContig.hh"
 #include "ArtSamHeader.hh"
+#include "DumbFileStream.hh"
 #include "SamRead.hh"
 #include "ThreadSafeFileStream.hh"
-#include "main_fn.hh"
 #include "art_modern_constants.hh"
+#include "main_fn.hh"
 #include "seq_utils.hh"
 
 using namespace std;
@@ -230,7 +231,15 @@ namespace art_modern {
             SAMFILE.write(generate_sam_header(id, ref_seq, art_params));
         }
         ThreadSafeFileStream FQFILE1(art_params.fqfile1(id));
-        ThreadSafeFileStream FQFILE2(art_params.fqfile2(id));
+
+        FileStreamInterface* FQFILE2_ptr;
+        if (art_params.is_pe) {
+            ThreadSafeFileStream FQFILE2(art_params.fqfile2(id));
+            FQFILE2_ptr = &FQFILE2;
+        } else {
+            DumbFileStream FQFILE2;
+            FQFILE2_ptr = &FQFILE2;
+        }
 
         if (art_params.mask_n) {
             art_contig.mask_n_region(art_params.max_num_n);
@@ -248,13 +257,13 @@ namespace art_modern {
             num_cores = 1;
         }
         auto num_read_per_batch = static_cast<int>(t_num_read / num_cores + 1);
-        auto func = [num_read_per_batch, art_params, qdist, id, art_contig, &FQFILE1, &FQFILE2, &SAMFILE]() {
+        auto func = [num_read_per_batch, art_params, qdist, id, art_contig, &FQFILE1, FQFILE2_ptr, &SAMFILE]() {
             auto current_num_read_per_batch = num_read_per_batch;
             while (current_num_read_per_batch > 0) {
                 auto retv = (art_params.is_pe ? generate_pe : generate_se)(art_params, qdist, id, art_contig, current_num_read_per_batch);
                 if (!retv.fastq.empty()) {
                     FQFILE1.write(retv.fastq);
-                    FQFILE2.write(retv.fastq2);
+                    FQFILE2_ptr->write(retv.fastq2);
                     if (!art_params.no_sam) {
                         SAMFILE.write(retv.sam);
                     }
@@ -273,7 +282,7 @@ namespace art_modern {
         pool.join();
 
         FQFILE1.close();
-        FQFILE2.close();
+        FQFILE2_ptr->close();
         SAMFILE.close();
     }
 }

@@ -15,7 +15,7 @@ namespace art_modern {
     class ArtCustomException : std::exception {
     public:
         explicit ArtCustomException(const std::string& cause)
-            : _cause(cause) { };
+            : _cause(cause) {};
 
         const char* what() const noexcept override
         {

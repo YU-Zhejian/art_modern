@@ -31,6 +31,7 @@ namespace art_modern {
         bool sep_flag = false;
         bool cigar_use_m = false;
         bool no_sam;
+        bool stream;
         std::string id;
         std::string qual_file_1;
         std::string qual_file_2;

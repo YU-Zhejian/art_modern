@@ -12,6 +12,7 @@ uniprot*
 !requirements.txt
 *.tsv
 *.csv
+*.csv
 *.parquet
 *.json
 __pycache__

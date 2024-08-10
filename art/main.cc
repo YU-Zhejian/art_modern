@@ -1,15 +1,18 @@
 #include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/thread.hpp>
 
 #include <fstream>
 #include <string>
 
+#include <htslib/faidx.h>
+
 #include "ArtContig.hh"
 #include "Empdist.hh"
+#include "art_modern_constants.hh"
 #include "fasta_parser.hh"
 #include "main_fn.hh"
-#include "art_modern_constants.hh"
 
 using namespace std;
 using namespace labw::art_modern;
@@ -28,6 +31,15 @@ int main(int argc, char* argv[])
     art_params.print_params();
 
     auto qdist = art_params.read_emp();
+    BOOST_LOG_TRIVIAL(info) << "Checking FAI...";
+    auto seq_file_fai_path = fai_path(art_params.seq_file.c_str());
+    if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
+        if (!fai_build(art_params.seq_file.c_str())) {
+            return 1;
+        }
+    }
+    free(seq_file_fai_path);
+
     auto fa_reader = std::ifstream(art_params.seq_file);
     FastaIterator fai(fa_reader);
     int num_cores = 1;
