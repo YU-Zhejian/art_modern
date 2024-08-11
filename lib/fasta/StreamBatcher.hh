@@ -1,0 +1,12 @@
+//
+// Created by yuzj on 24-8-11.
+//
+
+#ifndef ART_MODERN_LIB_FASTA_STREAMBATCHER_HH
+#define ART_MODERN_LIB_FASTA_STREAMBATCHER_HH
+
+class StreamBatcher {
+
+};
+
+#endif //ART_MODERN_LIB_FASTA_STREAMBATCHER_HH

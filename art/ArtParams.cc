@@ -10,6 +10,8 @@
 
 using namespace labw::art_modern;
 using namespace std;
+namespace po = boost::program_options;
+
 namespace labw {
 namespace art_modern {
     void print_version()

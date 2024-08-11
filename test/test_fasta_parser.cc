@@ -1,11 +1,14 @@
 //
 // Created by yuzj on 3/9/24.
 //
-
-#include "fasta_parser.hh"
 #define BOOST_TEST_MODULE test_fasta_parser
 #include <boost/test/unit_test.hpp>
 #include <iostream>
+
+#include "fasta/FaidxFetch.hh"
+#include "fasta/FastaFetch.hh"
+#include "fasta/InMemoryFastaFetch.hh"
+#include "fasta/fasta_parser.hh"
 
 using namespace std;
 using namespace labw::art_modern;
@@ -28,4 +31,24 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
         }
         i++;
     }
+}
+
+void test_fasta(const std::shared_ptr<FastaFetch>& fastaFetch)
+{
+    BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
+    BOOST_TEST(fastaFetch->fetch("chr3", 2, 16) == "TANNTGNATNATGN");
+    BOOST_TEST(fastaFetch->fetch("chr2", 0, fastaFetch->seq_len("chr2")) == "NNNNNNNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTTCTNNNNNNNNN");
+    BOOST_TEST(fastaFetch->fetch("chr6", 0, fastaFetch->seq_len("chr6")) == "CTA");
+    BOOST_TEST(fastaFetch->fetch("chr4", 0, fastaFetch->seq_len("chr4")) == "AAAAAAAAAACCCCCC");
+    BOOST_TEST(fastaFetch->fetch("chr1", 0, 1) == "N");
+    BOOST_TEST(fastaFetch->fetch("chr1", 26, 29) == "CCA");
+    BOOST_TEST(fastaFetch->fetch("chr1", 28, 29) == "A");
+    BOOST_TEST(fastaFetch->fetch("chr1", 5, 29) == "NNNNNNNNNNATCGTTACGTACCA");
+    BOOST_TEST(fastaFetch->fetch("chr1", 5, 63) == "NNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTT");
+}
+
+BOOST_AUTO_TEST_CASE(test_faidx_fetch)
+{
+    auto faidxFetch = std::make_shared<FaidxFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
+    test_fasta(faidxFetch);
 }

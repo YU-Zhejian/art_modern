@@ -11,7 +11,7 @@
 #include "ArtContig.hh"
 #include "Empdist.hh"
 #include "art_modern_constants.hh"
-#include "fasta_parser.hh"
+#include "fasta/fasta_parser.hh"
 #include "main_fn.hh"
 
 using namespace std;
