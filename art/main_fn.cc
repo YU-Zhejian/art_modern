@@ -11,12 +11,12 @@
 
 #include "ArtContig.hh"
 #include "ArtSamHeader.hh"
-#include "DumbFileStream.hh"
 #include "SamRead.hh"
-#include "ThreadSafeFileStream.hh"
 #include "art_modern_constants.hh"
 #include "main_fn.hh"
 #include "seq_utils.hh"
+#include "stream/DumbFileStream.hh"
+#include "stream/ThreadSafeFileStream.hh"
 
 using namespace std;
 

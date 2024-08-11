@@ -2,7 +2,6 @@
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/format.hpp>
 #include <boost/regex.hpp>
-#include <exception>
 
 #include "fasta_parser.hh"
 

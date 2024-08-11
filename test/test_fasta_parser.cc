@@ -3,7 +3,6 @@
 //
 #define BOOST_TEST_MODULE test_fasta_parser
 #include <boost/test/unit_test.hpp>
-#include <iostream>
 
 #include "fasta/FaidxFetch.hh"
 #include "fasta/FastaFetch.hh"
@@ -35,6 +34,7 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 
 void test_fasta(const std::shared_ptr<FastaFetch>& fastaFetch)
 {
+    BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 16) == "TANNTGNATNATGN");
     BOOST_TEST(fastaFetch->fetch("chr2", 0, fastaFetch->seq_len("chr2")) == "NNNNNNNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTTCTNNNNNNNNN");
@@ -49,6 +49,12 @@ void test_fasta(const std::shared_ptr<FastaFetch>& fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
 {
-    auto faidxFetch = std::make_shared<FaidxFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
-    test_fasta(faidxFetch);
+    auto faidx_fetch = std::make_shared<FaidxFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
+    test_fasta(faidx_fetch);
+}
+
+BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
+{
+    auto in_memory_fasta_fetch = std::make_shared<InMemoryFastaFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
+    test_fasta(in_memory_fasta_fetch);
 }
