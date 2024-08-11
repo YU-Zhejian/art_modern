@@ -1,0 +1,16 @@
+name: art_modern
+channels:
+  - nodefaults
+  - conda-forge
+  - anaconda
+  - bioconda
+  - main
+  - free
+
+dependencies:
+  - python=3.10
+  - samtools
+  - pysam
+  - art
+  - black
+  - tqdm

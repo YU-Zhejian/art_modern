@@ -6,7 +6,9 @@ Changes:
 
 - Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
 - Supports 3 library construction methods: `se`, `pe` and `mp`.
-- Supports Illumina only. Support over the `aln` output format was dropped.
+- Masking detection dropped.
+- Supports Illumina only.
+- Support over the `aln` output format was dropped.
 - Build system changed to CMake.
 - All C++ code were re-implemented in C++14 with radical removal of duplicated or unused code.
 - Random generator was changed from GNU Science Library (GSL) to Boost or C++ standard library.
@@ -15,6 +17,7 @@ Changes:
 - Largely eliminated POSIX-only routines by Boost.
 - Argument parser implemented in Boost.
 - Built-in profiles are no longer supported. User must specify path to existing profiles.
+- FASTA and SAM I/O re-implemented using `htslib` to allow huge FASTA files.
 
 This simulator is based on the works of Weichun Huang <whduke@gmail.com>, under [GNU GPL v3](https://www.gnu.org/licenses/) license. The software is originally distributed [here](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) with following reference:
 
@@ -37,4 +40,6 @@ This simulator is based on the works of Weichun Huang <whduke@gmail.com>, under 
 
 Limitations:
 
+TODO:
 
+- Implement support over `sam` and `bam` output using `htslib`.

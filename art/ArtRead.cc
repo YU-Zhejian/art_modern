@@ -104,7 +104,6 @@ int ArtRead::generate_indels(int read_len, bool is_read_1)
     return (ins_len - del_len);
 };
 
-// number of deletions <= number of insertions
 int ArtRead::generate_indels_2(int read_len, bool is_read_1)
 {
     int ins_len = 0;
@@ -181,9 +180,8 @@ void ArtRead::ref2read()
         seq_read.push_back(indel[k]);
         k++;
     }
-    // I suppose this error exists no more.
-    //    if (seq_read.size() != _art_params.read_len) {
-    //        std::cout << map_to_str(indel) << std::endl;
-    //        throw std::exception();
-    //    }
+}
+ArtRead::ArtRead(const ArtParams& art_params)
+    : _art_params(art_params)
+{
 }

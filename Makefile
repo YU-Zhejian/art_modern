@@ -15,7 +15,7 @@ touch:
 	bash touch-all.sh
 
 .PHONY: testsmall
-testsmall: build
+testsmall: build raw_data
 	bash test_small.sh
 
 .PHONY: testse

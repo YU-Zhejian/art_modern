@@ -14,10 +14,8 @@ namespace art_modern {
         ART_LIB_CONST_MODE art_lib_const_mode;
         int min_qual;
         int max_qual;
-        bool mask_n;
         bool parallel_on_read;
         int parallel;
-        int max_num_n;
         std::vector<std::string> _args;
 
         /**

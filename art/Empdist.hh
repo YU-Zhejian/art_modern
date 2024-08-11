@@ -15,12 +15,7 @@
 namespace labw {
 namespace art_modern {
 
-    inline double r_prob()
-    {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        return (double)gen() / std::mt19937::max();
-    }
+    double r_prob();
 
     class Empdist {
     public:

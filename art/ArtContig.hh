@@ -25,8 +25,6 @@ namespace art_modern {
 
         ArtReadPair generate_read_mp() const;
 
-        void mask_n_region(int max_num_n);
-
         ArtParams _art_params;
         /**
          * Current reference genome contig.
@@ -39,10 +37,6 @@ namespace art_modern {
          */
         std::string _ref_seq_cmp;
         int _valid_region;
-        /**
-         * Region with n
-         */
-        std::set<size_t> _masked_pos;
     };
 
 } // namespace art_modern

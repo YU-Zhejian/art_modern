@@ -17,5 +17,5 @@ void SamRead::printRead(ostream& fout) const
 {
     fout << qname << "\t" << flag << "\t" << rname << "\t" << pos << "\t" << mapQ
          << "\t" << cigar << "\t" << rNext << "\t" << pNext << "\t" << tLen
-         << "\t" << seq << "\t" << qual << endl;
+         << "\t" << seq << "\t" << qual << "\t" << endl;
 }

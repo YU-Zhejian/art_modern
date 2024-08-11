@@ -1,3 +1,4 @@
+#include <atomic>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -53,19 +54,6 @@ namespace art_modern {
         auto arp = art_params.art_lib_const_mode == ART_LIB_CONST_MODE::MP
             ? art_contig.generate_read_mp()
             : art_contig.generate_read_pe();
-        if (art_params.mask_n) {
-            if (arp.read_1.is_plus_strand) {
-                size_t bpos2 = art_contig._ref_seq.size() - arp.read_2.bpos - art_params.read_len;
-                if (art_contig._masked_pos.count(arp.read_1.bpos) > 0 || art_contig._masked_pos.count(bpos2) > 0) {
-                    return generated_seq;
-                }
-            } else {
-                size_t bpos1 = art_contig._ref_seq.size() - arp.read_1.bpos - art_params.read_len;
-                if (art_contig._masked_pos.count(bpos1) > 0 || art_contig._masked_pos.count(arp.read_2.bpos) > 0) {
-                    return generated_seq;
-                }
-            }
-        }
 
         if (!art_params.sep_flag) {
             qual_1 = qdist.get_read_qual(art_params.read_len, true);
@@ -134,11 +122,11 @@ namespace art_modern {
         sam_read_2.pNext = sam_read_1.pos;
         if (sam_read_2.pos > sam_read_1.pos) {
             sam_read_1.tLen = static_cast<int>(
-                sam_read_2.pos + arp.read_2.seq_read.size() - sam_read_1.pos);
+                sam_read_2.pos + art_params.read_len - sam_read_1.pos);
             sam_read_2.tLen = -sam_read_1.tLen;
         } else {
             sam_read_2.tLen = static_cast<int>(
-                sam_read_1.pos + arp.read_1.seq_read.size() - sam_read_2.pos);
+                sam_read_1.pos + art_params.read_len - sam_read_2.pos);
             sam_read_1.tLen = -sam_read_2.tLen;
         }
         sam_read_1.printRead(SAMFILE);
@@ -160,18 +148,6 @@ namespace art_modern {
         osID << id << ':' << art_params.id << t_num_read;
         read_id = osID.str();
         auto art_read = art_contig.generate_read_se();
-        if (art_params.mask_n) {
-            if (art_read.is_plus_strand) {
-                if (art_contig._masked_pos.count(art_read.bpos) > 0) {
-                    return generated_seq;
-                }
-            } else {
-                size_t bpos = art_contig._ref_seq.size() - art_read.bpos - art_params.read_len;
-                if (art_contig._masked_pos.count(bpos) > 0) {
-                    return generated_seq;
-                }
-            }
-        }
 
         if (!art_params.sep_flag) {
             qual = qdist.get_read_qual(art_params.read_len, true);
@@ -204,7 +180,7 @@ namespace art_modern {
             sam_read.pos = art_read.bpos + 1;
         } else {
             sam_read.flag = BAM_FREVERSE;
-            sam_read.pos = art_contig._ref_seq.size() - (art_read.bpos + art_read.seq_read.size() - 1);
+            sam_read.pos = art_contig._ref_seq.size() - (art_read.bpos + art_params.read_len - 1);
             sam_read.reverse_comp();
         }
         sam_read.printRead(SAMFILE);
@@ -259,9 +235,6 @@ namespace art_modern {
             FQFILE2_ptr = std::make_shared<DumbFileStream>();
         }
 
-        if (art_params.mask_n) {
-            art_contig.mask_n_region(art_params.max_num_n);
-        }
         auto t_num_read = static_cast<long>(static_cast<double>(art_contig._ref_seq.size()) / art_params.read_len * x_fold);
         int num_cores;
 
@@ -275,12 +248,13 @@ namespace art_modern {
             num_cores = 1;
         }
         auto num_read_per_batch = static_cast<int>(t_num_read / num_cores + 1);
+        std::atomic_long read_id;
         auto func = [num_read_per_batch, art_params, qdist, id, art_contig, &FQFILE1,
-                        FQFILE2_ptr, SAMFILE_ptr]() {
+                        FQFILE2_ptr, SAMFILE_ptr, &read_id]() {
             auto current_num_read_per_batch = num_read_per_batch;
             while (current_num_read_per_batch > 0) {
                 auto retv = (art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe : generate_se)(
-                    art_params, qdist, id, art_contig, current_num_read_per_batch);
+                    art_params, qdist, id, art_contig, read_id++);
                 if (!retv.fastq.empty()) {
                     FQFILE1.write(retv.fastq);
                     FQFILE2_ptr->write(retv.fastq2);

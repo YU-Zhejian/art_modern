@@ -55,7 +55,10 @@ include_directories(${Boost_INCLUDE_DIRS})
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
 
 # Main
-include_directories("lib")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
+
+include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")
+include_directories("${CMAKE_BINARY_DIR}/include/")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
 file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc" "lib/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE} lib/art_modern_constants.hh)

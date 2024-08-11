@@ -1,20 +1,19 @@
 all: \
-	MANE.GRCh38.v1.3.refseq_rna.fna \
+	ce11.mRNA.fa \
 	ce11_chr1.fa \
-	MANE.GRCh38.v1.3.refseq_genomic.gtf \
-	MANE.GRCh38.v1.3.summary.txt \
+	small_test.fa.fai \
+	lambda_phage.fa \
 
+small_test.fa.fai: small_test.fa
+	samtools faidx small_test.fa
 
-MANE.GRCh38.v1.3.refseq_rna.fna:
-	curl https://ftp.ncbi.nlm.nih.gov/refseq/MANE/MANE_human/release_1.3/MANE.GRCh38.v1.3.refseq_rna.fna.gz | gunzip -cdf > MANE.GRCh38.v1.3.refseq_rna.fna
-	# salmon index -t MANE.GRCh38.v1.3.refseq_rna.fna -i MANE.GRCh38.v1.3.refseq_rna.salmon_idx -p 40
+ce11.mRNA.fa:
+	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/bigZips/refMrna.fa.gz | gunzip -cdf > ce11.mRNA.fa
 
 ce11_chr1.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/chromosomes/chrI.fa.gz  | gunzip -cdf > ce11_chr1.fa
+	samtools faidx ce11_chr1.fa
 
-MANE.GRCh38.v1.3.refseq_genomic.gtf:
-	curl https://ftp.ncbi.nlm.nih.gov/refseq/MANE/MANE_human/release_1.3/MANE.GRCh38.v1.3.refseq_genomic.gtf.gz | gunzip -cdf > MANE.GRCh38.v1.3.refseq_genomic.gtf
-
-MANE.GRCh38.v1.3.summary.txt:
-	curl https://ftp.ncbi.nlm.nih.gov/refseq/MANE/MANE_human/release_1.3/MANE.GRCh38.v1.3.summary.txt.gz | gunzip > MANE.GRCh38.v1.3.summary.txt
-	# cat MANE.GRCh38.v1.3.summary.txt | cut -f 4,6 | sed -E 's;(\S+)\s(\S+);\2\t\1;' | sed '1d' > MANE_salmon_genemap.tsv
+lambda_phage.fa:
+	curl -L https://db.cngb.org/sequence/down_sequence_txt/NC_001416.1/ > lambda_phage.fa
+	samtools faidx lambda_phage.fa

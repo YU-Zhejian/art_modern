@@ -8,6 +8,7 @@
 #include "fasta/FastaFetch.hh"
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/fasta_parser.hh"
+#include "test_adaptor.h"
 
 using namespace std;
 using namespace labw::art_modern;
@@ -49,12 +50,12 @@ void test_fasta(const std::shared_ptr<FastaFetch>& fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
 {
-    auto faidx_fetch = std::make_shared<FaidxFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
+    auto faidx_fetch = std::make_shared<FaidxFetch>(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(faidx_fetch);
 }
 
 BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
 {
-    auto in_memory_fasta_fetch = std::make_shared<InMemoryFastaFetch>("/home/yuzj/Documents/pbsim3_modern/test/test.fasta");
+    auto in_memory_fasta_fetch = std::make_shared<InMemoryFastaFetch>(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(in_memory_fasta_fetch);
 }

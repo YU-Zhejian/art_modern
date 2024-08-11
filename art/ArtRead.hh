@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "ArtParams.hh"
@@ -14,8 +15,8 @@ namespace art_modern {
 
     class ArtCustomException : std::exception {
     public:
-        explicit ArtCustomException(const std::string& cause)
-            : _cause(cause) {};
+        explicit ArtCustomException(std::string cause)
+            : _cause(std::move(cause)) {};
 
         const char* what() const noexcept override { return _cause.c_str(); }
 
@@ -25,15 +26,12 @@ namespace art_modern {
 
     class ArtRead {
     public:
-        explicit ArtRead(const ArtParams& art_params)
-            : _art_params(art_params)
-        {
-        }
+        explicit ArtRead(const ArtParams& art_params);
 
         std::map<int, char> indel;
         std::map<int, char> substitution;
         bool is_plus_strand = false;
-        long bpos = 0; // parent
+        long bpos;
         std::string seq_read;
         std::string seq_ref;
 
