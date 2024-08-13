@@ -1,6 +1,8 @@
 #pragma once
 
+#include <htslib/sam.h>
 #include <string>
+#include <vector>
 
 namespace labw {
 namespace art_modern {
@@ -18,17 +20,30 @@ namespace art_modern {
 
     class PairwiseAlignment {
     public:
-        PairwiseAlignment(const std::string& aligned_query,
-            const std::string& aligned_ref);
+        PairwiseAlignment(
+            std::string read_name,
+            std::string contig_name,
+            std::string query,
+            std::string ref,
+            std::string qual,
+            std::string aligned_query,
+            std::string aligned_ref,
+            hts_pos_t align_contig_start,
+            bool is_plus_strand);
+        std::vector<uint32_t> generate_cigar_array(bool is_reverse, bool use_m) const;
 
-        std::string generate_cigar(bool is_reverse, bool use_m) const;
-
-    private:
         /**
          * Gap inserted using -
          */
-        std::string _aligned_query;
-        std::string _aligned_ref;
+        const std::string aligned_query;
+        const std::string aligned_ref;
+        const std::string query;
+        const std::string ref;
+        const std::string qual;
+        const std::string read_name;
+        const std::string contig_name;
+        const hts_pos_t align_contig_start;
+        const bool is_plus_strand;
     };
 
 } // namespace art_modern

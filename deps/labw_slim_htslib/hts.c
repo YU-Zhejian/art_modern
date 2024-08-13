@@ -598,7 +598,7 @@ int hts_detect_format2(hFILE *hfile, const char *fname, htsFormat *fmt)
         if (memcmp(s, "BAM\1", 4) == 0) {
             fmt->category = sequence_data;
             fmt->format = bam;
-            // TODO Decompress enough to pick version from @HD-VN header
+            // TODO Decompress enough to pick version from @HD-HD_VN header
             fmt->version.major = 1, fmt->version.minor = -1;
             return 0;
         }
@@ -653,7 +653,7 @@ int hts_detect_format2(hFILE *hfile, const char *fname, htsFormat *fmt)
               memcmp(s, "@CO\t", 4) == 0)) {
         fmt->category = sequence_data;
         fmt->format = sam;
-        // @HD-VN is not guaranteed to be the first tag, but then @HD is
+        // @HD-HD_VN is not guaranteed to be the first tag, but then @HD is
         // not guaranteed to be present at all...
         if (len >= 9 && memcmp(s, "@HD\tVN:", 7) == 0)
             parse_version(fmt, &s[7], &s[len]);

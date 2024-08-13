@@ -4,11 +4,11 @@
 
 #ifndef ART_MODERN_LIB_FASTA_INMEMORYFASTAFETCH_HH
 #define ART_MODERN_LIB_FASTA_INMEMORYFASTAFETCH_HH
-#include "FastaFetch.hh"
+#include "BaseFastaFetch.hh"
 namespace labw {
 namespace art_modern {
 
-    class InMemoryFastaFetch : public FastaFetch {
+    class InMemoryFastaFetch : public BaseFastaFetch {
     public:
         explicit InMemoryFastaFetch(const std::string& file_name);
         explicit InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map);

@@ -26,7 +26,7 @@ namespace art_modern {
 
     class ArtRead {
     public:
-        explicit ArtRead(const ArtParams& art_params);
+        explicit ArtRead(ArtParams art_params);
 
         std::map<int, char> indel;
         std::map<int, char> substitution;
@@ -34,6 +34,8 @@ namespace art_modern {
         long bpos;
         std::string seq_read;
         std::string seq_ref;
+        std::string aln_read;
+        std::string aln_ref;
 
         int generate_indels(int read_len, bool is_read_1);
         // number of deletions <= number of insertions
@@ -44,7 +46,7 @@ namespace art_modern {
          */
         void ref2read();
 
-        PairwiseAlignment generate_pairwise_aln() const;
+        void generate_pairwise_aln();
 
         /**
          * Add point mutations to random bases based on empirical dist of quali scores

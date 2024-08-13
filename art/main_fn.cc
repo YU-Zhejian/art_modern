@@ -72,17 +72,16 @@ namespace art_modern {
                  << qual_to_str(qual_1) << endl;
         generated_seq.fastq.append(FQFILE_1.str());
 
-        auto aln_1 = arp.read_1.generate_pairwise_aln();
-
         FQFILE_2 << "@" << read_id_2 << endl
                  << arp.read_2.seq_read << endl
                  << "+" << endl
                  << qual_to_str(qual_2) << endl;
-        auto aln_2 = arp.read_2.generate_pairwise_aln();
         generated_seq.fastq2.append(FQFILE_2.str());
         if (art_params.no_sam) {
             return generated_seq;
         }
+        arp.read_1.generate_pairwise_aln();
+        arp.read_2.generate_pairwise_aln();
 
         ostringstream SAMFILE;
         SamRead sam_read_1;
@@ -115,8 +114,8 @@ namespace art_modern {
             sam_read_1.flag = sam_read_1.flag | BAM_FREVERSE;
             sam_read_2.flag = sam_read_2.flag | BAM_FMREVERSE;
         }
-        sam_read_1.cigar = aln_1.generate_cigar(!arp.read_1.is_plus_strand, art_params.cigar_use_m);
-        sam_read_2.cigar = aln_2.generate_cigar(!arp.read_2.is_plus_strand, art_params.cigar_use_m);
+        // FIXME: sam_read_1.cigar = aln_1.generate_cigar(!arp.read_1.is_plus_strand, art_params.cigar_use_m);
+        // FIXME: sam_read_2.cigar = aln_2.generate_cigar(!arp.read_2.is_plus_strand, art_params.cigar_use_m);
 
         sam_read_1.pNext = sam_read_2.pos;
         sam_read_2.pNext = sam_read_1.pos;
@@ -168,8 +167,8 @@ namespace art_modern {
         SamRead sam_read;
         ostringstream SAMFILE;
 
-        auto aln = art_read.generate_pairwise_aln();
-        sam_read.cigar = aln.generate_cigar(!art_read.is_plus_strand, art_params.cigar_use_m);
+        art_read.generate_pairwise_aln();
+        // FIXME: sam_read.cigar = aln.generate_cigar(!art_read.is_plus_strand, art_params.cigar_use_m);
 
         sam_read.qname = read_id;
         sam_read.rname = id;

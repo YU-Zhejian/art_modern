@@ -79,48 +79,28 @@ ArtReadPair ArtContig::generate_read_mp() const
     }
 
     bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || r_prob() < 0.5;
-    // string read_info_1;
-    // string read_info_2;
-    // int aln_end;
-    // int aln_start;
     if (is_plus_strand) {
         // R1                  |----------->
         //   ------------------------------------
         // R2   <-----------|
         read_1.is_plus_strand = true;
         read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
-        // read_info_1 = (boost::format("%s:%d-%d:%s") % _id % pos_1 %
-        // (_art_params.read_len - slen_1 + pos_1) % "+").str(); aln_end = pos_1 +
-        // _art_params.read_len - slen_1;
 
         read_2.is_plus_strand = false;
         read_2.seq_ref = _ref_seq_cmp.substr(pos_2, _art_params.read_len - slen_2);
-        // read_info_2 = (boost::format("%s:%d-%d:%s") % _id % (ref_len - pos_2) %
-        // (ref_len - pos_2 - _art_params.read_len + slen_2) % "-").str(); aln_start
-        // = ref_len - pos_2 - _art_params.read_len + slen_2;
     } else {
         // R2   <-----------|
         //   ------------------------------------
         // R1                  |----------->
         read_1.is_plus_strand = false;
         read_1.seq_ref = _ref_seq_cmp.substr(pos_1, _art_params.read_len - slen_1);
-        // read_info_1 = (boost::format("%s:%d-%d:%s") % _id % pos_1 % (pos_1 +
-        // _art_params.read_len - slen_1) % "-").str(); aln_end = pos_1 +
-        // _art_params.read_len - slen_1;
-
         read_2.is_plus_strand = true;
         read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
-        // read_info_2 = (boost::format("%s:%d-%d:%s") % _id % (ref_len - pos_2) %
-        // (ref_len - pos_2 - _art_params.read_len + slen_2) % "+").str(); aln_start
-        // = ref_len - pos_2 - _art_params.read_len + slen_2;
     }
-    // std::cout << "R1: " << read_info_1 << ", R2: " << read_info_2 << " Dist: "
-    // << aln_end - aln_start + 1 << endl;
     read_1.bpos = pos_1;
     read_1.ref2read();
     read_2.bpos = pos_2;
     read_2.ref2read();
-    // On reverse: pos -= del_len - ins_len; // FIXME: adjust start position
     return { read_1, read_2 };
 }
 
@@ -166,40 +146,23 @@ ArtReadPair ArtContig::generate_read_pe() const
 
     bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || r_prob() < 0.5;
 
-    // string read_info_1;
-    // string read_info_2;
-    // int aln_start;
-    // int aln_end;
     if (is_plus_strand) {
         //    |----------->
         // ------------------------------------
         //                   <-----------|
         read_1.is_plus_strand = true;
         read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
-        // read_info_1 = (boost::format("%s:%d-%d:%s") % _id % pos_1 %
-        // (_art_params.read_len - slen_1 + pos_1) % "+").str();
         read_2.is_plus_strand = false;
         read_2.seq_ref = _ref_seq_cmp.substr(pos_2, _art_params.read_len - slen_2);
-        // read_info_2 = (boost::format("%s:%d-%d:%s") % _id % (ref_len - pos_2 + 1)
-        // % (ref_len - pos_2 + 1 - _art_params.read_len + slen_2) % "-").str();
-        // aln_start = pos_1;
-        // aln_end = ref_len - pos_2 + 1;
     } else {
         //                   <-----------|
         // ------------------------------------
         //    |----------->
         read_1.is_plus_strand = false;
         read_1.seq_ref = _ref_seq_cmp.substr(pos_1, _art_params.read_len - slen_1);
-        // read_info_1 = (boost::format("%s:%d-%d:%s") % _id % (ref_len - pos_1 + 1)
-        // % (ref_len - pos_1 + 1 - _art_params.read_len + slen_1) % "-").str();
         read_2.is_plus_strand = true;
         read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
-        // read_info_2 = (boost::format("%s:%d-%d:%s") % _id % pos_2 %
-        // (_art_params.read_len - slen_2 + pos_2) % "+").str(); aln_start = pos_2;
-        // aln_end = ref_len - pos_1 + 1;
     }
-    // std::cout << "R1: " << read_info_1 << ", R2: " << read_info_2 << " Dist: "
-    // << aln_end - aln_start + 1 << endl;
     read_1.bpos = pos_1;
     read_1.ref2read();
     read_2.bpos = pos_2;

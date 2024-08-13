@@ -306,10 +306,10 @@ int sam_hrecs_remove_key(sam_hrecs_t *hrecs,
  */
 sam_hrec_rg_t *sam_hrecs_find_rg(sam_hrecs_t *hrecs, const char *rg);
 
-/*! Returns the sort order from the @HD SO: field */
+/*! Returns the sort order from the @HD HD_SO: field */
 enum sam_sort_order sam_hrecs_sort_order(sam_hrecs_t *hrecs);
 
-/*! Returns the group order from the @HD SO: field */
+/*! Returns the group order from the @HD HD_SO: field */
 enum sam_group_order sam_hrecs_group_order(sam_hrecs_t *hrecs);
 
 #ifdef __cplusplus

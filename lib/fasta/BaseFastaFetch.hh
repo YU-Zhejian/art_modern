@@ -9,7 +9,7 @@ namespace art_modern {
     /**
      * Random access FASTA file.
      */
-    class FastaFetch {
+    class BaseFastaFetch {
     public:
         /**
          * This method is thread-safe since mutex is used for non-thread-safe implementations.
@@ -22,7 +22,7 @@ namespace art_modern {
         virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end);
 
         /**
-         * FastaFetch::fetch with C-style API.
+         * BaseFastaFetch::fetch with C-style API.
          *
          * @param seq_name As described.
          * @param start As described.
@@ -34,7 +34,7 @@ namespace art_modern {
         /**
          * Default destructor.
          */
-        virtual ~FastaFetch();
+        virtual ~BaseFastaFetch();
 
         void update_sam_header(sam_hdr_t* header) const;
 

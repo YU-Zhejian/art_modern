@@ -77,3 +77,7 @@ The bundled HTSLib library used MIT License with following reference:
 - Implement support over `sam` and `bam` output using `htslib`.
 - Make it faster.
 - Update the HTSLib CMake routine for setting macros like `HAVE_LIBBZ2` correct.
+
+## FAQ
+
+### How to split produced pair-end/mate-pair sequencing results to 2 files?

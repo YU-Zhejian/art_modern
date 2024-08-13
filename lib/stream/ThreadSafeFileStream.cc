@@ -25,3 +25,9 @@ ThreadSafeFileStream::ThreadSafeFileStream(const std::string& filename)
 void ThreadSafeFileStream::close() { file_.close(); }
 
 ThreadSafeFileStream::~ThreadSafeFileStream() { ThreadSafeFileStream::close(); }
+
+ThreadSafeFileStream::ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept
+{
+    std::unique_lock<std::mutex> rhs_lk(instance.mutex_);
+    file_ = std::move(instance.file_);
+}

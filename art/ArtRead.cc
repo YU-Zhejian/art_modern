@@ -6,6 +6,7 @@
 #include <boost/format.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_smallint.hpp>
+#include <utility>
 
 using namespace std;
 using namespace labw::art_modern;
@@ -30,14 +31,13 @@ namespace art_modern {
 } // namespace art_modern
 }; // namespace labw
 
-PairwiseAlignment ArtRead::generate_pairwise_aln() const
+void ArtRead::generate_pairwise_aln()
 {
-    std::string aln_read = seq_read;
-    std::string aln_ref = seq_ref;
+    aln_read = seq_read;
+    aln_ref = seq_ref;
     for (auto& it : indel) {
         (it.second != ALN_GAP ? aln_ref : aln_read).insert(it.first, 1, ALN_GAP);
     }
-    return { aln_read, aln_ref };
 }
 
 std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
@@ -181,7 +181,7 @@ void ArtRead::ref2read()
         k++;
     }
 }
-ArtRead::ArtRead(const ArtParams& art_params)
-    : _art_params(art_params)
+ArtRead::ArtRead(ArtParams art_params)
+    : _art_params(std::move(art_params))
 {
 }

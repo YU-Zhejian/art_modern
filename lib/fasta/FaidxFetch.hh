@@ -3,12 +3,12 @@
 #include <htslib/faidx.h>
 #include <mutex>
 
-#include "FastaFetch.hh"
+#include "BaseFastaFetch.hh"
 
 namespace labw {
 namespace art_modern {
 
-    class FaidxFetch : public FastaFetch {
+    class FaidxFetch : public BaseFastaFetch {
     public:
         explicit FaidxFetch(const std::string& file_name);
         std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) override;

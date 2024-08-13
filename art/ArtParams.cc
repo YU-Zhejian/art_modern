@@ -15,7 +15,7 @@ namespace labw {
 namespace art_modern {
     void print_version()
     {
-        // TODO
+        std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << endl;
     }
 
     std::vector<double> gen_per_base_mutation_rate(int read_len, double p,

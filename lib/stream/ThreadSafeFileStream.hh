@@ -13,11 +13,8 @@ public:
     void close() override;
 
     ~ThreadSafeFileStream() override;
-    ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept
-    {
-        std::unique_lock<std::mutex> rhs_lk(instance.mutex_);
-        file_ = std::move(instance.file_);
-    }
+
+    ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept;
 
 private:
     std::ofstream file_;

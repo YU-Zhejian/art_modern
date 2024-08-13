@@ -1,12 +1,7 @@
-//
-// Created by yuzj on 3/22/24.
-//
-
 #include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
 #include "misc.hh"
 #include <boost/format.hpp>
-#include <sstream>
 #include <utility>
 
 namespace labw {
@@ -25,49 +20,62 @@ namespace art_modern {
     {
     }
 
-    std::string PairwiseAlignment::generate_cigar(bool is_reverse,
-        bool use_m) const
+    PairwiseAlignment::PairwiseAlignment(std::string read_name,
+        std::string contig_name,
+        std::string query,
+        std::string ref,
+        std::string qual,
+        std::string aligned_query,
+        std::string aligned_ref,
+        hts_pos_t align_contig_start, bool is_plus_strand)
+        : aligned_query(std::move(aligned_query))
+        , aligned_ref(std::move(aligned_ref))
+        , query(std::move(query))
+        , ref(std::move(ref))
+        , qual(std::move(qual))
+        , read_name(std::move(read_name))
+        , contig_name(std::move(contig_name))
+        , align_contig_start(align_contig_start)
+        , is_plus_strand(is_plus_strand)
     {
-        std::ostringstream cigar;
-
-        char current_cigar;
-        char prev_cigar;
-        int cigar_len = 0;
-        auto ref_len = static_cast<int>(_aligned_ref.length());
+        if (this->aligned_ref.length() != this->aligned_query.length()) {
+            throw PWAException(this->aligned_query, this->aligned_ref);
+        }
+    }
+    std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(bool is_reverse, bool use_m) const
+    {
+        std::vector<uint32_t> cigar;
+        uint32_t current_cigar;
+        uint32_t prev_cigar;
+        uint32_t cigar_len = 0;
+        auto ref_len = static_cast<int>(aligned_ref.length());
 
         auto _range = is_reverse ? labw::art_modern::range(ref_len - 1, -1, -1)
                                  : labw::art_modern::range(0, ref_len, 1);
         for (auto i : _range) {
-            if (_aligned_ref[i] == _aligned_query[i]) {
-                current_cigar = use_m ? ALN_MATCH : SEQ_MATCH;
-            } else if (_aligned_ref[i] == ALN_GAP) {
-                current_cigar = INSERTION;
-            } else if (_aligned_query[i] == ALN_GAP) {
-                current_cigar = DELETION;
+            if (aligned_ref[i] == aligned_query[i]) {
+                current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
+            } else if (aligned_ref[i] == ALN_GAP) {
+                current_cigar = BAM_CINS;
+            } else if (aligned_query[i] == ALN_GAP) {
+                current_cigar = BAM_CDEL;
             } else {
-                current_cigar = use_m ? ALN_MATCH : SEQ_MISMATCH;
+                current_cigar = use_m ? BAM_CMATCH : BAM_CDIFF;
             }
             if (current_cigar != prev_cigar && cigar_len > 0) {
-                cigar << cigar_len << prev_cigar;
+                cigar.emplace_back(cigar_len);
+                cigar.emplace_back(prev_cigar);
                 cigar_len = 0;
             }
             cigar_len++;
             prev_cigar = current_cigar;
         }
         if (cigar_len != 0) {
-            cigar << cigar_len << prev_cigar;
+            cigar.emplace_back(cigar_len);
+            cigar.emplace_back(prev_cigar);
         }
-        return cigar.str();
+        return cigar;
     }
 
-    PairwiseAlignment::PairwiseAlignment(const std::string& aligned_query,
-        const std::string& aligned_ref)
-        : _aligned_query(aligned_query)
-        , _aligned_ref(aligned_ref)
-    {
-        if (_aligned_ref.length() != _aligned_query.length()) {
-            throw PWAException(aligned_query, aligned_ref);
-        }
-    }
 } // namespace art_modern
 } // namespace labw

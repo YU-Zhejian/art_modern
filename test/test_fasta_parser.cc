@@ -4,8 +4,8 @@
 #define BOOST_TEST_MODULE test_fasta_parser
 #include <boost/test/unit_test.hpp>
 
+#include "fasta/BaseFastaFetch.hh"
 #include "fasta/FaidxFetch.hh"
-#include "fasta/FastaFetch.hh"
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/fasta_parser.hh"
 #include "test_adaptor.h"
@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
     }
 }
 
-void test_fasta(const std::shared_ptr<FastaFetch>& fastaFetch)
+void test_fasta(const std::shared_ptr<BaseFastaFetch>& fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
