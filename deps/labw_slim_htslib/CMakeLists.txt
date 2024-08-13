@@ -41,7 +41,7 @@ if(BUILD_SHARED_LIBS)
 
     if(${CEU_CM_HAVE_WORKING_LIBBZ2_RUN_SHARED} EQUAL 0)
         message(NOTICE "libbz2 detected")
-        add_compile_definitions(HAVE_LIBBZ2)
+        add_compile_definitions(HAVE_LIBBZ2) # FIXME: Move those things to a header file.
     else()
         message(NOTICE "libbz2 NOT detected")
     endif()

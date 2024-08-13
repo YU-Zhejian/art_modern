@@ -2,6 +2,9 @@
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/thread.hpp>
+#ifdef WITH_BOOST_TIMER
+#include <boost/timer/timer.hpp>
+#endif
 
 #include <fstream>
 #include <string>
@@ -19,6 +22,11 @@ using namespace labw::art_modern;
 
 int main(int argc, char* argv[])
 {
+#ifdef WITH_BOOST_TIMER
+    boost::timer::auto_cpu_timer t;
+#else
+    BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
+#endif
     vector<string> args;
     for (auto i = 0; i < argc; i++) {
         args.emplace_back(argv[i]);
