@@ -2,25 +2,27 @@
 
 Modernized ART that is parallelized and modularized using modern C++.
 
+**WARNING** Largely under development in internal Git hosting. The Git repository on GitHub may not reflect latest status.
+
 ## Quick Start
 
 ## Installation 
 
 ### Dependencies
 
-- [CMake](https://cmake.org/).
+- [CMake](https://cmake.org/), our building system.
 - A working C and C++ compiler that supports C++ 14. Following compilers are supported:
   - [GCC](https://gcc.gnu.org/);
   - [Clang](https://clang.llvm.org/);
   - [Intel oneAPI DPCPP](https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/get-started-guide/2024-2/overview.html).
-- [Boost C++ Library](https://www.boost.org/). Required modules are namely:
-  - [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/);
-  - [Regex](https://www.boost.org/doc/libs/1_85_0/libs/regex/);
-  - [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/);
-  - [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/);
-  - [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/);
-  - [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/);
-  - [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/).
+- [Boost C++ Library](https://www.boost.org/). The modules used in this project are namely:
+  - **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/);
+  - **REQUIRED** [Regex](https://www.boost.org/doc/libs/1_85_0/libs/regex/);
+  - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/);
+  - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/);
+  - **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/);
+  - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers;
+  - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program.
 - A working [HTSLib](https://www.htslib.org/).
   - To use bundled HTSLib sources, you need to have:
     - **REQUIRED** [zlib](https://www.zlib.net/);
@@ -46,7 +48,7 @@ Changes on software function:
 -[ ] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
 -[ ] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
 -[X] Supports 3 library construction methods: `se`, `pe` and `mp`.
--[ ] Except FASTQ, support output in SAM and BAM format through HTSLib.
+-[X] Except FASTQ, support output in SAM and BAM format through HTSLib.
 -[X] Support over masking detection was dropped.
 -[X] Support over sequencers except Illumina dropped.
 -[X] Support over the `aln` output format was dropped.
@@ -74,9 +76,10 @@ The bundled HTSLib library used MIT License with following reference:
 
 ## TODO
 
-- Implement support over `sam` and `bam` output using `htslib`.
+- Support external HTSLib.
 - Make it faster.
 - Update the HTSLib CMake routine for setting macros like `HAVE_LIBBZ2` correct.
+- Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 
 ## FAQ
 

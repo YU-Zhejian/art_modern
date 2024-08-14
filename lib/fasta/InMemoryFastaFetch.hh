@@ -1,9 +1,4 @@
-//
-// Created by yuzj on 24-8-11.
-//
-
-#ifndef ART_MODERN_LIB_FASTA_INMEMORYFASTAFETCH_HH
-#define ART_MODERN_LIB_FASTA_INMEMORYFASTAFETCH_HH
+#pragma once
 #include "BaseFastaFetch.hh"
 namespace labw {
 namespace art_modern {
@@ -12,6 +7,7 @@ namespace art_modern {
     public:
         explicit InMemoryFastaFetch(const std::string& file_name);
         explicit InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map);
+        InMemoryFastaFetch(const std::string& contig_name, const std::string& seq);
         char* cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end) override;
         std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) override;
         ~InMemoryFastaFetch() override;
@@ -21,5 +17,3 @@ namespace art_modern {
     };
 }
 }
-
-#endif // ART_MODERN_LIB_FASTA_INMEMORYFASTAFETCH_HH

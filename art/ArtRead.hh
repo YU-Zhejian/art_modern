@@ -13,17 +13,6 @@
 namespace labw {
 namespace art_modern {
 
-    class ArtCustomException : std::exception {
-    public:
-        explicit ArtCustomException(std::string cause)
-            : _cause(std::move(cause)) {};
-
-        const char* what() const noexcept override { return _cause.c_str(); }
-
-    private:
-        std::string _cause;
-    };
-
     class ArtRead {
     public:
         explicit ArtRead(ArtParams art_params);

@@ -13,13 +13,9 @@ namespace po = boost::program_options;
 
 namespace labw {
 namespace art_modern {
-    void print_version()
-    {
-        std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << endl;
-    }
+    void print_version() { std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << endl; }
 
-    std::vector<double> gen_per_base_mutation_rate(int read_len, double p,
-        int max_num)
+    std::vector<double> gen_per_base_mutation_rate(int read_len, double p, int max_num)
     {
         std::vector<double> rate;
         if (max_num == 0 || p < 1E-30) {
@@ -29,8 +25,7 @@ namespace art_modern {
         double tp;
         double p_cdf = 0;
         for (size_t i = 0; i < read_len; i++) {
-            tp = boost::math::cdf(
-                boost::math::complement(boost::math::binomial(read_len, p), i));
+            tp = boost::math::cdf(boost::math::complement(boost::math::binomial(read_len, p), i));
             rate.push_back(tp);
             if (max_num > 0 && (i >= max_num)) {
                 break;
@@ -61,9 +56,7 @@ namespace art_modern {
 
         po::variables_map vm;
         try {
-            po::store(
-                po::parse_command_line(static_cast<int>(args.size()), argv, po_desc),
-                vm);
+            po::store(po::parse_command_line(static_cast<int>(args.size()), argv, po_desc), vm);
         } catch (const exception& exp) {
             BOOST_LOG_TRIVIAL(fatal) << exp.what();
             print_help();
@@ -87,8 +80,7 @@ namespace art_modern {
         } else if (simulation_mode_str == "template") {
             art_simulation_mode = ART_SIMULATION_MODE::TEMPLATE;
         } else {
-            BOOST_LOG_TRIVIAL(fatal)
-                << R"(Simulation mode (--mode) should be one of "wgs", "trans" and "template")";
+            BOOST_LOG_TRIVIAL(fatal) << R"(Simulation mode (--mode) should be one of "wgs", "trans" and "template")";
             exit(EXIT_FAILURE);
         }
         auto lib_const_mode_str = vm["lc"].as<string>();
@@ -135,15 +127,13 @@ namespace art_modern {
     void ArtParams::validate_args()
     {
         if (min_qual < 0 || min_qual > MAX_QUAL) {
-            BOOST_LOG_TRIVIAL(fatal)
-                << "Input Error: The minimum quality score must be an integer in [0,"
-                << MAX_QUAL << "]";
+            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The minimum quality score must be an integer in [0," << MAX_QUAL
+                                     << "]";
             exit(EXIT_FAILURE);
         }
         if (max_qual <= min_qual || max_qual > MAX_QUAL) {
-            BOOST_LOG_TRIVIAL(fatal)
-                << "Input Error: The quality score must be an integer in [" << min_qual
-                << ", " << MAX_QUAL << "]";
+            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The quality score must be an integer in [" << min_qual << ", "
+                                     << MAX_QUAL << "]";
             exit(EXIT_FAILURE);
         }
         // Make sure the minimum requirements to run were met if the help tag was not
@@ -155,36 +145,34 @@ namespace art_modern {
         }
 
         if (read_len < 0) {
-            BOOST_LOG_TRIVIAL(fatal)
-                << "Fatal Error: The read length must be a positive integer.";
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
             exit(EXIT_FAILURE);
         }
         if (seq_file.empty() || out_file_prefix.empty() || read_len == 0) {
-            BOOST_LOG_TRIVIAL(fatal)
-                << "Fatal Error: An input-file, output-file prefix, read length, and "
-                   "fold coverage must be specified.";
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: An input-file, output-file prefix, read length, and "
+                                        "fold coverage must be specified.";
             exit(EXIT_FAILURE);
         }
         if (boost::filesystem::exists(out_file_prefix)) {
             if (!boost::filesystem::is_directory(out_file_prefix)) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "'" << out_file_prefix << "' is not a directory.";
+                BOOST_LOG_TRIVIAL(fatal) << "'" << out_file_prefix << "' is not a directory.";
                 exit(EXIT_FAILURE);
             }
         } else {
             if (!boost::filesystem::create_directories(out_file_prefix)) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "'" << out_file_prefix << "' create directory failed.";
+                BOOST_LOG_TRIVIAL(fatal) << "'" << out_file_prefix << "' create directory failed.";
                 exit(EXIT_FAILURE);
             }
         }
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            if (art_simulation_mode != ART_SIMULATION_MODE::TEMPLATE && !(pe_frag_dist_std_dev > 0 && pe_frag_dist_mean > 0)) {
+            if (art_simulation_mode != ART_SIMULATION_MODE::TEMPLATE
+                && !(pe_frag_dist_std_dev > 0 && pe_frag_dist_mean > 0)) {
                 BOOST_LOG_TRIVIAL(fatal) << "ERROR: set pe_frag_dist_std_dev and "
                                             "pe_frag_dist_mean for PE reads for \"wgs\" or \"trans\" mode";
                 exit(EXIT_FAILURE);
             }
-            if (art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE && (pe_frag_dist_std_dev != 0 || pe_frag_dist_mean != 0)) {
+            if (art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+                && (pe_frag_dist_std_dev != 0 || pe_frag_dist_mean != 0)) {
                 BOOST_LOG_TRIVIAL(warning) << "Warning: pe_frag_dist_std_dev and "
                                               "pe_frag_dist_mean ignored for template mode.";
             }
@@ -203,8 +191,7 @@ namespace art_modern {
                 }
                 boost::algorithm::trim(xfold_line);
                 auto tab_pos = xfold_line.find('\t');
-                sequencing_depth.emplace(xfold_line.substr(0, tab_pos),
-                    stod(xfold_line.substr(tab_pos + 1)));
+                sequencing_depth.emplace(xfold_line.substr(0, tab_pos), stod(xfold_line.substr(tab_pos + 1)));
             }
         }
 
@@ -213,15 +200,13 @@ namespace art_modern {
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
             // use the both default profiles or provide both profiles
             if (qual_file_1.empty() || qual_file_2.empty()) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Please provide the quality profile of both reads";
+                BOOST_LOG_TRIVIAL(fatal) << "Please provide the quality profile of both reads";
                 exit(EXIT_FAILURE);
             }
 
             if (pe_frag_dist_mean != 0 && pe_frag_dist_std_dev != 0 && pe_frag_dist_mean <= read_len) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: The read length must be shorter than the "
-                       "pe_frag_dist_mean fragment length specified.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be shorter than the "
+                                            "pe_frag_dist_mean fragment length specified.";
                 exit(EXIT_FAILURE);
             }
         }
@@ -264,26 +249,22 @@ namespace art_modern {
 
         if (read_len > r1_profile_size) {
             if (r1_profile_size == 0) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: " << qual_file_1 << ", is not a valid profile.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << qual_file_1 << ", is not a valid profile.";
             } else {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: The read length, " << read_len
-                    << ", exceeds the maximum first read profile length, "
-                    << r1_profile_size << ".";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
+                                         << ", exceeds the maximum first read profile length, " << r1_profile_size
+                                         << ".";
             }
             exit(EXIT_FAILURE);
         }
 
         if ((read_len > r2_profile_size) && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
             if (r2_profile_size == 0) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: " << qual_file_2 << ", is not a valid profile.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << qual_file_2 << ", is not a valid profile.";
             } else {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: The read length, " << read_len
-                    << ", exceeds the maximum second read profile length, "
-                    << r2_profile_size << ".";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
+                                         << ", exceeds the maximum second read profile length, " << r2_profile_size
+                                         << ".";
             }
             exit(EXIT_FAILURE);
         }
@@ -336,10 +317,7 @@ namespace art_modern {
         return art_lib_const_mode != ART_LIB_CONST_MODE::SE ? out_file_prefix + '/' + gene_name + "_2.fq" : "";
     }
 
-    string ArtParams::samfile(const string& gene_name) const
-    {
-        return out_file_prefix + '/' + gene_name + ".sam";
-    }
+    string ArtParams::samfile(const string& gene_name) const { return out_file_prefix + '/' + gene_name + ".sam"; }
 
     void ArtParams::print_params() const
     {
@@ -359,11 +337,9 @@ namespace art_modern {
         cout << "Parameters used during run" << endl;
         cout << "\tRead Length:\t" << read_len << endl;
         if (uniform_sequencing_depth != 0) {
-            cout << "\tFold Coverage: (uniform)  " << uniform_sequencing_depth << "X"
-                 << endl;
+            cout << "\tFold Coverage: (uniform)  " << uniform_sequencing_depth << "X" << endl;
         } else {
-            cout << "\tFold Coverage: (file)     " << sequencing_depth.size()
-                 << " entries" << endl;
+            cout << "\tFold Coverage: (file)     " << sequencing_depth.size() << " entries" << endl;
         }
 
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
@@ -383,8 +359,7 @@ namespace art_modern {
         } else {
             cout << "\tProfile Type:             Separated" << endl;
         }
-        cout << "\tID Tag:                   " << id.c_str() << endl
-             << endl;
+        cout << "\tID Tag:                   " << id.c_str() << endl << endl;
 
         cout << "Quality Profile(s)" << endl;
 
@@ -402,93 +377,75 @@ namespace art_modern {
 
         po::options_description required_opts("Required Options");
 
-        required_opts.add_options()(
-            "mode", po::value<std::string>()->default_value("wgs"),
+        required_opts.add_options()("mode", po::value<std::string>()->default_value("wgs"),
             R"(simulation mode, should be "wgs", "trans" or "template")");
-        required_opts.add_options()(
-            "lc", po::value<std::string>()->default_value("se"),
+        required_opts.add_options()("lc", po::value<std::string>()->default_value("se"),
             R"(library construction mode, should be "se", "pe" or "mp")");
 
         required_opts.add_options()("seq_file", po::value<std::string>(),
             "the filename of input reference genome, reference "
             "transcriptome, or templates");
-        required_opts.add_options()(
-            "fcov", po::value<std::string>(),
+        required_opts.add_options()("fcov", po::value<std::string>(),
             "the fold of read coverage to be simulated or number of reads/read pairs "
             "generated for each sequence for simulating cDNA reads, or a float for "
             "simulating WGS reads.");
-        required_opts.add_options()("out_file_prefix",
-            po::value<std::string>()->default_value("art_opts.out"),
+        required_opts.add_options()("out_file_prefix", po::value<std::string>()->default_value("art_opts.out"),
             "the prefix of output filename");
 
         po::options_description art_opts("ART-specific options");
-        art_opts.add_options()("id", po::value<std::string>()->default_value("ART"),
-            "the prefix identification tag for read ID");
+        art_opts.add_options()(
+            "id", po::value<std::string>()->default_value("ART"), "the prefix identification tag for read ID");
 
-        art_opts.add_options()("qual_file_1",
-            po::value<std::string>()->default_value(""),
-            "the first-read quality profile");
-        art_opts.add_options()("qual_file_2",
-            po::value<std::string>()->default_value(""),
+        art_opts.add_options()(
+            "qual_file_1", po::value<std::string>()->default_value(""), "the first-read quality profile");
+        art_opts.add_options()("qual_file_2", po::value<std::string>()->default_value(""),
             "the second-read quality profile. For PE/MP only.");
-        art_opts.add_options()("ins_rate_1",
-            po::value<double>()->default_value(DEFAULT_INS_RATE_1),
-            "the first-read insertion rate");
-        art_opts.add_options()("ins_rate_2",
-            po::value<double>()->default_value(DEFAULT_INS_RATE_2),
-            "the second-read insertion rate");
-        art_opts.add_options()("del_rate_1",
-            po::value<double>()->default_value(DEFAULT_DEL_RATE_1),
-            "the second-read deletion rate");
-        art_opts.add_options()("del_rate_2",
-            po::value<double>()->default_value(DEFAULT_DEL_RATE_2),
-            "the second-read deletion rate");
         art_opts.add_options()(
-            "sep_flag", "use separate quality profiles for different bases. Default "
-                        "is to use same quality profile regardless its position");
+            "ins_rate_1", po::value<double>()->default_value(DEFAULT_INS_RATE_1), "the first-read insertion rate");
         art_opts.add_options()(
-            "max_indel", po::value<int>()->default_value(DEFAULT_MAX_INDEL),
+            "ins_rate_2", po::value<double>()->default_value(DEFAULT_INS_RATE_2), "the second-read insertion rate");
+        art_opts.add_options()(
+            "del_rate_1", po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the second-read deletion rate");
+        art_opts.add_options()(
+            "del_rate_2", po::value<double>()->default_value(DEFAULT_DEL_RATE_2), "the second-read deletion rate");
+        art_opts.add_options()("sep_flag",
+            "use separate quality profiles for different bases. Default "
+            "is to use same quality profile regardless its position");
+        art_opts.add_options()("max_indel", po::value<int>()->default_value(DEFAULT_MAX_INDEL),
             "the maximum total number of insertion and deletion per read");
-        art_opts.add_options()("read_len", po::value<int>(),
-            "read length to be simulated");
-        art_opts.add_options()(
-            "pe_frag_dist_mean", po::value<int>()->default_value(0),
+        art_opts.add_options()("read_len", po::value<int>(), "read length to be simulated");
+        art_opts.add_options()("pe_frag_dist_mean", po::value<int>()->default_value(0),
             "Mean distance between DNA/RNA fragments for paired-end simulations");
-        art_opts.add_options()(
-            "pe_frag_dist_std_dev", po::value<double>()->default_value(0),
+        art_opts.add_options()("pe_frag_dist_std_dev", po::value<double>()->default_value(0),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
-        art_opts.add_options()(
-            "cigar_use_m", "indicate to use CIGAR 'M' instead of '=/X' for alignment "
-                           "match/mismatch");
+        art_opts.add_options()("cigar_use_m",
+            "indicate to use CIGAR 'M' instead of '=/X' for alignment "
+            "match/mismatch");
         art_opts.add_options()("no_sam", "disable syntheis of SAM file");
         art_opts.add_options()(
-            "q_shift_1", po::value<int>()->default_value(0),
-            "the amount to shift every first-read quality score by");
+            "q_shift_1", po::value<int>()->default_value(0), "the amount to shift every first-read quality score by");
         art_opts.add_options()(
-            "q_shift_2", po::value<int>()->default_value(0),
-            "the amount to shift every second-read quality score by");
-        art_opts.add_options()("min_qual", po::value<int>()->default_value(MIN_QUAL),
-            "the minimum base quality score");
-        art_opts.add_options()("max_qual", po::value<int>()->default_value(MAX_QUAL),
-            "the maxiumum base quality score");
+            "q_shift_2", po::value<int>()->default_value(0), "the amount to shift every second-read quality score by");
+        art_opts.add_options()("min_qual", po::value<int>()->default_value(MIN_QUAL), "the minimum base quality score");
+        art_opts.add_options()(
+            "max_qual", po::value<int>()->default_value(MAX_QUAL), "the maxiumum base quality score");
 
         po::options_description parallel_opts("Parallelism-related options");
-        parallel_opts.add_options()(
-            "parallel", po::value<int>()->default_value(PARALLEL_ALL),
+        parallel_opts.add_options()("parallel", po::value<int>()->default_value(PARALLEL_ALL),
             "Parallel level. -1 for disable, 0 for all CPUs, >=1 to specify number "
             "of threads.");
-        parallel_opts.add_options()(
-            "parallel_on_read",
-            "Perform read-level parallelism instead of contig-level");
-        art_opts.add_options()(
-            "stream", "If specified, will use streamline FASTA parser (For "
-                      "transcriptome/amplicon); Otherwise will use HTSLib indexed "
-                      "FASTA parser (For genome).");
+        parallel_opts.add_options()("parallel_on_read", "Perform read-level parallelism instead of contig-level");
+        art_opts.add_options()("stream",
+            "If specified, will use streamline FASTA parser (For "
+            "transcriptome/amplicon); Otherwise will use HTSLib indexed "
+            "FASTA parser (For genome).");
         po_desc.add(general_opts).add(required_opts).add(art_opts).add(parallel_opts);
     }
 
     void ArtParams::print_help() const { po_desc.print(cout, 0); }
+
+    std::string ArtParams::fqfile(const string& gene_name) const { return out_file_prefix + '/' + gene_name + ".fq"; }
 
 } // namespace art_modern
 } // namespace labw

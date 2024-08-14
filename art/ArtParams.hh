@@ -69,6 +69,13 @@ namespace art_modern {
         std::string fqfile1(const std::string& gene_name) const;
 
         /**
+         * Get file name for the FASTQ file.
+         * @param gene_name As described.
+         * @return As described.
+         */
+        std::string fqfile(const std::string& gene_name) const;
+
+        /**
          * Get file name for the FASTQ file 2.
          * @param gene_name As described.
          * @return As described.

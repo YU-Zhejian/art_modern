@@ -20,17 +20,10 @@ namespace art_modern {
 
     class PairwiseAlignment {
     public:
-        PairwiseAlignment(
-            std::string read_name,
-            std::string contig_name,
-            std::string query,
-            std::string ref,
-            std::string qual,
-            std::string aligned_query,
-            std::string aligned_ref,
-            hts_pos_t align_contig_start,
+        PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
+            std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t align_contig_start,
             bool is_plus_strand);
-        std::vector<uint32_t> generate_cigar_array(bool is_reverse, bool use_m) const;
+        std::vector<uint32_t> generate_cigar_array(bool use_m) const;
 
         /**
          * Gap inserted using -

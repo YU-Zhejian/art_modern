@@ -5,7 +5,6 @@
 #ifndef ART_MODERN_LIB_FASTA_STREAMBATCHER_HH
 #define ART_MODERN_LIB_FASTA_STREAMBATCHER_HH
 
-class StreamBatcher {
-};
+class StreamBatcher { };
 
 #endif // ART_MODERN_LIB_FASTA_STREAMBATCHER_HH

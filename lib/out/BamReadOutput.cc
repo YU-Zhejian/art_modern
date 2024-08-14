@@ -1,6 +1,5 @@
 #include <algorithm>
-#include <fstream>
-#include <iostream>
+#include <boost/log/trivial.hpp>
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
@@ -10,52 +9,61 @@ namespace labw {
 namespace art_modern {
     void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     {
+        if (is_closed_) {
+            return;
+        }
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
+
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+            USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
+            CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         auto contig_len = sam_hdr_tid2len(sam_header_, tid);
-        auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(bam_init1(), "htslib");
+        auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(
+            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa.query.size());
-        auto cigar = pwa.generate_cigar_array(!pwa.is_plus_strand, sam_options_.use_m);
+        auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
 
         auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
         auto qual = pwa.qual;
         hts_pos_t pos;
         if (pwa.is_plus_strand) {
-            pos = pwa.align_contig_start + 1L;
+            pos = pwa.align_contig_start;
         } else {
-            pos = contig_len - (pwa.align_contig_start + rlen) + 1L;
+            pos = contig_len - (pwa.align_contig_start + rlen);
             std::reverse(qual.begin(), qual.end());
         }
-        CExceptionsProxy::requires_numeric(bam_set1(
-                                               sam_record,
-                                               pwa.read_name.length(),
-                                               pwa.read_name.c_str(),
-                                               pwa.is_plus_strand ? 0 : BAM_FREVERSE,
-                                               tid,
-                                               pos,
-                                               MAPQ_MAX,
-                                               cigar.size(),
-                                               cigar.data(),
-                                               0, // Unset for SE reads
-                                               0, // Unset for SE reads
-                                               0, // Unset for SE reads
-                                               rlen,
-                                               seq.c_str(),
-                                               qual.c_str(),
-                                               0),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record), "htslib");
+        auto cigar_c_arr = cigar_arr_to_c(cigar);
+        CExceptionsProxy::requires_numeric(
+            bam_set1(sam_record, pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE,
+                tid, pos, MAPQ_MAX, cigar.size(), cigar_c_arr,
+                0, // Unset for SE reads
+                0, // Unset for SE reads
+                0, // Unset for SE reads
+                rlen, seq.c_str(), qual.c_str(), 0),
+            USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
+            "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        free(cigar_c_arr);
     }
 
     void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
+        if (is_closed_) {
+            return;
+        }
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
+
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+            USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
+            CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         auto contig_len = sam_hdr_tid2len(sam_header_, tid);
         auto rlen = static_cast<long>(pwa1.query.size());
 
-        auto cigar1 = pwa1.generate_cigar_array(!pwa1.is_plus_strand, sam_options_.use_m);
-        auto cigar2 = pwa2.generate_cigar_array(!pwa2.is_plus_strand, sam_options_.use_m);
+        auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
+        auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
+
+        auto cigar1_arr = cigar_arr_to_c(cigar1);
+        auto cigar2_arr = cigar_arr_to_c(cigar2);
 
         auto seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
         auto seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
@@ -70,14 +78,14 @@ namespace art_modern {
         hts_pos_t pos2;
 
         if (pwa1.is_plus_strand) {
-            pos1 = pwa1.align_contig_start + 1L;
-            pos2 = contig_len - (pwa2.align_contig_start + rlen) + 1L;
+            pos1 = pwa1.align_contig_start;
+            pos2 = contig_len - (pwa2.align_contig_start + rlen);
             flag1 |= BAM_FMREVERSE;
             flag2 |= BAM_FREVERSE;
             std::reverse(qual2.begin(), qual2.end());
         } else {
-            pos1 = contig_len - (pwa1.align_contig_start + rlen) + 1L;
-            pos2 = pwa2.align_contig_start + 1L;
+            pos1 = contig_len - (pwa1.align_contig_start + rlen);
+            pos2 = pwa2.align_contig_start;
             flag1 |= BAM_FREVERSE;
             flag2 |= BAM_FMREVERSE;
             std::reverse(qual1.begin(), qual1.end());
@@ -94,74 +102,62 @@ namespace art_modern {
             isize1 = -isize2;
         }
 
-        auto sam_record1 = (bam1_t*)CExceptionsProxy::requires_not_null(bam_init1(), "htslib");
-        auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(bam_init1(), "htslib");
+        auto sam_record1 = (bam1_t*)CExceptionsProxy::requires_not_null(
+            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
+            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        CExceptionsProxy::requires_numeric(
+            bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
+                cigar1.size(), cigar1_arr, tid, pos2, isize1, rlen, seq1.c_str(), qual1.c_str(), 0),
+            USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        CExceptionsProxy::requires_numeric(
+            bam_set1(sam_record2, pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
+                cigar2.size(), cigar2_arr, tid, pos1, isize2, rlen, seq2.c_str(), qual2.c_str(), 0),
+            USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
+            "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
+            "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
-        CExceptionsProxy::requires_numeric(bam_set1(
-                                               sam_record1,
-                                               pwa1.read_name.length(),
-                                               pwa1.read_name.c_str(),
-                                               flag1,
-                                               tid,
-                                               pos1,
-                                               MAPQ_MAX,
-                                               cigar1.size(),
-                                               cigar1.data(),
-                                               tid,
-                                               pos2,
-                                               isize1,
-                                               rlen,
-                                               seq1.c_str(),
-                                               qual1.c_str(),
-                                               0),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        CExceptionsProxy::requires_numeric(bam_set1(
-                                               sam_record2,
-                                               pwa2.read_name.length(),
-                                               pwa2.read_name.c_str(),
-                                               flag2,
-                                               tid,
-                                               pos2,
-                                               MAPQ_MAX,
-                                               cigar2.size(),
-                                               cigar2.data(),
-                                               tid,
-                                               pos1,
-                                               isize2,
-                                               rlen,
-                                               seq2.c_str(),
-                                               qual2.c_str(),
-                                               0),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record1), "htslib");
-        CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record2), "htslib");
+        free(cigar1_arr);
+        free(cigar2_arr);
     }
-    BamReadOutput::~BamReadOutput()
-    {
-        sam_close(sam_file_);
-    }
-    BamReadOutput::BamReadOutput(const std::string& filename,
-        const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
+    BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
+    BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
         const SamReadOutputOptions& sam_options)
         : sam_options_(sam_options)
     {
-        sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(sam_open(filename.c_str(), "wb"), "htslib");
-        sam_header_ = (sam_hdr_t*)CExceptionsProxy::requires_not_null(sam_hdr_init(), "htslib");
-        CExceptionsProxy::requires_numeric(
-            sam_hdr_add_line(sam_header_, "HD", "HD_VN", sam_options_.HD_VN.c_str(), "HD_SO", sam_options_.HD_SO.c_str(), NULL),
-            "htslib");
-        CExceptionsProxy::requires_numeric(sam_hdr_add_line(
-                                               sam_header_,
-                                               "PG",
-                                               "ID", sam_options_.PG_ID.c_str(),
-                                               "PN", sam_options_.PG_PN.c_str(),
-                                               "CL", sam_options_.PG_CL.c_str(),
-                                               NULL),
-            "htslib", UNKNOWN_C_EXCEPTION, false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+        if (is_closed_) {
+            return;
+        }
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
+
+        sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(
+            sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "w"), USED_HTSLIB_NAME,
+            "Failed to open SAM file");
+        sam_header_ = (sam_hdr_t*)CExceptionsProxy::requires_not_null(
+            sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
+        CExceptionsProxy::requires_numeric(sam_hdr_add_line(sam_header_, "HD", "VN", sam_options_.HD_VN.c_str(), "SO",
+                                               sam_options_.HD_SO.c_str(), NULL),
+            USED_HTSLIB_NAME, "Failed to add HD header line");
+        CExceptionsProxy::requires_numeric(sam_hdr_add_line(sam_header_, "PG", "ID", sam_options_.PG_ID.c_str(), "PN",
+                                               sam_options_.PG_PN.c_str(), "CL", sam_options_.PG_CL.c_str(), NULL),
+            USED_HTSLIB_NAME, "Failed to add PG header line", false, CExceptionsProxy::EXPECTATION::ZERO);
 
         fasta_fetch->update_sam_header(sam_header_);
-        CExceptionsProxy::requires_numeric(sam_hdr_write(sam_file_, sam_header_),
-            "htslib");
+        CExceptionsProxy::requires_numeric(
+            sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
+        BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
+    }
+
+    void BamReadOutput::close()
+    {
+        if (is_closed_) {
+            return;
+        }
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
+        sam_close(sam_file_);
+        is_closed_ = true;
     }
 }
 }

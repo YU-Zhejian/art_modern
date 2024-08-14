@@ -30,8 +30,7 @@ namespace art_modern {
                 if (!parts.empty()) {
                     firstPart = parts[0];
                 } else {
-                    throw MalformedFastaException(_lineno,
-                        "FASTA record contains empty ID.");
+                    throw MalformedFastaException(_lineno, "FASTA record contains empty ID.");
                 }
                 nextRecord.id = firstPart;
                 break;
@@ -57,10 +56,6 @@ namespace art_modern {
         }
     }
 
-    const char* MalformedFastaException::what() const noexcept
-    {
-        auto info = (boost::format("FASTA parse error at l. %d: %s") % _lineno % _what);
-        return info.str().c_str();
-    }
+    const char* MalformedFastaException::what() const noexcept { return "FASTA parse error"; }
 } // namespace art_modern
 } // namespace labw

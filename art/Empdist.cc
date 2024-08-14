@@ -7,8 +7,7 @@ using namespace std;
 namespace labw {
 namespace art_modern {
 
-    Empdist::Empdist(const std::string& emp_filename_1,
-        const std::string& emp_filename_2, bool sep_qual)
+    Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
         : _sep_qual(sep_qual)
     {
         read_emp_dist(emp_filename_1, true);
@@ -145,8 +144,7 @@ namespace art_modern {
             if (read_pos != linenum) {
                 linenum = 0;
                 if (read_pos != linenum) {
-                    BOOST_LOG_TRIVIAL(fatal)
-                        << "Fatal error (1): Wrong format of input distribution.";
+                    BOOST_LOG_TRIVIAL(fatal) << "Fatal error (1): Wrong format of input distribution.";
                     exit(EXIT_FAILURE);
                 }
             }
@@ -165,8 +163,7 @@ namespace art_modern {
             ss >> read_pos;
 
             if (read_pos != linenum) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal error (2): Wrong format of input distribution.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal error (2): Wrong format of input distribution.";
                 exit(EXIT_FAILURE);
             }
 
@@ -178,8 +175,7 @@ namespace art_modern {
             }
 
             if (count.size() != qual.size()) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal error (3): Wrong format of input distribution.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal error (3): Wrong format of input distribution.";
                 exit(EXIT_FAILURE);
             }
 
@@ -213,25 +209,23 @@ namespace art_modern {
                 } else if (c_flag) {
                     c_qual_dist_second.push_back(dist);
                 } else {
-                    BOOST_LOG_TRIVIAL(fatal)
-                        << "Unexpected Error: Profile was not read in correctly.";
+                    BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                     exit(EXIT_FAILURE);
                 }
             }
         }
 
         if (_sep_qual) {
-            if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size()
+            if (a_qual_dist_first.size() != g_qual_dist_first.size()
+                || g_qual_dist_first.size() != c_qual_dist_first.size()
                 || c_qual_dist_first.size() != t_qual_dist_first.size()) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Unexpected Error: Profile was not read in correctly.";
+                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                 exit(EXIT_FAILURE);
             }
             if (a_qual_dist_second.size() != g_qual_dist_second.size()
                 || g_qual_dist_second.size() != c_qual_dist_second.size()
                 || c_qual_dist_second.size() != t_qual_dist_second.size()) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Unexpected Error: Profile was not read in correctly.";
+                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                 exit(EXIT_FAILURE);
             }
         }
@@ -246,8 +240,7 @@ namespace art_modern {
     {
         ifstream distss(infile.c_str());
         if (!distss) {
-            BOOST_LOG_TRIVIAL(fatal)
-                << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
             exit(EXIT_FAILURE);
         }
         read_emp_dist(distss, is_first);

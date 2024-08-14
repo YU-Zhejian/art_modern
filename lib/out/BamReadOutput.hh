@@ -38,15 +38,20 @@ namespace art_modern {
         std::string PG_VN = "ART-" ART_VERSION "-ART_MODERN-" ART_MODERN_VERSION;
 
         bool use_m = false;
+
+        /**
+         * If `false`, will write SAM instead.
+         */
+        bool write_bam = true;
     };
 
     class BamReadOutput : public BaseReadOutput {
     public:
-        BamReadOutput(const std::string& filename,
-            const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
+        BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
             const SamReadOutputOptions& sam_options);
         void writeSE(const PairwiseAlignment& pwa) override;
         void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+        void close() override;
         ~BamReadOutput() override;
 
     private:
@@ -54,6 +59,7 @@ namespace art_modern {
         sam_hdr_t* sam_header_;
         const SamReadOutputOptions& sam_options_;
         std::mutex mutex_;
+        bool is_closed_ = false;
     };
 }
 }

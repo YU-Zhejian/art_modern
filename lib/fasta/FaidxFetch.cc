@@ -27,15 +27,11 @@ namespace art_modern {
         free(pos);
         return rets;
     }
-    FaidxFetch::~FaidxFetch()
-    {
-        fai_destroy(faidx_);
-    }
+    FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
     FaidxFetch::FaidxFetch(const std::string& file_name)
     {
         auto seq_file_fai_path = std::string(fai_path(file_name.c_str()));
-        if (!boost::filesystem::exists(
-                boost::filesystem::path(seq_file_fai_path))) {
+        if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
             BOOST_LOG_TRIVIAL(fatal) << "FAI not found!";
             exit(EXIT_FAILURE);
         } else {

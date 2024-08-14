@@ -1,7 +1,10 @@
 #include <boost/log/trivial.hpp>
+#include <iostream>
 
 #include "BaseFastaFetch.hh"
+#include "CExceptionsProxy.hh"
 #include "NotImplementedException.hh"
+#include "art_modern_constants.hh"
 
 namespace labw {
 namespace art_modern {
@@ -17,17 +20,14 @@ namespace art_modern {
     {
         for (const auto& pair : seq_lengths_) {
             auto seq_len_str = std::to_string(pair.second);
-            sam_hdr_add_line(header, "SQ", "SN", pair.first.c_str(), "LN", seq_len_str.c_str(), NULL);
+            CExceptionsProxy::requires_numeric(
+                sam_hdr_add_line(header, "SQ", "SN", pair.first.c_str(), "LN", seq_len_str.c_str(), NULL),
+                USED_HTSLIB_NAME, "Failed to add SQ header line for contig '" + pair.first + "'", false,
+                CExceptionsProxy::EXPECTATION::ZERO);
         }
     }
-    hts_pos_t BaseFastaFetch::seq_len(const std::string& seq_name) const
-    {
-        return seq_lengths_.at(seq_name);
-    }
-    size_t BaseFastaFetch::num_seqs() const
-    {
-        return seq_lengths_.size();
-    }
+    hts_pos_t BaseFastaFetch::seq_len(const std::string& seq_name) const { return seq_lengths_.at(seq_name); }
+    size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
     BaseFastaFetch::~BaseFastaFetch() = default;
 }
 }

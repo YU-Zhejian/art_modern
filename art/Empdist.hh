@@ -1,7 +1,3 @@
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-// ART_ILLUMINA -- Artificial Read Transcription
-// Copyright(c) 2008-2011 Weichun Huang All Rights Reserved.
-//___________________________________________________________________________
 #pragma once
 #include <algorithm>
 #include <iostream>
@@ -33,8 +29,7 @@ namespace art_modern {
         std::vector<std::map<int, int>> g_qual_dist_second;
         std::vector<std::map<int, int>> c_qual_dist_second;
 
-        Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2,
-            bool sep_qual);
+        Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual);
         std::vector<int> get_read_qual(int len, bool first = true) const;
         std::vector<int> get_read_qual_sep_1(const std::string& seq) const;
         std::vector<int> get_read_qual_sep_2(const std::string& seq) const;

@@ -50,9 +50,6 @@ art_illumina \
     -f 10 \
     -o tmp/test_small_se_official \
     -ir "${IDRATE}" -ir2 "${IDRATE}" -dr "${IDRATE}" -dr2 "${IDRATE}"
-cat tmp/test_small_se_official.sam |
-    sed 's; Enterobacteria phage lambda, complete genome;;' |
-    samtools sort --write-index -@30 /dev/stdin -o tmp/test_small_se_official.bam
 
 build/art_modern \
     --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \

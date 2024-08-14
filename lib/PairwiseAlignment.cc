@@ -7,12 +7,7 @@
 namespace labw {
 namespace art_modern {
 
-    const char* PWAException::what() const noexcept
-    {
-        return (boost::format("Alignment %s -> %s is of not equal length!") % _aligned_query % _aligned_ref)
-            .str()
-            .c_str();
-    }
+    const char* PWAException::what() const noexcept { return "Alignment is of not equal length!"; }
 
     PWAException::PWAException(std::string aligned_query, std::string aligned_ref)
         : _aligned_query(std::move(aligned_query))
@@ -20,13 +15,8 @@ namespace art_modern {
     {
     }
 
-    PairwiseAlignment::PairwiseAlignment(std::string read_name,
-        std::string contig_name,
-        std::string query,
-        std::string ref,
-        std::string qual,
-        std::string aligned_query,
-        std::string aligned_ref,
+    PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query,
+        std::string ref, std::string qual, std::string aligned_query, std::string aligned_ref,
         hts_pos_t align_contig_start, bool is_plus_strand)
         : aligned_query(std::move(aligned_query))
         , aligned_ref(std::move(aligned_ref))
@@ -42,7 +32,7 @@ namespace art_modern {
             throw PWAException(this->aligned_query, this->aligned_ref);
         }
     }
-    std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(bool is_reverse, bool use_m) const
+    std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(bool use_m) const
     {
         std::vector<uint32_t> cigar;
         uint32_t current_cigar;
@@ -50,8 +40,8 @@ namespace art_modern {
         uint32_t cigar_len = 0;
         auto ref_len = static_cast<int>(aligned_ref.length());
 
-        auto _range = is_reverse ? labw::art_modern::range(ref_len - 1, -1, -1)
-                                 : labw::art_modern::range(0, ref_len, 1);
+        auto _range
+            = is_plus_strand ? labw::art_modern::range(0, ref_len, 1) : labw::art_modern::range(ref_len - 1, -1, -1);
         for (auto i : _range) {
             if (aligned_ref[i] == aligned_query[i]) {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
@@ -63,16 +53,14 @@ namespace art_modern {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CDIFF;
             }
             if (current_cigar != prev_cigar && cigar_len > 0) {
-                cigar.emplace_back(cigar_len);
-                cigar.emplace_back(prev_cigar);
+                cigar.emplace_back(cigar_len << BAM_CIGAR_SHIFT | prev_cigar);
                 cigar_len = 0;
             }
             cigar_len++;
             prev_cigar = current_cigar;
         }
         if (cigar_len != 0) {
-            cigar.emplace_back(cigar_len);
-            cigar.emplace_back(prev_cigar);
+            cigar.emplace_back(cigar_len << BAM_CIGAR_SHIFT | prev_cigar);
         }
         return cigar;
     }

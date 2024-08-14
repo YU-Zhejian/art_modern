@@ -1,4 +1,5 @@
 ---
 BasedOnStyle: webkit
+ColumnLimit: 120
 # OK, old clang-format does not support such
 # InsertNewlineAtEOF: true

@@ -39,6 +39,12 @@ namespace art_modern {
         file_reader.close();
     }
 
+    InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
+    {
+        seq_map_.emplace(contig_name, seq);
+        seq_lengths_.emplace(contig_name, seq.size());
+    }
+
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;
 }
 }

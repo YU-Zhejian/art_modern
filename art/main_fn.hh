@@ -4,6 +4,7 @@
 #include "ArtContig.hh"
 #include "ArtParams.hh"
 #include "Empdist.hh"
+#include "out/OutputDispatcher.hh"
 
 namespace labw {
 namespace art_modern {
@@ -12,9 +13,8 @@ namespace art_modern {
     // the maxium number of indels is set by cdf_cutoff to save computation time
     void print_banner();
 
-    void generate_all(const std::string& id, const std::string& ref_seq,
-        const ArtParams& art_params, const Empdist& qdist,
-        double x_fold);
+    void generate_all(const std::string& contig_name, const std::string& ref_seq, const ArtParams& art_params,
+        const Empdist& qdist, double x_fold, OutputDispatcher& output_dispatcher);
 
     class GeneratedSeq {
     public:

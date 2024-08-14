@@ -15,7 +15,9 @@ ArtRead ArtContig::generate_read_se() const
 {
     ArtRead read_1(_art_params);
     auto ref_len = static_cast<int>(_ref_seq.length());
-    auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE ? 0 : static_cast<int>(floor(r_prob() * _valid_region));
+    auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+        ? 0
+        : static_cast<int>(floor(r_prob() * _valid_region));
     auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
     // ensure get a fixed read length
     if (pos_1 + _art_params.read_len - slen_1 > ref_len) {
@@ -47,8 +49,7 @@ ArtReadPair ArtContig::generate_read_mp() const
         fragment_len = ref_len;
     } else {
         auto rng = boost::mt19937();
-        auto gaussian = boost::normal_distribution<>(
-            _art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
+        auto gaussian = boost::normal_distribution<>(_art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
         if (_art_params.pe_frag_dist_mean - 2 * _art_params.pe_frag_dist_std_dev > ref_len) {
             // when reference length < pe_frag_dist_mean-2*std, fragment_len sets to
             // be reference length
@@ -64,8 +65,9 @@ ArtReadPair ArtContig::generate_read_mp() const
     auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
         ? ref_len - _art_params.read_len
         : static_cast<int>(floor((ref_len - fragment_len) * r_prob()) + fragment_len - _art_params.read_len);
-    auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE ? ref_len - _art_params.read_len
-                                                                                  : ref_len - (pos_1 + 2 * _art_params.read_len - fragment_len);
+    auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+        ? ref_len - _art_params.read_len
+        : ref_len - (pos_1 + 2 * _art_params.read_len - fragment_len);
     // Exceptions at this step for unknown reasons.
     auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
     auto slen_2 = read_2.generate_indels(_art_params.read_len, false);
@@ -116,8 +118,7 @@ ArtReadPair ArtContig::generate_read_pe() const
     } else {
         auto rng = boost::mt19937();
         // FIXME: _art_params.pe_frag_dist_std_dev seems not working
-        auto gaussian = boost::normal_distribution<>(
-            _art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
+        auto gaussian = boost::normal_distribution<>(_art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
         if (_art_params.pe_frag_dist_mean - 2 * _art_params.pe_frag_dist_std_dev > ref_len) {
             // when reference length < pe_frag_dist_mean-2*std, fragment_len sets to
             // be reference length
@@ -170,8 +171,7 @@ ArtReadPair ArtContig::generate_read_pe() const
     return { read_1, read_2 };
 }
 
-ArtContig::ArtContig(std::string ref_seq, std::string id,
-    const ArtParams& art_params)
+ArtContig::ArtContig(std::string ref_seq, std::string id, const ArtParams& art_params)
     : _art_params(art_params)
     , _ref_seq(ref_seq)
     , _id(std::move(id))

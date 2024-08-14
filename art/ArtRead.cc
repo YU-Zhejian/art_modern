@@ -65,17 +65,15 @@ int ArtRead::generate_indels(int read_len, bool is_read_1)
     int ins_len = 0;
     int del_len = 0;
     indel.clear();
-    auto per_base_del_rate = is_read_1 ? _art_params.per_base_del_rate_1
-                                       : _art_params.per_base_del_rate_2;
-    auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1
-                                       : _art_params.per_base_ins_rate_2;
+    auto per_base_del_rate = is_read_1 ? _art_params.per_base_del_rate_1 : _art_params.per_base_del_rate_2;
+    auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1 : _art_params.per_base_ins_rate_2;
     // deletion
     for (int i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
         if (per_base_del_rate[i] >= r_prob()) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = static_cast<int>(
-                    floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
+                auto pos
+                    = static_cast<int>(floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
                 if (indel.count(pos) == 0) {
                     indel[pos] = ALN_GAP;
                     j--;
@@ -109,10 +107,8 @@ int ArtRead::generate_indels_2(int read_len, bool is_read_1)
     int ins_len = 0;
     int del_len = 0;
     indel.clear();
-    auto per_base_del_rate = is_read_1 ? _art_params.per_base_del_rate_1
-                                       : _art_params.per_base_del_rate_2;
-    auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1
-                                       : _art_params.per_base_ins_rate_2;
+    auto per_base_del_rate = is_read_1 ? _art_params.per_base_del_rate_1 : _art_params.per_base_del_rate_2;
+    auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1 : _art_params.per_base_ins_rate_2;
 
     for (int i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
         if (per_base_ins_rate[i] >= r_prob()) {
@@ -140,8 +136,8 @@ int ArtRead::generate_indels_2(int read_len, bool is_read_1)
         if (per_base_del_rate[i] >= r_prob()) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = static_cast<int>(
-                    floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
+                auto pos
+                    = static_cast<int>(floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
                 if (pos == 0) {
                     continue;
                 }

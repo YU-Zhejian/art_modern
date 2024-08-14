@@ -38,7 +38,8 @@ void test_fasta(const std::shared_ptr<BaseFastaFetch>& fastaFetch)
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 16) == "TANNTGNATNATGN");
-    BOOST_TEST(fastaFetch->fetch("chr2", 0, fastaFetch->seq_len("chr2")) == "NNNNNNNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTTCTNNNNNNNNN");
+    BOOST_TEST(fastaFetch->fetch("chr2", 0, fastaFetch->seq_len("chr2"))
+        == "NNNNNNNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTTCTNNNNNNNNN");
     BOOST_TEST(fastaFetch->fetch("chr6", 0, fastaFetch->seq_len("chr6")) == "CTA");
     BOOST_TEST(fastaFetch->fetch("chr4", 0, fastaFetch->seq_len("chr4")) == "AAAAAAAAAACCCCCC");
     BOOST_TEST(fastaFetch->fetch("chr1", 0, 1) == "N");
