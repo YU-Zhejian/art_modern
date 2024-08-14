@@ -58,12 +58,12 @@ if __name__ == "__main__":
             query_ptr = 0
             for cigar_op, cigar_len in aln.cigartuples:
                 if cigar_op == CigarOps.BAM_CEQUAL_STR:
-                    assert ref_seq[ref_ptr : ref_ptr + cigar_len] == query_seq[query_ptr : query_ptr + cigar_len]
+                    assert ref_seq[ref_ptr : ref_ptr + cigar_len] == query_seq[query_ptr : query_ptr + cigar_len], aln
                 elif cigar_op == CigarOps.BAM_CDIFF:
-                    assert ref_seq[ref_ptr : ref_ptr + cigar_len] != query_seq[query_ptr : query_ptr + cigar_len]
+                    assert ref_seq[ref_ptr : ref_ptr + cigar_len] != query_seq[query_ptr : query_ptr + cigar_len], aln
                 if CigarOps.CONSUMES_QUERY[cigar_op]:
                     query_ptr += cigar_len
                 if CigarOps.CONSUMES_REFERENCE[cigar_op]:
                     ref_ptr += cigar_len
-            assert ref_ptr == len(ref_seq)
-            assert query_ptr == len(query_seq)
+            assert ref_ptr == len(ref_seq), aln
+            assert query_ptr == len(query_seq), aln

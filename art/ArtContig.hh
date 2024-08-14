@@ -9,11 +9,6 @@
 namespace labw {
 namespace art_modern {
 
-    struct ArtReadPair {
-        ArtRead read_1;
-        ArtRead read_2;
-    };
-
     class ArtContig {
 
     public:
@@ -32,10 +27,6 @@ namespace art_modern {
          */
         std::string _ref_seq;
         std::string _id;
-        /**
-         * Reverse-complementary of {@link _ref_seq}.
-         */
-        std::string _ref_seq_cmp;
         int _valid_region;
     };
 

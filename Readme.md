@@ -6,11 +6,24 @@ Modernized ART that is parallelized and modularized using modern C++.
 
 ## Quick Start
 
+Build the project using:
+
+```shell
+mkdir -p build_release
+env -C build_release cmake -DCMAKE_BUILD_TYPE=Release -DCEU_CM_SHOULD_ENABLE_TEST=FALSE ..
+env -C build_release make
+```
+
+The project binary will be available at `build_release/art_modern`.
+
 ## Installation 
 
 ### Dependencies
 
-- [CMake](https://cmake.org/), our building system.
+- [CMake](https://cmake.org/), the building system used in our project. That further require:
+  - A [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
+    - Under GNU/Linux, using [Ninja](https://ninja-build.org/) or [GNU Make](https://www.gnu.org/software/make) is preferred.
+  - Under GNU/Linux, our project further requires [GNU Bash](https://www.gnu.org/software/bash).
 - A working C and C++ compiler that supports C++ 14. Following compilers are supported:
   - [GCC](https://gcc.gnu.org/);
   - [Clang](https://clang.llvm.org/);
@@ -49,7 +62,23 @@ sets `BUILD_SHARED_LIBS` to `ON`.
 - `USE_HTSLIB`: Use which HTSLib implementation
   - unset (DEFAULT): Will use bundled HTSLib.
   - `hts`: Will use the HTSLib found in system.
-
+- `CEU_CM_SHOULD_ENABLE_TEST`: Whether test should be enabled.
+  - unset (DEFAULT): Depends on `CMAKE_BUILD_TYPE`.
+  - `OFF`: Will disable test.
+  - `ON`: Will enable test.
+- `CEU_CM_SHOULD_USE_NATIVE`: Whether to build the binaries using `-mtune=native`, if possible. This would result in faster executable but impaired portability.
+  - `OFF` (DEFAULT): Will not build native executables/libraries.
+  - `ON`: Will not native executables/libraries.
+- [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html): The CMake build type.
+  - `Debug` (DEFAULT): For developers with debugging needs.
+    - Optimization is turned off with debugging symbols and compiler warnings enabled.
+    - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `TRUE`.
+  - `Release`: Optimized executables/libraries without debug symbols.
+    - Optimization is turned on with compiler warnings disabled.
+    - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `FALSE`.
+  - `RelWithDebInfo`: Optimized executables/libraries with debug symbols.
+    - Optimization is turned on with compiler warnings disabled.
+    - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `TRUE`.
 
 ## Usage
 
@@ -94,11 +123,24 @@ The bundled HTSLib library used MIT License with following reference:
 
 ## TODO
 
-- Support external HTSLib.
+- Refactor output-related argument parser to `OutputDispatcher`.
+- Design and implement a job scheduling system using `boost::lockfree` and `boost::signal2`.
 - Make it faster.
 - Update the HTSLib CMake routine for setting macros like `HAVE_LIBBZ2` correct.
+- Support running under Microsoft Windows.
+
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
+- Support MAF output format?
 
 ## FAQ
 
 ### How to split produced pair-end/mate-pair sequencing results to 2 files?
+
+This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `tmp/test_small_pe/NC_001416.1.fq`:
+
+```shell
+# Read 1
+seqtk seq tmp/test_small_pe/NC_001416.1.fq -1 > tmp/test_small_pe/NC_001416.1_1.fq
+# Read 2
+seqtk seq tmp/test_small_pe/NC_001416.1.fq -2 > tmp/test_small_pe/NC_001416.1_2.fq
+```

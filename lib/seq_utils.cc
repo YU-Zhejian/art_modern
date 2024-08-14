@@ -2,6 +2,8 @@
 
 #include "art_modern_constants.hh"
 #include <algorithm>
+#include <boost/log/trivial.hpp>
+#include <htslib/sam.h>
 #include <map>
 #include <sstream>
 #include <vector>
@@ -24,9 +26,15 @@ namespace art_modern {
     std::string comp(const std::string& dna)
     {
         std::string rets;
-        rets.reserve(dna.length());
-        for (auto i : dna) {
-            rets += rev_comp_trans.at(i);
+        rets.resize(dna.length());
+        for (const auto& i : range(0, dna.length(), 1)) {
+            try {
+                rets[i] = rev_comp_trans.at(dna[i]);
+            } catch (std::out_of_range&) {
+                // TODO: Make this more user-friendly.
+                BOOST_LOG_TRIVIAL(error) << "Invalid character asc(" << (int)dna[i] << ") in dna string";
+                throw std::invalid_argument("Invalid character in dna string");
+            }
         }
         return rets;
     }
@@ -54,6 +62,15 @@ namespace art_modern {
             c[i] = cigar_arr[i];
         }
         return c;
+    }
+
+    std::vector<int> range(int start, int stop, int step)
+    {
+        std::vector<int> result;
+        for (int i = start; step > 0 ? i < stop : i > stop; i += step) {
+            result.push_back(i);
+        }
+        return result;
     }
 } // namespace art_modern
 } // namespace labw

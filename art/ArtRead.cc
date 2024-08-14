@@ -1,9 +1,7 @@
 #include "ArtRead.hh"
 #include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
-#include "misc.hh"
 
-#include <boost/format.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_smallint.hpp>
 #include <utility>
@@ -48,7 +46,7 @@ std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
             qual_mutated[i] = 1; // FIXME: This is the reason why this function cannot be const
             continue;
         }
-        if (r_prob() < _art_params.err_prob[qual_mutated[i]]) {
+        if (rprob.r_prob() < _art_params.err_prob[qual_mutated[i]]) {
             char achar = seq_read[i];
             while (seq_read[i] == achar) {
                 achar = rand_base();
@@ -69,11 +67,11 @@ int ArtRead::generate_indels(int read_len, bool is_read_1)
     auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1 : _art_params.per_base_ins_rate_2;
     // deletion
     for (int i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_del_rate[i] >= r_prob()) {
+        if (per_base_del_rate[i] >= rprob.r_prob()) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos
-                    = static_cast<int>(floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
+                auto pos = static_cast<int>(
+                    floor((read_len - 1) * rprob.r_prob())); // invalid deletion positions: 0 or read_len-1
                 if (indel.count(pos) == 0) {
                     indel[pos] = ALN_GAP;
                     j--;
@@ -87,10 +85,10 @@ int ArtRead::generate_indels(int read_len, bool is_read_1)
         if ((read_len - del_len - ins_len) < (i + 1)) {
             continue; // ensure that enough unchanged position for mutation
         }
-        if (per_base_ins_rate[i] >= r_prob()) {
+        if (per_base_ins_rate[i] >= rprob.r_prob()) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = static_cast<int>(floor(r_prob() * read_len));
+                auto pos = static_cast<int>(floor(rprob.r_prob() * read_len));
                 if (indel.count(pos) == 0) {
                     indel[pos] = rand_base();
                     j--;
@@ -111,10 +109,10 @@ int ArtRead::generate_indels_2(int read_len, bool is_read_1)
     auto per_base_ins_rate = is_read_1 ? _art_params.per_base_ins_rate_1 : _art_params.per_base_ins_rate_2;
 
     for (int i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_ins_rate[i] >= r_prob()) {
+        if (per_base_ins_rate[i] >= rprob.r_prob()) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = static_cast<int>(floor(r_prob() * read_len));
+                auto pos = static_cast<int>(floor(rprob.r_prob() * read_len));
                 if (indel.count(pos) == 0) {
                     indel[pos] = rand_base();
                     j--;
@@ -133,11 +131,11 @@ int ArtRead::generate_indels_2(int read_len, bool is_read_1)
         if ((read_len - del_len - ins_len) < (i + 1))
             continue; // ensure that enough unchanged position for mutation
 
-        if (per_base_del_rate[i] >= r_prob()) {
+        if (per_base_del_rate[i] >= rprob.r_prob()) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos
-                    = static_cast<int>(floor((read_len - 1) * r_prob())); // invalid deletion positions: 0 or read_len-1
+                auto pos = static_cast<int>(
+                    floor((read_len - 1) * rprob.r_prob())); // invalid deletion positions: 0 or read_len-1
                 if (pos == 0) {
                     continue;
                 }

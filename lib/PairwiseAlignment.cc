@@ -1,7 +1,6 @@
 #include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
-#include "misc.hh"
-#include <boost/format.hpp>
+#include "seq_utils.hh"
 #include <utility>
 
 namespace labw {
@@ -40,8 +39,7 @@ namespace art_modern {
         uint32_t cigar_len = 0;
         auto ref_len = static_cast<int>(aligned_ref.length());
 
-        auto _range
-            = is_plus_strand ? labw::art_modern::range(0, ref_len, 1) : labw::art_modern::range(ref_len - 1, -1, -1);
+        auto _range = is_plus_strand ? range(0, ref_len, 1) : range(ref_len - 1, -1, -1);
         for (auto i : _range) {
             if (aligned_ref[i] == aligned_query[i]) {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;

@@ -17,13 +17,13 @@ ArtRead ArtContig::generate_read_se() const
     auto ref_len = static_cast<int>(_ref_seq.length());
     auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
         ? 0
-        : static_cast<int>(floor(r_prob() * _valid_region));
+        : static_cast<int>(floor(rprob.r_prob() * _valid_region));
     auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
     // ensure get a fixed read length
     if (pos_1 + _art_params.read_len - slen_1 > ref_len) {
         slen_1 = read_1.generate_indels_2(_art_params.read_len, true);
     }
-    read_1.is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || r_prob() < 0.5;
+    read_1.is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
     if (read_1.is_plus_strand) {
         //    |----------->
         // ------------------------------------
@@ -31,7 +31,7 @@ ArtRead ArtContig::generate_read_se() const
     } else {
         // ------------------------------------
         //                   <-----------|
-        read_1.seq_ref = _ref_seq_cmp.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -64,7 +64,7 @@ ArtReadPair ArtContig::generate_read_mp() const
 
     auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
         ? ref_len - _art_params.read_len
-        : static_cast<int>(floor((ref_len - fragment_len) * r_prob()) + fragment_len - _art_params.read_len);
+        : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()) + fragment_len - _art_params.read_len);
     auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
         ? ref_len - _art_params.read_len
         : ref_len - (pos_1 + 2 * _art_params.read_len - fragment_len);
@@ -80,7 +80,7 @@ ArtReadPair ArtContig::generate_read_mp() const
         slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
     }
 
-    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || r_prob() < 0.5;
+    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
     if (is_plus_strand) {
         // R1                  |----------->
         //   ------------------------------------
@@ -89,13 +89,13 @@ ArtReadPair ArtContig::generate_read_mp() const
         read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
 
         read_2.is_plus_strand = false;
-        read_2.seq_ref = _ref_seq_cmp.substr(pos_2, _art_params.read_len - slen_2);
+        read_2.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_2, _art_params.read_len - slen_2));
     } else {
         // R2   <-----------|
         //   ------------------------------------
         // R1                  |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = _ref_seq_cmp.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
         read_2.is_plus_strand = true;
         read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
     }
@@ -132,7 +132,7 @@ ArtReadPair ArtContig::generate_read_pe() const
     }
     auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
         ? 0
-        : static_cast<int>(floor((ref_len - fragment_len) * r_prob()));
+        : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()));
     auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE ? 0 : ref_len - pos_1 - fragment_len;
     int slen_1 = read_1.generate_indels(_art_params.read_len, true);
     int slen_2 = read_2.generate_indels(_art_params.read_len, false);
@@ -145,7 +145,7 @@ ArtReadPair ArtContig::generate_read_pe() const
         slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
     }
 
-    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || r_prob() < 0.5;
+    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
 
     if (is_plus_strand) {
         //    |----------->
@@ -154,13 +154,13 @@ ArtReadPair ArtContig::generate_read_pe() const
         read_1.is_plus_strand = true;
         read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
         read_2.is_plus_strand = false;
-        read_2.seq_ref = _ref_seq_cmp.substr(pos_2, _art_params.read_len - slen_2);
+        read_2.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_2, _art_params.read_len - slen_2));
     } else {
         //                   <-----------|
         // ------------------------------------
         //    |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = _ref_seq_cmp.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
         read_2.is_plus_strand = true;
         read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
     }
@@ -179,26 +179,6 @@ ArtContig::ArtContig(std::string ref_seq, std::string id, const ArtParams& art_p
     std::replace(ref_seq.begin(), ref_seq.end(), 'U', 'T');
 
     const auto ref_len = static_cast<int>(ref_seq.length());
-    _ref_seq_cmp.resize(ref_len);
     boost::algorithm::to_upper(ref_seq);
-    for (auto i = 0; i < ref_len; i++) {
-        auto k = ref_len - i - 1; // Reverse complementary position
-        switch (ref_seq[i]) {
-        case 'A':
-            _ref_seq_cmp[k] = 'T';
-            break;
-        case 'C':
-            _ref_seq_cmp[k] = 'G';
-            break;
-        case 'G':
-            _ref_seq_cmp[k] = 'C';
-            break;
-        case 'T':
-            _ref_seq_cmp[k] = 'A';
-            break;
-        default:
-            _ref_seq_cmp[k] = 'N';
-        }
-    }
     _valid_region = ref_len - _art_params.read_len;
 }

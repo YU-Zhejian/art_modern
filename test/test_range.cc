@@ -1,4 +1,5 @@
-#include "misc.hh"
+#include "seq_utils.hh"
+
 #define BOOST_TEST_MODULE test_range
 #include <boost/test/unit_test.hpp>
 

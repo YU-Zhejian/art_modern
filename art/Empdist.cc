@@ -25,7 +25,7 @@ namespace art_modern {
         int cumCC;
         map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(r_prob() * max_dist_number);
+            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
             it = qual_dist[i].lower_bound(cumCC);
             read_qual.push_back(it->second);
         }
@@ -46,7 +46,7 @@ namespace art_modern {
         int cumCC;
 
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(r_prob() * max_dist_number);
+            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
                 read_qual.push_back(it->second);
@@ -61,7 +61,7 @@ namespace art_modern {
                 read_qual.push_back(it->second);
             } else {
                 // return random quality less than 10
-                read_qual.push_back((int)r_prob() * 10);
+                read_qual.push_back((int)rprob.r_prob() * 10);
             }
         }
         return read_qual;
@@ -80,7 +80,7 @@ namespace art_modern {
         }
         int cumCC;
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(r_prob() * max_dist_number);
+            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_second[i].lower_bound(cumCC);
                 read_qual.push_back(it->second);
@@ -95,7 +95,7 @@ namespace art_modern {
                 read_qual.push_back(it->second);
             } else {
                 // return random quality less than 10
-                read_qual.push_back((int)r_prob() * 10);
+                read_qual.push_back((int)rprob.r_prob() * 10);
             }
         }
         return read_qual;
@@ -245,11 +245,14 @@ namespace art_modern {
         }
         read_emp_dist(distss, is_first);
     }
-    double r_prob()
+
+    Rprob::Rprob()
+        : gen_(rd_())
+        , dis_(0.0f, 1.0f)
     {
-        std::random_device rd;
-        std::mt19937 gen(rd());
-        return (double)gen() / std::mt19937::max();
     }
+
+    double Rprob::r_prob() { return dis_(gen_); }
+
 }
 }

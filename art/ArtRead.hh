@@ -47,5 +47,10 @@ namespace art_modern {
         ArtParams _art_params;
     };
 
+    struct ArtReadPair {
+        ArtRead read_1;
+        ArtRead read_2;
+    };
+
 } // namespace art_modern
 } // namespace labw

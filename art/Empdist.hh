@@ -10,8 +10,17 @@
 
 namespace labw {
 namespace art_modern {
+    class Rprob {
+    public:
+        Rprob();
+        double r_prob();
 
-    double r_prob();
+    private:
+        std::random_device rd_;
+        std::mt19937 gen_;
+        std::uniform_real_distribution<float> dis_;
+    };
+    static Rprob rprob;
 
     class Empdist {
     public:

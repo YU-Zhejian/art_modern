@@ -5,6 +5,7 @@ CONTIG=NC_001416.1
 FILE=raw_data/lambda_phage.fa
 PARALLEL=0
 IDRATE=0.1
+FCOV=100
 
 function sam2bam() {
     samtools sort -@20 "${1}"/"${CONTIG}".sam -o "${1}"/"${CONTIG}".bam
@@ -19,7 +20,7 @@ build/art_modern \
     --out_file_prefix tmp/test_small_se_amp \
     --read_len 125 \
     --mode template \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
@@ -33,7 +34,7 @@ build/art_modern \
     --seq_file "${FILE}" \
     --out_file_prefix tmp/test_small_se \
     --read_len 125 \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
@@ -42,12 +43,12 @@ build/art_modern \
     --del_rate_2 "${IDRATE}"
 sam2bam tmp/test_small_se
 # Official
-art_illumina \
+time art_illumina \
     -ss HS25 \
     -sam \
     -i raw_data/lambda_phage.fa \
     -l 125 \
-    -f 10 \
+    -f "${FCOV}" \
     -o tmp/test_small_se_official \
     -ir "${IDRATE}" -ir2 "${IDRATE}" -dr "${IDRATE}" -dr2 "${IDRATE}"
 
@@ -60,7 +61,7 @@ build/art_modern \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 10 \
     --lc pe \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
@@ -77,7 +78,7 @@ build/art_modern \
     --read_len 125 \
     --lc pe \
     --mode template \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
@@ -95,7 +96,7 @@ build/art_modern \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 10 \
     --lc mp \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
@@ -112,7 +113,7 @@ build/art_modern \
     --read_len 125 \
     --lc mp \
     --mode template \
-    --fcov 10 \
+    --fcov "${FCOV}" \
     --parallel "${PARALLEL}" \
     --parallel_on_read \
     --ins_rate_1 "${IDRATE}" \
