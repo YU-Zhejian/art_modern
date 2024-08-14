@@ -3,13 +3,10 @@ project(
     htslib
     VERSION 1.15
     LANGUAGES C CXX)
-set(CMAKE_C_STANDARD 99)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
-
-set(LIBCEU_CMAKE_COLLECTION_DIR "../../../libceu/cmake_collections")
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_c_helloworld.cmake")
@@ -95,23 +92,23 @@ else()
     endif()
 endif()
 
-configure_file("${CMAKE_CURRENT_LIST_DIR}/config_vars.h.in" "${CMAKE_BINARY_DIR}/include/config_vars.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/htslib_config_vars.h.in" "${CMAKE_BINARY_DIR}/include/htslib_config_vars.h")
 configure_file("${CMAKE_CURRENT_LIST_DIR}/htslib_version.h.in" "${CMAKE_BINARY_DIR}/include/htslib_version.h")
 
 file(GLOB HTSLIB_SOURCES ${CMAKE_CURRENT_LIST_DIR}/*.c ${CMAKE_CURRENT_LIST_DIR}/cram/*.c
      ${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs/*.c)
 if(BUILD_SHARED_LIBS)
-    add_library(hts SHARED ${HTSLIB_SOURCES})
+    add_library(labw_slim_htslib SHARED ${HTSLIB_SOURCES})
     target_link_libraries(
-        hts
+            labw_slim_htslib
         PUBLIC "${CMAKE_CM_LIBDEFLATE_LIBRARY_SHARED}" "${CMAKE_CM_LIBZ_LIBRARY_SHARED}"
                "${CMAKE_CM_LIBLZMA_LIBRARY_SHARED}" "${CMAKE_CM_LIBBZ2_LIBRARY_SHARED}" "${CEU_CM_LIBPTHREAD_SHARED}"
                "${CEU_CM_LIBM_SHARED}")
 else()
-    add_library(hts STATIC ${HTSLIB_SOURCES})
-    ceu_cm_set_static_target(hts)
+    add_library(labw_slim_htslib STATIC ${HTSLIB_SOURCES})
+    ceu_cm_set_static_target(labw_slim_htslib)
     target_link_libraries(
-        hts
+            labw_slim_htslib
         PUBLIC "${CMAKE_CM_LIBDEFLATE_LIBRARY_STATIC}" "${CMAKE_CM_LIBZ_LIBRARY_STATIC}"
                "${CMAKE_CM_LIBLZMA_LIBRARY_STATIC}" "${CMAKE_CM_LIBBZ2_LIBRARY_STATIC}" "${CEU_CM_LIBPTHREAD_STATIC}"
                "${CEU_CM_LIBM_STATIC}")

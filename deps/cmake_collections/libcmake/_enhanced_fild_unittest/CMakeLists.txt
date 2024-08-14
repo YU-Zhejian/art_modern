@@ -1,0 +1,35 @@
+# Unit test of enhanced_find.
+cmake_minimum_required(VERSION 3.14)
+project(CUT C)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../enhanced_find.cmake")
+
+ceu_cm_get_abspath_from_linker_flag(UT_LIBM_LIBRARIES_STATIC m true)
+message(STATUS "UT_LIBM_LIBRARIES_STATIC=${UT_LIBM_LIBRARIES_STATIC}")
+
+ceu_cm_get_abspath_from_linker_flag(UT_LIBM_LIBRARIES_SHARED m false)
+message(STATUS "UT_LIBM_LIBRARIES_SHARED=${UT_LIBM_LIBRARIES_SHARED}")
+
+ceu_cm_get_linker_flags_from_pkg_config(UT_XRENDER_LIBRARIES_STATIC xrender true)
+message(STATUS "UT_XRENDER_LIBRARIES_STATIC=${UT_XRENDER_LIBRARIES_STATIC}")
+
+ceu_cm_get_linker_flags_from_pkg_config(UT_XRENDER_LIBRARIES_SHARED xrender false)
+message(STATUS "UT_XRENDER_LIBRARIES_SHARED=${UT_XRENDER_LIBRARIES_SHARED}")
+
+ceu_cm_get_library_abspath_from_pkg_config(UT_XRENDER_LINK_LIBRARIES_STATIC xrender true)
+message(STATUS "UT_XRENDER_LINK_LIBRARIES_STATIC=${UT_XRENDER_LINK_LIBRARIES_STATIC}")
+
+ceu_cm_get_library_abspath_from_pkg_config(UT_XRENDER_LINK_LIBRARIES_SHARED xrender false)
+message(STATUS "UT_XRENDER_LINK_LIBRARIES_SHARED=${UT_XRENDER_LINK_LIBRARIES_SHARED}")
+
+ceu_cm_enhanced_find_library(STATIC LINKER_FLAG z OUTPUT_VARIABLE ZLIB_FROM_LINKER_FLAG)
+message(STATUS "ZLIB_FROM_LINKER_FLAG=${ZLIB_FROM_LINKER_FLAG}")
+
+ceu_cm_enhanced_find_library(STATIC PKGCONFIG_NAME zlib OUTPUT_VARIABLE ZLIB_FROM_PKGCONF)
+message(STATUS "ZLIB_FROM_PKGCONF=${ZLIB_FROM_PKGCONF}")
+
+ceu_cm_enhanced_find_library(LINKER_FLAG deflate OUTPUT_VARIABLE LIBDEFLATE_FROM_LINKER_FLAG)
+message(STATUS "LIBDEFLATE_FROM_LINKER_FLAG=${LIBDEFLATE_FROM_LINKER_FLAG}")
+
+ceu_cm_enhanced_find_library(PKGCONFIG_NAME libdeflate OUTPUT_VARIABLE LIBDEFLATE_FROM_PKGCONF)
+message(STATUS "LIBDEFLATE_FROM_PKGCONF=${LIBDEFLATE_FROM_PKGCONF}")

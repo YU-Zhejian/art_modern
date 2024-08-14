@@ -55,7 +55,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include "htslib/hfile.h"
 #include "htslib/hts_endian.h"
 #include "htslib_version.h"
-#include "config_vars.h"
+#include "htslib_config_vars.h"
 #include "hts_internal.h"
 #include "hfile_internal.h"
 #include "sam_internal.h"
@@ -66,11 +66,7 @@ DEALINGS IN THE SOFTWARE.  */
 #include "htslib/kseq.h"
 #include "htslib/ksort.h"
 #include "htslib/tbx.h"
-#if defined(HAVE_EXTERNAL_LIBHTSCODECS)
-#include <htscodecs/htscodecs.h>
-#else
 #include "htscodecs/htscodecs/htscodecs.h"
-#endif
 
 #ifndef EFTYPE
 #define EFTYPE ENOEXEC
@@ -170,11 +166,7 @@ const char *hts_feature_string(void) {
     static char config[1200];
     const char *flags=
 
-#ifdef PACKAGE_URL
-    "build=configure "
-#else
-    "build=Makefile "
-#endif
+    "build=CMake "
 
 #ifdef HAVE_LIBCURL
     "libcurl=yes "

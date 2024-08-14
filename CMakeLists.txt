@@ -1,34 +1,29 @@
 cmake_minimum_required(VERSION 3.14)
 # cmake_policy(SET CMP0167 NEW)
 
-project(art_modern LANGUAGES CXX)
+project(
+    art_modern
+    LANGUAGES C CXX
+    VERSION 1.0.0)
+set(ART_MODERN_VERSION "${PROJECT_VERSION}")
+
+set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+
+if(NOT DEFINED BUILD_SHARED_LIBS)
+    set(BUILD_SHARED_LIBS ON)
+endif()
 
 # Installation
 include(GNUInstallDirs)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 
-# Set C/CXX standard
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
-
 # Macros from LibCEU.
-macro(ceu_cm_set_static_target name)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
-    set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
-    if(CMAKE_VERSION GREATER_EQUAL 3.13
-       AND NOT BORLAND
-       AND NOT MSVC)
-        target_link_options(
-            "${name}" PRIVATE -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
-            $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> $<$<COMPILE_LANGUAGE:Fortran>:-static-libgfortran>)
-    endif()
-endmacro()
-
-if(NOT DEFINED BUILD_SHARED_LIBS)
-    set(BUILD_SHARED_LIBS ON)
-endif()
+set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 # Boost
 if(BUILD_SHARED_LIBS)
@@ -47,14 +42,38 @@ find_package(
 include_directories(${Boost_INCLUDE_DIRS})
 
 # HTSLib
-add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
+if(DEFINED USE_HTSLIB)
+
+    if(BUILD_SHARED_LIBS)
+        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG hts PKGCONFIG_NAME htslib)
+    else()
+        ceu_cm_enhanced_find_library(
+            OUTPUT_VARIABLE
+            CMAKE_CM_LIBHTS_LIBRARY
+            STATIC
+            LINKER_FLAG
+            hts
+            PKGCONFIG_NAME
+            htslib)
+    endif()
+
+    if(NOT CMAKE_CM_LIBHTS_LIBRARY)
+        message(FATAL_ERROR "htslib not found!")
+    endif()
+
+    set(USED_HTSLIB_NAME "${CMAKE_CM_LIBHTS_LIBRARY}")
+else()
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
+    include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
+    set(USED_HTSLIB_NAME labw_slim_htslib)
+endif()
 
 # Main
 configure_file("${CMAKE_CURRENT_LIST_DIR}/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/lib/art_modern_config.h.in" "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")
 include_directories("${CMAKE_BINARY_DIR}/include/")
-include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
 file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc" "lib/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE} lib/art_modern_constants.hh)
 
@@ -65,7 +84,7 @@ set(ART_MODERN_LINK_LIBS
     Boost::thread
     Boost::log_setup
     Boost::log
-    hts)
+    "${USED_HTSLIB_NAME}")
 if(Boost_timer_FOUND)
     add_compile_definitions("WITH_BOOST_TIMER")
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::timer)

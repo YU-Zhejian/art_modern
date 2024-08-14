@@ -1,4 +1,3 @@
-
 .PHONY: build
 build:
 	mkdir -p build
@@ -6,9 +5,23 @@ build:
 	env -C build ninja -j40
 	env -C build ctest
 
+.PHONY: build_external_htslib
+build_external_htslib:
+	mkdir -p build_external_htslib
+	env -C build_external_htslib cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DUSE_HTSLIB="hts" \
+		-G Ninja ..
+	env -C build_external_htslib ninja -j40
+	env -C build_external_htslib ctest
+
 .PHONY: fmt
 fmt:
 	bash fmt.sh
+
+.PHONY: scc
+scc:
+	bash scc.sh
 
 .PHONY: touch
 touch:
@@ -51,3 +64,8 @@ raw_data:
 .PHONY: build-alpine
 build-alpine:
 	cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF; ninja
+
+.PHONY: sync-ceu-cm
+sync-ceu-cm:
+	rm -fr deps/cmake_collections
+	cp -r ../libceu/cmake_collections/ deps/

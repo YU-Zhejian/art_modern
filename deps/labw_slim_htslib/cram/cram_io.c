@@ -74,21 +74,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../htslib/hts.h"
 #include "open_trace_file.h"
 
-#if defined(HAVE_EXTERNAL_LIBHTSCODECS)
-#include <htscodecs/rANS_static.h>
-#include <htscodecs/rANS_static4x16.h>
-#include <htscodecs/arith_dynamic.h>
-#include <htscodecs/tokenise_name3.h>
-#include <htscodecs/fqzcomp_qual.h>
-#include <htscodecs/varint.h> // CRAM v4.0 variable-size integers
-#else
 #include "../htscodecs/htscodecs/rANS_static.h"
 #include "../htscodecs/htscodecs/rANS_static4x16.h"
 #include "../htscodecs/htscodecs/arith_dynamic.h"
 #include "../htscodecs/htscodecs/tokenise_name3.h"
 #include "../htscodecs/htscodecs/fqzcomp_qual.h"
 #include "../htscodecs/htscodecs/varint.h"
-#endif
 
 //#define REF_DEBUG
 

@@ -33,6 +33,24 @@ Modernized ART that is parallelized and modularized using modern C++.
     - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details.
   - To use external HTSLib, consult your system administrator.
 
+### CMake Variables
+
+CMake variables should be set when invoking `cmake`. For example,
+
+```shell
+cmake -DBUILD_SHARED_LIBS=ON
+```
+
+sets `BUILD_SHARED_LIBS` to `ON`.
+
+- `BUILD_SHARED_LIBS`: Whether to build shared libraries
+  - `ON` (DEFAULT): Will search for shared libraries and use dynamic linking.
+  - `OFF`: Will search for static libraries and use static linking.
+- `USE_HTSLIB`: Use which HTSLib implementation
+  - unset (DEFAULT): Will use bundled HTSLib.
+  - `hts`: Will use the HTSLib found in system.
+
+
 ## Usage
 
 ### Mode
@@ -45,14 +63,14 @@ Modernized ART that is parallelized and modularized using modern C++.
 
 Changes on software function:
 
--[ ] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
--[ ] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
--[X] Supports 3 library construction methods: `se`, `pe` and `mp`.
--[X] Except FASTQ, support output in SAM and BAM format through HTSLib.
--[X] Support over masking detection was dropped.
--[X] Support over sequencers except Illumina dropped.
--[X] Support over the `aln` output format was dropped.
--[X] Built-in profiles are no longer supported. User must specify path to existing profiles.
+- [ ] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
+- [ ] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
+- [X] Supports 3 library construction methods: `se`, `pe` and `mp`.
+- [X] Except FASTQ, support output in SAM and BAM format through HTSLib.
+- [X] Support over masking detection was dropped.
+- [X] Support over sequencers except Illumina dropped.
+- [X] Support over the `aln` output format was dropped.
+- [X] Built-in profiles are no longer supported. User must specify path to existing profiles.
 
 Changes on software engineering stuff:
 

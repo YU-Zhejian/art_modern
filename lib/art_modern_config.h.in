@@ -1,0 +1,6 @@
+#ifndef ART_MODERN_CONFIG_H
+#define ART_MODERN_CONFIG_H
+
+#cmakedefine USED_HTSLIB_NAME "${USED_HTSLIB_NAME}"
+#cmakedefine ART_MODERN_VERSION "${ART_MODERN_VERSION}"
+#endif

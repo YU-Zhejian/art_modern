@@ -1,5 +1,6 @@
 #include "seq_utils.hh"
 
+#include "art_modern_constants.hh"
 #include <algorithm>
 #include <map>
 #include <sstream>
@@ -15,7 +16,7 @@ namespace art_modern {
         string retq;
         retq.resize(qual.size());
         for (size_t k = 0; k < qual.size(); k++) {
-            retq[k] = (char)(qual[k] + 33);
+            retq[k] = (char)(qual[k] + PHRED_OFFSET);
         }
         return retq;
     }
