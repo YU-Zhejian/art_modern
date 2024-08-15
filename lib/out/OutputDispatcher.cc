@@ -26,6 +26,27 @@ namespace art_modern {
 
     OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
 
-    void OutputDispatcher::add(std::shared_ptr<BaseReadOutput> output) { outputs_.emplace_back(output); }
+    void OutputDispatcher::add(const std::shared_ptr<BaseReadOutput>& output) { outputs_.emplace_back(output); }
+
+    void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc)
+    {
+        for (auto const& factory : factories_) {
+            factory->patch_options(desc);
+        }
+    }
+    std::shared_ptr<BaseReadOutput> OutputDispatcherFactory::create(
+        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    {
+        auto output_dispatcher = std::make_shared<OutputDispatcher>();
+        for (auto const& factory : factories_) {
+            output_dispatcher->add(factory->create(vm, fasta_fetch));
+        }
+        return output_dispatcher;
+    }
+    void OutputDispatcherFactory::add(const std::shared_ptr<BaseReadOutputFactory>& factory)
+    {
+        factories_.emplace_back(factory);
+    }
+
 }
 }

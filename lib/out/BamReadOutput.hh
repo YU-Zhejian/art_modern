@@ -61,5 +61,15 @@ namespace art_modern {
         std::mutex mutex_;
         bool is_closed_ = false;
     };
+
+    class BamReadOutputFactory : public BaseReadOutputFactory {
+    public:
+        void patch_options(boost::program_options::options_description& desc) override;
+        std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
+            std::shared_ptr<BaseFastaFetch>& fasta_fetch) const override;
+
+    private:
+        SamReadOutputOptions sam_options_;
+    };
 }
 }

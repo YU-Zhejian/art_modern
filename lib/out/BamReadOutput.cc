@@ -3,7 +3,10 @@
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
+#include "global_variables.hh"
 #include "seq_utils.hh"
+#include <boost/algorithm/string/join.hpp>
+namespace po = boost::program_options;
 
 namespace labw {
 namespace art_modern {
@@ -127,9 +130,6 @@ namespace art_modern {
         const SamReadOutputOptions& sam_options)
         : sam_options_(sam_options)
     {
-        if (is_closed_) {
-            return;
-        }
         std::unique_lock<std::mutex> rhs_lk(mutex_);
 
         sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(
@@ -158,6 +158,28 @@ namespace art_modern {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
         sam_close(sam_file_);
         is_closed_ = true;
+    }
+    void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc)
+    {
+        po::options_description bam_desc("SAM/BAM Output");
+        bam_desc.add_options()(
+            "o-sam", po::value<std::string>(), "Destination of output SAM/BAM file. Unset to disable the writer.");
+        bam_desc.add_options()(
+            "o-sam-use_m", po::bool_switch(), "Whether to use CIGAR 'M' instead of '=/X' for alignment");
+        bam_desc.add_options()("o-sam-write_bam", po::bool_switch(), "Enforce BAM instead of SAM output.");
+        desc.add(bam_desc);
+    }
+    std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(
+        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    {
+        if (vm.count("o-sam")) {
+            auto so = SamReadOutputOptions();
+            so.use_m = vm.count("o-sam-use_m") > 0;
+            so.write_bam = vm.count("o-sam-write_bam") > 0;
+            so.PG_CL = boost::algorithm::join(args, " ");
+            return std::make_shared<BamReadOutput>(vm["o-sam"].as<std::string>(), fasta_fetch, so);
+        }
+        return std::make_shared<DumbReadOutput>();
     }
 }
 }

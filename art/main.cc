@@ -17,6 +17,7 @@
 #include "art_modern_constants.hh"
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/fasta_parser.hh"
+#include "global_variables.hh"
 #include "main_fn.hh"
 #include "out/BamReadOutput.hh"
 #include "out/FastqReadOutput.hh"
@@ -31,7 +32,6 @@ int main(int argc, char* argv[])
 #else
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
-    vector<string> args;
     for (auto i = 0; i < argc; i++) {
         args.emplace_back(argv[i]);
     }
@@ -79,14 +79,11 @@ int main(int argc, char* argv[])
             break;
         }
 
-        OutputDispatcher output_dispatcher;
+        auto output_dispatcher = art_params.get_output_dispatcher();
         auto fasta_fetch = std::make_shared<InMemoryFastaFetch>(contig_name, ref_seq);
         SamReadOutputOptions sam_opts;
         sam_opts.write_bam = false;
         sam_opts.PG_CL = boost::algorithm::join(args, " ");
-
-        output_dispatcher.add(std::make_shared<FastqReadOutput>(art_params.fqfile(contig_name)));
-        output_dispatcher.add(std::make_shared<BamReadOutput>(art_params.samfile(contig_name), fasta_fetch, sam_opts));
 
         auto func = [art_params, contig_name, ref_seq, qdist, &output_dispatcher] {
             double sequencing_depth;

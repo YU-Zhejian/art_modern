@@ -41,5 +41,20 @@ namespace art_modern {
     }
 
     void FastqReadOutput::close() { stream_.close(); }
+    void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc)
+    {
+        boost::program_options::options_description fastq_desc("FASTQ Output");
+        fastq_desc.add_options()("o-fastq", boost::program_options::value<std::string>(),
+            "Destination of output FASTQ file. Unset to disable the writer.");
+        desc.add(fastq_desc);
+    }
+    std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(
+        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    {
+        if (vm.count("o-fastq")) {
+            return std::make_shared<FastqReadOutput>(vm["o-fastq"].as<std::string>());
+        }
+        return std::make_shared<DumbReadOutput>();
+    }
 }
 }

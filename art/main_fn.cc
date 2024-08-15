@@ -27,10 +27,9 @@ namespace art_modern {
     }
 
     bool generate_pe(const ArtParams& art_params, const Empdist& qdist, const string& contig_name,
-        const ArtContig& art_contig, const long& t_num_read, OutputDispatcher& output_dispatcher)
+        const ArtContig& art_contig, const long& t_num_read, std::shared_ptr<OutputDispatcher>& output_dispatcher)
     {
         ostringstream osID;
-        GeneratedSeq generated_seq;
 
         vector<int> qual_1;
         vector<int> qual_2;
@@ -52,12 +51,10 @@ namespace art_modern {
         auto qual_1_str = qual_to_str(arp.read_1.generate_snv_on_qual(qual_1));
         auto qual_2_str = qual_to_str(arp.read_2.generate_snv_on_qual(qual_2));
 
-        if (!art_params.no_sam) {
-            arp.read_1.generate_pairwise_aln();
-            arp.read_2.generate_pairwise_aln();
-        }
+        arp.read_1.generate_pairwise_aln();
+        arp.read_2.generate_pairwise_aln();
 
-        output_dispatcher.writePE(
+        output_dispatcher->writePE(
             PairwiseAlignment(sam_read_id, contig_name, arp.read_1.seq_read, arp.read_1.seq_ref, qual_1_str,
                 arp.read_1.aln_read, arp.read_1.aln_ref, arp.read_1.bpos, arp.read_1.is_plus_strand),
             PairwiseAlignment(sam_read_id, contig_name, arp.read_2.seq_read, arp.read_2.seq_ref, qual_2_str,
@@ -67,11 +64,10 @@ namespace art_modern {
     }
 
     bool generate_se(const ArtParams& art_params, const Empdist& qdist, const string& contig_name,
-        const ArtContig& art_contig, const long& t_num_read, OutputDispatcher& output_dispatcher)
+        const ArtContig& art_contig, const long& t_num_read, std::shared_ptr<OutputDispatcher>& output_dispatcher)
     {
         ostringstream osID;
         ostringstream FQFILE;
-        GeneratedSeq generated_seq;
         vector<int> qual;
         string read_id;
 
@@ -85,16 +81,14 @@ namespace art_modern {
             qual = qdist.get_read_qual_sep_1(art_read.seq_read);
         }
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
-        if (!art_params.no_sam) {
-            art_read.generate_pairwise_aln();
-        }
-        output_dispatcher.writeSE(PairwiseAlignment(read_id, contig_name, art_read.seq_read, art_read.seq_ref, qual_str,
-            art_read.aln_read, art_read.aln_ref, art_read.bpos, art_read.is_plus_strand));
+        art_read.generate_pairwise_aln();
+        output_dispatcher->writeSE(PairwiseAlignment(read_id, contig_name, art_read.seq_read, art_read.seq_ref,
+            qual_str, art_read.aln_read, art_read.aln_ref, art_read.bpos, art_read.is_plus_strand));
         return true;
     }
 
     void generate_all(const string& contig_name, const string& ref_seq, const ArtParams& art_params,
-        const Empdist& qdist, double x_fold, OutputDispatcher& output_dispatcher)
+        const Empdist& qdist, double x_fold, std::shared_ptr<OutputDispatcher>& output_dispatcher)
     {
         if (x_fold <= 0.0) {
             return;
@@ -123,15 +117,16 @@ namespace art_modern {
         }
         auto num_read_per_batch = static_cast<int>(t_num_read / num_cores + 1);
         std::atomic_long read_id;
-        auto func = [num_read_per_batch, art_params, qdist, contig_name, art_contig, &output_dispatcher, &read_id]() {
-            auto current_num_read_per_batch = num_read_per_batch;
-            while (current_num_read_per_batch > 0) {
-                if ((art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe : generate_se)(
-                        art_params, qdist, contig_name, art_contig, read_id++, output_dispatcher)) {
-                    current_num_read_per_batch -= art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
-                }
-            }
-        };
+        auto func
+            = [&num_read_per_batch, &art_params, &qdist, &contig_name, &art_contig, &output_dispatcher, &read_id]() {
+                  auto current_num_read_per_batch = num_read_per_batch;
+                  while (current_num_read_per_batch > 0) {
+                      if ((art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe : generate_se)(
+                              art_params, qdist, contig_name, art_contig, read_id++, output_dispatcher)) {
+                          current_num_read_per_batch -= art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
+                      }
+                  }
+              };
         boost::asio::thread_pool pool(num_cores);
         for (int i = 0; i < num_cores; i++) {
             if (art_params.parallel_on_read && art_params.parallel != PARALLEL_DISABLE) {

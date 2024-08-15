@@ -1,5 +1,6 @@
 #pragma once
 #include "Empdist.hh"
+#include "out/OutputDispatcher.hh"
 #include <boost/program_options.hpp>
 #include <map>
 #include <string>
@@ -23,14 +24,11 @@ namespace art_modern {
          */
         int max_indel;
         bool sep_flag = false;
-        bool cigar_use_m = false;
-        bool no_sam;
         bool stream;
         std::string id;
         std::string qual_file_1;
         std::string qual_file_2;
         std::string seq_file;
-        std::string out_file_prefix;
         std::map<std::string, double> sequencing_depth;
         double uniform_sequencing_depth = 0.0;
         std::string p_cigar;
@@ -61,39 +59,17 @@ namespace art_modern {
 
         Empdist read_emp() const;
 
-        /**
-         * Get file name for the FASTQ file or FASTQ file 1 for PE simulation.
-         * @param gene_name As described.
-         * @return As described.
-         */
-        std::string fqfile1(const std::string& gene_name) const;
-
-        /**
-         * Get file name for the FASTQ file.
-         * @param gene_name As described.
-         * @return As described.
-         */
-        std::string fqfile(const std::string& gene_name) const;
-
-        /**
-         * Get file name for the FASTQ file 2.
-         * @param gene_name As described.
-         * @return As described.
-         */
-        std::string fqfile2(const std::string& gene_name) const;
-
-        /**
-         * Get file name for the SAM file.
-         * @param gene_name As described.
-         * @return As described.
-         */
-        std::string samfile(const std::string& gene_name) const;
+        std::shared_ptr<OutputDispatcher> get_output_dispatcher() const;
 
         /**
          * Print parameter parsing results.
          */
         void print_params() const;
         void print_help() const;
+
+    private:
+        OutputDispatcherFactory out_dispatcher_factory_;
+        boost::program_options::variables_map vm_;
     };
 
 } // namespace art_modern

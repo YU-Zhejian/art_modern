@@ -171,14 +171,14 @@ ArtReadPair ArtContig::generate_read_pe() const
     return { read_1, read_2 };
 }
 
-ArtContig::ArtContig(std::string ref_seq, std::string id, const ArtParams& art_params)
-    : _art_params(art_params)
-    , _ref_seq(ref_seq)
+ArtContig::ArtContig(std::string ref_seq, std::string id, ArtParams art_params)
+    : _art_params(std::move(art_params))
+    , _ref_seq(std::move(ref_seq))
     , _id(std::move(id))
 {
-    std::replace(ref_seq.begin(), ref_seq.end(), 'U', 'T');
+    std::replace(_ref_seq.begin(), _ref_seq.end(), 'U', 'T');
 
-    const auto ref_len = static_cast<int>(ref_seq.length());
-    boost::algorithm::to_upper(ref_seq);
+    const auto ref_len = static_cast<int>(_ref_seq.length());
+    boost::algorithm::to_upper(_ref_seq);
     _valid_region = ref_len - _art_params.read_len;
 }

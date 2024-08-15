@@ -12,7 +12,7 @@ namespace art_modern {
     class ArtContig {
 
     public:
-        ArtContig(std::string ref_seq, std::string id, const ArtParams& art_params);
+        ArtContig(std::string ref_seq, std::string id, ArtParams art_params);
 
         ArtRead generate_read_se() const;
 

@@ -10,6 +10,9 @@
 
 #include "ArtParams.hh"
 #include "art_modern_constants.hh"
+#include "global_variables.hh"
+#include "out/BamReadOutput.hh"
+#include "out/FastqReadOutput.hh"
 
 using namespace std;
 namespace po = boost::program_options;
@@ -106,25 +109,25 @@ namespace art_modern {
             i += 1;
         }
 
-        po::variables_map vm;
         try {
-            po::store(po::parse_command_line(static_cast<int>(args.size()), argv, po_desc), vm);
+            po::store(po::parse_command_line(static_cast<int>(args.size()), argv, po_desc), vm_);
         } catch (const exception& exp) {
             BOOST_LOG_TRIVIAL(fatal) << exp.what();
             print_help();
             exit(EXIT_FAILURE);
         }
-        po::notify(vm);
-        if (vm.count("version")) {
+        po::notify(vm_);
+
+        if (vm_.count("version")) {
             print_version();
             exit(EXIT_SUCCESS);
         }
-        if (vm.count("help")) {
+        if (vm_.count("help")) {
             print_help();
             exit(EXIT_SUCCESS);
         }
 
-        auto simulation_mode_str = vm["mode"].as<string>();
+        auto simulation_mode_str = vm_["mode"].as<string>();
         if (simulation_mode_str == "wgs") {
             art_simulation_mode = ART_SIMULATION_MODE::WGS;
         } else if (simulation_mode_str == "trans") {
@@ -135,7 +138,7 @@ namespace art_modern {
             BOOST_LOG_TRIVIAL(fatal) << R"(Simulation mode (--mode) should be one of "wgs", "trans" and "template")";
             exit(EXIT_FAILURE);
         }
-        auto lib_const_mode_str = vm["lc"].as<string>();
+        auto lib_const_mode_str = vm_["lc"].as<string>();
         if (lib_const_mode_str == "se") {
             art_lib_const_mode = ART_LIB_CONST_MODE::SE;
         } else if (lib_const_mode_str == "pe") {
@@ -147,33 +150,30 @@ namespace art_modern {
                 << R"(Library construction mode (--lc) should be one of "wgs", "trans" and "template")";
             exit(EXIT_FAILURE);
         }
-        no_sam = vm.count("no_sam");
-        stream = vm.count("stream");
-        cigar_use_m = vm.count("cigar_use_m");
-        sep_flag = vm.count("sep_flag");
-        parallel_on_read = vm.count("parallel_on_read");
+        stream = vm_.count("stream");
+        sep_flag = vm_.count("sep_flag");
+        parallel_on_read = vm_.count("parallel_on_read");
 
-        seq_file = vm["seq_file"].as<string>();
-        out_file_prefix = vm["out_file_prefix"].as<string>();
-        read_len = vm["read_len"].as<int>();
+        seq_file = vm_["seq_file"].as<string>();
+        read_len = vm_["read_len"].as<int>();
         p_cigar.append("read_len").append("=");
-        max_indel = vm["max_indel"].as<int>();
-        max_indel = vm["max_indel"].as<int>();
-        ins_rate_1 = vm["ins_rate_1"].as<double>();
-        ins_rate_2 = vm["ins_rate_2"].as<double>();
-        del_rate_1 = vm["del_rate_1"].as<double>();
-        del_rate_2 = vm["del_rate_2"].as<double>();
-        fcov = vm["fcov"].as<string>();
-        pe_frag_dist_mean = vm["pe_frag_dist_mean"].as<int>();
-        pe_frag_dist_std_dev = vm["pe_frag_dist_std_dev"].as<double>();
-        min_qual = vm["min_qual"].as<int>();
-        max_qual = vm["max_qual"].as<int>();
-        q_shift_1 = vm["q_shift_1"].as<int>();
-        q_shift_2 = vm["q_shift_2"].as<int>();
-        qual_file_1 = vm["qual_file_1"].as<string>();
-        qual_file_2 = vm["qual_file_2"].as<string>();
-        id = vm["id"].as<string>();
-        parallel = vm["parallel"].as<int>();
+        max_indel = vm_["max_indel"].as<int>();
+        max_indel = vm_["max_indel"].as<int>();
+        ins_rate_1 = vm_["ins_rate_1"].as<double>();
+        ins_rate_2 = vm_["ins_rate_2"].as<double>();
+        del_rate_1 = vm_["del_rate_1"].as<double>();
+        del_rate_2 = vm_["del_rate_2"].as<double>();
+        fcov = vm_["fcov"].as<string>();
+        pe_frag_dist_mean = vm_["pe_frag_dist_mean"].as<int>();
+        pe_frag_dist_std_dev = vm_["pe_frag_dist_std_dev"].as<double>();
+        min_qual = vm_["min_qual"].as<int>();
+        max_qual = vm_["max_qual"].as<int>();
+        q_shift_1 = vm_["q_shift_1"].as<int>();
+        q_shift_2 = vm_["q_shift_2"].as<int>();
+        qual_file_1 = vm_["qual_file_1"].as<string>();
+        qual_file_2 = vm_["qual_file_2"].as<string>();
+        id = vm_["id"].as<string>();
+        parallel = vm_["parallel"].as<int>();
     }
 
     void ArtParams::validate_args()
@@ -200,21 +200,10 @@ namespace art_modern {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
             exit(EXIT_FAILURE);
         }
-        if (seq_file.empty() || out_file_prefix.empty() || read_len == 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: An input-file, output-file prefix, read length, and "
+        if (seq_file.empty() || read_len == 0) {
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: An input-file, read length, and "
                                         "fold coverage must be specified.";
             exit(EXIT_FAILURE);
-        }
-        if (boost::filesystem::exists(out_file_prefix)) {
-            if (!boost::filesystem::is_directory(out_file_prefix)) {
-                BOOST_LOG_TRIVIAL(fatal) << "'" << out_file_prefix << "' is not a directory.";
-                exit(EXIT_FAILURE);
-            }
-        } else {
-            if (!boost::filesystem::create_directories(out_file_prefix)) {
-                BOOST_LOG_TRIVIAL(fatal) << "'" << out_file_prefix << "' create directory failed.";
-                exit(EXIT_FAILURE);
-            }
         }
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
             if (art_simulation_mode != ART_SIMULATION_MODE::TEMPLATE
@@ -360,17 +349,6 @@ namespace art_modern {
         return qdist;
     }
 
-    string ArtParams::fqfile1(const std::string& gene_name) const
-    {
-        return out_file_prefix + '/' + gene_name + (art_lib_const_mode != ART_LIB_CONST_MODE::SE ? "_1.fq" : ".fq");
-    }
-    string ArtParams::fqfile2(const string& gene_name) const
-    {
-        return art_lib_const_mode != ART_LIB_CONST_MODE::SE ? out_file_prefix + '/' + gene_name + "_2.fq" : "";
-    }
-
-    string ArtParams::samfile(const string& gene_name) const { return out_file_prefix + '/' + gene_name + ".sam"; }
-
     void ArtParams::print_params() const
     {
         if (stream) {
@@ -423,6 +401,8 @@ namespace art_modern {
 
     ArtParams::ArtParams()
     {
+        out_dispatcher_factory_.add(std::make_shared<FastqReadOutputFactory>());
+        out_dispatcher_factory_.add(std::make_shared<BamReadOutputFactory>());
         po::options_description general_opts("General Options");
         general_opts.add_options()("help", "print out usage information");
         general_opts.add_options()("version", "display version info");
@@ -441,8 +421,6 @@ namespace art_modern {
             "the fold of read coverage to be simulated or number of reads/read pairs "
             "generated for each sequence for simulating cDNA reads, or a float for "
             "simulating WGS reads.");
-        required_opts.add_options()("out_file_prefix", po::value<std::string>()->default_value("art_opts.out"),
-            "the prefix of output filename");
 
         po::options_description art_opts("ART-specific options");
         art_opts.add_options()(
@@ -471,10 +449,6 @@ namespace art_modern {
         art_opts.add_options()("pe_frag_dist_std_dev", po::value<double>()->default_value(0),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
-        art_opts.add_options()("cigar_use_m",
-            "indicate to use CIGAR 'M' instead of '=/X' for alignment "
-            "match/mismatch");
-        art_opts.add_options()("no_sam", "disable syntheis of SAM file");
         art_opts.add_options()(
             "q_shift_1", po::value<int>()->default_value(0), "the amount to shift every first-read quality score by");
         art_opts.add_options()(
@@ -491,12 +465,17 @@ namespace art_modern {
             "If specified, will use streamline FASTA parser (For "
             "transcriptome/amplicon); Otherwise will use HTSLib indexed "
             "FASTA parser (For genome).");
-        po_desc.add(general_opts).add(required_opts).add(art_opts).add(parallel_opts);
+
+        po_desc.add(general_opts).add(required_opts);
+        out_dispatcher_factory_.patch_options(po_desc);
+        po_desc.add(art_opts).add(parallel_opts);
     }
 
     void ArtParams::print_help() const { po_desc.print(cout, 0); }
-
-    std::string ArtParams::fqfile(const string& gene_name) const { return out_file_prefix + '/' + gene_name + ".fq"; }
+    std::shared_ptr<OutputDispatcher> ArtParams::get_output_dispatcher() const
+    {
+        return out_dispatcher_factory_.create(vm_, ...);
+    }
 
 } // namespace art_modern
 } // namespace labw

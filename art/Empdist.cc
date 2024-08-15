@@ -16,18 +16,19 @@ namespace art_modern {
         }
     }
 
-    // generate quali vector from dist of one read from pair-end [default first
+    // generate quality vector from dist of one read from pair-end [default first
     // read]
     std::vector<int> Empdist::get_read_qual(int len, bool first) const
     {
         std::vector<int> read_qual;
+        read_qual.resize(len);
         auto qual_dist = first ? qual_dist_first : qual_dist_second;
         int cumCC;
         map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
             cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
             it = qual_dist[i].lower_bound(cumCC);
-            read_qual.push_back(it->second);
+            read_qual[i] = it->second;
         }
         return read_qual;
     }
