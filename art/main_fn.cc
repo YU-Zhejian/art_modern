@@ -27,7 +27,7 @@ namespace art_modern {
     }
 
     bool generate_pe(const ArtParams& art_params, const Empdist& qdist, const string& contig_name,
-        const ArtContig& art_contig, const long& t_num_read, std::shared_ptr<OutputDispatcher>& output_dispatcher)
+        const ArtContig& art_contig, const long& t_num_read, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
     {
         ostringstream osID;
 
@@ -54,17 +54,24 @@ namespace art_modern {
         arp.read_1.generate_pairwise_aln();
         arp.read_2.generate_pairwise_aln();
 
-        output_dispatcher->writePE(
-            PairwiseAlignment(sam_read_id, contig_name, arp.read_1.seq_read, arp.read_1.seq_ref, qual_1_str,
-                arp.read_1.aln_read, arp.read_1.aln_ref, arp.read_1.bpos, arp.read_1.is_plus_strand),
+        output_dispatcher->writePE(PairwiseAlignment(sam_read_id, contig_name, arp.read_1.seq_read, arp.read_1.seq_ref,
+                                       qual_1_str, arp.read_1.aln_read, arp.read_1.aln_ref,
+                                       static_cast<hts_pos_t>(arp.read_1.is_plus_strand ? arp.read_1.bpos
+                                                                                        : art_contig._ref_seq.length()
+                                                   - (arp.read_1.bpos + art_params.read_len)),
+                                       arp.read_1.is_plus_strand),
             PairwiseAlignment(sam_read_id, contig_name, arp.read_2.seq_read, arp.read_2.seq_ref, qual_2_str,
-                arp.read_2.aln_read, arp.read_2.aln_ref, arp.read_2.bpos, arp.read_2.is_plus_strand));
+                arp.read_2.aln_read, arp.read_2.aln_ref,
+                static_cast<hts_pos_t>(arp.read_2.is_plus_strand
+                        ? arp.read_2.bpos
+                        : art_contig._ref_seq.length() - (arp.read_2.bpos + art_params.read_len)),
+                arp.read_2.is_plus_strand));
 
         return true;
     }
 
     bool generate_se(const ArtParams& art_params, const Empdist& qdist, const string& contig_name,
-        const ArtContig& art_contig, const long& t_num_read, std::shared_ptr<OutputDispatcher>& output_dispatcher)
+        const ArtContig& art_contig, const long& t_num_read, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
     {
         ostringstream osID;
         ostringstream FQFILE;
@@ -83,12 +90,16 @@ namespace art_modern {
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
         art_read.generate_pairwise_aln();
         output_dispatcher->writeSE(PairwiseAlignment(read_id, contig_name, art_read.seq_read, art_read.seq_ref,
-            qual_str, art_read.aln_read, art_read.aln_ref, art_read.bpos, art_read.is_plus_strand));
+            qual_str, art_read.aln_read, art_read.aln_ref,
+            static_cast<hts_pos_t>(art_read.is_plus_strand
+                    ? art_read.bpos
+                    : art_contig._ref_seq.length() - (art_read.bpos + art_params.read_len)),
+            art_read.is_plus_strand));
         return true;
     }
 
     void generate_all(const string& contig_name, const string& ref_seq, const ArtParams& art_params,
-        const Empdist& qdist, double x_fold, std::shared_ptr<OutputDispatcher>& output_dispatcher)
+        const Empdist& qdist, double x_fold, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
     {
         if (x_fold <= 0.0) {
             return;

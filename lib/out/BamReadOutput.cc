@@ -20,7 +20,6 @@ namespace art_modern {
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
             USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
             CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        auto contig_len = sam_hdr_tid2len(sam_header_, tid);
         auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa.query.size());
@@ -28,11 +27,8 @@ namespace art_modern {
 
         auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
         auto qual = pwa.qual;
-        hts_pos_t pos;
-        if (pwa.is_plus_strand) {
-            pos = pwa.align_contig_start;
-        } else {
-            pos = contig_len - (pwa.align_contig_start + rlen);
+        hts_pos_t pos = pwa.align_contig_start;
+        if (!pwa.is_plus_strand) {
             std::reverse(qual.begin(), qual.end());
         }
         auto cigar_c_arr = cigar_arr_to_c(cigar);
@@ -59,7 +55,6 @@ namespace art_modern {
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
             USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
             CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        auto contig_len = sam_hdr_tid2len(sam_header_, tid);
         auto rlen = static_cast<long>(pwa1.query.size());
 
         auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
@@ -80,15 +75,13 @@ namespace art_modern {
         hts_pos_t pos1;
         hts_pos_t pos2;
 
+        pos1 = pwa1.align_contig_start;
+        pos2 = pwa2.align_contig_start;
         if (pwa1.is_plus_strand) {
-            pos1 = pwa1.align_contig_start;
-            pos2 = contig_len - (pwa2.align_contig_start + rlen);
             flag1 |= BAM_FMREVERSE;
             flag2 |= BAM_FREVERSE;
             std::reverse(qual2.begin(), qual2.end());
         } else {
-            pos1 = contig_len - (pwa1.align_contig_start + rlen);
-            pos2 = pwa2.align_contig_start;
             flag1 |= BAM_FREVERSE;
             flag2 |= BAM_FMREVERSE;
             std::reverse(qual1.begin(), qual1.end());
@@ -170,7 +163,7 @@ namespace art_modern {
         desc.add(bam_desc);
     }
     std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
     {
         if (vm.count("o-sam")) {
             auto so = SamReadOutputOptions();

@@ -17,7 +17,7 @@ namespace art_modern {
         throw NotImplementedException();
     }
     std::shared_ptr<BaseReadOutput> BaseReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
     {
         throw NotImplementedException();
     }

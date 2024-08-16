@@ -35,7 +35,7 @@ namespace art_modern {
         }
     }
     std::shared_ptr<BaseReadOutput> OutputDispatcherFactory::create(
-        const boost::program_options::variables_map& vm, std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
     {
         auto output_dispatcher = std::make_shared<OutputDispatcher>();
         for (auto const& factory : factories_) {

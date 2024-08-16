@@ -68,4 +68,4 @@ build-alpine:
 .PHONY: sync-ceu-cm
 sync-ceu-cm:
 	rm -fr deps/cmake_collections
-	cp -r ../libceu/cmake_collections/ deps/
+	cp -rv ../libceu/cmake_collections/ deps/

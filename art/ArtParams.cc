@@ -14,6 +14,8 @@
 #include "out/BamReadOutput.hh"
 #include "out/FastqReadOutput.hh"
 
+#include <fasta/InMemoryFastaFetch.hh>
+
 using namespace std;
 namespace po = boost::program_options;
 
@@ -472,9 +474,11 @@ namespace art_modern {
     }
 
     void ArtParams::print_help() const { po_desc.print(cout, 0); }
-    std::shared_ptr<OutputDispatcher> ArtParams::get_output_dispatcher() const
+    std::shared_ptr<BaseReadOutput> ArtParams::get_output_dispatcher() const
     {
-        return out_dispatcher_factory_.create(vm_, ...);
+        // FIXME:
+        auto ff = std::make_shared<InMemoryFastaFetch>();
+        return out_dispatcher_factory_.create(vm_, ff);
     }
 
 } // namespace art_modern

@@ -21,6 +21,7 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/htslib")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs")
 include_directories("${CMAKE_BINARY_DIR}/include")
+set(LABW_SLIM_HTSLIB_LINK_LIBRARIES "")
 
 if(BUILD_SHARED_LIBS)
     message(NOTICE "Wanting shared htslib.")
@@ -28,16 +29,21 @@ if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "CMake cannot compile & run a hello world program!")
     endif()
 
-    if(NOT ${CEU_CM_LIBPTHREAD_SHARD})
+    if(NOT ${CEU_CM_LIBPTHREAD_SHARED})
         message(FATAL_ERROR "-lpthread not found!")
+    else()
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBPTHREAD_SHARED}")
     endif()
 
     if(NOT ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
         message(FATAL_ERROR "-lz not found!")
+    else()
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBZ_LIBRARY_SHARED}")
     endif()
 
     if(${CEU_CM_HAVE_WORKING_LIBBZ2_RUN_SHARED} EQUAL 0)
         message(NOTICE "libbz2 detected")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBBZ2_LIBRARY_SHARED}")
         add_compile_definitions(HAVE_LIBBZ2) # FIXME: Move those things to a header file.
     else()
         message(NOTICE "libbz2 NOT detected")
@@ -45,6 +51,7 @@ if(BUILD_SHARED_LIBS)
 
     if(${CEU_CM_HAVE_WORKING_LIBDEFLATE_RUN_SHARED} EQUAL 0)
         message(NOTICE "libdeflate detected")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBDEFLATE_LIBRARY_SHARED}")
         add_compile_definitions(HAVE_LIBDEFLATE)
     else()
         message(NOTICE "libdeflate NOT detected")
@@ -52,6 +59,7 @@ if(BUILD_SHARED_LIBS)
 
     if(${CEU_CM_HAVE_WORKING_LIBLZMA_RUN_SHARED} EQUAL 0)
         message(NOTICE "liblzma detected")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBLZMA_LIBRARY_SHARED}")
         add_compile_definitions(HAVE_LIBLZMA)
     else()
         message(NOTICE "liblzma NOT detected")
@@ -64,15 +72,20 @@ else()
 
     if(NOT ${CEU_CM_LIBPTHREAD_STATIC})
         message(FATAL_ERROR "-lpthread not found!")
+    else()
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBPTHREAD_STATIC}")
     endif()
 
     if(NOT ${CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC} EQUAL 0)
         message(FATAL_ERROR "-lz not found!")
+    else()
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBZ_LIBRARY_STATIC}")
     endif()
 
     if(${CEU_CM_HAVE_WORKING_LIBBZ2_RUN_STATIC} EQUAL 0)
         message(NOTICE "libbz2 detected")
         add_compile_definitions(HAVE_LIBBZ2)
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBBZ2_LIBRARY_STATIC}")
     else()
         message(NOTICE "libbz2 NOT detected")
     endif()
@@ -80,6 +93,7 @@ else()
     if(${CEU_CM_HAVE_WORKING_LIBDEFLATE_RUN_STATIC} EQUAL 0)
         message(NOTICE "libdeflate detected")
         add_compile_definitions(HAVE_LIBDEFLATE)
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBDEFLATE_LIBRARY_STATIC}")
     else()
         message(NOTICE "libdeflate NOT detected")
     endif()
@@ -87,6 +101,7 @@ else()
     if(${CEU_CM_HAVE_WORKING_LIBLZMA_RUN_STATIC} EQUAL 0)
         message(NOTICE "liblzma detected")
         add_compile_definitions(HAVE_LIBLZMA)
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBLZMA_LIBRARY_STATIC}")
     else()
         message(NOTICE "liblzma NOT detected")
     endif()
@@ -99,17 +114,11 @@ file(GLOB HTSLIB_SOURCES ${CMAKE_CURRENT_LIST_DIR}/*.c ${CMAKE_CURRENT_LIST_DIR}
      ${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs/*.c)
 if(BUILD_SHARED_LIBS)
     add_library(labw_slim_htslib SHARED ${HTSLIB_SOURCES})
-    target_link_libraries(
-            labw_slim_htslib
-        PUBLIC "${CMAKE_CM_LIBDEFLATE_LIBRARY_SHARED}" "${CMAKE_CM_LIBZ_LIBRARY_SHARED}"
-               "${CMAKE_CM_LIBLZMA_LIBRARY_SHARED}" "${CMAKE_CM_LIBBZ2_LIBRARY_SHARED}" "${CEU_CM_LIBPTHREAD_SHARED}"
-               "${CEU_CM_LIBM_SHARED}")
 else()
     add_library(labw_slim_htslib STATIC ${HTSLIB_SOURCES})
     ceu_cm_set_static_target(labw_slim_htslib)
-    target_link_libraries(
-            labw_slim_htslib
-        PUBLIC "${CMAKE_CM_LIBDEFLATE_LIBRARY_STATIC}" "${CMAKE_CM_LIBZ_LIBRARY_STATIC}"
-               "${CMAKE_CM_LIBLZMA_LIBRARY_STATIC}" "${CMAKE_CM_LIBBZ2_LIBRARY_STATIC}" "${CEU_CM_LIBPTHREAD_STATIC}"
-               "${CEU_CM_LIBM_STATIC}")
 endif()
+
+target_link_libraries(
+        labw_slim_htslib
+        ${LABW_SLIM_HTSLIB_LINK_LIBRARIES})

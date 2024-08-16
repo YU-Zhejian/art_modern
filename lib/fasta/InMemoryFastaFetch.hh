@@ -5,6 +5,7 @@ namespace art_modern {
 
     class InMemoryFastaFetch : public BaseFastaFetch {
     public:
+        InMemoryFastaFetch();
         explicit InMemoryFastaFetch(const std::string& file_name);
         explicit InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map);
         InMemoryFastaFetch(const std::string& contig_name, const std::string& seq);

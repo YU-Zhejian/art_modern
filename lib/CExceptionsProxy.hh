@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <string>
 
 #define UNKNOWN_C_EXCEPTION "UNKNOWN"
 
@@ -10,7 +11,7 @@ namespace art_modern {
     public:
         enum class EXPECTATION { ZERO, NON_NEGATIVE, POSITIVE };
 
-        explicit CExceptionsProxy(std::string c_lib_name, std::string details);
+        CExceptionsProxy(std::string c_lib_name, std::string details);
         const char* what() const noexcept override;
 
         static int requires_numeric(int c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,

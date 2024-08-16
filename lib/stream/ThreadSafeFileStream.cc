@@ -4,30 +4,33 @@
 #include <boost/log/trivial.hpp>
 
 using namespace std;
+namespace labw {
+namespace art_modern {
+    void ThreadSafeFileStream::write(const std::string& str)
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        file_ << str;
+        file_.flush();
+    }
 
-void ThreadSafeFileStream::write(const std::string& str)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    file_ << str;
-    file_.flush();
-}
+    ThreadSafeFileStream::ThreadSafeFileStream(const std::string& filename)
+        : file_(filename)
+    {
 
-ThreadSafeFileStream::ThreadSafeFileStream(const std::string& filename)
-    : file_(filename)
-{
+        if (!file_.is_open()) {
+            BOOST_LOG_TRIVIAL(fatal) << "Can not open output file: " << filename;
+            exit(EXIT_FAILURE);
+        }
+    }
 
-    if (!file_.is_open()) {
-        BOOST_LOG_TRIVIAL(fatal) << "Can not open output file: " << filename;
-        exit(EXIT_FAILURE);
+    void ThreadSafeFileStream::close() { file_.close(); }
+
+    ThreadSafeFileStream::~ThreadSafeFileStream() { ThreadSafeFileStream::close(); }
+
+    ThreadSafeFileStream::ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept
+    {
+        std::unique_lock<std::mutex> rhs_lk(instance.mutex_);
+        file_ = std::move(instance.file_);
     }
 }
-
-void ThreadSafeFileStream::close() { file_.close(); }
-
-ThreadSafeFileStream::~ThreadSafeFileStream() { ThreadSafeFileStream::close(); }
-
-ThreadSafeFileStream::ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept
-{
-    std::unique_lock<std::mutex> rhs_lk(instance.mutex_);
-    file_ = std::move(instance.file_);
 }

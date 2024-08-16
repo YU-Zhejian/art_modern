@@ -6,14 +6,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_c_helloworld.cmake")
 
 if(NOT DEFINED LIBZ_LIBRARY_SHARED)
-    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBZ_LIBRARY_SHARED PKGCONFIG_NAME zlib LINKER_FLAG z)
+    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CEU_CM_LIBZ_LIBRARY_SHARED PKGCONFIG_NAME zlib LINKER_FLAG z)
 endif()
 
 if(NOT DEFINED LIBZ_LIBRARY_STATIC)
     ceu_cm_enhanced_find_library(
         STATIC
         OUTPUT_VARIABLE
-        CMAKE_CM_LIBZ_LIBRARY_STATIC
+        CEU_CM_LIBZ_LIBRARY_STATIC
         PKGCONFIG_NAME
         zlib
         LINKER_FLAG
@@ -26,7 +26,7 @@ ceu_cm_enhanced_try_run(
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_libz.c"
     LINK_LIBRARIES
-    "${CMAKE_CM_LIBZ_LIBRARY_SHARED}"
+    "${CEU_CM_LIBZ_LIBRARY_SHARED}"
     DEPENDS
     C_HELLOWORLD)
 ceu_cm_enhanced_try_run(
@@ -36,7 +36,7 @@ ceu_cm_enhanced_try_run(
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_libz.c"
     LINK_LIBRARIES
-    "${CMAKE_CM_LIBZ_LIBRARY_STATIC}"
+    "${CEU_CM_LIBZ_LIBRARY_STATIC}"
     DEPENDS
     C_HELLOWORLD)
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")

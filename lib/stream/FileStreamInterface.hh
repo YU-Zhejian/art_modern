@@ -1,16 +1,15 @@
 #pragma once
+#include <string>
 
-class FileStreamInterface {
-public:
-    virtual void write(const std::string& str)
-    {
-        // Implementation-defined
-    }
+namespace labw {
+namespace art_modern {
+    class FileStreamInterface {
 
-    virtual void close()
-    {
-        // Implementation-defined
-    }
+    public:
+        virtual void write(const std::string& str);
+        virtual void close();
 
-    virtual ~FileStreamInterface() = default;
-};
+        virtual ~FileStreamInterface();
+    };
+}
+}

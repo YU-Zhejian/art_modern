@@ -59,7 +59,7 @@ namespace art_modern {
 
         Empdist read_emp() const;
 
-        std::shared_ptr<OutputDispatcher> get_output_dispatcher() const;
+        std::shared_ptr<BaseReadOutput> get_output_dispatcher() const;
 
         /**
          * Print parameter parsing results.

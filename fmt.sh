@@ -1,17 +1,6 @@
 #!/usr/bin/env bash
 # Shell script that counts how many lines of code was written by us.
 # shellcheck disable=SC2086
-which dos2unix &>/dev/null &&
-    git ls-files |
-    while read -r line; do
-        if [ -e "${line}" ]; then
-            {
-                echo DOS2UNIX "${line}"
-                dos2unix --newline --keepdate "${line}" &>>/dev/null
-            } &
-        fi
-    done
-wait
 
 which shfmt &>/dev/null &&
     git ls-files |
@@ -70,9 +59,20 @@ which cmake-format &>/dev/null &&
                     cmake-format \
                         --tab-size 4 \
                         --line-width 120 \
-                        --use-tabchars false \
                         --in-place "${line}"
                 } &
             fi
         done
+wait
+
+which dos2unix &>/dev/null &&
+    git ls-files |
+    while read -r line; do
+        if [ -e "${line}" ]; then
+            {
+                echo DOS2UNIX "${line}"
+                dos2unix --newline --keepdate "${line}" &>>/dev/null
+            } &
+        fi
+    done
 wait

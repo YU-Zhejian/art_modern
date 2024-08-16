@@ -17,3 +17,6 @@ dependencies:
   - fastp
   - seqtk
   - seqkit
+  - go-shfmt
+  - cmake_format
+  - curl

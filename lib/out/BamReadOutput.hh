@@ -66,7 +66,7 @@ namespace art_modern {
     public:
         void patch_options(boost::program_options::options_description& desc) override;
         std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-            std::shared_ptr<BaseFastaFetch>& fasta_fetch) const override;
+            const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const override;
 
     private:
         SamReadOutputOptions sam_options_;

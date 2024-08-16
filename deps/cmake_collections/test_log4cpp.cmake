@@ -5,16 +5,16 @@ include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_cxx_stdthread.cmake")
 
-if(NOT DEFINED CMAKE_CM_LOG4CPP_LIBRARY_SHARED)
-    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LOG4CPP_LIBRARY_SHARED PKGCONFIG_NAME log4cpp LINKER_FLAG
+if(NOT DEFINED CEU_CM_LOG4CPP_LIBRARY_SHARED)
+    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CEU_CM_LOG4CPP_LIBRARY_SHARED PKGCONFIG_NAME log4cpp LINKER_FLAG
                                  log4cpp)
 endif()
 
-if(NOT DEFINED CMAKE_CM_LOG4CPP_LIBRARY_STATIC)
+if(NOT DEFINED CEU_CM_LOG4CPP_LIBRARY_STATIC)
     ceu_cm_enhanced_find_library(
         STATIC
         OUTPUT_VARIABLE
-        CMAKE_CM_LOG4CPP_LIBRARY_STATIC
+        CEU_CM_LOG4CPP_LIBRARY_STATIC
         PKGCONFIG_NAME
         log4cpp
         LINKER_FLAG
@@ -27,7 +27,7 @@ ceu_cm_enhanced_try_run(
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_log4cpp.cc"
     LINK_LIBRARIES
-    ${CMAKE_CM_LOG4CPP_LIBRARY_SHARED}
+    ${CEU_CM_LOG4CPP_LIBRARY_SHARED}
     Threads::Threads
     DEPENDS
     CXX_STDTHREAD)
@@ -39,7 +39,7 @@ ceu_cm_enhanced_try_run(
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_log4cpp.cc"
     LINK_LIBRARIES
-    ${CMAKE_CM_LOG4CPP_LIBRARY_SATTIC}
+    ${CEU_CM_LOG4CPP_LIBRARY_SATTIC}
     Threads::Threads
     DEPENDS
     CXX_STDTHREAD)

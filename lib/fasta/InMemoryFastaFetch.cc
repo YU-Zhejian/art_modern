@@ -23,6 +23,7 @@ namespace art_modern {
         strncpy(rets, fetch_str.c_str(), fetch_str.size());
         return rets;
     }
+    InMemoryFastaFetch::InMemoryFastaFetch() = default;
     InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
     {
         auto file_reader = std::ifstream(file_name);
