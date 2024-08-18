@@ -1,5 +1,6 @@
 #pragma once
 #include "Empdist.hh"
+#include "art_modern_constants.hh"
 #include "out/OutputDispatcher.hh"
 #include <boost/program_options.hpp>
 #include <map>
@@ -11,7 +12,7 @@ namespace art_modern {
 
     class ArtParams {
     public:
-        ART_SIMULATION_MODE art_simulation_mode;
+        SIMULATION_MODE art_simulation_mode;
         ART_LIB_CONST_MODE art_lib_const_mode;
         int min_qual;
         int max_qual;

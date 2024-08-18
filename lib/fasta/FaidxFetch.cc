@@ -13,7 +13,7 @@ namespace art_modern {
         free(cfetch_str);
         return rets;
     }
-    // FIXME: I believe I'm using FAIDX the wrong way.
+
     char* FaidxFetch::cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end)
     {
         std::lock_guard<std::mutex> lock(mutex_);

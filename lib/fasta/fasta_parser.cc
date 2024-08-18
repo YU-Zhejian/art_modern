@@ -9,6 +9,7 @@ namespace labw {
 namespace art_modern {
     FastaRecord FastaIterator::next()
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         FastaRecord nextRecord;
         std::string nextLine;
         while (true) {
@@ -54,6 +55,10 @@ namespace art_modern {
                 nextRecord.sequence += nextLine;
             }
         }
+    }
+    FastaIterator::FastaIterator(std::istream& istream)
+        : _istream(istream)
+    {
     }
 
     const char* MalformedFastaException::what() const noexcept { return "FASTA parse error"; }

@@ -4,6 +4,22 @@ Modernized ART that is parallelized and modularized using modern C++.
 
 **WARNING** Largely under development in internal Git hosting. The Git repository on GitHub may not reflect latest status.
 
+## Motivation
+
+ART is an excellent software for simulating reads from a reference genome. However, it comes with following limitations:
+
+- The implementation is not parallelized.
+- The implementation may consume too much memory or fail on genomes that contains limited number of chromosomes of enormous sizes.
+- The implementation may consume too much memory or fail on transcriptome or template collection that contains enormous number of contigs (cDNAs or other types of template molecules).
+- The implementation only supports unified coverage, which is not suitable for transcriptome simulation where each cDNA molecule have its own expression level.
+- The implementation outputs alignments in SAM format, which is not space-efficient.
+
+So, we developed `art_modern` using the following ideas:
+
+- Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread \& process \& co-routine, etc.
+- The SAM output format was re-implemented using [HTSLib](https://www.htslib.org/), which allows BAM output format with minimal modifications of code.
+- Multiple FASTA parsers were added. For example, the `htslib` parser allows on-disk random access of enormous genomes without reading them into memory, while the `stream` parser allows streaming of FASTA files.
+
 ## Quick Start
 
 Build the project using:
@@ -83,6 +99,34 @@ sets `BUILD_SHARED_LIBS` to `ON`.
 ## Usage
 
 ### Mode
+
+The parallelization strategy of different modes and input parsers are as follows:
+
+|          | `wgs`     | `trans`   | `templ`   |
+|----------|-----------|-----------|-----------|
+| `memory` | Coverage  | Batch     | Batch     |
+| `htslib` | Coverage  | **ERROR** | **ERROR** |
+| `stream` | **ERROR** | Batch     | Batch     |
+
+### Input Formats
+
+Currently, we support input in FASTA and PBSim3 transcripts format.
+
+**FOR FASTA FORMAT**: For read names, only characters before blank space are read.
+
+A compatibility matrix is as follows:
+
+|          | FASTA     | PBSim3 Transcripts |
+|----------|-----------|--------------------|
+| `memory` | Supported | Supported          |
+| `htslib` | Supported | ERROR              |
+| `stream` | Supported | Supported          |
+
+|         | FASTA     | PBSim3 Transcripts |
+|---------|-----------|--------------------|
+| `wgs`   | Supported | ERROR              |
+| `trans` | Supported | Supported          |
+| `templ` | Supported | Supported          |
 
 ### Library Construction Methods
 

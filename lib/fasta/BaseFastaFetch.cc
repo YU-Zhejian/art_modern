@@ -1,5 +1,4 @@
 #include <boost/log/trivial.hpp>
-#include <iostream>
 
 #include "BaseFastaFetch.hh"
 #include "CExceptionsProxy.hh"

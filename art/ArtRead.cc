@@ -43,7 +43,7 @@ std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
     auto qual_mutated = qual;
     for (auto i = 0; i < qual.size(); i++) {
         if (seq_read[i] == 'N') {
-            qual_mutated[i] = 1; // FIXME: This is the reason why this function cannot be const
+            qual_mutated[i] = 1;
             continue;
         }
         if (rprob.r_prob() < _art_params.err_prob[qual_mutated[i]]) {

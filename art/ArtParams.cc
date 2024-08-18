@@ -131,11 +131,11 @@ namespace art_modern {
 
         auto simulation_mode_str = vm_["mode"].as<string>();
         if (simulation_mode_str == "wgs") {
-            art_simulation_mode = ART_SIMULATION_MODE::WGS;
+            art_simulation_mode = SIMULATION_MODE::WGS;
         } else if (simulation_mode_str == "trans") {
-            art_simulation_mode = ART_SIMULATION_MODE::TRANS;
+            art_simulation_mode = SIMULATION_MODE::TRANS;
         } else if (simulation_mode_str == "template") {
-            art_simulation_mode = ART_SIMULATION_MODE::TEMPLATE;
+            art_simulation_mode = SIMULATION_MODE::TEMPLATE;
         } else {
             BOOST_LOG_TRIVIAL(fatal) << R"(Simulation mode (--mode) should be one of "wgs", "trans" and "template")";
             exit(EXIT_FAILURE);
@@ -208,13 +208,13 @@ namespace art_modern {
             exit(EXIT_FAILURE);
         }
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            if (art_simulation_mode != ART_SIMULATION_MODE::TEMPLATE
+            if (art_simulation_mode != SIMULATION_MODE::TEMPLATE
                 && !(pe_frag_dist_std_dev > 0 && pe_frag_dist_mean > 0)) {
                 BOOST_LOG_TRIVIAL(fatal) << "ERROR: set pe_frag_dist_std_dev and "
                                             "pe_frag_dist_mean for PE reads for \"wgs\" or \"trans\" mode";
                 exit(EXIT_FAILURE);
             }
-            if (art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+            if (art_simulation_mode == SIMULATION_MODE::TEMPLATE
                 && (pe_frag_dist_std_dev != 0 || pe_frag_dist_mean != 0)) {
                 BOOST_LOG_TRIVIAL(warning) << "Warning: pe_frag_dist_std_dev and "
                                               "pe_frag_dist_mean ignored for template mode.";

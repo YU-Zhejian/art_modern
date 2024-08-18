@@ -7,6 +7,7 @@
 
 #include "ArtContig.hh"
 #include "Empdist.hh"
+#include "art_modern_constants.hh"
 
 using namespace std;
 using namespace labw::art_modern;
@@ -15,7 +16,7 @@ ArtRead ArtContig::generate_read_se() const
 {
     ArtRead read_1(_art_params);
     auto ref_len = static_cast<int>(_ref_seq.length());
-    auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
         : static_cast<int>(floor(rprob.r_prob() * _valid_region));
     auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
@@ -23,7 +24,7 @@ ArtRead ArtContig::generate_read_se() const
     if (pos_1 + _art_params.read_len - slen_1 > ref_len) {
         slen_1 = read_1.generate_indels_2(_art_params.read_len, true);
     }
-    read_1.is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
+    read_1.is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
     if (read_1.is_plus_strand) {
         //    |----------->
         // ------------------------------------
@@ -45,7 +46,7 @@ ArtReadPair ArtContig::generate_read_mp() const
     ArtRead read_2(_art_params);
     int fragment_len;
     auto ref_len = static_cast<int>(_ref_seq.length());
-    if (_art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE) {
+    if (_art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
         fragment_len = ref_len;
     } else {
         auto rng = boost::mt19937();
@@ -62,10 +63,10 @@ ArtReadPair ArtContig::generate_read_mp() const
         }
     }
 
-    auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? ref_len - _art_params.read_len
         : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()) + fragment_len - _art_params.read_len);
-    auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+    auto pos_2 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? ref_len - _art_params.read_len
         : ref_len - (pos_1 + 2 * _art_params.read_len - fragment_len);
     // Exceptions at this step for unknown reasons.
@@ -80,7 +81,7 @@ ArtReadPair ArtContig::generate_read_mp() const
         slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
     }
 
-    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
+    bool is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
     if (is_plus_strand) {
         // R1                  |----------->
         //   ------------------------------------
@@ -113,7 +114,7 @@ ArtReadPair ArtContig::generate_read_pe() const
     ArtRead read_2(_art_params);
     int fragment_len;
     auto ref_len = static_cast<int>(_ref_seq.length());
-    if (_art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE) {
+    if (_art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
         fragment_len = ref_len;
     } else {
         auto rng = boost::mt19937();
@@ -130,10 +131,10 @@ ArtReadPair ArtContig::generate_read_pe() const
             }
         }
     }
-    auto pos_1 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE
+    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
         : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()));
-    auto pos_2 = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE ? 0 : ref_len - pos_1 - fragment_len;
+    auto pos_2 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE ? 0 : ref_len - pos_1 - fragment_len;
     int slen_1 = read_1.generate_indels(_art_params.read_len, true);
     int slen_2 = read_2.generate_indels(_art_params.read_len, false);
 
@@ -145,7 +146,7 @@ ArtReadPair ArtContig::generate_read_pe() const
         slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
     }
 
-    bool is_plus_strand = _art_params.art_simulation_mode == ART_SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
+    bool is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
 
     if (is_plus_strand) {
         //    |----------->

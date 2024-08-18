@@ -1,6 +1,7 @@
 #pragma once
 
 #include "fasta/BaseFastaFetch.hh"
+#include "fasta/CoverageInfo.hh"
 #include <memory>
 
 namespace labw {
@@ -10,17 +11,15 @@ namespace art_modern {
 
     class SimulationJob {
     public:
-        SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, int num_reads_positive,
-            int num_reads_negative, SIMULATION_FRAGMENTATION_TYPE fragmentation_type);
+        SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, CoverageInfo coverage_info,
+            SIMULATION_FRAGMENTATION_TYPE fragmentation_type);
         const std::shared_ptr<BaseFastaFetch>& fasta_fetch() const;
-        int num_reads_positive() const;
-        int num_reads_negative() const;
         SIMULATION_FRAGMENTATION_TYPE fragmentation_type() const;
+        const CoverageInfo& coverage_info() const;
 
     private:
         const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
-        int num_reads_positive_;
-        int num_reads_negative_;
+        CoverageInfo coverage_info_;
         SIMULATION_FRAGMENTATION_TYPE fragmentation_type_;
     };
 

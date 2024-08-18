@@ -27,7 +27,7 @@ namespace art_modern {
     {
         std::string rets;
         rets.resize(dna.length());
-        for (const auto& i : range(0, dna.length(), 1)) {
+        for (const auto& i : range(0, static_cast<int>(dna.length()), 1)) {
             try {
                 rets[i] = rev_comp_trans.at(dna[i]);
             } catch (std::out_of_range&) {

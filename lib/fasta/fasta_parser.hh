@@ -1,5 +1,6 @@
 #pragma once
 #include <exception>
+#include <mutex>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -28,16 +29,14 @@ namespace art_modern {
 
     class FastaIterator {
     public:
-        explicit FastaIterator(std::istream& istream)
-            : _istream(istream)
-        {
-        }
+        explicit FastaIterator(std::istream& istream);
 
         FastaRecord next();
 
     private:
         std::istream& _istream;
         int _lineno = 0;
+        std::mutex mutex_;
     };
 
 } // namespace art_modern

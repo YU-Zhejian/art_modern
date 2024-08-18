@@ -11,6 +11,4 @@
 #define DEFAULT_MAX_INDEL (-1)
 #define DEFAULT_MAX_NUM_N (-1)
 
-enum class ART_SIMULATION_MODE { WGS, TRANS, TEMPLATE };
-
 enum class ART_LIB_CONST_MODE { SE, PE, MP };
