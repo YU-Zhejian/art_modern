@@ -8,6 +8,8 @@
 #elif defined(USE_ONEMKL_RANDOM)
 #include <oneapi/mkl/rng.hpp>
 #include <sycl/sycl.hpp>
+#elif defined(USE_GSL_RANDOM)
+#include <gsl/gsl_rng.h>
 #else
 #error "Define USE_STD_RANDOM, USE_BOOST_RANDOM for random generators!"
 #endif
@@ -23,6 +25,7 @@ namespace art_modern {
         char rand_base();
         int rand_quality();
         int rand_quality_less_than_10();
+        ~Rprob();
 
     private:
 #if defined(USE_STD_RANDOM)
@@ -54,6 +57,11 @@ namespace art_modern {
 //    oneapi::mkl::rng::uniform<int, oneapi::mkl::rng::uniform_method::by_default> strand_;
 //    oneapi::mkl::rng::uniform<int, oneapi::mkl::rng::uniform_method::by_default> quality_less_than_10_;
 //    oneapi::mkl::rng::uniform<int, oneapi::mkl::rng::uniform_method::by_default> quality_;
+#elif defined(USE_GSL_RANDOM)
+    const gsl_rng_type * T;
+    gsl_rng * r;
+    float pe_frag_dist_mean_;
+    float pe_frag_dist_std_dev_;
 #endif
     };
 }

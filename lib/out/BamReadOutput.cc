@@ -1,11 +1,11 @@
 #include <algorithm>
 #include <boost/log/trivial.hpp>
+#include <boost/algorithm/string/join.hpp>
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "global_variables.hh"
 #include "seq_utils.hh"
-#include <boost/algorithm/string/join.hpp>
 namespace po = boost::program_options;
 
 namespace labw {
@@ -174,5 +174,7 @@ namespace art_modern {
         }
         return std::make_shared<DumbReadOutput>();
     }
+
+BamReadOutputFactory::~BamReadOutputFactory()=default;
 }
 }

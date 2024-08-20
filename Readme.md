@@ -14,7 +14,7 @@ ART is an excellent software for simulating reads from a reference genome. Howev
 - The implementation only supports unified coverage, which is not suitable for transcriptome simulation where each cDNA molecule have its own expression level.
 - The implementation outputs alignments in SAM format, which is not space-efficient.
 
-So, we developed `art_modern` using the following ideas:
+So, we developed `art_modern` with the following ideas:
 
 - Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread \& process \& co-routine, etc.
 - The SAM output format was re-implemented using [HTSLib](https://www.htslib.org/), which allows BAM output format with minimal modifications of code.

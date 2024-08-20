@@ -71,7 +71,10 @@ else()
     set(USED_HTSLIB_NAME labw_slim_htslib)
 endif()
 add_compile_definitions(USE_STD_RANDOM)
-# find_package(MKL) # TODO find_package(IntelSYCL) include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR})
+add_compile_definitions(PARALLEL_DISABLED)
+# find_package(MKL) # TODO
+# find_package(IntelSYCL) # TODO
+# include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR}) # TODO
 
 # Main
 configure_file("${CMAKE_CURRENT_LIST_DIR}/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")

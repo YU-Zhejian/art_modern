@@ -9,8 +9,7 @@ namespace art_modern {
     // when max_num =-1, no limit on the number of indels
     // the maxium number of indels is set by cdf_cutoff to save computation time
     void print_banner();
-    void generate_all(const std::string& contig_name, const std::string& ref_seq, const ArtParams& art_params,
-        const Empdist& qdist, double x_fold, const std::shared_ptr<BaseReadOutput>& output_dispatcher);
+    void generate_all(const ArtParams& art_params);
 
 } // namespace art_modern
 

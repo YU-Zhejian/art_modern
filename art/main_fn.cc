@@ -26,8 +26,7 @@ namespace art_modern {
         BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <Zhejian.23@intl.zju.edu.cn>";
     }
 
-    void generate_all(const string& contig_name, const string& ref_seq, const ArtParams& art_params,
-        const Empdist& qdist, double x_fold, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
+    void generate_all(const ArtParams& art_params)
     {
         // FIXME
     }

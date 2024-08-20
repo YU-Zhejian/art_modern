@@ -16,7 +16,7 @@ using namespace labw::art_modern;
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {
     auto iss = std::istringstream(">chr1\r\nAAAA\nCCC\n>chr2\r\n>chr3\nTTTT\n\n");
-    auto fai = FastaIterator(iss);
+    FastaIterator fai(iss);
     vector<string> chrNames = { "chr1", "chr2", "chr3" };
     vector<string> seqs = { "AAAACCC", "", "TTTT" };
     int i = 0;

@@ -4,6 +4,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <fstream>
+#include "ArtCmdOpts.hh"
 
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
@@ -12,7 +13,9 @@
 #include "art_modern_constants.hh"
 #include "global_variables.hh"
 #include "out/BamReadOutput.hh"
+#include "out/HeadlessBamReadOutput.hh"
 #include "out/FastqReadOutput.hh"
+#include "CExceptionsProxy.hh"
 
 #include <fasta/InMemoryFastaFetch.hh>
 
@@ -22,55 +25,6 @@ namespace po = boost::program_options;
 namespace labw {
 namespace art_modern {
 
-    void print_htslib_version()
-    {
-        std::cout << "USING HTSLib: " << USED_HTSLIB_NAME << ", ver. " << hts_version() << endl;
-        std::cout << "\tFeatures: " << hts_feature_string() << endl;
-        std::cout << "\tCC: " << hts_test_feature(HTS_FEATURE_CC) << endl;
-        std::cout << "\tCPPFLAGS: " << hts_test_feature(HTS_FEATURE_CPPFLAGS) << endl;
-        std::cout << "\tCFLAGS: " << hts_test_feature(HTS_FEATURE_CFLAGS) << endl;
-        std::cout << "\tLDFLAGS: " << hts_test_feature(HTS_FEATURE_LDFLAGS) << endl;
-        std::cout << "\tHTSlib URL scheme handlers present:" << endl;
-
-        // Following code were modified from SAMTtools ver. 1.13.
-        const char* plugins[100];
-        int np = 100;
-
-        if (hfile_list_plugins(plugins, &np) >= 0) {
-            for (int i = 0; i < np; i++) {
-                const char* sc_list[100];
-                int nschemes = 100;
-                if (hfile_list_schemes(plugins[i], sc_list, &nschemes) < 0) {
-                    continue;
-                }
-                std::cout << "\t\t" << plugins[i] << ": ";
-                if (nschemes == 0) {
-                    std::cout << endl;
-                } else {
-                    for (int j = 0; j < nschemes - 1; j++) {
-                        std::cout << sc_list[j] << ", ";
-                    }
-                }
-                std::cout << sc_list[nschemes - 1];
-                std::cout << endl;
-            }
-        }
-    }
-
-    void print_boost_version()
-    {
-        int patch_level = BOOST_VERSION % 100;
-        int minor = BOOST_VERSION / 100 % 1000;
-        int major = BOOST_VERSION / 100000;
-        std::cout << "BOOST: " << major << "." << minor << "." << patch_level << endl;
-    }
-
-    void print_version()
-    {
-        std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << endl;
-        print_htslib_version();
-        print_boost_version();
-    }
 
     std::vector<double> gen_per_base_mutation_rate(int read_len, double p, int max_num)
     {
@@ -154,11 +108,9 @@ namespace art_modern {
         }
         stream = vm_.count("stream");
         sep_flag = vm_.count("sep_flag");
-        parallel_on_read = vm_.count("parallel_on_read");
 
         seq_file = vm_["seq_file"].as<string>();
         read_len = vm_["read_len"].as<int>();
-        p_cigar.append("read_len").append("=");
         max_indel = vm_["max_indel"].as<int>();
         max_indel = vm_["max_indel"].as<int>();
         ins_rate_1 = vm_["ins_rate_1"].as<double>();
@@ -178,65 +130,61 @@ namespace art_modern {
         parallel = vm_["parallel"].as<int>();
     }
 
-    void ArtParams::validate_args()
-    {
-        if (min_qual < 0 || min_qual > MAX_QUAL) {
+    void validate_min_max_qual(const ArtParams& art_params)  {
+        if (art_params.min_qual < 0 || art_params.min_qual > MAX_QUAL) {
             BOOST_LOG_TRIVIAL(fatal) << "Input Error: The minimum quality score must be an integer in [0," << MAX_QUAL
                                      << "]";
             exit(EXIT_FAILURE);
         }
-        if (max_qual <= min_qual || max_qual > MAX_QUAL) {
-            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The quality score must be an integer in [" << min_qual << ", "
+        if (art_params.max_qual <= art_params.min_qual || art_params.max_qual > MAX_QUAL) {
+            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The quality score must be an integer in [" << art_params.min_qual << ", "
                                      << MAX_QUAL << "]";
             exit(EXIT_FAILURE);
         }
-        // Make sure the minimum requirements to run were met if the help tag was not
-        // given
-        if (fcov.empty()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: please use only one of the two "
-                                        "parameters: fold coverage (-f).";
-            exit(EXIT_FAILURE);
-        }
+    }
 
+void validate_fasta_parser(const ArtParams& art_params){
+    if (!art_params.stream) {
+        const char* fasta_path = art_params.seq_file.c_str();
+        BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
+        auto seq_file_fai_path = string(fai_path(fasta_path));
+        if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
+            BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
+            CExceptionsProxy::requires_numeric(
+                fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
+            CExceptionsProxy::requires_not_null(
+                fai_load_format(fasta_path, FAI_FASTA), USED_HTSLIB_NAME, "Failed to load FAI");
+        }
+    }
+    }
+
+    void ArtParams::validate_args()
+    {
+        validate_min_max_qual(*this);
         if (read_len < 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
             exit(EXIT_FAILURE);
         }
         if (seq_file.empty() || read_len == 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: An input-file, read length, and "
-                                        "fold coverage must be specified.";
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: An input-file, read length must be specified.";
             exit(EXIT_FAILURE);
         }
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
             if (art_simulation_mode != SIMULATION_MODE::TEMPLATE
                 && !(pe_frag_dist_std_dev > 0 && pe_frag_dist_mean > 0)) {
-                BOOST_LOG_TRIVIAL(fatal) << "ERROR: set pe_frag_dist_std_dev and "
-                                            "pe_frag_dist_mean for PE reads for \"wgs\" or \"trans\" mode";
+                BOOST_LOG_TRIVIAL(fatal) << R"(set pe_frag_dist_std_dev and "
+                                            "pe_frag_dist_mean for PE reads for "wgs" or "trans" mode)";
                 exit(EXIT_FAILURE);
             }
             if (art_simulation_mode == SIMULATION_MODE::TEMPLATE
                 && (pe_frag_dist_std_dev != 0 || pe_frag_dist_mean != 0)) {
-                BOOST_LOG_TRIVIAL(warning) << "Warning: pe_frag_dist_std_dev and "
-                                              "pe_frag_dist_mean ignored for template mode.";
+                BOOST_LOG_TRIVIAL(warning) << R"(pe_frag_dist_std_dev and "
+                                              "pe_frag_dist_mean ignored for "template" mode.)";
             }
         }
-        try {
-            auto d = boost::lexical_cast<double>(fcov);
-            uniform_sequencing_depth = d;
-        } catch (const boost::bad_lexical_cast&) {
-            ifstream X_FOLD(fcov.c_str(), ios::binary);
-            string xfold_line;
-            getline(X_FOLD, xfold_line); // Skip 1st line
-            while (true) {
-                getline(X_FOLD, xfold_line);
-                if (xfold_line.empty()) {
-                    break;
-                }
-                boost::algorithm::trim(xfold_line);
-                auto tab_pos = xfold_line.find('\t');
-                sequencing_depth.emplace(xfold_line.substr(0, tab_pos), stod(xfold_line.substr(tab_pos + 1)));
-            }
-        }
+
 
         // Make sure the minimum requirements to run were given for a paired end
         // simulation
@@ -248,7 +196,7 @@ namespace art_modern {
             }
 
             if (pe_frag_dist_mean != 0 && pe_frag_dist_std_dev != 0 && pe_frag_dist_mean <= read_len) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be shorter than the "
+                BOOST_LOG_TRIVIAL(fatal) << "The read length must be shorter than the "
                                             "pe_frag_dist_mean fragment length specified.";
                 exit(EXIT_FAILURE);
             }
@@ -258,11 +206,15 @@ namespace art_modern {
         per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, del_rate_1, max_indel);
         per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, ins_rate_2, max_indel);
         per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, del_rate_2, max_indel);
+
         for (int i = 0; i < HIGHEST_QUAL; i++) {
             err_prob[i] = pow(10, -i / 10.0);
         }
 
-        pe_dist_mean_minus_2_std = pe_frag_dist_mean - 2 * pe_frag_dist_std_dev;
+        pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
+
+        validate_fasta_parser(*this);
+        read_emp();
     }
 
     void ArtParams::shift_emp(map<int, int> map_to_process, int q_shift) const
@@ -369,11 +321,6 @@ namespace art_modern {
 
         cout << "Parameters used during run" << endl;
         cout << "\tRead Length:\t" << read_len << endl;
-        if (uniform_sequencing_depth != 0) {
-            cout << "\tFold Coverage: (uniform)  " << uniform_sequencing_depth << "X" << endl;
-        } else {
-            cout << "\tFold Coverage: (file)     " << sequencing_depth.size() << " entries" << endl;
-        }
 
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
             cout << "\tMean Fragment Length:     " << pe_frag_dist_mean << endl;
@@ -402,76 +349,9 @@ namespace art_modern {
         }
     }
 
-    ArtParams::ArtParams()
+    ArtParams::ArtParams(): coverage_info(0.0)
     {
-        out_dispatcher_factory_.add(std::make_shared<FastqReadOutputFactory>());
-        out_dispatcher_factory_.add(std::make_shared<BamReadOutputFactory>());
-        po::options_description general_opts("General Options");
-        general_opts.add_options()("help", "print out usage information");
-        general_opts.add_options()("version", "display version info");
-
-        po::options_description required_opts("Required Options");
-
-        required_opts.add_options()("mode", po::value<std::string>()->default_value("wgs"),
-            R"(simulation mode, should be "wgs", "trans" or "template")");
-        required_opts.add_options()("lc", po::value<std::string>()->default_value("se"),
-            R"(library construction mode, should be "se", "pe" or "mp")");
-
-        required_opts.add_options()("seq_file", po::value<std::string>(),
-            "the filename of input reference genome, reference "
-            "transcriptome, or templates");
-        required_opts.add_options()("fcov", po::value<std::string>(),
-            "the fold of read coverage to be simulated or number of reads/read pairs "
-            "generated for each sequence for simulating cDNA reads, or a float for "
-            "simulating WGS reads.");
-
-        po::options_description art_opts("ART-specific options");
-        art_opts.add_options()(
-            "id", po::value<std::string>()->default_value("ART"), "the prefix identification tag for read ID");
-
-        art_opts.add_options()(
-            "qual_file_1", po::value<std::string>()->default_value(""), "the first-read quality profile");
-        art_opts.add_options()("qual_file_2", po::value<std::string>()->default_value(""),
-            "the second-read quality profile. For PE/MP only.");
-        art_opts.add_options()(
-            "ins_rate_1", po::value<double>()->default_value(DEFAULT_INS_RATE_1), "the first-read insertion rate");
-        art_opts.add_options()(
-            "ins_rate_2", po::value<double>()->default_value(DEFAULT_INS_RATE_2), "the second-read insertion rate");
-        art_opts.add_options()(
-            "del_rate_1", po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the second-read deletion rate");
-        art_opts.add_options()(
-            "del_rate_2", po::value<double>()->default_value(DEFAULT_DEL_RATE_2), "the second-read deletion rate");
-        art_opts.add_options()("sep_flag",
-            "use separate quality profiles for different bases. Default "
-            "is to use same quality profile regardless its position");
-        art_opts.add_options()("max_indel", po::value<int>()->default_value(DEFAULT_MAX_INDEL),
-            "the maximum total number of insertion and deletion per read");
-        art_opts.add_options()("read_len", po::value<int>(), "read length to be simulated");
-        art_opts.add_options()("pe_frag_dist_mean", po::value<int>()->default_value(0),
-            "Mean distance between DNA/RNA fragments for paired-end simulations");
-        art_opts.add_options()("pe_frag_dist_std_dev", po::value<double>()->default_value(0),
-            "Std. deviation of distance between DNA/RNA fragments for paired-end "
-            "simulations");
-        art_opts.add_options()(
-            "q_shift_1", po::value<int>()->default_value(0), "the amount to shift every first-read quality score by");
-        art_opts.add_options()(
-            "q_shift_2", po::value<int>()->default_value(0), "the amount to shift every second-read quality score by");
-        art_opts.add_options()("min_qual", po::value<int>()->default_value(MIN_QUAL), "the minimum base quality score");
-        art_opts.add_options()("max_qual", po::value<int>()->default_value(MAX_QUAL), "the maximum base quality score");
-
-        po::options_description parallel_opts("Parallelism-related options");
-        parallel_opts.add_options()("parallel", po::value<int>()->default_value(PARALLEL_ALL),
-            "Parallel level. -1 for disable, 0 for all CPUs, >=1 to specify number "
-            "of threads.");
-        parallel_opts.add_options()("parallel_on_read", "Perform read-level parallelism instead of contig-level");
-        art_opts.add_options()("stream",
-            "If specified, will use streamline FASTA parser (For "
-            "transcriptome/amplicon); Otherwise will use HTSLib indexed "
-            "FASTA parser (For genome).");
-
-        po_desc.add(general_opts).add(required_opts);
-        out_dispatcher_factory_.patch_options(po_desc);
-        po_desc.add(art_opts).add(parallel_opts);
+        return;
     }
 
     void ArtParams::print_help() const { po_desc.print(cout, 0); }
@@ -481,6 +361,24 @@ namespace art_modern {
         auto ff = std::make_shared<InMemoryFastaFetch>();
         return out_dispatcher_factory_.create(vm_, ff);
     }
+
+void ArtParams::read_fcov()
+{
+    if (fcov.empty()) {
+        BOOST_LOG_TRIVIAL(fatal) << "Error: please use only one of the two "
+                                    "parameters: fold coverage (-f).";
+        exit(EXIT_FAILURE);
+    }
+
+    try {
+        auto d = boost::lexical_cast<double>(fcov);
+        coverage_info = CoverageInfo(d);
+    } catch (const boost::bad_lexical_cast&) {
+        ifstream X_FOLD(fcov.c_str(), ios::binary);
+        coverage_info = CoverageInfo(X_FOLD);
+        X_FOLD.close();
+    }
+}
 
 } // namespace art_modern
 } // namespace labw
