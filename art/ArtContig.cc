@@ -1,38 +1,34 @@
 #include <string>
 
-#include <boost/algorithm/string/case_conv.hpp>
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/normal_distribution.hpp>
 #include <utility>
 
 #include "ArtContig.hh"
-#include "Empdist.hh"
 #include "art_modern_constants.hh"
+#include "random_generator.hh"
 
 using namespace std;
 using namespace labw::art_modern;
 
-ArtRead ArtContig::generate_read_se() const
+ArtRead ArtContig::generate_read_se(bool is_plus_strand)
 {
-    ArtRead read_1(_art_params);
-    auto ref_len = static_cast<int>(_ref_seq.length());
-    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
+    ArtRead read_1(art_params_, rprob_);
+    auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
-        : static_cast<int>(floor(rprob.r_prob() * _valid_region));
-    auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
+        : static_cast<hts_pos_t>(floor(rprob_.r_prob() * valid_region_));
+    auto slen_1 = read_1.generate_indels(art_params_.read_len, true);
     // ensure get a fixed read length
-    if (pos_1 + _art_params.read_len - slen_1 > ref_len) {
-        slen_1 = read_1.generate_indels_2(_art_params.read_len, true);
+    if (pos_1 + art_params_.read_len - slen_1 > ref_len_) {
+        slen_1 = read_1.generate_indels_2(art_params_.read_len, true);
     }
-    read_1.is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
+    read_1.is_plus_strand = is_plus_strand;
     if (read_1.is_plus_strand) {
         //    |----------->
         // ------------------------------------
-        read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
     } else {
         // ------------------------------------
         //                   <-----------|
-        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
+        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -40,65 +36,62 @@ ArtRead ArtContig::generate_read_se() const
 }
 
 // matepair-end read: the second read is reverse complemenaty strand
-ArtReadPair ArtContig::generate_read_mp() const
+ArtReadPair ArtContig::generate_read_mp(bool is_plus_strand)
 {
-    ArtRead read_1(_art_params);
-    ArtRead read_2(_art_params);
-    int fragment_len;
-    auto ref_len = static_cast<int>(_ref_seq.length());
-    if (_art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-        fragment_len = ref_len;
+    ArtRead read_1(art_params_, rprob_);
+    ArtRead read_2(art_params_, rprob_);
+    hts_pos_t fragment_len;
+    if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
+        fragment_len = ref_len_;
     } else {
-        auto rng = boost::mt19937();
-        auto gaussian = boost::normal_distribution<>(_art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
-        if (_art_params.pe_frag_dist_mean - 2 * _art_params.pe_frag_dist_std_dev > ref_len) {
+        if (art_params_.pe_dist_mean_minus_2_std > ref_len_) {
             // when reference length < pe_frag_dist_mean-2*std, fragment_len sets to
             // be reference length
-            fragment_len = ref_len;
+            fragment_len = ref_len_;
         } else {
             fragment_len = 0;
-            while (fragment_len < _art_params.read_len || fragment_len > _ref_seq.length()) {
-                fragment_len = static_cast<int>(gaussian(rng));
+            while (fragment_len < art_params_.read_len || fragment_len > ref_len_) {
+                fragment_len = rprob_.insertion_length();
             }
         }
     }
 
-    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
-        ? ref_len - _art_params.read_len
-        : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()) + fragment_len - _art_params.read_len);
-    auto pos_2 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
-        ? ref_len - _art_params.read_len
-        : ref_len - (pos_1 + 2 * _art_params.read_len - fragment_len);
+    auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
+        ? ref_len_ - art_params_.read_len
+        : static_cast<hts_pos_t>(
+            floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
+    auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
+        ? ref_len_ - art_params_.read_len
+        : ref_len_ - (pos_1 + 2 * art_params_.read_len - fragment_len);
     // Exceptions at this step for unknown reasons.
-    auto slen_1 = read_1.generate_indels(_art_params.read_len, true);
-    auto slen_2 = read_2.generate_indels(_art_params.read_len, false);
+    auto slen_1 = read_1.generate_indels(art_params_.read_len, true);
+    auto slen_2 = read_2.generate_indels(art_params_.read_len, false);
 
     // ensure get a fixed read length
-    if ((pos_1 + _art_params.read_len - slen_1) > ref_len) {
-        slen_1 = read_1.generate_indels_2(_art_params.read_len, true);
+    if ((pos_1 + art_params_.read_len - slen_1) > ref_len_) {
+        slen_1 = read_1.generate_indels_2(art_params_.read_len, true);
     }
-    if ((pos_2 + _art_params.read_len - slen_2) > ref_len) {
-        slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
+    if ((pos_2 + art_params_.read_len - slen_2) > ref_len_) {
+        slen_2 = read_2.generate_indels_2(art_params_.read_len, false);
     }
 
-    bool is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
     if (is_plus_strand) {
         // R1                  |----------->
         //   ------------------------------------
         // R2   <-----------|
         read_1.is_plus_strand = true;
-        read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
 
         read_2.is_plus_strand = false;
-        read_2.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_2, _art_params.read_len - slen_2));
+        read_2.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_2, art_params_.read_len - slen_2));
     } else {
         // R2   <-----------|
         //   ------------------------------------
         // R1                  |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
+        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
         read_2.is_plus_strand = true;
-        read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
+        read_2.seq_ref = fasta_fetch_->fetch(id_, pos_2, art_params_.read_len - slen_2);
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -108,62 +101,56 @@ ArtReadPair ArtContig::generate_read_mp() const
 }
 
 // paired-end read: the second read is reverse complemenaty strand
-ArtReadPair ArtContig::generate_read_pe() const
+ArtReadPair ArtContig::generate_read_pe(bool is_plus_strand)
 {
-    ArtRead read_1(_art_params);
-    ArtRead read_2(_art_params);
-    int fragment_len;
-    auto ref_len = static_cast<int>(_ref_seq.length());
-    if (_art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-        fragment_len = ref_len;
+    ArtRead read_1(art_params_, rprob_);
+    ArtRead read_2(art_params_, rprob_);
+    hts_pos_t fragment_len;
+    if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
+        fragment_len = ref_len_;
     } else {
-        auto rng = boost::mt19937();
-        // FIXME: _art_params.pe_frag_dist_std_dev seems not working
-        auto gaussian = boost::normal_distribution<>(_art_params.pe_frag_dist_mean, _art_params.pe_frag_dist_std_dev);
-        if (_art_params.pe_frag_dist_mean - 2 * _art_params.pe_frag_dist_std_dev > ref_len) {
+        if (art_params_.pe_dist_mean_minus_2_std > ref_len_) {
             // when reference length < pe_frag_dist_mean-2*std, fragment_len sets to
             // be reference length
-            fragment_len = ref_len;
+            fragment_len = ref_len_;
         } else {
             fragment_len = 0;
-            while (fragment_len < _art_params.read_len || fragment_len > _ref_seq.length()) {
-                fragment_len = static_cast<int>(gaussian(rng));
+            while (fragment_len < art_params_.read_len || fragment_len > ref_len_) {
+                fragment_len = rprob_.insertion_length();
             }
         }
     }
-    auto pos_1 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE
+    auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
-        : static_cast<int>(floor((ref_len - fragment_len) * rprob.r_prob()));
-    auto pos_2 = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE ? 0 : ref_len - pos_1 - fragment_len;
-    int slen_1 = read_1.generate_indels(_art_params.read_len, true);
-    int slen_2 = read_2.generate_indels(_art_params.read_len, false);
+        : static_cast<hts_pos_t>(floor((ref_len_ - fragment_len) * rprob_.r_prob()));
+    auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE ? 0 : ref_len_ - pos_1 - fragment_len;
+    int slen_1 = read_1.generate_indels(art_params_.read_len, true);
+    int slen_2 = read_2.generate_indels(art_params_.read_len, false);
 
     // ensure get a fixed read length
-    if ((pos_1 + _art_params.read_len - slen_1) > ref_len) {
-        slen_1 = read_1.generate_indels_2(_art_params.read_len, true);
+    if ((pos_1 + art_params_.read_len - slen_1) > ref_len_) {
+        slen_1 = read_1.generate_indels_2(art_params_.read_len, true);
     }
-    if ((pos_2 + _art_params.read_len - slen_2) > ref_len) {
-        slen_2 = read_2.generate_indels_2(_art_params.read_len, false);
+    if ((pos_2 + art_params_.read_len - slen_2) > ref_len_) {
+        slen_2 = read_2.generate_indels_2(art_params_.read_len, false);
     }
-
-    bool is_plus_strand = _art_params.art_simulation_mode == SIMULATION_MODE::TEMPLATE || rprob.r_prob() < 0.5;
 
     if (is_plus_strand) {
         //    |----------->
         // ------------------------------------
         //                   <-----------|
         read_1.is_plus_strand = true;
-        read_1.seq_ref = _ref_seq.substr(pos_1, _art_params.read_len - slen_1);
+        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
         read_2.is_plus_strand = false;
-        read_2.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_2, _art_params.read_len - slen_2));
+        read_2.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_2, art_params_.read_len - slen_2));
     } else {
         //                   <-----------|
         // ------------------------------------
         //    |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = revcomp(_ref_seq.substr(_valid_region - pos_1, _art_params.read_len - slen_1));
+        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
         read_2.is_plus_strand = true;
-        read_2.seq_ref = _ref_seq.substr(pos_2, _art_params.read_len - slen_2);
+        read_2.seq_ref = fasta_fetch_->fetch(id_, pos_2, art_params_.read_len - slen_2);
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -172,14 +159,13 @@ ArtReadPair ArtContig::generate_read_pe() const
     return { read_1, read_2 };
 }
 
-ArtContig::ArtContig(std::string ref_seq, std::string id, ArtParams art_params)
-    : _art_params(std::move(art_params))
-    , _ref_seq(std::move(ref_seq))
-    , _id(std::move(id))
+ArtContig::ArtContig(
+    std::shared_ptr<BaseFastaFetch> fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
+    : fasta_fetch_(fasta_fetch)
+    , art_params_(art_params)
+    , rprob_(rprob)
+    , id_(std::move(id))
+    , valid_region_(fasta_fetch->seq_len(id_) - art_params.read_len)
+    , ref_len_(fasta_fetch->seq_len(id_))
 {
-    std::replace(_ref_seq.begin(), _ref_seq.end(), 'U', 'T');
-
-    const auto ref_len = static_cast<int>(_ref_seq.length());
-    boost::algorithm::to_upper(_ref_seq);
-    _valid_region = ref_len - _art_params.read_len;
 }

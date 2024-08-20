@@ -27,6 +27,16 @@ namespace art_modern {
     }
     hts_pos_t BaseFastaFetch::seq_len(const std::string& seq_name) const { return seq_lengths_.at(seq_name); }
     size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
+
+    std::vector<std::string> BaseFastaFetch::seq_names() const
+    {
+        std::vector<std::string> seq_names;
+        for (const auto& pair : seq_lengths_) {
+            seq_names.push_back(pair.first);
+        }
+        return seq_names;
+    }
+
     BaseFastaFetch::~BaseFastaFetch() = default;
 }
 }

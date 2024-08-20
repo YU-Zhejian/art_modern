@@ -923,7 +923,7 @@ set to one of BCF_ERR* codes and must be checked before calling bcf_write().
     bcf_info_t *bcf_get_info(const bcf_hdr_t *hdr, bcf1_t *line, const char *key);
 
     /**
-     * bcf_get_*_id() - returns pointer to FORMAT/INFO field data given the header index instead of the string ID
+     * bcf_get_*id_() - returns pointer to FORMAT/INFO field data given the header index instead of the string ID
      * @line: VCF line obtained from vcf_parse1
      * @id:  The header index for the tag, obtained from bcf_hdr_id2int()
      *

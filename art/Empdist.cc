@@ -1,12 +1,12 @@
 #include "Empdist.hh"
+#include "ArtConstants.hh"
+#include "random_generator.hh"
 #include <boost/log/trivial.hpp>
 #include <fstream>
-#include <sstream>
 
 using namespace std;
 namespace labw {
 namespace art_modern {
-
     Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
         : _sep_qual(sep_qual)
     {
@@ -18,7 +18,7 @@ namespace art_modern {
 
     // generate quality vector from dist of one read from pair-end [default first
     // read]
-    std::vector<int> Empdist::get_read_qual(int len, bool first) const
+    std::vector<int> Empdist::get_read_qual(int len, Rprob& rprob, bool first) const
     {
         std::vector<int> read_qual;
         read_qual.resize(len);
@@ -26,14 +26,14 @@ namespace art_modern {
         int cumCC;
         map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
+            cumCC = rprob.rand_quality();
             it = qual_dist[i].lower_bound(cumCC);
             read_qual[i] = it->second;
         }
         return read_qual;
     }
 
-    vector<int> Empdist::get_read_qual_sep_1(const string& seq) const
+    vector<int> Empdist::get_read_qual_sep_1(const string& seq, Rprob& rprob) const
     {
         vector<int> read_qual;
         const auto len = static_cast<int>(seq.size());
@@ -47,7 +47,7 @@ namespace art_modern {
         int cumCC;
 
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
+            cumCC = rprob.rand_quality();
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
                 read_qual.push_back(it->second);
@@ -62,13 +62,13 @@ namespace art_modern {
                 read_qual.push_back(it->second);
             } else {
                 // return random quality less than 10
-                read_qual.push_back((int)rprob.r_prob() * 10);
+                read_qual.push_back(rprob.rand_quality_less_than_10());
             }
         }
         return read_qual;
     }
 
-    vector<int> Empdist::get_read_qual_sep_2(const string& seq) const
+    vector<int> Empdist::get_read_qual_sep_2(const string& seq, Rprob& rprob) const
     {
         vector<int> read_qual;
         const auto len = static_cast<int>(seq.size());
@@ -81,7 +81,7 @@ namespace art_modern {
         }
         int cumCC;
         for (int i = 0; i < len; i++) {
-            cumCC = (int)ceil(rprob.r_prob() * max_dist_number);
+            cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_second[i].lower_bound(cumCC);
                 read_qual.push_back(it->second);
@@ -96,7 +96,7 @@ namespace art_modern {
                 read_qual.push_back(it->second);
             } else {
                 // return random quality less than 10
-                read_qual.push_back((int)rprob.r_prob() * 10);
+                read_qual.push_back(rprob.rand_quality_less_than_10());
             }
         }
         return read_qual;
@@ -180,7 +180,7 @@ namespace art_modern {
                 exit(EXIT_FAILURE);
             }
 
-            double denom = static_cast<double>(count[count.size() - 1]) / max_dist_number;
+            double denom = static_cast<double>(count[count.size() - 1]) / MAX_DIST_NUMBER;
             map<int, int> dist;
 
             for (size_t i = 0; i < count.size(); i++) {
@@ -247,13 +247,7 @@ namespace art_modern {
         read_emp_dist(distss, is_first);
     }
 
-    Rprob::Rprob()
-        : gen_(rd_())
-        , dis_(0.0f, 1.0f)
-    {
-    }
-
-    double Rprob::r_prob() { return dis_(gen_); }
+    Empdist::Empdist() = default;
 
 }
 }

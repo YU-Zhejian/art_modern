@@ -2,20 +2,23 @@
 
 #include <map>
 #include <string>
-#include <utility>
-#include <vector>
 
 #include "ArtParams.hh"
 #include "Empdist.hh"
 #include "PairwiseAlignment.hh"
+#include "random_generator.hh"
 #include "seq_utils.hh"
 
 namespace labw {
 namespace art_modern {
 
+    struct TooMuchNException : public std::exception {
+        const char* what() const noexcept override { return "Too much N in the contig"; }
+    };
+
     class ArtRead {
     public:
-        explicit ArtRead(ArtParams art_params);
+        ArtRead(const ArtParams& art_params, Rprob& rprob);
 
         std::map<int, char> indel;
         std::map<int, char> substitution;
@@ -29,6 +32,7 @@ namespace art_modern {
         int generate_indels(int read_len, bool is_read_1);
         // number of deletions <= number of insertions
         int generate_indels_2(int read_len, bool is_read_1);
+        void assess_num_n();
 
         /**
          * Populate the read while adding insertions and deletions.
@@ -44,7 +48,8 @@ namespace art_modern {
         std::vector<int> generate_snv_on_qual(const std::vector<int>& qual);
 
     private:
-        ArtParams _art_params;
+        const ArtParams& art_params_;
+        Rprob& rprob_;
     };
 
     struct ArtReadPair {

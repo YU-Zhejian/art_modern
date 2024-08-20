@@ -102,11 +102,11 @@ sets `BUILD_SHARED_LIBS` to `ON`.
 
 The parallelization strategy of different modes and input parsers are as follows:
 
-|          | `wgs`     | `trans`   | `templ`   |
-|----------|-----------|-----------|-----------|
-| `memory` | Coverage  | Batch     | Batch     |
-| `htslib` | Coverage  | **ERROR** | **ERROR** |
-| `stream` | **ERROR** | Batch     | Batch     |
+| Parser \ Mode | `wgs`     | `trans`   | `templ`   |
+|---------------|-----------|-----------|-----------|
+| `memory`      | Coverage  | Batch     | Batch     |
+| `htslib`      | Coverage  | **ERROR** | **ERROR** |
+| `stream`      | **ERROR** | Batch     | Batch     |
 
 ### Input Formats
 
@@ -116,17 +116,11 @@ Currently, we support input in FASTA and PBSim3 transcripts format.
 
 A compatibility matrix is as follows:
 
-|          | FASTA     | PBSim3 Transcripts |
-|----------|-----------|--------------------|
-| `memory` | Supported | Supported          |
-| `htslib` | Supported | ERROR              |
-| `stream` | Supported | Supported          |
-
-|         | FASTA     | PBSim3 Transcripts |
-|---------|-----------|--------------------|
-| `wgs`   | Supported | ERROR              |
-| `trans` | Supported | Supported          |
-| `templ` | Supported | Supported          |
+| Parser \ Mode | `wgs` | `trans`                     | `templ`                     |
+|---------------|-------|-----------------------------|-----------------------------|
+| `memory`      | FASTA | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
+| `htslib`      | FASTA | FASTA                       | FASTA                       |
+| `stream`      | FASTA | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
 
 ### Library Construction Methods
 

@@ -261,6 +261,8 @@ namespace art_modern {
         for (int i = 0; i < HIGHEST_QUAL; i++) {
             err_prob[i] = pow(10, -i / 10.0);
         }
+
+        pe_dist_mean_minus_2_std = pe_frag_dist_mean - 2 * pe_frag_dist_std_dev;
     }
 
     void ArtParams::shift_emp(map<int, int> map_to_process, int q_shift) const
@@ -277,17 +279,17 @@ namespace art_modern {
         }
     }
 
-    Empdist ArtParams::read_emp() const
+    void ArtParams::read_emp()
     {
-        auto qdist = Empdist(qual_file_1, qual_file_2, sep_flag);
+        qdist_ = Empdist(qual_file_1, qual_file_2, sep_flag);
         size_t r1_profile_size;
         size_t r2_profile_size;
         if (sep_flag) {
-            r1_profile_size = qdist.a_qual_dist_first.size();
-            r2_profile_size = qdist.a_qual_dist_second.size();
+            r1_profile_size = qdist_.a_qual_dist_first.size();
+            r2_profile_size = qdist_.a_qual_dist_second.size();
         } else {
-            r1_profile_size = qdist.qual_dist_first.size();
-            r2_profile_size = qdist.qual_dist_second.size();
+            r1_profile_size = qdist_.qual_dist_first.size();
+            r2_profile_size = qdist_.qual_dist_second.size();
         }
 
         if (read_len > r1_profile_size) {
@@ -313,42 +315,41 @@ namespace art_modern {
         }
 
         if (!sep_flag) {
-            for (const auto& i : qdist.qual_dist_first) {
+            for (const auto& i : qdist_.qual_dist_first) {
                 shift_emp(i, q_shift_1);
             }
-            for (const auto& i : qdist.qual_dist_second) {
+            for (const auto& i : qdist_.qual_dist_second) {
                 shift_emp(i, q_shift_2);
             }
         } else {
-            for (const auto& i : qdist.a_qual_dist_first) {
+            for (const auto& i : qdist_.a_qual_dist_first) {
                 shift_emp(i, q_shift_1);
             }
-            for (const auto& i : qdist.a_qual_dist_second) {
+            for (const auto& i : qdist_.a_qual_dist_second) {
                 shift_emp(i, q_shift_2);
             }
 
-            for (const auto& i : qdist.c_qual_dist_first) {
+            for (const auto& i : qdist_.c_qual_dist_first) {
                 shift_emp(i, q_shift_1);
             }
-            for (const auto& i : qdist.c_qual_dist_second) {
+            for (const auto& i : qdist_.c_qual_dist_second) {
                 shift_emp(i, q_shift_2);
             }
 
-            for (const auto& i : qdist.g_qual_dist_first) {
+            for (const auto& i : qdist_.g_qual_dist_first) {
                 shift_emp(i, q_shift_1);
             }
-            for (const auto& i : qdist.g_qual_dist_second) {
+            for (const auto& i : qdist_.g_qual_dist_second) {
                 shift_emp(i, q_shift_2);
             }
 
-            for (const auto& i : qdist.t_qual_dist_first) {
+            for (const auto& i : qdist_.t_qual_dist_first) {
                 shift_emp(i, q_shift_1);
             }
-            for (const auto& i : qdist.t_qual_dist_second) {
+            for (const auto& i : qdist_.t_qual_dist_second) {
                 shift_emp(i, q_shift_2);
             }
         }
-        return qdist;
     }
 
     void ArtParams::print_params() const

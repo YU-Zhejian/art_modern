@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
     art_params.validate_args();
     art_params.print_params();
 
-    auto qdist = art_params.read_emp();
+    art_params.read_emp();
     if (!art_params.stream) {
         BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
         auto seq_file_fai_path = string(fai_path(art_params.seq_file.c_str()));

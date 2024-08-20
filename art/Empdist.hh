@@ -1,30 +1,16 @@
 #pragma once
-#include <algorithm>
-#include <iostream>
+#include <istream>
 #include <map>
-#include <random>
 #include <string>
 #include <vector>
 
-#include "ArtConstants.hh"
+#include "random_generator.hh"
 
 namespace labw {
 namespace art_modern {
-    class Rprob {
-    public:
-        Rprob();
-        double r_prob();
-
-    private:
-        std::random_device rd_;
-        std::mt19937 gen_;
-        std::uniform_real_distribution<float> dis_;
-    };
-    static Rprob rprob;
 
     class Empdist {
     public:
-        static const int max_dist_number = 1000000;
         std::vector<std::map<int, int>> qual_dist_first;
         std::vector<std::map<int, int>> qual_dist_second;
 
@@ -38,10 +24,14 @@ namespace art_modern {
         std::vector<std::map<int, int>> g_qual_dist_second;
         std::vector<std::map<int, int>> c_qual_dist_second;
 
+        /**
+         * FIXME: TO BE REMOVED
+         */
+        Empdist();
         Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual);
-        std::vector<int> get_read_qual(int len, bool first = true) const;
-        std::vector<int> get_read_qual_sep_1(const std::string& seq) const;
-        std::vector<int> get_read_qual_sep_2(const std::string& seq) const;
+        std::vector<int> get_read_qual(int len, Rprob& rprob, bool first = true) const;
+        std::vector<int> get_read_qual_sep_1(const std::string& seq, Rprob& rprob) const;
+        std::vector<int> get_read_qual_sep_2(const std::string& seq, Rprob& rprob) const;
 
     private:
         bool _sep_qual;

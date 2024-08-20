@@ -1,4 +1,5 @@
 #pragma once
+#include "ArtConstants.hh"
 #include "Empdist.hh"
 #include "art_modern_constants.hh"
 #include "out/OutputDispatcher.hh"
@@ -30,7 +31,7 @@ namespace art_modern {
         std::string qual_file_1;
         std::string qual_file_2;
         std::string seq_file;
-        std::map<std::string, double> sequencing_depth;
+        std::map<std::string, double, std::less<>> sequencing_depth;
         double uniform_sequencing_depth = 0.0;
         std::string p_cigar;
         std::string fcov;
@@ -58,7 +59,7 @@ namespace art_modern {
 
         void shift_emp(std::map<int, int> map_to_process, int q_shift) const;
 
-        Empdist read_emp() const;
+        void read_emp();
 
         std::shared_ptr<BaseReadOutput> get_output_dispatcher() const;
 
@@ -67,6 +68,8 @@ namespace art_modern {
          */
         void print_params() const;
         void print_help() const;
+        hts_pos_t pe_dist_mean_minus_2_std;
+        Empdist qdist_;
 
     private:
         OutputDispatcherFactory out_dispatcher_factory_;

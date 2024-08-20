@@ -3,6 +3,7 @@
 #include <htslib/sam.h>
 #include <map>
 #include <string>
+#include <vector>
 
 namespace labw {
 namespace art_modern {
@@ -51,7 +52,9 @@ namespace art_modern {
          * @return As described.
          */
         size_t num_seqs() const;
+        std::vector<std::string> seq_names() const;
 
+    protected:
         std::map<std::string, hts_pos_t, std::less<>> seq_lengths_;
     };
 }

@@ -22,6 +22,9 @@ namespace art_modern {
         if (coverage_positive_.empty()) {
             return static_coverage_ / 2;
         } else {
+            if (coverage_positive_.find(contig_name) == coverage_positive_.end()) {
+                return 0;
+            }
             return coverage_positive_.at(contig_name);
         }
     }
@@ -30,6 +33,9 @@ namespace art_modern {
         if (coverage_negative_.empty()) {
             return static_coverage_ / 2;
         } else {
+            if (coverage_negative_.find(contig_name) == coverage_negative_.end()) {
+                return 0;
+            }
             return coverage_negative_.at(contig_name);
         }
     }
@@ -59,11 +65,11 @@ namespace art_modern {
             return CoverageInfo(static_coverage_ / num_parts);
         } else {
             coverage_map coverage_positive_new;
-            for (auto& pair : coverage_positive_) {
+            for (auto const& pair : coverage_positive_) {
                 coverage_positive_new[pair.first] = pair.second / num_parts;
             }
             coverage_map coverage_negative_new;
-            for (auto& pair : coverage_positive_) {
+            for (auto const& pair : coverage_positive_) {
                 coverage_negative_new[pair.first] = pair.second / num_parts;
             }
             return { coverage_positive_new, coverage_negative_new };
