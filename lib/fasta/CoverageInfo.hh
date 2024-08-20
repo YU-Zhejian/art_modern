@@ -16,7 +16,7 @@ namespace art_modern {
 
         double coverage_positive(const std::string& contig_name) const;
         double coverage_negative(const std::string& contig_name) const;
-        CoverageInfo operator/=(int num_parts);
+        CoverageInfo div(int num_parts) const;
 
     private:
         double static_coverage_;

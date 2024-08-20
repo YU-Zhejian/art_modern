@@ -10,6 +10,7 @@ namespace labw {
 namespace art_modern {
 
     class Pbsim3TranscriptBatcher {
+    public:
         explicit Pbsim3TranscriptBatcher(int batch_size, std::istream& istream);
         std::pair<InMemoryFastaFetch, CoverageInfo> fetch();
 

@@ -3,16 +3,17 @@
 #include "random_generator.hh"
 #include <boost/log/trivial.hpp>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 namespace labw {
 namespace art_modern {
     Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
-        : _sep_qual(sep_qual)
+        : sep_qual_(sep_qual)
     {
-        read_emp_dist(emp_filename_1, true);
+        read_emp_dist_(emp_filename_1, true);
         if (!emp_filename_2.empty()) {
-            read_emp_dist(emp_filename_2, false);
+            read_emp_dist_(emp_filename_2, false);
         }
     }
 
@@ -20,7 +21,7 @@ namespace art_modern {
     // read]
     std::vector<int> Empdist::get_read_qual(int len, Rprob& rprob, bool first) const
     {
-        std::vector<int> read_qual;
+        std::vector<int> read_qual(len);
         read_qual.resize(len);
         auto qual_dist = first ? qual_dist_first : qual_dist_second;
         int cumCC;
@@ -35,8 +36,10 @@ namespace art_modern {
 
     vector<int> Empdist::get_read_qual_sep_1(const string& seq, Rprob& rprob) const
     {
-        vector<int> read_qual;
         const auto len = static_cast<int>(seq.size());
+        vector<int> read_qual(len);
+        read_qual.resize(len);
+
         if (a_qual_dist_first.size() < len || t_qual_dist_first.size() < len || g_qual_dist_first.size() < len
             || c_qual_dist_first.size() < len) {
             BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the "
@@ -50,19 +53,19 @@ namespace art_modern {
             cumCC = rprob.rand_quality();
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'C') {
                 auto it = c_qual_dist_first[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'G') {
                 auto it = g_qual_dist_first[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'T') {
                 auto it = t_qual_dist_first[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else {
                 // return random quality less than 10
-                read_qual.push_back(rprob.rand_quality_less_than_10());
+                read_qual[i] = rprob.rand_quality_less_than_10();
             }
         }
         return read_qual;
@@ -70,8 +73,9 @@ namespace art_modern {
 
     vector<int> Empdist::get_read_qual_sep_2(const string& seq, Rprob& rprob) const
     {
-        vector<int> read_qual;
         const auto len = static_cast<int>(seq.size());
+        vector<int> read_qual(len);
+        read_qual.resize(len);
 
         if (a_qual_dist_second.size() < len || t_qual_dist_second.size() < len || g_qual_dist_second.size() < len
             || c_qual_dist_second.size() < len) {
@@ -84,25 +88,25 @@ namespace art_modern {
             cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_second[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'C') {
                 auto it = c_qual_dist_second[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'G') {
                 auto it = g_qual_dist_second[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else if (seq[i] == 'T') {
                 auto it = t_qual_dist_second[i].lower_bound(cumCC);
-                read_qual.push_back(it->second);
+                read_qual[i] = it->second;
             } else {
                 // return random quality less than 10
-                read_qual.push_back(rprob.rand_quality_less_than_10());
+                read_qual[i] = rprob.rand_quality_less_than_10();
             }
         }
         return read_qual;
     }
 
-    void Empdist::read_emp_dist(istream& input, bool is_first)
+    void Empdist::read_emp_dist_(istream& input, bool is_first)
     {
         int linenum = 0;
         int read_pos;
@@ -118,13 +122,14 @@ namespace art_modern {
             getline(input, aLine);
             if (aLine.empty())
                 continue;
-            if (aLine[0] == '#')
-                continue;
-
-            if (!_sep_qual && (aLine[0] != '.')) {
+            if (aLine[0] == '#') {
                 continue;
             }
-            if (_sep_qual) {
+
+            if (!sep_qual_ && (aLine[0] != '.')) {
+                continue;
+            }
+            if (sep_qual_) {
                 if (aLine[0] == 'A') {
                     a_flag = true;
                 } else if (aLine[0] == 'T') {
@@ -154,7 +159,7 @@ namespace art_modern {
             vector<int> qual;
 
             while (ss >> t_int) {
-                qual.push_back(t_int);
+                qual.emplace_back(t_int);
             }
 
             getline(input, aLine);
@@ -169,10 +174,10 @@ namespace art_modern {
             }
 
             long t_uint;
-            vector<long> count;
+            vector<long> count(qual.size());
 
             while (ss >> t_uint) {
-                count.push_back(t_uint);
+                count.emplace_back(t_uint);
             }
 
             if (count.size() != qual.size()) {
@@ -189,26 +194,26 @@ namespace art_modern {
             }
             if (!dist.empty()) {
                 linenum++;
-                if (!_sep_qual && is_first) {
-                    qual_dist_first.push_back(dist);
-                } else if (!_sep_qual) {
-                    qual_dist_second.push_back(dist);
+                if (!sep_qual_ && is_first) {
+                    qual_dist_first.emplace_back(dist);
+                } else if (!sep_qual_) {
+                    qual_dist_second.emplace_back(dist);
                 } else if (a_flag && is_first) {
-                    a_qual_dist_first.push_back(dist);
+                    a_qual_dist_first.emplace_back(dist);
                 } else if (a_flag) {
-                    a_qual_dist_second.push_back(dist);
+                    a_qual_dist_second.emplace_back(dist);
                 } else if (t_flag && is_first) {
-                    t_qual_dist_first.push_back(dist);
+                    t_qual_dist_first.emplace_back(dist);
                 } else if (t_flag) {
-                    t_qual_dist_second.push_back(dist);
+                    t_qual_dist_second.emplace_back(dist);
                 } else if (g_flag && is_first) {
-                    g_qual_dist_first.push_back(dist);
+                    g_qual_dist_first.emplace_back(dist);
                 } else if (g_flag) {
-                    g_qual_dist_second.push_back(dist);
+                    g_qual_dist_second.emplace_back(dist);
                 } else if (c_flag && is_first) {
-                    c_qual_dist_first.push_back(dist);
+                    c_qual_dist_first.emplace_back(dist);
                 } else if (c_flag) {
-                    c_qual_dist_second.push_back(dist);
+                    c_qual_dist_second.emplace_back(dist);
                 } else {
                     BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                     exit(EXIT_FAILURE);
@@ -216,7 +221,7 @@ namespace art_modern {
             }
         }
 
-        if (_sep_qual) {
+        if (sep_qual_) {
             if (a_qual_dist_first.size() != g_qual_dist_first.size()
                 || g_qual_dist_first.size() != c_qual_dist_first.size()
                 || c_qual_dist_first.size() != t_qual_dist_first.size()) {
@@ -237,17 +242,15 @@ namespace art_modern {
         }
     }
 
-    void Empdist::read_emp_dist(const string& infile, bool is_first)
+    void Empdist::read_emp_dist_(const std::string& infile, bool is_first)
     {
         ifstream distss(infile.c_str());
         if (!distss) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
             exit(EXIT_FAILURE);
         }
-        read_emp_dist(distss, is_first);
+        read_emp_dist_(distss, is_first);
     }
-
-    Empdist::Empdist() = default;
 
 }
 }

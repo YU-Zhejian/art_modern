@@ -59,7 +59,7 @@ namespace art_modern {
             }
         }
     }
-    CoverageInfo CoverageInfo::operator/=(int num_parts)
+    CoverageInfo CoverageInfo::div(int num_parts) const
     {
         if (coverage_positive_.empty()) {
             return CoverageInfo(static_coverage_ / num_parts);

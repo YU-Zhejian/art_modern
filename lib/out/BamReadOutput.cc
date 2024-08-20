@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <boost/log/trivial.hpp>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/log/trivial.hpp>
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
@@ -166,6 +166,12 @@ namespace art_modern {
         const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
     {
         if (vm.count("o-sam")) {
+            if (fasta_fetch->num_seqs() == 0) {
+                BOOST_LOG_TRIVIAL(error) << "No sequences in the reference file. If you used "
+                                         << INPUT_FILE_PARSER_STREAM
+                                         << " input parser, you should use headless SAM/BAM instead of this one.";
+                exit(EXIT_FAILURE);
+            }
             auto so = SamReadOutputOptions();
             so.use_m = vm.count("o-sam-use_m") > 0;
             so.write_bam = vm.count("o-sam-write_bam") > 0;
@@ -175,6 +181,6 @@ namespace art_modern {
         return std::make_shared<DumbReadOutput>();
     }
 
-BamReadOutputFactory::~BamReadOutputFactory()=default;
+    BamReadOutputFactory::~BamReadOutputFactory() = default;
 }
 }

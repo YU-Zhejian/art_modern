@@ -11,7 +11,7 @@ namespace art_modern {
     bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand)
     {
         ostringstream osID;
-        auto const& qdist = art_params_.qdist_;
+        auto const& qdist = art_params_.qdist;
 
         vector<int> qual_1;
         vector<int> qual_2;
@@ -64,7 +64,7 @@ namespace art_modern {
         ostringstream FQFILE;
         vector<int> qual;
         string read_name;
-        auto const& qdist = art_params_.qdist_;
+        auto const& qdist = art_params_.qdist;
 
         osID << art_contig.id_ << ':' << art_params_.id << read_id;
         read_name = osID.str();
@@ -93,6 +93,7 @@ namespace art_modern {
         , art_params_(std::move(art_params))
         , rprob_(
               static_cast<float>(art_params_.pe_frag_dist_mean), static_cast<float>(art_params_.pe_frag_dist_std_dev))
+        , output_dispatcher_(std::move(art_params.out_dispatcher))
     {
     }
 

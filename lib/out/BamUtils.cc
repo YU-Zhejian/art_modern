@@ -1,33 +1,27 @@
-// #include "BamUtils.hh"
-//
-// namespace labw
-//{
-// namespace art_modern
-//{
-///*  bam_md.c -- calmd subcommand.
-//
-//    Copyright (C) 2009-2011, 2014-2015, 2019-2020, 2022 Genome Research Ltd.
-//    Portions copyright (C) 2009-2011 Broad Institute.
-//
-//    Author: Heng Li <lh3@sanger.ac.uk>
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.  */
+#include "BamUtils.hh"
+#include "seq_utils.hh"
+
+namespace labw {
+namespace art_modern {
+    std::string BamUtils::generate_oa_tag(const PairwiseAlignment& pwa) const
+    {
+        auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
+        auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+        hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
+        auto strand = pwa.is_plus_strand ? '+' : '-';
+        auto cigar_str = cigar_arr_to_str(cigar);
+        std::ostringstream oss;
+        auto nm_tag = "";
+        oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ',' << nm_tag
+            << ';';
+        return oss.str();
+    }
+    BamUtils::BamUtils(const SamReadOutputOptions& sam_options)
+        : sam_options_(sam_options)
+    {
+    }
+}
+}
 //
 // #include <config.h>
 //

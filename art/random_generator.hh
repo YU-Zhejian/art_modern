@@ -58,10 +58,10 @@ namespace art_modern {
 //    oneapi::mkl::rng::uniform<int, oneapi::mkl::rng::uniform_method::by_default> quality_less_than_10_;
 //    oneapi::mkl::rng::uniform<int, oneapi::mkl::rng::uniform_method::by_default> quality_;
 #elif defined(USE_GSL_RANDOM)
-    const gsl_rng_type * T;
-    gsl_rng * r;
-    float pe_frag_dist_mean_;
-    float pe_frag_dist_std_dev_;
+        const gsl_rng_type* T;
+        gsl_rng* r;
+        float pe_frag_dist_mean_;
+        float pe_frag_dist_std_dev_;
 #endif
     };
 }

@@ -49,7 +49,7 @@ namespace art_modern {
         desc.add(fastq_desc);
     }
     std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>&) const
     {
         if (vm.count("o-fastq")) {
             return std::make_shared<FastqReadOutput>(vm["o-fastq"].as<std::string>());

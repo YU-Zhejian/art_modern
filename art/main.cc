@@ -3,9 +3,8 @@
 #include <boost/timer/timer.hpp>
 #endif
 
-#include "ArtParams.hh"
+#include "ArtCmdOpts.hh"
 #include "main_fn.hh"
-#include "global_variables.hh"
 
 using namespace std;
 using namespace labw::art_modern;
@@ -18,14 +17,9 @@ int main(int argc, char* argv[])
 #else
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
-    for (auto i = 0; i < argc; i++) {
-        args.emplace_back(argv[i]);
-    }
     print_banner();
-    ArtParams art_params;
-    art_params.parse_args(args);
-    art_params.validate_args();
-    art_params.print_params();
+    ArtCmdOpts art_cmd_opts;
+    auto art_params = art_cmd_opts.parse_args(argc, argv);
     generate_all(art_params);
     return EXIT_SUCCESS;
 }

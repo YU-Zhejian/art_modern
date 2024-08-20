@@ -68,6 +68,7 @@ namespace art_modern {
         std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
             const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const override;
         ~BamReadOutputFactory();
+
     private:
         SamReadOutputOptions sam_options_;
     };
