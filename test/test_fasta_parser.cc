@@ -33,7 +33,7 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
     }
 }
 
-void test_fasta(const std::shared_ptr<BaseFastaFetch>& fastaFetch)
+void test_fasta(BaseFastaFetch* fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
@@ -51,12 +51,14 @@ void test_fasta(const std::shared_ptr<BaseFastaFetch>& fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
 {
-    auto faidx_fetch = std::make_shared<FaidxFetch>(TEST_RESOURCES_PATH "test.fasta");
+    auto faidx_fetch = new FaidxFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(faidx_fetch);
+    delete faidx_fetch;
 }
 
 BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
 {
-    auto in_memory_fasta_fetch = std::make_shared<InMemoryFastaFetch>(TEST_RESOURCES_PATH "test.fasta");
+    auto in_memory_fasta_fetch = new InMemoryFastaFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(in_memory_fasta_fetch);
+    delete in_memory_fasta_fetch;
 }

@@ -9,6 +9,10 @@ namespace art_modern {
     void ThreadSafeFileStream::write(const std::string& str)
     {
         std::lock_guard<std::mutex> lock(mutex_);
+
+        if (!file_.is_open()) {
+            return;
+        }
         file_ << str;
         file_.flush();
     }
@@ -23,7 +27,14 @@ namespace art_modern {
         }
     }
 
-    void ThreadSafeFileStream::close() { file_.close(); }
+    void ThreadSafeFileStream::close()
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        if (!file_.is_open()) {
+            return;
+        }
+        file_.close();
+    }
 
     ThreadSafeFileStream::~ThreadSafeFileStream() { ThreadSafeFileStream::close(); }
 

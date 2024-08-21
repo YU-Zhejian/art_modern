@@ -2,22 +2,28 @@
 
 #include "fasta/BaseFastaFetch.hh"
 #include "fasta/CoverageInfo.hh"
-#include <memory>
+#include "fasta/InMemoryFastaFetch.hh"
 
 namespace labw {
 namespace art_modern {
 
     class SimulationJob {
     public:
-        SimulationJob(
-            const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const CoverageInfo& coverage_info, long job_id);
-        const std::shared_ptr<BaseFastaFetch>& fasta_fetch() const;
-        const CoverageInfo& coverage_info() const;
-        const long job_id;
+        ~SimulationJob();
+        SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, const int job_id);
 
-    private:
-        const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
-        const CoverageInfo& coverage_info_;
+        SimulationJob(SimulationJob&& other) noexcept:
+        fasta_fetch(other.fasta_fetch),
+        coverage_info(other.coverage_info),
+        job_id(other.job_id)
+        {
+        };
+        SimulationJob(const SimulationJob & ) = delete;
+        SimulationJob& operator=(SimulationJob&& ) =delete;
+
+        BaseFastaFetch* fasta_fetch;
+        const CoverageInfo& coverage_info;
+        const int job_id;
     };
 
 } // art_modern

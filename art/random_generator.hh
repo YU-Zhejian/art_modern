@@ -29,7 +29,6 @@ namespace art_modern {
 
     private:
 #if defined(USE_STD_RANDOM)
-        std::random_device rd_;
         std::mt19937 gen_;
         std::uniform_real_distribution<float> dis_;
         std::normal_distribution<float> insertion_length_gaussian_;
@@ -38,7 +37,6 @@ namespace art_modern {
         std::uniform_int_distribution<int> quality_less_than_10_;
         std::uniform_int_distribution<int> quality_;
 #elif defined(USE_BOOST_RANDOM)
-        boost::random_device rd_;
         boost::mt19937 gen_;
         boost::uniform_real<float> dis_;
         boost::normal_distribution<float> insertion_length_gaussian_;

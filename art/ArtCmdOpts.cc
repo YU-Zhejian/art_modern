@@ -186,12 +186,12 @@ namespace art_modern {
         }
     }
 
-    std::pair<CoverageInfo, std::shared_ptr<BaseFastaFetch>> get_coverage_info_fasta_fetch(
-        const std::string& fcov_arg_str, const INPUT_FILE_TYPE input_file_type,
-        const INPUT_FILE_PARSER input_file_parser, const std::string& input_file_name)
+    std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std::string& fcov_arg_str,
+        const INPUT_FILE_TYPE input_file_type, const INPUT_FILE_PARSER input_file_parser,
+        const std::string& input_file_name)
     {
         CoverageInfo coverage_info(0);
-        std::shared_ptr<BaseFastaFetch> fasta_fetch;
+        BaseFastaFetch* fasta_fetch;
         if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
             // PBSIM3_TEMPLATE have bundled coverage info
         }
@@ -209,18 +209,18 @@ namespace art_modern {
             X_FOLD.close();
         }
         if (input_file_parser == INPUT_FILE_PARSER::STREAM) {
-            fasta_fetch = std::make_shared<InMemoryFastaFetch>(); // EMpty
+            fasta_fetch = new InMemoryFastaFetch(); // EMpty
         }
         if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
-            fasta_fetch = std::make_shared<FaidxFetch>(input_file_name); // EMpty
+            fasta_fetch = new FaidxFetch(input_file_name); // EMpty
         }
         if (input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             if (input_file_type == INPUT_FILE_TYPE::FASTA) {
-                fasta_fetch = std::make_shared<InMemoryFastaFetch>(input_file_name);
+                fasta_fetch = new InMemoryFastaFetch(input_file_name);
             } else if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
                 std::ifstream input_file_stream(input_file_name);
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
-                fasta_fetch = std::make_shared<InMemoryFastaFetch>(batcher.fetch().first);
+                fasta_fetch = new InMemoryFastaFetch(batcher.fetch().first);
                 coverage_info = batcher.fetch().second;
                 input_file_stream.close();
             }
@@ -536,9 +536,9 @@ namespace art_modern {
     po::options_description option_parser()
     {
         OutputDispatcherFactory out_dispatcher_factory_;
-        out_dispatcher_factory_.add(std::make_shared<FastqReadOutputFactory>());
-        out_dispatcher_factory_.add(std::make_shared<BamReadOutputFactory>());
-        out_dispatcher_factory_.add(std::make_shared<HeadlessBamReadOutputFactory>());
+        out_dispatcher_factory_.add(new FastqReadOutputFactory());
+        out_dispatcher_factory_.add(new BamReadOutputFactory());
+        out_dispatcher_factory_.add(new HeadlessBamReadOutputFactory());
         po::options_description general_opts("General Options");
         general_opts.add_options()(ARG_HELP, "print out usage information");
         general_opts.add_options()(ARG_VERSION, "display version info");
@@ -662,9 +662,9 @@ namespace art_modern {
     {
 
         OutputDispatcherFactory out_dispatcher_factory;
-        out_dispatcher_factory.add(std::make_shared<FastqReadOutputFactory>());
-        out_dispatcher_factory.add(std::make_shared<BamReadOutputFactory>());
-        out_dispatcher_factory.add(std::make_shared<HeadlessBamReadOutputFactory>());
+        out_dispatcher_factory.add(new FastqReadOutputFactory());
+        out_dispatcher_factory.add(new BamReadOutputFactory());
+        out_dispatcher_factory.add(new HeadlessBamReadOutputFactory());
         return out_dispatcher_factory;
     }
 } // art_modern

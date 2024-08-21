@@ -23,8 +23,8 @@ namespace art_modern {
     class FastqReadOutputFactory : public BaseReadOutputFactory {
     public:
         void patch_options(boost::program_options::options_description& desc) override;
-        std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-            const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const override;
+        BaseReadOutput* create(
+            const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const override;
     };
 }
 }

@@ -3,21 +3,11 @@
 #include "BaseFastaFetch.hh"
 #include "CExceptionsProxy.hh"
 #include "ExceptionUtils.hh"
-#include "NotImplementedException.hh"
 #include "art_modern_constants.hh"
 
 namespace labw {
 namespace art_modern {
-    std::string BaseFastaFetch::fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Some method calls BaseFastaFetch::fetch?";
-        throw_with_trace(NotImplementedException());
-    }
-    char* BaseFastaFetch::cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end)
-    {
-        BOOST_LOG_TRIVIAL(error) << "Some method calls BaseFastaFetch::cfetch?";
-        throw_with_trace(NotImplementedException());
-    }
+
     void BaseFastaFetch::update_sam_header(sam_hdr_t* header) const
     {
         for (const auto& pair : seq_lengths_) {
@@ -28,10 +18,35 @@ namespace art_modern {
                 CExceptionsProxy::EXPECTATION::ZERO);
         }
     }
-    hts_pos_t BaseFastaFetch::seq_len(const std::string& seq_name) const { return seq_lengths_.at(seq_name); }
+    hts_pos_t BaseFastaFetch::seq_len(const std::string& seq_name) const
+    {
+        try {
+            return seq_lengths_.at(seq_name);
+        } catch (std::out_of_range&) {
+            BOOST_LOG_TRIVIAL(error) << "Invalid sequence name " << seq_name << ".";
+            throw std::invalid_argument("Invalid sequence name.");
+        }
+    }
+
     size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
 
-    std::vector<std::string> BaseFastaFetch::seq_names() const { return seq_names_; }
+    const std::vector<std::string>& BaseFastaFetch::seq_names() const { return seq_names_; }
+
+    std::vector<std::string> get_seq_names(const std::map<std::string, hts_pos_t, std::less<>>& seq_lengths)
+    {
+        std::vector<std::string> retv;
+        retv.reserve(seq_lengths.size());
+        for (const auto& pair : seq_lengths) {
+            retv.emplace_back(pair.first);
+        }
+        return retv;
+    }
+
+    BaseFastaFetch::BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>> seq_lengths)
+        : seq_lengths_(std::move(seq_lengths))
+        , seq_names_(get_seq_names(seq_lengths_))
+    {
+    }
 
     BaseFastaFetch::~BaseFastaFetch() = default;
 }

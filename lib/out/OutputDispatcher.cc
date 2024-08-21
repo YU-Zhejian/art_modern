@@ -23,12 +23,18 @@ namespace art_modern {
         for (const auto& output : outputs_) {
             output->close();
         }
-        outputs_.clear();
     }
 
-    OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
+    OutputDispatcher::~OutputDispatcher()
+    {
+        OutputDispatcher::close();
 
-    void OutputDispatcher::add(const std::shared_ptr<BaseReadOutput>& output) { outputs_.emplace_back(output); }
+        for (const auto& output : outputs_) {
+            delete output;
+        }
+    }
+
+    void OutputDispatcher::add(BaseReadOutput* output) { outputs_.emplace_back(output); }
 
     void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc)
     {
@@ -36,19 +42,23 @@ namespace art_modern {
             factory->patch_options(desc);
         }
     }
-    std::shared_ptr<BaseReadOutput> OutputDispatcherFactory::create(
-        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    BaseReadOutput* OutputDispatcherFactory::create(
+        const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const
     {
-        auto output_dispatcher = std::make_shared<OutputDispatcher>();
+        auto output_dispatcher = new OutputDispatcher();
         for (auto const& factory : factories_) {
             output_dispatcher->add(factory->create(vm, fasta_fetch));
         }
         BOOST_LOG_TRIVIAL(info) << "All writers added";
         return output_dispatcher;
     }
-    void OutputDispatcherFactory::add(const std::shared_ptr<BaseReadOutputFactory>& factory)
+    void OutputDispatcherFactory::add(BaseReadOutputFactory* factory) { factories_.emplace_back(factory); }
+
+    OutputDispatcherFactory::~OutputDispatcherFactory()
     {
-        factories_.emplace_back(factory);
+        for (auto& factory : factories_) {
+            delete factory;
+        }
     }
 
 }

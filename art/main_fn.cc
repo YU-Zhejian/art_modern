@@ -1,7 +1,10 @@
 #include "ArtJobPool.hh"
+#include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/console.hpp>
 
 #include "ArtConstants.hh"
+#include "fasta/FaidxFetch.hh"
 #include "fasta/FastaStreamBatcher.hh"
 #include "fasta/Pbsim3TranscriptBatcher.hh"
 #include "main_fn.hh"
@@ -14,9 +17,17 @@
 #define DUMP_FILENAME "./backtrace.dump"
 
 using namespace std;
+namespace logging = boost::log;
 
 namespace labw {
 namespace art_modern {
+
+    void init_logger()
+    {
+#ifndef CEU_CM_IS_DEBUG
+        logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);
+#endif
+    }
 
     void my_signal_handler(int signum)
     {
@@ -39,7 +50,6 @@ namespace art_modern {
             // cleaning up
             ifs.close();
             boost::filesystem::remove(DUMP_FILENAME);
-            exit(EXIT_FAILURE);
         }
     }
 
@@ -49,18 +59,28 @@ namespace art_modern {
         BOOST_LOG_TRIVIAL(info) << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
         BOOST_LOG_TRIVIAL(info) << "Originally written by: Weichun Huang <whduke@gmail.com>";
         BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <Zhejian.23@intl.zju.edu.cn>";
+#ifdef CEU_CM_IS_DEBUG
+        BOOST_LOG_TRIVIAL(info) << "Debugging functions enabled.";
+#endif
     }
 
     void generate_all(const ArtParams& art_params)
     {
-        long job_id = 0;
+        int job_id = 0;
         ArtJobPool job_pool(art_params);
         if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
             // Coverage-based parallelism
             auto coverage_info = art_params.coverage_info.div(art_params.parallel);
             for (int i = 0; i < art_params.parallel; ++i) {
-                ArtJobExecutor aje(SimulationJob(art_params.fasta_fetch, coverage_info, job_id++), art_params);
-                job_pool.add(aje);
+                BaseFastaFetch* fetch;
+                if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+                    fetch = new InMemoryFastaFetch(art_params.input_file_name);
+                } else {
+                    fetch = new FaidxFetch(art_params.input_file_name);
+                }
+                SimulationJob sj(fetch, coverage_info, ++job_id);
+                ArtJobExecutor aje(std::move(sj), art_params);
+                job_pool.add(std::move(aje));
             }
         } else {
             // Batch-based parallelism
@@ -76,11 +96,11 @@ namespace art_modern {
                         if (fa_view.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info, job_id++),
-                            art_params);
-                        job_pool.add(aje);
-                        BOOST_LOG_TRIVIAL(info) << "POST  " << fa_view.num_seqs() << " sequences";
+                        job_id += 1;
+                        SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info,  job_id);
+                        ArtJobExecutor aje(std::move(sj), art_params);
+                        std::cout << "Simulation job " << job_id << endl;
+                        job_pool.add(std::move(aje));
                     }
                 } else {
                     std::ifstream fasta_stream(art_params.input_file_name);
@@ -91,10 +111,9 @@ namespace art_modern {
                         if (fa_view.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info, job_id++),
-                            art_params);
-                        job_pool.add(aje);
+                        thread_local SimulationJob sj (new InMemoryFastaFetch(fa_view), coverage_info, ++job_id);
+                        ArtJobExecutor aje(std::move(sj), art_params);
+                        job_pool.add(std::move(aje));
                     }
                     fasta_stream.close();
                 }
@@ -108,10 +127,9 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first),
-                                               fa_view.second, job_id++),
-                            art_params);
-                        job_pool.add(aje);
+                        thread_local SimulationJob sj(  new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id );
+                        ArtJobExecutor aje(std::move(sj), art_params);
+                        job_pool.add(std::move(aje));
                     }
                     pbsim3_template_stream.close();
                 } else {
@@ -122,16 +140,18 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first),
-                                               fa_view.second, job_id++),
-                            art_params);
-                        job_pool.add(aje);
+                        thread_local SimulationJob sj( new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id );
+                        ArtJobExecutor aje(std::move(sj), art_params);
+                        job_pool.add(std::move(aje));
                     }
                     pbsim3_template_stream.close();
                 }
             }
         }
         job_pool.stop();
+        art_params.out_dispatcher->close();
+        delete art_params.out_dispatcher;
+        delete art_params.fasta_fetch;
     }
 } // namespace art_modern
 } // namespace labw

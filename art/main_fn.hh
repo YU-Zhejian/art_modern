@@ -10,6 +10,7 @@ namespace art_modern {
     // the maxium number of indels is set by cdf_cutoff to save computation time
     void print_banner();
     void handle_dumps();
+    void init_logger();
     void generate_all(const ArtParams& art_params);
 
 } // namespace art_modern

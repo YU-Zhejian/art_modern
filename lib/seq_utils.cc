@@ -32,7 +32,6 @@ namespace art_modern {
             try {
                 rets[i] = rev_comp_trans.at(dna[i]);
             } catch (std::out_of_range&) {
-                // TODO: Make this more user-friendly.
                 BOOST_LOG_TRIVIAL(error) << "Invalid character asc(" << (int)dna[i] << ") in dna string";
                 throw std::invalid_argument("Invalid character in dna string");
             }
@@ -61,7 +60,7 @@ namespace art_modern {
     std::string cigar_arr_to_str(const vector<uint32_t>& cigar_arr)
     {
         std::ostringstream oss;
-        for (auto i = 0; i < cigar_arr.size(); i += 1) {
+        for (size_t i = 0; i < cigar_arr.size(); i += 1) {
             oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);
             oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
         }
@@ -71,7 +70,7 @@ namespace art_modern {
     uint32_t* cigar_arr_to_c(const vector<uint32_t>& cigar_arr)
     {
         auto* c = (uint32_t*)calloc(cigar_arr.size(), sizeof(uint32_t));
-        for (auto i = 0; i < cigar_arr.size(); i++) {
+        for (size_t i = 0; i < cigar_arr.size(); i++) {
             c[i] = cigar_arr[i];
         }
         return c;

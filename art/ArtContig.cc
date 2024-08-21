@@ -1,6 +1,5 @@
 #include <string>
 
-#include <boost/log/trivial.hpp>
 #include <utility>
 
 #include "ArtContig.hh"
@@ -61,7 +60,7 @@ ArtReadPair ArtContig::generate_read_mp(bool is_plus_strand)
     auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? ref_len_ - art_params_.read_len
         : static_cast<hts_pos_t>(
-              floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
+            floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
     auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? ref_len_ - art_params_.read_len
         : ref_len_ - (pos_1 + 2 * art_params_.read_len - fragment_len);
@@ -165,13 +164,12 @@ ArtReadPair ArtContig::generate_read_pe(bool is_plus_strand)
     return { read_1, read_2 };
 }
 
-ArtContig::ArtContig(
-    const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
+ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
     : fasta_fetch_(fasta_fetch)
     , art_params_(art_params)
     , rprob_(rprob)
     , id_(std::move(id))
-    , valid_region_(fasta_fetch->seq_len(id_) - art_params.read_len)
-    , ref_len_(fasta_fetch->seq_len(id_))
+    , valid_region_(fasta_fetch_->seq_len(id_) - art_params.read_len)
+    , ref_len_(fasta_fetch_->seq_len(id_))
 {
 }

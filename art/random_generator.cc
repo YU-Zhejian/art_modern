@@ -10,7 +10,7 @@ namespace art_modern {
 #if defined(USE_STD_RANDOM)
     Rprob::~Rprob() = default;
     Rprob::Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev)
-        : gen_(rd_())
+        : gen_()
         , dis_(0.0f, 1.0f)
         , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
         , base_(0, 3)
@@ -45,7 +45,7 @@ namespace art_modern {
 #elif defined(USE_BOOST_RANDOM)
     Rprob::~Rprob() = default;
     Rprob::Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev)
-        : gen_(rd_())
+        : gen_()
         , dis_(0.0f, 1.0f)
         , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
         , base_(0, 3)

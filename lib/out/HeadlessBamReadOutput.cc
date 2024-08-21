@@ -31,10 +31,10 @@ namespace art_modern {
     }
     void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa.query.size());
@@ -65,10 +65,10 @@ namespace art_modern {
     }
     void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         auto sam_record1 = (bam1_t*)CExceptionsProxy::requires_not_null(
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
@@ -128,10 +128,10 @@ namespace art_modern {
     }
     void HeadlessBamReadOutput::close()
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         sam_close(sam_file_);
         is_closed_ = true;
     }
@@ -147,8 +147,8 @@ namespace art_modern {
         desc.add(bam_desc);
     }
 
-    std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    BaseReadOutput* HeadlessBamReadOutputFactory::create(
+        const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const
     {
         if (vm.count("o-hl_sam")) {
             if (fasta_fetch->num_seqs() != 0) {
@@ -159,9 +159,9 @@ namespace art_modern {
             so.use_m = vm.count("o-hl_sam-use_m") > 0;
             so.write_bam = vm.count("o-hl_sam-write_bam") > 0;
             so.PG_CL = boost::algorithm::join(args, " ");
-            return std::make_shared<HeadlessBamReadOutput>(vm["o-hl_sam"].as<std::string>(), so);
+            return new HeadlessBamReadOutput(vm["o-hl_sam"].as<std::string>(), so);
         }
-        return std::make_shared<DumbReadOutput>();
+        return new DumbReadOutput();
     }
 
     HeadlessBamReadOutputFactory::~HeadlessBamReadOutputFactory() = default;

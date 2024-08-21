@@ -2,7 +2,6 @@
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/fasta_parser.hh"
 
-#include <memory>
 #include <mutex>
 #include <sstream>
 #include <string>
@@ -18,10 +17,10 @@ namespace art_modern {
          */
         InMemoryFastaFetch fetch();
 
-        FastaStreamBatcher(int batch_size, std::istream& stream);
+        FastaStreamBatcher(size_t batch_size, std::istream& stream);
 
     private:
-        int batch_size_;
+        size_t batch_size_;
         FastaIterator fasta_iterator_;
         std::mutex mutex_;
     };
@@ -34,14 +33,13 @@ namespace art_modern {
          */
         InMemoryFastaFetch fetch();
 
-        InMemoryFastaStreamBatcher(int batch_size, std::shared_ptr<BaseFastaFetch> stream);
+        InMemoryFastaStreamBatcher(int batch_size, BaseFastaFetch* stream);
 
     private:
-        int batch_size_;
+        size_t batch_size_;
         size_t current_index_;
-        std::shared_ptr<BaseFastaFetch> stream_;
+        BaseFastaFetch* stream_;
         std::mutex mutex_;
-        std::vector<std::string> seq_names_;
     };
 
 }

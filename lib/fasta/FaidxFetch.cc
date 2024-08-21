@@ -28,7 +28,18 @@ namespace art_modern {
         return rets;
     }
     FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
-    FaidxFetch::FaidxFetch(const std::string& file_name)
+
+    std::map<std::string, hts_pos_t, std::less<>> get_seq_lengths(const faidx_t* faidx)
+    {
+        std::map<std::string, hts_pos_t, std::less<>> seq_lengths;
+        for (int i = 0; i < faidx_nseq(faidx); i++) {
+            auto seq_name = faidx_iseq(faidx, i);
+            seq_lengths.emplace(std::string(seq_name), faidx_seq_len(faidx, seq_name));
+        }
+        return seq_lengths;
+    }
+
+    faidx_t* get_faidx(const std::string& file_name)
     {
         auto seq_file_fai_path = std::string(fai_path(file_name.c_str()));
         if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
@@ -36,17 +47,24 @@ namespace art_modern {
             exit(EXIT_FAILURE);
         } else {
             BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
-            faidx_ = fai_load_format(file_name.c_str(), FAI_FASTA);
-            if (!faidx_) {
+            auto faidx = fai_load_format(file_name.c_str(), FAI_FASTA);
+            if (!faidx) {
                 BOOST_LOG_TRIVIAL(fatal) << "Loading FAI failed!";
                 exit(EXIT_FAILURE);
             }
+            return faidx;
         }
-        for (int i = 0; i < faidx_nseq(faidx_); i++) {
-            auto seq_name = faidx_iseq(faidx_, i);
-            seq_lengths_.emplace(std::string(seq_name), faidx_seq_len(faidx_, seq_name));
-            seq_names_.emplace_back(seq_name);
-        }
+    }
+
+    FaidxFetch::FaidxFetch(const std::string& file_name)
+        : FaidxFetch(get_faidx(file_name))
+    {
+    }
+
+    FaidxFetch::FaidxFetch(faidx_t* faidx)
+        : BaseFastaFetch(get_seq_lengths(faidx))
+        , faidx_(faidx)
+    {
     }
 }
 }

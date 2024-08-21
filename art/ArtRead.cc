@@ -21,7 +21,7 @@ namespace art_modern {
     std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
     {
         auto qual_mutated = qual;
-        for (auto i = 0; i < qual.size(); i++) {
+        for (size_t i = 0; i < qual.size(); i++) {
             if (seq_read[i] == 'N') {
                 qual_mutated[i] = 1;
                 continue;
@@ -137,7 +137,7 @@ namespace art_modern {
             return;
         }
         int k = 0;
-        for (auto i = 0; i < seq_ref.size();) {
+        for (size_t i = 0; i < seq_ref.size();) {
             if (indel.find(k) == indel.end()) {
                 seq_read.push_back(seq_ref[i]);
                 i++;

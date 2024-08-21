@@ -12,6 +12,11 @@ namespace art_modern {
      */
     class BaseFastaFetch {
     public:
+        BaseFastaFetch(const BaseFastaFetch&) = delete;
+        BaseFastaFetch(BaseFastaFetch&&) = delete;
+        BaseFastaFetch &operator=(const BaseFastaFetch &) = delete;
+
+        explicit BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>> seq_lengths);
         /**
          * This method is thread-safe since mutex is used for non-thread-safe implementations.
          *
@@ -20,17 +25,7 @@ namespace art_modern {
          * @param end 0-based exclusive end point.
          * @return Fetched sequence.
          */
-        virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end);
-
-        /**
-         * BaseFastaFetch::fetch with C-style API.
-         *
-         * @param seq_name As described.
-         * @param start As described.
-         * @param end As described.
-         * @return The returned string should be manually freed.
-         */
-        virtual char* cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end);
+        virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)= 0;
 
         /**
          * Default destructor.
@@ -52,11 +47,10 @@ namespace art_modern {
          * @return As described.
          */
         size_t num_seqs() const;
-        std::vector<std::string> seq_names() const;
+        const std::vector<std::string>& seq_names() const;
 
-    protected:
-        std::map<std::string, hts_pos_t, std::less<>> seq_lengths_;
-        std::vector<std::string> seq_names_;
+        const std::map<std::string, hts_pos_t, std::less<>> seq_lengths_;
+        const std::vector<std::string> seq_names_;
     };
 }
 }

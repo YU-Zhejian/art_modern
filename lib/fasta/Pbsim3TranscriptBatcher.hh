@@ -15,7 +15,7 @@ namespace art_modern {
         std::pair<InMemoryFastaFetch, CoverageInfo> fetch();
 
     private:
-        int batch_size_;
+        size_t batch_size_;
         std::istream& istream_;
         std::mutex mutex_;
     };

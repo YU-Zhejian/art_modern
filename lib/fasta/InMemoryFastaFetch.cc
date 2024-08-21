@@ -5,47 +5,57 @@
 
 namespace labw {
 namespace art_modern {
-    InMemoryFastaFetch::InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map)
-        : seq_map_(std::move(seq_map))
+
+    std::map<std::string, hts_pos_t, std::less<>> get_seq_lengths(
+        const std::map<std::string, std::string, std::less<>>& seq_map)
     {
-        for (auto const& pair : seq_map_) {
-            seq_lengths_.emplace(pair.first, pair.second.size());
+        std::map<std::string, hts_pos_t, std::less<>> seq_lengths;
+
+        for (auto const& pair : seq_map) {
+            seq_lengths.emplace(pair.first, pair.second.size());
         }
+        return seq_lengths;
     }
+
+    InMemoryFastaFetch::InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map)
+        : BaseFastaFetch(get_seq_lengths(seq_map))
+        , seq_map_(std::move(seq_map))
+    {
+    }
+
     std::string InMemoryFastaFetch::fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)
     {
         return seq_map_.at(seq_name).substr(start, end - start);
     }
-    char* InMemoryFastaFetch::cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end)
+
+    InMemoryFastaFetch::InMemoryFastaFetch()
+        : BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>>()) {};
+
+    std::map<std::string, std::string, std::less<>> get_seq_map(const std::string& file_name)
     {
-        auto fetch_str = InMemoryFastaFetch::fetch(seq_name, start, end);
-        auto rets = (char*)calloc(fetch_str.size() + 1, sizeof(char));
-        strncpy(rets, fetch_str.c_str(), fetch_str.size());
-        return rets;
-    }
-    InMemoryFastaFetch::InMemoryFastaFetch() = default;
-    InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
-    {
+        std::map<std::string, std::string, std::less<>> seq_map;
         auto file_reader = std::ifstream(file_name);
         FastaIterator fai(file_reader);
         while (true) {
             try {
                 auto fasta_record = fai.next();
-                seq_map_.emplace(fasta_record.id, fasta_record.sequence);
-                seq_lengths_.emplace(fasta_record.id, fasta_record.sequence.size());
-                seq_names_.emplace_back(fasta_record.id);
+                seq_map.emplace(fasta_record.id, fasta_record.sequence);
             } catch (EOFException&) {
                 break;
             }
         }
         file_reader.close();
+        return seq_map;
+    }
+
+    InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
+        : InMemoryFastaFetch(get_seq_map(file_name))
+    {
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
+        : InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> { { contig_name, seq } })
     {
-        seq_map_.emplace(contig_name, seq);
-        seq_lengths_.emplace(contig_name, seq.size());
-        seq_names_.emplace_back(contig_name);
     }
 
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;

@@ -10,12 +10,13 @@ namespace po = boost::program_options;
 
 namespace labw {
 namespace art_modern {
+
     void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
 
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
             USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
@@ -32,6 +33,7 @@ namespace art_modern {
             std::reverse(qual.begin(), qual.end());
         }
         auto cigar_c_arr = cigar_arr_to_c(cigar);
+        bam_utils_.assert_correct_cigar(pwa, cigar, cigar_c_arr);
         CExceptionsProxy::requires_numeric(
             bam_set1(sam_record, pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE,
                 tid, pos, MAPQ_MAX, cigar.size(), cigar_c_arr,
@@ -47,10 +49,10 @@ namespace art_modern {
 
     void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
 
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
             USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
@@ -102,6 +104,10 @@ namespace art_modern {
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+
+        bam_utils_.assert_correct_cigar(pwa1, cigar1, cigar1_arr);
+        bam_utils_.assert_correct_cigar(pwa2, cigar2, cigar2_arr);
+
         CExceptionsProxy::requires_numeric(
             bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
                 cigar1.size(), cigar1_arr, tid, pos2, isize1, rlen, seq1.c_str(), qual1.c_str(), 0),
@@ -119,9 +125,10 @@ namespace art_modern {
         free(cigar2_arr);
     }
     BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
-    BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-        const SamReadOutputOptions& sam_options)
+    BamReadOutput::BamReadOutput(
+        const std::string& filename, BaseFastaFetch* fasta_fetch, const SamReadOutputOptions& sam_options)
         : sam_options_(sam_options)
+        , bam_utils_(sam_options)
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
 
@@ -145,10 +152,10 @@ namespace art_modern {
 
     void BamReadOutput::close()
     {
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         sam_close(sam_file_);
         is_closed_ = true;
     }
@@ -161,8 +168,8 @@ namespace art_modern {
         bam_desc.add_options()("o-sam-write_bam", "Enforce BAM instead of SAM output.");
         desc.add(bam_desc);
     }
-    std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, const std::shared_ptr<BaseFastaFetch>& fasta_fetch) const
+    BaseReadOutput* BamReadOutputFactory::create(
+        const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const
     {
         if (vm.count("o-sam")) {
             if (fasta_fetch->num_seqs() == 0) {
@@ -175,9 +182,9 @@ namespace art_modern {
             so.use_m = vm.count("o-sam-use_m") > 0;
             so.write_bam = vm.count("o-sam-write_bam") > 0;
             so.PG_CL = boost::algorithm::join(args, " ");
-            return std::make_shared<BamReadOutput>(vm["o-sam"].as<std::string>(), fasta_fetch, so);
+            return new BamReadOutput(vm["o-sam"].as<std::string>(), fasta_fetch, so);
         }
-        return std::make_shared<DumbReadOutput>();
+        return new DumbReadOutput();
     }
 
     BamReadOutputFactory::~BamReadOutputFactory() = default;

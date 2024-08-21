@@ -26,7 +26,6 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
-ceu_cm_global_enhanced_check_compiler_flag(-rdynamic)
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
@@ -82,6 +81,7 @@ else()
 endif()
 add_compile_definitions(USE_STD_RANDOM)
 add_compile_definitions(PARALLEL_ASIO)
+
 # find_package(MKL) # TODO find_package(IntelSYCL) # TODO include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR}) # TODO
 
 # Main

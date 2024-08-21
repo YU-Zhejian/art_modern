@@ -1,16 +1,14 @@
-#include <iostream>
-
 #include "DumbFileStream.hh"
 
 using namespace std;
 namespace labw {
 namespace art_modern {
-    void DumbFileStream::write(const std::string& str)
+    void DumbFileStream::write(const std::string&)
     {
         // Does nothing!
     }
 
-    DumbFileStream::DumbFileStream(const std::string& filename)
+    DumbFileStream::DumbFileStream(const std::string&)
     {
         // Does nothing!
     }

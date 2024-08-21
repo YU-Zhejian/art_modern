@@ -11,6 +11,7 @@ using namespace labw::art_modern;
 
 int main(int argc, char* argv[])
 {
+    init_logger();
     handle_dumps();
 #ifdef WITH_BOOST_TIMER
     BOOST_LOG_TRIVIAL(info) << "Boost::timer started.";

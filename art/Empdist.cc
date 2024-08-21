@@ -36,7 +36,7 @@ namespace art_modern {
 
     vector<int> Empdist::get_read_qual_sep_1(const string& seq, Rprob& rprob) const
     {
-        const auto len = static_cast<int>(seq.size());
+        const auto len = seq.size();
         vector<int> read_qual(len);
         read_qual.resize(len);
 
@@ -49,7 +49,7 @@ namespace art_modern {
 
         int cumCC;
 
-        for (int i = 0; i < len; i++) {
+        for (size_t i = 0; i < len; i++) {
             cumCC = rprob.rand_quality();
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
@@ -73,7 +73,7 @@ namespace art_modern {
 
     vector<int> Empdist::get_read_qual_sep_2(const string& seq, Rprob& rprob) const
     {
-        const auto len = static_cast<int>(seq.size());
+        const auto len = seq.size();
         vector<int> read_qual(len);
         read_qual.resize(len);
 
@@ -84,7 +84,7 @@ namespace art_modern {
             exit(EXIT_FAILURE);
         }
         int cumCC;
-        for (int i = 0; i < len; i++) {
+        for (size_t i = 0; i < len; i++) {
             cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_second[i].lower_bound(cumCC);

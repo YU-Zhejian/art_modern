@@ -2,7 +2,7 @@
 #include "ArtContig.hh"
 #include "global_variables.hh"
 #include <boost/log/trivial.hpp>
-#include <utility>
+
 
 using namespace std;
 
@@ -17,7 +17,7 @@ namespace art_modern {
         vector<int> qual_1;
         vector<int> qual_2;
 
-        osID << art_contig.id_ << ':' << art_params_.id << read_id;
+        osID << art_contig.id_ << ':' << art_params_.id << ":" << read_id++;
         string sam_read_id = osID.str();
         ArtReadPair arp = art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP
             ? art_contig.generate_read_mp(is_plus_strand)
@@ -43,6 +43,14 @@ namespace art_modern {
         arp.read_1.generate_pairwise_aln();
         arp.read_2.generate_pairwise_aln();
 
+        if( arp.read_1.seq_read.size() != art_params_.read_len){
+            return false;// FIXME: No idea why this occurs.
+        }
+
+        if( arp.read_2.seq_read.size() != art_params_.read_len){
+            return false;// FIXME: No idea why this occurs.
+        }
+
         output_dispatcher_->writePE(
             PairwiseAlignment(sam_read_id, art_contig.id_, arp.read_1.seq_read, arp.read_1.seq_ref, qual_1_str,
                 arp.read_1.aln_read, arp.read_1.aln_ref,
@@ -67,7 +75,7 @@ namespace art_modern {
         string read_name;
         auto const& qdist = art_params_.qdist;
 
-        osID << art_contig.id_ << ':' << art_params_.id << read_id;
+        osID << art_contig.id_ << ':' << art_params_.id << ":" << read_id++;
         read_name = osID.str();
         auto art_read = art_contig.generate_read_se(is_plus_strand);
         try {
@@ -82,6 +90,11 @@ namespace art_modern {
         }
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
         art_read.generate_pairwise_aln();
+
+        if(art_read.seq_read.size() != art_params_.read_len){
+            return false;// FIXME: No idea why this occurs.
+        }
+
         output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_contig.id_, art_read.seq_read, art_read.seq_ref,
             qual_str, art_read.aln_read, art_read.aln_ref,
             art_read.is_plus_strand ? art_read.bpos : art_contig.ref_len_ - (art_read.bpos + art_params_.read_len),
@@ -89,7 +102,7 @@ namespace art_modern {
         return true;
     }
 
-    ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
+    ArtJobExecutor::ArtJobExecutor( SimulationJob job, const ArtParams& art_params)
         : job_(std::move(job))
         , art_params_(art_params)
         , rprob_(
@@ -100,18 +113,28 @@ namespace art_modern {
 
     void ArtJobExecutor::execute()
     {
+        if( job_.fasta_fetch->num_seqs() == 0){
+            return;
+        }
         BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id;
-        for (const auto& contig_name : job_.fasta_fetch()->seq_names()) {
+        for (const auto& contig_name : job_.fasta_fetch->seq_names()) {
 
-            ArtContig art_contig(job_.fasta_fetch(), contig_name, art_params_, rprob_);
+            BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name;
+
+            ArtContig art_contig(job_.fasta_fetch, contig_name, art_params_, rprob_);
+
+            BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
+                                     << ": ArtContig created";
             if (art_contig.ref_len_ < art_params_.read_len) {
                 BOOST_LOG_TRIVIAL(warning)
                     << "Warning: the reference sequence " << contig_name << " (length " << art_contig.ref_len_
                     << "bps ) is skipped as it < the defined read length (" << art_params_.read_len << " bps)";
+                BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
+                                         << ": SKIPPED";
                 continue;
             }
-            auto coverage_positive = job_.coverage_info().coverage_positive(contig_name);
-            auto coverage_negative = job_.coverage_info().coverage_negative(contig_name);
+            auto coverage_positive = job_.coverage_info.coverage_positive(contig_name);
+            auto coverage_negative = job_.coverage_info.coverage_negative(contig_name);
 
             long num_pos_reads;
             long num_neg_reads;
@@ -127,18 +150,25 @@ namespace art_modern {
             }
 
             while (num_pos_reads > 0) {
+                BOOST_LOG_TRIVIAL(debug) << "Simulation for job " << job_.job_id << " CONTIG: " << contig_name
+                                         << ": POS: " << num_pos_reads << " remaining";
                 if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, true)
                                                                              : generate_se(art_contig, true)) {
                     num_pos_reads -= art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
                 }
             }
             while (num_neg_reads > 0) {
+                BOOST_LOG_TRIVIAL(debug) << "Simulation for job " << job_.job_id << " CONTIG: " << contig_name
+                                         << ": NEG: " << num_neg_reads << " remaining";
                 if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, false)
                                                                              : generate_se(art_contig, false)) {
                     num_neg_reads -= art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
                 }
             }
         }
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id;
     }
+
+ArtJobExecutor::~ArtJobExecutor() = default;
 } // art_modern
 } // labw

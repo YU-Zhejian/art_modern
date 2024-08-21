@@ -7,7 +7,7 @@
 #include <array>
 #include <boost/program_options.hpp>
 #include <map>
-#include <memory>
+
 #include <string>
 #include <vector>
 
@@ -34,8 +34,8 @@ namespace art_modern {
         const std::array<double, HIGHEST_QUAL> err_prob;
         const hts_pos_t pe_dist_mean_minus_2_std;
         const Empdist qdist;
-        const std::shared_ptr<BaseFastaFetch> fasta_fetch;
-        const std::shared_ptr<BaseReadOutput> out_dispatcher;
+        BaseFastaFetch* fasta_fetch;
+        BaseReadOutput* out_dispatcher;
     };
 
 } // namespace art_modern
