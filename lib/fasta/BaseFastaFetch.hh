@@ -56,6 +56,7 @@ namespace art_modern {
 
     protected:
         std::map<std::string, hts_pos_t, std::less<>> seq_lengths_;
+        std::vector<std::string> seq_names_;
     };
 }
 }

@@ -2,6 +2,7 @@
 
 #include "art_modern_constants.hh"
 #include <algorithm>
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/log/trivial.hpp>
 #include <htslib/sam.h>
 #include <map>
@@ -11,7 +12,7 @@
 using namespace std;
 namespace labw {
 namespace art_modern {
-    const map<char, char>& rev_comp_trans { { 'A', 'T' }, { 'T', 'A' }, { 'C', 'G' }, { 'G', 'C' } };
+    const map<char, char>& rev_comp_trans { { 'A', 'T' }, { 'T', 'A' }, { 'C', 'G' }, { 'G', 'C' }, { 'N', 'N' } };
 
     std::string qual_to_str(const std::vector<int>& qual)
     {
@@ -42,6 +43,18 @@ namespace art_modern {
     {
         auto rets = comp(dna);
         reverse(rets.begin(), rets.end());
+        return rets;
+    }
+
+    std::string normalize(const std::string& dna)
+    {
+        std::string rets = dna;
+        boost::algorithm::to_upper(rets);
+        for (const auto& i : range(0, static_cast<int>(rets.length()), 1)) {
+            if (rets[i] != 'A' && rets[i] != 'T' && rets[i] != 'C' && rets[i] != 'G') {
+                rets[i] = 'N';
+            }
+        }
         return rets;
     }
 

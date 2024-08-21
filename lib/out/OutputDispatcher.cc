@@ -1,4 +1,6 @@
 #include "OutputDispatcher.hh"
+#include <boost/log/trivial.hpp>
+
 namespace labw {
 namespace art_modern {
 
@@ -41,6 +43,7 @@ namespace art_modern {
         for (auto const& factory : factories_) {
             output_dispatcher->add(factory->create(vm, fasta_fetch));
         }
+        BOOST_LOG_TRIVIAL(info) << "All writers added";
         return output_dispatcher;
     }
     void OutputDispatcherFactory::add(const std::shared_ptr<BaseReadOutputFactory>& factory)

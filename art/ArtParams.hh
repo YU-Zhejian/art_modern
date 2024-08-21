@@ -15,27 +15,27 @@ namespace labw {
 namespace art_modern {
 
     struct ArtParams {
-        SIMULATION_MODE art_simulation_mode;
-        ART_LIB_CONST_MODE art_lib_const_mode;
-        std::string input_file_name;
-        INPUT_FILE_TYPE art_input_file_type;
-        INPUT_FILE_PARSER art_input_file_parser;
-        int parallel;
-        bool sep_flag;
-        std::string id;
-        CoverageInfo coverage_info;
-        int read_len;
-        double pe_frag_dist_mean;
-        double pe_frag_dist_std_dev;
-        std::vector<double> per_base_ins_rate_1;
-        std::vector<double> per_base_del_rate_1;
-        std::vector<double> per_base_ins_rate_2;
-        std::vector<double> per_base_del_rate_2;
-        std::array<double, HIGHEST_QUAL> err_prob;
-        hts_pos_t pe_dist_mean_minus_2_std;
-        Empdist qdist;
-        std::shared_ptr<BaseFastaFetch> fasta_fetch;
-        std::shared_ptr<BaseReadOutput> out_dispatcher;
+        const SIMULATION_MODE art_simulation_mode;
+        const ART_LIB_CONST_MODE art_lib_const_mode;
+        const std::string input_file_name;
+        const INPUT_FILE_TYPE art_input_file_type;
+        const INPUT_FILE_PARSER art_input_file_parser;
+        const int parallel;
+        const bool sep_flag;
+        const std::string id;
+        const CoverageInfo coverage_info;
+        const int read_len;
+        const double pe_frag_dist_mean;
+        const double pe_frag_dist_std_dev;
+        const std::vector<double> per_base_ins_rate_1;
+        const std::vector<double> per_base_del_rate_1;
+        const std::vector<double> per_base_ins_rate_2;
+        const std::vector<double> per_base_del_rate_2;
+        const std::array<double, HIGHEST_QUAL> err_prob;
+        const hts_pos_t pe_dist_mean_minus_2_std;
+        const Empdist qdist;
+        const std::shared_ptr<BaseFastaFetch> fasta_fetch;
+        const std::shared_ptr<BaseReadOutput> out_dispatcher;
     };
 
 } // namespace art_modern

@@ -15,7 +15,7 @@ namespace art_modern {
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
         sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(
-            sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "w"), USED_HTSLIB_NAME,
+            sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME,
             "Failed to open SAM file");
         sam_header_ = (sam_hdr_t*)CExceptionsProxy::requires_not_null(
             sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
@@ -142,9 +142,8 @@ namespace art_modern {
         po::options_description bam_desc("Headless SAM/BAM Output");
         bam_desc.add_options()("o-hl_sam", po::value<std::string>(),
             "Destination of output headless SAM/BAM file. Unset to disable the writer.");
-        bam_desc.add_options()(
-            "o-hl_sam-use_m", po::bool_switch(), "Whether to use CIGAR 'M' instead of '=/X' for alignment");
-        bam_desc.add_options()("o-hl_sam-write_bam", po::bool_switch(), "Enforce BAM instead of SAM output.");
+        bam_desc.add_options()("o-hl_sam-use_m", "Whether to use CIGAR 'M' instead of '=/X' for alignment");
+        bam_desc.add_options()("o-hl_sam-write_bam", "Enforce BAM instead of SAM output.");
         desc.add(bam_desc);
     }
 

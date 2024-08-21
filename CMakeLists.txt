@@ -26,20 +26,30 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
+ceu_cm_global_enhanced_check_compiler_flag(-rdynamic)
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
+add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
 # Boost
 if(BUILD_SHARED_LIBS)
     add_definitions(-DBOOST_ALL_DYN_LINK)
     add_definitions(-DBOOST_LOG_DYN_LINK)
     add_definitions(-DBOOST_TEST_DYN_LINK)
+    add_definitions(-DBOOST_STACKTRACE_DYN_LINK)
+    add_definitions(-DBOOST_STACKTRACE_LINK)
 else()
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 find_package(
     Boost REQUIRED
-    COMPONENTS filesystem regex program_options thread log_setup log
+    COMPONENTS filesystem
+               regex
+               program_options
+               thread
+               log_setup
+               log
+               stacktrace_backtrace
     # signals2 is header-only lockfree is header-only
     OPTIONAL_COMPONENTS unit_test_framework timer)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -71,7 +81,7 @@ else()
     set(USED_HTSLIB_NAME labw_slim_htslib)
 endif()
 add_compile_definitions(USE_STD_RANDOM)
-add_compile_definitions(PARALLEL_DISABLED)
+add_compile_definitions(PARALLEL_ASIO)
 # find_package(MKL) # TODO find_package(IntelSYCL) # TODO include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR}) # TODO
 
 # Main
@@ -90,6 +100,7 @@ set(ART_MODERN_LINK_LIBS
     Boost::thread
     Boost::log_setup
     Boost::log
+    Boost::stacktrace_backtrace
     "${USED_HTSLIB_NAME}")
 if(Boost_timer_FOUND)
     add_compile_definitions("WITH_BOOST_TIMER")

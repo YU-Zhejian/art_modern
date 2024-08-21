@@ -40,3 +40,4 @@ MANIFEST.in
 !build_with_intel_compiler.sh
 _cmake_test_compile/
 /expr/
+backtrace.dump

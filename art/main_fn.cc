@@ -7,10 +7,41 @@
 #include "main_fn.hh"
 #include <fstream>
 
+#include <boost/filesystem.hpp>
+#include <boost/stacktrace.hpp>
+#include <csignal>
+#include <iostream>
+#define DUMP_FILENAME "./backtrace.dump"
+
 using namespace std;
 
 namespace labw {
 namespace art_modern {
+
+    void my_signal_handler(int signum)
+    {
+        ::signal(signum, SIG_DFL);
+        boost::stacktrace::safe_dump_to(DUMP_FILENAME);
+        ::raise(SIGABRT);
+    }
+
+    void handle_dumps()
+    {
+        ::signal(SIGSEGV, &my_signal_handler);
+        ::signal(SIGABRT, &my_signal_handler);
+        if (boost::filesystem::exists(DUMP_FILENAME)) {
+            // there is a backtrace
+            std::ifstream ifs(DUMP_FILENAME);
+
+            boost::stacktrace::stacktrace st = boost::stacktrace::stacktrace::from_dump(ifs);
+            std::cout << "Previous run crashed:\n" << st << std::endl;
+
+            // cleaning up
+            ifs.close();
+            boost::filesystem::remove(DUMP_FILENAME);
+            exit(EXIT_FAILURE);
+        }
+    }
 
     void print_banner()
     {
@@ -22,12 +53,13 @@ namespace art_modern {
 
     void generate_all(const ArtParams& art_params)
     {
+        long job_id = 0;
         ArtJobPool job_pool(art_params);
         if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
             // Coverage-based parallelism
             auto coverage_info = art_params.coverage_info.div(art_params.parallel);
             for (int i = 0; i < art_params.parallel; ++i) {
-                ArtJobExecutor aje(SimulationJob(art_params.fasta_fetch, coverage_info), art_params);
+                ArtJobExecutor aje(SimulationJob(art_params.fasta_fetch, coverage_info, job_id++), art_params);
                 job_pool.add(aje);
             }
         } else {
@@ -45,8 +77,10 @@ namespace art_modern {
                             break;
                         }
                         ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info), art_params);
+                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info, job_id++),
+                            art_params);
                         job_pool.add(aje);
+                        BOOST_LOG_TRIVIAL(info) << "POST  " << fa_view.num_seqs() << " sequences";
                     }
                 } else {
                     std::ifstream fasta_stream(art_params.input_file_name);
@@ -58,7 +92,8 @@ namespace art_modern {
                             break;
                         }
                         ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info), art_params);
+                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info, job_id++),
+                            art_params);
                         job_pool.add(aje);
                     }
                     fasta_stream.close();
@@ -73,8 +108,8 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first), fa_view.second),
+                        ArtJobExecutor aje(SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first),
+                                               fa_view.second, job_id++),
                             art_params);
                         job_pool.add(aje);
                     }
@@ -87,8 +122,8 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        ArtJobExecutor aje(
-                            SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first), fa_view.second),
+                        ArtJobExecutor aje(SimulationJob(std::make_shared<InMemoryFastaFetch>(fa_view.first),
+                                               fa_view.second, job_id++),
                             art_params);
                         job_pool.add(aje);
                     }

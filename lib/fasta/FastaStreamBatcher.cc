@@ -1,6 +1,6 @@
-#include <utility>
-
 #include "FastaStreamBatcher.hh"
+#include <boost/log/trivial.hpp>
+#include <utility>
 
 namespace labw {
 namespace art_modern {
@@ -39,8 +39,8 @@ namespace art_modern {
 
     InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(int batch_size, std::shared_ptr<BaseFastaFetch> stream)
         : batch_size_(batch_size)
-        , stream_(std::move(stream))
         , current_index_(0)
+        , stream_(std::move(stream))
         , seq_names_(stream_->seq_names())
     {
     }

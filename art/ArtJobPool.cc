@@ -9,7 +9,7 @@ namespace art_modern {
         // Do nothing!
     }
 
-    void ArtJobPool::add(ArtJobExecutor& aje)
+    void ArtJobPool::add(ArtJobExecutor aje)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         aje.execute();
@@ -22,8 +22,7 @@ namespace art_modern {
 
 #elif defined(PARALLEL_ASIO)
     ArtJobPool::ArtJobPool(const ArtParams& art_params)
-        : pool_(art_params.parallel == PARALLEL_ALL ? static_cast<int>(std::thread::hardware_concurrency())
-                                                    : art_params.parallel)
+        : pool_(art_params.parallel)
     {
     }
 

@@ -16,8 +16,8 @@ namespace art_modern {
     class ArtContig {
 
     public:
-        ArtContig(
-            std::shared_ptr<BaseFastaFetch> fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob);
+        ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::string id, const ArtParams& art_params,
+            Rprob& rprob);
 
         ArtRead generate_read_se(bool is_plus_strand);
 
@@ -25,7 +25,7 @@ namespace art_modern {
 
         ArtReadPair generate_read_mp(bool is_plus_strand);
 
-        std::shared_ptr<BaseFastaFetch> fasta_fetch_;
+        const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
         const ArtParams& art_params_;
         Rprob& rprob_;
         const std::string id_;

@@ -15,7 +15,7 @@ namespace art_modern {
     class ArtJobPool {
     public:
         explicit ArtJobPool(const ArtParams& art_params);
-        void add(ArtJobExecutor& aje);
+        void add(ArtJobExecutor aje);
         void stop();
 
     private:

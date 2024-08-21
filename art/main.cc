@@ -11,6 +11,7 @@ using namespace labw::art_modern;
 
 int main(int argc, char* argv[])
 {
+    handle_dumps();
 #ifdef WITH_BOOST_TIMER
     BOOST_LOG_TRIVIAL(info) << "Boost::timer started.";
     boost::timer::auto_cpu_timer t;
@@ -20,6 +21,7 @@ int main(int argc, char* argv[])
     print_banner();
     ArtCmdOpts art_cmd_opts;
     auto art_params = art_cmd_opts.parse_args(argc, argv);
+    BOOST_LOG_TRIVIAL(info) << "Argument parsing finished. Start generating...";
     generate_all(art_params);
     return EXIT_SUCCESS;
 }

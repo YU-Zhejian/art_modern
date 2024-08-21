@@ -18,7 +18,7 @@ namespace art_modern {
     }
     char* InMemoryFastaFetch::cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end)
     {
-        auto fetch_str = fetch(seq_name, start, end);
+        auto fetch_str = InMemoryFastaFetch::fetch(seq_name, start, end);
         auto rets = (char*)calloc(fetch_str.size() + 1, sizeof(char));
         strncpy(rets, fetch_str.c_str(), fetch_str.size());
         return rets;
@@ -33,6 +33,7 @@ namespace art_modern {
                 auto fasta_record = fai.next();
                 seq_map_.emplace(fasta_record.id, fasta_record.sequence);
                 seq_lengths_.emplace(fasta_record.id, fasta_record.sequence.size());
+                seq_names_.emplace_back(fasta_record.id);
             } catch (EOFException&) {
                 break;
             }
@@ -44,6 +45,7 @@ namespace art_modern {
     {
         seq_map_.emplace(contig_name, seq);
         seq_lengths_.emplace(contig_name, seq.size());
+        seq_names_.emplace_back(contig_name);
     }
 
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;

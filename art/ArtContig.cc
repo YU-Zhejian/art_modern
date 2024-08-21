@@ -1,5 +1,6 @@
 #include <string>
 
+#include <boost/log/trivial.hpp>
 #include <utility>
 
 #include "ArtContig.hh"
@@ -24,11 +25,12 @@ ArtRead ArtContig::generate_read_se(bool is_plus_strand)
     if (read_1.is_plus_strand) {
         //    |----------->
         // ------------------------------------
-        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
+        read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
     } else {
         // ------------------------------------
         //                   <-----------|
-        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
+        read_1.seq_ref = revcomp(normalize(
+            fasta_fetch_->fetch(id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -80,18 +82,20 @@ ArtReadPair ArtContig::generate_read_mp(bool is_plus_strand)
         //   ------------------------------------
         // R2   <-----------|
         read_1.is_plus_strand = true;
-        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
+        read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
 
         read_2.is_plus_strand = false;
-        read_2.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_2, art_params_.read_len - slen_2));
+        read_2.seq_ref = revcomp(normalize(
+            fasta_fetch_->fetch(id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
     } else {
         // R2   <-----------|
         //   ------------------------------------
         // R1                  |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
+        read_1.seq_ref = revcomp(normalize(
+            fasta_fetch_->fetch(id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
         read_2.is_plus_strand = true;
-        read_2.seq_ref = fasta_fetch_->fetch(id_, pos_2, art_params_.read_len - slen_2);
+        read_2.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_2, pos_2 + art_params_.read_len - slen_2));
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -140,17 +144,19 @@ ArtReadPair ArtContig::generate_read_pe(bool is_plus_strand)
         // ------------------------------------
         //                   <-----------|
         read_1.is_plus_strand = true;
-        read_1.seq_ref = fasta_fetch_->fetch(id_, pos_1, art_params_.read_len - slen_1);
+        read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
         read_2.is_plus_strand = false;
-        read_2.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_2, art_params_.read_len - slen_2));
+        read_2.seq_ref = revcomp(normalize(
+            fasta_fetch_->fetch(id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
     } else {
         //                   <-----------|
         // ------------------------------------
         //    |----------->
         read_1.is_plus_strand = false;
-        read_1.seq_ref = revcomp(fasta_fetch_->fetch(id_, valid_region_ - pos_1, art_params_.read_len - slen_1));
+        read_1.seq_ref = revcomp(normalize(
+            fasta_fetch_->fetch(id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
         read_2.is_plus_strand = true;
-        read_2.seq_ref = fasta_fetch_->fetch(id_, pos_2, art_params_.read_len - slen_2);
+        read_2.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_2, pos_2 + art_params_.read_len - slen_2));
     }
     read_1.bpos = pos_1;
     read_1.ref2read();
@@ -160,7 +166,7 @@ ArtReadPair ArtContig::generate_read_pe(bool is_plus_strand)
 }
 
 ArtContig::ArtContig(
-    std::shared_ptr<BaseFastaFetch> fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
+    const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
     : fasta_fetch_(fasta_fetch)
     , art_params_(art_params)
     , rprob_(rprob)

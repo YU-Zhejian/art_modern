@@ -174,14 +174,16 @@ namespace art_modern {
             }
 
             long t_uint;
-            vector<long> count(qual.size());
+            vector<long> count;
+            count.reserve(qual.size());
 
             while (ss >> t_uint) {
                 count.emplace_back(t_uint);
             }
 
             if (count.size() != qual.size()) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal error (3): Wrong format of input distribution.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal error (3): Wrong format of input distribution. count.size = "
+                                         << count.size() << "; qual.size = " << qual.size();
                 exit(EXIT_FAILURE);
             }
 

@@ -2,6 +2,7 @@
 #include "ArtContig.hh"
 #include "global_variables.hh"
 #include <boost/log/trivial.hpp>
+#include <utility>
 
 using namespace std;
 
@@ -81,24 +82,25 @@ namespace art_modern {
         }
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
         art_read.generate_pairwise_aln();
-        output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_params_.id, art_read.seq_read, art_read.seq_ref,
+        output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_contig.id_, art_read.seq_read, art_read.seq_ref,
             qual_str, art_read.aln_read, art_read.aln_ref,
             art_read.is_plus_strand ? art_read.bpos : art_contig.ref_len_ - (art_read.bpos + art_params_.read_len),
             art_read.is_plus_strand));
         return true;
     }
 
-    ArtJobExecutor::ArtJobExecutor(SimulationJob job, ArtParams art_params)
+    ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
         : job_(std::move(job))
-        , art_params_(std::move(art_params))
+        , art_params_(art_params)
         , rprob_(
               static_cast<float>(art_params_.pe_frag_dist_mean), static_cast<float>(art_params_.pe_frag_dist_std_dev))
-        , output_dispatcher_(std::move(art_params.out_dispatcher))
+        , output_dispatcher_(art_params_.out_dispatcher)
     {
     }
 
     void ArtJobExecutor::execute()
     {
+        BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id;
         for (const auto& contig_name : job_.fasta_fetch()->seq_names()) {
 
             ArtContig art_contig(job_.fasta_fetch(), contig_name, art_params_, rprob_);
@@ -106,7 +108,7 @@ namespace art_modern {
                 BOOST_LOG_TRIVIAL(warning)
                     << "Warning: the reference sequence " << contig_name << " (length " << art_contig.ref_len_
                     << "bps ) is skipped as it < the defined read length (" << art_params_.read_len << " bps)";
-                return;
+                continue;
             }
             auto coverage_positive = job_.coverage_info().coverage_positive(contig_name);
             auto coverage_negative = job_.coverage_info().coverage_negative(contig_name);

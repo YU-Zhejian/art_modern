@@ -5,6 +5,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/program_options.hpp>
+#include <boost/thread.hpp>
 
 #include "ArtConstants.hh"
 #include "ArtVersion.hh"
@@ -489,7 +490,7 @@ namespace art_modern {
         }
         auto ci_ff = get_coverage_info_fasta_fetch(
             vm_[ARG_FCOV].as<string>(), input_file_type, input_file_parser, input_file_name);
-        auto coverage_info = ci_ff.first;
+        auto const& coverage_info = ci_ff.first;
         auto fasta_fetch = ci_ff.second;
 
         auto id = vm_[ARG_ID].as<string>();
@@ -511,6 +512,11 @@ namespace art_modern {
         auto pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
 
         auto parallel = vm_[ARG_PARALLEL].as<int>();
+        if (parallel == PARALLEL_ALL) {
+            parallel = static_cast<int>(boost::thread::hardware_concurrency());
+        } else if (parallel == PARALLEL_DISABLE) {
+            parallel = 1;
+        }
 
         auto qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<string>(), vm_[ARG_QUAL_FILE_2].as<string>(), read_len,
             art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
@@ -582,7 +588,7 @@ namespace art_modern {
         art_opts.add_options()(ARG_MAX_INDEL, po::value<int>()->default_value(DEFAULT_MAX_INDEL),
             "the maximum total number of insertion and deletion per read");
         art_opts.add_options()(ARG_READ_LEN, po::value<int>(), "read length to be simulated");
-        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<int>()->default_value(0),
+        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
             "Mean distance between DNA/RNA fragments for paired-end simulations");
         art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>()->default_value(0),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "

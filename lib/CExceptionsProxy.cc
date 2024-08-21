@@ -8,6 +8,7 @@
 #include <cstring>
 
 #include "CExceptionsProxy.hh"
+#include "ExceptionUtils.hh"
 
 namespace labw {
 namespace art_modern {
@@ -35,14 +36,12 @@ namespace art_modern {
             std::ostringstream oss;
             if (details != UNKNOWN_C_EXCEPTION) {
                 oss << details;
-            } else {
-                if (explain_using_strerror) {
-                    oss << strerror(errno);
-                } else {
-                    oss << "returned " << c_value;
-                }
             }
-            throw CExceptionsProxy(std::move(c_lib_name), oss.str());
+            if (explain_using_strerror) {
+                oss << strerror(errno);
+            }
+            oss << " returned " << c_value;
+            throw_with_trace(CExceptionsProxy(std::move(c_lib_name), oss.str()));
         }
         return c_value;
     }
@@ -54,14 +53,13 @@ namespace art_modern {
             std::ostringstream oss;
             if (details != UNKNOWN_C_EXCEPTION) {
                 oss << details;
-            } else {
-                if (explain_using_strerror) {
-                    oss << strerror(errno);
-                } else {
-                    oss << "returned null";
-                }
             }
-            throw CExceptionsProxy(std::move(c_lib_name), oss.str());
+            if (explain_using_strerror) {
+                oss << strerror(errno);
+            }
+            oss << " returned null";
+
+            throw_with_trace(CExceptionsProxy(std::move(c_lib_name), oss.str()));
         }
         return c_value;
     }

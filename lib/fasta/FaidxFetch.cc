@@ -45,6 +45,7 @@ namespace art_modern {
         for (int i = 0; i < faidx_nseq(faidx_); i++) {
             auto seq_name = faidx_iseq(faidx_, i);
             seq_lengths_.emplace(std::string(seq_name), faidx_seq_len(faidx_, seq_name));
+            seq_names_.emplace_back(seq_name);
         }
     }
 }

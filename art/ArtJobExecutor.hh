@@ -10,7 +10,7 @@ namespace art_modern {
 
     class ArtJobExecutor {
     public:
-        ArtJobExecutor(SimulationJob job, ArtParams art_params);
+        ArtJobExecutor(SimulationJob job, const ArtParams& art_params);
         void execute();
 
     private:
@@ -18,9 +18,9 @@ namespace art_modern {
         bool generate_se(ArtContig& art_contig, bool is_plus_strand);
 
         SimulationJob job_;
-        ArtParams art_params_;
+        const ArtParams& art_params_;
         Rprob rprob_;
-        std::shared_ptr<BaseReadOutput> output_dispatcher_;
+        const std::shared_ptr<BaseReadOutput>& output_dispatcher_;
     };
 
 } // art_modern
