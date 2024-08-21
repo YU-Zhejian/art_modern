@@ -14,7 +14,7 @@ namespace art_modern {
     public:
         BaseFastaFetch(const BaseFastaFetch&) = delete;
         BaseFastaFetch(BaseFastaFetch&&) = delete;
-        BaseFastaFetch &operator=(const BaseFastaFetch &) = delete;
+        BaseFastaFetch& operator=(const BaseFastaFetch&) = delete;
 
         explicit BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>> seq_lengths);
         /**
@@ -25,7 +25,7 @@ namespace art_modern {
          * @param end 0-based exclusive end point.
          * @return Fetched sequence.
          */
-        virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)= 0;
+        virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) = 0;
 
         /**
          * Default destructor.

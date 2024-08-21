@@ -33,7 +33,7 @@ namespace art_modern {
             std::reverse(qual.begin(), qual.end());
         }
         auto cigar_c_arr = cigar_arr_to_c(cigar);
-        bam_utils_.assert_correct_cigar(pwa, cigar, cigar_c_arr);
+        assert_correct_cigar(pwa, cigar, cigar_c_arr);
         CExceptionsProxy::requires_numeric(
             bam_set1(sam_record, pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE,
                 tid, pos, MAPQ_MAX, cigar.size(), cigar_c_arr,
@@ -105,8 +105,8 @@ namespace art_modern {
         auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
             bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
 
-        bam_utils_.assert_correct_cigar(pwa1, cigar1, cigar1_arr);
-        bam_utils_.assert_correct_cigar(pwa2, cigar2, cigar2_arr);
+        assert_correct_cigar(pwa1, cigar1, cigar1_arr);
+        assert_correct_cigar(pwa2, cigar2, cigar2_arr);
 
         CExceptionsProxy::requires_numeric(
             bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,

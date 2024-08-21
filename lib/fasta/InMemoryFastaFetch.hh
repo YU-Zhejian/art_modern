@@ -5,11 +5,14 @@ namespace art_modern {
 
     class InMemoryFastaFetch : public BaseFastaFetch {
     public:
-        InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept: InMemoryFastaFetch(other.seq_map_){
+        InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
+            : InMemoryFastaFetch(other.seq_map_)
+        {
         }
 
-        InMemoryFastaFetch(const InMemoryFastaFetch & other) noexcept:
-            InMemoryFastaFetch(other.seq_map_){
+        InMemoryFastaFetch(const InMemoryFastaFetch& other) noexcept
+            : InMemoryFastaFetch(other.seq_map_)
+        {
         }
 
         InMemoryFastaFetch();

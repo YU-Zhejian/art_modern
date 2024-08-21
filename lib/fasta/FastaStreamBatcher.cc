@@ -27,7 +27,8 @@ namespace art_modern {
             fetch_e = fasta_record.id;
             fasta_map.emplace(fasta_record.id, fasta_record.sequence);
         }
-        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size() << "） created";
+        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size()
+                                << "） created";
         return InMemoryFastaFetch(fasta_map);
     }
 
@@ -46,7 +47,8 @@ namespace art_modern {
             fetch_e = seq_name;
             current_index_++;
         }
-        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size() << "） created";
+        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size()
+                                << "） created";
         return InMemoryFastaFetch(fasta_map);
     }
 

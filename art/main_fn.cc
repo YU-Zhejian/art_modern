@@ -97,9 +97,8 @@ namespace art_modern {
                             break;
                         }
                         job_id += 1;
-                        SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info,  job_id);
+                        SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id);
                         ArtJobExecutor aje(std::move(sj), art_params);
-                        std::cout << "Simulation job " << job_id << endl;
                         job_pool.add(std::move(aje));
                     }
                 } else {
@@ -111,7 +110,7 @@ namespace art_modern {
                         if (fa_view.num_seqs() == 0) {
                             break;
                         }
-                        thread_local SimulationJob sj (new InMemoryFastaFetch(fa_view), coverage_info, ++job_id);
+                        thread_local SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, ++job_id);
                         ArtJobExecutor aje(std::move(sj), art_params);
                         job_pool.add(std::move(aje));
                     }
@@ -127,7 +126,7 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        thread_local SimulationJob sj(  new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id );
+                        thread_local SimulationJob sj(new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id);
                         ArtJobExecutor aje(std::move(sj), art_params);
                         job_pool.add(std::move(aje));
                     }
@@ -140,7 +139,7 @@ namespace art_modern {
                         if (fa_view.first.num_seqs() == 0) {
                             break;
                         }
-                        thread_local SimulationJob sj( new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id );
+                        thread_local SimulationJob sj(new InMemoryFastaFetch(fa_view.first), fa_view.second, ++job_id);
                         ArtJobExecutor aje(std::move(sj), art_params);
                         job_pool.add(std::move(aje));
                     }

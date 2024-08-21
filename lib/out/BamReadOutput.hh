@@ -23,7 +23,7 @@ namespace art_modern {
     private:
         samFile* sam_file_;
         sam_hdr_t* sam_header_;
-        const SamReadOutputOptions& sam_options_;
+        SamReadOutputOptions sam_options_;
         std::mutex mutex_;
         bool is_closed_ = false;
         BamUtils bam_utils_;

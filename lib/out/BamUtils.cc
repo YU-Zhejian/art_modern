@@ -23,22 +23,21 @@ namespace art_modern {
     {
     }
 
-    void BamUtils::assert_correct_cigar(
-        const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t *cigar_c_arr) const
+    void assert_correct_cigar(
+        const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t* cigar_c_arr)
     {
-#ifdef CEU_CM_IS_DEBUG
+        // #ifdef CEU_CM_IS_DEBUG
         size_t cigar_qlen = bam_cigar2qlen(static_cast<int>(cigar.size()), cigar_c_arr);
         size_t cigar_rlen = bam_cigar2rlen(static_cast<int>(cigar.size()), cigar_c_arr);
 
         if (cigar_qlen != pwa.query.length()) {
-            BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: "
-                                     << cigar_qlen << " != " << pwa.query.length();
+            BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen
+                                     << " != " << pwa.query.length();
             goto err;
         }
 
         if (cigar_rlen != pwa.ref.length()) {
-            BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen
-                                     << " != " << pwa.ref.length();
+            BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << pwa.ref.length();
             goto err;
         }
         if (pwa.query.length() != pwa.qual.length()) {
@@ -47,17 +46,17 @@ namespace art_modern {
             goto err;
         }
         return;
-        err:
+    err:
 
-        BOOST_LOG_TRIVIAL(error) << "Cigar  : " <<
-        cigar_arr_to_str(cigar) << " (QLEN=" << cigar_qlen << ", RLEN=" << cigar_rlen << ")";
+        BOOST_LOG_TRIVIAL(error) << "Cigar  : " << cigar_arr_to_str(cigar) << " (QLEN=" << cigar_qlen
+                                 << ", RLEN=" << cigar_rlen << ")";
         BOOST_LOG_TRIVIAL(error) << "Query  : " << pwa.query;
         BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
         BOOST_LOG_TRIVIAL(error) << "Ref    : " << pwa.ref;
         BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aligned_query;
         BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aligned_ref;
         exit(EXIT_FAILURE);
-#endif
+        // #endif
     }
 }
 }

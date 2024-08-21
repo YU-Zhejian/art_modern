@@ -19,26 +19,23 @@ namespace art_modern {
 
     // generate quality vector from dist of one read from pair-end [default first
     // read]
-    std::vector<int> Empdist::get_read_qual(int len, Rprob& rprob, bool first) const
+    void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, bool first) const
     {
-        std::vector<int> read_qual(len);
-        read_qual.resize(len);
+        qual.resize(len);
         auto qual_dist = first ? qual_dist_first : qual_dist_second;
         int cumCC;
         map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
             cumCC = rprob.rand_quality();
             it = qual_dist[i].lower_bound(cumCC);
-            read_qual[i] = it->second;
+            qual[i] = it->second;
         }
-        return read_qual;
     }
 
-    vector<int> Empdist::get_read_qual_sep_1(const string& seq, Rprob& rprob) const
+    void Empdist::get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const
     {
         const auto len = seq.size();
-        vector<int> read_qual(len);
-        read_qual.resize(len);
+        qual.resize(len);
 
         if (a_qual_dist_first.size() < len || t_qual_dist_first.size() < len || g_qual_dist_first.size() < len
             || c_qual_dist_first.size() < len) {
@@ -53,29 +50,27 @@ namespace art_modern {
             cumCC = rprob.rand_quality();
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'C') {
                 auto it = c_qual_dist_first[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'G') {
                 auto it = g_qual_dist_first[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'T') {
                 auto it = t_qual_dist_first[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else {
                 // return random quality less than 10
-                read_qual[i] = rprob.rand_quality_less_than_10();
+                qual[i] = rprob.rand_quality_less_than_10();
             }
         }
-        return read_qual;
     }
 
-    vector<int> Empdist::get_read_qual_sep_2(const string& seq, Rprob& rprob) const
+    void Empdist::get_read_qual_sep_2(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const
     {
         const auto len = seq.size();
-        vector<int> read_qual(len);
-        read_qual.resize(len);
+        qual.resize(len);
 
         if (a_qual_dist_second.size() < len || t_qual_dist_second.size() < len || g_qual_dist_second.size() < len
             || c_qual_dist_second.size() < len) {
@@ -88,22 +83,21 @@ namespace art_modern {
             cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_second[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'C') {
                 auto it = c_qual_dist_second[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'G') {
                 auto it = g_qual_dist_second[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else if (seq[i] == 'T') {
                 auto it = t_qual_dist_second[i].lower_bound(cumCC);
-                read_qual[i] = it->second;
+                qual[i] = it->second;
             } else {
                 // return random quality less than 10
-                read_qual[i] = rprob.rand_quality_less_than_10();
+                qual[i] = rprob.rand_quality_less_than_10();
             }
         }
-        return read_qual;
     }
 
     void Empdist::read_emp_dist_(istream& input, bool is_first)

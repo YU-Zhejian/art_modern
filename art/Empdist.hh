@@ -1,4 +1,5 @@
 #pragma once
+#include <array>
 #include <istream>
 #include <map>
 #include <string>
@@ -25,9 +26,9 @@ namespace art_modern {
         std::vector<std::map<int, int>> c_qual_dist_second;
 
         Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual);
-        std::vector<int> get_read_qual(int len, Rprob& rprob, bool first = true) const;
-        std::vector<int> get_read_qual_sep_1(const std::string& seq, Rprob& rprob) const;
-        std::vector<int> get_read_qual_sep_2(const std::string& seq, Rprob& rprob) const;
+        void get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, bool first = true) const;
+        void get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const;
+        void get_read_qual_sep_2(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const;
 
     private:
         void read_emp_dist_(const std::string& infile, bool is_first);

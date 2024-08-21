@@ -28,8 +28,7 @@ namespace art_modern {
 
     void ArtJobPool::add(ArtJobExecutor aje)
     {
-        auto func = [&aje] { aje.execute(); };
-        boost::asio::post(pool_, func);
+        boost::asio::post(pool_, [this_aje = std::move(aje)]() mutable { this_aje.execute(); });
     }
 
     void ArtJobPool::stop() { pool_.join(); }

@@ -33,9 +33,10 @@ namespace art_modern {
     }
     std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(bool use_m) const
     {
+
         std::vector<uint32_t> cigar;
-        uint32_t current_cigar;
-        uint32_t prev_cigar;
+        uint32_t current_cigar = BAM_CMATCH;
+        uint32_t prev_cigar = BAM_CMATCH;
         uint32_t cigar_len = 0;
         auto ref_len = static_cast<int>(aligned_ref.length());
 

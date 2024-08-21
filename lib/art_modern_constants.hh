@@ -25,5 +25,4 @@ enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM, AUTO };
 #define INPUT_FILE_PARSER_STREAM "stream"
 #define INPUT_FILE_PARSER_AUTO "auto"
 
-
-#define CEU_CM_IS_DEBUG // FIXME: CMake seems not working!
+#undef CEU_CM_IS_DEBUG // FIXME: CMake seems not working!

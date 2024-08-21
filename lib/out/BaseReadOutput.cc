@@ -3,7 +3,6 @@
 namespace labw {
 namespace art_modern {
 
-
     BaseReadOutput::~BaseReadOutput() = default;
 
     BaseReadOutputFactory::~BaseReadOutputFactory() = default;

@@ -2,7 +2,7 @@
 #include "ArtContig.hh"
 #include "global_variables.hh"
 #include <boost/log/trivial.hpp>
-
+#include <boost/timer/progress_display.hpp>
 
 using namespace std;
 
@@ -30,11 +30,11 @@ namespace art_modern {
         }
 
         if (!art_params_.sep_flag) {
-            qual_1 = qdist.get_read_qual(art_params_.read_len, rprob_, true);
-            qual_2 = qdist.get_read_qual(art_params_.read_len, rprob_, false);
+            qdist.get_read_qual(qual_1, art_params_.read_len, rprob_, true);
+            qdist.get_read_qual(qual_2, art_params_.read_len, rprob_, true);
         } else {
-            qual_1 = qdist.get_read_qual_sep_1(arp.read_1.seq_read, rprob_);
-            qual_2 = qdist.get_read_qual_sep_2(arp.read_2.seq_read, rprob_);
+            qdist.get_read_qual_sep_1(qual_1, arp.read_1.seq_read, rprob_);
+            qdist.get_read_qual_sep_2(qual_2, arp.read_1.seq_read, rprob_);
         }
 
         auto qual_1_str = qual_to_str(arp.read_1.generate_snv_on_qual(qual_1));
@@ -43,12 +43,12 @@ namespace art_modern {
         arp.read_1.generate_pairwise_aln();
         arp.read_2.generate_pairwise_aln();
 
-        if( arp.read_1.seq_read.size() != art_params_.read_len){
-            return false;// FIXME: No idea why this occurs.
+        if (arp.read_1.seq_read.size() != art_params_.read_len) {
+            return false; // FIXME: No idea why this occurs.
         }
 
-        if( arp.read_2.seq_read.size() != art_params_.read_len){
-            return false;// FIXME: No idea why this occurs.
+        if (arp.read_2.seq_read.size() != art_params_.read_len) {
+            return false; // FIXME: No idea why this occurs.
         }
 
         output_dispatcher_->writePE(
@@ -84,15 +84,15 @@ namespace art_modern {
             return false;
         }
         if (!art_params_.sep_flag) {
-            qual = qdist.get_read_qual(art_params_.read_len, rprob_, true);
+            qdist.get_read_qual(qual, art_params_.read_len, rprob_, true);
         } else {
-            qual = qdist.get_read_qual_sep_1(art_read.seq_read, rprob_);
+            qdist.get_read_qual_sep_1(qual, art_read.seq_read, rprob_);
         }
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
         art_read.generate_pairwise_aln();
 
-        if(art_read.seq_read.size() != art_params_.read_len){
-            return false;// FIXME: No idea why this occurs.
+        if (art_read.seq_read.size() != art_params_.read_len) {
+            return false; // FIXME: No idea why this occurs.
         }
 
         output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_contig.id_, art_read.seq_read, art_read.seq_ref,
@@ -102,7 +102,7 @@ namespace art_modern {
         return true;
     }
 
-    ArtJobExecutor::ArtJobExecutor( SimulationJob job, const ArtParams& art_params)
+    ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
         : job_(std::move(job))
         , art_params_(art_params)
         , rprob_(
@@ -113,12 +113,11 @@ namespace art_modern {
 
     void ArtJobExecutor::execute()
     {
-        if( job_.fasta_fetch->num_seqs() == 0){
+        if (job_.fasta_fetch->num_seqs() == 0) {
             return;
         }
         BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id;
         for (const auto& contig_name : job_.fasta_fetch->seq_names()) {
-
             BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name;
 
             ArtContig art_contig(job_.fasta_fetch, contig_name, art_params_, rprob_);
@@ -126,9 +125,9 @@ namespace art_modern {
             BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
                                      << ": ArtContig created";
             if (art_contig.ref_len_ < art_params_.read_len) {
-                BOOST_LOG_TRIVIAL(warning)
-                    << "Warning: the reference sequence " << contig_name << " (length " << art_contig.ref_len_
-                    << "bps ) is skipped as it < the defined read length (" << art_params_.read_len << " bps)";
+                // BOOST_LOG_TRIVIAL(warning)
+                //     << "Warning: the reference sequence " << contig_name << " (length " << art_contig.ref_len_
+                //     << "bps ) is skipped as it < the defined read length (" << art_params_.read_len << " bps)";
                 BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
                                          << ": SKIPPED";
                 continue;
@@ -169,6 +168,6 @@ namespace art_modern {
         BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id;
     }
 
-ArtJobExecutor::~ArtJobExecutor() = default;
+    ArtJobExecutor::~ArtJobExecutor() = default;
 } // art_modern
 } // labw

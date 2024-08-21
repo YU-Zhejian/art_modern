@@ -39,13 +39,13 @@ namespace art_modern {
          */
         bool write_bam = true;
     };
+    void assert_correct_cigar(
+        const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t* cigar_c_arr);
 
     class BamUtils {
     public:
         explicit BamUtils(const SamReadOutputOptions& sam_options);
         std::string generate_oa_tag(const PairwiseAlignment& pwa) const;
-        void assert_correct_cigar(
-            const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t *cigar_c_arr) const;
 
     private:
         const SamReadOutputOptions& sam_options_;
