@@ -4,21 +4,19 @@
 #include <boost/log/trivial.hpp>
 #include <boost/timer/progress_display.hpp>
 
-using namespace std;
-
 namespace labw {
 namespace art_modern {
 
-    bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand)
+    bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand)
     {
-        ostringstream osID;
+        std::ostringstream osID;
         auto const& qdist = art_params_.qdist;
 
-        vector<int> qual_1;
-        vector<int> qual_2;
+        std::vector<int> qual_1;
+        std::vector<int> qual_2;
 
         osID << art_contig.id_ << ':' << art_params_.id << ":" << read_id++;
-        string sam_read_id = osID.str();
+        std::string sam_read_id = osID.str();
         ArtReadPair arp = art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP
             ? art_contig.generate_read_mp(is_plus_strand)
             : art_contig.generate_read_pe(is_plus_strand);
@@ -66,13 +64,13 @@ namespace art_modern {
         return true;
     }
 
-    bool ArtJobExecutor::generate_se(ArtContig& art_contig, bool is_plus_strand)
+    bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand)
 
     {
-        ostringstream osID;
-        ostringstream FQFILE;
-        vector<int> qual;
-        string read_name;
+        std::ostringstream osID;
+        std::ostringstream FQFILE;
+        std::vector<int> qual;
+        std::string read_name;
         auto const& qdist = art_params_.qdist;
 
         osID << art_contig.id_ << ':' << art_params_.id << ":" << read_id++;
@@ -105,8 +103,8 @@ namespace art_modern {
     ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
         : job_(std::move(job))
         , art_params_(art_params)
-        , rprob_(
-              static_cast<float>(art_params_.pe_frag_dist_mean), static_cast<float>(art_params_.pe_frag_dist_std_dev))
+        , rprob_(static_cast<float>(art_params_.pe_frag_dist_mean),
+              static_cast<float>(art_params_.pe_frag_dist_std_dev), art_params_.read_len)
         , output_dispatcher_(art_params_.out_dispatcher)
     {
     }

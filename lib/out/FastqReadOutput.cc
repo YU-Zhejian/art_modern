@@ -41,7 +41,7 @@ namespace art_modern {
     }
 
     void FastqReadOutput::close() { stream_.close(); }
-    void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc)
+    void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
     {
         boost::program_options::options_description fastq_desc("FASTQ Output");
         fastq_desc.add_options()("o-fastq", boost::program_options::value<std::string>(),

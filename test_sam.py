@@ -51,7 +51,10 @@ class CigarOps:
 if __name__ == "__main__":
     _, ref, alignment = sys.argv
     with pysam.FastaFile(ref) as ref_file, pysam.AlignmentFile(alignment, "rb") as alignment_file:
-        for aln in tqdm.tqdm(list(alignment_file.fetch())):
+        alignments = list(alignment_file.fetch())
+        if not alignments:
+            raise ValueError("No alignments found")
+        for aln in tqdm.tqdm(alignments):
             ref_seq = ref_file.fetch(aln.reference_name, aln.reference_start, aln.reference_end)
             query_seq = aln.query_sequence
             ref_ptr = 0

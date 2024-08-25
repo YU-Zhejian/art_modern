@@ -1,16 +1,17 @@
 #pragma once
 #include <istream>
-#include <map>
 #include <string>
+#include <unordered_map>
 
 namespace labw {
 namespace art_modern {
 
     class CoverageInfo {
-        using coverage_map = std::map<std::string, double, std::less<>>;
+        using coverage_map = std::unordered_map<std::string, double>;
 
     public:
         explicit CoverageInfo(double static_coverage);
+        explicit CoverageInfo(double static_coverage_positive, double static_coverage_negative);
         CoverageInfo(coverage_map coverage_positive, coverage_map coverage_negative);
         explicit CoverageInfo(std::istream& istream);
 
@@ -19,9 +20,10 @@ namespace art_modern {
         CoverageInfo div(int num_parts) const;
 
     private:
-        double static_coverage_;
-        coverage_map coverage_positive_;
-        coverage_map coverage_negative_;
+        const double static_coverage_positive_;
+        const double static_coverage_negative_;
+        const coverage_map coverage_positive_;
+        const coverage_map coverage_negative_;
     };
 
 } // art_modern

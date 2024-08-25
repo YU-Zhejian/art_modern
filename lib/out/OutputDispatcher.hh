@@ -27,10 +27,10 @@ namespace art_modern {
     class OutputDispatcherFactory : public BaseReadOutputFactory {
     public:
         void add(BaseReadOutputFactory* factory);
-        void patch_options(boost::program_options::options_description& desc) override;
+        void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
             const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const override;
-        ~OutputDispatcherFactory();
+        ~OutputDispatcherFactory() override;
 
     private:
         std::vector<BaseReadOutputFactory*> factories_;

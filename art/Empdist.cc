@@ -5,7 +5,6 @@
 #include <fstream>
 #include <sstream>
 
-using namespace std;
 namespace labw {
 namespace art_modern {
     Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
@@ -24,7 +23,7 @@ namespace art_modern {
         qual.resize(len);
         auto qual_dist = first ? qual_dist_first : qual_dist_second;
         int cumCC;
-        map<int, int>::iterator it;
+        std::map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
             cumCC = rprob.rand_quality();
             it = qual_dist[i].lower_bound(cumCC);
@@ -100,44 +99,58 @@ namespace art_modern {
         }
     }
 
-    void Empdist::read_emp_dist_(istream& input, bool is_first)
+    void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     {
         int linenum = 0;
         int read_pos;
         char alt_read_pos;
+        bool a_flag;
+        bool t_flag;
+        bool g_flag;
+        bool c_flag;
+        long t_uint;
+        std::string aLine;
+
+        int t_int;
+        std::vector<int> qual;
+        std::map<int, int> dist;
+        std::vector<long> count;
 
         while (!input.eof()) {
-            bool a_flag = false;
-            bool t_flag = false;
-            bool g_flag = false;
-            bool c_flag = false;
+            a_flag = false;
+            t_flag = false;
+            g_flag = false;
+            c_flag = false;
 
-            string aLine;
-            getline(input, aLine);
-            if (aLine.empty())
-                continue;
-            if (aLine[0] == '#') {
-                continue;
-            }
-
-            if (!sep_qual_ && (aLine[0] != '.')) {
+            std::getline(input, aLine);
+            if (aLine.empty() || aLine[0] == '#') {
                 continue;
             }
             if (sep_qual_) {
-                if (aLine[0] == 'A') {
+                if (aLine[0] == 'N' || aLine[0] == '.') {
+                    continue;
+                }
+                switch (aLine[0]) {
+                case 'A':
                     a_flag = true;
-                } else if (aLine[0] == 'T') {
+                    break;
+                case 'T':
                     t_flag = true;
-                } else if (aLine[0] == 'G') {
+                    break;
+                case 'G':
                     g_flag = true;
-                } else if (aLine[0] == 'C') {
+                    break;
+                case 'C':
                     c_flag = true;
-                } else if (aLine[0] == 'N' || aLine[0] == '.') {
+                    break;
+                }
+            } else {
+                if (aLine[0] != '.') {
                     continue;
                 }
             }
 
-            istringstream ss(aLine);
+            std::istringstream ss(aLine);
             ss >> alt_read_pos;
             ss >> read_pos;
 
@@ -148,10 +161,7 @@ namespace art_modern {
                     exit(EXIT_FAILURE);
                 }
             }
-
-            int t_int;
-            vector<int> qual;
-
+            qual.clear();
             while (ss >> t_int) {
                 qual.emplace_back(t_int);
             }
@@ -167,8 +177,7 @@ namespace art_modern {
                 exit(EXIT_FAILURE);
             }
 
-            long t_uint;
-            vector<long> count;
+            count.clear();
             count.reserve(qual.size());
 
             while (ss >> t_uint) {
@@ -181,35 +190,24 @@ namespace art_modern {
                 exit(EXIT_FAILURE);
             }
 
-            double denom = static_cast<double>(count[count.size() - 1]) / MAX_DIST_NUMBER;
-            map<int, int> dist;
+            auto denom = static_cast<double>(count[count.size() - 1]) / MAX_DIST_NUMBER;
+            dist.clear();
 
-            for (size_t i = 0; i < count.size(); i++) {
-                auto cc = static_cast<int>(ceil(static_cast<double>(count[i]) / denom));
-                dist[cc] = qual[i];
+            for (auto i = 0; i < count.size(); i++) {
+                dist[static_cast<int>(std::ceil(static_cast<double>(count[i]) / denom))] = qual[i];
             }
             if (!dist.empty()) {
                 linenum++;
-                if (!sep_qual_ && is_first) {
-                    qual_dist_first.emplace_back(dist);
-                } else if (!sep_qual_) {
-                    qual_dist_second.emplace_back(dist);
-                } else if (a_flag && is_first) {
-                    a_qual_dist_first.emplace_back(dist);
+                if (!sep_qual_) {
+                    (is_first ? qual_dist_first : qual_dist_second).emplace_back(dist);
                 } else if (a_flag) {
-                    a_qual_dist_second.emplace_back(dist);
-                } else if (t_flag && is_first) {
-                    t_qual_dist_first.emplace_back(dist);
+                    (is_first ? a_qual_dist_first : a_qual_dist_second).emplace_back(dist);
                 } else if (t_flag) {
-                    t_qual_dist_second.emplace_back(dist);
-                } else if (g_flag && is_first) {
-                    g_qual_dist_first.emplace_back(dist);
+                    (is_first ? t_qual_dist_first : t_qual_dist_second).emplace_back(dist);
                 } else if (g_flag) {
-                    g_qual_dist_second.emplace_back(dist);
-                } else if (c_flag && is_first) {
-                    c_qual_dist_first.emplace_back(dist);
+                    (is_first ? g_qual_dist_first : g_qual_dist_second).emplace_back(dist);
                 } else if (c_flag) {
-                    c_qual_dist_second.emplace_back(dist);
+                    (is_first ? c_qual_dist_first : c_qual_dist_second).emplace_back(dist);
                 } else {
                     BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                     exit(EXIT_FAILURE);
@@ -238,9 +236,9 @@ namespace art_modern {
         }
     }
 
-    void Empdist::read_emp_dist_(const std::string& infile, bool is_first)
+    void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
     {
-        ifstream distss(infile.c_str());
+        std::ifstream distss(infile);
         if (!distss) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
             exit(EXIT_FAILURE);

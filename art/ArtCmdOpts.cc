@@ -20,7 +20,6 @@
 #include "out/HeadlessBamReadOutput.hh"
 #include "out/OutputDispatcher.hh"
 
-using namespace std;
 namespace po = boost::program_options;
 
 #define ARG_VERSION "version"
@@ -54,7 +53,7 @@ namespace po = boost::program_options;
 namespace labw {
 namespace art_modern {
 
-    void print_help(const po::options_description& po_desc) { std::cout << po_desc << endl; }
+    void print_help(const po::options_description& po_desc) { std::cout << po_desc << std::endl; }
 
     po::variables_map generate_vm_while_handling_help_version(
         const po::options_description& po_desc, const int argc, char** argv) noexcept
@@ -68,7 +67,7 @@ namespace art_modern {
 
         try {
             po::store(po::parse_command_line(static_cast<int>(args.size()), argv, po_desc), vm_);
-        } catch (const exception& exp) {
+        } catch (const std::exception& exp) {
             BOOST_LOG_TRIVIAL(fatal) << exp.what();
             print_help(po_desc);
             exit(EXIT_FAILURE);
@@ -125,7 +124,7 @@ namespace art_modern {
         } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TEMPLATE) {
             return INPUT_FILE_TYPE::PBSIM3_TEMPLATE;
         } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
-            for (const auto& fasta_file_end : std::vector<string> { "fna", "faa", "fa", "fasta" }) {
+            for (const auto& fasta_file_end : std::vector<std::string> { "fna", "faa", "fa", "fasta" }) {
                 if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
                     return INPUT_FILE_TYPE::FASTA;
                 }
@@ -204,7 +203,7 @@ namespace art_modern {
             auto d = boost::lexical_cast<double>(fcov_arg_str);
             coverage_info = CoverageInfo(d);
         } catch (const boost::bad_lexical_cast&) {
-            ifstream X_FOLD(fcov_arg_str, ios::binary);
+            std::ifstream X_FOLD(fcov_arg_str, std::ios::binary);
             coverage_info = CoverageInfo(X_FOLD);
             X_FOLD.close();
         }
@@ -228,17 +227,17 @@ namespace art_modern {
         return { coverage_info, fasta_fetch };
     }
 
-    void shift_emp(map<int, int> map_to_process, const int q_shift, const int min_qual, const int max_qual)
+    void shift_emp(std::map<int, int> map_to_process, const int q_shift, const int min_qual, const int max_qual)
     {
         for (auto& map_to_proces : map_to_process) {
             if (q_shift != 0) {
                 if (q_shift < 0 && (-q_shift > map_to_proces.second)) {
                     map_to_proces.second = min_qual;
                 } else {
-                    map_to_proces.second = min(map_to_proces.second + q_shift, max_qual);
+                    map_to_proces.second = std::min(map_to_proces.second + q_shift, max_qual);
                 }
             }
-            map_to_proces.second = min(max(map_to_proces.second, min_qual), max_qual);
+            map_to_proces.second = std::min(std::max(map_to_proces.second, min_qual), max_qual);
         }
     }
 
@@ -370,7 +369,7 @@ namespace art_modern {
     {
         const char* fasta_path = input_file_path.c_str();
         BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
-        auto seq_file_fai_path = string(fai_path(fasta_path));
+        auto seq_file_fai_path = std::string(fai_path(fasta_path));
         if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
             BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
             CExceptionsProxy::requires_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
@@ -477,23 +476,23 @@ namespace art_modern {
             args.emplace_back(argv[i]);
         }
         auto vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
-        auto art_simulation_mode = get_simulation_mode(vm_[ARG_SIMULATION_MODE].as<string>());
-        auto art_lib_const_mode = get_art_lib_const_mode(vm_[ARG_LIB_CONST_MODE].as<string>());
-        auto input_file_name = vm_[ARG_INPUT_FILE_NAME].as<string>();
+        auto art_simulation_mode = get_simulation_mode(vm_[ARG_SIMULATION_MODE].as<std::string>());
+        auto art_lib_const_mode = get_art_lib_const_mode(vm_[ARG_LIB_CONST_MODE].as<std::string>());
+        auto input_file_name = vm_[ARG_INPUT_FILE_NAME].as<std::string>();
         validate_input_filename(input_file_name, ARG_INPUT_FILE_NAME);
-        auto input_file_type = get_input_file_type(vm_[ARG_INPUT_FILE_TYPE].as<string>(), input_file_name);
+        auto input_file_type = get_input_file_type(vm_[ARG_INPUT_FILE_TYPE].as<std::string>(), input_file_name);
         auto input_file_parser
-            = get_input_file_parser(vm_[ARG_INPUT_FILE_PARSER].as<string>(), input_file_name, art_simulation_mode);
+            = get_input_file_parser(vm_[ARG_INPUT_FILE_PARSER].as<std::string>(), input_file_name, art_simulation_mode);
         validate_comp_mtx(input_file_parser, art_simulation_mode, input_file_type);
         if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
             validate_htslib_parser(input_file_name);
         }
         auto ci_ff = get_coverage_info_fasta_fetch(
-            vm_[ARG_FCOV].as<string>(), input_file_type, input_file_parser, input_file_name);
+            vm_[ARG_FCOV].as<std::string>(), input_file_type, input_file_parser, input_file_name);
         auto const& coverage_info = ci_ff.first;
         auto fasta_fetch = ci_ff.second;
 
-        auto id = vm_[ARG_ID].as<string>();
+        auto id = vm_[ARG_ID].as<std::string>();
 
         auto sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
         auto max_indel = vm_[ARG_MAX_INDEL].as<int>();
@@ -518,7 +517,7 @@ namespace art_modern {
             parallel = 1;
         }
 
-        auto qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<string>(), vm_[ARG_QUAL_FILE_2].as<string>(), read_len,
+        auto qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(), read_len,
             art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
             vm_[ARG_MIN_QUAL].as<int>(), vm_[ARG_MAX_QUAL].as<int>());
         std::array<double, HIGHEST_QUAL> err_prob {};

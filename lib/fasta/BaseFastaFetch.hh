@@ -1,8 +1,8 @@
 #pragma once
 #include <htslib/faidx.h>
 #include <htslib/sam.h>
-#include <map>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 namespace labw {
@@ -16,7 +16,7 @@ namespace art_modern {
         BaseFastaFetch(BaseFastaFetch&&) = delete;
         BaseFastaFetch& operator=(const BaseFastaFetch&) = delete;
 
-        explicit BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>> seq_lengths);
+        explicit BaseFastaFetch(std::unordered_map<std::string, hts_pos_t> seq_lengths);
         /**
          * This method is thread-safe since mutex is used for non-thread-safe implementations.
          *
@@ -49,7 +49,7 @@ namespace art_modern {
         size_t num_seqs() const;
         const std::vector<std::string>& seq_names() const;
 
-        const std::map<std::string, hts_pos_t, std::less<>> seq_lengths_;
+        const std::unordered_map<std::string, hts_pos_t> seq_lengths_;
         const std::vector<std::string> seq_names_;
     };
 }

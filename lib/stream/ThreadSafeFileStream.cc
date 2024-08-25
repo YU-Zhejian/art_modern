@@ -2,8 +2,6 @@
 
 #include "ThreadSafeFileStream.hh"
 #include <boost/log/trivial.hpp>
-
-using namespace std;
 namespace labw {
 namespace art_modern {
     void ThreadSafeFileStream::write(const std::string& str)

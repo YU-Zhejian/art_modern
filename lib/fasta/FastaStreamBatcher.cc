@@ -11,21 +11,20 @@ namespace art_modern {
     InMemoryFastaFetch FastaStreamBatcher::fetch()
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::map<std::string, std::string, std::less<>> fasta_map;
+        std::unordered_map<std::string, std::string> fasta_map;
         std::string fetch_s;
         std::string fetch_e;
         while (fasta_map.size() < batch_size_) {
-            FastaRecord fasta_record;
             try {
-                fasta_record = fasta_iterator_.next();
+                auto fasta_record = fasta_iterator_.next();
+                if (fetch_s.empty()) {
+                    fetch_s = fasta_record.id;
+                }
+                fetch_e = fasta_record.id;
+                fasta_map.emplace(fasta_record.id, fasta_record.sequence);
             } catch (EOFException&) {
                 break;
             }
-            if (fetch_s.empty()) {
-                fetch_s = fasta_record.id;
-            }
-            fetch_e = fasta_record.id;
-            fasta_map.emplace(fasta_record.id, fasta_record.sequence);
         }
         BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size()
                                 << "） created";
@@ -35,7 +34,7 @@ namespace art_modern {
     InMemoryFastaFetch InMemoryFastaStreamBatcher::fetch()
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::map<std::string, std::string, std::less<>> fasta_map;
+        std::unordered_map<std::string, std::string> fasta_map;
         std::string fetch_s;
         std::string fetch_e;
         while (current_index_ < stream_->num_seqs() && fasta_map.size() < batch_size_) {

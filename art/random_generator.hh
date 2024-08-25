@@ -4,12 +4,14 @@
 #include <random>
 #elif defined(USE_BOOST_RANDOM)
 #include <boost/random.hpp>
-#include <boost/random/random_device.hpp>
+#error "Under construction."
 #elif defined(USE_ONEMKL_RANDOM)
 #include <oneapi/mkl/rng.hpp>
 #include <sycl/sycl.hpp>
+#error "Under construction."
 #elif defined(USE_GSL_RANDOM)
 #include <gsl/gsl_rng.h>
+#error "Under construction."
 #else
 #error "Define USE_STD_RANDOM, USE_BOOST_RANDOM for random generators!"
 #endif
@@ -19,13 +21,15 @@ namespace art_modern {
 
     class Rprob {
     public:
-        explicit Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev);
+        Rprob(const float pe_frag_dist_mean, const float pe_frag_dist_std_dev, const int read_length);
         double r_prob();
         int insertion_length();
         char rand_base();
         int rand_quality();
         int rand_quality_less_than_10();
         ~Rprob();
+        int rand_pos_on_read();
+        int rand_pos_on_read_not_head_and_tail();
 
     private:
 #if defined(USE_STD_RANDOM)
@@ -36,6 +40,8 @@ namespace art_modern {
         std::uniform_int_distribution<int> strand_;
         std::uniform_int_distribution<int> quality_less_than_10_;
         std::uniform_int_distribution<int> quality_;
+        std::uniform_int_distribution<int> pos_on_read_;
+        std::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
 #elif defined(USE_BOOST_RANDOM)
         boost::mt19937 gen_;
         boost::uniform_real<float> dis_;
@@ -44,6 +50,8 @@ namespace art_modern {
         boost::uniform_smallint<int> strand_;
         boost::uniform_smallint<int> quality_less_than_10_;
         boost::uniform_int<int> quality_;
+        boost::uniform_int_distribution<int> pos_on_read_;
+        boost::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
 #error "TODO"
 //    sycl::device rd_;

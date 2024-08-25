@@ -6,10 +6,10 @@
 namespace labw {
 namespace art_modern {
 
-    std::map<std::string, hts_pos_t, std::less<>> get_seq_lengths(
-        const std::map<std::string, std::string, std::less<>>& seq_map)
+    std::unordered_map<std::string, hts_pos_t> get_seq_lengths(
+        const std::unordered_map<std::string, std::string>& seq_map)
     {
-        std::map<std::string, hts_pos_t, std::less<>> seq_lengths;
+        std::unordered_map<std::string, hts_pos_t> seq_lengths;
 
         for (auto const& pair : seq_map) {
             seq_lengths.emplace(pair.first, pair.second.size());
@@ -17,7 +17,7 @@ namespace art_modern {
         return seq_lengths;
     }
 
-    InMemoryFastaFetch::InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map)
+    InMemoryFastaFetch::InMemoryFastaFetch(std::unordered_map<std::string, std::string> seq_map)
         : BaseFastaFetch(get_seq_lengths(seq_map))
         , seq_map_(std::move(seq_map))
     {
@@ -29,11 +29,11 @@ namespace art_modern {
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch()
-        : BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>>()) {};
+        : BaseFastaFetch(std::unordered_map<std::string, hts_pos_t>()) {};
 
-    std::map<std::string, std::string, std::less<>> get_seq_map(const std::string& file_name)
+    std::unordered_map<std::string, std::string> get_seq_map(const std::string& file_name)
     {
-        std::map<std::string, std::string, std::less<>> seq_map;
+        std::unordered_map<std::string, std::string> seq_map;
         auto file_reader = std::ifstream(file_name);
         FastaIterator fai(file_reader);
         while (true) {
@@ -54,7 +54,7 @@ namespace art_modern {
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
-        : InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> { { contig_name, seq } })
+        : InMemoryFastaFetch(std::unordered_map<std::string, std::string> { { contig_name, seq } })
     {
     }
 

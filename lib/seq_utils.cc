@@ -5,18 +5,18 @@
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/log/trivial.hpp>
 #include <htslib/sam.h>
-#include <map>
 #include <sstream>
+#include <unordered_map>
 #include <vector>
 
-using namespace std;
 namespace labw {
 namespace art_modern {
-    const map<char, char>& rev_comp_trans { { 'A', 'T' }, { 'T', 'A' }, { 'C', 'G' }, { 'G', 'C' }, { 'N', 'N' } };
+    const std::unordered_map<char, char>& rev_comp_trans { { 'A', 'T' }, { 'T', 'A' }, { 'C', 'G' }, { 'G', 'C' },
+        { 'N', 'N' } };
 
     std::string qual_to_str(const std::vector<int>& qual)
     {
-        string retq;
+        std::string retq;
         retq.resize(qual.size());
         for (size_t k = 0; k < qual.size(); k++) {
             retq[k] = (char)(qual[k] + PHRED_OFFSET);
@@ -57,7 +57,7 @@ namespace art_modern {
         return rets;
     }
 
-    std::string cigar_arr_to_str(const vector<uint32_t>& cigar_arr)
+    std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr)
     {
         std::ostringstream oss;
         for (size_t i = 0; i < cigar_arr.size(); i += 1) {
@@ -67,7 +67,7 @@ namespace art_modern {
         return oss.str();
     }
 
-    uint32_t* cigar_arr_to_c(const vector<uint32_t>& cigar_arr)
+    uint32_t* cigar_arr_to_c(const std::vector<uint32_t>& cigar_arr)
     {
         auto* c = (uint32_t*)calloc(cigar_arr.size(), sizeof(uint32_t));
         for (size_t i = 0; i < cigar_arr.size(); i++) {

@@ -36,7 +36,7 @@ namespace art_modern {
 
     void OutputDispatcher::add(BaseReadOutput* output) { outputs_.emplace_back(output); }
 
-    void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc)
+    void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc) const
     {
         for (auto const& factory : factories_) {
             factory->patch_options(desc);

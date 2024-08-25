@@ -10,30 +10,27 @@
 #include "fasta/fasta_parser.hh"
 #include "test_adaptor.h"
 
-using namespace std;
-using namespace labw::art_modern;
-
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {
-    auto iss = std::istringstream(">chr1\r\nAAAA\nCCC\n>chr2\r\n>chr3\nTTTT\n\n");
-    FastaIterator fai(iss);
-    vector<string> chrNames = { "chr1", "chr2", "chr3" };
-    vector<string> seqs = { "AAAACCC", "", "TTTT" };
+    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2\r\n>chr3\nTTTT\n\n");
+    labw::art_modern::FastaIterator fai(iss);
+    std::vector<std::string> chrNames = { "chr1", "chr2", "chr3" };
+    std::vector<std::string> seqs = { "AAAACCC", "", "TTTT" };
     int i = 0;
     while (true) {
-        FastaRecord fa_record;
         try {
-            fa_record = fai.next();
-            BOOST_TEST(fa_record.sequence == seqs[i]);
+            auto fa_record = fai.next();
             BOOST_TEST(fa_record.id == chrNames[i]);
-        } catch (EOFException&) {
+            BOOST_TEST(fa_record.sequence == seqs[i]);
+        } catch (labw::art_modern::EOFException&) {
             break;
         }
         i++;
     }
+    BOOST_TEST(i == chrNames.size());
 }
 
-void test_fasta(BaseFastaFetch* fastaFetch)
+void test_fasta(labw::art_modern::BaseFastaFetch* fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
@@ -51,14 +48,14 @@ void test_fasta(BaseFastaFetch* fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
 {
-    auto faidx_fetch = new FaidxFetch(TEST_RESOURCES_PATH "test.fasta");
+    auto faidx_fetch = new labw::art_modern::FaidxFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(faidx_fetch);
     delete faidx_fetch;
 }
 
 BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
 {
-    auto in_memory_fasta_fetch = new InMemoryFastaFetch(TEST_RESOURCES_PATH "test.fasta");
+    auto in_memory_fasta_fetch = new labw::art_modern::InMemoryFastaFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(in_memory_fasta_fetch);
     delete in_memory_fasta_fetch;
 }

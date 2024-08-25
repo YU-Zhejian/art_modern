@@ -26,3 +26,5 @@ enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM, AUTO };
 #define INPUT_FILE_PARSER_AUTO "auto"
 
 #undef CEU_CM_IS_DEBUG // FIXME: CMake seems not working!
+
+#define TID_FOR_UNMAPPED (-1)

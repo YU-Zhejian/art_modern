@@ -14,9 +14,9 @@ namespace art_modern {
     std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::map<std::string, double, std::less<>> coverage_positive;
-        std::map<std::string, double, std::less<>> coverage_negative;
-        std::map<std::string, std::string, std::less<>> seq_map;
+        std::unordered_map<std::string, double> coverage_positive;
+        std::unordered_map<std::string, double> coverage_negative;
+        std::unordered_map<std::string, std::string> seq_map;
 
         std::string buff;
         std::vector<std::string> tokens;

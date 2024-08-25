@@ -17,13 +17,13 @@ namespace art_modern {
 
         InMemoryFastaFetch();
         explicit InMemoryFastaFetch(const std::string& file_name);
-        explicit InMemoryFastaFetch(std::map<std::string, std::string, std::less<>> seq_map);
+        explicit InMemoryFastaFetch(std::unordered_map<std::string, std::string> seq_map);
         InMemoryFastaFetch(const std::string& contig_name, const std::string& seq);
         std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) override;
         ~InMemoryFastaFetch() override;
 
     private:
-        const std::map<std::string, std::string, std::less<>> seq_map_;
+        const std::unordered_map<std::string, std::string> seq_map_;
     };
 }
 }

@@ -6,7 +6,7 @@
 #include "out/BaseReadOutput.hh"
 #include <array>
 #include <boost/program_options.hpp>
-#include <map>
+#include <unordered_map>
 
 #include <string>
 #include <vector>

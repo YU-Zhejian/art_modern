@@ -7,12 +7,14 @@
 namespace labw {
 namespace art_modern {
     CoverageInfo::CoverageInfo(const double static_coverage)
-        : static_coverage_(static_coverage)
+        : static_coverage_positive_(static_coverage / 2)
+        , static_coverage_negative_(static_coverage / 2)
     {
     }
     CoverageInfo::CoverageInfo(
         CoverageInfo::coverage_map coverage_positive, CoverageInfo::coverage_map coverage_negative)
-        : static_coverage_(0)
+        : static_coverage_positive_(0)
+        , static_coverage_negative_(0)
         , coverage_positive_(std::move(coverage_positive))
         , coverage_negative_(std::move(coverage_negative))
     {
@@ -20,7 +22,7 @@ namespace art_modern {
     double CoverageInfo::coverage_positive(const std::string& contig_name) const
     {
         if (coverage_positive_.empty()) {
-            return static_coverage_ / 2;
+            return static_coverage_positive_;
         } else {
             if (coverage_positive_.find(contig_name) == coverage_positive_.end()) {
                 return 0;
@@ -31,7 +33,7 @@ namespace art_modern {
     double CoverageInfo::coverage_negative(const std::string& contig_name) const
     {
         if (coverage_negative_.empty()) {
-            return static_coverage_ / 2;
+            return static_coverage_negative_;
         } else {
             if (coverage_negative_.find(contig_name) == coverage_negative_.end()) {
                 return 0;
@@ -40,29 +42,34 @@ namespace art_modern {
         }
     }
     CoverageInfo::CoverageInfo(std::istream& istream)
-        : static_coverage_(0)
+        : static_coverage_positive_(0)
+        , static_coverage_negative_(0)
     {
+        coverage_map coverage_positive;
+        coverage_map coverage_negative;
         std::string buff;
         std::vector<std::string> tokens;
         while (!istream.eof()) {
             std::getline(istream, buff);
-            if (buff.empty() || buff.at(0) == '#') {
+            if (buff.empty() || buff.front() == '#') {
                 continue;
             }
             boost::algorithm::split(tokens, buff, boost::is_any_of("\t"));
             if (tokens.size() == 3) {
-                coverage_positive_[tokens.at(0)] = std::stod(tokens.at(1));
-                coverage_negative_[tokens.at(0)] = std::stod(tokens.at(2));
+                coverage_positive[tokens.at(0)] = std::stod(tokens.at(1));
+                coverage_negative[tokens.at(0)] = std::stod(tokens.at(2));
             } else if (tokens.size() == 2) {
-                coverage_positive_[tokens.at(0)] = std::stod(tokens.at(1)) / 2;
-                coverage_negative_[tokens.at(0)] = std::stod(tokens.at(1)) / 2;
+                coverage_positive[tokens.at(0)] = std::stod(tokens.at(1)) / 2;
+                coverage_negative[tokens.at(0)] = std::stod(tokens.at(1)) / 2;
             }
         }
+        CoverageInfo(coverage_positive, coverage_negative);
     }
+
     CoverageInfo CoverageInfo::div(int num_parts) const
     {
         if (coverage_positive_.empty()) {
-            return CoverageInfo(static_coverage_ / num_parts);
+            return CoverageInfo(static_coverage_positive_ / num_parts, static_coverage_negative_ / num_parts);
         } else {
             coverage_map coverage_positive_new;
             for (auto const& pair : coverage_positive_) {
@@ -74,6 +81,12 @@ namespace art_modern {
             }
             return { coverage_positive_new, coverage_negative_new };
         }
+    }
+
+    CoverageInfo::CoverageInfo(double static_coverage_positive, double static_coverage_negative)
+        : static_coverage_positive_(static_coverage_positive)
+        , static_coverage_negative_(static_coverage_negative)
+    {
     }
 } // art_modern
 } // labw

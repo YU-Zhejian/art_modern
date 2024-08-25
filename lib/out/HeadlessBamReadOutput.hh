@@ -9,7 +9,7 @@ namespace art_modern {
 
     class HeadlessBamReadOutput : public BaseReadOutput {
     public:
-        HeadlessBamReadOutput(const std::string& filename, const SamReadOutputOptions& sam_options);
+        HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options);
         void writeSE(const PairwiseAlignment& pwa) override;
         void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
         void close() override;
@@ -18,7 +18,7 @@ namespace art_modern {
     private:
         samFile* sam_file_;
         sam_hdr_t* sam_header_;
-        const SamReadOutputOptions& sam_options_;
+        const SamOptions& sam_options_;
         std::mutex mutex_;
         bool is_closed_ = false;
         BamUtils bam_utils_;
@@ -26,13 +26,13 @@ namespace art_modern {
 
     class HeadlessBamReadOutputFactory : public BaseReadOutputFactory {
     public:
-        void patch_options(boost::program_options::options_description& desc) override;
+        void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
             const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const override;
         ~HeadlessBamReadOutputFactory();
 
     private:
-        SamReadOutputOptions sam_options_;
+        SamOptions sam_options_;
     };
 
 }

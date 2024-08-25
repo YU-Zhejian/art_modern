@@ -1,15 +1,15 @@
 #include "HeadlessBamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "global_variables.hh"
+#include "seq_utils.hh"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
-#include <seq_utils.hh>
 
 namespace po = boost::program_options;
 
 namespace labw {
 namespace art_modern {
-    HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const SamReadOutputOptions& sam_options)
+    HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options)
         : sam_options_(sam_options)
         , bam_utils_(sam_options)
     {
@@ -45,16 +45,14 @@ namespace art_modern {
         }
         auto oa_tag = bam_utils_.generate_oa_tag(pwa);
         auto tag_len = 2 + 1 + oa_tag.size() + 1;
-        CExceptionsProxy::requires_numeric(bam_set1(sam_record,
-                                               0, // Alignment info moved to OA tag
-                                               nullptr, // Alignment info moved to OA tag
+        CExceptionsProxy::requires_numeric(bam_set1(sam_record, pwa.read_name.size(), pwa.read_name.c_str(),
                                                BAM_FUNMAP, // Alignment info moved to OA tag
-                                               0, // Alignment info moved to OA tag
+                                               TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                                                0, // Alignment info moved to OA tag
                                                0, // Alignment info moved to OA tag
                                                0, // Alignment info moved to OA tag
                                                nullptr, // Alignment info moved to OA tag
-                                               0, // Unset for SE reads
+                                               TID_FOR_UNMAPPED, // Unset for SE reads
                                                0, // Unset for SE reads
                                                0, // Unset for SE reads
                                                rlen, seq.c_str(), qual.c_str(), tag_len),
@@ -89,32 +87,28 @@ namespace art_modern {
         auto tag_len1 = 2 + 1 + oa_tag1.size() + 1;
         auto tag_len2 = 2 + 1 + oa_tag2.size() + 1;
         CExceptionsProxy::requires_numeric(
-            bam_set1(sam_record1,
-                0, // Alignment info moved to OA tag
-                nullptr, // Alignment info moved to OA tag
+            bam_set1(sam_record1, pwa1.read_name.size(), pwa1.read_name.c_str(),
                 BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD1, // Alignment info moved to OA tag
-                0, // Alignment info moved to OA tag
+                TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 nullptr, // Alignment info moved to OA tag
-                0, // Alignment info moved to OA tag
+                TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 rlen, seq1.c_str(), qual1.c_str(), tag_len1),
             USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         bam_aux_update_str(sam_record1, "OA", static_cast<int>(oa_tag1.length()), oa_tag1.c_str());
         CExceptionsProxy::requires_numeric(
-            bam_set1(sam_record2,
-                0, // Alignment info moved to OA tag
-                nullptr, // Alignment info moved to OA tag
+            bam_set1(sam_record2, pwa2.read_name.size(), pwa2.read_name.c_str(),
                 BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD2, // Alignment info moved to OA tag
-                0, // Alignment info moved to OA tag
+                TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 nullptr, // Alignment info moved to OA tag
-                0, // Alignment info moved to OA tag
+                TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 0, // Alignment info moved to OA tag
                 rlen, seq2.c_str(), qual2.c_str(), tag_len2),
@@ -137,7 +131,7 @@ namespace art_modern {
     }
     HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close(); }
 
-    void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc)
+    void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
     {
         po::options_description bam_desc("Headless SAM/BAM Output");
         bam_desc.add_options()("o-hl_sam", po::value<std::string>(),
@@ -155,7 +149,7 @@ namespace art_modern {
                 BOOST_LOG_TRIVIAL(warning) << "Sequences presented in the reference file. Use SAM/BAM instead of this "
                                               "headless one for better compatibility.";
             }
-            auto so = SamReadOutputOptions();
+            auto so = SamOptions();
             so.use_m = vm.count("o-hl_sam-use_m") > 0;
             so.write_bam = vm.count("o-hl_sam-write_bam") > 0;
             so.PG_CL = boost::algorithm::join(args, " ");

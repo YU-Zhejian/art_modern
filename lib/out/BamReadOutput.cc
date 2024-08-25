@@ -126,9 +126,8 @@ namespace art_modern {
     }
     BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
     BamReadOutput::BamReadOutput(
-        const std::string& filename, BaseFastaFetch* fasta_fetch, const SamReadOutputOptions& sam_options)
+        const std::string& filename, BaseFastaFetch* fasta_fetch, const SamOptions& sam_options)
         : sam_options_(sam_options)
-        , bam_utils_(sam_options)
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
 
@@ -159,7 +158,7 @@ namespace art_modern {
         sam_close(sam_file_);
         is_closed_ = true;
     }
-    void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc)
+    void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
     {
         po::options_description bam_desc("SAM/BAM Output");
         bam_desc.add_options()(
@@ -178,7 +177,7 @@ namespace art_modern {
                                          << " input parser, you should use headless SAM/BAM instead of this one.";
                 exit(EXIT_FAILURE);
             }
-            auto so = SamReadOutputOptions();
+            auto so = SamOptions();
             so.use_m = vm.count("o-sam-use_m") > 0;
             so.write_bam = vm.count("o-sam-write_bam") > 0;
             so.PG_CL = boost::algorithm::join(args, " ");

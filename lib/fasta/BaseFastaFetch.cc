@@ -32,7 +32,7 @@ namespace art_modern {
 
     const std::vector<std::string>& BaseFastaFetch::seq_names() const { return seq_names_; }
 
-    std::vector<std::string> get_seq_names(const std::map<std::string, hts_pos_t, std::less<>>& seq_lengths)
+    std::vector<std::string> get_seq_names(const std::unordered_map<std::string, hts_pos_t>& seq_lengths)
     {
         std::vector<std::string> retv;
         retv.reserve(seq_lengths.size());
@@ -42,7 +42,7 @@ namespace art_modern {
         return retv;
     }
 
-    BaseFastaFetch::BaseFastaFetch(std::map<std::string, hts_pos_t, std::less<>> seq_lengths)
+    BaseFastaFetch::BaseFastaFetch(std::unordered_map<std::string, hts_pos_t> seq_lengths)
         : seq_lengths_(std::move(seq_lengths))
         , seq_names_(get_seq_names(seq_lengths_))
     {

@@ -18,7 +18,7 @@ namespace art_modern {
             << ';';
         return oss.str();
     }
-    BamUtils::BamUtils(const SamReadOutputOptions& sam_options)
+    BamUtils::BamUtils(const SamOptions& sam_options)
         : sam_options_(sam_options)
     {
     }
@@ -27,8 +27,8 @@ namespace art_modern {
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t* cigar_c_arr)
     {
         // #ifdef CEU_CM_IS_DEBUG
-        size_t cigar_qlen = bam_cigar2qlen(static_cast<int>(cigar.size()), cigar_c_arr);
-        size_t cigar_rlen = bam_cigar2rlen(static_cast<int>(cigar.size()), cigar_c_arr);
+        auto cigar_qlen = bam_cigar2qlen(static_cast<int>(cigar.size()), cigar_c_arr);
+        auto cigar_rlen = bam_cigar2rlen(static_cast<int>(cigar.size()), cigar_c_arr);
 
         if (cigar_qlen != pwa.query.length()) {
             BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen

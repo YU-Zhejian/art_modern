@@ -1,5 +1,4 @@
 #include "ArtRead.hh"
-#include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
 #include "random_generator.hh"
 #include <boost/algorithm/string/case_conv.hpp>
@@ -21,7 +20,7 @@ namespace art_modern {
     std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
     {
         auto qual_mutated = qual;
-        for (size_t i = 0; i < qual.size(); i++) {
+        for (auto i = 0; i < qual.size(); i++) {
             if (seq_read[i] == 'N') {
                 qual_mutated[i] = 1;
                 continue;
@@ -38,7 +37,7 @@ namespace art_modern {
         return qual_mutated;
     }
 
-    int ArtRead::generate_indels(int read_len, bool is_read_1)
+    int ArtRead::generate_indels(const bool is_read_1)
     {
         int ins_len = 0;
         int del_len = 0;
@@ -46,12 +45,11 @@ namespace art_modern {
         auto per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
         auto per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
         // deletion
-        for (int i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
+        for (auto i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
             if (per_base_del_rate[i] >= rprob_.r_prob()) {
                 del_len = i + 1;
                 for (int j = i; j >= 0;) {
-                    auto pos = static_cast<int>(
-                        floor((read_len - 1) * rprob_.r_prob())); // invalid deletion positions: 0 or read_len-1
+                    auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
                     if (indel.count(pos) == 0) {
                         indel[pos] = ALN_GAP;
                         j--;
@@ -62,13 +60,13 @@ namespace art_modern {
         }
 
         for (auto i = static_cast<int>(per_base_ins_rate.size() - 1); i >= 0; i--) {
-            if ((read_len - del_len - ins_len) < (i + 1)) {
+            if ((art_params_.read_len - del_len - ins_len) < (i + 1)) {
                 continue; // ensure that enough unchanged position for mutation
             }
             if (per_base_ins_rate[i] >= rprob_.r_prob()) {
                 ins_len = i + 1;
                 for (int j = i; j >= 0;) {
-                    auto pos = static_cast<int>(floor(rprob_.r_prob() * read_len));
+                    auto pos = rprob_.rand_pos_on_read();
                     if (indel.count(pos) == 0) {
                         indel[pos] = rprob_.rand_base();
                         j--;
@@ -80,7 +78,7 @@ namespace art_modern {
         return (ins_len - del_len);
     };
 
-    int ArtRead::generate_indels_2(int read_len, bool is_read_1)
+    int ArtRead::generate_indels_2(const bool is_read_1)
     {
         int ins_len = 0;
         int del_len = 0;
@@ -92,7 +90,7 @@ namespace art_modern {
             if (per_base_ins_rate[i] >= rprob_.r_prob()) {
                 ins_len = i + 1;
                 for (int j = i; j >= 0;) {
-                    auto pos = static_cast<int>(floor(rprob_.r_prob() * read_len));
+                    auto pos = rprob_.rand_pos_on_read();
                     if (indel.count(pos) == 0) {
                         indel[pos] = rprob_.rand_base();
                         j--;
@@ -108,14 +106,13 @@ namespace art_modern {
                 break;
             }
 
-            if ((read_len - del_len - ins_len) < (i + 1))
+            if ((art_params_.read_len - del_len - ins_len) < (i + 1))
                 continue; // ensure that enough unchanged position for mutation
 
             if (per_base_del_rate[i] >= rprob_.r_prob()) {
                 del_len = i + 1;
                 for (int j = i; j >= 0;) {
-                    auto pos = static_cast<int>(
-                        floor((read_len - 1) * rprob_.r_prob())); // invalid deletion positions: 0 or read_len-1
+                    auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
                     if (pos == 0) {
                         continue;
                     }
@@ -162,18 +159,11 @@ namespace art_modern {
     {
     }
 
-    void ArtRead::assess_num_n()
+    void ArtRead::assess_num_n() const
     {
-        boost::algorithm::to_upper(seq_read);
         int num_n = 0;
-        for (auto i : range(0, static_cast<int>(seq_read.size()), 1)) {
-            if (seq_read[i] == ALN_GAP) {
-                continue;
-            }
-            if (seq_read[i] != 'A' && seq_read[i] != 'C' && seq_read[i] != 'G' && seq_read[i] != 'T') {
-                seq_read[i] = 'N';
-            }
-            if (seq_read[i] == 'N') {
+        for (auto c : seq_read) {
+            if (c == 'N') {
                 num_n++;
             }
         }

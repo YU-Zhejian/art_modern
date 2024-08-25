@@ -6,7 +6,7 @@
 namespace labw {
 namespace art_modern {
 
-    std::string FaidxFetch::fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)
+    std::string FaidxFetch::fetch(const std::string& seq_name, const hts_pos_t start, const hts_pos_t end)
     {
         auto cfetch_str = cfetch(seq_name.c_str(), start, end);
         auto rets = std::string(cfetch_str);
@@ -14,7 +14,7 @@ namespace art_modern {
         return rets;
     }
 
-    char* FaidxFetch::cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end)
+    char* FaidxFetch::cfetch(const char* seq_name, const hts_pos_t start, const hts_pos_t end)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         auto reg = boost::format("%s:%d-%d") % seq_name % (start + 1) % end;
@@ -29,9 +29,9 @@ namespace art_modern {
     }
     FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
 
-    std::map<std::string, hts_pos_t, std::less<>> get_seq_lengths(const faidx_t* faidx)
+    std::unordered_map<std::string, hts_pos_t> get_seq_lengths(const faidx_t* faidx)
     {
-        std::map<std::string, hts_pos_t, std::less<>> seq_lengths;
+        std::unordered_map<std::string, hts_pos_t> seq_lengths;
         for (int i = 0; i < faidx_nseq(faidx); i++) {
             auto seq_name = faidx_iseq(faidx, i);
             seq_lengths.emplace(std::string(seq_name), faidx_seq_len(faidx, seq_name));

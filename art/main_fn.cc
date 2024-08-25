@@ -16,7 +16,6 @@
 #include <iostream>
 #define DUMP_FILENAME "./backtrace.dump"
 
-using namespace std;
 namespace logging = boost::log;
 
 namespace labw {

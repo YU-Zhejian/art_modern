@@ -9,8 +9,8 @@ namespace labw {
 namespace art_modern {
 
     struct FastaRecord {
-        std::string id;
-        std::string sequence;
+        const std::string id;
+        const std::string sequence;
     };
 
     struct EOFException : std::exception { };
