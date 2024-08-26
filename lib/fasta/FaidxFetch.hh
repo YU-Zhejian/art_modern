@@ -17,7 +17,7 @@ namespace art_modern {
 
     private:
         faidx_t* faidx_;
-        char* cfetch(const char* seq_name, hts_pos_t start, hts_pos_t end);
+        char* cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end);
         std::mutex mutex_;
     };
 }

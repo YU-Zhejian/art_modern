@@ -13,7 +13,7 @@ namespace art_modern {
 
     class BamReadOutput : public BaseReadOutput {
     public:
-        BamReadOutput(const std::string& filename, BaseFastaFetch* fasta_fetch, const SamOptions& sam_options);
+        BamReadOutput(const std::string& filename, const BaseFastaFetch *fasta_fetch, const SamOptions& sam_options);
         void writeSE(const PairwiseAlignment& pwa) override;
         void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
         void close() override;
@@ -31,8 +31,8 @@ namespace art_modern {
     public:
         void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const override;
-        ~BamReadOutputFactory();
+            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const override;
+        ~BamReadOutputFactory() override;
 
     private:
         SamOptions sam_options_;

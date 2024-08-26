@@ -22,7 +22,7 @@ namespace art_modern {
     public:
         virtual void patch_options(boost::program_options::options_description& desc) const = 0;
         virtual BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const
+            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const
             = 0;
         virtual ~BaseReadOutputFactory();
     };

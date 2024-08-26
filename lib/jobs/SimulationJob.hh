@@ -16,8 +16,10 @@ namespace art_modern {
             : fasta_fetch(other.fasta_fetch)
             , coverage_info(other.coverage_info)
             , job_id(other.job_id) {};
+
         SimulationJob(const SimulationJob&) = delete;
         SimulationJob& operator=(SimulationJob&&) = delete;
+        SimulationJob& operator=(const SimulationJob&) = delete;
 
         BaseFastaFetch* fasta_fetch;
         const CoverageInfo& coverage_info;

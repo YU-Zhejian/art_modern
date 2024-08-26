@@ -29,7 +29,7 @@ namespace art_modern {
         void add(BaseReadOutputFactory* factory);
         void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const override;
+            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const override;
         ~OutputDispatcherFactory() override;
 
     private:

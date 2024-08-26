@@ -66,7 +66,7 @@ namespace art_modern {
         CoverageInfo(coverage_positive, coverage_negative);
     }
 
-    CoverageInfo CoverageInfo::div(int num_parts) const
+    CoverageInfo CoverageInfo::div(const int num_parts) const
     {
         if (coverage_positive_.empty()) {
             return CoverageInfo(static_coverage_positive_ / num_parts, static_coverage_negative_ / num_parts);
@@ -83,7 +83,7 @@ namespace art_modern {
         }
     }
 
-    CoverageInfo::CoverageInfo(double static_coverage_positive, double static_coverage_negative)
+    CoverageInfo::CoverageInfo(const double static_coverage_positive, const double static_coverage_negative)
         : static_coverage_positive_(static_coverage_positive)
         , static_coverage_negative_(static_coverage_negative)
     {

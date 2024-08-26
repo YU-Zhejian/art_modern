@@ -13,8 +13,6 @@ namespace art_modern {
         void close() override;
 
         ~DumbFileStream() override;
-
-    private:
     };
 }
 }

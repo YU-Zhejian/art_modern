@@ -126,7 +126,7 @@ namespace art_modern {
     }
     BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
     BamReadOutput::BamReadOutput(
-        const std::string& filename, BaseFastaFetch* fasta_fetch, const SamOptions& sam_options)
+        const std::string& filename, const BaseFastaFetch *fasta_fetch, const SamOptions& sam_options)
         : sam_options_(sam_options)
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
@@ -168,7 +168,7 @@ namespace art_modern {
         desc.add(bam_desc);
     }
     BaseReadOutput* BamReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, BaseFastaFetch* fasta_fetch) const
+        const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const
     {
         if (vm.count("o-sam")) {
             if (fasta_fetch->num_seqs() == 0) {

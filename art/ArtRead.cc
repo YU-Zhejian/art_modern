@@ -1,7 +1,6 @@
 #include "ArtRead.hh"
 #include "art_modern_constants.hh"
 #include "random_generator.hh"
-#include <boost/algorithm/string/case_conv.hpp>
 
 using namespace std;
 
@@ -134,7 +133,7 @@ namespace art_modern {
             return;
         }
         int k = 0;
-        for (size_t i = 0; i < seq_ref.size();) {
+        for (auto i = 0; i < seq_ref.size();) {
             if (indel.find(k) == indel.end()) {
                 seq_read.push_back(seq_ref[i]);
                 i++;
@@ -161,12 +160,8 @@ namespace art_modern {
 
     void ArtRead::assess_num_n() const
     {
-        int num_n = 0;
-        for (auto c : seq_read) {
-            if (c == 'N') {
-                num_n++;
-            }
-        }
+        auto num_n = std::count(seq_read.begin(), seq_read.end(), 'N');
+
         if (num_n > 0) {
             throw TooMuchNException();
         }

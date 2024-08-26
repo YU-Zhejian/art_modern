@@ -8,13 +8,13 @@ namespace art_modern {
 
     std::string FaidxFetch::fetch(const std::string& seq_name, const hts_pos_t start, const hts_pos_t end)
     {
-        auto cfetch_str = cfetch(seq_name.c_str(), start, end);
+        auto cfetch_str = cfetch_(seq_name.c_str(), start, end);
         auto rets = std::string(cfetch_str);
         free(cfetch_str);
         return rets;
     }
 
-    char* FaidxFetch::cfetch(const char* seq_name, const hts_pos_t start, const hts_pos_t end)
+    char* FaidxFetch::cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         auto reg = boost::format("%s:%d-%d") % seq_name % (start + 1) % end;

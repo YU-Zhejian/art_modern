@@ -20,6 +20,11 @@ namespace art_modern {
 
     class PairwiseAlignment {
     public:
+        PairwiseAlignment(PairwiseAlignment&& other) = delete;
+        PairwiseAlignment(const PairwiseAlignment&) = delete;
+        PairwiseAlignment& operator=(PairwiseAlignment&&) = delete;
+        PairwiseAlignment& operator=(const PairwiseAlignment&) = delete;
+
         PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
             std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t align_contig_start,
             bool is_plus_strand);

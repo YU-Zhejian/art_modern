@@ -31,7 +31,7 @@ namespace art_modern {
             throw PWAException(this->aligned_query, this->aligned_ref);
         }
     }
-    std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(bool use_m) const
+    std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
     {
 
         std::vector<uint32_t> cigar;

@@ -102,7 +102,7 @@ namespace art_modern {
                     }
                 } else {
                     std::ifstream fasta_stream(art_params.input_file_name);
-                    FastaStreamBatcher fsb(1000, fasta_stream);
+                    FastaStreamBatcher fsb(art_params.batch_size, fasta_stream);
                     while (true) {
                         auto fa_view = fsb.fetch();
 
@@ -119,7 +119,7 @@ namespace art_modern {
             if (art_params.art_input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
                 if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                     std::ifstream pbsim3_template_stream(art_params.input_file_name);
-                    Pbsim3TranscriptBatcher fsb(1000, pbsim3_template_stream);
+                    Pbsim3TranscriptBatcher fsb(art_params.batch_size, pbsim3_template_stream);
                     while (true) {
                         auto fa_view = fsb.fetch();
                         if (fa_view.first.num_seqs() == 0) {
@@ -132,7 +132,7 @@ namespace art_modern {
                     pbsim3_template_stream.close();
                 } else {
                     std::ifstream pbsim3_template_stream(art_params.input_file_name);
-                    Pbsim3TranscriptBatcher fsb(1000, pbsim3_template_stream);
+                    Pbsim3TranscriptBatcher fsb(art_params.batch_size, pbsim3_template_stream);
                     while (true) {
                         auto fa_view = fsb.fetch();
                         if (fa_view.first.num_seqs() == 0) {

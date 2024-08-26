@@ -49,7 +49,7 @@ namespace art_modern {
         desc.add(fastq_desc);
     }
     BaseReadOutput* FastqReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, BaseFastaFetch*) const
+        const boost::program_options::variables_map& vm, const BaseFastaFetch *) const
     {
         if (vm.count("o-fastq")) {
             return new FastqReadOutput(vm["o-fastq"].as<std::string>());
