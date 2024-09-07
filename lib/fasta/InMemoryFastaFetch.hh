@@ -22,6 +22,9 @@ namespace art_modern {
         std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) override;
         ~InMemoryFastaFetch() override;
 
+        InMemoryFastaFetch& operator=(const InMemoryFastaFetch&) = delete;
+        InMemoryFastaFetch& operator=(InMemoryFastaFetch&&) = delete;
+
     private:
         const std::unordered_map<std::string, std::string> seq_map_;
     };

@@ -11,11 +11,16 @@ namespace art_modern {
 
     class Pbsim3TranscriptBatcher {
     public:
-        explicit Pbsim3TranscriptBatcher(int batch_size, std::istream& istream);
+        explicit Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream);
         std::pair<InMemoryFastaFetch, CoverageInfo> fetch();
 
+        Pbsim3TranscriptBatcher(const Pbsim3TranscriptBatcher&) = delete;
+        Pbsim3TranscriptBatcher(Pbsim3TranscriptBatcher&&) = delete;
+        Pbsim3TranscriptBatcher& operator=(const Pbsim3TranscriptBatcher&) = delete;
+        Pbsim3TranscriptBatcher& operator=(Pbsim3TranscriptBatcher&&) = delete;
+
     private:
-        size_t batch_size_;
+        std::size_t batch_size_;
         std::istream& istream_;
         std::mutex mutex_;
     };

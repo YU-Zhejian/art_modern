@@ -43,7 +43,7 @@ namespace art_modern {
         }
     }
     BaseReadOutput* OutputDispatcherFactory::create(
-        const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const
+        const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const
     {
         auto output_dispatcher = new OutputDispatcher();
         for (auto const& factory : factories_) {

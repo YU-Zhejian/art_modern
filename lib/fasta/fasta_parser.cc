@@ -26,7 +26,7 @@ namespace art_modern {
                 nextLine.pop_back();
             }
             if (nextLine[0] != '>') {
-                throw MalformedFastaException(_lineno, "New name not started by >");
+                throw MalformedFastaException();
             } else {
                 std::vector<std::string> parts;
                 std::string firstPart;
@@ -34,7 +34,7 @@ namespace art_modern {
                 if (!parts.empty()) {
                     firstPart = parts[0];
                 } else {
-                    throw MalformedFastaException(_lineno, "FASTA record contains empty ID.");
+                    throw MalformedFastaException();
                 }
                 next_record_id = firstPart;
                 break;

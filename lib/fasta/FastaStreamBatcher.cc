@@ -3,7 +3,7 @@
 
 namespace labw {
 namespace art_modern {
-    FastaStreamBatcher::FastaStreamBatcher(size_t batch_size, std::istream& stream)
+    FastaStreamBatcher::FastaStreamBatcher(std::size_t batch_size, std::istream& stream)
         : batch_size_(batch_size)
         , fasta_iterator_(stream)
     {
@@ -51,7 +51,7 @@ namespace art_modern {
         return InMemoryFastaFetch(fasta_map);
     }
 
-    InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(int batch_size, BaseFastaFetch* stream)
+    InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(std::size_t batch_size, BaseFastaFetch* stream)
         : batch_size_(batch_size)
         , current_index_(0)
         , stream_(stream)

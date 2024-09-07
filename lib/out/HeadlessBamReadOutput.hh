@@ -9,6 +9,11 @@ namespace art_modern {
 
     class HeadlessBamReadOutput : public BaseReadOutput {
     public:
+        HeadlessBamReadOutput(HeadlessBamReadOutput&& other) = delete;
+        HeadlessBamReadOutput(const HeadlessBamReadOutput&) = delete;
+        HeadlessBamReadOutput& operator=(HeadlessBamReadOutput&&) = delete;
+        HeadlessBamReadOutput& operator=(const HeadlessBamReadOutput&) = delete;
+
         HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options);
         void writeSE(const PairwiseAlignment& pwa) override;
         void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
@@ -28,7 +33,7 @@ namespace art_modern {
     public:
         void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const override;
+            const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const override;
         ~HeadlessBamReadOutputFactory();
 
     private:

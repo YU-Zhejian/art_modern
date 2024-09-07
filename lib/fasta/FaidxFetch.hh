@@ -15,6 +15,11 @@ namespace art_modern {
         std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) override;
         ~FaidxFetch() override;
 
+        FaidxFetch(const FaidxFetch&) = delete;
+        FaidxFetch(FaidxFetch&&) = delete;
+        FaidxFetch& operator=(const FaidxFetch&) = delete;
+        FaidxFetch& operator=(FaidxFetch&&) = delete;
+
     private:
         faidx_t* faidx_;
         char* cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end);

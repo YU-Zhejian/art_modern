@@ -419,16 +419,19 @@ namespace art_modern {
         }
     }
 
-    int validate_parallel(int parallel){
+    int validate_parallel(int parallel)
+    {
         auto max_threads = static_cast<int>(boost::thread::hardware_concurrency());
         if (parallel == PARALLEL_ALL) {
             parallel = max_threads;
         } else if (parallel == PARALLEL_DISABLE) {
             parallel = 1;
-        } else if(parallel > max_threads){
-            BOOST_LOG_TRIVIAL(warning) << "parallel (" << parallel << ") is greater than the "
-                                                                      "maximum number of threads available on the system (" << max_threads << ").";
-        } else if(parallel < -1){
+        } else if (parallel > max_threads) {
+            BOOST_LOG_TRIVIAL(warning) << "parallel (" << parallel
+                                       << ") is greater than the "
+                                          "maximum number of threads available on the system ("
+                                       << max_threads << ").";
+        } else if (parallel < -1) {
             BOOST_LOG_TRIVIAL(fatal) << "parallel (" << parallel << ") must be greater than or equal to -1.";
         }
         return parallel;
@@ -542,7 +545,7 @@ namespace art_modern {
             err_prob[i] = std::pow(10, -i / 10.0);
         }
         auto batch_size = vm_[ARG_BATCH_SIZE].as<int>();
-        if(batch_size < 1){
+        if (batch_size < 1) {
             BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
         }
 
