@@ -6,7 +6,7 @@
 
 namespace labw {
 namespace art_modern {
-    Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(int batch_size, std::istream& istream)
+    Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream)
         : batch_size_(batch_size)
         , istream_(istream)
     {

@@ -11,20 +11,17 @@ namespace art_modern {
     struct FastaRecord {
         const std::string id;
         const std::string sequence;
+
+        FastaRecord(const FastaRecord&) = delete;
+        FastaRecord(FastaRecord&&) = default; // Allow move constructor
+        FastaRecord& operator=(const FastaRecord&) = delete;
+        FastaRecord& operator=(FastaRecord&&) = delete;
     };
 
     struct EOFException : std::exception { };
     struct MalformedFastaException : std::exception {
-        MalformedFastaException(int lineno, std::string what)
-            : _lineno(lineno)
-            , _what(std::move(what))
-        {
-        }
+    public:
         const char* what() const noexcept override;
-
-    private:
-        int _lineno;
-        std::string _what;
     };
 
     class FastaIterator {
@@ -33,9 +30,14 @@ namespace art_modern {
 
         FastaRecord next();
 
+        FastaIterator(const FastaIterator&) = delete;
+        FastaIterator(FastaIterator&&) = delete;
+        FastaIterator& operator=(const FastaIterator&) = delete;
+        FastaIterator& operator=(FastaIterator&&) = delete;
+
     private:
         std::istream& _istream;
-        int _lineno = 0;
+        std::size_t _lineno = 0;
         std::mutex mutex_;
     };
 

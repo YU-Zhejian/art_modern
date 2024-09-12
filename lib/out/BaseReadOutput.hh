@@ -11,6 +11,8 @@ namespace art_modern {
         BaseReadOutput(BaseReadOutput&& other) = delete;
         BaseReadOutput(const BaseReadOutput&) = delete;
         BaseReadOutput& operator=(BaseReadOutput&&) = delete;
+        BaseReadOutput& operator=(const BaseReadOutput&) = delete;
+
         BaseReadOutput() = default;
         virtual void writeSE(const PairwiseAlignment& pwa) = 0;
         virtual void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
@@ -22,13 +24,18 @@ namespace art_modern {
     public:
         virtual void patch_options(boost::program_options::options_description& desc) const = 0;
         virtual BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const
+            const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const
             = 0;
         virtual ~BaseReadOutputFactory();
     };
 
     class DumbReadOutput final : public BaseReadOutput {
     public:
+        DumbReadOutput(DumbReadOutput&& other) = delete;
+        DumbReadOutput(const DumbReadOutput&) = delete;
+        DumbReadOutput& operator=(DumbReadOutput&&) = delete;
+        DumbReadOutput& operator=(const DumbReadOutput&) = delete;
+
         DumbReadOutput();
         void writeSE(const PairwiseAlignment& pwa) override;
         void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;

@@ -15,6 +15,7 @@ namespace art_modern {
         BaseFastaFetch(const BaseFastaFetch&) = delete;
         BaseFastaFetch(BaseFastaFetch&&) = delete;
         BaseFastaFetch& operator=(const BaseFastaFetch&) = delete;
+        BaseFastaFetch& operator=(BaseFastaFetch&&) = delete;
 
         explicit BaseFastaFetch(std::unordered_map<std::string, hts_pos_t> seq_lengths);
         /**

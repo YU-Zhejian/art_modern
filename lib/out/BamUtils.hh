@@ -12,6 +12,11 @@ namespace art_modern {
 
     class BamUtils {
     public:
+        BamUtils(BamUtils&& other) = delete;
+        BamUtils(const BamUtils&) = delete;
+        BamUtils& operator=(BamUtils&&) = delete;
+        BamUtils& operator=(const BamUtils&) = delete;
+
         explicit BamUtils(const SamOptions& sam_options);
         std::string generate_oa_tag(const PairwiseAlignment& pwa) const;
 

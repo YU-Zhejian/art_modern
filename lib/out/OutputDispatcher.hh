@@ -10,6 +10,13 @@ namespace art_modern {
     class OutputDispatcher : public BaseReadOutput {
 
     public:
+        OutputDispatcher(OutputDispatcher&& other) = delete;
+        OutputDispatcher(const OutputDispatcher&) = delete;
+        OutputDispatcher& operator=(OutputDispatcher&&) = delete;
+        OutputDispatcher& operator=(const OutputDispatcher&) = delete;
+
+        OutputDispatcher() = default;
+
         void add(BaseReadOutput* output);
 
         void writeSE(const PairwiseAlignment& pwa) override;
@@ -29,7 +36,7 @@ namespace art_modern {
         void add(BaseReadOutputFactory* factory);
         void patch_options(boost::program_options::options_description& desc) const override;
         BaseReadOutput* create(
-            const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const override;
+            const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const override;
         ~OutputDispatcherFactory() override;
 
     private:

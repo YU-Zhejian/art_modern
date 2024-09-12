@@ -142,7 +142,7 @@ namespace art_modern {
     }
 
     BaseReadOutput* HeadlessBamReadOutputFactory::create(
-        const boost::program_options::variables_map& vm, const BaseFastaFetch *fasta_fetch) const
+        const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const
     {
         if (vm.count("o-hl_sam")) {
             if (fasta_fetch->num_seqs() != 0) {

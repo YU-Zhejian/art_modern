@@ -17,10 +17,15 @@ namespace art_modern {
          */
         InMemoryFastaFetch fetch();
 
-        FastaStreamBatcher(size_t batch_size, std::istream& stream);
+        FastaStreamBatcher(std::size_t batch_size, std::istream& stream);
+
+        FastaStreamBatcher(const FastaStreamBatcher&) = delete;
+        FastaStreamBatcher(FastaStreamBatcher&&) = delete;
+        FastaStreamBatcher& operator=(const FastaStreamBatcher&) = delete;
+        FastaStreamBatcher& operator=(FastaStreamBatcher&&) = delete;
 
     private:
-        size_t batch_size_;
+        std::size_t batch_size_;
         FastaIterator fasta_iterator_;
         std::mutex mutex_;
     };
@@ -33,11 +38,16 @@ namespace art_modern {
          */
         InMemoryFastaFetch fetch();
 
-        InMemoryFastaStreamBatcher(int batch_size, BaseFastaFetch* stream);
+        InMemoryFastaStreamBatcher(std::size_t batch_size, BaseFastaFetch* stream);
+
+        InMemoryFastaStreamBatcher(const InMemoryFastaStreamBatcher&) = delete;
+        InMemoryFastaStreamBatcher(InMemoryFastaStreamBatcher&&) = delete;
+        InMemoryFastaStreamBatcher& operator=(const InMemoryFastaStreamBatcher&) = delete;
+        InMemoryFastaStreamBatcher& operator=(InMemoryFastaStreamBatcher&&) = delete;
 
     private:
-        size_t batch_size_;
-        size_t current_index_;
+        std::size_t batch_size_;
+        std::size_t current_index_;
         BaseFastaFetch* stream_;
         std::mutex mutex_;
     };
