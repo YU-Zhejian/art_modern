@@ -28,7 +28,10 @@ set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collection
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
-add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
+if(Boost_stacktrace_backtrace_FOUND)
+    add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
+endif()
+
 # Boost
 if(BUILD_SHARED_LIBS)
     add_definitions(-DBOOST_ALL_DYN_LINK)
@@ -38,7 +41,7 @@ if(BUILD_SHARED_LIBS)
     add_definitions(-DBOOST_STACKTRACE_LINK)
 else()
     set(Boost_USE_STATIC_LIBS ON)
-    set(Boost_USE_STATIC_RUNTIME ON)
+    # set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 find_package(
     Boost REQUIRED
@@ -48,10 +51,10 @@ find_package(
                thread
                log_setup
                log
-               stacktrace_backtrace
     # signals2 is header-only lockfree is header-only
-    OPTIONAL_COMPONENTS unit_test_framework timer)
+    OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_backtrace stacktrace_windbg)
 include_directories(${Boost_INCLUDE_DIRS})
+include_directories(${env.INCLUDE})
 
 # HTSLib
 if(DEFINED USE_HTSLIB)
@@ -100,11 +103,16 @@ set(ART_MODERN_LINK_LIBS
     Boost::thread
     Boost::log_setup
     Boost::log
-    Boost::stacktrace_backtrace
     "${USED_HTSLIB_NAME}")
 if(Boost_timer_FOUND)
     add_compile_definitions("WITH_BOOST_TIMER")
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::timer)
+endif()
+if(Boost_stacktrace_backtrace_FOUND)
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_backtrace)
+endif()
+if(Boost_stacktrace_windbg_FOUND)
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_windbg)
 endif()
 
 file(GLOB ART_SOURCE "art/*.cpp" "art/*.cc")

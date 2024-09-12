@@ -3,7 +3,7 @@
 #include <string.h>
 #include <zlib.h>
 
-uLong get_adler_crc32(unsigned char* buff)
+uLong get_adler_crc32(char* buff)
 {
     uLong adler_checksum = adler32(0L, Z_NULL, 0);
     adler_checksum = adler32(adler_checksum, buff, sizeof(buff));
@@ -14,12 +14,12 @@ int main(void)
 {
     printf("Zlib version: %s\n", ZLIB_VERSION);
 
-    unsigned char strSrc[] = "hello world!";
-    unsigned char buf[1024] = { 0 };
-    unsigned char strDst[1024] = { 0 };
-    size_t srcLen = sizeof(strSrc);
-    size_t bufLen = sizeof(buf);
-    size_t dstLen = sizeof(strDst);
+    char strSrc[] = "hello world!";
+    char buf[1024] = { 0 };
+    char strDst[1024] = { 0 };
+    uLong srcLen = sizeof(strSrc);
+    uLong bufLen = sizeof(buf);
+    uLong dstLen = sizeof(strDst);
 
     printf("Src string: %s (len = %zu)\n", strSrc, srcLen);
 

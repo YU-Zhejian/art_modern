@@ -5,4 +5,3 @@
 #ifndef __APPLE__
 #define HAVE_LZMA_H 1 // FIXME: Investigate this under CMake!
 #endif
-#define HAVE_DRAND48 1 // FIXME: Investigate this under CMake!

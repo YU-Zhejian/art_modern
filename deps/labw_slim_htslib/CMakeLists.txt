@@ -23,6 +23,12 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/htscodecs/htscodecs")
 include_directories("${CMAKE_BINARY_DIR}/include")
 set(LABW_SLIM_HTSLIB_LINK_LIBRARIES "")
 
+if(WIN32 OR CYGWIN OR MSVC OR MSYS OR MINGW)
+else()
+    add_compile_definitions(HAVE_DRAND48)
+    # It seems that MinGW also requries -lregex.
+endif()
+
 if(BUILD_SHARED_LIBS)
     message(NOTICE "Wanting shared htslib.")
     if(NOT ${CEU_CM_HAVE_WORKING_C_HELLOWORLD_RUN_SHARED} EQUAL 0)
