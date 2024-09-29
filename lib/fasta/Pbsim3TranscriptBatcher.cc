@@ -16,11 +16,17 @@ namespace art_modern {
         std::lock_guard<std::mutex> lock(mutex_);
         std::unordered_map<std::string, double> coverage_positive;
         std::unordered_map<std::string, double> coverage_negative;
-        std::unordered_map<std::string, std::string> seq_map;
+        coverage_positive.reserve(batch_size_);
+        coverage_negative.reserve(batch_size_);
+
+        std::vector<std::string> seq_names;
+        std::vector<std::string> seqs;
+        seq_names.reserve(batch_size_);
+        seqs.reserve(batch_size_);
 
         std::string buff;
         std::vector<std::string> tokens;
-        while (seq_map.size() < batch_size_ && !istream_.eof()) {
+        while (seq_names.size() < batch_size_ && !istream_.eof()) {
             std::getline(istream_, buff);
             if (buff.empty() || buff.at(0) == '#') {
                 continue;
@@ -29,12 +35,13 @@ namespace art_modern {
             if (tokens.size() == 4) {
                 coverage_positive[tokens.at(0)] = std::stod(tokens.at(1));
                 coverage_negative[tokens.at(0)] = std::stod(tokens.at(2));
-                seq_map[tokens.at(0)] = tokens.at(3);
+                seq_names.emplace_back(tokens.at(0));
+                seqs.emplace_back(tokens.at(3));
             } else {
                 throw std::invalid_argument("Cannot parse PBSIM3 transcript " + buff);
             }
         }
-        return std::make_pair(InMemoryFastaFetch(seq_map), CoverageInfo(coverage_positive, coverage_negative));
+        return std::make_pair(InMemoryFastaFetch(seq_names, seqs), CoverageInfo(coverage_positive, coverage_negative));
     }
 } // art_modern
 } // labw

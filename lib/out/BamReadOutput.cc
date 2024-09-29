@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
+#include <utility>
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
@@ -21,8 +22,8 @@ namespace art_modern {
         int tid = CExceptionsProxy::requires_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
             USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
             CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa.query.size());
         auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
 
@@ -100,10 +101,10 @@ namespace art_modern {
             isize1 = -isize2;
         }
 
-        auto sam_record1 = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-        auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record1
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record2
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
 
         assert_correct_cigar(pwa1, cigar1, cigar1_arr);
         assert_correct_cigar(pwa2, cigar2, cigar2_arr);
@@ -125,17 +126,16 @@ namespace art_modern {
         free(cigar2_arr);
     }
     BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
-    BamReadOutput::BamReadOutput(
-        const std::string& filename, const BaseFastaFetch* fasta_fetch, const SamOptions& sam_options)
-        : sam_options_(sam_options)
+    BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options)
+        : sam_options_(std::move(sam_options))
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
 
-        sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(
-            sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME,
-            "Failed to open SAM file");
-        sam_header_ = (sam_hdr_t*)CExceptionsProxy::requires_not_null(
-            sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
+        sam_file_
+            = CExceptionsProxy::requires_not_null(sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"),
+                USED_HTSLIB_NAME, "Failed to open SAM file");
+        sam_header_
+            = CExceptionsProxy::requires_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
         CExceptionsProxy::requires_numeric(sam_hdr_add_line(sam_header_, "HD", "VN", sam_options_.HD_VN.c_str(), "SO",
                                                sam_options_.HD_SO.c_str(), NULL),
             USED_HTSLIB_NAME, "Failed to add HD header line");

@@ -44,6 +44,8 @@ void test_fasta(labw::art_modern::BaseFastaFetch* fastaFetch)
     BOOST_TEST(fastaFetch->fetch("chr1", 28, 29) == "A");
     BOOST_TEST(fastaFetch->fetch("chr1", 5, 29) == "NNNNNNNNNNATCGTTACGTACCA");
     BOOST_TEST(fastaFetch->fetch("chr1", 5, 63) == "NNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTT");
+    BOOST_TEST(fastaFetch->seq_len("chr1") == 154);
+    BOOST_TEST(fastaFetch->seq_len("chr2") == 74);
 }
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
