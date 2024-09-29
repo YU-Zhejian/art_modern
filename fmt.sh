@@ -26,7 +26,7 @@ which black &>/dev/null &&
             if [ -e "${line}" ]; then
                 {
                     echo BLACK "${line}"
-                    black --line-length 120 --target-version py38 --quiet "${line}"
+                    black --line-length 120 --target-version py39 --quiet "${line}"
                 } &
             fi
         done
@@ -41,7 +41,7 @@ which clang-format &>/dev/null &&
             if [ -e "${line}" ]; then
                 {
                     echo "CLANG-FORMAT ${line}"
-                    ./clang-formatw.sh "${line}"
+                    clang-format -i "${line}"
                 } &
             fi
         done

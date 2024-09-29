@@ -45,12 +45,7 @@ else()
 endif()
 find_package(
     Boost REQUIRED
-    COMPONENTS filesystem
-               regex
-               program_options
-               thread
-               log_setup
-               log
+    COMPONENTS filesystem regex program_options thread log_setup log
     # signals2 is header-only lockfree is header-only
     OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -112,7 +107,7 @@ if(Boost_stacktrace_backtrace_FOUND)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_backtrace)
 elseif(Boost_stacktrace_windbg_FOUND)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_windbg)
-elseif (Boost_stacktrace_basic_FOUND)
+elseif(Boost_stacktrace_basic_FOUND)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_basic)
 endif()
 

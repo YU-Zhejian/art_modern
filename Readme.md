@@ -50,8 +50,10 @@ The project binary will be available at `build_release/art_modern`.
   - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/);
   - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/);
   - **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/);
+  - **REQUIRED** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html);
   - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers;
   - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program.
+  - **OPTIONAL** `stacktrace_backtrace`: See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details.
 - A working [HTSLib](https://www.htslib.org/).
   - To use bundled HTSLib sources, you need to have:
     - **REQUIRED** [zlib](https://www.zlib.net/);

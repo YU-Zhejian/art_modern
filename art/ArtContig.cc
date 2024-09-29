@@ -59,7 +59,7 @@ namespace art_modern {
         auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? ref_len_ - art_params_.read_len
             : static_cast<hts_pos_t>(
-                floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
+                  floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
         auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? ref_len_ - art_params_.read_len
             : ref_len_ - (pos_1 + 2 * art_params_.read_len - fragment_len);
