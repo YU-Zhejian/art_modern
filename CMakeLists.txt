@@ -52,7 +52,7 @@ find_package(
                log_setup
                log
     # signals2 is header-only lockfree is header-only
-    OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_backtrace stacktrace_windbg)
+    OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories(${env.INCLUDE})
 
@@ -110,9 +110,10 @@ if(Boost_timer_FOUND)
 endif()
 if(Boost_stacktrace_backtrace_FOUND)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_backtrace)
-endif()
-if(Boost_stacktrace_windbg_FOUND)
+elseif(Boost_stacktrace_windbg_FOUND)
     set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_windbg)
+elseif (Boost_stacktrace_basic_FOUND)
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_basic)
 endif()
 
 file(GLOB ART_SOURCE "art/*.cpp" "art/*.cc")
