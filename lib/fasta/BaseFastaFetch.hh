@@ -17,16 +17,28 @@ namespace art_modern {
         BaseFastaFetch& operator=(const BaseFastaFetch&) = delete;
         BaseFastaFetch& operator=(BaseFastaFetch&&) = delete;
 
-        explicit BaseFastaFetch(std::unordered_map<std::string, hts_pos_t> seq_lengths);
+        explicit BaseFastaFetch(const std::unordered_map<std::string, hts_pos_t>& seq_names_lengths);
+        explicit BaseFastaFetch(const std::tuple<std::vector<std::string>, std::vector<hts_pos_t>>& seq_names_lengths);
+        BaseFastaFetch(std::vector<std::string> seq_names, std::vector<hts_pos_t> seq_lengths);
+
         /**
          * This method is thread-safe since mutex is used for non-thread-safe implementations.
          *
-         * @param seq_name Contig name.
+         * @param seq_id Contig name.
          * @param start 0-based inclusive start point.
          * @param end 0-based exclusive end point.
          * @return Fetched sequence.
          */
-        virtual std::string fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end) = 0;
+        virtual std::string fetch(std::size_t seq_id, hts_pos_t start, hts_pos_t end) = 0;
+
+        /**
+         * This method is thread-safe since mutex is used for non-thread-safe implementations.
+         * Fetch the entire contig.
+         *
+         * @param seq_id Contig name.
+         * @return Fetched sequence.
+         */
+        virtual std::string fetch(std::size_t seq_id);
 
         /**
          * Default destructor.
@@ -36,11 +48,18 @@ namespace art_modern {
         void update_sam_header(sam_hdr_t* header) const;
 
         /**
-         * Get length of desired sequence.
-         * @param seq_name As described.
+         * Get the length of the desired sequence.
+         * @param seq_id As described.
          * @return As described.
          */
-        hts_pos_t seq_len(const std::string& seq_name) const;
+        hts_pos_t seq_len(std::size_t seq_id) const;
+
+        /**
+         * Get the name of the desired sequence.
+         * @param seq_id As described.
+         * @return As described.
+         */
+        std::string seq_name(std::size_t seq_id) const;
 
         /**
          * Get number of sequences inside.
@@ -48,10 +67,12 @@ namespace art_modern {
          * @return As described.
          */
         size_t num_seqs() const;
-        const std::vector<std::string>& seq_names() const;
 
-        const std::unordered_map<std::string, hts_pos_t> seq_lengths_;
+        bool empty() const;
+
+    protected:
         const std::vector<std::string> seq_names_;
+        const std::vector<hts_pos_t> seq_lengths_;
     };
 }
 }

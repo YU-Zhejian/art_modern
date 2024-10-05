@@ -13,7 +13,7 @@ namespace art_modern {
         ArtRead read_1(art_params_, rprob_);
         auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 0
-            : static_cast<hts_pos_t>(floor(rprob_.r_prob() * valid_region_));
+            : static_cast<hts_pos_t>(floor(rprob_.r_prob() * static_cast<double>(valid_region_)));
         auto slen_1 = read_1.generate_indels(true);
         // ensure get a fixed read length
         if (pos_1 + art_params_.read_len - slen_1 > ref_len_) {
@@ -23,12 +23,12 @@ namespace art_modern {
         if (read_1.is_plus_strand) {
             //    |----------->
             // ------------------------------------
-            read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
+            read_1.seq_ref = normalize(fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1));
         } else {
             // ------------------------------------
             //                   <-----------|
             read_1.seq_ref = revcomp(normalize(fasta_fetch_->fetch(
-                id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
+                seq_id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
         }
         read_1.bpos = pos_1;
         read_1.ref2read();
@@ -58,8 +58,8 @@ namespace art_modern {
 
         auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? ref_len_ - art_params_.read_len
-            : static_cast<hts_pos_t>(
-                  floor((ref_len_ - fragment_len) * rprob_.r_prob()) + fragment_len - art_params_.read_len);
+            : static_cast<hts_pos_t>(floor(static_cast<double>(ref_len_ - fragment_len) * rprob_.r_prob()))
+                + fragment_len - art_params_.read_len;
         auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? ref_len_ - art_params_.read_len
             : ref_len_ - (pos_1 + 2 * art_params_.read_len - fragment_len);
@@ -80,20 +80,20 @@ namespace art_modern {
             //   ------------------------------------
             // R2   <-----------|
             read_1.is_plus_strand = true;
-            read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
+            read_1.seq_ref = normalize(fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1));
 
             read_2.is_plus_strand = false;
             read_2.seq_ref = revcomp(normalize(fasta_fetch_->fetch(
-                id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
+                seq_id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
         } else {
             // R2   <-----------|
             //   ------------------------------------
             // R1                  |----------->
             read_1.is_plus_strand = false;
             read_1.seq_ref = revcomp(normalize(fasta_fetch_->fetch(
-                id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
+                seq_id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
             read_2.is_plus_strand = true;
-            read_2.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_2, pos_2 + art_params_.read_len - slen_2));
+            read_2.seq_ref = normalize(fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len - slen_2));
         }
         read_1.bpos = pos_1;
         read_1.ref2read();
@@ -124,7 +124,7 @@ namespace art_modern {
         }
         auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 0
-            : static_cast<hts_pos_t>(floor((ref_len_ - fragment_len) * rprob_.r_prob()));
+            : static_cast<hts_pos_t>(floor(static_cast<double>(ref_len_ - fragment_len) * rprob_.r_prob()));
         auto pos_2 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE ? 0 : ref_len_ - pos_1 - fragment_len;
         int slen_1 = read_1.generate_indels(true);
         int slen_2 = read_2.generate_indels(false);
@@ -142,19 +142,19 @@ namespace art_modern {
             // ------------------------------------
             //                   <-----------|
             read_1.is_plus_strand = true;
-            read_1.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_1, pos_1 + art_params_.read_len - slen_1));
+            read_1.seq_ref = normalize(fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1));
             read_2.is_plus_strand = false;
             read_2.seq_ref = revcomp(normalize(fasta_fetch_->fetch(
-                id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
+                seq_id_, valid_region_ - pos_2, valid_region_ - pos_2 + art_params_.read_len - slen_2)));
         } else {
             //                   <-----------|
             // ------------------------------------
             //    |----------->
             read_1.is_plus_strand = false;
             read_1.seq_ref = revcomp(normalize(fasta_fetch_->fetch(
-                id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
+                seq_id_, valid_region_ - pos_1, valid_region_ - pos_1 + art_params_.read_len - slen_1)));
             read_2.is_plus_strand = true;
-            read_2.seq_ref = normalize(fasta_fetch_->fetch(id_, pos_2, pos_2 + art_params_.read_len - slen_2));
+            read_2.seq_ref = normalize(fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len - slen_2));
         }
         read_1.bpos = pos_1;
         read_1.ref2read();
@@ -163,13 +163,14 @@ namespace art_modern {
         return { std::move(read_1), std::move(read_2) };
     }
 
-    ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, std::string id, const ArtParams& art_params, Rprob& rprob)
+    ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob)
         : fasta_fetch_(fasta_fetch)
         , art_params_(art_params)
         , rprob_(rprob)
-        , id_(std::move(id))
-        , valid_region_(fasta_fetch_->seq_len(id_) - art_params.read_len)
-        , ref_len_(fasta_fetch_->seq_len(id_))
+        , seq_id_(seq_id)
+        , id_(fasta_fetch->seq_name(seq_id_))
+        , valid_region_(fasta_fetch_->seq_len(seq_id_) - art_params.read_len)
+        , ref_len_(fasta_fetch_->seq_len(seq_id_))
     {
     }
 

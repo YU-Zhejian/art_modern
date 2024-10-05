@@ -4,11 +4,7 @@
 #include <sstream>
 #include <utility>
 
-#include <cerrno>
-#include <cstring>
-
 #include "CExceptionsProxy.hh"
-#include "ExceptionUtils.hh"
 
 namespace labw {
 namespace art_modern {
@@ -27,41 +23,6 @@ namespace art_modern {
         : c_lib_name_(std::move(c_lib_name))
         , details_(std::move(details))
     {
-    }
-    int CExceptionsProxy::requires_numeric(int c_value, std::string c_lib_name, const std::string& details,
-        bool explain_using_strerror, EXPECTATION expectation)
-    {
-        if ((expectation == EXPECTATION::ZERO && c_value != 0) || (expectation == EXPECTATION::POSITIVE && c_value <= 0)
-            || (expectation == EXPECTATION::NON_NEGATIVE && c_value < 0)) {
-            std::ostringstream oss;
-            if (details != UNKNOWN_C_EXCEPTION) {
-                oss << details;
-            }
-            if (explain_using_strerror) {
-                oss << strerror(errno);
-            }
-            oss << " returned " << c_value;
-            throw_with_trace(CExceptionsProxy(std::move(c_lib_name), oss.str()));
-        }
-        return c_value;
-    }
-
-    void* CExceptionsProxy::requires_not_null(void* c_value, // NOSONAR cpp:S5008
-        std::string c_lib_name, const std::string& details, bool explain_using_strerror)
-    {
-        if (c_value == nullptr) {
-            std::ostringstream oss;
-            if (details != UNKNOWN_C_EXCEPTION) {
-                oss << details;
-            }
-            if (explain_using_strerror) {
-                oss << strerror(errno);
-            }
-            oss << " returned null";
-
-            throw_with_trace(CExceptionsProxy(std::move(c_lib_name), oss.str()));
-        }
-        return c_value;
     }
 
 } // art_modern

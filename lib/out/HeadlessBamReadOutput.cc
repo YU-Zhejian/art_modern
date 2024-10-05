@@ -14,11 +14,11 @@ namespace art_modern {
         , bam_utils_(sam_options)
     {
         std::unique_lock<std::mutex> rhs_lk(mutex_);
-        sam_file_ = (samFile*)CExceptionsProxy::requires_not_null(
-            sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME,
-            "Failed to open SAM file");
-        sam_header_ = (sam_hdr_t*)CExceptionsProxy::requires_not_null(
-            sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
+        sam_file_
+            = CExceptionsProxy::requires_not_null(sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"),
+                USED_HTSLIB_NAME, "Failed to open SAM file");
+        sam_header_
+            = CExceptionsProxy::requires_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
         CExceptionsProxy::requires_numeric(sam_hdr_add_line(sam_header_, "HD", "VN", sam_options_.HD_VN.c_str(), "SO",
                                                sam_options_.HD_SO.c_str(), NULL),
             USED_HTSLIB_NAME, "Failed to add HD header line");
@@ -35,8 +35,8 @@ namespace art_modern {
         if (is_closed_) {
             return;
         }
-        auto sam_record = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa.query.size());
         auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
         auto qual = pwa.qual;
@@ -67,10 +67,10 @@ namespace art_modern {
         if (is_closed_) {
             return;
         }
-        auto sam_record1 = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-        auto sam_record2 = (bam1_t*)CExceptionsProxy::requires_not_null(
-            bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record1
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+        auto sam_record2
+            = CExceptionsProxy::requires_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
         auto rlen = static_cast<long>(pwa1.query.size());
         auto seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
         auto seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);

@@ -20,12 +20,12 @@ const char SIMULATION_MODE_WGS[] = "wgs";
 const char SIMULATION_MODE_TRANS[] = "trans";
 const char SIMULATION_MODE_TEMPLATE[] = "template";
 
-enum class INPUT_FILE_TYPE { FASTA, PBSIM3_TEMPLATE, AUTO };
+enum class INPUT_FILE_TYPE { FASTA, PBSIM3_TEMPLATE };
 const char INPUT_FILE_TYPE_FASTA[] = "fasta";
 const char INPUT_FILE_TYPE_PBSIM3_TEMPLATE[] = "pbsim3_template";
 const char INPUT_FILE_TYPE_AUTO[] = "auto";
 
-enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM, AUTO };
+enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM };
 const char INPUT_FILE_PARSER_MEMORY[] = "memory";
 const char INPUT_FILE_PARSER_HTSLIB[] = "htslib";
 const char INPUT_FILE_PARSER_STREAM[] = "stream";

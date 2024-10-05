@@ -30,6 +30,9 @@ namespace art_modern {
          */
         std::string PG_VN = "1.0"; // "ART-" ART_VERSION "-ART_MODERN-" ART_MODERN_VERSION;
 
+        /**
+         * Use `M` instead of `X` or `=` for matching.
+         */
         bool use_m = false;
 
         /**

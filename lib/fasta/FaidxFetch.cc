@@ -6,37 +6,38 @@
 namespace labw {
 namespace art_modern {
 
-    std::string FaidxFetch::fetch(const std::string& seq_name, const hts_pos_t start, const hts_pos_t end)
-    {
-        auto cfetch_str = cfetch_(seq_name.c_str(), start, end);
-        auto rets = std::string(cfetch_str);
-        free(cfetch_str);
-        return rets;
-    }
-
     char* FaidxFetch::cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end)
     {
         std::lock_guard<std::mutex> lock(mutex_);
         auto reg = boost::format("%s:%d-%d") % seq_name % (start + 1) % end;
-        auto pos = (hts_pos_t*)malloc(sizeof(hts_pos_t));
-        auto rets = fai_fetch64(faidx_, reg.str().c_str(), pos);
+        hts_pos_t pos;
+        auto rets = fai_fetch64(faidx_, reg.str().c_str(), &pos);
         if (!rets) {
             BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
             exit(EXIT_FAILURE);
         }
-        free(pos);
         return rets;
     }
     FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
 
-    std::unordered_map<std::string, hts_pos_t> get_seq_lengths(const faidx_t* faidx)
+    std::tuple<std::vector<std::string>, std::vector<hts_pos_t>> get_seq_names_lengths(const faidx_t* faidx)
     {
-        std::unordered_map<std::string, hts_pos_t> seq_lengths;
-        for (int i = 0; i < faidx_nseq(faidx); i++) {
+        std::vector<std::string> seq_names;
+        std::vector<hts_pos_t> seq_lengths;
+        auto size = faidx_nseq(faidx);
+        seq_names.reserve(size);
+        seq_lengths.reserve(size);
+
+        for (int i = 0; i < size; i++) {
             auto seq_name = faidx_iseq(faidx, i);
-            seq_lengths.emplace(std::string(seq_name), faidx_seq_len(faidx, seq_name));
+            if (!seq_name) {
+                BOOST_LOG_TRIVIAL(fatal) << "Sequence name of seq " << i << " is null!";
+                exit(EXIT_FAILURE);
+            }
+            seq_names.emplace_back(seq_name);
+            seq_lengths.emplace_back(faidx_seq_len(faidx, seq_name));
         }
-        return seq_lengths;
+        return std::tie(seq_names, seq_lengths);
     }
 
     faidx_t* get_faidx(const std::string& file_name)
@@ -62,9 +63,16 @@ namespace art_modern {
     }
 
     FaidxFetch::FaidxFetch(faidx_t* faidx)
-        : BaseFastaFetch(get_seq_lengths(faidx))
+        : BaseFastaFetch(get_seq_names_lengths(faidx))
         , faidx_(faidx)
     {
+    }
+    std::string FaidxFetch::fetch(size_t seq_id, hts_pos_t start, hts_pos_t end)
+    {
+        auto cfetch_str = cfetch_(seq_names_[seq_id].c_str(), start, end);
+        auto rets = std::string(cfetch_str);
+        std::free(cfetch_str);
+        return rets;
     }
 }
 }

@@ -11,44 +11,50 @@ namespace art_modern {
     InMemoryFastaFetch FastaStreamBatcher::fetch()
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::unordered_map<std::string, std::string> fasta_map;
+        std::vector<std::string> seq_names;
+        std::vector<std::string> seqs;
+        seq_names.reserve(batch_size_);
+        seqs.reserve(batch_size_);
+
         std::string fetch_s;
         std::string fetch_e;
-        while (fasta_map.size() < batch_size_) {
+        while (seq_names.size() < batch_size_) {
             try {
                 auto fasta_record = fasta_iterator_.next();
                 if (fetch_s.empty()) {
                     fetch_s = fasta_record.id;
                 }
                 fetch_e = fasta_record.id;
-                fasta_map.emplace(fasta_record.id, fasta_record.sequence);
+                seq_names.emplace_back(fasta_record.id);
+                seqs.emplace_back(fasta_record.sequence);
             } catch (EOFException&) {
                 break;
             }
         }
-        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size()
+        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << seq_names.size()
                                 << "） created";
-        return InMemoryFastaFetch(fasta_map);
+        return { seq_names, seqs };
     }
 
     InMemoryFastaFetch InMemoryFastaStreamBatcher::fetch()
     {
         std::lock_guard<std::mutex> lock(mutex_);
-        std::unordered_map<std::string, std::string> fasta_map;
-        std::string fetch_s;
-        std::string fetch_e;
-        while (current_index_ < stream_->num_seqs() && fasta_map.size() < batch_size_) {
-            auto seq_name = stream_->seq_names_[current_index_];
-            fasta_map.emplace(seq_name, stream_->fetch(seq_name, 0, stream_->seq_len(seq_name)));
-            if (fetch_s.empty()) {
-                fetch_s = seq_name;
-            }
-            fetch_e = seq_name;
+        std::vector<std::string> seq_names;
+        std::vector<std::string> seqs;
+        seq_names.reserve(batch_size_);
+        seqs.reserve(batch_size_);
+        while (current_index_ < stream_->num_seqs() && seq_names.size() < batch_size_) {
+            auto seq_name = stream_->seq_name(current_index_);
+            seq_names.emplace_back(seq_name);
+            seqs.emplace_back(stream_->fetch(current_index_, 0, stream_->seq_len(current_index_)));
             current_index_++;
         }
-        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << fasta_map.size()
-                                << "） created";
-        return InMemoryFastaFetch(fasta_map);
+        if (!seq_names.empty()) {
+            BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << seq_names[0] << " to " << seq_names[seq_names.size() - 1]
+                                    << " (" << seq_names.size() << "） created";
+        }
+
+        return { seq_names, seqs };
     }
 
     InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(std::size_t batch_size, BaseFastaFetch* stream)

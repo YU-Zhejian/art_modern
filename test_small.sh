@@ -3,12 +3,18 @@ set -uex
 # TODO: Ensure we're at the correct directory
 
 . test_small.sh.d/base.sh
-# . test_small.sh.d/wgs.sh
+. test_small.sh.d/wgs.sh
 . test_small.sh.d/trans_constcov.sh
-# . test_small.sh.d/tmpl_constcov.sh
+. test_small.sh.d/tmpl_constcov.sh
 
 # Trans mode with strandless coverage
 
 # Trans mode with stranded coverage
 
 # Trans mode with pbsim3-formatted coverage
+
+# Template mode with strandless coverage
+
+# Template mode with stranded coverage
+
+# Template mode with pbsim3-formatted coverage

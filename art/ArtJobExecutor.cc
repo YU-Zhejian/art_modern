@@ -115,10 +115,11 @@ namespace art_modern {
             return;
         }
         BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id;
-        for (const auto& contig_name : job_.fasta_fetch->seq_names()) {
+        for (size_t seq_id = 0; seq_id < job_.fasta_fetch->num_seqs(); ++seq_id) {
+            const std::string contig_name = job_.fasta_fetch->seq_name(seq_id);
             BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name;
 
-            ArtContig art_contig(job_.fasta_fetch, contig_name, art_params_, rprob_);
+            ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
 
             BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
                                      << ": ArtContig created";

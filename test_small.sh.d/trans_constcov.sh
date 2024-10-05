@@ -20,4 +20,3 @@ for lc in se pe mp; do
     sam2bam tmp/test_small_"${lc}"_trans_"${parser}" raw_data/ce11.mRNA_head.fa
 done
 # No need to test stream FASTA parser
-exit

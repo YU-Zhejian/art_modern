@@ -1,31 +1,25 @@
 #include <fstream>
 
 #include "InMemoryFastaFetch.hh"
+#include "MapUtils.hh"
 #include "fasta_parser.hh"
 
 namespace labw {
 namespace art_modern {
 
-    std::unordered_map<std::string, hts_pos_t> get_seq_lengths(
-        const std::unordered_map<std::string, std::string>& seq_map)
+    std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
     {
-        std::unordered_map<std::string, hts_pos_t> seq_lengths;
-
-        for (auto const& pair : seq_map) {
-            seq_lengths.emplace(pair.first, pair.second.size());
+        std::vector<hts_pos_t> retv;
+        retv.reserve(seq.size());
+        for (auto const& s : seq) {
+            retv.emplace_back(s.size());
         }
-        return seq_lengths;
+        return retv;
     }
 
-    InMemoryFastaFetch::InMemoryFastaFetch(std::unordered_map<std::string, std::string> seq_map)
-        : BaseFastaFetch(get_seq_lengths(seq_map))
-        , seq_map_(std::move(seq_map))
+    InMemoryFastaFetch::InMemoryFastaFetch(const std::unordered_map<std::string, std::string>& seq_map)
+        : InMemoryFastaFetch(convert_map_to_k_v_list(seq_map))
     {
-    }
-
-    std::string InMemoryFastaFetch::fetch(const std::string& seq_name, hts_pos_t start, hts_pos_t end)
-    {
-        return seq_map_.at(seq_name).substr(start, end - start);
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch()
@@ -57,6 +51,24 @@ namespace art_modern {
         : InMemoryFastaFetch(std::unordered_map<std::string, std::string> { { contig_name, seq } })
     {
     }
+    std::string InMemoryFastaFetch::fetch(size_t seq_id, hts_pos_t start, hts_pos_t end)
+    {
+        return seqs_[seq_id].substr(start, end - start);
+    }
+
+    InMemoryFastaFetch::InMemoryFastaFetch(
+        const std::vector<std::string>& seq_name, const std::vector<std::string>& seq)
+        : BaseFastaFetch(seq_name, get_seq_lengths(seq))
+        , seqs_(seq)
+    {
+    }
+    InMemoryFastaFetch::InMemoryFastaFetch(
+        const std::tuple<std::vector<std::string>, std::vector<std::string>>& seq_map)
+        : BaseFastaFetch(std::get<0>(seq_map), get_seq_lengths(std::get<1>(seq_map)))
+        , seqs_(std::get<1>(seq_map))
+    {
+    }
+    std::string InMemoryFastaFetch::fetch(size_t seq_id) { return seqs_[seq_id]; }
 
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;
 }
