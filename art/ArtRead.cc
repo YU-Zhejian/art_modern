@@ -162,7 +162,7 @@ namespace art_modern {
     {
         auto num_n = std::count(seq_read.begin(), seq_read.end(), 'N');
 
-        if (num_n > 0) {
+        if (num_n > 0) { // TODO: Add params back.
             throw TooMuchNException();
         }
     }

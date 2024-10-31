@@ -58,6 +58,9 @@ namespace art_modern {
                                                rlen, seq.c_str(), qual.c_str(), tag_len),
             USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         bam_aux_update_str(sam_record, "OA", static_cast<int>(oa_tag.length()), oa_tag.c_str());
+
+        fill_md_nm_tag(sam_record, pwa);
+
         CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     }
@@ -114,6 +117,9 @@ namespace art_modern {
                 rlen, seq2.c_str(), qual2.c_str(), tag_len2),
             USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         bam_aux_update_str(sam_record2, "OA", static_cast<int>(oa_tag2.length()), oa_tag2.c_str());
+
+        fill_md_nm_tag(sam_record1, pwa1);
+        fill_md_nm_tag(sam_record2, pwa2);
 
         CExceptionsProxy::requires_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);

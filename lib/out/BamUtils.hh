@@ -9,6 +9,7 @@ namespace art_modern {
 
     void assert_correct_cigar(
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const uint32_t* cigar_c_arr);
+    void fill_md_nm_tag(bam1_t* b, const PairwiseAlignment& pwa);
 
     class BamUtils {
     public:

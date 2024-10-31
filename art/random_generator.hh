@@ -21,7 +21,7 @@ namespace art_modern {
 
     class Rprob {
     public:
-        Rprob(const float pe_frag_dist_mean, const float pe_frag_dist_std_dev, const int read_length);
+        Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev, int read_length);
         double r_prob();
         int insertion_length();
         char rand_base();
