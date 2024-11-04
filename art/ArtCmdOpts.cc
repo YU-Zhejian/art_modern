@@ -376,10 +376,10 @@ namespace art_modern {
         auto seq_file_fai_path = std::string(fai_path(fasta_path));
         if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
             BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
-            CExceptionsProxy::requires_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
+            CExceptionsProxy::assert_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
         } else {
             BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
-            CExceptionsProxy::requires_not_null(
+            CExceptionsProxy::assert_not_null(
                 fai_load_format(fasta_path, FAI_FASTA), USED_HTSLIB_NAME, "Failed to load FAI");
         }
     }

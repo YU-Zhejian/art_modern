@@ -7,7 +7,7 @@
 
 namespace labw {
 namespace art_modern {
-#if defined(USE_STD_RANDOM)
+#if defined(USE_STL_RANDOM)
     Rprob::~Rprob() = default;
     Rprob::Rprob(const float pe_frag_dist_mean, const float pe_frag_dist_std_dev, const int read_length)
         : gen_()
@@ -132,9 +132,10 @@ namespace art_modern {
 
 #elif defined(USE_GSL_RANDOM)
 
-    Rprob::Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev)
+    Rprob::Rprob(float pe_frag_dist_mean, float pe_frag_dist_std_dev, int read_length)
         : pe_frag_dist_mean_(pe_frag_dist_mean)
         , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
+        , read_length_(read_length)
     {
         gsl_rng_env_setup();
 
@@ -152,7 +153,7 @@ namespace art_modern {
 
     char Rprob::rand_base()
     {
-        switch (static_cast<int>(r_prob() * 4)) {
+        switch (static_cast<int>(gsl_rng_uniform_int(r, 4))) {
         case 0:
             return 'A';
         case 1:
@@ -164,9 +165,13 @@ namespace art_modern {
         }
     }
 
-    int Rprob::rand_quality() { return static_cast<int>(r_prob() * MAX_DIST_NUMBER + 1.0); }
+    int Rprob::rand_quality() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER) + 1); }
 
-    int Rprob::rand_quality_less_than_10() { return static_cast<int>(r_prob() * 10 + 1.0); }
+    int Rprob::rand_quality_less_than_10() { return static_cast<int>(gsl_rng_uniform_int(r, 9) + 1); }
+
+    int Rprob::rand_pos_on_read() { return gsl_rng_uniform_int(r, read_length_); }
+
+    int Rprob::rand_pos_on_read_not_head_and_tail() { return gsl_rng_uniform_int(r, read_length_ - 2) + 1; }
 
 #endif
 }

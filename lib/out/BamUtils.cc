@@ -108,13 +108,13 @@ namespace art_modern {
         md_str_ss << matched;
 
         // update NM
-        CExceptionsProxy::requires_numeric(bam_aux_append(b, "NM", 'i', 4, (uint8_t*)&nm), USED_HTSLIB_NAME,
+        CExceptionsProxy::assert_numeric(bam_aux_append(b, "NM", 'i', 4, (uint8_t*)&nm), USED_HTSLIB_NAME,
             "Failed to add NM tag", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
         // update MD
         const auto md_str = md_str_ss.str();
         const auto md_cstr = md_str.c_str();
-        CExceptionsProxy::requires_numeric(
+        CExceptionsProxy::assert_numeric(
             bam_aux_append(b, "MD", 'Z', static_cast<int>(md_str.size() + 1), (uint8_t*)md_cstr), USED_HTSLIB_NAME,
             "Failed to add NM tag", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     }

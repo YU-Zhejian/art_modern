@@ -19,6 +19,46 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
+set(USE_RANDOM_GENERATOR GSL) # TODO
+
+if(NOT DEFINED USE_RANDOM_GENERATOR)
+    set(USE_RANDOM_GENERATOR STL)
+endif()
+
+unset(USE_STL_RANDOM)
+unset(USE_GSL_RANDOM)
+unset(USE_BOOST_RANDOM)
+unset(USE_ONEMKL_RANDOM)
+
+unset(WITH_MPI)
+find_package(MPI REQUIRED)
+include_directories(${MPI_C_HEADER_DIR})
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MPI::MPI_C)
+set(WITH_MPI ON)
+
+if("${USE_RANDOM_GENERATOR}" STREQUAL "STL")
+    set(USE_STL_RANDOM ON)
+elseif("${USE_RANDOM_GENERATOR}" STREQUAL "GSL")
+    set(USE_GSL_RANDOM ON)
+    find_package(GSL REQUIRED)
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} GSL::gsl)
+    include_directories(${GSL_INCLUDE_DIRS})
+elseif("${USE_RANDOM_GENERATOR}" STREQUAL "BOOST")
+    set(USE_BOOST_RANDOM ON)
+elseif("${USE_RANDOM_GENERATOR}" STREQUAL "ONEMKL")
+    set(USE_ONEMKL_RANDOM ON)
+    find_package(MKL) # TODO: Link
+    find_package(IntelSYCL) # TODO: Link
+    include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR})
+else()
+    message(
+        FATAL_ERROR
+            "Variable USE_RANDOM_GENERATOR should be set to one of STL, GSL, BOOST or ONEMKL. Current: ${USE_RANDOM_GENERATOR}"
+    )
+endif()
+
+add_compile_definitions(PARALLEL_ASIO)
+
 # Installation
 include(GNUInstallDirs)
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
@@ -28,59 +68,10 @@ set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collection
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
-if(Boost_stacktrace_backtrace_FOUND)
-    add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
 
-# Boost
-if(BUILD_SHARED_LIBS)
-    add_definitions(-DBOOST_ALL_DYN_LINK)
-    add_definitions(-DBOOST_LOG_DYN_LINK)
-    add_definitions(-DBOOST_TEST_DYN_LINK)
-    add_definitions(-DBOOST_STACKTRACE_DYN_LINK)
-    add_definitions(-DBOOST_STACKTRACE_LINK)
-else()
-    set(Boost_USE_STATIC_LIBS ON)
-    # set(Boost_USE_STATIC_RUNTIME ON)
-endif()
-find_package(
-    Boost REQUIRED
-    COMPONENTS filesystem regex program_options thread log_setup log
-    # signals2 is header-only lockfree is header-only
-    OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
-include_directories(${Boost_INCLUDE_DIRS})
-include_directories(${env.INCLUDE})
-
-# HTSLib
-if(DEFINED USE_HTSLIB)
-
-    if(BUILD_SHARED_LIBS)
-        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG hts PKGCONFIG_NAME htslib)
-    else()
-        ceu_cm_enhanced_find_library(
-            OUTPUT_VARIABLE
-            CMAKE_CM_LIBHTS_LIBRARY
-            STATIC
-            LINKER_FLAG
-            hts
-            PKGCONFIG_NAME
-            htslib)
-    endif()
-
-    if(NOT CMAKE_CM_LIBHTS_LIBRARY)
-        message(FATAL_ERROR "htslib not found!")
-    endif()
-
-    set(USED_HTSLIB_NAME "${CMAKE_CM_LIBHTS_LIBRARY}")
-else()
-    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
-    include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/labw_slim_htslib")
-    set(USED_HTSLIB_NAME labw_slim_htslib)
-endif()
-add_compile_definitions(USE_STD_RANDOM)
-add_compile_definitions(PARALLEL_ASIO)
-
-# find_package(MKL) # TODO find_package(IntelSYCL) # TODO include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR}) # TODO
+message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 
 # Main
 configure_file("${CMAKE_CURRENT_LIST_DIR}/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
@@ -88,40 +79,22 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/lib/art_modern_config.h.in" "${CMAKE_B
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")
 include_directories("${CMAKE_BINARY_DIR}/include/")
+include_directories(${env.INCLUDE})
+
 file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc" "lib/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE} lib/art_modern_constants.hh)
-
-set(ART_MODERN_LINK_LIBS
-    Boost::filesystem
-    Boost::regex
-    Boost::program_options
-    Boost::thread
-    Boost::log_setup
-    Boost::log
-    "${USED_HTSLIB_NAME}")
-if(Boost_timer_FOUND)
-    add_compile_definitions("WITH_BOOST_TIMER")
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::timer)
-endif()
-if(Boost_stacktrace_backtrace_FOUND)
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_backtrace)
-elseif(Boost_stacktrace_windbg_FOUND)
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_windbg)
-elseif(Boost_stacktrace_basic_FOUND)
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::stacktrace_basic)
-endif()
 
 file(GLOB ART_SOURCE "art/*.cpp" "art/*.cc")
 add_executable(art_modern ${ART_SOURCE})
 
 target_link_libraries(art_modern_lib PUBLIC ${ART_MODERN_LINK_LIBS})
-
 target_link_libraries(art_modern PUBLIC art_modern_lib)
 
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(art_modern_lib)
     ceu_cm_set_static_target(art_modern)
 endif()
+
 if(NOT CEU_CM_SHOULD_ENABLE_TEST)
     message(NOTICE "Testing disabled since CEU_CM_SHOULD_ENABLE_TEST was set to FASE")
 elseif(Boost_unit_test_framework_FOUND)

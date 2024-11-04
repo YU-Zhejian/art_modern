@@ -33,19 +33,19 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 void test_fasta(labw::art_modern::BaseFastaFetch* fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
-    BOOST_TEST(fastaFetch->fetch("chr3", 2, 15) == "TANNTGNATNATG");
-    BOOST_TEST(fastaFetch->fetch("chr3", 2, 16) == "TANNTGNATNATGN");
-    BOOST_TEST(fastaFetch->fetch("chr2", 0, fastaFetch->seq_len("chr2"))
+    BOOST_TEST(fastaFetch->fetch(2, 2, 15) == "TANNTGNATNATG");
+    BOOST_TEST(fastaFetch->fetch(2, 2, 16) == "TANNTGNATNATGN");
+    BOOST_TEST(fastaFetch->fetch(1, 0, fastaFetch->seq_len(1))
         == "NNNNNNNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTTCTNNNNNNNNN");
-    BOOST_TEST(fastaFetch->fetch("chr6", 0, fastaFetch->seq_len("chr6")) == "CTA");
-    BOOST_TEST(fastaFetch->fetch("chr4", 0, fastaFetch->seq_len("chr4")) == "AAAAAAAAAACCCCCC");
-    BOOST_TEST(fastaFetch->fetch("chr1", 0, 1) == "N");
-    BOOST_TEST(fastaFetch->fetch("chr1", 26, 29) == "CCA");
-    BOOST_TEST(fastaFetch->fetch("chr1", 28, 29) == "A");
-    BOOST_TEST(fastaFetch->fetch("chr1", 5, 29) == "NNNNNNNNNNATCGTTACGTACCA");
-    BOOST_TEST(fastaFetch->fetch("chr1", 5, 63) == "NNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTT");
-    BOOST_TEST(fastaFetch->seq_len("chr1") == 154);
-    BOOST_TEST(fastaFetch->seq_len("chr2") == 74);
+    BOOST_TEST(fastaFetch->fetch(4, 0, fastaFetch->seq_len(4)) == "CTA");
+    BOOST_TEST(fastaFetch->fetch(3, 0, fastaFetch->seq_len(3)) == "AAAAAAAAAACCCCCC");
+    BOOST_TEST(fastaFetch->fetch(0, 0, 1) == "N");
+    BOOST_TEST(fastaFetch->fetch(0, 26, 29) == "CCA");
+    BOOST_TEST(fastaFetch->fetch(0, 28, 29) == "A");
+    BOOST_TEST(fastaFetch->fetch(0, 5, 29) == "NNNNNNNNNNATCGTTACGTACCA");
+    BOOST_TEST(fastaFetch->fetch(0, 5, 63) == "NNNNNNNNNNATCGTTACGTACCATATACTATATCTTAGTCTAGTCTAACGTCTTTTT");
+    BOOST_TEST(fastaFetch->seq_len(0) == 154);
+    BOOST_TEST(fastaFetch->seq_len(1) == 74);
 }
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)

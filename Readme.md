@@ -61,6 +61,9 @@ The project binary will be available at `build_release/art_modern`.
     - **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate);
     - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details.
   - To use external HTSLib, consult your system administrator.
+- Optional libraries for random generators. Including:
+  - [Intel OneAPI Math Kernel Library (MKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+  - [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
 
 ### CMake Variables
 
@@ -73,20 +76,20 @@ cmake -DBUILD_SHARED_LIBS=ON
 sets `BUILD_SHARED_LIBS` to `ON`.
 
 - `BUILD_SHARED_LIBS`: Whether to build shared libraries
-  - `ON` (DEFAULT): Will search for shared libraries and use dynamic linking.
+  - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
   - `OFF`: Will search for static libraries and use static linking.
 - `USE_HTSLIB`: Use which HTSLib implementation
-  - unset (DEFAULT): Will use bundled HTSLib.
-  - `hts`: Will use the HTSLib found in system.
+  - **unset (DEFAULT): Will use bundled HTSLib.**
+  - `hts`: Will use the HTSLib (`libhts.so`) found in system.
 - `CEU_CM_SHOULD_ENABLE_TEST`: Whether test should be enabled.
-  - unset (DEFAULT): Depends on `CMAKE_BUILD_TYPE`.
+  - **unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
   - `OFF`: Will disable test.
   - `ON`: Will enable test.
-- `CEU_CM_SHOULD_USE_NATIVE`: Whether to build the binaries using `-mtune=native`, if possible. This would result in faster executable but impaired portability.
-  - `OFF` (DEFAULT): Will not build native executables/libraries.
-  - `ON`: Will not native executables/libraries.
+- `CEU_CM_SHOULD_USE_NATIVE`: Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable but impaired portability.
+  - **`OFF` (DEFAULT): Will not build native executables/libraries.**
+  - `ON`: Will build native executables/libraries.
 - [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html): The CMake build type.
-  - `Debug` (DEFAULT): For developers with debugging needs.
+  - **`Debug` (DEFAULT): For developers with debugging needs.**
     - Optimization is turned off with debugging symbols and compiler warnings enabled.
     - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `TRUE`.
   - `Release`: Optimized executables/libraries without debug symbols.
@@ -95,6 +98,12 @@ sets `BUILD_SHARED_LIBS` to `ON`.
   - `RelWithDebInfo`: Optimized executables/libraries with debug symbols.
     - Optimization is turned on with compiler warnings disabled.
     - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `TRUE`.
+- `USE_RANDOM_GENERATOR`: The random number generator used.
+  - **`STL` (DEFAULT): Use STL random generators.**
+  - `BOOST`: Use Boost random generators.
+  - `GSL`: Use GSL random generators.
+  - `OneMKL`: Use Intel OneAPI MKL random generators.
+
 
 ## Usage
 

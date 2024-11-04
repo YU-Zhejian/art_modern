@@ -1,6 +1,6 @@
 #pragma once
-
-#if defined(USE_STD_RANDOM)
+#include "art_modern_config.h"
+#if defined(USE_STL_RANDOM)
 #include <random>
 #elif defined(USE_BOOST_RANDOM)
 #include <boost/random.hpp>
@@ -11,9 +11,8 @@
 #error "Under construction."
 #elif defined(USE_GSL_RANDOM)
 #include <gsl/gsl_rng.h>
-#error "Under construction."
 #else
-#error "Define USE_STD_RANDOM, USE_BOOST_RANDOM for random generators!"
+#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM or USE_GSL_RANDOM for random generators!"
 #endif
 
 namespace labw {
@@ -32,7 +31,7 @@ namespace art_modern {
         int rand_pos_on_read_not_head_and_tail();
 
     private:
-#if defined(USE_STD_RANDOM)
+#if defined(USE_STL_RANDOM)
         std::mt19937 gen_;
         std::uniform_real_distribution<float> dis_;
         std::normal_distribution<float> insertion_length_gaussian_;
@@ -68,6 +67,7 @@ namespace art_modern {
         gsl_rng* r;
         float pe_frag_dist_mean_;
         float pe_frag_dist_std_dev_;
+        int read_length_;
 #endif
     };
 }

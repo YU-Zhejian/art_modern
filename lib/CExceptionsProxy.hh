@@ -3,10 +3,9 @@
 #include <exception>
 #include <string>
 
-#define UNKNOWN_C_EXCEPTION "UNKNOWN"
-
 namespace labw {
 namespace art_modern {
+    const char UNKNOWN_C_EXCEPTION[] = "UNKNOWN";
 
     class CExceptionsProxy : public std::exception {
     public:
@@ -16,7 +15,7 @@ namespace art_modern {
         const char* what() const noexcept override;
 
         template <typename t>
-        static t requires_numeric(t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
+        static t assert_numeric(t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
             const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false,
             EXPECTATION expectation = EXPECTATION::ZERO)
         {
@@ -37,7 +36,7 @@ namespace art_modern {
         }
 
         template <typename t>
-        static t requires_not_null(t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
+        static t assert_not_null(t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
             const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false)
         {
             if (c_value == nullptr) {

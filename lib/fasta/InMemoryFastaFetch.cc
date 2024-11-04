@@ -17,29 +17,27 @@ namespace art_modern {
         return retv;
     }
 
-    InMemoryFastaFetch::InMemoryFastaFetch(const std::unordered_map<std::string, std::string>& seq_map)
-        : InMemoryFastaFetch(convert_map_to_k_v_list(seq_map))
-    {
-    }
-
     InMemoryFastaFetch::InMemoryFastaFetch()
         : BaseFastaFetch(std::unordered_map<std::string, hts_pos_t>()) {};
 
-    std::unordered_map<std::string, std::string> get_seq_map(const std::string& file_name)
+    std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
     {
-        std::unordered_map<std::string, std::string> seq_map;
+        std::vector<std::string> seq_names;
+        std::vector<std::string> seqs;
+
         auto file_reader = std::ifstream(file_name);
         FastaIterator fai(file_reader);
         while (true) {
             try {
                 auto fasta_record = fai.next();
-                seq_map.emplace(fasta_record.id, fasta_record.sequence);
+                seq_names.emplace_back(fasta_record.id);
+                seqs.emplace_back(fasta_record.sequence);
             } catch (EOFException&) {
                 break;
             }
         }
         file_reader.close();
-        return seq_map;
+        return std::tie(seq_names, seqs);
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
@@ -48,10 +46,10 @@ namespace art_modern {
     }
 
     InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
-        : InMemoryFastaFetch(std::unordered_map<std::string, std::string> { { contig_name, seq } })
+        : InMemoryFastaFetch(std::vector<std::string> { { contig_name } }, std::vector<std::string> { { seq } })
     {
     }
-    std::string InMemoryFastaFetch::fetch(size_t seq_id, hts_pos_t start, hts_pos_t end)
+    std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
     {
         return seqs_[seq_id].substr(start, end - start);
     }
@@ -68,7 +66,17 @@ namespace art_modern {
         , seqs_(std::get<1>(seq_map))
     {
     }
-    std::string InMemoryFastaFetch::fetch(size_t seq_id) { return seqs_[seq_id]; }
+    std::string InMemoryFastaFetch::fetch(const size_t seq_id) { return seqs_[seq_id]; }
+
+    InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
+        : InMemoryFastaFetch(other.seq_names_, other.seqs_)
+    {
+    }
+
+    InMemoryFastaFetch::InMemoryFastaFetch(const InMemoryFastaFetch& other) noexcept
+        : InMemoryFastaFetch(other.seq_names_, other.seqs_)
+    {
+    }
 
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;
 }

@@ -2,6 +2,7 @@
 #include "ArtConstants.hh"
 #include "random_generator.hh"
 #include <boost/log/trivial.hpp>
+#include <cmath>
 #include <fstream>
 #include <sstream>
 
