@@ -177,6 +177,10 @@ The bundled HTSLib library used MIT License with following reference:
 - Update the HTSLib CMake routine for setting macros like `HAVE_LIBBZ2` correct.
 - Support running under Microsoft Windows.
 - Implement an ultrasonic sequence chopper and connect `trans` or `wgs` mode to it.
+- Support MPI-based parallelization. Basic ideas:
+  - For `htslib` parser, just divide sequencing depth.
+  - For `memory` parser, skip records based on MPI rank.
+  - For `stream` parser, skip records based on MPI rank.
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 - Support MAF output format?
