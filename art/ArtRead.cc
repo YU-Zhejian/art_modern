@@ -11,8 +11,11 @@ namespace art_modern {
     {
         aln_read = seq_read;
         aln_ref = seq_ref;
-        for (const auto& it : indel) {
-            (it.second != ALN_GAP ? aln_ref : aln_read).insert(it.first, 1, ALN_GAP);
+        for (auto pos = 0; pos < art_params_.read_len; pos++) {
+            if (indel_[pos] == 0) {
+                continue;
+            }
+            (indel_[pos] != ALN_GAP ? aln_ref : aln_read).insert(indel_[pos], 1, ALN_GAP);
         }
     }
 
@@ -30,7 +33,6 @@ namespace art_modern {
                     achar = rprob_.rand_base();
                 }
                 seq_read[i] = achar;
-                substitution[i] = achar;
             }
         }
         return qual_mutated;
@@ -40,7 +42,7 @@ namespace art_modern {
     {
         int ins_len = 0;
         int del_len = 0;
-        indel.clear();
+        std::fill(indel_.begin(), indel_.end(), 0);
         auto per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
         auto per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
         // deletion
@@ -49,8 +51,8 @@ namespace art_modern {
                 del_len = i + 1;
                 for (int j = i; j >= 0;) {
                     auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
-                    if (indel.count(pos) == 0) {
-                        indel[pos] = ALN_GAP;
+                    if (indel_[pos] == 0) {
+                        indel_[pos] = ALN_GAP;
                         j--;
                     }
                 }
@@ -66,8 +68,8 @@ namespace art_modern {
                 ins_len = i + 1;
                 for (int j = i; j >= 0;) {
                     auto pos = rprob_.rand_pos_on_read();
-                    if (indel.count(pos) == 0) {
-                        indel[pos] = rprob_.rand_base();
+                    if (indel_[pos] == 0) {
+                        indel_[pos] = rprob_.rand_base();
                         j--;
                     }
                 }
@@ -81,17 +83,17 @@ namespace art_modern {
     {
         int ins_len = 0;
         int del_len = 0;
-        indel.clear();
-        auto per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
-        auto per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
+        indel_.clear();
+        auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
+        auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
         for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
             if (per_base_ins_rate[i] >= rprob_.r_prob()) {
                 ins_len = i + 1;
                 for (int j = i; j >= 0;) {
                     auto pos = rprob_.rand_pos_on_read();
-                    if (indel.count(pos) == 0) {
-                        indel[pos] = rprob_.rand_base();
+                    if (indel_[pos] == 0) {
+                        indel_[pos] = rprob_.rand_base();
                         j--;
                     }
                 }
@@ -105,8 +107,9 @@ namespace art_modern {
                 break;
             }
 
-            if ((art_params_.read_len - del_len - ins_len) < (i + 1))
+            if ((art_params_.read_len - del_len - ins_len) < (i + 1)) {
                 continue; // ensure that enough unchanged position for mutation
+            }
 
             if (per_base_del_rate[i] >= rprob_.r_prob()) {
                 del_len = i + 1;
@@ -115,8 +118,8 @@ namespace art_modern {
                     if (pos == 0) {
                         continue;
                     }
-                    if (indel.count(pos) == 0) {
-                        indel[pos] = ALN_GAP;
+                    if (indel_[pos] == 0) {
+                        indel_[pos] = ALN_GAP;
                         j--;
                     }
                 }
@@ -128,26 +131,22 @@ namespace art_modern {
 
     void ArtRead::ref2read()
     {
-        if (indel.empty()) {
-            seq_read = seq_ref;
-            return;
-        }
         int k = 0;
         for (auto i = 0; i < seq_ref.size();) {
-            if (indel.find(k) == indel.end()) {
+            if (indel_[k] == 0) {
                 seq_read.push_back(seq_ref[i]);
                 i++;
                 k++;
-            } else if (indel[k] == ALN_GAP) {
+            } else if (indel_[k] == ALN_GAP) {
                 i++;
                 k++;
             } else {
-                seq_read.push_back(indel[k]);
+                seq_read.push_back(indel_[k]);
                 k++;
             }
         }
-        while (indel.find(k) != indel.end()) {
-            seq_read.push_back(indel[k]);
+        while (indel_[k] != 0) {
+            seq_read.push_back(indel_[k]);
             k++;
         }
     }
@@ -155,6 +154,7 @@ namespace art_modern {
     ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob)
         : art_params_(art_params)
         , rprob_(rprob)
+        , indel_(art_params.read_len)
     {
     }
 

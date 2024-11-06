@@ -15,6 +15,32 @@ namespace art_modern {
         if (!emp_filename_2.empty()) {
             read_emp_dist_(emp_filename_2, false);
         }
+        if (sep_qual_) {
+            if (a_qual_dist_first.size() != g_qual_dist_first.size()
+                || g_qual_dist_first.size() != c_qual_dist_first.size()
+                || c_qual_dist_first.size() != t_qual_dist_first.size()) {
+                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
+                exit(EXIT_FAILURE);
+            }
+            if (a_qual_dist_second.size() != g_qual_dist_second.size()
+                || g_qual_dist_second.size() != c_qual_dist_second.size()
+                || c_qual_dist_second.size() != t_qual_dist_second.size()) {
+                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
+                exit(EXIT_FAILURE);
+            }
+        }
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
+        if (sep_qual_) {
+            BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first.size()
+                                    << ", C: " << c_qual_dist_first.size() << ", G: " << g_qual_dist_first.size()
+                                    << ", T: " << t_qual_dist_first.size();
+            BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: A: " << a_qual_dist_second.size()
+                                    << ", C: " << c_qual_dist_second.size() << ", G: " << g_qual_dist_second.size()
+                                    << ", T: " << t_qual_dist_second.size();
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: " << qual_dist_first.size();
+            BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second.size();
+        }
     }
 
     // generate quality vector from dist of one read from pair-end [default first
@@ -22,13 +48,11 @@ namespace art_modern {
     void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, bool first) const
     {
         qual.resize(len);
-        auto qual_dist = first ? qual_dist_first : qual_dist_second;
+        const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
         int cumCC;
-        std::map<int, int>::iterator it;
         for (int i = 0; i < len; i++) {
             cumCC = rprob.rand_quality();
-            it = qual_dist[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = qual_dist[i].lower_bound(cumCC)->second;
         }
     }
 
@@ -39,14 +63,18 @@ namespace art_modern {
 
         if (a_qual_dist_first.size() < len || t_qual_dist_first.size() < len || g_qual_dist_first.size() < len
             || c_qual_dist_first.size() < len) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the "
-                                        "length of the read quality profile";
+            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << len
+                                     << ") exceeds the length of the read quality profile (A: "
+                                     << a_qual_dist_first.size() << ", C: " << c_qual_dist_first.size()
+                                     << ", G: " << g_qual_dist_first.size() << ", T: " << t_qual_dist_first.size()
+
+                                     << ")";
             exit(EXIT_FAILURE);
         }
 
         int cumCC;
 
-        for (size_t i = 0; i < len; i++) {
+        for (auto i = 0; i < len; i++) {
             cumCC = rprob.rand_quality();
             if (seq[i] == 'A') {
                 auto it = a_qual_dist_first[i].lower_bound(cumCC);
@@ -74,8 +102,12 @@ namespace art_modern {
 
         if (a_qual_dist_second.size() < len || t_qual_dist_second.size() < len || g_qual_dist_second.size() < len
             || c_qual_dist_second.size() < len) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length exceeds the "
-                                        "length of the read quality profile";
+            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << len
+                                     << ") exceeds the "
+                                        "length of the read quality profile (A: "
+                                     << a_qual_dist_second.size() << ", C: " << c_qual_dist_second.size()
+                                     << ", G: " << g_qual_dist_second.size() << ", T: " << t_qual_dist_second.size()
+                                     << ")";
             exit(EXIT_FAILURE);
         }
         int cumCC;
@@ -128,9 +160,6 @@ namespace art_modern {
                 continue;
             }
             if (sep_qual_) {
-                if (aLine[0] == 'N' || aLine[0] == '.') {
-                    continue;
-                }
                 switch (aLine[0]) {
                 case 'A':
                     a_flag = true;
@@ -144,6 +173,8 @@ namespace art_modern {
                 case 'C':
                     c_flag = true;
                     break;
+                default:
+                    continue;
                 }
             } else {
                 if (aLine[0] != '.') {
@@ -213,21 +244,6 @@ namespace art_modern {
                     BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
                     exit(EXIT_FAILURE);
                 }
-            }
-        }
-
-        if (sep_qual_) {
-            if (a_qual_dist_first.size() != g_qual_dist_first.size()
-                || g_qual_dist_first.size() != c_qual_dist_first.size()
-                || c_qual_dist_first.size() != t_qual_dist_first.size()) {
-                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
-                exit(EXIT_FAILURE);
-            }
-            if (a_qual_dist_second.size() != g_qual_dist_second.size()
-                || g_qual_dist_second.size() != c_qual_dist_second.size()
-                || c_qual_dist_second.size() != t_qual_dist_second.size()) {
-                BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
-                exit(EXIT_FAILURE);
             }
         }
 

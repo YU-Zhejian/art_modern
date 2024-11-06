@@ -1,6 +1,7 @@
 #include "CoverageInfo.hh"
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <sstream>
 #include <utility>
 #include <vector>
 
@@ -104,5 +105,6 @@ namespace art_modern {
         , coverage_negative_(std::get<1>(coverage))
     {
     }
+
 } // art_modern
 } // labw

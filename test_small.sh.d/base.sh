@@ -1,8 +1,7 @@
 # shell=bash
 
-PARALLEL=0
-IDRATE=0.1
-FCOV=10
+export PARALLEL=0
+export IDRATE=0.1
 
 function sam2bam() {
     samtools sort -@20 "${1}".sam -o "${1}".bam

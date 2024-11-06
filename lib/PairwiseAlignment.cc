@@ -12,6 +12,7 @@ namespace art_modern {
         : _aligned_query(std::move(aligned_query))
         , _aligned_ref(std::move(aligned_ref))
     {
+        // FIXME: More specific on this exception
     }
 
     PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query,

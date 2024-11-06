@@ -20,3 +20,4 @@ dependencies:
   - go-shfmt
   - cmake_format
   - curl
+  - pyfastx

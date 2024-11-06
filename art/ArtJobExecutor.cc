@@ -27,6 +27,10 @@ namespace art_modern {
             return false;
         }
 
+        if (arp.read_1.seq_read.size() != art_params_.read_len || arp.read_2.seq_read.size() != art_params_.read_len) {
+            return false; // FIXME: No idea why this occurs.
+        }
+
         if (!art_params_.sep_flag) {
             qdist.get_read_qual(qual_1, art_params_.read_len, rprob_, true);
             qdist.get_read_qual(qual_2, art_params_.read_len, rprob_, true);
@@ -40,14 +44,6 @@ namespace art_modern {
 
         arp.read_1.generate_pairwise_aln();
         arp.read_2.generate_pairwise_aln();
-
-        if (arp.read_1.seq_read.size() != art_params_.read_len) {
-            return false; // FIXME: No idea why this occurs.
-        }
-
-        if (arp.read_2.seq_read.size() != art_params_.read_len) {
-            return false; // FIXME: No idea why this occurs.
-        }
 
         output_dispatcher_->writePE(
             PairwiseAlignment(sam_read_id, art_contig.id_, arp.read_1.seq_read, arp.read_1.seq_ref, qual_1_str,
@@ -81,6 +77,11 @@ namespace art_modern {
         } catch (TooMuchNException&) {
             return false;
         }
+
+        if (art_read.seq_read.size() != art_params_.read_len) {
+            return false; // FIXME: No idea why this occurs.
+        }
+
         if (!art_params_.sep_flag) {
             qdist.get_read_qual(qual, art_params_.read_len, rprob_, true);
         } else {
@@ -88,10 +89,6 @@ namespace art_modern {
         }
         auto qual_str = qual_to_str(art_read.generate_snv_on_qual(qual));
         art_read.generate_pairwise_aln();
-
-        if (art_read.seq_read.size() != art_params_.read_len) {
-            return false; // FIXME: No idea why this occurs.
-        }
 
         output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_contig.id_, art_read.seq_read, art_read.seq_ref,
             qual_str, art_read.aln_read, art_read.aln_ref,
@@ -103,8 +100,7 @@ namespace art_modern {
     ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
         : job_(std::move(job))
         , art_params_(art_params)
-        , rprob_(static_cast<float>(art_params_.pe_frag_dist_mean),
-              static_cast<float>(art_params_.pe_frag_dist_std_dev), art_params_.read_len)
+        , rprob_(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len)
         , output_dispatcher_(art_params_.out_dispatcher)
     {
     }
@@ -124,9 +120,9 @@ namespace art_modern {
             BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
                                      << ": ArtContig created";
             if (art_contig.ref_len_ < art_params_.read_len) {
-                // BOOST_LOG_TRIVIAL(warning)
-                //     << "Warning: the reference sequence " << contig_name << " (length " << art_contig.ref_len_
-                //     << "bps ) is skipped as it < the defined read length (" << art_params_.read_len << " bps)";
+                BOOST_LOG_TRIVIAL(debug) << "Warning: the reference sequence " << contig_name << " (length "
+                                         << art_contig.ref_len_ << "bps ) is skipped as it < the defined read length ("
+                                         << art_params_.read_len << " bps)";
                 BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name
                                          << ": SKIPPED";
                 continue;

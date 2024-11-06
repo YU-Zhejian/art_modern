@@ -91,7 +91,6 @@ namespace art_modern {
                         art_params.fasta_fetch);
                     while (true) {
                         auto fa_view = fsb.fetch();
-
                         if (fa_view.num_seqs() == 0) {
                             break;
                         }

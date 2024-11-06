@@ -1,6 +1,4 @@
 # shell=bash
-
-# WGS mode
 FCOV=2
 parser=memory
 for lc in se pe mp; do

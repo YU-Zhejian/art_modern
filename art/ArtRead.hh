@@ -52,10 +52,9 @@ namespace art_modern {
         std::vector<int> generate_snv_on_qual(const std::vector<int>& qual);
 
     private:
-        std::map<int, char> indel;
-        std::map<int, char> substitution;
         const ArtParams& art_params_;
         Rprob& rprob_;
+        std::vector<char> indel_;
     };
 
     struct ArtReadPair {

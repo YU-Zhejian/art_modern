@@ -1889,7 +1889,7 @@ typedef union {
  @abstract Structure for one alignment covering the pileup position.
  @field  b          pointer to the alignment
  @field  qpos       position of the read base at the pileup site, 0-based
- @field  indel      indel length; 0 for no indel, positive for ins and negative for del
+ @field  indel_      indel_ length; 0 for no indel_, positive for ins and negative for del
  @field  level      the level of the read in the "viewer" mode
  @field  is_del     1 iff the base on the padded read is a deletion
  @field  is_head    1 iff this is the first base in the query sequence

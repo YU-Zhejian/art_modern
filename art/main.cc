@@ -14,6 +14,19 @@ int main(int argc, char* argv[])
 {
 #ifdef WITH_MPI
     MPI_Init(&argc, &argv);
+    int mpi_comm_rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_comm_rank);
+    if (mpi_comm_rank == 0) {
+        int mpi_comm_size;
+        MPI_Comm_size(MPI_COMM_WORLD, &mpi_comm_size);
+        BOOST_LOG_TRIVIAL(info) << "MPI detected with " << mpi_comm_size
+                                << " MPI-parallelized processes running in total.";
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "MPI detected. This process have rank " << mpi_comm_rank << ".";
+        BOOST_LOG_TRIVIAL(info) << "MPI-based parallelization not implemented; terminating the process.";
+        MPI_Finalize();
+        return EXIT_SUCCESS;
+    }
 #else
     BOOST_LOG_TRIVIAL(warning) << "MPI not found! Cross-node parallelism disabled.";
 #endif

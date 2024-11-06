@@ -67,8 +67,8 @@ extern "C" {
 /*
     When reading multiple files in parallel, duplicate records within each
     file will be reordered and offered in intuitive order. For example,
-    when reading two files, each with unsorted SNP and indel record, the
-    reader should return the SNP records together and the indel records
+    when reading two files, each with unsorted SNP and indel_ record, the
+    reader should return the SNP records together and the indel_ records
     together. The logic of compatible records can vary depending on the
     application and can be set using the PAIR_* defined below.
 

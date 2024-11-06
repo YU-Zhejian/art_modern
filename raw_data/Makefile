@@ -9,7 +9,6 @@ all: \
 	ce11.mRNA_head.fa \
 	ce11.mRNA_head.fa.fai \
 
-
 ce11.mRNA.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/bigZips/refMrna.fa.gz | gunzip -cdf > ce11.mRNA.fa
 ce11.mRNA_head.fa:

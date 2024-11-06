@@ -5260,7 +5260,7 @@ int bam_plp_insertion_mod(const bam_pileup1_t *p,
     if (del_len)
         *del_len = 0;
 
-    // Measure indel length including pads
+    // Measure indel_ length including pads
     indel = 0;
     k = p->cigar_ind+1;
     cigar = bam_get_cigar(p->b);

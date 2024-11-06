@@ -557,10 +557,7 @@ namespace art_modern {
 
     po::options_description option_parser()
     {
-        OutputDispatcherFactory out_dispatcher_factory_;
-        out_dispatcher_factory_.add(new FastqReadOutputFactory());
-        out_dispatcher_factory_.add(new BamReadOutputFactory());
-        out_dispatcher_factory_.add(new HeadlessBamReadOutputFactory());
+        OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
         po::options_description general_opts("General Options");
         general_opts.add_options()(ARG_HELP, "print out usage information");
         general_opts.add_options()(ARG_VERSION, "display version info");
@@ -592,7 +589,7 @@ namespace art_modern {
             "transcriptome, or templates");
         required_opts.add_options()(ARG_FCOV, po::value<std::string>(),
             "the fold of read coverage to be simulated or number of reads/read pairs "
-            "generated for each sequence for simulating cDNA reads, or a float for "
+            "generated for each sequence for simulating cDNA reads, or a double for "
             "simulating WGS reads.");
 
         po::options_description art_opts("ART-specific options");
@@ -642,51 +639,6 @@ namespace art_modern {
         return po_desc;
     }
 
-    /*
-     *     {
-        if (stream) {
-            cout << "                  FASTA parser: Stream." << endl;
-        } else {
-            cout << "                  FASTA parser: HTSLib." << endl;
-        }
-        if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            cout << "                  Single-end Simulation" << endl;
-        } else if (art_lib_const_mode == ART_LIB_CONST_MODE::MP) {
-            cout << "                  Matepair-end sequencing simulation" << endl;
-        } else {
-            cout << "                  Paired-end sequencing simulation" << endl;
-        }
-
-        cout << "Parameters used during run" << endl;
-        cout << "\tRead Length:\t" << read_len << endl;
-
-        if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            cout << "\tMean Fragment Length:     " << pe_frag_dist_mean << endl;
-            cout << "\tStandard Deviation:       " << pe_frag_dist_std_dev << endl;
-        }
-        cout << "\tFirst Insertion Rate:     " << ins_rate_1 << endl;
-        cout << "\tSecond Insertion Rate:    " << ins_rate_2 << endl;
-        cout << "\tFirst Deletion Rate:      " << del_rate_1 << endl;
-        cout << "\tSecond Deletion Rate:     " << del_rate_2 << endl;
-
-        cout << "\tFirst quality shift:      " << q_shift_1 << endl;
-        cout << "\tSecond quality shift:     " << q_shift_2 << endl;
-
-        if (!sep_flag) {
-            cout << "\tProfile Type:             Combined" << endl;
-        } else {
-            cout << "\tProfile Type:             Separated" << endl;
-        }
-        cout << "\tID Tag:                   " << id.c_str() << endl << endl;
-
-        cout << "Quality Profile(s)" << endl;
-
-        cout << "\t" << qual_file_1.c_str() << " (user's profile)" << endl;
-        if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            cout << "\t" << qual_file_2.c_str() << " (user's profile)" << endl;
-        }
-    }
-     */
     OutputDispatcherFactory get_output_dispatcher_factory()
     {
         OutputDispatcherFactory out_dispatcher_factory;

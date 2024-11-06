@@ -13,7 +13,7 @@ namespace art_modern {
         ArtJobExecutor(ArtJobExecutor&& other) noexcept
             : job_(std::move(other.job_))
             , art_params_(other.art_params_)
-            , rprob_(other.rprob_)
+            , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
             , output_dispatcher_(other.output_dispatcher_) {};
         ArtJobExecutor(const ArtJobExecutor&) = delete;
         ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
