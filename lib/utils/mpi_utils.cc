@@ -49,5 +49,11 @@ void bye_mpi()
     std::free(buffer);
 #endif
 }
+void init_mpi(int* argc, char*** argv)
+{
+#ifdef WITH_MPI
+    MPI_Init(argc, argv);
+#endif
+}
 
 }

@@ -9,8 +9,12 @@
 namespace labw::art_modern {
 const char MPI_MESSAGE_BYE[] = "BYE\0";
 
+void init_mpi(int* argc, char*** argv);
+
 /*!
  * Call `MPI_Finalize` (if MPI is not finalized) or `std::exit` with the given status.
+ *
+ * Every process should call this method.
  *
  * @param status Exit status.
  */

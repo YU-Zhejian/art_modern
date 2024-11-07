@@ -73,10 +73,7 @@ void handle_mpi_child()
 
 int main(int argc, char* argv[])
 {
-    // Initialize MPI
-#ifdef WITH_MPI
-    MPI_Init(&argc, &argv);
-#endif
+    init_mpi(&argc, &argv);
     // 1st round initialization of a working console logger
     init_logger();
     handle_mpi_child();
@@ -100,7 +97,8 @@ int main(int argc, char* argv[])
 #else
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
-    auto art_params = parse_args(argc, argv); // FIXME: Come up a way to avoid this 2nd parsing of params.
+    // FIXME: Come up a way to avoid this 2nd parsing of params.
+    auto art_params = parse_args(argc, argv);
     generate_all(art_params);
 #ifdef WITH_BOOST_TIMER
     t.stop();
