@@ -1,7 +1,7 @@
 #include "BamUtils.hh"
 #include "CExceptionsProxy.hh"
 #include "art_modern_constants.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 #include <boost/log/trivial.hpp>
 
 namespace labw {

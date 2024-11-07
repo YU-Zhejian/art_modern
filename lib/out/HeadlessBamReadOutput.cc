@@ -1,7 +1,7 @@
 #include "HeadlessBamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "global_variables.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
 

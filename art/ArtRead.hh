@@ -7,7 +7,7 @@
 #include "Empdist.hh"
 #include "PairwiseAlignment.hh"
 #include "random_generator.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 
 namespace labw {
 namespace art_modern {

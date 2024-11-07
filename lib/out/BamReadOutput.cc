@@ -6,7 +6,7 @@
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "global_variables.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 namespace po = boost::program_options;
 
 namespace labw {

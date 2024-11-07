@@ -3,7 +3,7 @@
 #include <htslib/sam.h>
 
 #include "PairwiseAlignment.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 
 BOOST_AUTO_TEST_CASE(test_seq_utils_1)
 {

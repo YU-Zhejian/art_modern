@@ -6,24 +6,20 @@
 
 #include "CExceptionsProxy.hh"
 
-namespace labw {
-namespace art_modern {
-    const char* CExceptionsProxy::what() const noexcept
-    {
-        std::ostringstream oss;
-        oss << "Error occurred in C library '" << c_lib_name_ << "' due to '" << details_ << "'";
-        auto err_str = oss.str();
-        BOOST_LOG_TRIVIAL(fatal) << err_str;
-        BOOST_LOG_TRIVIAL(fatal) << "Stack trace:";
-        BOOST_LOG_TRIVIAL(fatal) << boost::stacktrace::stacktrace();
-        return "Error occurred in C library";
-    }
+namespace labw::art_modern {
+const char* CExceptionsProxy::what() const noexcept { return "Error occurred in C library"; }
 
-    CExceptionsProxy::CExceptionsProxy(std::string c_lib_name, std::string details)
-        : c_lib_name_(std::move(c_lib_name))
-        , details_(std::move(details))
-    {
-    }
+CExceptionsProxy::CExceptionsProxy(std::string c_lib_name, std::string details)
+    : c_lib_name_(std::move(c_lib_name))
+    , details_(std::move(details))
+{
+}
+void CExceptionsProxy::log() const
+{
+    BOOST_LOG_TRIVIAL(fatal) << "Error occurred in C library '" << c_lib_name_ << "' due to '" << details_ << "'";
+    BOOST_LOG_TRIVIAL(fatal) << "Stack trace:";
+    BOOST_LOG_TRIVIAL(fatal) << boost::stacktrace::stacktrace();
+}
 
 } // art_modern
-} // labw
+// labw

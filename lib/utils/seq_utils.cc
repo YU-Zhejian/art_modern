@@ -1,10 +1,10 @@
 #include "seq_utils.hh"
 
 #include "art_modern_constants.hh"
+#include "htslib/sam.h"
 #include <algorithm>
 #include <boost/algorithm/string/case_conv.hpp>
 #include <boost/log/trivial.hpp>
-#include <htslib/sam.h>
 #include <sstream>
 #include <unordered_map>
 #include <vector>

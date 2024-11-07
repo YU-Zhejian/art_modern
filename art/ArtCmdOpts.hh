@@ -1,22 +1,22 @@
+#pragma once
 #include <boost/program_options/options_description.hpp>
 
 #include "ArtParams.hh"
 #include "out/OutputDispatcher.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
+class ArtCmdException : public std::exception { };
+class ArtCmdNormalExit : public std::exception { };
 
-    boost::program_options::options_description option_parser();
-    OutputDispatcherFactory get_output_dispatcher_factory();
-
-    class ArtCmdOpts {
-    public:
-        ArtParams parse_args(int argc, char** argv) const;
-
-    private:
-        const boost::program_options::options_description po_desc_ = option_parser();
-        const OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
-    };
+/*!
+ * @brief Parse command line arguments and return the parsed parameters.
+ * @param argc Number of arguments.
+ * @param argv Array of arguments.
+ * @return Parsed parameters.
+ * @throws ArtCmdException if an error occurred.
+ * @throws ArtCmdNormalExit if the user requested help or version.
+ */
+ArtParams parse_args(int argc, char** argv);
 
 } // art_modern
-} // labw
+// labw

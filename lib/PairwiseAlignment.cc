@@ -1,6 +1,6 @@
 #include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
-#include "seq_utils.hh"
+#include "utils/seq_utils.hh"
 #include <utility>
 
 namespace labw {

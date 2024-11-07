@@ -12,7 +12,7 @@ set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 99)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
@@ -35,6 +35,7 @@ find_package(MPI REQUIRED)
 include_directories(${MPI_C_HEADER_DIR} ${MPI_CXX_HEADER_DIR})
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MPI::MPI_C MPI::MPI_CXX)
 set(WITH_MPI ON)
+set(WITH_PROTOBUF ON) # TODO
 
 if("${USE_RANDOM_GENERATOR}" STREQUAL "STL")
     set(USE_STL_RANDOM ON)
@@ -70,6 +71,7 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/protobuf.cmake")
 
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 

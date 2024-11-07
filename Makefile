@@ -1,7 +1,7 @@
 .PHONY: build
 build:
 	mkdir -p build
-	env -C build cmake -DCMAKE_BUILD_TYPE=Release -G Ninja ..
+	env -C build cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja ..
 	env -C build ninja -j40
 	env -C build ctest
 	build/art_modern --help
@@ -71,3 +71,7 @@ build-alpine:
 sync-ceu-cm:
 	rm -fr deps/cmake_collections
 	cp -rv ../libceu/cmake_collections/ deps/
+
+.PHONY: clean
+clean:
+	rm -fr build

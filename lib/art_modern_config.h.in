@@ -9,4 +9,5 @@
 #cmakedefine USE_ONEMKL_RANDOM
 #cmakedefine WITH_BOOST_TIMER
 #cmakedefine WITH_MPI
+#cmakedefine WITH_PROTOBUF
 #endif
