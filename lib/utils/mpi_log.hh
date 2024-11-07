@@ -9,4 +9,10 @@ public:
     MPIRankLoggerAttribute();
     explicit MPIRankLoggerAttribute(boost::log::attributes::cast_source const& source);
 };
+
+class MPIHostNameLoggerAttribute : public boost::log::attribute {
+public:
+    MPIHostNameLoggerAttribute();
+    explicit MPIHostNameLoggerAttribute(boost::log::attributes::cast_source const& source);
+};
 }

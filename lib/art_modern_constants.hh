@@ -30,6 +30,7 @@ const char INPUT_FILE_PARSER_MEMORY[] = "memory";
 const char INPUT_FILE_PARSER_HTSLIB[] = "htslib";
 const char INPUT_FILE_PARSER_STREAM[] = "stream";
 const char INPUT_FILE_PARSER_AUTO[] = "auto";
+const int MPI_MAIN_RANK = 0;
 
 #undef CEU_CM_IS_DEBUG // FIXME: CMake seems not working!
 

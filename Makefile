@@ -5,7 +5,7 @@ build:
 	env -C build ninja -j40
 	env -C build ctest
 	build/art_modern --help
-	build/art_modern --version
+	mpiexec --verbose -n 5 build/art_modern --version
 
 .PHONY: build_external_htslib
 build_external_htslib:

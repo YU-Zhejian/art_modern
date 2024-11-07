@@ -11,7 +11,6 @@ const char MPI_MESSAGE_BYE[] = "BYE\0";
 
 /*!
  * Call `MPI_Finalize` (if MPI is not finalized) or `std::exit` with the given status.
- * Effective on the current process only.
  *
  * @param status Exit status.
  */
