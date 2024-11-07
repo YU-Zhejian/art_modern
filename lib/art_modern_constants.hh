@@ -1,7 +1,5 @@
 #pragma once
 
-#include "art_modern_config.h"
-
 const int PARALLEL_DISABLE = -1;
 const int PARALLEL_ALL = 0;
 const char ALN_GAP = '-';
@@ -31,7 +29,6 @@ const char INPUT_FILE_PARSER_HTSLIB[] = "htslib";
 const char INPUT_FILE_PARSER_STREAM[] = "stream";
 const char INPUT_FILE_PARSER_AUTO[] = "auto";
 const int MPI_MAIN_RANK = 0;
-
-#undef CEU_CM_IS_DEBUG // FIXME: CMake seems not working!
+const int MPI_UNAVAILABLE_RANK = -1;
 
 const int TID_FOR_UNMAPPED = (-1);

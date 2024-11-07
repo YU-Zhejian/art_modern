@@ -49,7 +49,7 @@ namespace art_modern {
          * Add point mutations to random bases based on empirical dist of quali scores
          * @param qual As described.
          */
-        std::vector<int> generate_snv_on_qual(const std::vector<int>& qual);
+        void generate_snv_on_qual(std::vector<int>& qual);
 
     private:
         const ArtParams& art_params_;

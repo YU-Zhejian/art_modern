@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "ThreadSafeFileStream.hh"
+#include "utils/mpi_utils.hh"
 #include <boost/log/trivial.hpp>
 namespace labw {
 namespace art_modern {
@@ -21,7 +22,7 @@ namespace art_modern {
 
         if (!file_.is_open()) {
             BOOST_LOG_TRIVIAL(fatal) << "Can not open output file: " << filename;
-            exit(EXIT_FAILURE);
+            abort_mpi();
         }
     }
 

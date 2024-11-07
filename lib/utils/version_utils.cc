@@ -1,22 +1,33 @@
+#include "version_utils.hh"
 #include "art_modern_config.h"
-#include "htslib/hts.h"
-#include <boost/version.hpp>
+#include "art_modern_constants.hh"
+
 #include <iostream>
 
-#include "art_modern_constants.hh"
-#include "htslib/hfile.h"
-#include "version_utils.hh"
+// Boost
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/version.hpp>
 
+// HTSLib
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
+
+// GSL
 #ifdef USE_GSL_RANDOM
 #include <gsl/gsl_version.h>
 #endif
 
+// MKL
 #ifdef USE_ONEMKL_RANDOM
 #include <mkl_version.h>
 #endif
+
+// MPI
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
+
+// Protobuf
 #ifdef WITH_PROTOBUF
 #include <google/protobuf/stubs/common.h>
 #endif
@@ -87,22 +98,19 @@ void print_onemkl_version()
 void print_mpi_version()
 {
 #ifdef WITH_MPI
+    std::cout << "MPI:" << std::endl;
+
     int major;
     int minor;
     MPI_Get_version(&major, &minor);
+    std::cout << "\tStandard Version: " << major << "." << minor << std::endl;
 
     char libversion_string[MPI_MAX_LIBRARY_VERSION_STRING];
     int libversion_len;
     MPI_Get_library_version(libversion_string, &libversion_len);
-    std::cout << "MPI:" << std::endl;
-    std::cout << "\tStandard Version: " << major << "." << minor << std::endl;
-    std::cout << "\tLibrary Version: " << std::string(libversion_string, libversion_len) << std::endl;
-
-    char vendor_string[MPI_MAX_PROCESSOR_NAME];
-    int vendor_len;
-    MPI_Get_processor_name(vendor_string, &vendor_len);
-
-    std::cout << "\tVendor: " << std::string(vendor_string, vendor_len) << std::endl;
+    auto lib_ver_str = std::string(libversion_string, libversion_len);
+    boost::algorithm::trim(lib_ver_str);
+    std::cout << "\tLibrary Version: " << lib_ver_str << std::endl;
 #else
     std::cout << "MPI: not used" << std::endl;
 #endif
@@ -128,6 +136,7 @@ void print_protobuf_version()
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
+    std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
     print_boost_version();
     print_gsl_version();

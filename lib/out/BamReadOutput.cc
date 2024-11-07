@@ -5,8 +5,11 @@
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
+#include "art_modern_config.h"
 #include "global_variables.hh"
+#include "utils/mpi_utils.hh"
 #include "utils/seq_utils.hh"
+
 namespace po = boost::program_options;
 
 namespace labw {
@@ -179,7 +182,7 @@ namespace art_modern {
                 BOOST_LOG_TRIVIAL(error) << "No sequences in the reference file. If you used "
                                          << INPUT_FILE_PARSER_STREAM
                                          << " input parser, you should use headless SAM/BAM instead of this one.";
-                exit(EXIT_FAILURE);
+                abort_mpi();
             }
             auto so = SamOptions();
             so.use_m = vm.count("o-sam-use_m") > 0;

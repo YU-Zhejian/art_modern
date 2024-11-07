@@ -3,6 +3,8 @@
 #include <boost/log/trivial.hpp>
 
 #include "FaidxFetch.hh"
+#include "utils/mpi_utils.hh"
+
 namespace labw {
 namespace art_modern {
 
@@ -14,7 +16,7 @@ namespace art_modern {
         auto rets = fai_fetch64(faidx_, reg.str().c_str(), &pos);
         if (!rets) {
             BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
-            exit(EXIT_FAILURE);
+            abort_mpi();
         }
         return rets;
     }
@@ -32,7 +34,7 @@ namespace art_modern {
             auto seq_name = faidx_iseq(faidx, i);
             if (!seq_name) {
                 BOOST_LOG_TRIVIAL(fatal) << "Sequence name of seq " << i << " is null!";
-                exit(EXIT_FAILURE);
+                abort_mpi();
             }
             seq_names.emplace_back(seq_name);
             seq_lengths.emplace_back(faidx_seq_len(faidx, seq_name));
@@ -45,13 +47,13 @@ namespace art_modern {
         auto seq_file_fai_path = std::string(fai_path(file_name.c_str()));
         if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
             BOOST_LOG_TRIVIAL(fatal) << "FAI not found!";
-            exit(EXIT_FAILURE);
+            abort_mpi();
         } else {
             BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
             auto faidx = fai_load_format(file_name.c_str(), FAI_FASTA);
             if (!faidx) {
                 BOOST_LOG_TRIVIAL(fatal) << "Loading FAI failed!";
-                exit(EXIT_FAILURE);
+                abort_mpi();
             }
             return faidx;
         }

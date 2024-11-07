@@ -1,4 +1,3 @@
-
 #pragma once
 
 namespace labw::art_modern {

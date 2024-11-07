@@ -176,7 +176,6 @@ The bundled HTSLib library used MIT License with the following reference:
 
 - Design and implement a job scheduling system using `boost::lockfree` and `boost::signal2`.
 - Make it faster.
-- Update the HTSLib CMake routine for setting macros like `HAVE_LIBBZ2` correct.
 - Support running under Microsoft Windows.
 - Implement an ultrasonic sequence chopper and connect `trans` or `wgs` mode to it.
 - Support MPI-based parallelization. Basic ideas:

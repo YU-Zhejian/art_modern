@@ -12,7 +12,7 @@ public:
         int mpi_finalized_flag;
         MPI_Finalized(&mpi_finalized_flag);
         if (mpi_finalized_flag) {
-            return boost::log::attributes::make_attribute_value(-1);
+            return boost::log::attributes::make_attribute_value(MPI_UNAVAILABLE_RANK);
         }
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -20,7 +20,7 @@ public:
     }
 };
 
-MPIRankLoggerAttribute::MPIRankLoggerAttribute(const boost::log::attributes::cast_source& source)
+[[maybe_unused]] MPIRankLoggerAttribute::MPIRankLoggerAttribute(const boost::log::attributes::cast_source& source)
     : boost::log::attribute(source.as<MPIRankLoggerAttributeImpl>())
 {
 }

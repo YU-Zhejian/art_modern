@@ -18,6 +18,7 @@
 #include "out/FastqReadOutput.hh"
 #include "out/HeadlessBamReadOutput.hh"
 #include "out/OutputDispatcher.hh"
+#include "utils/mpi_utils.hh"
 #include "utils/version_utils.hh"
 
 namespace po = boost::program_options;
@@ -157,15 +158,17 @@ po::variables_map generate_vm_while_handling_help_version(
     } catch (const std::exception& exp) {
         BOOST_LOG_TRIVIAL(fatal) << exp.what();
         print_help(po_desc);
-        throw ArtCmdException();
+        abort_mpi();
     }
 
     if (vm_.count(ARG_VERSION)) {
         print_version();
-        throw ArtCmdNormalExit();
+        bye_mpi();
+        exit_mpi(EXIT_SUCCESS);
     } else if (vm_.count(ARG_HELP)) {
         print_help(po_desc);
-        throw ArtCmdNormalExit();
+        bye_mpi();
+        exit_mpi(EXIT_SUCCESS);
     }
     return vm_;
 }
@@ -182,7 +185,7 @@ SIMULATION_MODE get_simulation_mode(const std::string& simulation_mode_str)
         BOOST_LOG_TRIVIAL(fatal) << "Simulation mode (--" << ARG_SIMULATION_MODE << ") should be one of "
                                  << SIMULATION_MODE_WGS << ", " << SIMULATION_MODE_TRANS << ", "
                                  << SIMULATION_MODE_TEMPLATE << ".";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -198,7 +201,7 @@ ART_LIB_CONST_MODE get_art_lib_const_mode(const std::string& lib_const_mode_str)
         BOOST_LOG_TRIVIAL(fatal) << "Library construction mode (--" << ARG_LIB_CONST_MODE << ") should be one of "
                                  << ART_LIB_CONST_MODE_SE << ", " << ART_LIB_CONST_MODE_PE << ", "
                                  << ART_LIB_CONST_MODE_MP << ".";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -217,12 +220,12 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
         BOOST_LOG_TRIVIAL(fatal) << "Automatic inference of input file type failed! Modify value of this param (--"
                                  << ARG_INPUT_FILE_TYPE << ") to be one of " << INPUT_FILE_TYPE_FASTA << ", "
                                  << INPUT_FILE_TYPE_PBSIM3_TEMPLATE << ".";
-        throw ArtCmdException();
+        abort_mpi();
     } else {
         BOOST_LOG_TRIVIAL(fatal) << "Input file type (--" << ARG_INPUT_FILE_TYPE << ") should be one of "
                                  << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TEMPLATE << ", "
                                  << INPUT_FILE_TYPE_AUTO << ".";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -266,7 +269,7 @@ INPUT_FILE_PARSER get_input_file_parser(
         BOOST_LOG_TRIVIAL(fatal) << "Input file parser (--" << ARG_INPUT_FILE_PARSER << ") should be one of "
                                  << INPUT_FILE_PARSER_MEMORY << ", " << INPUT_FILE_PARSER_HTSLIB << ", "
                                  << INPUT_FILE_PARSER_STREAM << ", " << INPUT_FILE_PARSER_AUTO << ".";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -289,7 +292,7 @@ std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std
     }
     if (fcov_arg_str.empty()) {
         BOOST_LOG_TRIVIAL(fatal) << "Coverage parameter (--" << ARG_FCOV << ") is required.";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (input_file_parser == INPUT_FILE_PARSER::STREAM) {
         fasta_fetch = new InMemoryFastaFetch(); // Empty
@@ -334,12 +337,12 @@ void validate_min_max_qual(const int min_qual, const int max_qual)
     if (min_qual < 0 || min_qual > MAX_QUAL) {
         BOOST_LOG_TRIVIAL(fatal) << "Input Error: The minimum quality score must be an integer in [0," << MAX_QUAL
                                  << "]";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (max_qual <= min_qual || max_qual > MAX_QUAL) {
         BOOST_LOG_TRIVIAL(fatal) << "Input Error: The quality score must be an integer in [" << min_qual << ", "
                                  << MAX_QUAL << "]";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -388,12 +391,12 @@ void validate_input_filename(const std::string& input_file_path, const std::stri
 {
     if (input_file_path.empty()) {
         BOOST_LOG_TRIVIAL(fatal) << "An input file path for --" << arg_name << " must be specified.";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (!boost::filesystem::exists(input_file_path)) {
         BOOST_LOG_TRIVIAL(fatal) << "Input file for --" << arg_name << " at '" << input_file_path
                                  << "' does not exist.";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (!boost::filesystem::is_regular_file(input_file_path)) {
         BOOST_LOG_TRIVIAL(warning) << "Input file for --" << arg_name << " at '" << input_file_path
@@ -433,7 +436,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
                                      << ", exceeds the maximum first read profile length, " << r1_profile_size << ".";
         }
-        throw ArtCmdException();
+        abort_mpi();
     }
 
     if ((read_len > r2_profile_size) && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
@@ -443,7 +446,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
                                      << ", exceeds the maximum second read profile length, " << r2_profile_size << ".";
         }
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (q_shift_1 != 0 || q_shift_2 != 0) {
         shift_all_emp(qdist, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
@@ -493,11 +496,11 @@ void validate_read_length(const int read_len)
 {
     if (read_len < 0) {
         BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (read_len == 0) {
         BOOST_LOG_TRIVIAL(fatal) << "Read length must be specified.";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -534,13 +537,13 @@ void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_
                 BOOST_LOG_TRIVIAL(fatal) << "set pe_frag_dist_std_dev and "
                                             "pe_frag_dist_mean for PE reads for "
                                          << SIMULATION_MODE_WGS << " or " << SIMULATION_MODE_TRANS << " mode)";
-                throw ArtCmdException();
+                abort_mpi();
             }
 
             if (pe_frag_dist_mean <= read_len) {
                 BOOST_LOG_TRIVIAL(fatal) << "The read length must be shorter than the "
                                             "pe_frag_dist_mean fragment length specified.";
-                throw ArtCmdException();
+                abort_mpi();
             }
         }
     } else {
@@ -558,19 +561,19 @@ void validate_comp_mtx(const INPUT_FILE_PARSER input_file_parser, const SIMULATI
     if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
         if (art_simulation_mode == SIMULATION_MODE::WGS) {
             BOOST_LOG_TRIVIAL(fatal) << "Input using PBSim3 transcripts format are not supported for WGS simulation.";
-            throw ArtCmdException();
+            abort_mpi();
         } else if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
             BOOST_LOG_TRIVIAL(fatal) << "Input using PBSim3 transcripts format are not supported for HTSLib parser";
-            throw ArtCmdException();
+            abort_mpi();
         }
     }
     if (art_simulation_mode == SIMULATION_MODE::WGS && input_file_parser == INPUT_FILE_PARSER::STREAM) {
         BOOST_LOG_TRIVIAL(fatal) << "STREAM parser is not supported for WGS simulation ";
-        throw ArtCmdException();
+        abort_mpi();
     }
     if (art_simulation_mode != SIMULATION_MODE::WGS && input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
         BOOST_LOG_TRIVIAL(fatal) << "HTSLib parser is only supported in WGS simulation ";
-        throw ArtCmdException();
+        abort_mpi();
     }
 }
 
@@ -629,7 +632,7 @@ ArtParams parse_args(int argc, char** argv)
     auto batch_size = vm_[ARG_BATCH_SIZE].as<int>();
     if (batch_size < 1) {
         BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
-        throw ArtCmdException();
+        abort_mpi();
     }
     return { art_simulation_mode, art_lib_const_mode, input_file_name, input_file_type, input_file_parser, parallel,
         sep_flag, id, coverage_info, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, per_base_ins_rate_1,

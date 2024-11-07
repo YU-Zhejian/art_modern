@@ -1,12 +1,11 @@
 #include "art_modern_config.h"
+#include <boost/filesystem.hpp>
 #include <boost/log/attributes/clock.hpp>
 #include <boost/log/attributes/current_thread_id.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
-
-#include <boost/filesystem.hpp>
 
 #include <iostream>
 
@@ -60,15 +59,14 @@ void init_file_logger(const std::string& log_dir)
                  << ".log";
     logging::add_file_log(logging::keywords::file_name = file_name_ss.str(),
         logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%",
-        logging::keywords::filter = expr::attr<int>("MPIRank") == -1);
+        logging::keywords::filter = expr::attr<int>("MPIRank") == MPI_UNAVAILABLE_RANK);
 #else
     std::stringstream file_name_ss;
     file_name_ss << log_dir << "/"
                  << "nompi"
                  << ".log";
     logging::add_file_log(logging::keywords::file_name = file_name_ss.str(),
-        logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%] %Severity%: %Message%",
-        logging::keywords::filter = expr::attr<int>("MPIRank") == -1);
+        logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%] %Severity%: %Message%");
 #endif
 }
 }

@@ -10,4 +10,6 @@
 #cmakedefine WITH_BOOST_TIMER
 #cmakedefine WITH_MPI
 #cmakedefine WITH_PROTOBUF
+#cmakedefine CEU_CM_IS_DEBUG
+#cmakedefine ART_MODERN_LINK_LIBS "${ART_MODERN_LINK_LIBS}"
 #endif

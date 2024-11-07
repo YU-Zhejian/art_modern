@@ -81,14 +81,7 @@ int main(int argc, char* argv[])
     handle_dumps();
     validate_protobuf_version();
 
-    try {
-        auto parse_args_1st = parse_args(argc, argv);
-    } catch (const ArtCmdNormalExit&) {
-        bye_mpi();
-        exit_mpi(EXIT_SUCCESS);
-    } catch (const ArtCmdException&) {
-        abort_mpi(EXIT_FAILURE);
-    }
+    auto art_params = parse_args(argc, argv);
     BOOST_LOG_TRIVIAL(info) << "Argument parsing finished. Start generating...";
 
 #ifdef WITH_BOOST_TIMER
@@ -99,7 +92,6 @@ int main(int argc, char* argv[])
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
     // FIXME: Come up a way to avoid this 2nd parsing of params.
-    auto art_params = parse_args(argc, argv);
     generate_all(art_params);
 #ifdef WITH_BOOST_TIMER
     t.stop();

@@ -19,15 +19,14 @@ namespace art_modern {
         }
     }
 
-    std::vector<int> ArtRead::generate_snv_on_qual(const std::vector<int>& qual)
+    void ArtRead::generate_snv_on_qual(std::vector<int>& qual)
     {
-        auto qual_mutated = qual;
         for (auto i = 0; i < qual.size(); i++) {
             if (seq_read[i] == 'N') {
-                qual_mutated[i] = 1;
+                qual[i] = 1;
                 continue;
             }
-            if (rprob_.r_prob() < art_params_.err_prob[qual_mutated[i]]) {
+            if (rprob_.r_prob() < art_params_.err_prob[qual[i]]) {
                 char achar = seq_read[i];
                 while (seq_read[i] == achar) {
                     achar = rprob_.rand_base();
@@ -35,7 +34,6 @@ namespace art_modern {
                 seq_read[i] = achar;
             }
         }
-        return qual_mutated;
     }
 
     int ArtRead::generate_indels(const bool is_read_1)

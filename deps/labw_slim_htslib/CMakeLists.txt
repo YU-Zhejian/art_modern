@@ -50,7 +50,7 @@ if(BUILD_SHARED_LIBS)
     if(${CEU_CM_HAVE_WORKING_LIBBZ2_RUN_SHARED} EQUAL 0)
         message(NOTICE "libbz2 detected")
         set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBBZ2_LIBRARY_SHARED}")
-        add_compile_definitions(HAVE_LIBBZ2) # FIXME: Move those things to a header file.
+        add_compile_definitions(HAVE_LIBBZ2)
     else()
         message(NOTICE "libbz2 NOT detected")
     endif()

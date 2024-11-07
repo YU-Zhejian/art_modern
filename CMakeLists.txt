@@ -19,7 +19,7 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-set(USE_RANDOM_GENERATOR STL) # TODO
+set(USE_RANDOM_GENERATOR ONEMKL) # TODO
 
 if(NOT DEFINED USE_RANDOM_GENERATOR)
     set(USE_RANDOM_GENERATOR STL)
@@ -48,9 +48,9 @@ elseif("${USE_RANDOM_GENERATOR}" STREQUAL "BOOST")
     set(USE_BOOST_RANDOM ON)
 elseif("${USE_RANDOM_GENERATOR}" STREQUAL "ONEMKL")
     set(USE_ONEMKL_RANDOM ON)
-    find_package(MKL) # TODO: Link
-    find_package(IntelSYCL) # TODO: Link
+    find_package(MKL)
     include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR})
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MKL::MKL)
 else()
     message(
         FATAL_ERROR
