@@ -1,4 +1,4 @@
-#include "utils/mpi_log.hh"
+#include "utils/mpi_log_attributes.hh"
 
 #include <boost/log/attributes/attribute_value_impl.hpp>
 #include <mpi.h>
@@ -12,7 +12,7 @@ public:
         int mpi_finalized_flag;
         MPI_Finalized(&mpi_finalized_flag);
         if (mpi_finalized_flag) {
-            return boost::log::attributes::make_attribute_value(std::string("N/A"));
+            return boost::log::attributes::make_attribute_value(-1);
         }
         int rank;
         MPI_Comm_rank(MPI_COMM_WORLD, &rank);

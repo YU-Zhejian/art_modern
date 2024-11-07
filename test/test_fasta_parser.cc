@@ -1,6 +1,3 @@
-//
-// Created by yuzj on 3/9/24.
-//
 #define BOOST_TEST_MODULE test_fasta_parser
 #include <boost/test/unit_test.hpp>
 

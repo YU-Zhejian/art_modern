@@ -76,6 +76,7 @@ int main(int argc, char* argv[])
     init_mpi(&argc, &argv);
     // 1st round initialization of a working console logger
     init_logger();
+    init_file_logger("log.d");
     handle_mpi_child();
     handle_dumps();
     validate_protobuf_version();

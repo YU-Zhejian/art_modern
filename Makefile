@@ -3,7 +3,7 @@ build:
 	mkdir -p build
 	env -C build cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja ..
 	env -C build ninja -j40
-	env -C build ctest
+	env -C build ctest --output-on-failure
 	build/art_modern --help
 	mpiexec --verbose -n 5 build/art_modern --version
 

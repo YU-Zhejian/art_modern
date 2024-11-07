@@ -15,11 +15,11 @@ namespace labw::art_modern {
     int mpi_finalized_flag;
     MPI_Finalized(&mpi_finalized_flag);
     if (!mpi_finalized_flag) {
-        BOOST_LOG_TRIVIAL(info) << "Finalizing MPI...";
+        BOOST_LOG_TRIVIAL(debug) << "Finalizing MPI...";
         MPI_Finalize();
-        BOOST_LOG_TRIVIAL(info) << "MPI finalized.";
+        BOOST_LOG_TRIVIAL(debug) << "MPI finalized.";
     } else {
-        BOOST_LOG_TRIVIAL(info) << "MPI already finalized.";
+        BOOST_LOG_TRIVIAL(debug) << "MPI already finalized.";
     }
 #endif
     exit(status);
@@ -29,10 +29,10 @@ namespace labw::art_modern {
 {
     BOOST_LOG_TRIVIAL(info) << "ABORT";
 #ifdef WITH_MPI
-    BOOST_LOG_TRIVIAL(info) << "Sending MPI_ABORT...";
+    BOOST_LOG_TRIVIAL(debug) << "Sending MPI_ABORT...";
     MPI_Abort(MPI_COMM_WORLD, status);
 #endif
-    BOOST_LOG_TRIVIAL(info) << "Sending std::abort...";
+    BOOST_LOG_TRIVIAL(debug) << "Sending std::abort...";
     std::abort();
 }
 
@@ -55,5 +55,4 @@ void init_mpi(int* argc, char*** argv)
     MPI_Init(argc, argv);
 #endif
 }
-
 }
