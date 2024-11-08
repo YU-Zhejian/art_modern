@@ -40,11 +40,11 @@ int main_mpi_child()
                 return EXIT_SUCCESS;
             } else {
                 BOOST_LOG_TRIVIAL(info) << "Received wrong signal.";
-                sleep(1);
+                // sleep(1); FIXME: Not found under MS Windows
             }
         } else {
             BOOST_LOG_TRIVIAL(info) << "Received no signal.";
-            sleep(1);
+            // sleep(1); FIXME: Not found under MS Windows
         }
     }
 }
