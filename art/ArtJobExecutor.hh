@@ -5,8 +5,7 @@
 #include "out/BaseReadOutput.hh"
 #include "random_generator.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     class ArtJobExecutor {
     public:
@@ -32,5 +31,4 @@ namespace art_modern {
         BaseReadOutput* output_dispatcher_;
     };
 
-} // art_modern
-} // labw
+} // namespace labw::art_modern

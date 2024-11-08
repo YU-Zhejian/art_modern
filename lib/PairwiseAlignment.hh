@@ -5,6 +5,12 @@
 #include <vector>
 
 namespace labw::art_modern {
+class PWAException : public std::exception {
+public:
+    const char* what() const noexcept override;
+    const char* msg;
+    explicit PWAException(const char* msg);
+};
 
 class PairwiseAlignment {
 public:
@@ -13,6 +19,18 @@ public:
     PairwiseAlignment& operator=(PairwiseAlignment&&) = delete;
     PairwiseAlignment& operator=(const PairwiseAlignment&) = delete;
 
+    /*!
+     *
+     * @param read_name Number of read.
+     * @param contig_name Name of the contig.
+     * @param query Gapless query sequence.
+     * @param ref Gapless reference sequence.
+     * @param qual Quality sequence whose length should be the same as query.
+     * @param aligned_query Aligned query sequence with gaps.
+     * @param aligned_ref Aligned reference sequence with gaps.
+     * @param align_contig_start
+     * @param is_plus_strand Whether the reference is reverse-complemented.
+     */
     PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
         std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t align_contig_start,
         bool is_plus_strand);

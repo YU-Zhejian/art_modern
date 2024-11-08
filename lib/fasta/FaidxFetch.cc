@@ -5,12 +5,10 @@
 #include "FaidxFetch.hh"
 #include "utils/mpi_utils.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     char* FaidxFetch::cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end)
     {
-        std::lock_guard<std::mutex> lock(mutex_);
         auto reg = boost::format("%s:%d-%d") % seq_name % (start + 1) % end;
         hts_pos_t pos;
         auto rets = fai_fetch64(faidx_, reg.str().c_str(), &pos);
@@ -76,5 +74,4 @@ namespace art_modern {
         std::free(cfetch_str);
         return rets;
     }
-}
 }

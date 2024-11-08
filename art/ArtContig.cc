@@ -5,10 +5,9 @@
 #include "ArtContig.hh"
 #include "art_modern_constants.hh"
 #include "random_generator.hh"
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
-    ArtRead ArtContig::generate_read_se(bool is_plus_strand)
+    ArtRead ArtContig::generate_read_se(const bool is_plus_strand)
     {
         ArtRead read_1(art_params_, rprob_);
         auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
@@ -36,7 +35,7 @@ namespace art_modern {
     }
 
     // matepair-end read: the second read is reverse complemenaty strand
-    ArtReadPair ArtContig::generate_read_mp(bool is_plus_strand)
+    ArtReadPair ArtContig::generate_read_mp(const bool is_plus_strand)
     {
         ArtRead read_1(art_params_, rprob_);
         ArtRead read_2(art_params_, rprob_);
@@ -163,16 +162,15 @@ namespace art_modern {
         return { std::move(read_1), std::move(read_2) };
     }
 
-    ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob)
+    ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, const size_t seq_id, const ArtParams& art_params, Rprob& rprob)
         : fasta_fetch_(fasta_fetch)
         , art_params_(art_params)
         , rprob_(rprob)
         , seq_id_(seq_id)
-        , id_(fasta_fetch->seq_name(seq_id_))
-        , valid_region_(fasta_fetch_->seq_len(seq_id_) - art_params.read_len)
-        , ref_len_(fasta_fetch_->seq_len(seq_id_))
+        , valid_region_(fasta_fetch->seq_len(seq_id) - art_params.read_len)
+        , ref_len_(fasta_fetch->seq_len(seq_id))
+        , seq_name_(fasta_fetch->seq_name(seq_id))
     {
     }
 
-}
 }

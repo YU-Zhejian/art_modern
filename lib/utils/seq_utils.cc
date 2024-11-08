@@ -17,6 +17,18 @@ namespace art_modern {
         79, 80, 81, 82, 83, 65, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 116, 98, 103, 100, 101, 102, 99, 104,
         105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 97, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126,
         127 };
+    /*!
+     *
+     * Generated using:
+     *
+     * ```python
+     * ",".join([str(i) if chr(i) in 'AGCT' else str(ord(chr(i).upper())) if chr(i) in 'agct' else str(ord('N'))for i in range(0, 128)])
+     * ```
+     */
+    const char normalization_matrix[] = {
+        78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,78,65,78,67,78,78,78,71,78,78,78,78,78,78,78,78,78,78,78,78,84,78,78,78,78,78,78,78,78,78,78,78,78,65,78,67,78,78,78,71,78,78,78,78,78,78,78,78,78,78,78,78,84,78,78,78,78,78,78,78,78,78,78,78
+
+    };
 
     std::string qual_to_str(const std::vector<int>& qual)
     {
@@ -32,7 +44,7 @@ namespace art_modern {
     {
         std::string rets;
         rets.resize(dna.length());
-        for (const auto& i : range(0, static_cast<int>(dna.length()), 1)) {
+        for (auto i = 0; i < dna.length(); i++) {
             rets[i] = rev_comp_trans_2[dna[i]];
         }
         return rets;
@@ -47,12 +59,7 @@ namespace art_modern {
     std::string normalize(const std::string& dna)
     {
         std::string rets = dna;
-        boost::algorithm::to_upper(rets);
-        for (const auto& i : range(0, static_cast<int>(rets.length()), 1)) {
-            if (rets[i] != 'A' && rets[i] != 'T' && rets[i] != 'C' && rets[i] != 'G') {
-                rets[i] = 'N';
-            }
-        }
+        std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c]; });
         return rets;
     }
 

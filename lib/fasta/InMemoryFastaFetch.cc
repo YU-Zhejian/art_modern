@@ -4,8 +4,7 @@
 #include "MapUtils.hh"
 #include "fasta_parser.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
     {
@@ -79,5 +78,4 @@ namespace art_modern {
     }
 
     InMemoryFastaFetch::~InMemoryFastaFetch() = default;
-}
 }

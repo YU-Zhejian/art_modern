@@ -13,6 +13,5 @@ namespace art_modern {
     std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr);
     std::string normalize(const std::string& dna);
     uint32_t* cigar_arr_to_c(const std::vector<uint32_t>& cigar_arr);
-    std::vector<int> range(int start, int stop, int step);
 } // namespace art_modern
 } // namespace labw

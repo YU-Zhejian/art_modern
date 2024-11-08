@@ -6,8 +6,7 @@
 #include <sstream>
 #include <string>
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
     class FastaStreamBatcher {
     public:
         /**
@@ -52,5 +51,4 @@ namespace art_modern {
         std::mutex mutex_;
     };
 
-}
 }

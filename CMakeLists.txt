@@ -19,7 +19,9 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-set(USE_RANDOM_GENERATOR ONEMKL) # TODO
+set(USE_RANDOM_GENERATOR STL) # TODO
+
+add_compile_definitions(PARALLEL_DISABLED) # PARALLEL_ASIO TODO
 
 if(NOT DEFINED USE_RANDOM_GENERATOR)
     set(USE_RANDOM_GENERATOR STL)
@@ -30,8 +32,8 @@ unset(USE_GSL_RANDOM)
 unset(USE_BOOST_RANDOM)
 unset(USE_ONEMKL_RANDOM)
 
-unset(WITH_MPI) # TODO
-find_package(MPI REQUIRED)
+unset(WITH_MPI)
+find_package(MPI REQUIRED) # TODO
 include_directories(${MPI_C_HEADER_DIR} ${MPI_CXX_HEADER_DIR})
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MPI::MPI_C MPI::MPI_CXX)
 set(WITH_MPI ON)
@@ -57,8 +59,6 @@ else()
             "Variable USE_RANDOM_GENERATOR should be set to one of STL, GSL, BOOST or ONEMKL. Current: ${USE_RANDOM_GENERATOR}"
     )
 endif()
-
-add_compile_definitions(PARALLEL_ASIO)
 
 # Installation
 include(GNUInstallDirs)

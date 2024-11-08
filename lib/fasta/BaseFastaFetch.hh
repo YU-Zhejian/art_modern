@@ -49,6 +49,8 @@ namespace art_modern {
 
         /**
          * Get the length of the desired sequence.
+         * This operation should take $O(1)$ complexity.
+         *
          * @param seq_id As described.
          * @return As described.
          */

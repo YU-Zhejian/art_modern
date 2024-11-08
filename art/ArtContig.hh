@@ -8,8 +8,7 @@
 #include "fasta/BaseFastaFetch.hh"
 #include "random_generator.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     class ArtContig {
 
@@ -21,15 +20,15 @@ namespace art_modern {
         ArtReadPair generate_read_pe(bool is_plus_strand);
 
         ArtReadPair generate_read_mp(bool is_plus_strand);
+        const std::string seq_name_;
+        const hts_pos_t ref_len_;
 
+    private:
         BaseFastaFetch* fasta_fetch_;
         const ArtParams& art_params_;
         Rprob& rprob_;
         const size_t seq_id_;
         const hts_pos_t valid_region_;
-        const hts_pos_t ref_len_;
-        const std::string id_;
     };
 
-} // namespace art_modern
-} // namespace labw
+} // namespace labw::art_modern // namespace labw

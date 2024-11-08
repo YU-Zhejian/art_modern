@@ -17,7 +17,6 @@ namespace art_modern {
 
     void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     {
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
@@ -47,14 +46,15 @@ namespace art_modern {
                 rlen, seq.c_str(), qual.c_str(), 0),
             USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         fill_md_nm_tag(sam_record, pwa);
+        free(cigar_c_arr);
+
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-        free(cigar_c_arr);
     }
 
     void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
@@ -125,13 +125,14 @@ namespace art_modern {
         fill_md_nm_tag(sam_record1, pwa1);
         fill_md_nm_tag(sam_record2, pwa2);
 
+        free(cigar1_arr);
+        free(cigar2_arr);
+
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-
-        free(cigar1_arr);
-        free(cigar2_arr);
     }
     BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
     BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options)
@@ -158,10 +159,10 @@ namespace art_modern {
 
     void BamReadOutput::close()
     {
-        std::unique_lock<std::mutex> rhs_lk(mutex_);
         if (is_closed_) {
             return;
         }
+        std::unique_lock<std::mutex> rhs_lk(mutex_);
         sam_close(sam_file_);
         is_closed_ = true;
     }

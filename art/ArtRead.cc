@@ -4,8 +4,7 @@
 
 using namespace std;
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     void ArtRead::generate_pairwise_aln()
     {
@@ -23,7 +22,7 @@ namespace art_modern {
     {
         for (auto i = 0; i < qual.size(); i++) {
             if (seq_read[i] == 'N') {
-                qual[i] = 1;
+                qual[i] = MIN_QUAL;
                 continue;
             }
             if (rprob_.r_prob() < art_params_.err_prob[qual[i]]) {
@@ -41,8 +40,8 @@ namespace art_modern {
         int ins_len = 0;
         int del_len = 0;
         std::fill(indel_.begin(), indel_.end(), 0);
-        auto per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
-        auto per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
+        const auto &per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
+        const auto &per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
         // deletion
         for (auto i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
             if (per_base_del_rate[i] >= rprob_.r_prob()) {
@@ -81,9 +80,9 @@ namespace art_modern {
     {
         int ins_len = 0;
         int del_len = 0;
-        indel_.clear();
-        auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
-        auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
+        std::fill(indel_.begin(), indel_.end(), 0);
+        const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
+        const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
         for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
             if (per_base_ins_rate[i] >= rprob_.r_prob()) {
@@ -130,20 +129,18 @@ namespace art_modern {
     void ArtRead::ref2read()
     {
         int k = 0;
-        for (auto i = 0; i < seq_ref.size();) {
-            if (indel_[k] == 0) {
-                seq_read.push_back(seq_ref[i]);
-                i++;
-                k++;
-            } else if (indel_[k] == ALN_GAP) {
-                i++;
-                k++;
-            } else {
+        for (auto pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
+            if (indel_[k] == 0) { // No indel
+                seq_read.push_back(seq_ref[pos_on_ref]);
+                pos_on_ref++;
+            } else if (indel_[k] == ALN_GAP) { // Deletion
+                pos_on_ref++;
+            } else { // Insertion
                 seq_read.push_back(indel_[k]);
-                k++;
             }
+            k++;
         }
-        while (indel_[k] != 0) {
+        while (indel_[k] != 0) { // Insertions after reference
             seq_read.push_back(indel_[k]);
             k++;
         }
@@ -152,8 +149,10 @@ namespace art_modern {
     ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob)
         : art_params_(art_params)
         , rprob_(rprob)
-        , indel_(art_params.read_len)
     {
+        seq_read.reserve(art_params_.read_len);
+        seq_ref.reserve(art_params_.read_len);
+        indel_.reserve(art_params_.read_len);
     }
 
     void ArtRead::assess_num_n() const
@@ -165,5 +164,4 @@ namespace art_modern {
         }
     }
 
-} // namespace art_modern
-}; // namespace labw
+} // namespace labw::art_modern; // namespace labw

@@ -30,7 +30,6 @@ HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const 
 }
 void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
     if (is_closed_) {
         return;
     }
@@ -60,12 +59,12 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
 
     fill_md_nm_tag(sam_record, pwa);
 
+    std::unique_lock<std::mutex> rhs_lk(mutex_);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
         "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 }
 void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
     if (is_closed_) {
         return;
     }
@@ -120,6 +119,7 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     fill_md_nm_tag(sam_record1, pwa1);
     fill_md_nm_tag(sam_record2, pwa2);
 
+    std::unique_lock<std::mutex> rhs_lk(mutex_);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
         "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
@@ -127,10 +127,10 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
 }
 void HeadlessBamReadOutput::close()
 {
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
     if (is_closed_) {
         return;
     }
+    std::unique_lock<std::mutex> rhs_lk(mutex_);
     sam_close(sam_file_);
     is_closed_ = true;
 }
