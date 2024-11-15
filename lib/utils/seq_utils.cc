@@ -30,6 +30,17 @@ namespace art_modern {
 
     };
 
+
+    std::string qual_to_str(const uint8_t *qual, const size_t qlen)
+    {
+        std::string retq;
+        retq.resize(qlen);
+        for (size_t k = 0; k < qlen; k++) {
+            retq[k] = (char)(qual[k] + PHRED_OFFSET);
+        }
+        return retq;
+    }
+
     std::string qual_to_str(const std::vector<int>& qual)
     {
         std::string retq;
