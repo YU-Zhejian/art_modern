@@ -189,8 +189,13 @@ The bundled HTSLib library used MIT License with the following reference:
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 - Support MAF output format?
+- Working with >65535 CIGAR operations? See <https://github.com/lh3/minimap2?tab=readme-ov-file#working-with-65535-cigar-operations>
 
 ## FAQ
+
+### Supported CPUs?
+
+Only little endian is supported.
 
 ### How to split produced pair-end/mate-pair sequencing results to 2 files?
 

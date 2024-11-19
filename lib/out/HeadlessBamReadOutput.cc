@@ -13,7 +13,7 @@ HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const 
     : sam_options_(sam_options)
     , bam_utils_(sam_options)
 {
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
+    std::unique_lock rhs_lk(mutex_);
     sam_file_ = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
     sam_header_
@@ -41,8 +41,16 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     if (!pwa.is_plus_strand) {
         std::reverse(qual.begin(), qual.end());
     }
-    auto oa_tag = bam_utils_.generate_oa_tag(pwa);
-    auto tag_len = 2 + 1 + oa_tag.size() + 1;
+    auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
+    assert_correct_cigar(pwa, cigar);
+
+    auto [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
+    auto oa_tag = BamUtils::generate_oa_tag(pwa, cigar, nm_tag);
+    BamTags tags;
+    tags.add_string("OA", oa_tag);
+    tags.add_string("MD", md_tag);
+    tags.add_int_i("NM", nm_tag);
+
     CExceptionsProxy::assert_numeric(bam_set1(sam_record, pwa.read_name.size(), pwa.read_name.c_str(),
                                          BAM_FUNMAP, // Alignment info moved to OA tag
                                          TID_FOR_UNMAPPED, // Alignment info moved to OA tag
@@ -53,13 +61,11 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
                                          TID_FOR_UNMAPPED, // Unset for SE reads
                                          0, // Unset for SE reads
                                          0, // Unset for SE reads
-                                         rlen, seq.c_str(), qual.c_str(), tag_len),
+                                         rlen, seq.c_str(), qual.c_str(), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    bam_aux_update_str(sam_record, "OA", static_cast<int>(oa_tag.length()), oa_tag.c_str());
+    tags.patch(sam_record);
 
-    fill_md_nm_tag(sam_record, pwa);
-
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
+    std::unique_lock rhs_lk(mutex_);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
         "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 }
@@ -83,10 +89,28 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     if (!pwa1.is_plus_strand) {
         std::reverse(qual2.begin(), qual2.end());
     }
-    auto oa_tag1 = bam_utils_.generate_oa_tag(pwa1);
-    auto oa_tag2 = bam_utils_.generate_oa_tag(pwa2);
-    auto tag_len1 = 2 + 1 + oa_tag1.size() + 1;
-    auto tag_len2 = 2 + 1 + oa_tag2.size() + 1;
+    auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
+    auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
+
+    assert_correct_cigar(pwa1, cigar1);
+    assert_correct_cigar(pwa2, cigar2);
+
+    auto [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
+    auto [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+
+    auto oa_tag1 = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag1);
+    auto oa_tag2 = BamUtils::generate_oa_tag(pwa2, cigar2, nm_tag2);
+
+    BamTags tags1;
+    tags1.add_string("OA", oa_tag1);
+    tags1.add_string("MD", md_tag1);
+    tags1.add_int_i("NM", nm_tag1);
+
+    BamTags tags2;
+    tags2.add_string("OA", oa_tag2);
+    tags2.add_string("MD", md_tag2);
+    tags2.add_int_i("NM", nm_tag2);
+
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1, pwa1.read_name.size(), pwa1.read_name.c_str(),
             BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD1, // Alignment info moved to OA tag
@@ -98,9 +122,8 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq1.c_str(), qual1.c_str(), tag_len1),
+            rlen, seq1.c_str(), qual1.c_str(), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    bam_aux_update_str(sam_record1, "OA", static_cast<int>(oa_tag1.length()), oa_tag1.c_str());
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2, pwa2.read_name.size(), pwa2.read_name.c_str(),
             BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD2, // Alignment info moved to OA tag
@@ -112,14 +135,13 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq2.c_str(), qual2.c_str(), tag_len2),
+            rlen, seq2.c_str(), qual2.c_str(), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    bam_aux_update_str(sam_record2, "OA", static_cast<int>(oa_tag2.length()), oa_tag2.c_str());
 
-    fill_md_nm_tag(sam_record1, pwa1);
-    fill_md_nm_tag(sam_record2, pwa2);
+    tags1.patch(sam_record1);
+    tags2.patch(sam_record2);
 
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
+    std::unique_lock rhs_lk(mutex_);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
         "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
@@ -130,7 +152,7 @@ void HeadlessBamReadOutput::close()
     if (is_closed_) {
         return;
     }
-    std::unique_lock<std::mutex> rhs_lk(mutex_);
+    std::unique_lock rhs_lk(mutex_);
     sam_close(sam_file_);
     is_closed_ = true;
 }

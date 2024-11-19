@@ -1,6 +1,6 @@
 #include "PairwiseAlignment.hh"
-#include "art_modern_constants.hh"
 #include "art_modern_config.h" // For CEU_CM_IS_DEBUG
+#include "art_modern_constants.hh"
 #include <htslib/sam.h>
 #include <utility>
 
@@ -36,8 +36,8 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
     uint32_t cigar_len = 0;
     auto ref_len = aligned_ref.length();
 
-    if (is_plus_strand){
-        for (auto i =0; i < ref_len; i++){
+    if (is_plus_strand) {
+        for (auto i = 0; i < ref_len; i++) {
             if (aligned_ref[i] == aligned_query[i]) {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
             } else if (aligned_ref[i] == ALN_GAP) {
@@ -54,8 +54,8 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
             cigar_len++;
             prev_cigar = current_cigar;
         }
-    } else{
-        for (auto i =ref_len - 1; i > -1; i--){
+    } else {
+        for (auto i = ref_len - 1; i > -1; i--) {
             if (aligned_ref[i] == aligned_query[i]) {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
             } else if (aligned_ref[i] == ALN_GAP) {
@@ -71,7 +71,7 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
             }
             cigar_len++;
             prev_cigar = current_cigar;
-        }// TODO: Merge this redundant code
+        } // TODO: Merge this redundant code
     }
 
     if (cigar_len != 0) {
@@ -85,8 +85,5 @@ PWAException::PWAException(const char* msg)
 {
 }
 
-const char *PWAException::what() const noexcept
-{
-    return msg;
-}
+const char* PWAException::what() const noexcept { return msg; }
 } // namespace labw::art_modern // namespace labw
