@@ -9,11 +9,11 @@
 namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
 {
-    hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
-    auto strand = pwa.is_plus_strand ? '+' : '-';
-    auto cigar_str = cigar_arr_to_str(cigar);
+    const hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
+    const auto strand = pwa.is_plus_strand ? '+' : '-';
+    const auto cigar_str = cigar_arr_to_str(cigar);
     std::ostringstream oss;
-    auto nm_tag = "";
+    const auto nm_tag = "";
     oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ',' << nm_tag
         << ';';
     return oss.str();
@@ -25,9 +25,9 @@ BamUtils::BamUtils(const SamOptions& sam_options)
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
 {
-    hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
-    auto strand = pwa.is_plus_strand ? '+' : '-';
-    auto cigar_str = cigar_arr_to_str(cigar);
+    const hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
+    const auto strand = pwa.is_plus_strand ? '+' : '-';
+    const auto cigar_str = cigar_arr_to_str(cigar);
     std::ostringstream oss;
     oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ','
         << std::to_string(nm_tag) << ';';
@@ -36,44 +36,49 @@ std::string BamUtils::generate_oa_tag(
 std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
 {
-    hts_pos_t qpos = 0;
-    int matched = 0;
-    hts_pos_t rpos = 0;
+    hts_pos_t pos_on_query = 0;
+    uint32_t matched = 0;
+    hts_pos_t pos_on_ref = 0;
     std::stringstream md_str_ss;
     int32_t nm = 0;
-    uint32_t oplen;
-    uint32_t op;
+    uint32_t this_cigar_len;
+    uint32_t this_cigar_ops;
 
     for (auto i = 0; i < cigar.size(); ++i) {
-        oplen = bam_cigar_oplen(cigar[i]);
-        op = bam_cigar_op(cigar[i]);
-        if (op == BAM_CMATCH || op == BAM_CEQUAL || op == BAM_CDIFF) {
-            for (int j = 0; j < oplen; ++j) {
-                if (pwa.query[qpos] == pwa.ref[rpos]) { // a match. TODO: Support IUB code
+        this_cigar_len = bam_cigar_oplen(cigar[i]);
+        this_cigar_ops = bam_cigar_op(cigar[i]);
+        if (this_cigar_ops == BAM_CEQUAL) {
+            matched += this_cigar_len;
+            pos_on_query += this_cigar_len;
+            pos_on_ref += this_cigar_len;
+        }
+        else if (this_cigar_ops == BAM_CMATCH || this_cigar_ops == BAM_CDIFF) {
+            for (int j = 0; j < this_cigar_len; ++j) {
+                if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) { // a match. TODO: Support IUB code
                     ++matched;
                 } else {
-                    md_str_ss << matched << static_cast<char>(std::toupper(pwa.ref[rpos]));
+                    md_str_ss << matched << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                     matched = 0;
                     ++nm;
                 }
-                qpos++;
-                rpos++;
+                pos_on_query++;
+                pos_on_ref++;
             }
-        } else if (op == BAM_CDEL) {
+        } else if (this_cigar_ops == BAM_CDEL) {
             md_str_ss << matched << '^';
-            for (int j = 0; j < oplen; ++j) {
-                md_str_ss << static_cast<char>(std::toupper(pwa.ref[rpos]));
-                rpos++;
+            for (int j = 0; j < this_cigar_len; ++j) {
+                md_str_ss << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                pos_on_ref++;
                 nm++;
             }
             matched = 0;
-        } else if (op == BAM_CINS || op == BAM_CSOFT_CLIP) {
-            qpos += oplen;
-            if (op == BAM_CINS) {
-                nm += oplen;
+        } else if (this_cigar_ops == BAM_CINS || this_cigar_ops == BAM_CSOFT_CLIP) {
+            pos_on_query += this_cigar_len;
+            if (this_cigar_ops == BAM_CINS) {
+                nm += static_cast<int32_t>(this_cigar_len);
             }
-        } else if (op == BAM_CREF_SKIP) {
-            rpos += oplen;
+        } else if (this_cigar_ops == BAM_CREF_SKIP) {
+            pos_on_ref += this_cigar_len;
         }
     }
     md_str_ss << matched;
@@ -83,14 +88,20 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
 void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
 {
 #ifdef CEU_CM_IS_DEBUG
-    auto cigar_qlen = bam_cigar2qlen(static_cast<int>(cigar.size()), cigar.data());
-    auto cigar_rlen = bam_cigar2rlen(static_cast<int>(cigar.size()), cigar.data());
+    const auto n_cigar = static_cast<int>(cigar.size());
+    const auto cigar_qlen = bam_cigar2qlen(n_cigar, cigar.data());
+    const auto cigar_rlen = bam_cigar2rlen(n_cigar, cigar.data());
+
+    hts_pos_t pos_on_read = 0;
+    hts_pos_t pos_on_ref = 0;
+    uint32_t this_cigar_ops;
+    uint32_t this_cigar_len;
+    uint8_t this_cigar_type;
 
     if (cigar_qlen != pwa.query.length()) {
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << pwa.query.length();
         goto err;
     }
-
     if (cigar_rlen != pwa.ref.length()) {
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << pwa.ref.length();
         goto err;
@@ -98,6 +109,36 @@ void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32
     if (pwa.query.length() != pwa.qual.length()) {
         BOOST_LOG_TRIVIAL(error) << "Qual length mismatch with query: " << pwa.qual.length()
                                  << " != " << pwa.query.length();
+        goto err;
+    }
+    for (auto cigar_idx = 0; cigar_idx < n_cigar; ++cigar_idx) {
+        this_cigar_ops = bam_cigar_op(cigar[cigar_idx]);
+        this_cigar_len = bam_cigar_oplen(cigar[cigar_idx]);
+        this_cigar_type = bam_cigar_type(this_cigar_ops);
+
+        switch (this_cigar_type) {
+        case CONSUME_QUERY_AND_REFERENCE:
+            if ((this_cigar_ops == BAM_CMATCH
+                && std::strncmp(pwa.query.c_str() + pos_on_read, pwa.ref.c_str() + pos_on_ref, this_cigar_len) != 0) || (this_cigar_ops == BAM_CDIFF
+                && std::strncmp(pwa.query.c_str() + pos_on_read, pwa.ref.c_str() + pos_on_ref, this_cigar_len) == 0)) {
+                BOOST_LOG_TRIVIAL(error) << "Query match with ref with BAM_CDIFF in CIGAR";
+                goto err;
+            }
+            break;
+        case CONSUME_NEITHER_QUERY_NOR_REFERENCE:
+            break;
+        case CONSUME_QUERY:
+            pos_on_read += this_cigar_len;
+            break;
+        case CONSUME_REFERENCE:
+            pos_on_ref += this_cigar_len;
+            break;
+        default: // Error!
+            abort_mpi();
+        }
+    }
+    if(pos_on_read != pwa.query.length() || pos_on_ref != pwa.ref.length()){
+        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query and ref: " << pos_on_read << " != " << pwa.query.length() << " or " << pos_on_ref << " != " << pwa.ref.length();
         goto err;
     }
     return;

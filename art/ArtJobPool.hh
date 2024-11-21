@@ -10,21 +10,19 @@
 #error "No parallel strategy defined! One of: PARALLEL_DISABLED, PARALLEL_ASIO"
 #endif
 
-namespace labw {
-namespace art_modern {
-    class ArtJobPool {
-    public:
-        explicit ArtJobPool(const ArtParams& art_params);
-        void add(ArtJobExecutor aje);
-        void stop();
+namespace labw::art_modern {
+class ArtJobPool {
+public:
+    explicit ArtJobPool(const ArtParams& art_params);
+    void add(ArtJobExecutor aje);
+    void stop();
 
-    private:
+private:
 #if defined(PARALLEL_DISABLED)
-        std::mutex mutex_;
+    std::mutex mutex_;
 #elif defined(PARALLEL_ASIO)
-        boost::asio::thread_pool pool_;
+    boost::asio::thread_pool pool_;
 #endif
-    };
+};
 
-}
 }

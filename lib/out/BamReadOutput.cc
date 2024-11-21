@@ -20,14 +20,19 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
         return;
     }
 
-    int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()), USED_HTSLIB_NAME,
-        "Failed to fetch TID for contig '" + pwa.contig_name + "'", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
+        USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
+        CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     auto sam_record
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-    auto rlen = static_cast<long>(pwa.query.size());
-    auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
+    const auto rlen = static_cast<long>(pwa.query.size());
+    const auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
 
-    auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+    if (cigar.empty()) {
+        pwa.generate_cigar_array(sam_options_.use_m);
+    }
+
+    const auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
     auto qual = pwa.qual;
     hts_pos_t pos = pwa.align_contig_start;
     if (!pwa.is_plus_strand) {
@@ -81,8 +86,8 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     tags2.add_string("MD", md_tag2);
     tags2.add_int_i("NM", nm_tag2);
 
-    auto seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
-    auto seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
+    const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
+    const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
 
     auto qual1 = pwa1.qual;
     auto qual2 = pwa2.qual;

@@ -37,7 +37,7 @@ int Rprob::rand_pos_on_read_not_head_and_tail() { return pos_on_read_not_head_an
 
 #elif defined(USE_BOOST_RANDOM)
 Rprob::~Rprob() = default;
-Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev)
+Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
     : gen_()
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
@@ -45,6 +45,8 @@ Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev)
     , strand_(0, 1)
     , quality_less_than_10_(1, 10)
     , quality_(1, MAX_DIST_NUMBER)
+    , pos_on_read_(0, read_length - 1)
+    , pos_on_read_not_head_and_tail_(1, read_length - 2)
 {
 }
 
@@ -57,6 +59,9 @@ char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 int Rprob::rand_quality() { return quality_(gen_); }
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
+
+int Rprob::rand_pos_on_read() { return pos_on_read_(gen_); }
+int Rprob::rand_pos_on_read_not_head_and_tail() { return pos_on_read_not_head_and_tail_(gen_); }
 
 #elif defined(USE_ONEMKL_RANDOM)
 Rprob::~Rprob() = default;

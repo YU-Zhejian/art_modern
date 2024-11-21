@@ -3,12 +3,14 @@
 #include <boost/log/trivial.hpp>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 #include "ArtConstants.hh"
 #include "ArtJobPool.hh"
 #include "fasta/FaidxFetch.hh"
 #include "fasta/FastaStreamBatcher.hh"
 #include "fasta/Pbsim3TranscriptBatcher.hh"
+#include "global_variables.hh"
 #include "main_fn.hh"
 
 namespace labw::art_modern {

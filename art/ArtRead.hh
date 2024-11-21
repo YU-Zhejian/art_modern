@@ -9,58 +9,51 @@
 #include "random_generator.hh"
 #include "utils/seq_utils.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
-    struct TooMuchNException : public std::exception {
-        const char* what() const noexcept override { return "Too much N in the contig"; }
-    };
+struct TooMuchNException : public std::exception {
+    const char* what() const noexcept override { return "Too much N in the contig"; }
+};
 
-    class ArtRead {
-    public:
-        // Disable copy constructors
-        ArtRead(const ArtRead&) = delete;
-        ArtRead& operator=(ArtRead&&) = delete;
-        // Enable move constructors
-        ArtRead(ArtRead&& other) noexcept = default;
+class ArtRead {
+public:
+    // Disable copy constructors
+    ArtRead(const ArtRead&) = delete;
+    ArtRead& operator=(ArtRead&&) = delete;
+    // Enable move constructors
+    ArtRead(ArtRead&& other) noexcept = default;
 
-        ArtRead(const ArtParams& art_params, Rprob& rprob);
+    ArtRead(const ArtParams& art_params, Rprob& rprob);
 
-        bool is_plus_strand = false;
-        long bpos;
-        std::string seq_read;
-        std::string seq_ref;
-        std::string aln_read;
-        std::string aln_ref;
+    bool is_plus_strand = false;
+    long bpos;
+    std::string seq_read;
+    std::string seq_ref;
+    std::string aln_read;
+    std::string aln_ref;
 
-        int generate_indels(bool is_read_1);
-        // number of deletions <= number of insertions
-        int generate_indels_2(bool is_read_1);
-        void assess_num_n() const;
+    int generate_indels(bool is_read_1);
+    // number of deletions <= number of insertions
+    int generate_indels_2(bool is_read_1);
+    void assess_num_n() const;
 
-        /**
-         * Populate the read while adding insertions and deletions.
-         */
-        void ref2read();
+    /**
+     * Populate the read while adding insertions and deletions.
+     */
+    void ref2read();
 
-        void generate_pairwise_aln();
+    void generate_pairwise_aln();
 
-        /**
-         * Add point mutations to random bases based on empirical dist of quali scores
-         * @param qual As described.
-         */
-        void generate_snv_on_qual(std::vector<int>& qual);
+    /**
+     * Add point mutations to random bases based on empirical dist of quali scores
+     * @param qual As described.
+     */
+    void generate_snv_on_qual(std::vector<int>& qual);
 
-    private:
-        const ArtParams& art_params_;
-        Rprob& rprob_;
-        std::vector<char> indel_;
-    };
+private:
+    const ArtParams& art_params_;
+    Rprob& rprob_;
+    std::map<int, char, std::less<>> indel_;
+};
 
-    struct ArtReadPair {
-        ArtRead read_1;
-        ArtRead read_2;
-    };
-
-} // namespace art_modern
-} // namespace labw
+} // namespace labw::art_modern // namespace labw

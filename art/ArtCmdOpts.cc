@@ -318,20 +318,6 @@ std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std
     }
 }
 
-void shift_emp(std::map<int, int> map_to_process, const int q_shift, const int min_qual, const int max_qual)
-{
-    for (auto& map_to_proces : map_to_process) {
-        if (q_shift != 0) {
-            if (q_shift < 0 && (-q_shift > map_to_proces.second)) {
-                map_to_proces.second = min_qual;
-            } else {
-                map_to_proces.second = std::min(map_to_proces.second + q_shift, max_qual);
-            }
-        }
-        map_to_proces.second = std::min(std::max(map_to_proces.second, min_qual), max_qual);
-    }
-}
-
 void validate_min_max_qual(const int min_qual, const int max_qual)
 {
     if (min_qual < 0 || min_qual > MAX_QUAL) {
@@ -343,47 +329,6 @@ void validate_min_max_qual(const int min_qual, const int max_qual)
         BOOST_LOG_TRIVIAL(fatal) << "Input Error: The quality score must be an integer in [" << min_qual << ", "
                                  << MAX_QUAL << "]";
         abort_mpi();
-    }
-}
-
-void shift_all_emp(const Empdist& qdist, const bool sep_flag, const int q_shift_1, const int q_shift_2,
-    const int min_qual, const int max_qual)
-{
-    if (!sep_flag) {
-        for (const auto& i : qdist.qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for (const auto& i : qdist.qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-    } else {
-        for (const auto& i : qdist.a_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for (const auto& i : qdist.a_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for (const auto& i : qdist.c_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for (const auto& i : qdist.c_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for (const auto& i : qdist.g_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for (const auto& i : qdist.g_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for (const auto& i : qdist.t_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for (const auto& i : qdist.t_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
     }
 }
 
@@ -449,7 +394,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
         abort_mpi();
     }
     if (q_shift_1 != 0 || q_shift_2 != 0) {
-        shift_all_emp(qdist, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+        qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
     }
     return qdist;
 }

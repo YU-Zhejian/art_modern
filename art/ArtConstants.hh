@@ -17,3 +17,4 @@ const char ART_LIB_CONST_MODE_PE[] = "pe";
 const char ART_LIB_CONST_MODE_MP[] = "mp";
 const char ART_PROGRAM_NAME[] = "art_modern";
 const char ART_ACGT[] = "ACGT";
+const std::string ART_ACGT_STR = "ACGT";

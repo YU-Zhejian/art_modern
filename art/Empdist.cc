@@ -8,6 +8,22 @@
 #include <sstream>
 
 namespace labw::art_modern {
+
+void shift_emp(
+    std::map<int, int, std::less<>> map_to_process, const int q_shift, const int min_qual, const int max_qual)
+{
+    for (auto& map_to_proces : map_to_process) {
+        if (q_shift != 0) {
+            if (q_shift < 0 && (-q_shift > map_to_proces.second)) {
+                map_to_proces.second = min_qual;
+            } else {
+                map_to_proces.second = std::min(map_to_proces.second + q_shift, max_qual);
+            }
+        }
+        map_to_proces.second = std::min(std::max(map_to_proces.second, min_qual), max_qual);
+    }
+}
+
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
     : sep_qual_(sep_qual)
 {
@@ -44,12 +60,12 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, bool first) const
+void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, const bool first) const
 {
     qual.resize(len);
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
     int cumCC;
-    for (int i = 0; i < len; i++) {
+    for (auto i = 0; i < len; i++) {
         cumCC = rprob.rand_quality();
         qual[i] = qual_dist[i].lower_bound(cumCC)->second;
     }
@@ -76,17 +92,13 @@ void Empdist::get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq
     for (auto i = 0; i < len; i++) {
         cumCC = rprob.rand_quality();
         if (seq[i] == 'A') {
-            auto it = a_qual_dist_first[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = a_qual_dist_first[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'C') {
-            auto it = c_qual_dist_first[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = c_qual_dist_first[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'G') {
-            auto it = g_qual_dist_first[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = g_qual_dist_first[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'T') {
-            auto it = t_qual_dist_first[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = t_qual_dist_first[i].lower_bound(cumCC)->second;
         } else {
             // return random quality less than 10
             qual[i] = rprob.rand_quality_less_than_10();
@@ -112,17 +124,13 @@ void Empdist::get_read_qual_sep_2(std::vector<int>& qual, const std::string& seq
     for (size_t i = 0; i < len; i++) {
         cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
         if (seq[i] == 'A') {
-            auto it = a_qual_dist_second[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = a_qual_dist_second[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'C') {
-            auto it = c_qual_dist_second[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = c_qual_dist_second[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'G') {
-            auto it = g_qual_dist_second[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = g_qual_dist_second[i].lower_bound(cumCC)->second;
         } else if (seq[i] == 'T') {
-            auto it = t_qual_dist_second[i].lower_bound(cumCC);
-            qual[i] = it->second;
+            qual[i] = t_qual_dist_second[i].lower_bound(cumCC)->second;
         } else {
             // return random quality less than 10
             qual[i] = rprob.rand_quality_less_than_10();
@@ -135,52 +143,26 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     int linenum = 0;
     int read_pos;
     char alt_read_pos;
-    bool a_flag;
-    bool t_flag;
-    bool g_flag;
-    bool c_flag;
+    char leading_base;
     long t_uint;
-    std::string aLine;
-
+    std::string line;
     int t_int;
     std::vector<int> qual;
-    std::map<int, int> dist;
+    std::map<int, int, std::less<>> dist;
     std::vector<long> count;
 
     while (!input.eof()) {
-        a_flag = false;
-        t_flag = false;
-        g_flag = false;
-        c_flag = false;
-
-        std::getline(input, aLine);
-        if (aLine.empty() || aLine[0] == '#') {
+        std::getline(input, line);
+        if (line.empty() || line[0] == '#') {
             continue;
         }
-        if (sep_qual_) {
-            switch (aLine[0]) {
-            case 'A':
-                a_flag = true;
-                break;
-            case 'T':
-                t_flag = true;
-                break;
-            case 'G':
-                g_flag = true;
-                break;
-            case 'C':
-                c_flag = true;
-                break;
-            default:
-                continue;
-            }
-        } else {
-            if (aLine[0] != '.') {
-                continue;
-            }
+        leading_base = line[0];
+        if (!((sep_qual_ && ART_ACGT_STR.find(leading_base) != std::string::npos)
+                || (!sep_qual_ && leading_base == '.'))) {
+            continue;
         }
 
-        std::istringstream ss(aLine);
+        std::istringstream ss(line);
         ss >> alt_read_pos;
         ss >> read_pos;
 
@@ -196,9 +178,9 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             qual.emplace_back(t_int);
         }
 
-        getline(input, aLine);
+        std::getline(input, line);
         ss.clear();
-        ss.str(aLine);
+        ss.str(line);
         ss >> alt_read_pos;
         ss >> read_pos;
 
@@ -230,13 +212,13 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             linenum++;
             if (!sep_qual_) {
                 (is_first ? qual_dist_first : qual_dist_second).emplace_back(dist);
-            } else if (a_flag) {
+            } else if (leading_base == 'A') {
                 (is_first ? a_qual_dist_first : a_qual_dist_second).emplace_back(dist);
-            } else if (t_flag) {
+            } else if (leading_base == 'T') {
                 (is_first ? t_qual_dist_first : t_qual_dist_second).emplace_back(dist);
-            } else if (g_flag) {
+            } else if (leading_base == 'G') {
                 (is_first ? g_qual_dist_first : g_qual_dist_second).emplace_back(dist);
-            } else if (c_flag) {
+            } else if (leading_base == 'C') {
                 (is_first ? c_qual_dist_first : c_qual_dist_second).emplace_back(dist);
             } else {
                 BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
@@ -259,6 +241,48 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
         abort_mpi();
     }
     read_emp_dist_(distss, is_first);
+}
+
+void Empdist::shift_all_emp(
+    const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
+
+{
+    if (!sep_flag) {
+        for (const auto& i : qual_dist_first) {
+            shift_emp(i, q_shift_1, min_qual, max_qual);
+        }
+        for (const auto& i : qual_dist_second) {
+            shift_emp(i, q_shift_2, min_qual, max_qual);
+        }
+    } else {
+        for (const auto& i : a_qual_dist_first) {
+            shift_emp(i, q_shift_1, min_qual, max_qual);
+        }
+        for (const auto& i : a_qual_dist_second) {
+            shift_emp(i, q_shift_2, min_qual, max_qual);
+        }
+
+        for (const auto& i : c_qual_dist_first) {
+            shift_emp(i, q_shift_1, min_qual, max_qual);
+        }
+        for (const auto& i : c_qual_dist_second) {
+            shift_emp(i, q_shift_2, min_qual, max_qual);
+        }
+
+        for (const auto& i : g_qual_dist_first) {
+            shift_emp(i, q_shift_1, min_qual, max_qual);
+        }
+        for (const auto& i : g_qual_dist_second) {
+            shift_emp(i, q_shift_2, min_qual, max_qual);
+        }
+
+        for (const auto& i : t_qual_dist_first) {
+            shift_emp(i, q_shift_1, min_qual, max_qual);
+        }
+        for (const auto& i : t_qual_dist_second) {
+            shift_emp(i, q_shift_2, min_qual, max_qual);
+        }
+    }
 }
 
 }

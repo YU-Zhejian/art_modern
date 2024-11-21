@@ -25,7 +25,7 @@ namespace labw::art_modern {
     exit(status);
 }
 
-[[noreturn]] void abort_mpi(const int status)
+[[noreturn]] void abort_mpi([[maybe_unused]] const int status)
 {
     BOOST_LOG_TRIVIAL(info) << "ABORT";
 #ifdef WITH_MPI
@@ -49,7 +49,7 @@ void bye_mpi()
     std::free(buffer);
 #endif
 }
-void init_mpi(int* argc, char*** argv)
+void init_mpi([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv)
 {
 #ifdef WITH_MPI
     MPI_Init(argc, argv);

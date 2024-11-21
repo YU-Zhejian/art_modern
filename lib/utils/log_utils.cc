@@ -32,8 +32,7 @@ void init_logger()
 #endif
     auto sink
         = boost::log::add_console_log(std::cerr, boost::log::keywords::format = "[%TimeStamp%] %Severity%: %Message%",
-            logging::keywords::filter
-            = expr::attr<int>("MPIRank") == 0 & logging::trivial::severity >= logging::trivial::info);
+            logging::keywords::filter = logging::trivial::severity >= logging::trivial::info);
 
     core->add_sink(sink);
 }

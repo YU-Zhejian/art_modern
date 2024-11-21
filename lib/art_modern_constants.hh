@@ -32,3 +32,20 @@ const int MPI_MAIN_RANK = 0;
 const int MPI_UNAVAILABLE_RANK = -1;
 
 const int TID_FOR_UNMAPPED = (-1);
+
+/**
+ * BAM_CMATCH, BAM_CEQUAL, BAM_CDIFF; Consume both
+ */
+const int CONSUME_QUERY_AND_REFERENCE = 0b11;
+/**
+ * BAM_CHARD_CLIP, BAM_CPAD, BAM_CBACK; Consume neither
+ */
+const int CONSUME_NEITHER_QUERY_NOR_REFERENCE = 0b00;
+/**
+ *  BAM_CINS, BAM_CSOFT_CLIP; Consume query
+ */
+const int CONSUME_QUERY = 0b01;
+/**
+ *  BAM_CDEL, BAM_CREF_SKIP; Consume reference
+ */
+const int CONSUME_REFERENCE = 0b10;

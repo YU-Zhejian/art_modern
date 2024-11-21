@@ -4,7 +4,6 @@
 #include <random>
 #elif defined(USE_BOOST_RANDOM)
 #include <boost/random.hpp>
-#error "Under construction."
 #elif defined(USE_ONEMKL_RANDOM)
 #include <mkl.h>
 #elif defined(USE_GSL_RANDOM)
@@ -46,8 +45,8 @@ private:
     boost::uniform_smallint<int> strand_;
     boost::uniform_smallint<int> quality_less_than_10_;
     boost::uniform_int<int> quality_;
-    boost::uniform_int_distribution<int> pos_on_read_;
-    boost::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
+    boost::uniform_int<int> pos_on_read_;
+    boost::uniform_int<int> pos_on_read_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
     double pe_frag_dist_mean_;

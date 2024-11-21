@@ -83,6 +83,9 @@ int main(int argc, char* argv[])
 
     auto art_params = parse_args(argc, argv);
     BOOST_LOG_TRIVIAL(info) << "Argument parsing finished. Start generating...";
+#ifdef CEU_CM_IS_DEBUG
+    BOOST_LOG_TRIVIAL(warning) << "Debug mode enabled.";
+#endif
 
 #ifdef WITH_BOOST_TIMER
     BOOST_LOG_TRIVIAL(info) << "Boost::timer started.";

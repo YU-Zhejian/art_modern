@@ -10,16 +10,19 @@
 
 namespace labw::art_modern {
 
+struct ReadGenerationException : public std::runtime_error {
+    using runtime_error::runtime_error;
+};
+
 class ArtContig {
 
 public:
     ArtContig(BaseFastaFetch* fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob);
 
-    ArtRead generate_read_se(bool is_plus_strand);
+    void generate_read_se(bool is_plus_strand, ArtRead& read_1);
 
-    ArtReadPair generate_read_pe(bool is_plus_strand);
+    void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);
 
-    ArtReadPair generate_read_mp(bool is_plus_strand);
     const std::string seq_name_;
     const hts_pos_t ref_len_;
 

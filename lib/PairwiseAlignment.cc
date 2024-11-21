@@ -34,8 +34,7 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
     uint32_t current_cigar = BAM_CMATCH;
     uint32_t prev_cigar = BAM_CMATCH;
     uint32_t cigar_len = 0;
-    auto ref_len = aligned_ref.length();
-
+    const auto ref_len = aligned_ref.length();
     if (is_plus_strand) {
         for (auto i = 0; i < ref_len; i++) {
             if (aligned_ref[i] == aligned_query[i]) {
@@ -48,14 +47,14 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
                 current_cigar = use_m ? BAM_CMATCH : BAM_CDIFF;
             }
             if (current_cigar != prev_cigar && cigar_len > 0) {
-                cigar.emplace_back(cigar_len << BAM_CIGAR_SHIFT | prev_cigar);
+                cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));
                 cigar_len = 0;
             }
             cigar_len++;
             prev_cigar = current_cigar;
         }
     } else {
-        for (auto i = ref_len - 1; i > -1; i--) {
+        for (auto i = static_cast<int>(ref_len) - 1; i > -1; i--) {
             if (aligned_ref[i] == aligned_query[i]) {
                 current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
             } else if (aligned_ref[i] == ALN_GAP) {
@@ -66,16 +65,15 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
                 current_cigar = use_m ? BAM_CMATCH : BAM_CDIFF;
             }
             if (current_cigar != prev_cigar && cigar_len > 0) {
-                cigar.emplace_back(cigar_len << BAM_CIGAR_SHIFT | prev_cigar);
+                cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));
                 cigar_len = 0;
             }
             cigar_len++;
             prev_cigar = current_cigar;
-        } // TODO: Merge this redundant code
+        }
     }
-
     if (cigar_len != 0) {
-        cigar.emplace_back(cigar_len << BAM_CIGAR_SHIFT | prev_cigar);
+        cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));
     }
     return cigar;
 }
