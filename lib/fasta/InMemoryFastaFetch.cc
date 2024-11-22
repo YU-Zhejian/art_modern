@@ -16,7 +16,7 @@ std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
 }
 
 InMemoryFastaFetch::InMemoryFastaFetch()
-    : BaseFastaFetch() {};
+    : BaseFastaFetch() { };
 
 std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
 {

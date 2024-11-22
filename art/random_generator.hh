@@ -41,6 +41,7 @@ private:
     std::uniform_int_distribution<int> quality_;
     std::uniform_int_distribution<int> pos_on_read_;
     std::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
+    int read_length_;
 #elif defined(USE_BOOST_RANDOM)
     boost::mt19937_64 gen_;
     boost::uniform_real<double> dis_;
@@ -51,6 +52,7 @@ private:
     boost::uniform_int<int> quality_;
     boost::uniform_int<int> pos_on_read_;
     boost::uniform_int<int> pos_on_read_not_head_and_tail_;
+    int read_length_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
     double pe_frag_dist_mean_;

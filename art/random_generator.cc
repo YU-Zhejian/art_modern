@@ -1,5 +1,7 @@
 #include "random_generator.hh"
 #include "ArtConstants.hh"
+
+#include <algorithm>
 #include <chrono>
 #include <thread>
 #include <vector>
@@ -20,7 +22,7 @@ long Rprob::seed()
 #if defined(USE_STL_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_(Rprob::seed())
+    : gen_(seed())
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)
@@ -29,6 +31,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , quality_(1, MAX_DIST_NUMBER)
     , pos_on_read_(0, read_length - 1)
     , pos_on_read_not_head_and_tail_(1, read_length - 2)
+    , read_length_(read_length)
 {
 }
 
@@ -38,7 +41,12 @@ int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussia
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-int Rprob::rand_quality() { return quality_(gen_); }
+std::vector<int> Rprob::rand_quality()
+{
+    std::vector<int> result(read_length_);
+    std::generate_n(result.begin(), read_length_, [this]() { quality_(gen_); });
+    return result;
+}
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
 
@@ -49,7 +57,7 @@ int Rprob::randint(int min, int max) { return std::uniform_int_distribution<int>
 #elif defined(USE_BOOST_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_(Rprob::seed())
+    : gen_(seed())
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)
@@ -58,6 +66,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , quality_(1, MAX_DIST_NUMBER)
     , pos_on_read_(0, read_length - 1)
     , pos_on_read_not_head_and_tail_(1, read_length - 2)
+    , read_length_(read_length)
 {
 }
 
@@ -67,7 +76,12 @@ int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussia
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-int Rprob::rand_quality() { return quality_(gen_); }
+std::vector<int> Rprob::rand_quality()
+{
+    std::vector<int> result(read_length_);
+    std::generate_n(result.begin(), read_length_, [this]() { quality_(gen_); });
+    return result;
+}
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
 
@@ -151,6 +165,7 @@ Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_len
 
     T = gsl_rng_default;
     r = gsl_rng_alloc(T);
+    gsl_rng_set(r, seed());
 }
 Rprob::~Rprob() { gsl_rng_free(r); }
 
@@ -163,8 +178,13 @@ int Rprob::insertion_length()
 
 char Rprob::rand_base() { return ART_ACGT[gsl_rng_uniform_int(r, 4)]; }
 
-int Rprob::rand_quality() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER) + 1); }
-
+std::vector<int> Rprob::rand_quality()
+{
+    std::vector<int> result(read_length_);
+    std::generate_n(result.begin(), read_length_,
+        [this]() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER) + 1); });
+    return result;
+}
 int Rprob::rand_quality_less_than_10() { return static_cast<int>(gsl_rng_uniform_int(r, 9) + 1); }
 
 int Rprob::rand_pos_on_read() { return static_cast<int>(gsl_rng_uniform_int(r, read_length_)); }
@@ -174,5 +194,6 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
     return static_cast<int>(gsl_rng_uniform_int(r, read_length_ - 2) + 1);
 }
 
+int Rprob::randint(int min, int max) { return static_cast<int>(gsl_rng_uniform_int(r, max - min) + min); }
 #endif
 }
