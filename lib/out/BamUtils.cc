@@ -9,7 +9,7 @@
 namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
 {
-    const hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
+    const hts_pos_t pos = pwa.pos_on_contig + 1; // SAM is 1-based
     const auto strand = pwa.is_plus_strand ? '+' : '-';
     const auto cigar_str = cigar_arr_to_str(cigar);
     std::ostringstream oss;
@@ -25,7 +25,7 @@ BamUtils::BamUtils(const SamOptions& sam_options)
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
 {
-    const hts_pos_t pos = pwa.align_contig_start + 1; // SAM is 1-based
+    const hts_pos_t pos = pwa.pos_on_contig + 1; // SAM is 1-based
     const auto strand = pwa.is_plus_strand ? '+' : '-';
     const auto cigar_str = cigar_arr_to_str(cigar);
     std::ostringstream oss;
@@ -51,8 +51,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
             matched += this_cigar_len;
             pos_on_query += this_cigar_len;
             pos_on_ref += this_cigar_len;
-        }
-        else if (this_cigar_ops == BAM_CMATCH || this_cigar_ops == BAM_CDIFF) {
+        } else if (this_cigar_ops == BAM_CMATCH || this_cigar_ops == BAM_CDIFF) {
             for (int j = 0; j < this_cigar_len; ++j) {
                 if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) { // a match. TODO: Support IUB code
                     ++matched;
@@ -111,6 +110,7 @@ void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32
                                  << " != " << pwa.query.length();
         goto err;
     }
+    bool is_equal;
     for (auto cigar_idx = 0; cigar_idx < n_cigar; ++cigar_idx) {
         this_cigar_ops = bam_cigar_op(cigar[cigar_idx]);
         this_cigar_len = bam_cigar_oplen(cigar[cigar_idx]);
@@ -118,12 +118,18 @@ void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32
 
         switch (this_cigar_type) {
         case CONSUME_QUERY_AND_REFERENCE:
-            if ((this_cigar_ops == BAM_CMATCH
-                && std::strncmp(pwa.query.c_str() + pos_on_read, pwa.ref.c_str() + pos_on_ref, this_cigar_len) != 0) || (this_cigar_ops == BAM_CDIFF
-                && std::strncmp(pwa.query.c_str() + pos_on_read, pwa.ref.c_str() + pos_on_ref, this_cigar_len) == 0)) {
-                BOOST_LOG_TRIVIAL(error) << "Query match with ref with BAM_CDIFF in CIGAR";
-                goto err;
+            if (this_cigar_ops == BAM_CEQUAL || this_cigar_ops == BAM_CDIFF) {
+                is_equal
+                    = std::strncmp(pwa.query.c_str() + pos_on_read, pwa.ref.c_str() + pos_on_ref, this_cigar_len) == 0;
+                if ((this_cigar_ops == BAM_CEQUAL) != is_equal) {
+                    BOOST_LOG_TRIVIAL(error) << "Query/ref X/= error in CIGAR. QPOS=" << pos_on_read
+                                             << " RPOS=" << pos_on_ref << " CIGAR_ID=" << cigar_idx << " ("
+                                             << this_cigar_len << bam_cigar_opchr(this_cigar_ops) << ")";
+                    goto err;
+                }
             }
+            pos_on_read += this_cigar_len;
+            pos_on_ref += this_cigar_len;
             break;
         case CONSUME_NEITHER_QUERY_NOR_REFERENCE:
             break;
@@ -137,17 +143,22 @@ void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32
             abort_mpi();
         }
     }
-    if(pos_on_read != pwa.query.length() || pos_on_ref != pwa.ref.length()){
-        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query and ref: " << pos_on_read << " != " << pwa.query.length() << " or " << pos_on_ref << " != " << pwa.ref.length();
+    if (pos_on_read != pwa.query.length() || pos_on_ref != pwa.ref.length()) {
+        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query and ref: " << pos_on_read
+                                 << " != " << pwa.query.length() << " or " << pos_on_ref << " != " << pwa.ref.length();
         goto err;
     }
     return;
 err:
+    BOOST_LOG_TRIVIAL(error) << "Read   : " << pwa.read_name;
+    BOOST_LOG_TRIVIAL(error) << "Contig : " << pwa.contig_name << ":" << pwa.pos_on_contig << ":"
+                             << (pwa.is_plus_strand ? "+" : "-");
+
     BOOST_LOG_TRIVIAL(error) << "Cigar  : " << cigar_arr_to_str(cigar) << " (QLEN=" << cigar_qlen
                              << ", RLEN=" << cigar_rlen << ")";
     BOOST_LOG_TRIVIAL(error) << "Query  : " << pwa.query;
-    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
     BOOST_LOG_TRIVIAL(error) << "Ref    : " << pwa.ref;
+    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
     BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aligned_query;
     BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aligned_ref;
     abort_mpi();
@@ -171,26 +182,26 @@ size_t BamTags::size() const
 void BamTags::add_string(const std::string& key, const std::string& value)
 {
     size_t len = value.size();
-    std::shared_ptr<uint8_t[]> data(new uint8_t[len + 1]);
+    data_type data(new uint8_t[len + 1]);
     std::copy(value.begin(), value.end(), data.get());
     data[static_cast<std::ptrdiff_t>(len)] = '\0';
     tags_.emplace_back(key, 'Z', len + 1, data);
 }
 void BamTags::add_int_c(const std::string& key, int8_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[1]);
+    data_type data(new uint8_t[1]);
     data[0] = static_cast<uint8_t>(value);
     tags_.emplace_back(key, 'c', 1, data);
 }
 void BamTags::add_int_C(const std::string& key, uint8_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[1]);
+    data_type data(new uint8_t[1]);
     data[0] = value;
     tags_.emplace_back(key, 'C', 1, data);
 }
 void BamTags::add_int_s(const std::string& key, int16_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[2]);
+    data_type data(new uint8_t[2]);
     std::memcpy(data.get(), &value, 2);
 #ifdef HTS_LITTLE_ENDIAN
 #else
@@ -200,7 +211,7 @@ void BamTags::add_int_s(const std::string& key, int16_t value)
 }
 void BamTags::add_int_S(const std::string& key, uint16_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[2]);
+    data_type data(new uint8_t[2]);
     std::memcpy(data.get(), &value, 2);
 #ifdef HTS_LITTLE_ENDIAN
 #else
@@ -210,7 +221,7 @@ void BamTags::add_int_S(const std::string& key, uint16_t value)
 }
 void BamTags::add_int_i(const std::string& key, int32_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[4]);
+    data_type data(new uint8_t[4]);
     std::memcpy(data.get(), &value, 4);
 #ifdef HTS_LITTLE_ENDIAN
 #else
@@ -220,7 +231,7 @@ void BamTags::add_int_i(const std::string& key, int32_t value)
 }
 void BamTags::add_int_I(const std::string& key, uint32_t value)
 {
-    std::shared_ptr<uint8_t[]> data(new uint8_t[4]);
+    data_type data(new uint8_t[4]);
     std::memcpy(data.get(), &value, 4);
 #ifdef HTS_LITTLE_ENDIAN
 #else

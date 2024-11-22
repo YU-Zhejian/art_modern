@@ -2,7 +2,6 @@
 
 #include "BaseFastaFetch.hh"
 #include "CExceptionsProxy.hh"
-#include "MapUtils.hh"
 #include "art_modern_config.h"
 
 namespace labw::art_modern {
@@ -24,11 +23,6 @@ std::string BaseFastaFetch::seq_name(const std::size_t seq_id) const { return se
 
 size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
 
-BaseFastaFetch::BaseFastaFetch(const std::unordered_map<std::string, hts_pos_t>& seq_names_lengths)
-    : BaseFastaFetch(convert_map_to_k_v_list(seq_names_lengths))
-{
-}
-
 BaseFastaFetch::BaseFastaFetch(std::vector<std::string> seq_names, std::vector<hts_pos_t> seq_lengths)
     : seq_names_(std::move(seq_names))
     , seq_lengths_(std::move(seq_lengths))
@@ -41,6 +35,6 @@ BaseFastaFetch::BaseFastaFetch(const std::tuple<std::vector<std::string>, std::v
 }
 bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
 std::string BaseFastaFetch::fetch(std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
-
+BaseFastaFetch::BaseFastaFetch() = default;
 BaseFastaFetch::~BaseFastaFetch() = default;
 }

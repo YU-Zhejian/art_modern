@@ -240,7 +240,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
             goto fail;
         }
 
-        if (!extend_baq) { // in this block, bq[] is capped by base quality qual[]
+        if (!extend_baq) { // in this block, bq[] is capped by base quality qual_[]
             for (k = 0, x = c->pos, y = 0; k < c->n_cigar; ++k) {
                 int op = cigar[k]&0xf, l = cigar[k]>>4;
                 if (l == 0) continue;
@@ -264,7 +264,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
                 }
             }
             for (i = 0; i < c->l_qseq; ++i) bq[i] = qual[i] - bq[i] + 64; // finalize BQ
-        } else { // in this block, bq[] is BAQ that can be larger than qual[] (different from the above!)
+        } else { // in this block, bq[] is BAQ that can be larger than qual_[] (different from the above!)
             // tseq,tref are no longer needed, so we can steal them to avoid mallocs
             uint8_t *left = tseq;
             uint8_t *rght = tref;
@@ -297,7 +297,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
             for (i = 0; i < c->l_qseq; ++i) bq[i] = 64 + (qual[i] <= bq[i]? 0 : qual[i] - bq[i]); // finalize BQ
         }
         if (apply_baq) {
-            for (i = 0; i < c->l_qseq; ++i) qual[i] -= bq[i] - 64; // modify qual
+            for (i = 0; i < c->l_qseq; ++i) qual[i] -= bq[i] - 64; // modify qual_
             bam_aux_append(b, "ZQ", 'Z', c->l_qseq + 1, bq);
         } else bam_aux_append(b, "BQ", 'Z', c->l_qseq + 1, bq);
         free(bq); free(state);

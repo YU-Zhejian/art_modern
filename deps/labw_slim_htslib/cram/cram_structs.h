@@ -542,7 +542,7 @@ typedef union cram_feature {
     struct {
         int pos;
         int code;
-        int base;    // actual base & qual
+        int base;    // actual base & qual_
         int qual;
     } B;
     struct {

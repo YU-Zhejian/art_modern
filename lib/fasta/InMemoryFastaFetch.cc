@@ -1,7 +1,6 @@
 #include <fstream>
 
 #include "InMemoryFastaFetch.hh"
-#include "MapUtils.hh"
 #include "fasta_parser.hh"
 
 namespace labw::art_modern {
@@ -17,7 +16,7 @@ std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
 }
 
 InMemoryFastaFetch::InMemoryFastaFetch()
-    : BaseFastaFetch(std::unordered_map<std::string, hts_pos_t>()) {};
+    : BaseFastaFetch() {};
 
 std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
 {

@@ -1301,7 +1301,7 @@ static int bam_sym_lookup(void *data, char *str, char **end,
             res->is_str = 1;
             kputs(bam_get_qname(b), ks_clear(&res->s));
             return 0;
-        } else if (memcmp(str, "qual", 4) == 0) {
+        } else if (memcmp(str, "qual_", 4) == 0) {
             *end = str+4;
             ks_clear(&res->s);
             if (ks_resize(&res->s, b->core.l_qseq+1) < 0)
@@ -2758,7 +2758,7 @@ int sam_parse1(kstring_t *s, sam_hdr_t *h, bam1_t *b)
         for (; i < c->l_qseq; ++i)
             t[i>>1] = seq_nt16_table[(unsigned char)q[i]] << ((~i&1)<<2);
     } else c->l_qseq = 0;
-    // qual
+    // qual_
     _get_mem(uint8_t, &t, b, c->l_qseq);
     if (p[0] == '*' && (p[1] == '\t' || p[1] == '\0')) {
         memset(t, 0xff, c->l_qseq);
@@ -3881,7 +3881,7 @@ static int fastq_parse1(htsFile *fp, bam1_t *b) {
             remainder -= fp->line.l;
         } while (remainder > 0);
 
-        // Decr qual
+        // Decr qual_
         for (i = 0; i < x->qual.l; i++)
             x->qual.s[i] -= '!';
     }
@@ -4142,7 +4142,7 @@ static int sam_format1_append(const bam_hdr_t *h, const bam1_t *b, kstring_t *st
         r |= kputc_('\t', str);
     } else r |= kputsn_("*\t", 2, str);
     r |= kputll(c->pos + 1, str); r |= kputc_('\t', str); // pos
-    r |= kputw(c->qual, str); r |= kputc_('\t', str); // qual
+    r |= kputw(c->qual, str); r |= kputc_('\t', str); // qual_
     if (c->n_cigar) { // cigar
         uint32_t *cigar = bam_get_cigar(b);
         for (i = 0; i < c->n_cigar; ++i) {
@@ -4159,7 +4159,7 @@ static int sam_format1_append(const bam_hdr_t *h, const bam1_t *b, kstring_t *st
     }
     r |= kputll(c->mpos + 1, str); r |= kputc_('\t', str); // mate pos
     r |= kputll(c->isize, str); r |= kputc_('\t', str); // template len
-    if (c->l_qseq) { // seq and qual
+    if (c->l_qseq) { // seq and qual_
         uint8_t *s = bam_get_seq(b);
         if (ks_resize(str, str->l+2+2*c->l_qseq) < 0) goto mem_err;
         char *cp = str->s + str->l;
@@ -5604,13 +5604,13 @@ static int tweak_overlap_quality(bam1_t *a, bam1_t *b)
             b_qual[b_iseq] = bmul * (qual>200 ? 200 : qual);;
         } else {
             // Not so confident about anymore given the mismatch.
-            // Reduce qual for lowest quality base.
+            // Reduce qual_ for lowest quality base.
             if ( a_qual[a_iseq] > b_qual[b_iseq] ) {
-                // A highest qual base; keep
+                // A highest qual_ base; keep
                 a_qual[a_iseq] = 0.8 * a_qual[a_iseq];
                 b_qual[b_iseq] = 0;
             } else if (a_qual[a_iseq] < b_qual[b_iseq] ) {
-                // B highest qual base; keep
+                // B highest qual_ base; keep
                 b_qual[b_iseq] = 0.8 * b_qual[b_iseq];
                 a_qual[a_iseq] = 0;
             } else {
@@ -6084,7 +6084,7 @@ struct hts_base_mod_state {
     int MMcount[MAX_BASE_MOD];  // no. canonical bases left until next mod
     char *MM[MAX_BASE_MOD];     // next pos delta (string)
     char *MMend[MAX_BASE_MOD];  // end of pos-delta string
-    uint8_t *ML[MAX_BASE_MOD];  // next qual
+    uint8_t *ML[MAX_BASE_MOD];  // next qual_
     int MLstride[MAX_BASE_MOD]; // bytes between quals for this type
     int seq_pos;                // current position along sequence
     int nmods;                  // used array size (0 to MAX_BASE_MOD-1).

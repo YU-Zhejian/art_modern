@@ -286,7 +286,7 @@ static inline void RansEncPutSymbol(RansState* r, uint8_t** pptr, RansEncSymbol 
     uint32_t x = *r;
     uint32_t x_max = sym->x_max;
 
-    // This is better for 40-qual illumina (3.7% quicker overall CRAM).
+    // This is better for 40-qual_ illumina (3.7% quicker overall CRAM).
     // The old method was better for low complexity data such as NovaSeq
     // quals (2.6% quicker overall CRAM).
     int o = x >= x_max;

@@ -30,7 +30,8 @@ private:
 
 class BamTags {
 public:
-    using tag_type = std::tuple<std::string, char, int, std::shared_ptr<uint8_t[]>>;
+    using data_type = std::shared_ptr<uint8_t[]>;
+    using tag_type = std::tuple<std::string, char, int, data_type>;
     void patch(bam1_t* record) const;
     size_t size() const;
     void add_string(const std::string& key, const std::string& value);

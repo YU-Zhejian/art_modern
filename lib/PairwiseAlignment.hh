@@ -28,11 +28,11 @@ public:
      * @param qual Quality sequence whose length should be the same as query.
      * @param aligned_query Aligned query sequence with gaps.
      * @param aligned_ref Aligned reference sequence with gaps.
-     * @param align_contig_start
+     * @param pos_on_contig
      * @param is_plus_strand Whether the reference is reverse-complemented.
      */
     PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
-        std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t align_contig_start,
+        std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig,
         bool is_plus_strand);
     std::vector<uint32_t> generate_cigar_array(bool use_m) const;
 
@@ -58,7 +58,7 @@ public:
     const std::string qual;
     const std::string read_name;
     const std::string contig_name;
-    const hts_pos_t align_contig_start;
+    const hts_pos_t pos_on_contig;
     const bool is_plus_strand;
 };
 

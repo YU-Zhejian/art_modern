@@ -98,7 +98,7 @@ int main(int argc, char* argv[])
     generate_all(art_params);
 #ifdef WITH_BOOST_TIMER
     t.stop();
-    BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%w");
+    BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");
 #endif
     bye_mpi();
     exit_mpi(EXIT_SUCCESS);

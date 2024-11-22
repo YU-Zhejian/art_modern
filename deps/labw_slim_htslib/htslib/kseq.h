@@ -212,7 +212,7 @@
 		} \
 		seq->seq.s[seq->seq.l] = 0;	/* null terminated string */ \
 		if (c != '+') return seq->seq.l; /* FASTA */ \
-		if (seq->qual.m < seq->seq.m) {	/* allocate memory for qual in case insufficient */ \
+		if (seq->qual.m < seq->seq.m) {	/* allocate memory for qual_ in case insufficient */ \
 			seq->qual.m = seq->seq.m; \
 			seq->qual.s = (char*)realloc(seq->qual.s, seq->qual.m); \
 		} \
@@ -220,7 +220,7 @@
 		if (c == -1) return -2; /* error: no quality string */ \
 		while (ks_getuntil2(ks, KS_SEP_LINE, &seq->qual, 0, 1) >= 0 && seq->qual.l < seq->seq.l); \
 		seq->last_char = 0;	/* we have not come to the next header line */ \
-		if (seq->seq.l != seq->qual.l) return -2; /* error: qual string is of a different length */ \
+		if (seq->seq.l != seq->qual.l) return -2; /* error: qual_ string is of a different length */ \
 		return seq->seq.l; \
 	}
 

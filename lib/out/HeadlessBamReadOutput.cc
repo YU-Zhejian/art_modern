@@ -35,17 +35,18 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     }
     auto sam_record
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-    auto rlen = static_cast<long>(pwa.query.size());
-    auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+    const auto rlen = static_cast<long>(pwa.query.size());
+    const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
     auto qual = pwa.qual;
-    if (!pwa.is_plus_strand) {
-        std::reverse(qual.begin(), qual.end());
-    }
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
+    if (!pwa.is_plus_strand) {
+        std::reverse(qual.begin(), qual.end());
+        std::reverse(cigar.begin(), cigar.end());
+    }
 
-    auto [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
-    auto oa_tag = BamUtils::generate_oa_tag(pwa, cigar, nm_tag);
+    const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
+    const auto& oa_tag = BamUtils::generate_oa_tag(pwa, cigar, nm_tag);
     BamTags tags;
     tags.add_string("OA", oa_tag);
     tags.add_string("MD", md_tag);
@@ -78,28 +79,31 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
     auto sam_record2
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-    auto rlen = static_cast<long>(pwa1.query.size());
-    auto seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
-    auto seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
+    const auto rlen = static_cast<long>(pwa1.query.size());
+    const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
+    const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
     auto qual1 = pwa1.qual;
-    if (!pwa1.is_plus_strand) {
-        std::reverse(qual1.begin(), qual1.end());
-    }
-    auto qual2 = pwa2.qual;
-    if (!pwa1.is_plus_strand) {
-        std::reverse(qual2.begin(), qual2.end());
-    }
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
 
     assert_correct_cigar(pwa1, cigar1);
     assert_correct_cigar(pwa2, cigar2);
 
-    auto [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
-    auto [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+    if (!pwa1.is_plus_strand) {
+        std::reverse(qual1.begin(), qual1.end());
+        std::reverse(cigar1.begin(), cigar1.end());
+    }
+    auto qual2 = pwa2.qual;
+    if (!pwa1.is_plus_strand) {
+        std::reverse(qual2.begin(), qual2.end());
+        std::reverse(cigar2.begin(), cigar2.end());
+    }
 
-    auto oa_tag1 = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag1);
-    auto oa_tag2 = BamUtils::generate_oa_tag(pwa2, cigar2, nm_tag2);
+    const auto& [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
+    const auto& [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+
+    const auto& oa_tag1 = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag1);
+    const auto& oa_tag2 = BamUtils::generate_oa_tag(pwa2, cigar2, nm_tag2);
 
     BamTags tags1;
     tags1.add_string("OA", oa_tag1);

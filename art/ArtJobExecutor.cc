@@ -7,43 +7,12 @@
 
 namespace labw::art_modern {
 
-bool is_good(const ArtRead& art_read, const ArtParams& art_params, const std::string& qual_str)
-{
-    try {
-        art_read.assess_num_n();
-    } catch (TooMuchNException&) {
-        return false;
-    }
-    if (art_read.seq_read.size() != art_params.read_len) {
-        goto error;
-    }
-    if (qual_str.size() != art_params.read_len) {
-        goto error;
-    }
-    if (art_read.aln_read.size() != art_read.aln_ref.size()) {
-        goto error;
-    }
-    return true;
-error:
-    // #ifdef CEU_CM_IS_DEBUG
-    //         abort_mpi();
-    // #else
-    return false; // FIXME: No idea why this occurs.
-    // #endif
-}
-
 bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand)
 {
     std::ostringstream osID;
-    auto const& qdist = art_params_.qdist;
-
-    std::vector<int> qual_1;
-    std::vector<int> qual_2;
-
-    osID << art_contig.seq_name_ << ':' << art_params_.id << ":" << read_id++;
-    std::string sam_read_id = osID.str();
-    ArtRead read_1(art_params_, rprob_);
-    ArtRead read_2(art_params_, rprob_);
+    osID << art_contig.seq_name << ':' << art_params_.id << ":" << read_id++;
+    ArtRead read_1(art_params_, rprob_, art_contig.seq_name, osID.str());
+    ArtRead read_2(art_params_, rprob_, art_contig.seq_name, osID.str());
 
     try {
         art_contig.generate_read_pe(
@@ -52,32 +21,15 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
         return false;
     }
 
-    if (!art_params_.sep_flag) {
-        qdist.get_read_qual(qual_1, art_params_.read_len, rprob_, true);
-        qdist.get_read_qual(qual_2, art_params_.read_len, rprob_, true);
-    } else {
-        qdist.get_read_qual_sep_1(qual_1, read_1.seq_read, rprob_);
-        qdist.get_read_qual_sep_2(qual_2, read_1.seq_read, rprob_);
-    }
-    read_1.generate_snv_on_qual(qual_1);
-    read_2.generate_snv_on_qual(qual_2);
-    auto qual_1_str = qual_to_str(qual_1);
-    auto qual_2_str = qual_to_str(qual_2);
+    read_1.generate_snv_on_qual(true);
+    read_2.generate_snv_on_qual(false);
     read_1.generate_pairwise_aln();
     read_2.generate_pairwise_aln();
-    if (!(is_good(read_1, art_params_, qual_1_str) && is_good(read_2, art_params_, qual_2_str))) {
+    if (!(read_1.is_good() && read_2.is_good())) {
         return false;
     }
 
-    output_dispatcher_->writePE(
-        PairwiseAlignment(sam_read_id, art_contig.seq_name_, read_1.seq_read, read_1.seq_ref, qual_1_str,
-            read_1.aln_read, read_1.aln_ref,
-            read_1.is_plus_strand ? read_1.bpos : art_contig.ref_len_ - (read_1.bpos + art_params_.read_len),
-            read_1.is_plus_strand),
-        PairwiseAlignment(sam_read_id, art_contig.seq_name_, read_2.seq_read, read_2.seq_ref, qual_2_str,
-            read_2.aln_read, read_2.aln_ref,
-            read_2.is_plus_strand ? read_2.bpos : art_contig.ref_len_ - (read_2.bpos + art_params_.read_len),
-            read_2.is_plus_strand));
+    output_dispatcher_->writePE(read_1.to_pwa(), read_2.to_pwa());
 
     return true;
 }
@@ -86,36 +38,20 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
 
 {
     std::ostringstream osID;
-    std::vector<int> qual;
-    std::string read_name;
-
-    osID << art_contig.seq_name_ << ':' << art_params_.id << ':' << read_id++;
-    read_name = osID.str();
-    ArtRead art_read(art_params_, rprob_);
+    osID << art_contig.seq_name << ':' << art_params_.id << ':' << read_id++;
+    ArtRead art_read(art_params_, rprob_, art_contig.seq_name, osID.str());
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
     } catch (ReadGenerationException&) {
         return false;
     }
-
-    if (!art_params_.sep_flag) {
-        art_params_.qdist.get_read_qual(qual, art_params_.read_len, rprob_, true);
-    } else {
-        art_params_.qdist.get_read_qual_sep_1(qual, art_read.seq_read, rprob_);
-    }
-    art_read.generate_snv_on_qual(qual);
-    auto qual_str = qual_to_str(qual);
-
+    art_read.generate_snv_on_qual(true);
     art_read.generate_pairwise_aln();
-
-    if (!is_good(art_read, art_params_, qual_str)) {
+    if (!art_read.is_good()) {
         return false;
     }
 
-    output_dispatcher_->writeSE(PairwiseAlignment(read_name, art_contig.seq_name_, art_read.seq_read, art_read.seq_ref,
-        qual_str, art_read.aln_read, art_read.aln_ref,
-        art_read.is_plus_strand ? art_read.bpos : art_contig.ref_len_ - (art_read.bpos + art_params_.read_len),
-        art_read.is_plus_strand));
+    output_dispatcher_->writeSE(art_read.to_pwa());
     return true;
 }
 

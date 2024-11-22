@@ -8,29 +8,59 @@ namespace labw::art_modern {
 
 void ArtRead::generate_pairwise_aln()
 {
-    aln_read = seq_read;
-    aln_ref = seq_ref;
-    for (auto pos = 0; pos < art_params_.read_len; pos++) {
-        if (indel_.find(pos) == indel_.end()) {
-            continue;
+    int k = 0;
+    int pos_on_read = 0;
+    std::ostringstream aln_seq_ss;
+    std::ostringstream aln_ref_ss;
+    for (auto pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
+        if (indel_.find(k) == indel_.end()) { // No indel
+            aln_seq_ss << seq_read_[pos_on_read];
+            aln_ref_ss << seq_ref[pos_on_ref];
+            pos_on_read++;
+            pos_on_ref++;
+        } else if (indel_[k] == ALN_GAP) { // Deletion
+            aln_seq_ss << ALN_GAP;
+            aln_ref_ss << seq_ref[pos_on_ref];
+            pos_on_ref++;
+        } else { // Insertion
+            aln_seq_ss << indel_[k];
+            aln_ref_ss << ALN_GAP;
+            pos_on_read++;
         }
-        (indel_[pos] != ALN_GAP ? aln_ref : aln_read).insert(indel_[pos], 1, ALN_GAP);
+        k++;
     }
+    while (indel_.find(k) != indel_.end()) { // Insertions after reference
+        aln_seq_ss << indel_[k];
+        aln_ref_ss << ALN_GAP;
+        pos_on_read++;
+        k++;
+    }
+    aln_read_ = aln_seq_ss.str();
+    aln_ref_ = aln_ref_ss.str();
 }
 
-void ArtRead::generate_snv_on_qual(std::vector<int>& qual)
+void ArtRead::generate_snv_on_qual(bool is_first_read)
 {
-    for (auto i = 0; i < qual.size(); i++) {
-        if (seq_read[i] == 'N') {
-            qual[i] = MIN_QUAL;
+
+    if (!art_params_.sep_flag) {
+        art_params_.qdist.get_read_qual(qual_, art_params_.read_len, rprob_, is_first_read);
+    } else if (is_first_read) {
+        art_params_.qdist.get_read_qual_sep_1(qual_, seq_read_, rprob_);
+    } else {
+        art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
+    }
+    char achar;
+    for (auto i = 0; i < qual_.size(); i++) {
+        if (seq_read_[i] == 'N') {
+            qual_[i] = MIN_QUAL;
             continue;
         }
-        if (rprob_.r_prob() < art_params_.err_prob[qual[i]]) {
-            char achar = seq_read[i];
-            while (seq_read[i] == achar) {
+        if (rprob_.r_prob() < art_params_.err_prob[qual_[i]]) {
+            achar = seq_read_[i];
+            while (seq_read_[i] == achar) {
                 achar = rprob_.rand_base();
             }
-            seq_read[i] = achar;
+            seq_read_[i] = achar;
         }
     }
 }
@@ -136,39 +166,64 @@ void ArtRead::ref2read()
     int pos_on_read = 0;
     for (auto pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
         if (indel_.find(k) == indel_.end()) { // No indel
-            seq_read[pos_on_read] = (seq_ref[pos_on_ref]);
+            seq_read_[pos_on_read] = seq_ref[pos_on_ref];
             pos_on_ref++;
             pos_on_read++;
         } else if (indel_[k] == ALN_GAP) { // Deletion
             pos_on_ref++;
         } else { // Insertion
-            seq_read[pos_on_read] = (indel_[k]);
+            seq_read_[pos_on_read] = indel_[k];
             pos_on_read++;
         }
         k++;
     }
     while (indel_.find(k) != indel_.end()) { // Insertions after reference
-        seq_read[pos_on_read] = (indel_[k]);
+        seq_read_[pos_on_read] = indel_[k];
         pos_on_read++;
         k++;
     }
+    if (seq_read_.size() != art_params_.read_len) {
+        throw ReadGenerationException("Generated seq_read_ with unequal sizes");
+    }
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob)
+ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob, std::string contig_name, std::string read_name)
     : art_params_(art_params)
     , rprob_(rprob)
+    , read_name_(std::move(read_name))
+    , contig_name_(std::move(contig_name))
 {
-    seq_read.resize(art_params_.read_len);
+    seq_read_.resize(art_params_.read_len);
     seq_ref.reserve(art_params_.read_len);
+    qual_.resize(art_params_.read_len);
 }
 
-void ArtRead::assess_num_n() const
+PairwiseAlignment ArtRead::to_pwa() const
 {
-    auto num_n = std::count(seq_read.begin(), seq_read.end(), 'N');
-
-    if (num_n > 0) { // TODO: Add params back.
-        throw TooMuchNException();
+    return { read_name_, contig_name_, seq_read_, seq_ref, qual_to_str(qual_), aln_read_, aln_ref_, pos_on_contig,
+        is_plus_strand };
+}
+bool ArtRead::is_good() const
+{
+    if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > 0) { // TODO: Add params back.
+        return false;
     }
+    if (seq_read_.size() != art_params_.read_len) {
+        goto error;
+    }
+    if (qual_.size() != art_params_.read_len) {
+        goto error;
+    }
+    if (aln_read_.size() != aln_ref_.size()) {
+        goto error;
+    }
+    return true;
+error:
+    // #ifdef CEU_CM_IS_DEBUG
+    //         abort_mpi();
+    // #else
+    return false; // FIXME: No idea why this occurs.
+    // #endif
 }
 
 } // namespace labw::art_modern; // namespace labw

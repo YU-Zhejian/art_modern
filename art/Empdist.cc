@@ -198,7 +198,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
 
         if (count.size() != qual.size()) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal error (3): Wrong format of input distribution. count.size = "
-                                     << count.size() << "; qual.size = " << qual.size();
+                                     << count.size() << "; qual_.size = " << qual.size();
             abort_mpi();
         }
 

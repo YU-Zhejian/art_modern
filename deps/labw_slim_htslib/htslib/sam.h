@@ -200,7 +200,7 @@ extern const int8_t bam_cigar_table[256];
  @field  pos     0-based leftmost coordinate
  @field  tid     chromosome ID, defined by sam_hdr_t
  @field  bin     bin calculated by bam_reg2bin()
- @field  qual    mapping quality
+ @field  qual_    mapping quality
  @field  l_extranul length of extra NULs between qname & cigar (for alignment)
  @field  flag    bitwise flag
  @field  l_qname length of the query name
@@ -229,7 +229,7 @@ typedef struct bam1_core_t {
  @abstract Structure for one alignment.
  @field  core       core information about the alignment
  @field  id
- @field  data       all variable-length data, concatenated; structure: qname-cigar-seq-qual-aux
+ @field  data       all variable-length data, concatenated; structure: qname-cigar-seq-qual_-aux
  @field  l_data     current length of bam1_t::data
  @field  m_data     maximum length of bam1_t::data
  @field  mempolicy  memory handling policy, see bam_set_mempolicy()
@@ -2156,7 +2156,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag);
                           One of A, C, G, T or N.  Note this may not be the
                           explicit base recorded in the SEQ column (esp. if N).
  @field stran             0 or 1, indicating + or - strand from MM tag.
- @field qual              Quality code (256*probability), or -1 if unknown
+ @field qual_              Quality code (256*probability), or -1 if unknown
 
  @discussion
  Note this doesn't hold any location data or information on which other

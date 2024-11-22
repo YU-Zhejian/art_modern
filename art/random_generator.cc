@@ -1,5 +1,7 @@
 #include "random_generator.hh"
 #include "ArtConstants.hh"
+#include <chrono>
+#include <thread>
 
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
@@ -7,10 +9,17 @@
 
 namespace labw::art_modern {
 
+long Rprob::seed()
+{
+    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
+               .count()
+        * static_cast<long>(std::hash<std::thread::id>()(std::this_thread::get_id()));
+}
+
 #if defined(USE_STL_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_()
+    : gen_(Rprob::seed())
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)
@@ -34,11 +43,12 @@ int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
 
 int Rprob::rand_pos_on_read() { return pos_on_read_(gen_); }
 int Rprob::rand_pos_on_read_not_head_and_tail() { return pos_on_read_not_head_and_tail_(gen_); }
+int Rprob::randint(int min, int max) { return std::uniform_int_distribution<int>(min, max - 1)(gen_); }
 
 #elif defined(USE_BOOST_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_()
+    : gen_(Rprob::seed())
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)
@@ -62,6 +72,7 @@ int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
 
 int Rprob::rand_pos_on_read() { return pos_on_read_(gen_); }
 int Rprob::rand_pos_on_read_not_head_and_tail() { return pos_on_read_not_head_and_tail_(gen_); }
+int Rprob::randint(int min, int max) { return std::uniform_int_distribution<int>(min, max - 1)(gen_); }
 
 #elif defined(USE_ONEMKL_RANDOM)
 Rprob::~Rprob() = default;

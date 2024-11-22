@@ -26,21 +26,18 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     auto sam_record
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
     const auto rlen = static_cast<long>(pwa.query.size());
-    const auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
-
-    if (cigar.empty()) {
-        pwa.generate_cigar_array(sam_options_.use_m);
-    }
-
-    const auto seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
-    auto qual = pwa.qual;
-    hts_pos_t pos = pwa.align_contig_start;
-    if (!pwa.is_plus_strand) {
-        std::reverse(qual.begin(), qual.end());
-    }
+    auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
 
-    auto [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
+    const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+    auto qual = pwa.qual;
+    const hts_pos_t pos = pwa.pos_on_contig;
+    if (!pwa.is_plus_strand) {
+        std::reverse(qual.begin(), qual.end());
+        std::reverse(cigar.begin(), cigar.end());
+    }
+
+    const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
     BamTags tags;
     tags.add_string("MD", md_tag);
     tags.add_int_i("NM", nm_tag);
@@ -75,8 +72,11 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
 
-    auto [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
-    auto [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+    assert_correct_cigar(pwa1, cigar1);
+    assert_correct_cigar(pwa2, cigar2);
+
+    const auto& [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
+    const auto& [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
 
     BamTags tags1;
     tags1.add_string("MD", md_tag1);
@@ -89,45 +89,34 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
     const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
 
+    const hts_pos_t pos1 = pwa1.pos_on_contig;
+    const hts_pos_t pos2 = pwa2.pos_on_contig;
+
     auto qual1 = pwa1.qual;
     auto qual2 = pwa2.qual;
 
     uint16_t flag1 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD1;
     uint16_t flag2 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD2;
 
-    hts_pos_t pos1;
-    hts_pos_t pos2;
-
-    pos1 = pwa1.align_contig_start;
-    pos2 = pwa2.align_contig_start;
     if (pwa1.is_plus_strand) {
         flag1 |= BAM_FMREVERSE;
         flag2 |= BAM_FREVERSE;
         std::reverse(qual2.begin(), qual2.end());
+        std::reverse(cigar2.begin(), cigar2.end());
     } else {
         flag1 |= BAM_FREVERSE;
         flag2 |= BAM_FMREVERSE;
         std::reverse(qual1.begin(), qual1.end());
+        std::reverse(cigar1.begin(), cigar1.end());
     }
 
-    hts_pos_t isize1;
-    hts_pos_t isize2;
-
-    if (pos2 > pos1) {
-        isize1 = pos2 + rlen - pos1;
-        isize2 = -isize1;
-    } else {
-        isize2 = pos1 + rlen - pos2;
-        isize1 = -isize2;
-    }
+    const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
+    const hts_pos_t isize2 = -isize1;
 
     auto sam_record1
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
     auto sam_record2
         = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-
-    assert_correct_cigar(pwa1, cigar1);
-    assert_correct_cigar(pwa2, cigar2);
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,

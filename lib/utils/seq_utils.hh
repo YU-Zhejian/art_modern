@@ -29,4 +29,5 @@ template <typename T> static void reverse(T* ptr, const size_t n)
         ptr[n - i - 1] = tmp;
     }
 }
+
 } // namespace labw::art_modern

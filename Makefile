@@ -74,4 +74,8 @@ sync-ceu-cm:
 
 .PHONY: clean
 clean:
-	rm -fr build
+	rm -fr build build_profile tmp
+
+.PHONY: profile
+profile:
+	env -i bash --norc --noprofile profile.sh

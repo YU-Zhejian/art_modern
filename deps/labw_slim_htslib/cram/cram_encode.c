@@ -644,7 +644,7 @@ static int cram_encode_slice_read(cram_fd *fd,
         r |= h->codecs[DS_TL]->encode(s, h->codecs[DS_TL], (char *)&cr->TL, 1);
     }
 
-    // qual
+    // qual_
     // QS codec : Already stored in block[2].
 
     // features (diffs)
@@ -717,7 +717,7 @@ static int cram_encode_slice_read(cram_fd *fd,
                                               (char *)&uc, 1);
 
                 //                  Already added
-                //                  uc  = f->B.qual;
+                //                  uc  = f->B.qual_;
                 //                  r |= h->codecs[DS_QS]->encode(s, h->codecs[DS_QS],
                 //                                           (char *)&uc, 1);
                 break;
@@ -732,7 +732,7 @@ static int cram_encode_slice_read(cram_fd *fd,
 
             case 'Q':
                 //                  Already added
-                //                  uc  = f->B.qual;
+                //                  uc  = f->B.qual_;
                 //                  r |= h->codecs[DS_QS]->encode(s, h->codecs[DS_QS],
                 //                                           (char *)&uc, 1);
                 break;
@@ -3088,9 +3088,9 @@ static int process_one_read(cram_fd *fd, cram_container *c,
         goto block_err;
 
     /*
-     * Append to the qual block now. We do this here as
+     * Append to the qual_ block now. We do this here as
      * cram_add_substitution() can generate BA/QS events which need to
-     * be in the qual block before we append the rest of the data.
+     * be in the qual_ block before we append the rest of the data.
      */
     if (cr->cram_flags & CRAM_FLAG_PRESERVE_QUAL_SCORES) {
         /* Special case of seq "*" */

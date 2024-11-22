@@ -116,7 +116,7 @@ int probaln_glocal(const uint8_t *ref, int l_ref, const uint8_t *query,
     s = malloc((l_query+2) * sizeof(double));
     if (!s) goto fail;
 
-    // initialize qual
+    // initialize qual_
     qual = malloc(l_query * sizeof(float));
     if (!qual) goto fail;
     if (g_qual2prob[0] == 0)

@@ -195,7 +195,7 @@ static int read_array(unsigned char *in, size_t in_size, unsigned int *array, in
 
 // FIXME: how to auto-tune these rather than trial and error?
 // r2 = READ2
-// qa = qual avg (0, 2, 4)
+// qa = qual_ avg (0, 2, 4)
 static int strat_opts[][12] = {
 //   qb  qs pb ps db ds ql sl pl  dl  r2 qa
     {10, 5, 4,-1, 2, 1, 0, 14, 10, 14, 0,-1}, // basic options (level < 7)
@@ -340,7 +340,7 @@ static int fqz_create_models(fqz_model *m, fqz_gparams *gp) {
 	pthread_setspecific(fqz_key, m->qual);
     }
 #else
-    if (!(m->qual = malloc(sizeof(*m->qual) * CTX_SIZE)))
+    if (!(m->qual_ = malloc(sizeof(*m->qual_) * CTX_SIZE)))
 	return -1;
 #endif
 
@@ -360,7 +360,7 @@ static int fqz_create_models(fqz_model *m, fqz_gparams *gp) {
 
 static void fqz_destroy_models(fqz_model *m) {
 #ifdef NO_THREADS
-    free(m->qual);
+    free(m->qual_);
 #endif
 }
 
@@ -426,7 +426,7 @@ void fqz_qual_stats(fqz_slice *s,
     uint32_t qhist2[NP][256] = {{0}};  // READ2 only
     uint64_t t1[NP] = {0};             // Count for READ1
     uint64_t t2[NP] = {0};             // COUNT for READ2
-    uint32_t avg[2560] = {0};          // Avg qual *and later* avg-to-selector map.
+    uint32_t avg[2560] = {0};          // Avg qual_ *and later* avg-to-selector map.
 
     int dir = 0;
     int last_len = 0;
@@ -505,7 +505,7 @@ void fqz_qual_stats(fqz_slice *s,
 
     // Auto tune: does average quality helps us?
     if (pm->do_qa != 0) {
-	// Histogram of average qual in avg[]
+	// Histogram of average qual_ in avg[]
 	// NB: we convert avg[] from count to selector index
 
 	// Few symbols means high compression which means
@@ -620,7 +620,7 @@ void fqz_qual_stats(fqz_slice *s,
 	}
 
 	if (pm->do_qa == -1) {
-	    // assume qual, pos, delta in that order.
+	    // assume qual_, pos, delta in that order.
 	    if (pm->pbits > 0 && pm->dbits > 0) {
 		// 1 from pos/delta
 		pm->sloc = pm->dloc-1;
@@ -781,7 +781,7 @@ int fqz_pick_parameters(fqz_gparams *gp,
     gp->nparam = 1;
     gp->max_sel = 0;
 
-    if (vers == 3) // V3.0 doesn't store qual in original orientation
+    if (vers == 3) // V3.0 doesn't store qual_ in original orientation
 	gp->gflags |= GFLAG_DO_REV;
 
     fqz_param *pm = gp->p;
@@ -1468,7 +1468,7 @@ unsigned char *uncompress_block_fqz2f(fqz_slice *s,
 
     RC_FinishDecode(&rc);
     fqz_destroy_models(&model);
-    //free(model.qual);
+    //free(model.qual_);
     free(rev_a);
     free(len_a);
     fqz_free_parameters(&gp);
