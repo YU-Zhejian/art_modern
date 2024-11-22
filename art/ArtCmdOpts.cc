@@ -6,6 +6,8 @@
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/program_options.hpp>
 #include <boost/thread.hpp>
+#include <fstream>
+#include <iostream>
 
 #include "ArtConstants.hh"
 #include "CExceptionsProxy.hh"
@@ -14,9 +16,6 @@
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/Pbsim3TranscriptBatcher.hh"
 #include "global_variables.hh"
-#include "out/BamReadOutput.hh"
-#include "out/FastqReadOutput.hh"
-#include "out/HeadlessBamReadOutput.hh"
 #include "out/OutputDispatcher.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/version_utils.hh"
@@ -53,15 +52,6 @@ const char ARG_Q_SHIFT_1[] = "q_shift_1";
 const char ARG_Q_SHIFT_2[] = "q_shift_2";
 
 namespace labw::art_modern {
-
-OutputDispatcherFactory get_output_dispatcher_factory() noexcept
-{
-    OutputDispatcherFactory out_dispatcher_factory;
-    out_dispatcher_factory.add(new FastqReadOutputFactory());
-    out_dispatcher_factory.add(new BamReadOutputFactory());
-    out_dispatcher_factory.add(new HeadlessBamReadOutputFactory());
-    return out_dispatcher_factory;
-}
 
 po::options_description option_parser() noexcept
 {

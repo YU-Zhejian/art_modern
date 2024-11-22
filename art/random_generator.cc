@@ -2,6 +2,7 @@
 #include "ArtConstants.hh"
 #include <chrono>
 #include <thread>
+#include <vector>
 
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
@@ -77,11 +78,12 @@ int Rprob::randint(int min, int max) { return std::uniform_int_distribution<int>
 #elif defined(USE_ONEMKL_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : pe_frag_dist_mean_(pe_frag_dist_mean)
+    : stream_() // Initialized in the function body
+    , pe_frag_dist_mean_(pe_frag_dist_mean)
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
-    vslNewStream(&stream_, VSL_BRNG_MT19937, 1);
+    vslNewStream(&stream_, VSL_BRNG_MT19937, Rprob::seed());
 }
 
 double Rprob::r_prob()
@@ -105,11 +107,11 @@ char Rprob::rand_base()
     return "ACGT"[index % 4];
 }
 
-int Rprob::rand_quality()
+std::vector<int> Rprob::rand_quality()
 {
-    int result;
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, 1, MAX_DIST_NUMBER);
-    return result;
+    int result[read_length_];
+    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, result, 1, MAX_DIST_NUMBER);
+    return { result, result + read_length_ };
 }
 
 int Rprob::rand_quality_less_than_10()
@@ -130,6 +132,12 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
 {
     int result;
     viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, 1, read_length_ - 2);
+    return result;
+}
+int Rprob::randint(int min, int max)
+{
+    int result;
+    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, min, max);
     return result;
 }
 

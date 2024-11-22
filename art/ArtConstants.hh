@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 const int HIGHEST_QUAL = 80;
 

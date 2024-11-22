@@ -1,5 +1,3 @@
-#include <string>
-
 #include "ArtContig.hh"
 #include "art_modern_constants.hh"
 #include "random_generator.hh"

@@ -43,5 +43,6 @@ namespace art_modern {
         std::vector<BaseReadOutputFactory*> factories_;
     };
 
+    OutputDispatcherFactory get_output_dispatcher_factory() noexcept;
 }
 }

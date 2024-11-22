@@ -1,5 +1,6 @@
 #pragma once
 #include "art_modern_config.h"
+#include <vector>
 
 #if defined(USE_STL_RANDOM)
 #include <random>
@@ -21,7 +22,7 @@ public:
     double r_prob();
     int insertion_length();
     char rand_base();
-    int rand_quality();
+    std::vector<int> rand_quality();
     int rand_quality_less_than_10();
     ~Rprob();
     int rand_pos_on_read();

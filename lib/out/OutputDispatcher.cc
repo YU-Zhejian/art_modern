@@ -1,4 +1,7 @@
 #include "OutputDispatcher.hh"
+#include "BamReadOutput.hh"
+#include "FastqReadOutput.hh"
+#include "HeadlessBamReadOutput.hh"
 #include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {
@@ -60,4 +63,12 @@ OutputDispatcherFactory::~OutputDispatcherFactory()
     }
 }
 
+OutputDispatcherFactory get_output_dispatcher_factory() noexcept
+{
+    OutputDispatcherFactory out_dispatcher_factory;
+    out_dispatcher_factory.add(new FastqReadOutputFactory());
+    out_dispatcher_factory.add(new BamReadOutputFactory());
+    out_dispatcher_factory.add(new HeadlessBamReadOutputFactory());
+    return out_dispatcher_factory;
+}
 }

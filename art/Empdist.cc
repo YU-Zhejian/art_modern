@@ -64,10 +64,9 @@ void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, const
 {
     qual.resize(len);
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
-    int cumCC;
+    const auto& cumCC = rprob.rand_quality();
     for (auto i = 0; i < len; i++) {
-        cumCC = rprob.rand_quality();
-        qual[i] = qual_dist[i].lower_bound(cumCC)->second;
+        qual[i] = qual_dist[i].lower_bound(cumCC[i])->second;
     }
 }
 
@@ -87,18 +86,17 @@ void Empdist::get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq
         abort_mpi();
     }
 
-    int cumCC;
+    const auto& cumCC = rprob.rand_quality();
 
     for (auto i = 0; i < len; i++) {
-        cumCC = rprob.rand_quality();
         if (seq[i] == 'A') {
-            qual[i] = a_qual_dist_first[i].lower_bound(cumCC)->second;
+            qual[i] = a_qual_dist_first[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'C') {
-            qual[i] = c_qual_dist_first[i].lower_bound(cumCC)->second;
+            qual[i] = c_qual_dist_first[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'G') {
-            qual[i] = g_qual_dist_first[i].lower_bound(cumCC)->second;
+            qual[i] = g_qual_dist_first[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'T') {
-            qual[i] = t_qual_dist_first[i].lower_bound(cumCC)->second;
+            qual[i] = t_qual_dist_first[i].lower_bound(cumCC[i])->second;
         } else {
             // return random quality less than 10
             qual[i] = rprob.rand_quality_less_than_10();
@@ -120,17 +118,16 @@ void Empdist::get_read_qual_sep_2(std::vector<int>& qual, const std::string& seq
                                  << ", G: " << g_qual_dist_second.size() << ", T: " << t_qual_dist_second.size() << ")";
         abort_mpi();
     }
-    int cumCC;
+    const auto& cumCC = rprob.rand_quality();
     for (size_t i = 0; i < len; i++) {
-        cumCC = rprob.rand_quality(); // (int)ceil(rprob.r_prob() * max_dist_number);
         if (seq[i] == 'A') {
-            qual[i] = a_qual_dist_second[i].lower_bound(cumCC)->second;
+            qual[i] = a_qual_dist_second[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'C') {
-            qual[i] = c_qual_dist_second[i].lower_bound(cumCC)->second;
+            qual[i] = c_qual_dist_second[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'G') {
-            qual[i] = g_qual_dist_second[i].lower_bound(cumCC)->second;
+            qual[i] = g_qual_dist_second[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'T') {
-            qual[i] = t_qual_dist_second[i].lower_bound(cumCC)->second;
+            qual[i] = t_qual_dist_second[i].lower_bound(cumCC[i])->second;
         } else {
             // return random quality less than 10
             qual[i] = rprob.rand_quality_less_than_10();
