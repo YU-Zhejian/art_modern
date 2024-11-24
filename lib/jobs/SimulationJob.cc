@@ -1,7 +1,6 @@
 #include "SimulationJob.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
     SimulationJob::~SimulationJob()
     {
         // delete fasta_fetch; // FIXME
@@ -13,5 +12,4 @@ namespace art_modern {
         , job_id(job_id)
     {
     }
-}
 }

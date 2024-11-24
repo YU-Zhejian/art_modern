@@ -65,24 +65,24 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
 
 void ArtJobExecutor::execute()
 {
-    if (job_.fasta_fetch->num_seqs() == 0) {
+    size_t num_reads = 0;
+    const auto num_contigs = job_.fasta_fetch->num_seqs();
+    if (num_contigs == 0) {
         return;
     }
     const int num_reads_to_reduce = art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
 
-    BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id;
-    for (size_t seq_id = 0; seq_id < job_.fasta_fetch->num_seqs(); ++seq_id) {
+    BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
+    for (auto seq_id = 0; seq_id < num_contigs; ++seq_id) {
         const auto contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
-        if (job_.fasta_fetch->seq_len(seq_id) < art_params_.read_len) {
-            BOOST_LOG_TRIVIAL(debug) << "Warning: the reference sequence " << contig_name << " (length "
+        if (contig_size < art_params_.read_len) {
+            BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
                                      << job_.fasta_fetch->seq_len(seq_id)
                                      << "bps ) is skipped as it < the defined read length (" << art_params_.read_len
                                      << " bps)";
             continue;
         }
-        BOOST_LOG_TRIVIAL(debug) << "Starting simulation for job " << job_.job_id << " CONTIG: " << contig_name;
-
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
         const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 1
@@ -95,16 +95,18 @@ void ArtJobExecutor::execute()
             if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, true)
                                                                          : generate_se(art_contig, true)) {
                 num_pos_reads -= num_reads_to_reduce;
+                num_reads += num_reads_to_reduce;
             }
         }
         while (num_neg_reads > 0) {
             if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, false)
                                                                          : generate_se(art_contig, false)) {
                 num_neg_reads -= num_reads_to_reduce;
+                num_reads += num_reads_to_reduce;
             }
         }
     }
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id;
+    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads << " reads generated.";
 }
 
 ArtJobExecutor::~ArtJobExecutor() = default;

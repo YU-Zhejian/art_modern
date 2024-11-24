@@ -18,6 +18,7 @@
 #include "utils/log_utils.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/protobuf_utils.hh"
+#include "global_variables.hh"
 
 using namespace labw::art_modern;
 
@@ -100,6 +101,7 @@ int main(int argc, char* argv[])
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");
 #endif
+    BOOST_LOG_TRIVIAL(info) << "Generated " << read_id << " reads.";
     bye_mpi();
     exit_mpi(EXIT_SUCCESS);
 }

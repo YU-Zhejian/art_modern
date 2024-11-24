@@ -4,8 +4,7 @@
 #include "fasta/CoverageInfo.hh"
 #include "fasta/InMemoryFastaFetch.hh"
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     class SimulationJob {
     public:
@@ -26,5 +25,4 @@ namespace art_modern {
         const int job_id;
     };
 
-} // art_modern
-} // labw
+} // namespace labw::art_modern

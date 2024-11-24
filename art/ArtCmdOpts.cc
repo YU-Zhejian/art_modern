@@ -81,10 +81,10 @@ po::options_description option_parser() noexcept
     required_opts.add_options()(ARG_BATCH_SIZE, po::value<int>()->default_value(DEFAULT_BATCH_SIZE),
         (std::string() + "Batch size for " + INPUT_FILE_PARSER_STREAM + " input parser").c_str());
 
-    required_opts.add_options()(ARG_INPUT_FILE_NAME, po::value<std::string>()->default_value("0.0"),
+    required_opts.add_options()(ARG_INPUT_FILE_NAME, po::value<std::string>(),
         "the filename of input reference genome, reference "
         "transcriptome, or templates");
-    required_opts.add_options()(ARG_FCOV, po::value<std::string>(),
+    required_opts.add_options()(ARG_FCOV, po::value<std::string>()->default_value("0.0"),
         "the fold of read coverage to be simulated or number of reads/read pairs "
         "generated for each sequence for simulating cDNA reads, or a double for "
         "simulating WGS reads.");
@@ -242,7 +242,7 @@ INPUT_FILE_PARSER get_input_file_parser(
         return INPUT_FILE_PARSER::STREAM;
     } else if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
         const auto file_size = get_file_size(input_file_path);
-        const auto file_too_large = file_size == -1 || file_size > (1 * 1024 * 1024 * 1024);
+        const auto file_too_large = file_size == -1 || file_size > (1<<30);
         if (simulation_mode == SIMULATION_MODE::WGS) {
             if (file_too_large) {
                 return INPUT_FILE_PARSER::HTSLIB;
@@ -266,19 +266,18 @@ std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std
     const INPUT_FILE_TYPE input_file_type, const INPUT_FILE_PARSER input_file_parser,
     const SIMULATION_MODE simulation_mode, const std::string& input_file_name)
 {
-    BaseFastaFetch* fasta_fetch;
     if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
         if (input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::ifstream input_file_stream(input_file_name);
             Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
-            fasta_fetch = new InMemoryFastaFetch(batcher.fetch().first);
-            auto coverage_info = batcher.fetch().second;
+            auto [fasta_fetch, coverage_info] = batcher.fetch();
             input_file_stream.close();
-            return { coverage_info, fasta_fetch };
+            return { coverage_info, std::make_shared<InMemoryFastaFetch>().get() };
         } else if (input_file_parser == INPUT_FILE_PARSER::STREAM) {
             return { CoverageInfo(0.0), new InMemoryFastaFetch() };
         }
     }
+    BaseFastaFetch* fasta_fetch;
     if (fcov_arg_str.empty()) {
         BOOST_LOG_TRIVIAL(fatal) << "Coverage parameter (--" << ARG_FCOV << ") is required.";
         abort_mpi();
@@ -293,15 +292,15 @@ std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std
     try {
         auto d = boost::lexical_cast<double>(fcov_arg_str);
         if (simulation_mode == SIMULATION_MODE::TEMPLATE) {
-            auto coverage_info = CoverageInfo(d, 0.0);
+            const auto& coverage_info = CoverageInfo(d, 0.0);
             return { coverage_info, fasta_fetch };
         } else {
-            auto coverage_info = CoverageInfo(d);
+            const auto& coverage_info = CoverageInfo(d);
             return { coverage_info, fasta_fetch };
         }
     } catch (const boost::bad_lexical_cast&) {
         std::ifstream X_FOLD(fcov_arg_str, std::ios::binary);
-        auto coverage_info = CoverageInfo(X_FOLD);
+        const auto& coverage_info = CoverageInfo(X_FOLD);
         X_FOLD.close();
         return { coverage_info, fasta_fetch };
     }
@@ -573,6 +572,7 @@ ArtParams parse_args(int argc, char** argv)
         BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
         abort_mpi();
     }
+    BOOST_LOG_TRIVIAL(info) << fasta_fetch->num_seqs() << " sequences fetched";
     return { art_simulation_mode, art_lib_const_mode, input_file_name, input_file_type, input_file_parser, parallel,
         sep_flag, id, coverage_info, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, per_base_ins_rate_1,
         per_base_del_rate_1, per_base_ins_rate_2, per_base_del_rate_2, err_prob, pe_dist_mean_minus_2_std, qdist,
