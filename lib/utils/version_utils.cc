@@ -13,12 +13,12 @@
 #include <htslib/hts.h>
 
 // GSL
-#ifdef USE_GSL_RANDOM
+#ifdef WITH_GSL
 #include <gsl/gsl_version.h>
 #endif
 
 // MKL
-#ifdef USE_ONEMKL_RANDOM
+#ifdef WITH_ONEMKL
 #include <mkl_version.h>
 #endif
 

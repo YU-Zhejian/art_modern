@@ -1,13 +1,13 @@
 #pragma once
 #include "ArtJobExecutor.hh"
 
-#if defined(PARALLEL_DISABLED)
+#if defined(USE_NOP_PARALLEL)
 #include <mutex>
-#elif defined(PARALLEL_ASIO)
+#elif defined(USE_ASIO_PARALLEL)
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
 #else
-#error "No parallel strategy defined! One of: PARALLEL_DISABLED, PARALLEL_ASIO"
+#error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_ASIO_PARALLEL"
 #endif
 
 namespace labw::art_modern {
@@ -18,9 +18,9 @@ public:
     void stop();
 
 private:
-#if defined(PARALLEL_DISABLED)
+#if defined(USE_NOP_PARALLEL)
     std::mutex mutex_;
-#elif defined(PARALLEL_ASIO)
+#elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;
 #endif
 };

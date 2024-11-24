@@ -62,7 +62,7 @@ The project binary will be available at `build_release/art_modern`.
     - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details.
   - To use external HTSLib, consult your system administrator.
 - Optional libraries for random generators. Including:
-  - [Intel OneAPI Math Kernel Library (MKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+  - [Intel OneAPI Math Kernel Library (MKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html);
   - [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
 - Optional MPI library for MPI-based parallelism.
   - MPI implementations (library and compiler). The following MPI implementations are supported:
@@ -109,7 +109,10 @@ sets `BUILD_SHARED_LIBS` to `ON`.
   - **`STL` (DEFAULT): Use STL random generators.**
   - `BOOST`: Use Boost random generators.
   - `GSL`: Use GSL random generators.
-  - `OneMKL`: Use Intel OneAPI MKL random generators.
+  - `ONEMKL`: Use Intel OneAPI MKL random generators. Highly recommended on Intel CPUs.
+- `USE_ASIO_PARALLEL`: Whether to use Boost ASIO for thread-based parallelism.
+  - **`ON` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
+  - `OFF`: Will not use Boost ASIO for thread-based parallelism.
 
 
 ## Usage
@@ -146,8 +149,8 @@ A compatibility matrix is as follows:
 
 Changes on software function:
 
-- [ ] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
-- [ ] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
+- [X] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
+- [X] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
 - [X] Supports 3 library construction methods: `se`, `pe` and `mp`.
 - [X] Except FASTQ, support output in SAM and BAM format through HTSLib.
 - [X] Support for masking detection was dropped.
@@ -193,7 +196,7 @@ The bundled HTSLib library used MIT License with the following reference:
 
 ### Supported CPUs?
 
-Only little endian is supported.
+Although this application should theoretically support both endianness, only little endian is tested. That is, if you're working on an Intel or AMD CPU, this application should work fine.
 
 ### How to split produced pair-end/mate-pair sequencing results to 2 files?
 
@@ -213,3 +216,7 @@ We may develop a C interface in the future after the APIs and design of the core
 ### How to add adaptors \& primers to the reads?
 
 Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adapters to them, and use `templ` mode to introduce sequencing errors.
+
+### I don't care about portability. How to make it wicked fast?
+
+Easy. Set `USE_HTSLIB` to the latest HTSLib available on your system, `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL`. Please also make sure that your HTSLib had been linked with [libdeflate](https://github.com/ebiggers/libdeflate).

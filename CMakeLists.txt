@@ -11,9 +11,9 @@ project(
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 99)
-set(CMAKE_C_STANDARD_REQUIRED TRUE)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(CYGWIN)
     set(BUILD_SHARED_LIBS OFF)
@@ -23,46 +23,21 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-set(USE_RANDOM_GENERATOR BOOST) # TODO
+unset(USE_ASIO_PARALLEL)
+unset(USE_NOP_PARALLEL)
 
-add_compile_definitions(PARALLEL_ASIO) # PARALLEL_DISABLED #  TODO
+if(NOT DEFINED USE_ASIO_PARALLEL)
+    set(USE_ASIO_PARALLEL ON)
+endif()
+
+add_compile_definitions(USE_ASIO_PARALLEL) # USE_NOP_PARALLEL #  TODO
 
 if(NOT DEFINED USE_RANDOM_GENERATOR)
     set(USE_RANDOM_GENERATOR STL)
 endif()
 
-unset(USE_STL_RANDOM)
-unset(USE_GSL_RANDOM)
-unset(USE_BOOST_RANDOM)
-unset(USE_ONEMKL_RANDOM)
-
-unset(WITH_MPI)
-find_package(MPI REQUIRED) # TODO
-include_directories(${MPI_C_HEADER_DIR} ${MPI_CXX_HEADER_DIR})
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MPI::MPI_C MPI::MPI_CXX)
 set(WITH_MPI OFF) # TODO
-set(WITH_PROTOBUF ON) # TODO
-
-if("${USE_RANDOM_GENERATOR}" STREQUAL "STL")
-    set(USE_STL_RANDOM ON)
-elseif("${USE_RANDOM_GENERATOR}" STREQUAL "GSL")
-    set(USE_GSL_RANDOM ON)
-    find_package(GSL REQUIRED)
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} GSL::gsl)
-    include_directories(${GSL_INCLUDE_DIRS})
-elseif("${USE_RANDOM_GENERATOR}" STREQUAL "BOOST")
-    set(USE_BOOST_RANDOM ON)
-elseif("${USE_RANDOM_GENERATOR}" STREQUAL "ONEMKL")
-    set(USE_ONEMKL_RANDOM ON)
-    find_package(MKL REQUIRED)
-    include_directories(${MKL_INCLUDE} ${SYCL_INCLUDE_DIR})
-    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} MKL::MKL)
-else()
-    message(
-        FATAL_ERROR
-            "Variable USE_RANDOM_GENERATOR should be set to one of STL, GSL, BOOST or ONEMKL. Current: ${USE_RANDOM_GENERATOR}"
-    )
-endif()
+set(WITH_PROTOBUF OFF) # TODO
 
 # Installation
 include(GNUInstallDirs)
@@ -76,6 +51,8 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/protobuf.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
 
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 

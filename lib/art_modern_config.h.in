@@ -1,15 +1,28 @@
 #ifndef ART_MODERN_CONFIG_H
 #define ART_MODERN_CONFIG_H
 
+// Names and versions
+
 #cmakedefine USED_HTSLIB_NAME "${USED_HTSLIB_NAME}"
 #cmakedefine ART_MODERN_VERSION "${ART_MODERN_VERSION}"
+#cmakedefine ART_MODERN_LINK_LIBS "${ART_MODERN_LINK_LIBS}"
+
+// Random Generators
+
 #cmakedefine USE_STL_RANDOM
 #cmakedefine USE_GSL_RANDOM
 #cmakedefine USE_BOOST_RANDOM
 #cmakedefine USE_ONEMKL_RANDOM
+
+// Library availability
+
 #cmakedefine WITH_BOOST_TIMER
 #cmakedefine WITH_MPI
-#cmakedefine WITH_PROTOBUF
+#cmakedefine WITH_GSL
+#cmakedefine WITH_ONEMKL
+
+// Debug
 #cmakedefine CEU_CM_IS_DEBUG
-#cmakedefine ART_MODERN_LINK_LIBS "${ART_MODERN_LINK_LIBS}"
+#cmakedefine USE_ASIO_PARALLEL
+#cmakedefine USE_NOP_PARALLEL
 #endif

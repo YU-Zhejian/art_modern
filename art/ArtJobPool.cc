@@ -1,7 +1,7 @@
 #include "ArtJobPool.hh"
 
 namespace labw::art_modern {
-#if defined(PARALLEL_DISABLED)
+#if defined(USE_NOP_PARALLEL)
 
 void ArtJobPool::stop()
 {
@@ -19,7 +19,7 @@ ArtJobPool::ArtJobPool(const ArtParams&)
     // Do nothing!
 }
 
-#elif defined(PARALLEL_ASIO)
+#elif defined(USE_ASIO_PARALLEL)
 ArtJobPool::ArtJobPool(const ArtParams& art_params)
     : pool_(art_params.parallel)
 {
