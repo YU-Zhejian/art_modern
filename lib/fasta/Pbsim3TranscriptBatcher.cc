@@ -18,14 +18,13 @@ namespace art_modern {
         std::unordered_map<std::string, double> coverage_negative;
         std::vector<std::string> seq_names;
         std::vector<std::string> seqs;
-        if(batch_size_ != std::numeric_limits<int>::max()){
-        coverage_positive.reserve(batch_size_);
-        coverage_negative.reserve(batch_size_);
+        if (batch_size_ != std::numeric_limits<int>::max()) {
+            coverage_positive.reserve(batch_size_);
+            coverage_negative.reserve(batch_size_);
 
-        seq_names.reserve(batch_size_);
-        seqs.reserve(batch_size_);
+            seq_names.reserve(batch_size_);
+            seqs.reserve(batch_size_);
         }
-
 
         std::string line;
         std::vector<std::string> tokens;
@@ -45,7 +44,7 @@ namespace art_modern {
                 throw std::invalid_argument("Cannot parse PBSIM3 transcript " + line);
             }
         }
-        return {InMemoryFastaFetch(seq_names, seqs), CoverageInfo(coverage_positive, coverage_negative)};
+        return { InMemoryFastaFetch(seq_names, seqs), CoverageInfo(coverage_positive, coverage_negative) };
     }
 } // art_modern
 } // labw

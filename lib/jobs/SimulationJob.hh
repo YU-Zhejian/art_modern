@@ -6,23 +6,23 @@
 
 namespace labw::art_modern {
 
-    class SimulationJob {
-    public:
-        ~SimulationJob();
-        SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, int job_id);
+class SimulationJob {
+public:
+    ~SimulationJob();
+    SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, int job_id);
 
-        SimulationJob(SimulationJob&& other) noexcept
-            : fasta_fetch(other.fasta_fetch)
-            , coverage_info(other.coverage_info)
-            , job_id(other.job_id) {};
+    SimulationJob(SimulationJob&& other) noexcept
+        : fasta_fetch(other.fasta_fetch)
+        , coverage_info(other.coverage_info)
+        , job_id(other.job_id) {};
 
-        SimulationJob(const SimulationJob&) = delete;
-        SimulationJob& operator=(SimulationJob&&) = delete;
-        SimulationJob& operator=(const SimulationJob&) = delete;
+    SimulationJob(const SimulationJob&) = delete;
+    SimulationJob& operator=(SimulationJob&&) = delete;
+    SimulationJob& operator=(const SimulationJob&) = delete;
 
-        BaseFastaFetch* fasta_fetch;
-        const CoverageInfo& coverage_info;
-        const int job_id;
-    };
+    BaseFastaFetch* fasta_fetch;
+    const CoverageInfo& coverage_info;
+    const int job_id;
+};
 
 } // namespace labw::art_modern

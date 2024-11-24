@@ -13,9 +13,9 @@ namespace art_modern {
         std::lock_guard<std::mutex> lock(mutex_);
         std::vector<std::string> seq_names;
         std::vector<std::string> seqs;
-        if(batch_size_ != std::numeric_limits<int>::max()){
-        seq_names.reserve(batch_size_);
-        seqs.reserve(batch_size_);
+        if (batch_size_ != std::numeric_limits<int>::max()) {
+            seq_names.reserve(batch_size_);
+            seqs.reserve(batch_size_);
         }
 
         std::string fetch_s;
@@ -43,9 +43,9 @@ namespace art_modern {
         std::lock_guard<std::mutex> lock(mutex_);
         std::vector<std::string> seq_names;
         std::vector<std::string> seqs;
-        if(batch_size_ != std::numeric_limits<int>::max()){
-        seq_names.reserve(batch_size_);
-        seqs.reserve(batch_size_);
+        if (batch_size_ != std::numeric_limits<int>::max()) {
+            seq_names.reserve(batch_size_);
+            seqs.reserve(batch_size_);
         }
 
         while (current_index_ < stream_->num_seqs() && seq_names.size() < batch_size_) {

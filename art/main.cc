@@ -14,11 +14,11 @@
 #include "ArtCmdOpts.hh"
 #include "main_fn.hh"
 
+#include "global_variables.hh"
 #include "utils/dump_utils.hh"
 #include "utils/log_utils.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/protobuf_utils.hh"
-#include "global_variables.hh"
 
 using namespace labw::art_modern;
 

@@ -242,7 +242,7 @@ INPUT_FILE_PARSER get_input_file_parser(
         return INPUT_FILE_PARSER::STREAM;
     } else if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
         const auto file_size = get_file_size(input_file_path);
-        const auto file_too_large = file_size == -1 || file_size > (1<<30);
+        const auto file_too_large = file_size == -1 || file_size > (1 << 30);
         if (simulation_mode == SIMULATION_MODE::WGS) {
             if (file_too_large) {
                 return INPUT_FILE_PARSER::HTSLIB;
@@ -272,7 +272,7 @@ std::pair<CoverageInfo, BaseFastaFetch*> get_coverage_info_fasta_fetch(const std
             Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
             auto [fasta_fetch, coverage_info] = batcher.fetch();
             input_file_stream.close();
-            return { coverage_info, std::make_shared<InMemoryFastaFetch>().get() };
+            return { coverage_info, new InMemoryFastaFetch(std::move(fasta_fetch)) };
         } else if (input_file_parser == INPUT_FILE_PARSER::STREAM) {
             return { CoverageInfo(0.0), new InMemoryFastaFetch() };
         }
@@ -395,7 +395,8 @@ void validate_htslib_parser(const std::string& input_file_path)
 {
     const char* fasta_path = input_file_path.c_str();
     BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
-    const auto seq_file_fai_path = std::string(CExceptionsProxy::assert_not_null(fai_path(fasta_path), USED_HTSLIB_NAME, "Failed to load FAI"));
+    const auto seq_file_fai_path
+        = std::string(CExceptionsProxy::assert_not_null(fai_path(fasta_path), USED_HTSLIB_NAME, "Failed to load FAI"));
     if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
         BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
         CExceptionsProxy::assert_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
@@ -559,8 +560,8 @@ ArtParams parse_args(int argc, char** argv)
 
     const auto& parallel = validate_parallel(vm_[ARG_PARALLEL].as<int>());
 
-    const auto& qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(), read_len,
-        art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
+    const auto& qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(),
+        read_len, art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
         vm_[ARG_MIN_QUAL].as<int>(), vm_[ARG_MAX_QUAL].as<int>());
     std::array<double, HIGHEST_QUAL> err_prob {};
 

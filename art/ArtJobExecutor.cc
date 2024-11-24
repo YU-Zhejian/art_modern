@@ -106,7 +106,8 @@ void ArtJobExecutor::execute()
             }
         }
     }
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads << " reads generated.";
+    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
+                            << " reads generated.";
 }
 
 ArtJobExecutor::~ArtJobExecutor() = default;
