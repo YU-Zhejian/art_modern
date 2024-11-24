@@ -2,8 +2,7 @@
 #include <boost/log/trivial.hpp>
 
 #include "FastqReadOutput.hh"
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
     void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
     {
@@ -56,5 +55,4 @@ namespace art_modern {
         }
         return new DumbReadOutput();
     }
-}
 }

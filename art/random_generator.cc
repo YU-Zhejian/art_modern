@@ -44,7 +44,7 @@ char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 std::vector<int> Rprob::rand_quality()
 {
     std::vector<int> result(read_length_);
-    std::generate_n(result.begin(), read_length_, [this]() { quality_(gen_); });
+    std::generate_n(result.begin(), read_length_, [this]() { return quality_(gen_); });
     return result;
 }
 
@@ -79,7 +79,7 @@ char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 std::vector<int> Rprob::rand_quality()
 {
     std::vector<int> result(read_length_);
-    std::generate_n(result.begin(), read_length_, [this]() { quality_(gen_); });
+    std::generate_n(result.begin(), read_length_, [this]() { return quality_(gen_); });
     return result;
 }
 
