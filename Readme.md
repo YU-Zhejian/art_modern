@@ -132,11 +132,11 @@ Currently, we support input in FASTA and PBSim3 transcripts format.
 
 A compatibility matrix is as follows:
 
-| Parser \ Mode | `wgs` | `trans`                     | `templ`                     |
-|---------------|-------|-----------------------------|-----------------------------|
-| `memory`      | FASTA | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
-| `htslib`      | FASTA | FASTA                       | FASTA                       |
-| `stream`      | FASTA | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
+| Parser \ Mode | `wgs`     | `trans`                     | `templ`                     |
+|---------------|-----------|-----------------------------|-----------------------------|
+| `memory`      | FASTA     | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
+| `htslib`      | FASTA     | **ERROR**                   | **ERROR**                   |
+| `stream`      | **ERROR** | FASTA \| PBSim3 Transcripts | FASTA \| PBSim3 Transcripts |
 
 ### Library Construction Methods
 
@@ -178,9 +178,7 @@ The bundled HTSLib library used MIT License with the following reference:
 
 ## TODO
 
-- Design and implement a job scheduling system using `boost::lockfree` and `boost::signal2`.
 - Make it faster.
-- Support running under Microsoft Windows.
 - Implement an ultrasonic sequence chopper and connect `trans` or `wgs` mode to it.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.

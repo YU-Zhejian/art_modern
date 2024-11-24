@@ -1,4 +1,6 @@
 #pragma once
+#include "art_modern_config.h"
+#include "art_modern_constants.hh"
 #include <string>
 
 namespace labw {
@@ -28,7 +30,7 @@ namespace art_modern {
         /**
          * Program version.
          */
-        std::string PG_VN = "1.0"; // "ART-" ART_VERSION "-ART_MODERN-" ART_MODERN_VERSION;
+        std::string PG_VN = std::string("ART-") + ART_VERSION + "-ART_MODERN-" + ART_MODERN_VERSION;
 
         /**
          * Use `M` instead of `X` or `=` for matching.

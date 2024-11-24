@@ -3,23 +3,22 @@
 #include "FileStreamInterface.hh"
 #include <fstream>
 #include <mutex>
-namespace labw {
-namespace art_modern {
-    class ThreadSafeFileStream : public FileStreamInterface {
-    public:
-        explicit ThreadSafeFileStream(const std::string& filename);
 
-        void write(const std::string& str) override;
+namespace labw::art_modern {
+class ThreadSafeFileStream : public FileStreamInterface {
+public:
+    explicit ThreadSafeFileStream(const std::string& filename);
 
-        void close() override;
+    void write(const std::string& str) override;
 
-        ~ThreadSafeFileStream() override;
+    void close() override;
 
-        ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept;
+    ~ThreadSafeFileStream() override;
 
-    private:
-        std::ofstream file_;
-        std::mutex mutex_;
-    };
-}
+    ThreadSafeFileStream(ThreadSafeFileStream&& instance) noexcept;
+
+private:
+    std::ofstream file_;
+    std::mutex mutex_;
+};
 }

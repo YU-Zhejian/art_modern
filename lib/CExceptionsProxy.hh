@@ -3,7 +3,7 @@
  *  An exception proxy for C exceptions, with helper functions that asserts return value of C routines.
  */
 #pragma once
-#include "ExceptionUtils.hh"
+#include "utils/exception_utils.hh"
 #include <exception>
 #include <string>
 

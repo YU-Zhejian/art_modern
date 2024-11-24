@@ -55,7 +55,7 @@ namespace labw::art_modern {
 
 po::options_description option_parser() noexcept
 {
-    OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
+    const OutputDispatcherFactory& out_dispatcher_factory_ = get_output_dispatcher_factory();
     po::options_description general_opts("General Options");
     general_opts.add_options()(ARG_HELP, "print out usage information");
     general_opts.add_options()(ARG_VERSION, "display version info");
@@ -81,7 +81,7 @@ po::options_description option_parser() noexcept
     required_opts.add_options()(ARG_BATCH_SIZE, po::value<int>()->default_value(DEFAULT_BATCH_SIZE),
         (std::string() + "Batch size for " + INPUT_FILE_PARSER_STREAM + " input parser").c_str());
 
-    required_opts.add_options()(ARG_INPUT_FILE_NAME, po::value<std::string>(),
+    required_opts.add_options()(ARG_INPUT_FILE_NAME, po::value<std::string>()->default_value("0.0"),
         "the filename of input reference genome, reference "
         "transcriptome, or templates");
     required_opts.add_options()(ARG_FCOV, po::value<std::string>(),
@@ -140,7 +140,6 @@ po::variables_map generate_vm_while_handling_help_version(
     const po::options_description& po_desc, const int argc, char** argv)
 {
     po::variables_map vm_;
-    BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
 
     try {
         store(po::parse_command_line(argc, argv, po_desc), vm_);
@@ -242,8 +241,8 @@ INPUT_FILE_PARSER get_input_file_parser(
     } else if (input_file_parser_str == INPUT_FILE_PARSER_STREAM) {
         return INPUT_FILE_PARSER::STREAM;
     } else if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
-        auto file_size = get_file_size(input_file_path);
-        auto file_too_large = file_size == -1 || file_size > (1 * 1024 * 1024 * 1024);
+        const auto file_size = get_file_size(input_file_path);
+        const auto file_too_large = file_size == -1 || file_size > (1 * 1024 * 1024 * 1024);
         if (simulation_mode == SIMULATION_MODE::WGS) {
             if (file_too_large) {
                 return INPUT_FILE_PARSER::HTSLIB;
@@ -336,6 +335,10 @@ void validate_input_filename(const std::string& input_file_path, const std::stri
     if (!boost::filesystem::is_regular_file(input_file_path)) {
         BOOST_LOG_TRIVIAL(warning) << "Input file for --" << arg_name << " at '" << input_file_path
                                    << "' is not a regular file.";
+#ifdef WITH_MPI
+        BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
+        abort_mpi();
+#endif
     }
 }
 void validate_qual_files(
@@ -393,7 +396,7 @@ void validate_htslib_parser(const std::string& input_file_path)
 {
     const char* fasta_path = input_file_path.c_str();
     BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
-    auto seq_file_fai_path = std::string(fai_path(fasta_path));
+    const auto seq_file_fai_path = std::string(CExceptionsProxy::assert_not_null(fai_path(fasta_path), USED_HTSLIB_NAME, "Failed to load FAI"));
     if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
         BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
         CExceptionsProxy::assert_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
@@ -517,46 +520,47 @@ ArtParams parse_args(int argc, char** argv)
     const boost::program_options::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
 
-    for (int i = 0; i < argc; i++) {
-        args.emplace_back(argv[i]);
+    std::vector<std::string> args(argc);
+    for (int i = 0; i < argc; ++i) {
+        args[i] = argv[i];
     }
-    auto vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
-    auto art_simulation_mode = get_simulation_mode(vm_[ARG_SIMULATION_MODE].as<std::string>());
-    auto art_lib_const_mode = get_art_lib_const_mode(vm_[ARG_LIB_CONST_MODE].as<std::string>());
-    auto input_file_name = vm_[ARG_INPUT_FILE_NAME].as<std::string>();
+    BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
+
+    const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
+    const auto& art_simulation_mode = get_simulation_mode(vm_[ARG_SIMULATION_MODE].as<std::string>());
+    const auto& art_lib_const_mode = get_art_lib_const_mode(vm_[ARG_LIB_CONST_MODE].as<std::string>());
+    const auto& input_file_name = vm_[ARG_INPUT_FILE_NAME].as<std::string>();
     validate_input_filename(input_file_name, ARG_INPUT_FILE_NAME);
-    auto input_file_type = get_input_file_type(vm_[ARG_INPUT_FILE_TYPE].as<std::string>(), input_file_name);
-    auto input_file_parser
+    const auto& input_file_type = get_input_file_type(vm_[ARG_INPUT_FILE_TYPE].as<std::string>(), input_file_name);
+    const auto& input_file_parser
         = get_input_file_parser(vm_[ARG_INPUT_FILE_PARSER].as<std::string>(), input_file_name, art_simulation_mode);
     validate_comp_mtx(input_file_parser, art_simulation_mode, input_file_type);
     if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
         validate_htslib_parser(input_file_name);
     }
-    auto ci_ff = get_coverage_info_fasta_fetch(
+    auto [coverage_info, fasta_fetch] = get_coverage_info_fasta_fetch(
         vm_[ARG_FCOV].as<std::string>(), input_file_type, input_file_parser, art_simulation_mode, input_file_name);
-    auto const& coverage_info = ci_ff.first;
-    auto fasta_fetch = ci_ff.second;
 
-    auto id = vm_[ARG_ID].as<std::string>();
+    const auto& id = vm_[ARG_ID].as<std::string>();
 
-    auto sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
-    auto max_indel = vm_[ARG_MAX_INDEL].as<int>();
-    auto read_len = vm_[ARG_READ_LEN].as<int>();
+    const auto& sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
+    const auto& max_indel = vm_[ARG_MAX_INDEL].as<int>();
+    const auto& read_len = vm_[ARG_READ_LEN].as<int>();
     validate_read_length(read_len);
 
-    auto per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_1].as<double>(), max_indel);
-    auto per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_1].as<double>(), max_indel);
-    auto per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_2].as<double>(), max_indel);
-    auto per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_2].as<double>(), max_indel);
+    const auto& per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_1].as<double>(), max_indel);
+    const auto& per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_1].as<double>(), max_indel);
+    const auto& per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_2].as<double>(), max_indel);
+    const auto& per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_2].as<double>(), max_indel);
 
-    auto pe_frag_dist_mean = vm_[ARG_PE_FRAG_DIST_MEAN].as<double>();
-    auto pe_frag_dist_std_dev = vm_[ARG_PE_FRAG_DIST_STD_DEV].as<double>();
+    const auto& pe_frag_dist_mean = vm_[ARG_PE_FRAG_DIST_MEAN].as<double>();
+    const auto& pe_frag_dist_std_dev = vm_[ARG_PE_FRAG_DIST_STD_DEV].as<double>();
     validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len, art_lib_const_mode, art_simulation_mode);
-    auto pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
+    const auto& pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
 
-    auto parallel = validate_parallel(vm_[ARG_PARALLEL].as<int>());
+    const auto& parallel = validate_parallel(vm_[ARG_PARALLEL].as<int>());
 
-    auto qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(), read_len,
+    const auto& qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(), read_len,
         art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
         vm_[ARG_MIN_QUAL].as<int>(), vm_[ARG_MAX_QUAL].as<int>());
     std::array<double, HIGHEST_QUAL> err_prob {};
@@ -564,7 +568,7 @@ ArtParams parse_args(int argc, char** argv)
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
     }
-    auto batch_size = vm_[ARG_BATCH_SIZE].as<int>();
+    const auto& batch_size = vm_[ARG_BATCH_SIZE].as<int>();
     if (batch_size < 1) {
         BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
         abort_mpi();
@@ -572,7 +576,7 @@ ArtParams parse_args(int argc, char** argv)
     return { art_simulation_mode, art_lib_const_mode, input_file_name, input_file_type, input_file_parser, parallel,
         sep_flag, id, coverage_info, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, per_base_ins_rate_1,
         per_base_del_rate_1, per_base_ins_rate_2, per_base_del_rate_2, err_prob, pe_dist_mean_minus_2_std, qdist,
-        batch_size, fasta_fetch, out_dispatcher_factory_.create(vm_, fasta_fetch) };
+        batch_size, fasta_fetch, out_dispatcher_factory_.create(vm_, fasta_fetch, args) };
 }
 
 }

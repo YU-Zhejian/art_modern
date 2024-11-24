@@ -31,7 +31,7 @@ const char INPUT_FILE_PARSER_AUTO[] = "auto";
 const int MPI_MAIN_RANK = 0;
 const int MPI_UNAVAILABLE_RANK = -1;
 
-const int TID_FOR_UNMAPPED = (-1);
+const int TID_FOR_UNMAPPED = -1;
 
 /**
  * BAM_CMATCH, BAM_CEQUAL, BAM_CDIFF; Consume both

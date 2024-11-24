@@ -172,8 +172,8 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
     desc.add(bam_desc);
 }
 
-BaseReadOutput* HeadlessBamReadOutputFactory::create(
-    const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const
+BaseReadOutput* HeadlessBamReadOutputFactory::create(const boost::program_options::variables_map& vm,
+    const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
     if (vm.count("o-hl_sam")) {
         if (fasta_fetch->num_seqs() != 0) {

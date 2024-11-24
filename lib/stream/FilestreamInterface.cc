@@ -1,11 +1,7 @@
 #include "stream/FileStreamInterface.hh"
 
-namespace labw {
+namespace labw::art_modern {
 
-namespace art_modern {
-
-    FileStreamInterface::~FileStreamInterface() = default;
-
-}
+FileStreamInterface::~FileStreamInterface() = default;
 
 }

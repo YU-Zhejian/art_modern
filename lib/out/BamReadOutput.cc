@@ -5,6 +5,7 @@
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
+#include "DumbReadOutput.hh"
 #include "art_modern_config.h"
 #include "global_variables.hh"
 #include "utils/mpi_utils.hh"
@@ -177,8 +178,8 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
     bam_desc.add_options()("o-sam-write_bam", "Enforce BAM instead of SAM output.");
     desc.add(bam_desc);
 }
-BaseReadOutput* BamReadOutputFactory::create(
-    const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch) const
+BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
+    const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
     if (vm.count("o-sam")) {
         if (fasta_fetch->num_seqs() == 0) {
