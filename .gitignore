@@ -41,3 +41,4 @@ MANIFEST.in
 _cmake_test_compile/
 /expr/
 backtrace.dump
+log.d/

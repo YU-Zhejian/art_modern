@@ -3,8 +3,7 @@
 #include "art_modern_constants.hh"
 #include <string>
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
     struct SamOptions {
         /**
          * Format version. Accepted format: `/^[0-9]+\.[0-9]+$`.
@@ -42,5 +41,4 @@ namespace art_modern {
          */
         bool write_bam = true;
     };
-}
 }

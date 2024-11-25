@@ -1,34 +1,34 @@
 #pragma once
 
+#include <iostream>
 #include<fstream>
 #include <mutex>
 
 #include "out/BaseReadOutput.hh"
 
 namespace labw::art_modern {
-class FastqReadOutput : public BaseReadOutput {
+class PwaReadOutput : public BaseReadOutput {
 public:
-    FastqReadOutput(FastqReadOutput&& other) = delete;
-    FastqReadOutput(const FastqReadOutput&) = delete;
-    FastqReadOutput& operator=(FastqReadOutput&&) = delete;
-    FastqReadOutput& operator=(const FastqReadOutput&) = delete;
+    PwaReadOutput(PwaReadOutput&& other) = delete;
+    PwaReadOutput(const PwaReadOutput&) = delete;
+    PwaReadOutput& operator=(PwaReadOutput&&) = delete;
+    PwaReadOutput& operator=(const PwaReadOutput&) = delete;
 
-    explicit FastqReadOutput(const std::string& filename);
+    explicit PwaReadOutput(const std::string& filename);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
 
     void close() override;
 
-    ~FastqReadOutput() override;
+    ~PwaReadOutput() override;
 
 private:
-
     std::ofstream file_;
     std::mutex mutex_;
     bool is_closed_;
 };
 
-class FastqReadOutputFactory : public BaseReadOutputFactory {
+class PwaReadOutputFactory : public BaseReadOutputFactory {
 public:
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,

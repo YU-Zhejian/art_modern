@@ -20,7 +20,7 @@ ce11.mRNA_head.fa:
 	seqtk sample ce11.mRNA.fa 1000 > ce11.mRNA_head.fa
 
 %.fa.gz: %.fa
-	bgzip -i -k $<
+	bgzip -i -k -f $<
 
 ce11_chr1.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/chromosomes/chrI.fa.gz  | gunzip -cdf > ce11_chr1.fa

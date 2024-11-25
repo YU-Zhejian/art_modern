@@ -6,40 +6,40 @@ namespace labw::art_modern {
 
 void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    stream_.write("@");
-    stream_.write(pwa.read_name);
-    stream_.write("\n");
-    stream_.write(pwa.query);
-    stream_.write("\n+\n");
-    stream_.write(pwa.qual);
-    stream_.write("\n");
+    if (is_closed_) {
+        return;
+    }
+    std::scoped_lock lock(mutex_);
+    file_ << "@" << pwa.read_name << "\n" << pwa.query << "\n+\n" << pwa.qual << "\n";
 }
 
 void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    stream_.write("@");
-    stream_.write(pwa1.read_name);
-    stream_.write("/1\n");
-    stream_.write(pwa1.query);
-    stream_.write("\n+\n");
-    stream_.write(pwa1.qual);
-    stream_.write("\n@");
-    stream_.write(pwa2.read_name);
-    stream_.write("/2\n");
-    stream_.write(pwa2.query);
-    stream_.write("\n+\n");
-    stream_.write(pwa2.qual);
-    stream_.write("\n");
+    if (is_closed_) {
+        return;
+    }
+    std::scoped_lock lock(mutex_);
+    file_ << "@" << pwa1.read_name << "/1\n" << pwa1.query << "\n+\n" << pwa1.qual << "\n";
+    file_ << "@" << pwa2.read_name << "/2\n" << pwa2.query << "\n+\n" << pwa2.qual << "\n";
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
-    : stream_(ThreadSafeFileStream(filename))
+    : file_(filename),
+      is_closed_(false)
 {
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
-void FastqReadOutput::close() { stream_.close(); }
+void FastqReadOutput::close() {
+    if (is_closed_) {
+        return;
+    }
+    std::scoped_lock lock(mutex_);
+    file_.flush();
+    file_.close();
+    is_closed_ = true;
+}
 void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fastq_desc("FASTQ Output");

@@ -18,6 +18,7 @@ public:
     PairwiseAlignment(const PairwiseAlignment&) = delete;
     PairwiseAlignment& operator=(PairwiseAlignment&&) = delete;
     PairwiseAlignment& operator=(const PairwiseAlignment&) = delete;
+    static const int NUM_LINES = 4;
 
     /*!
      *

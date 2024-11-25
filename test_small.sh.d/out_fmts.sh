@@ -13,6 +13,7 @@ build/art_modern \
     --ins_rate_1 "${IDRATE}" \
     --del_rate_1 "${IDRATE}" \
     --o-fastq tmp/test_small_se_template_memory_sep.fastq \
+    --o-pwa tmp/test_small_se_template_memory_sep.pwa \
     --o-sam tmp/test_small_se_template_memory_sep.sam \
     --o-hl_sam tmp/test_small_se_template_memory_sep.hl.bam \
     --o-hl_sam-write_bam

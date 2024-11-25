@@ -95,12 +95,21 @@ else()
 endif()
 
 if(CEU_CM_SHOULD_ENABLE_TEST)
-    file(GLOB ART_MODERN_BENCHMARK_SOURCES "benchmarks/*.cc")
+    file(GLOB ART_MODERN_BENCHMARK_SOURCES "benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
         get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE)
-        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_TEST_EXEC}")
+        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
         add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
     endforeach()
 endif()
+
+file(GLOB ART_MODERN_UTIL_SOURCES "util/*.cc")
+
+foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES})
+    get_filename_component(ART_MODERN_UTIL_EXEC "${ART_MODERN_UTIL_SOURCE}" NAME_WLE)
+    set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
+    add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}")
+    target_link_libraries("${ART_MODERN_UTIL_EXEC}" art_modern_lib)
+endforeach()
