@@ -84,6 +84,15 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     const auto md_str = md_str_ss.str();
     return { nm, md_str };
 }
+bam1_t* BamUtils::init()
+{
+    return CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+}
+void BamUtils::write(samFile* fp, const sam_hdr_t* h, const bam1_t* b)
+{
+    CExceptionsProxy::assert_numeric(sam_write1(fp, h, b), USED_HTSLIB_NAME, "Failed to write SAM/BAM record", false,
+        CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+}
 void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
 {
 #ifdef CEU_CM_IS_DEBUG

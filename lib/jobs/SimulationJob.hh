@@ -14,7 +14,7 @@ public:
     SimulationJob(SimulationJob&& other) noexcept
         : fasta_fetch(other.fasta_fetch)
         , coverage_info(other.coverage_info)
-        , job_id(other.job_id) {};
+        , job_id(other.job_id) { };
 
     SimulationJob(const SimulationJob&) = delete;
     SimulationJob& operator=(SimulationJob&&) = delete;

@@ -2,7 +2,6 @@
 
 #include "BamUtils.hh"
 #include "DumbReadOutput.hh"
-#include "art_modern_constants.hh"
 #include "fasta/BaseFastaFetch.hh"
 #include "out/BaseReadOutput.hh"
 #include <htslib/sam.h>

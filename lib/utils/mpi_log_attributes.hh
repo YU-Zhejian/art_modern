@@ -1,5 +1,4 @@
 #pragma once
-#include "art_modern_constants.hh"
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_cast.hpp>
 namespace labw::art_modern {

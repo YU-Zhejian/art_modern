@@ -23,14 +23,9 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-unset(USE_ASIO_PARALLEL)
-unset(USE_NOP_PARALLEL)
-
-if(NOT DEFINED USE_ASIO_PARALLEL)
-    set(USE_ASIO_PARALLEL ON)
+if(NOT DEFINED USE_THREAD_PARALLEL)
+    set(USE_THREAD_PARALLEL ASIO)
 endif()
-
-add_compile_definitions(USE_ASIO_PARALLEL) # USE_NOP_PARALLEL #  TODO
 
 if(NOT DEFINED USE_RANDOM_GENERATOR)
     set(USE_RANDOM_GENERATOR STL)
@@ -49,6 +44,7 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/protobuf.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
@@ -87,11 +83,22 @@ elseif(Boost_unit_test_framework_FOUND)
 
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WLE)
-        set(ART_MODERN_TEST_EXEC "art_modern_test_${ART_MODERN_TEST_EXEC}")
+        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
         target_link_libraries("${ART_MODERN_TEST_EXEC}" art_modern_lib Boost::unit_test_framework)
         add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
     endforeach()
 else()
     message(NOTICE "Testing disabled since Boost::unit_test_framework was not found")
+endif()
+
+if(CEU_CM_SHOULD_ENABLE_TEST)
+    file(GLOB ART_MODERN_BENCHMARK_SOURCES "benchmarks/*.cc")
+
+    foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
+        get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE)
+        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_TEST_EXEC}")
+        add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
+        target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
+    endforeach()
 endif()

@@ -4,7 +4,7 @@
  */
 
 #pragma once
-#include <cstdlib>
+#include <cstdlib> // For EXIT_FAILURE
 
 namespace labw::art_modern {
 const char MPI_MESSAGE_BYE[] = "BYE\0";

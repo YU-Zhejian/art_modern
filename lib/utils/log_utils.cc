@@ -1,4 +1,4 @@
-#include "art_modern_config.h"
+#include "art_modern_config.h" // For WITH_MPI
 #include <boost/filesystem.hpp>
 #include <boost/log/attributes/clock.hpp>
 #include <boost/log/attributes/current_thread_id.hpp>
@@ -30,9 +30,8 @@ void init_logger()
     core->add_global_attribute("MPIRank", MPIRankLoggerAttribute());
     core->add_global_attribute("MPIHostName", MPIHostNameLoggerAttribute());
 #endif
-    auto sink
-        = boost::log::add_console_log(std::cerr, boost::log::keywords::format = "[%TimeStamp%] %Severity%: %Message%",
-            logging::keywords::filter = logging::trivial::severity >= logging::trivial::info);
+    const auto sink = add_console_log(std::cerr, boost::log::keywords::format = "[%TimeStamp%] %Severity%: %Message%",
+        logging::keywords::filter = logging::trivial::severity >= logging::trivial::info);
 
     core->add_sink(sink);
 }

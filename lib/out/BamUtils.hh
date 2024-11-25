@@ -23,6 +23,8 @@ public:
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, int32_t nm_tag);
     static std::pair<int32_t, std::string> generate_nm_md_tag(
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
+    inline static bam1_t* init();
+    inline static void write(samFile* fp, const sam_hdr_t* h, const bam1_t* b);
 
 private:
     const SamOptions& sam_options_;

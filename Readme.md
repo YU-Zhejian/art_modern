@@ -14,7 +14,7 @@ ART is an excellent software for simulating reads from a reference genome. Howev
 
 So, we developed `art_modern` with the following ideas:
 
-- Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread \& process \& co-routine, etc.
+- Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread, etc.
 - Writer for SAM output format was re-implemented using [HTSLib](https://www.htslib.org/), which allows supporting BAM and headless SAM/BAM output format with minimal modifications of code.
 - Multiple FASTA parsers were added. For example, the `htslib` parser allows on-disk random access of enormous genomes without reading them into memory, while the `stream` parser allows streaming of FASTA files.
 
@@ -28,7 +28,13 @@ env -C build_release cmake -DCMAKE_BUILD_TYPE=Release -DCEU_CM_SHOULD_ENABLE_TES
 env -C build_release make
 ```
 
-The project binary will be available at `build_release/art_modern`.
+The project binary will be available at `build_release/art_modern`. Now we can run the program:
+
+```shell
+# TODO
+build_release/art_modern --version # For version information
+
+```
 
 ## Installation
 
@@ -51,30 +57,38 @@ The project binary will be available at `build_release/art_modern`.
   - **REQUIRED** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html);
   - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers;
   - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program.
-  - **OPTIONAL** `stacktrace_backtrace`: See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details.
+  - **OPTIONAL** `stacktrace_backtrace`: For a more developer-friendly stack trace. See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details.
 - A working [HTSLib](https://www.htslib.org/). You may either use the one bundled with the project or an external one that had already been installed inside your system.
   - To use bundled HTSLib sources, you need to have:
     - **REQUIRED** [zlib](https://www.zlib.net/);
     - **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html);
-    - **OPTIONAL** [libbz2](http://www.bzip.org/);
-    - **OPTIONAL** [liblzma](https://tukaani.org/xz/); 
-    - **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate);
-    - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details.
-  - To use external HTSLib, consult your system administrator.
-- Optional libraries for random generators. Including:
-  - [Intel OneAPI Math Kernel Library (MKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html);
-  - [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
-- Optional MPI library for MPI-based parallelism.
-  - MPI implementations (library and compiler). The following MPI implementations are supported:
-    - [MPICH](https://www.mpich.org/).
-    - [OpenMPI](https://www.open-mpi.org/).
-    - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-    - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
-  - Google Protocol Buffers (Protobuf) for serialization/deserialization of MPI.
+    - **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression, which is now not supported.
+    - **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression, which is now not supported.
+    - **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
+    - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
+  - To use external HTSLib, consult your system administrator. hose libraries usually named `libhts.so` with optional version suffixes.
+- Optional libraries for accelerating random number generation. Including:
+  - [Intel OneAPI Math Kernel Library (MKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html): Recommended for Intel or AMD CPUs.
+  - [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/): Used in original ART.
+  - See `USE_RANDOM_GENERATOR` CMake variable mentioned below.
+
+[//]: # (- Optional MPI library for MPI-based parallelism.)
+
+[//]: # (  - MPI implementations &#40;library and compiler&#41;. The following MPI implementations are supported:)
+
+[//]: # (    - [MPICH]&#40;https://www.mpich.org/&#41;.)
+
+[//]: # (    - [OpenMPI]&#40;https://www.open-mpi.org/&#41;.)
+
+[//]: # (    - [Intel MPI]&#40;https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html&#41;.)
+
+[//]: # (    - [MS-MPI]&#40;https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi&#41; &#40;For working under MSYS2&#41;. See also: [MSYS2 Package Repository]&#40;https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi&#41;)
+
+[//]: # (  - Google Protocol Buffers &#40;Protobuf&#41; for serialization/deserialization of MPI.)
 
 ### CMake Variables
 
-CMake variables should be set when invoking `cmake`. For example,
+CMake variables control build behaviour. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
 
 ```shell
 cmake -DBUILD_SHARED_LIBS=ON
@@ -82,19 +96,9 @@ cmake -DBUILD_SHARED_LIBS=ON
 
 sets `BUILD_SHARED_LIBS` to `ON`.
 
-- `BUILD_SHARED_LIBS`: Whether to build shared libraries
+- [`BUILD_SHARED_LIBS`](https://cmake.org/cmake/help/latest/variable/BUILD_SHARED_LIBS.html): Whether to build shared libraries.
   - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
   - `OFF`: Will search for static libraries and use static linking.
-- `USE_HTSLIB`: Use which HTSLib implementation
-  - **unset (DEFAULT): Will use bundled HTSLib.**
-  - `hts`: Will use the HTSLib (`libhts.so`) found in system.
-- `CEU_CM_SHOULD_ENABLE_TEST`: Whether test should be enabled.
-  - **unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
-  - `OFF`: Will disable test.
-  - `ON`: Will enable test.
-- `CEU_CM_SHOULD_USE_NATIVE`: Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable but impaired portability.
-  - **`OFF` (DEFAULT): Will not build native executables/libraries.**
-  - `ON`: Will build native executables/libraries.
 - [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html): The CMake build type.
   - **`Debug` (DEFAULT): For developers with debugging needs.**
     - Optimization is turned off with debugging symbols and compiler warnings enabled.
@@ -105,15 +109,25 @@ sets `BUILD_SHARED_LIBS` to `ON`.
   - `RelWithDebInfo`: Optimized executables/libraries with debug symbols.
     - Optimization is turned on with compiler warnings disabled.
     - If `CEU_CM_SHOULD_ENABLE_TEST` is unset, it will be set to `TRUE`.
+- `CEU_CM_SHOULD_USE_NATIVE`: Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable but impaired portability.
+  - **`OFF` (DEFAULT): Will not build native executables/libraries.**
+  - `ON`: Will build native executables/libraries.
+- `CEU_CM_SHOULD_ENABLE_TEST`: Whether test should be enabled.
+  - **unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
+  - `OFF`: Will disable test.
+  - `ON`: Will enable test.
+- `USE_HTSLIB`: Use which HTSLib implementation.
+  - **unset (DEFAULT): Will use bundled HTSLib.**
+  - `hts`: Will use the HTSLib (`libhts.so`) found in the system.
+  - Any other values `[val]`: Will use the HTSLib of other names (`lib[val].so`) found in the system.
 - `USE_RANDOM_GENERATOR`: The random number generator used.
   - **`STL` (DEFAULT): Use STL random generators.**
   - `BOOST`: Use Boost random generators.
   - `GSL`: Use GSL random generators.
   - `ONEMKL`: Use Intel OneAPI MKL random generators. Highly recommended on Intel CPUs.
-- `USE_ASIO_PARALLEL`: Whether to use Boost ASIO for thread-based parallelism.
-  - **`ON` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
-  - `OFF`: Will not use Boost ASIO for thread-based parallelism.
-
+- `USE_THREAD_PARALLEL`: The thread-level parallelism strategy.
+  - **`ASIO` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
+  - `NOP`: Will not use thread-based parallelism.
 
 ## Usage
 
@@ -163,7 +177,7 @@ Changes on software engineering stuff:
 
 - Build systems changed to CMake.
 - All C++ code was re-implemented in C++14 with radical removal of duplicated or unused code.
-- Random generator was changed from GNU Science Library (GSL) to Boost or C++ standard library.
+- More random number generators were added.
 - Logging re-implemented using Boost.
 - Multithreading support implemented using Boost.
 - Largely eliminated POSIX-only routines by Boost.
@@ -219,4 +233,6 @@ Currently, there's no support for such features in the simulator. However, you m
 
 ### I don't care about portability. How to make it wicked fast?
 
-Easy. Set `USE_HTSLIB` to the latest HTSLib available on your system, `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL`. Please also make sure that your HTSLib had been linked with [libdeflate](https://github.com/ebiggers/libdeflate).
+Easy. Set `USE_HTSLIB` to the latest HTSLib available on your system, `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL` on Intel/AMD machines. Please also make sure that your HTSLib has been linked with [libdeflate](https://github.com/ebiggers/libdeflate).
+
+Also, when executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.

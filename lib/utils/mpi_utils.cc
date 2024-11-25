@@ -1,5 +1,5 @@
 #include "mpi_utils.hh"
-#include "art_modern_config.h"
+#include "art_modern_config.h" // for WITH_MPI
 #include "art_modern_constants.hh"
 #ifdef WITH_MPI
 #include <mpi.h>

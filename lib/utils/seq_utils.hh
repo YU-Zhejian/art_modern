@@ -17,7 +17,7 @@ std::string normalize(const std::string& dna);
  * Reverse an arbitrary sequence.
  *
  * @tparam T Sequence type.
- * @param ptr Start of sequence.
+ * @param ptr Start of the sequence.
  * @param n Sequence length.
  */
 template <typename T> static void reverse(T* ptr, const size_t n)

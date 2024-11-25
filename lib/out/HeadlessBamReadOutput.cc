@@ -33,8 +33,7 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     if (is_closed_) {
         return;
     }
-    auto sam_record
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+    auto sam_record = BamUtils::init();
     const auto rlen = static_cast<long>(pwa.query.size());
     const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
     auto qual = pwa.qual;
@@ -67,22 +66,25 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     tags.patch(sam_record);
 
     std::unique_lock rhs_lk(mutex_);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    BamUtils::write(sam_file_, sam_header_, sam_record);
+    bam_destroy1(sam_record);
 }
 void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (is_closed_) {
         return;
     }
-    auto sam_record1
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-    auto sam_record2
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+    auto sam_record1 = BamUtils::init();
+    auto sam_record2 = BamUtils::init();
+
     const auto rlen = static_cast<long>(pwa1.query.size());
+
     const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
     const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
+
     auto qual1 = pwa1.qual;
+    auto qual2 = pwa2.qual;
+
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
 
@@ -93,7 +95,6 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
         std::reverse(qual1.begin(), qual1.end());
         std::reverse(cigar1.begin(), cigar1.end());
     }
-    auto qual2 = pwa2.qual;
     if (!pwa1.is_plus_strand) {
         std::reverse(qual2.begin(), qual2.end());
         std::reverse(cigar2.begin(), cigar2.end());
@@ -146,10 +147,10 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     tags2.patch(sam_record2);
 
     std::unique_lock rhs_lk(mutex_);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    BamUtils::write(sam_file_, sam_header_, sam_record1);
+    BamUtils::write(sam_file_, sam_header_, sam_record2);
+    bam_destroy1(sam_record1);
+    bam_destroy1(sam_record2);
 }
 void HeadlessBamReadOutput::close()
 {

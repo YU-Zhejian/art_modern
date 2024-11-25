@@ -42,7 +42,7 @@ public:
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_numeric(const t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
+    static t assert_numeric(const t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
         const std::string& details = UNKNOWN_C_EXCEPTION, const bool explain_using_strerror = false,
         const EXPECTATION expectation = EXPECTATION::ZERO, const bool log = true)
     {
@@ -56,7 +56,7 @@ public:
                 oss << std::strerror(errno);
             }
             oss << " returned " << c_value;
-            auto cep = CExceptionsProxy(std::move(c_lib_name), oss.str());
+            auto cep = CExceptionsProxy(c_lib_name, oss.str());
             if (log) {
                 cep.log();
             }
@@ -73,12 +73,11 @@ public:
      * @param c_lib_name Name of the C library.
      * @param details Details about the error.
      * @param explain_using_strerror If true, the error message will include the error string returned by strerror.
-     * @param expectation The expected value of the C routine.
      * @param log If true, the exception will be logged.
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_not_null(const t c_value, std::string c_lib_name = UNKNOWN_C_EXCEPTION,
+    static t assert_not_null(const t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
         const std::string& details = UNKNOWN_C_EXCEPTION, const bool explain_using_strerror = false,
         const bool log = true)
     {
@@ -92,7 +91,7 @@ public:
             }
             oss << " returned null";
 
-            auto cep = CExceptionsProxy(std::move(c_lib_name), oss.str());
+            auto cep = CExceptionsProxy(c_lib_name, oss.str());
             if (log) {
                 cep.log();
             }

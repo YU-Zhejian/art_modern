@@ -6,8 +6,7 @@
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "DumbReadOutput.hh"
-#include "art_modern_config.h"
-#include "global_variables.hh"
+#include "art_modern_config.h" // For USED_HTSLIB_NAME
 #include "utils/mpi_utils.hh"
 #include "utils/seq_utils.hh"
 
@@ -24,8 +23,7 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    auto sam_record
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+    auto sam_record = BamUtils::init();
     const auto rlen = static_cast<long>(pwa.query.size());
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
@@ -55,8 +53,8 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     tags.patch(sam_record);
 
     std::unique_lock rhs_lk(mutex_);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    BamUtils::write(sam_file_, sam_header_, sam_record);
+    bam_destroy1(sam_record);
 }
 
 void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -65,10 +63,10 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
         return;
     }
 
-    int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
+    const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    auto rlen = static_cast<long>(pwa1.query.size());
+    const auto rlen = static_cast<long>(pwa1.query.size());
 
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
@@ -114,10 +112,8 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
     const hts_pos_t isize2 = -isize1;
 
-    auto sam_record1
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
-    auto sam_record2
-        = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to initialize SAM/BAM record");
+    auto sam_record1 = BamUtils::init();
+    auto sam_record2 = BamUtils::init();
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
@@ -131,17 +127,17 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);
 
-    std::unique_lock rhs_lk(mutex_);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record1), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    CExceptionsProxy::assert_numeric(sam_write1(sam_file_, sam_header_, sam_record2), USED_HTSLIB_NAME,
-        "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    std::scoped_lock rhs_lk(mutex_);
+    BamUtils::write(sam_file_, sam_header_, sam_record1);
+    BamUtils::write(sam_file_, sam_header_, sam_record2);
+    bam_destroy1(sam_record1);
+    bam_destroy1(sam_record2);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options)
     : sam_options_(std::move(sam_options))
 {
-    std::unique_lock rhs_lk(mutex_);
+    std::scoped_lock rhs_lk(mutex_);
 
     sam_file_ = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
@@ -165,7 +161,7 @@ void BamReadOutput::close()
     if (is_closed_) {
         return;
     }
-    std::unique_lock rhs_lk(mutex_);
+    std::scoped_lock rhs_lk(mutex_);
     sam_close(sam_file_);
     is_closed_ = true;
 }
