@@ -25,13 +25,14 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
-    : file_(filename),
-      is_closed_(false)
+    : file_(filename)
+    , is_closed_(false)
 {
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
-void FastqReadOutput::close() {
+void FastqReadOutput::close()
+{
     if (is_closed_) {
         return;
     }

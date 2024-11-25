@@ -1,6 +1,7 @@
 #include "Pbsim3TranscriptBatcher.hh"
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <iostream>
 #include <utility>
 #include <vector>
 
@@ -14,14 +15,11 @@ namespace art_modern {
     std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
     {
         std::scoped_lock lock(mutex_);
-        std::unordered_map<std::string, double> coverage_positive;
-        std::unordered_map<std::string, double> coverage_negative;
+        CoverageInfo::coverage_map coverage_positive;
+        CoverageInfo::coverage_map coverage_negative;
         std::vector<std::string> seq_names;
         std::vector<std::string> seqs;
         if (batch_size_ != std::numeric_limits<int>::max()) {
-            coverage_positive.reserve(batch_size_);
-            coverage_negative.reserve(batch_size_);
-
             seq_names.reserve(batch_size_);
             seqs.reserve(batch_size_);
         }
@@ -36,8 +34,8 @@ namespace art_modern {
             }
             boost::algorithm::split(tokens, line, boost::is_any_of("\t"));
             if (tokens.size() == 4) {
-                coverage_positive[tokens.at(0)] = std::stod(tokens.at(1));
-                coverage_negative[tokens.at(0)] = std::stod(tokens.at(2));
+                coverage_positive.emplace(tokens.at(0), std::stod(tokens.at(1)));
+                coverage_negative.emplace(tokens.at(0), std::stod(tokens.at(2)));
                 seq_names.emplace_back(tokens.at(0));
                 seqs.emplace_back(tokens.at(3));
             } else {

@@ -2,6 +2,10 @@
 #include "art_modern_config.h"
 #include "art_modern_constants.hh"
 
+#include <ceu_check/ceu_check_c_cxx_std.hh>
+#include <ceu_check/ceu_check_cc.hh>
+#include <ceu_check/ceu_check_ctypes_limit.hh>
+
 #include <iostream>
 
 // Boost
@@ -11,6 +15,10 @@
 // HTSLib
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+
+#ifdef WITH_OPENMP
+#include <omp.h>
+#endif
 
 // GSL
 #ifdef WITH_GSL
@@ -133,6 +141,24 @@ void print_protobuf_version()
 #endif
 }
 
+void print_openmp_version()
+{
+#ifdef WITH_OPENMP
+    std::cout << "OpenMP (C): " << OpenMP_C_SPEC_DATE <<
+#ifdef OpenMP_C_VERSION
+        " v" << OpenMP_C_VERSION <<
+#endif
+        std::endl;
+    std::cout << "OpenMP (CXX): " << OpenMP_CXX_SPEC_DATE <<
+#ifdef OpenMP_CXX_VERSION
+        " v" << OpenMP_CXX_VERSION <<
+#endif
+        std::endl;
+#else
+    std::cout << "OpenMP: not used" << std::endl;
+#endif
+}
+
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
@@ -143,6 +169,11 @@ void print_version()
     print_onemkl_version();
     print_mpi_version();
     print_protobuf_version();
+    print_openmp_version();
+    std::cout << ceu_interpret_c_std_version();
+    std::cout << ceu_interpret_cxx_std_version();
+    std::cout << ceu_check_get_compiler_info();
+    std::cout << ceu_check_get_ctypes_limit_info();
 }
 } // art_modern
 // labw

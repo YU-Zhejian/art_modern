@@ -8,8 +8,4 @@ Modifications done are:
 - All files unused in `htscodecs` are removed.
 - Support for external HTSCodecs and OpenSSL (For calculating MD5) are removed.
 
-This modified `htsib` can process local BAM files at relative high speed. You may read more about `htslib` at [here](http://www.htslib.org/). You may find deprecated Makefile and its CMake adapter at [`_deprecated`](_deprecated).
-
-## Known Bugs in CMake System
-
-- Cannot stop build even if shared libraries can not be found.
+This modified `htsib` can process local BAM files at relative high speed. You may read more about `htslib` at [here](http://www.htslib.org/).

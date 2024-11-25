@@ -1,7 +1,6 @@
 #include "HeadlessBamReadOutput.hh"
 #include "CExceptionsProxy.hh"
 #include "art_modern_config.h"
-#include "global_variables.hh"
 #include "utils/seq_utils.hh"
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>

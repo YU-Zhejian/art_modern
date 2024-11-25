@@ -23,7 +23,7 @@ std::string normalize(const std::string& dna);
 template <typename T> static void reverse(T* ptr, const size_t n)
 {
     T tmp;
-    for (int i = 0; i < n / 2; ++i) {
+    for (size_t i = 0; i < n / 2; ++i) {
         tmp = ptr[i];
         ptr[i] = ptr[n - i - 1];
         ptr[n - i - 1] = tmp;

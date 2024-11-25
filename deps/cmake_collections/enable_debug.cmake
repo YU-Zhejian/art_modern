@@ -93,6 +93,7 @@ function(ceu_cm_global_enhanced_check_compiler_flag)
 endfunction()
 
 if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     set(CEU_CM_ADDITIONAL_COMPILER_FLAGS "")
     set(CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED
         TRUE
@@ -146,11 +147,11 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
         ceu_cm_global_enhanced_check_compiler_flag(-g0)
         ceu_cm_global_enhanced_check_compiler_flag(-Ofast -O3 -O2)
     elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Information
-        ceu_cm_global_enhanced_check_compiler_flag(-W0 -w)
         ceu_cm_global_enhanced_check_compiler_flag(-Ofast -O3 -O2)
         ceu_cm_global_enhanced_check_compiler_flag(-g)
+        ceu_cm_global_enhanced_check_compiler_flag(-qopt-report -vec-report /Qvec-report)
+        ceu_cm_global_enhanced_check_compiler_flag(-fdump-tree-vect-details)
     else() # Debug, the default.
-        set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
         # ceu_cm_global_enhanced_check_compiler_flag(-fsanitize=address)
         ceu_cm_global_enhanced_check_compiler_flag(-Wall)
         ceu_cm_global_enhanced_check_compiler_flag(-Wextra)

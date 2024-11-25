@@ -1,6 +1,6 @@
 #pragma once
 
-#include<fstream>
+#include <fstream>
 #include <mutex>
 
 #include "out/BaseReadOutput.hh"
@@ -22,7 +22,6 @@ public:
     ~FastqReadOutput() override;
 
 private:
-
     std::ofstream file_;
     std::mutex mutex_;
     bool is_closed_;

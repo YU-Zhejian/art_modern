@@ -25,4 +25,12 @@
 #cmakedefine CEU_CM_IS_DEBUG
 #cmakedefine USE_ASIO_PARALLEL
 #cmakedefine USE_NOP_PARALLEL
+
+// OpenMP
+
+#cmakedefine WITH_OPENMP
+#cmakedefine OpenMP_C_SPEC_DATE "${OpenMP_C_SPEC_DATE}"
+#cmakedefine OpenMP_CXX_SPEC_DATE "${OpenMP_CXX_SPEC_DATE}"
+#cmakedefine OpenMP_C_VERSION "${OpenMP_C_VERSION}"
+#cmakedefine OpenMP_CXX_VERSION "${OpenMP_CXX_VERSION}"
 #endif

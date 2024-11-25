@@ -12,7 +12,7 @@ void ArtRead::generate_pairwise_aln()
     int pos_on_read = 0;
     std::ostringstream aln_seq_ss;
     std::ostringstream aln_ref_ss;
-    for (auto pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
+    for (decltype(seq_ref.size()) pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
         if (indel_.find(k) == indel_.end()) { // No indel
             aln_seq_ss << seq_read_[pos_on_read];
             aln_ref_ss << seq_ref[pos_on_ref];
@@ -49,7 +49,7 @@ void ArtRead::generate_snv_on_qual(bool is_first_read)
         art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
     }
     char achar;
-    for (auto i = 0; i < qual_.size(); i++) {
+    for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
         if (seq_read_[i] == 'N') {
             qual_[i] = MIN_QUAL;
             continue;
@@ -163,7 +163,7 @@ void ArtRead::ref2read()
 {
     int k = 0;
     int pos_on_read = 0;
-    for (auto pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
+    for (decltype(seq_ref.size()) pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
         if (indel_.find(k) == indel_.end()) { // No indel
             seq_read_[pos_on_read] = seq_ref[pos_on_ref];
             pos_on_ref++;
@@ -181,7 +181,7 @@ void ArtRead::ref2read()
         pos_on_read++;
         k++;
     }
-    if (seq_read_.size() != art_params_.read_len) {
+    if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
         throw ReadGenerationException("Generated seq_read_ with unequal sizes");
     }
 }
@@ -207,10 +207,10 @@ bool ArtRead::is_good() const
     if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > 0) { // TODO: Add params back.
         return false;
     }
-    if (seq_read_.size() != art_params_.read_len) {
+    if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
         goto error;
     }
-    if (qual_.size() != art_params_.read_len) {
+    if (static_cast<int>(qual_.size()) != art_params_.read_len) {
         goto error;
     }
     if (aln_read_.size() != aln_ref_.size()) {

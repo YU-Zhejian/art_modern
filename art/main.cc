@@ -14,7 +14,6 @@
 #include "ArtCmdOpts.hh"
 #include "main_fn.hh"
 
-#include "global_variables.hh"
 #include "utils/dump_utils.hh"
 #include "utils/log_utils.hh"
 #include "utils/mpi_utils.hh"
@@ -49,7 +48,6 @@ int main_mpi_child()
         }
     }
 }
-
 #endif
 
 void handle_mpi_child()
@@ -77,16 +75,14 @@ int main(int argc, char* argv[])
     init_mpi(&argc, &argv);
     // 1st round initialization of a working console logger
     init_logger();
+    print_banner();
     init_file_logger("log.d");
     handle_mpi_child();
     handle_dumps();
     validate_protobuf_version();
 
-    auto art_params = parse_args(argc, argv);
+    const auto& art_params = parse_args(argc, argv);
     BOOST_LOG_TRIVIAL(info) << "Argument parsing finished. Start generating...";
-#ifdef CEU_CM_IS_DEBUG
-    BOOST_LOG_TRIVIAL(warning) << "Debug mode enabled.";
-#endif
 
 #ifdef WITH_BOOST_TIMER
     BOOST_LOG_TRIVIAL(info) << "Boost::timer started.";
@@ -95,13 +91,11 @@ int main(int argc, char* argv[])
 #else
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
-    // FIXME: Come up a way to avoid this 2nd parsing of params.
     generate_all(art_params);
 #ifdef WITH_BOOST_TIMER
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");
 #endif
-    BOOST_LOG_TRIVIAL(info) << "Generated " << read_id << " reads.";
     bye_mpi();
     exit_mpi(EXIT_SUCCESS);
 }

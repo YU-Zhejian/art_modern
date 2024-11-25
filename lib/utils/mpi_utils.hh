@@ -5,6 +5,7 @@
 
 #pragma once
 #include <cstdlib> // For EXIT_FAILURE
+#include <string>
 
 namespace labw::art_modern {
 const char MPI_MESSAGE_BYE[] = "BYE\0";
@@ -31,5 +32,7 @@ void init_mpi(int* argc, char*** argv);
  * Broadcast the message "BYE" to all processes.
  */
 void bye_mpi();
+
+std::string mpi_rank();
 
 }

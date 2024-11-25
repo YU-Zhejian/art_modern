@@ -55,4 +55,19 @@ void init_mpi([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv)
     MPI_Init(argc, argv);
 #endif
 }
+std::string mpi_rank()
+{
+#ifdef WITH_MPI
+    int mpi_finalized_flag;
+    MPI_Finalized(&mpi_finalized_flag);
+    if (mpi_finalized_flag) {
+        return std::to_string(MPI_UNAVAILABLE_RANK);
+    }
+    int rank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return std::to_string(rank);
+#else
+    return "nompi";
+#endif
+}
 }

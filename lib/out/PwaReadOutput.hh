@@ -1,7 +1,7 @@
 #pragma once
 
+#include <fstream>
 #include <iostream>
-#include<fstream>
 #include <mutex>
 
 #include "out/BaseReadOutput.hh"

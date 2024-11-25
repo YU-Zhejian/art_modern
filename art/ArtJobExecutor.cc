@@ -1,16 +1,16 @@
 #include "ArtJobExecutor.hh"
 #include "ArtContig.hh"
-#include "global_variables.hh"
 #include "utils/mpi_utils.hh"
 #include <boost/log/trivial.hpp>
 #include <boost/timer/progress_display.hpp>
 
 namespace labw::art_modern {
 
-bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand)
+bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
 {
     std::ostringstream osID;
-    osID << art_contig.seq_name << ':' << art_params_.id << ":" << read_id++;
+    osID << art_contig.seq_name << ':' << art_params_.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
+         << current_num_reads;
     ArtRead read_1(art_params_, rprob_, art_contig.seq_name, osID.str());
     ArtRead read_2(art_params_, rprob_, art_contig.seq_name, osID.str());
 
@@ -34,11 +34,11 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand)
-
+bool ArtJobExecutor::generate_se(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
 {
     std::ostringstream osID;
-    osID << art_contig.seq_name << ':' << art_params_.id << ':' << read_id++;
+    osID << art_contig.seq_name << ':' << art_params_.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
+         << current_num_reads;
     ArtRead art_read(art_params_, rprob_, art_contig.seq_name, osID.str());
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
@@ -50,22 +50,22 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     if (!art_read.is_good()) {
         return false;
     }
-
     output_dispatcher_->writeSE(art_read.to_pwa());
     return true;
 }
 
-ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params)
+ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, BaseReadOutput* output_dispatcher)
     : job_(std::move(job))
     , art_params_(art_params)
     , rprob_(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len)
-    , output_dispatcher_(art_params_.out_dispatcher)
+    , output_dispatcher_(output_dispatcher)
+    , mpi_rank_(mpi_rank())
 {
 }
 
 void ArtJobExecutor::execute()
 {
-    size_t num_reads = 0;
+    std::size_t num_reads = 0;
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
         return;
@@ -73,8 +73,8 @@ void ArtJobExecutor::execute()
     const int num_reads_to_reduce = art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
-    for (auto seq_id = 0; seq_id < num_contigs; ++seq_id) {
-        const auto contig_name = job_.fasta_fetch->seq_name(seq_id);
+    for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
+        const auto& contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
         if (contig_size < art_params_.read_len) {
             BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
@@ -91,23 +91,45 @@ void ArtJobExecutor::execute()
         auto num_pos_reads = static_cast<long>(job_.coverage_info.coverage_positive(contig_name) * cov_ratio);
         auto num_neg_reads = static_cast<long>(job_.coverage_info.coverage_negative(contig_name) * cov_ratio);
 
-        while (num_pos_reads > 0) {
-            if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, true)
-                                                                         : generate_se(art_contig, true)) {
-                num_pos_reads -= num_reads_to_reduce;
-                num_reads += num_reads_to_reduce;
+        if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
+            while (num_pos_reads > 0) {
+                if (generate_se(art_contig, true, num_reads)) {
+                    num_pos_reads -= num_reads_to_reduce;
+                    num_reads += num_reads_to_reduce;
+                }
             }
-        }
-        while (num_neg_reads > 0) {
-            if (art_params_.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? generate_pe(art_contig, false)
-                                                                         : generate_se(art_contig, false)) {
-                num_neg_reads -= num_reads_to_reduce;
-                num_reads += num_reads_to_reduce;
+            while (num_neg_reads > 0) {
+                if (generate_se(art_contig, false, num_reads)) {
+                    num_neg_reads -= num_reads_to_reduce;
+                    num_reads += num_reads_to_reduce;
+                }
+            }
+        } else {
+            while (num_pos_reads > 0) {
+                if (generate_pe(art_contig, true, num_reads)) {
+                    num_pos_reads -= num_reads_to_reduce;
+                    num_reads += num_reads_to_reduce;
+                }
+            }
+            while (num_neg_reads > 0) {
+                if (generate_pe(art_contig, false, num_reads)) {
+                    num_neg_reads -= num_reads_to_reduce;
+                    num_reads += num_reads_to_reduce;
+                }
             }
         }
     }
+
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
                             << " reads generated.";
+}
+ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
+    : job_(std::move(other.job_))
+    , art_params_(other.art_params_)
+    , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
+    , output_dispatcher_(other.output_dispatcher_)
+    , mpi_rank_(other.mpi_rank_)
+{
 }
 
 ArtJobExecutor::~ArtJobExecutor() = default;

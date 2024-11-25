@@ -22,7 +22,7 @@ namespace art_modern {
         std::string fetch_e;
         while (seq_names.size() < batch_size_) {
             try {
-                auto fasta_record = fasta_iterator_.next();
+                const auto& fasta_record = fasta_iterator_.next();
                 if (fetch_s.empty()) {
                     fetch_s = fasta_record.id;
                 }

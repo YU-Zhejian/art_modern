@@ -93,12 +93,12 @@ void ArtContig::generate_read_pe(const bool is_plus_strand, const bool is_mp, Ar
 
 ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, const size_t seq_id, const ArtParams& art_params, Rprob& rprob)
     : seq_name(fasta_fetch->seq_name(seq_id))
-    , ref_len_(fasta_fetch->seq_len(seq_id))
     , fasta_fetch_(fasta_fetch)
     , art_params_(art_params)
     , rprob_(rprob)
     , seq_id_(seq_id)
     , valid_region_(fasta_fetch->seq_len(seq_id) - art_params.read_len)
+    , ref_len_(fasta_fetch->seq_len(seq_id))
 {
 }
 hts_pos_t ArtContig::generate_fragment_length() const

@@ -34,8 +34,8 @@ struct ArtParams {
     const hts_pos_t pe_dist_mean_minus_2_std;
     const Empdist qdist;
     const int batch_size;
-    BaseFastaFetch* fasta_fetch;
-    BaseReadOutput* out_dispatcher;
+    const boost::program_options::variables_map vm;
+    const std::vector<std::string> args;
 };
 
 } // namespace labw::art_modern

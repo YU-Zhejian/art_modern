@@ -1,0 +1,10 @@
+#pragma once
+
+// Whether <cygwin/version.h> is available
+#cmakedefine01 CEU_HAVE_INCLUDE_CYGWIN_VERSION_H
+
+// Whether <sys/utsname.h> is available
+#cmakedefine01 CEU_HAVE_INCLUDE_SYS_UTSNAME_H
+
+// Whether <_mingw.h> is available
+#cmakedefine01 CEU_HAVE_INCLUDE__MINGW_H
