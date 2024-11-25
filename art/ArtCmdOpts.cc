@@ -520,10 +520,7 @@ ArtParams parse_args(int argc, char** argv)
     const boost::program_options::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
 
-    std::vector<std::string> args(argc);
-    for (int i = 0; i < argc; ++i) {
-        args[i] = argv[i];
-    }
+    std::vector<std::string> args{argv, argv + argc};
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);

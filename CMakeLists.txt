@@ -53,7 +53,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 
 # Main
+if(CEU_CM_SHOULD_ENABLE_TEST)
 configure_file("${CMAKE_CURRENT_LIST_DIR}/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
+endif()
 configure_file("${CMAKE_CURRENT_LIST_DIR}/lib/art_modern_config.h.in" "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")

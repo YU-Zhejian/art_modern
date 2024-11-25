@@ -34,7 +34,9 @@ public:
     PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
         std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig,
         bool is_plus_strand);
+    static PairwiseAlignment deserialize(const std::vector<std::string> &serialized);
     std::vector<uint32_t> generate_cigar_array(bool use_m) const;
+    std::string serialize() const;
 
     /**
      * Query sequence with gap inserted using -
@@ -60,6 +62,7 @@ public:
     const std::string contig_name;
     const hts_pos_t pos_on_contig;
     const bool is_plus_strand;
+
 };
 
 } // namespace labw::art_modern // namespace labw

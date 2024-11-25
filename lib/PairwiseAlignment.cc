@@ -1,8 +1,11 @@
 #include "PairwiseAlignment.hh"
 #include "art_modern_config.h" // For CEU_CM_IS_DEBUG
 #include "art_modern_constants.hh"
+
+#include <boost/algorithm/string/erase.hpp>
 #include <htslib/sam.h>
 #include <utility>
+#include <sstream>
 
 namespace labw::art_modern {
 PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
@@ -57,7 +60,42 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
     return cigar;
 }
 
-PWAException::PWAException(const char* msg)
+    std::string PairwiseAlignment::serialize() const {
+    std::ostringstream os;
+        os << ">" << read_name << "\t" << contig_name << ":" << std::to_string(pos_on_contig) << ":" << (is_plus_strand?'+':'-') << "\n";
+        os << aligned_query << "\n";
+        os << aligned_ref << "\n";
+        os << qual << "\n";
+        return os.str();
+    }
+
+    PairwiseAlignment PairwiseAlignment::deserialize(const std::vector<std::string> &serialized) {
+        const auto sep_pos = serialized[0].find('\t');
+        const std::string& read_name_ = serialized[0].substr(1, sep_pos-1);
+        const std::string& coordinate_ = serialized[0].substr(sep_pos+1);
+        std::string token;
+        std::istringstream iss(coordinate_);
+        std::getline(iss, token, ':');
+        const std::string& contig_name_ = token;
+        std::getline(iss, token, ':');
+        const hts_pos_t pos_on_contig_ = std::stol(token);
+        std::getline(iss, token, ':');
+        const bool is_plus_strand_ = token[0] == '+';
+
+        const std::string& aligned_query_ = serialized[1];
+        const std::string& aligned_ref_ = serialized[2];
+        std::string query_ = serialized[1];
+        std::string ref_ = serialized[2];
+        const std::string& qual_ = serialized[3];
+        boost::algorithm::erase_all(query_, ALN_GAP_STR);
+        boost::algorithm::erase_all(ref_, ALN_GAP_STR);
+        return {
+                read_name_, contig_name_, query_, ref_, qual_, aligned_query_, aligned_ref_, pos_on_contig_, is_plus_strand_
+        };
+    }
+
+
+    PWAException::PWAException(const char* msg)
     : msg(msg)
 {
 }

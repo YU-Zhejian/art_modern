@@ -1,7 +1,10 @@
 .PHONY: build
 build:
 	mkdir -p build
-	env -C build cmake -DCMAKE_BUILD_TYPE=Debug -G Ninja ..
+	env -C build cmake \
+		-DCMAKE_BUILD_TYPE=Debug \
+		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-G Ninja ..
 	env -C build ninja -j40
 	env -C build ctest --output-on-failure
 	build/art_modern --help

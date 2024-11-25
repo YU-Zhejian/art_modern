@@ -203,8 +203,9 @@ The bundled HTSLib library used MIT License with the following reference:
   - For `stream` parser, skip records based on MPI rank.
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
-- Support MAF output format?
+- Support UCSC MAF output format?
 - Working with >65535 CIGAR operations? See <https://github.com/lh3/minimap2?tab=readme-ov-file#working-with-65535-cigar-operations>
+- Support UCSC 2bit input format?
 
 ## FAQ
 

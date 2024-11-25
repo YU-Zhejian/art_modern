@@ -1,8 +1,10 @@
 #pragma once
+#include <string>
 
 const int PARALLEL_DISABLE = -1;
 const int PARALLEL_ALL = 0;
 const char ALN_GAP = '-';
+const std::string ALN_GAP_STR = "-";
 
 const int MAX_QUAL = 93;
 const int MIN_QUAL = 0;
