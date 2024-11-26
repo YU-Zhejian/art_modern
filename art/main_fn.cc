@@ -112,7 +112,7 @@ void generate_all(const ArtParams& art_params)
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
-            } else {
+            } else { // Stream
                 out_dispatcher
                     = out_dispatcher_factory.create(art_params.vm, new InMemoryFastaFetch(), art_params.args);
                 std::ifstream pbsim3_template_stream(art_params.input_file_name);

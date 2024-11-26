@@ -21,7 +21,7 @@ public:
     SimulationJob& operator=(const SimulationJob&) = delete;
 
     BaseFastaFetch* fasta_fetch;
-    const CoverageInfo& coverage_info;
+    const CoverageInfo coverage_info; // We own this
     const int job_id;
 };
 

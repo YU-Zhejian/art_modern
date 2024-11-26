@@ -34,5 +34,6 @@ for lc in se pe mp; do
         --ins_rate_1 "${IDRATE}" \
         --del_rate_1 "${IDRATE}" \
         --o-hl_sam tmp/test_small_"${lc}"_template_"${parser}".hl.sam
+    sam2bam tmp/test_small_"${lc}"_template_"${parser}".hl raw_data/ce11.mRNA_head.fa
 done
 rm -fr tmp/test_small_??_template_stream.hl.sam

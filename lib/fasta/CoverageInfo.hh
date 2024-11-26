@@ -1,31 +1,30 @@
 #pragma once
 #include <istream>
 #include <string>
+#include <tbb/concurrent_hash_map.h>
 #include <unordered_map>
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
-    class CoverageInfo {
+class CoverageInfo {
 
-    public:
-        using coverage_map = std::unordered_map<std::string, double>;
-        explicit CoverageInfo(double static_coverage);
-        explicit CoverageInfo(double static_coverage_positive, double static_coverage_negative);
-        CoverageInfo(coverage_map coverage_positive, coverage_map coverage_negative);
-        explicit CoverageInfo(std::istream& istream);
-        explicit CoverageInfo(const std::tuple<coverage_map, coverage_map>& coverage);
+public:
+    using coverage_map = tbb::concurrent_hash_map<std::string, double>;
+    explicit CoverageInfo(double static_coverage);
+    explicit CoverageInfo(double static_coverage_positive, double static_coverage_negative);
+    CoverageInfo(coverage_map coverage_positive, coverage_map coverage_negative);
+    explicit CoverageInfo(std::istream& istream);
+    explicit CoverageInfo(const std::tuple<coverage_map, coverage_map>& coverage);
 
-        double coverage_positive(const std::string& contig_name) const;
-        double coverage_negative(const std::string& contig_name) const;
-        CoverageInfo div(int num_parts) const;
+    [[nodiscard]] double coverage_positive(const std::string& contig_name) const;
+    [[nodiscard]] double coverage_negative(const std::string& contig_name) const;
+    [[nodiscard]] CoverageInfo div(int num_parts) const;
 
-    private:
-        const double static_coverage_positive_;
-        const double static_coverage_negative_;
-        const coverage_map coverage_positive_;
-        const coverage_map coverage_negative_;
-    };
+private:
+    const double static_coverage_positive_;
+    const double static_coverage_negative_;
+    coverage_map coverage_positive_;
+    coverage_map coverage_negative_;
+};
 
-} // art_modern
-} // labw
+} // namespace labw::art_modern

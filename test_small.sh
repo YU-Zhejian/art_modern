@@ -7,6 +7,7 @@ if [ ! -f raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
 fi
 
 . test_small.sh.d/base.sh
+
 . test_small.sh.d/out_fmts.sh       # Test all output is working
 . test_small.sh.d/wgs.sh            # WGS mode (with constant coverage)
 . test_small.sh.d/trans_constcov.sh # Transcript mode with constant coverage

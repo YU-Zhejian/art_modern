@@ -79,8 +79,8 @@ if __name__ == "__main__":
         "POS": 0,
         "NEG": 0,
     }
-    with pysam.FastaFile(ref) as ref_file, pysam.AlignmentFile(alignment, "rb") as alignment_file:
-        alignments = list(alignment_file.fetch())
+    with pysam.FastaFile(ref) as ref_file, pysam.AlignmentFile(alignment, "rb", check_sq=False) as alignment_file:
+        alignments = list(alignment_file)
         if not alignments:
             raise ValueError("No alignments found")
         for aln in tqdm.tqdm(alignments):

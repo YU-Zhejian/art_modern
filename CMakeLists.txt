@@ -10,7 +10,7 @@ project(
     VERSION 1.0.0)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
-set(CMAKE_C_STANDARD 99)
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -51,8 +51,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
+find_package(TBB REQUIRED) # TODO: Have this dependency removed
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} TBB::tbb)
+
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/parallel-hashmap")
 
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} libceu)
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")

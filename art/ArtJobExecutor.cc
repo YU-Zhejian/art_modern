@@ -87,9 +87,17 @@ void ArtJobExecutor::execute()
         const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 1
             : static_cast<double>(contig_size) / art_params_.read_len;
+        const auto cov_pos = job_.coverage_info.coverage_positive(contig_name);
+        const auto cov_neg = job_.coverage_info.coverage_negative(contig_name);
 
-        auto num_pos_reads = static_cast<long>(job_.coverage_info.coverage_positive(contig_name) * cov_ratio);
-        auto num_neg_reads = static_cast<long>(job_.coverage_info.coverage_negative(contig_name) * cov_ratio);
+        auto num_pos_reads = static_cast<long>(cov_pos * cov_ratio);
+        auto num_neg_reads = static_cast<long>(cov_neg * cov_ratio);
+
+        if (num_pos_reads + num_neg_reads == 0) {
+            BOOST_LOG_TRIVIAL(debug) << "No read will be generated for the reference sequence " << contig_name
+                                     << " due to insufficient coverage (pos=" << cov_pos << ", neg=" << cov_neg << ")";
+            continue;
+        }
 
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             while (num_pos_reads > 0) {

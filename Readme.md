@@ -44,7 +44,7 @@ build_release/art_modern --version # For version information
   - A [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html).
     - Under GNU/Linux, using [Ninja](https://ninja-build.org/) or [GNU Make](https://www.gnu.org/software/make) is preferred.
   - Under GNU/Linux, our project further requires [GNU Bash](https://www.gnu.org/software/bash).
-- A working C and C++ compiler that supports C++ 14. The following compilers are supported:
+- A working C and C++ compiler that supports C++ 17. The following compilers are supported:
   - [GCC](https://gcc.gnu.org/);
   - [Clang](https://clang.llvm.org/);
   - [Intel oneAPI DPCPP](https://www.intel.com/content/www/us/en/docs/dpcpp-cpp-compiler/get-started-guide/2024-2/overview.html).
