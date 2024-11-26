@@ -163,6 +163,7 @@ void BamReadOutput::close()
     }
     std::scoped_lock rhs_lk(mutex_);
     sam_close(sam_file_);
+    sam_hdr_destroy(sam_header_);
     is_closed_ = true;
 }
 void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const

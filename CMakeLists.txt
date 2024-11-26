@@ -70,6 +70,7 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/lib/art_modern_config.h.in" "${CMAKE_B
 include_directories("${CMAKE_CURRENT_LIST_DIR}/lib")
 include_directories("${CMAKE_BINARY_DIR}/include/")
 include_directories(${env.INCLUDE})
+include_directories(${CMAKE_INCLUDE_PATH})
 
 file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc" "lib/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE} lib/art_modern_constants.hh)

@@ -22,19 +22,19 @@ build_external_htslib:
 
 .PHONY: fmt
 fmt:
-	bash fmt.sh
+	bash sh.d/fmt.sh
 
 .PHONY: scc
 scc:
-	bash scc.sh
+	bash sh.d/scc.sh
 
 .PHONY: touch
 touch:
-	bash touch-all.sh
+	bash sh.d/touch-all.sh
 
 .PHONY: testsmall
 testsmall: build raw_data
-	bash test_small.sh
+	bash sh.d/test_small.sh
 
 .PHONY: raw_data
 raw_data:
@@ -52,7 +52,3 @@ sync-ceu-cm:
 .PHONY: clean
 clean:
 	rm -fr build build_profile tmp
-
-.PHONY: profile
-profile:
-	env -i bash --norc --noprofile profile.sh

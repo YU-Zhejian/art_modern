@@ -4604,7 +4604,9 @@ uint8_t *bam_aux_get(const bam1_t *b, const char tag[2])
         }
         s = skip_aux(s, end);
     }
-    if (s == NULL) goto bad_aux;
+    if (s == NULL) {
+        goto bad_aux;
+    };
     errno = ENOENT;
     return NULL;
 
@@ -4622,7 +4624,9 @@ int bam_aux_del(bam1_t *b, uint8_t *s)
     aux = bam_get_aux(b);
     p = s - 2;
     s = skip_aux(s, aux + l_aux);
-    if (s == NULL) goto bad_aux;
+    if (s == NULL) {
+        goto bad_aux;
+    }
     memmove(p, s, l_aux - (s - aux));
     b->l_data -= s - p;
     return 0;

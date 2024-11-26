@@ -88,7 +88,7 @@ void Empdist::get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq
 
     const auto& cumCC = rprob.rand_quality();
 
-    for (auto i = 0; i < len; i++) {
+    for (decltype(seq.size()) i = 0; i < len; i++) {
         if (seq[i] == 'A') {
             qual[i] = a_qual_dist_first[i].lower_bound(cumCC[i])->second;
         } else if (seq[i] == 'C') {
@@ -202,7 +202,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         auto denom = static_cast<double>(count[count.size() - 1]) / MAX_DIST_NUMBER;
         dist.clear();
 
-        for (auto i = 0; i < count.size(); i++) {
+        for (decltype(count.size()) i = 0; i < count.size(); i++) {
             dist[static_cast<int>(std::ceil(static_cast<double>(count[i]) / denom))] = qual[i];
         }
         if (!dist.empty()) {

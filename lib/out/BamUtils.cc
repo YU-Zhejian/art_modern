@@ -190,7 +190,7 @@ size_t BamTags::size() const
 }
 void BamTags::add_string(const std::string& key, const std::string& value)
 {
-    size_t len = value.size();
+    const auto len = value.size();
     data_type data(new uint8_t[len + 1]);
     std::copy(value.begin(), value.end(), data.get());
     data[static_cast<std::ptrdiff_t>(len)] = '\0';

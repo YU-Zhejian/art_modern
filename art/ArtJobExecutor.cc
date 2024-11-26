@@ -130,6 +130,7 @@ void ArtJobExecutor::execute()
 
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
                             << " reads generated.";
+    delete job_.fasta_fetch;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     : job_(std::move(other.job_))

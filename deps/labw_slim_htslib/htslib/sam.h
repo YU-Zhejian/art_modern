@@ -1476,25 +1476,33 @@ static inline const uint8_t *sam_format_aux1(const uint8_t *key,
             r |= kputsn_("i:", 2, ks) < 0;
             r |= kputuw(le_to_u16(s), ks) < 0;
             s += 2;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
     } else if (type == 's') {
         if (end - s >= 2) {
             r |= kputsn_("i:", 2, ks) < 0;
             r |= kputw(le_to_i16(s), ks) < 0;
             s += 2;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
     } else if (type == 'I') {
         if (end - s >= 4) {
             r |= kputsn_("i:", 2, ks) < 0;
             r |= kputuw(le_to_u32(s), ks) < 0;
             s += 4;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
     } else if (type == 'i') {
         if (end - s >= 4) {
             r |= kputsn_("i:", 2, ks) < 0;
             r |= kputw(le_to_i32(s), ks) < 0;
             s += 4;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
     } else if (type == 'A') {
         r |= kputsn_("A:", 2, ks) < 0;
         r |= kputc_(*s, ks) < 0;
@@ -1504,7 +1512,9 @@ static inline const uint8_t *sam_format_aux1(const uint8_t *key,
             // cast to avoid triggering -Wdouble-promotion
             ksprintf(ks, "f:%g", (double)le_to_float(s));
             s += 4;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
 
     } else if (type == 'd') {
         // NB: "d" is not an official type in the SAM spec.
@@ -1514,7 +1524,9 @@ static inline const uint8_t *sam_format_aux1(const uint8_t *key,
         if (end - s >= 8) {
             ksprintf(ks, "d:%g", le_to_double(s));
             s += 8;
-        } else goto bad_aux;
+        } else {
+            goto bad_aux;
+        }
     } else if (type == 'Z' || type == 'H') {
         r |= kputc_(type, ks) < 0;
         r |= kputc_(':', ks) < 0;

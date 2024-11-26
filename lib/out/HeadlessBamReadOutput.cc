@@ -159,6 +159,7 @@ void HeadlessBamReadOutput::close()
     std::unique_lock rhs_lk(mutex_);
     sam_close(sam_file_);
     is_closed_ = true;
+    sam_hdr_destroy(sam_header_);
 }
 HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close(); }
 
