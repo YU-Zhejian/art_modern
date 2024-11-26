@@ -16,6 +16,8 @@ public:
 
     ~ArtJobExecutor();
     void execute();
+    std::size_t num_reads;
+    std::string thread_info() const;
 
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);

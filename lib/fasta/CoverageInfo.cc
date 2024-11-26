@@ -25,8 +25,8 @@ double CoverageInfo::coverage_positive(const std::string& contig_name) const
     if (coverage_positive_.empty()) {
         return static_coverage_positive_;
     } else {
-        if (coverage_map::const_accessor a; coverage_positive_.find(a, contig_name)) {
-            return a->second;
+        if (const auto& find_result = coverage_positive_.find(contig_name); find_result != coverage_positive_.end()) {
+            return find_result->second;
         }
         return 0.0;
     }
@@ -37,8 +37,8 @@ double CoverageInfo::coverage_negative(const std::string& contig_name) const
     if (coverage_negative_.empty()) {
         return static_coverage_negative_;
     } else {
-        if (coverage_map::const_accessor a; coverage_negative_.find(a, contig_name)) {
-            return a->second;
+        if (const auto& find_result = coverage_negative_.find(contig_name); find_result != coverage_negative_.end()) {
+            return find_result->second;
         }
         return 0.0;
     }

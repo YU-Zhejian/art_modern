@@ -1,7 +1,6 @@
 #pragma once
 #include <istream>
 #include <string>
-#include <tbb/concurrent_hash_map.h>
 #include <unordered_map>
 
 namespace labw::art_modern {
@@ -9,7 +8,7 @@ namespace labw::art_modern {
 class CoverageInfo {
 
 public:
-    using coverage_map = tbb::concurrent_hash_map<std::string, double>;
+    using coverage_map = std::unordered_map<std::string, double>;
     explicit CoverageInfo(double static_coverage);
     explicit CoverageInfo(double static_coverage_positive, double static_coverage_negative);
     CoverageInfo(coverage_map coverage_positive, coverage_map coverage_negative);

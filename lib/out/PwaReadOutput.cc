@@ -25,6 +25,7 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
 PwaReadOutput::PwaReadOutput(const std::string& filename)
     : file_(filename)
+    , filename(filename)
     , is_closed_(false)
 {
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
@@ -35,7 +36,7 @@ void PwaReadOutput::close()
     if (is_closed_) {
         return;
     }
-    std::scoped_lock lock(mutex_);
+    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
     file_.flush();
     file_.close();
 }

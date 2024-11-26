@@ -25,38 +25,54 @@ void print_banner()
 #endif
 }
 
-void generate_all(const ArtParams& art_params)
-{
+
+void generate_wgs(const ArtParams& art_params){
     const auto out_dispatcher_factory = get_output_dispatcher_factory();
     BaseReadOutput* out_dispatcher;
     int job_id = 0;
     ArtJobPool job_pool(art_params);
-    if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        // Coverage-based parallelism
-        const auto& coverage_info = art_params.coverage_info.div(art_params.parallel);
 
-        BaseFastaFetch* fetch;
-        if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-            fetch = new InMemoryFastaFetch(art_params.input_file_name);
-        } else {
-            fetch = new FaidxFetch(art_params.input_file_name);
-        }
-        out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
-        delete fetch;
+    // Coverage-based parallelism
+    const auto& coverage_info = art_params.coverage_info.div(art_params.parallel);
 
+    BaseFastaFetch* fetch;
+    if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+        fetch = new InMemoryFastaFetch(art_params.input_file_name);
+    } else {
+        fetch = new FaidxFetch(art_params.input_file_name);
+    }
+    out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
+    if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
         for (int i = 0; i < art_params.parallel; ++i) {
-            BaseFastaFetch* thread_fetch;
-            if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-                thread_fetch = new InMemoryFastaFetch(art_params.input_file_name);
-            } else {
-                thread_fetch = new FaidxFetch(art_params.input_file_name);
-            }
-            SimulationJob sj(thread_fetch, coverage_info, ++job_id);
+            SimulationJob sj(fetch, coverage_info, ++job_id, false);
             ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
             job_pool.add(std::move(aje));
-            // FIXME: fetch not closed!
         }
     } else {
+        for (int i = 0; i < art_params.parallel; ++i) {
+            BaseFastaFetch* thread_fetch = new InMemoryFastaFetch(art_params.input_file_name);
+            SimulationJob sj(thread_fetch, coverage_info, ++job_id, true);
+            ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+            job_pool.add(std::move(aje));
+        }
+    }
+    job_pool.stop();
+    BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
+    delete fetch;
+    out_dispatcher->close();
+    delete out_dispatcher;
+}
+
+
+void generate_all(const ArtParams& art_params)
+{
+    if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
+        generate_wgs(art_params);
+    } else {
+        const auto out_dispatcher_factory = get_output_dispatcher_factory();
+        BaseReadOutput* out_dispatcher;
+        int job_id = 0;
+        ArtJobPool job_pool(art_params);
         // Batch-based parallelism
         if (art_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
             auto const& coverage_info = art_params.coverage_info;
@@ -70,7 +86,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id);
+                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
@@ -86,7 +102,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id);
+                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
@@ -108,7 +124,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id);
+                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
@@ -123,7 +139,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id);
+                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
@@ -132,9 +148,10 @@ void generate_all(const ArtParams& art_params)
         } else {
             throw std::runtime_error("Unsupported input file type");
         }
+        job_pool.stop();
+        BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
+        out_dispatcher->close();
+        delete out_dispatcher;
     }
-    job_pool.stop();
-    out_dispatcher->close();
-    delete out_dispatcher;
 }
 } // namespace labw::art_modern

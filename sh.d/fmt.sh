@@ -6,6 +6,8 @@ which shfmt &>/dev/null &&
     git ls-files |
     grep -v 'deps' |
         grep -v '.idea/' |
+        grep -v 'art_original' |
+        grep -v 'htslib-1.21' |
         grep '\.sh$' |
         while read -r line; do
             if [ -e "${line}" ]; then
@@ -21,6 +23,8 @@ which black &>/dev/null &&
     git ls-files |
     grep -v 'deps' |
         grep -v '.idea/' |
+        grep -v 'art_original' |
+        grep -v 'htslib-1.21' |
         grep -e '\.py$' -e '\.pyi$' |
         while read -r line; do
             if [ -e "${line}" ]; then
@@ -36,6 +40,8 @@ which clang-format &>/dev/null &&
     git ls-files |
     grep -v 'deps' |
         grep -v '.idea/' |
+        grep -v 'art_original' |
+        grep -v 'htslib-1.21' |
         grep -e '\.cc$' -e '\.cpp$' -e '\.c$' -e '\.h$' -e '\.hh' -e '\.hpp$' |
         while read -r line; do
             if [ -e "${line}" ]; then
@@ -51,6 +57,8 @@ which cmake-format &>/dev/null &&
     git ls-files |
     grep -v 'deps' |
         grep -v '.idea/' |
+        grep -v 'art_original' |
+        grep -v 'htslib-1.21' |
         grep -e '\.cmake$' -e 'CMakeLists.txt' |
         while read -r line; do
             if [ -e "${line}" ]; then

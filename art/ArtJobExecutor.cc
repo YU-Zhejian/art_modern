@@ -1,10 +1,61 @@
 #include "ArtJobExecutor.hh"
+#include "ArtConstants.hh"
 #include "ArtContig.hh"
 #include "utils/mpi_utils.hh"
+#include <atomic>
 #include <boost/log/trivial.hpp>
 #include <boost/timer/progress_display.hpp>
+#include <chrono>
+#include<thread>
+
+#define GENERATE(NUM_WHAT_READS, IS_POSITIVE, GEN_FUNC) \
+   max_tolerance = std::max(1000, static_cast<int>(NUM_WHAT_READS * MAX_TRIAL_RATIO_BEFORE_FAIL)); \
+    while (NUM_WHAT_READS > 0) { \
+if (GEN_FUNC(art_contig, IS_POSITIVE, num_reads)) { \
+    NUM_WHAT_READS -= num_reads_to_reduce; \
+    num_reads += num_reads_to_reduce; \
+} else { \
+    num_cont_fail++; \
+    if (num_cont_fail >= max_tolerance) { \
+        BOOST_LOG_TRIVIAL(debug) << "Failed to generate reads for " << contig_name \
+                                   << " sized " << contig_size << " after " << max_tolerance << " attempts."; \
+        break; \
+    } \
+} \
+}
 
 namespace labw::art_modern {
+
+class Tick {
+public:
+    explicit Tick(ArtJobExecutor& aje)
+        : aje_(aje)
+    {
+    }
+
+    void start() { thread_ = std::thread(&Tick::run, this); }
+
+    void stop()
+    {
+        should_stop_ = true;
+        if (thread_.joinable()) {
+            thread_.join();
+        }
+    }
+
+private:
+    std::atomic<bool> should_stop_ = false;
+    std::thread thread_;
+    ArtJobExecutor& aje_;
+
+    void run()
+    {
+        while (!should_stop_) {
+            BOOST_LOG_TRIVIAL(debug) << "Tick:" << this->aje_.thread_info() << " " << this->aje_.num_reads << " reads generated.";
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+    }
+};
 
 bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
 {
@@ -65,7 +116,8 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
 
 void ArtJobExecutor::execute()
 {
-    std::size_t num_reads = 0;
+    Tick tick(*this);
+    tick.start();
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
         return;
@@ -83,6 +135,7 @@ void ArtJobExecutor::execute()
                                      << " bps)";
             continue;
         }
+
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
         const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 1
@@ -98,48 +151,35 @@ void ArtJobExecutor::execute()
                                      << " due to insufficient coverage (pos=" << cov_pos << ", neg=" << cov_neg << ")";
             continue;
         }
+        int num_cont_fail = 0;
+        int max_tolerance;
 
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            while (num_pos_reads > 0) {
-                if (generate_se(art_contig, true, num_reads)) {
-                    num_pos_reads -= num_reads_to_reduce;
-                    num_reads += num_reads_to_reduce;
-                }
-            }
-            while (num_neg_reads > 0) {
-                if (generate_se(art_contig, false, num_reads)) {
-                    num_neg_reads -= num_reads_to_reduce;
-                    num_reads += num_reads_to_reduce;
-                }
-            }
+            GENERATE(num_pos_reads, true, generate_se)
+            GENERATE(num_neg_reads, false, generate_se)
         } else {
-            while (num_pos_reads > 0) {
-                if (generate_pe(art_contig, true, num_reads)) {
-                    num_pos_reads -= num_reads_to_reduce;
-                    num_reads += num_reads_to_reduce;
-                }
-            }
-            while (num_neg_reads > 0) {
-                if (generate_pe(art_contig, false, num_reads)) {
-                    num_neg_reads -= num_reads_to_reduce;
-                    num_reads += num_reads_to_reduce;
-                }
-            }
+            GENERATE(num_pos_reads, true, generate_pe)
+            GENERATE(num_neg_reads, false, generate_pe)
         }
     }
+        tick.stop();
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
-                            << " reads generated.";
-    delete job_.fasta_fetch;
-}
-ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : job_(std::move(other.job_))
-    , art_params_(other.art_params_)
-    , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
-    , output_dispatcher_(other.output_dispatcher_)
-    , mpi_rank_(other.mpi_rank_)
-{
-}
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
+                                << " reads generated.";
+        if(job_.free_fasta_fetch_after_execution){
+            delete job_.fasta_fetch;
+        }
+    }
+    ArtJobExecutor::ArtJobExecutor(ArtJobExecutor && other) noexcept
+        : num_reads(0)
+        , job_(std::move(other.job_))
+        , art_params_(other.art_params_)
+        , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
+        , output_dispatcher_(other.output_dispatcher_)
+        , mpi_rank_(other.mpi_rank_)
+    {
+    }
+    std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }
 
-ArtJobExecutor::~ArtJobExecutor() = default;
+    ArtJobExecutor::~ArtJobExecutor() = default;
 }

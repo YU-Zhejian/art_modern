@@ -24,6 +24,7 @@ public:
 private:
     std::ofstream file_;
     std::mutex mutex_;
+    const std::string filename;
     bool is_closed_;
 };
 

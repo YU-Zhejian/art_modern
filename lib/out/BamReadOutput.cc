@@ -136,9 +136,8 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options)
     : sam_options_(std::move(sam_options))
+    , filename(filename)
 {
-    std::scoped_lock rhs_lk(mutex_);
-
     sam_file_ = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
     sam_header_
@@ -158,10 +157,11 @@ BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* 
 
 void BamReadOutput::close()
 {
+
     if (is_closed_) {
         return;
     }
-    std::scoped_lock rhs_lk(mutex_);
+    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
     sam_close(sam_file_);
     sam_hdr_destroy(sam_header_);
     is_closed_ = true;

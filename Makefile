@@ -10,16 +10,6 @@ build:
 	build/art_modern --help
 	mpiexec --verbose -n 5 build/art_modern --version
 
-.PHONY: build_external_htslib
-build_external_htslib:
-	mkdir -p build_external_htslib
-	env -C build_external_htslib cmake \
-		-DCMAKE_BUILD_TYPE=Release \
-		-DUSE_HTSLIB="hts" \
-		-G Ninja ..
-	env -C build_external_htslib ninja -j40
-	env -C build_external_htslib ctest
-
 .PHONY: fmt
 fmt:
 	bash sh.d/fmt.sh
@@ -39,10 +29,6 @@ testsmall: build raw_data
 .PHONY: raw_data
 raw_data:
 	$(MAKE) -C raw_data
-
-.PHONY: build-alpine
-build-alpine:
-	cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF; ninja
 
 .PHONY: sync-ceu-cm
 sync-ceu-cm:

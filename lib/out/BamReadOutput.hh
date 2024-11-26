@@ -28,6 +28,7 @@ private:
     sam_hdr_t* sam_header_;
     SamOptions sam_options_;
     std::mutex mutex_;
+    const std::string filename;
     bool is_closed_ = false;
 };
 
