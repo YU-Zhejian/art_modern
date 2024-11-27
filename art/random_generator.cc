@@ -138,41 +138,41 @@ int Rprob::insertion_length()
 char Rprob::rand_base()
 {
     unsigned int index;
-    viRngUniformBits32(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &index);
-    return "ACGT"[index % 4];
+    viRngUniformBits32(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &index);
+    return "ACGT"[index & 0b11];
 }
 
 std::vector<int> Rprob::rand_quality()
 {
     int result[read_length_];
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, result, 1, MAX_DIST_NUMBER);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, result, 1, MAX_DIST_NUMBER);
     return { result, result + read_length_ };
 }
 
 int Rprob::rand_quality_less_than_10()
 {
     int result;
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, 1, 10);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 1, 10);
     return result;
 }
 
 int Rprob::rand_pos_on_read()
 {
     int result;
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, 0, read_length_ - 1);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 0, read_length_ - 1);
     return result;
 }
 
 int Rprob::rand_pos_on_read_not_head_and_tail()
 {
     int result;
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, 1, read_length_ - 2);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 1, read_length_ - 2);
     return result;
 }
 int Rprob::randint(int min, int max)
 {
     int result;
-    viRngUniform(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, 1, &result, min, max);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, min, max);
     return result;
 }
 

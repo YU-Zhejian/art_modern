@@ -45,7 +45,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_query++;
                 pos_on_ref++;
             }
-        }else if (this_cigar_ops == BAM_CMATCH) {
+        } else if (this_cigar_ops == BAM_CMATCH) {
             for (int j = 0; j < this_cigar_len; ++j) {
                 if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) {
                     ++matched;
@@ -58,16 +58,16 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_ref++;
             }
         } else if (this_cigar_ops == BAM_CDEL) {
-            md_str_ss << std::to_string(matched) << '^'<< pwa.ref.substr(pos_on_ref, this_cigar_len);
+            md_str_ss << std::to_string(matched) << '^' << pwa.ref.substr(pos_on_ref, this_cigar_len);
             pos_on_ref += this_cigar_len;
-            nm+=static_cast<int32_t>(this_cigar_len);
+            nm += static_cast<int32_t>(this_cigar_len);
             matched = 0;
         } else if (this_cigar_ops == BAM_CINS) {
             pos_on_query += this_cigar_len;
             nm += static_cast<int32_t>(this_cigar_len);
         } else if (this_cigar_ops == BAM_CSOFT_CLIP) {
             pos_on_query += this_cigar_len;
-        }else if (this_cigar_ops == BAM_CREF_SKIP) {
+        } else if (this_cigar_ops == BAM_CREF_SKIP) {
             pos_on_ref += this_cigar_len;
         }
     }
@@ -85,7 +85,8 @@ void BamUtils::write(samFile* fp, const sam_hdr_t* h, const bam1_t* b)
     CExceptionsProxy::assert_numeric(sam_write1(fp, h, b), USED_HTSLIB_NAME, "Failed to write SAM/BAM record", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 }
-void assert_correct_cigar([[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
+void assert_correct_cigar(
+    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
 {
 #ifdef CEU_CM_IS_DEBUG
     const auto n_cigar = static_cast<int>(cigar.size());

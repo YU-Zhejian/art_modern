@@ -196,7 +196,6 @@ The bundled HTSLib library used MIT License with the following reference:
 ## TODO
 
 - Make it faster.
-- Implement an ultrasonic sequence chopper and connect `trans` or `wgs` mode to it.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.

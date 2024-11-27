@@ -21,3 +21,4 @@ dependencies:
   - cmake_format
   - curl
   - pyfastx
+  - fastqc

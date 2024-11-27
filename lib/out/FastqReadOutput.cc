@@ -21,8 +21,8 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
         return;
     }
     auto* ss = new std::stringstream();
-    *ss  << "@" << pwa1.read_name << "/1\n" << pwa1.query << "\n+\n" << pwa1.qual << "\n";
-    *ss  << "@" << pwa2.read_name << "/1\n" << pwa2.query << "\n+\n" << pwa2.qual << "\n";
+    *ss << "@" << pwa1.read_name << "/1\n" << pwa1.query << "\n+\n" << pwa1.qual << "\n";
+    *ss << "@" << pwa2.read_name << "/1\n" << pwa2.query << "\n+\n" << pwa2.qual << "\n";
     lfio_.push(ss);
 }
 
@@ -30,8 +30,8 @@ FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
     : file_(filename)
     , filename(filename)
-    , is_closed_(false),
-      lfio_(file_)
+    , is_closed_(false)
+    , lfio_(file_)
 {
     lfio_.start();
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";

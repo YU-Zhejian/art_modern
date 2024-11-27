@@ -9,7 +9,8 @@ namespace labw::art_modern {
 class SimulationJob {
 public:
     ~SimulationJob();
-    SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, int job_id, bool free_fasta_fetch_after_execution);
+    SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, int job_id,
+        bool free_fasta_fetch_after_execution);
 
     SimulationJob(SimulationJob&& other) noexcept;
 

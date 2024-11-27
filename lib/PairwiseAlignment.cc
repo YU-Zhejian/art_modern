@@ -34,7 +34,7 @@ PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_n
 std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
 {
     const uint32_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
-    const uint32_t bam_diff= use_m ? BAM_CMATCH : BAM_CDIFF;
+    const uint32_t bam_diff = use_m ? BAM_CMATCH : BAM_CDIFF;
 
     std::vector<uint32_t> cigar;
     uint32_t current_cigar;

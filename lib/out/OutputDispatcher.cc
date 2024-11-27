@@ -55,11 +55,12 @@ BaseReadOutput* OutputDispatcherFactory::create(const boost::program_options::va
     BOOST_LOG_TRIVIAL(info) << "All writers added";
     return output_dispatcher;
 }
-void OutputDispatcherFactory::add(std::shared_ptr<BaseReadOutputFactory> factory) {
+void OutputDispatcherFactory::add(std::shared_ptr<BaseReadOutputFactory> factory)
+{
     factories_.emplace_back(std::move(factory));
 }
 
-OutputDispatcherFactory::~OutputDispatcherFactory()=default;
+OutputDispatcherFactory::~OutputDispatcherFactory() = default;
 OutputDispatcherFactory get_output_dispatcher_factory() noexcept
 {
     OutputDispatcherFactory out_dispatcher_factory;

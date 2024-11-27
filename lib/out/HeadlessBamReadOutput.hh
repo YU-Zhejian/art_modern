@@ -29,9 +29,7 @@ private:
 
 class HeadlessBamReadOutputFactory : public BaseReadOutputFactory {
 public:
-    const std::string name() const override{
-        return "HeadlessBam";
-    }
+    const std::string name() const override { return "HeadlessBam"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const override;

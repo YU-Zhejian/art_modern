@@ -191,11 +191,13 @@ void ArtRead::ref2read()
     }
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob, const std::string &contig_name, const std::string &read_name)
+ArtRead::ArtRead(
+    const ArtParams& art_params, Rprob& rprob, const std::string& contig_name, const std::string& read_name)
     : art_params_(art_params)
     , rprob_(rprob)
     , read_name_(read_name)
-    , contig_name_(contig_name){
+    , contig_name_(contig_name)
+{
     seq_read_.resize(art_params_.read_len);
     seq_ref.reserve(art_params_.read_len);
     qual_.resize(art_params_.read_len);

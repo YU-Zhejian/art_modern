@@ -33,6 +33,7 @@ public:
     size_t size() const;
     void add_string(const std::string& key, const std::string& value);
     void add_int_i(const std::string& key, int32_t value);
+
 private:
     std::vector<tag_type> tags_;
 };

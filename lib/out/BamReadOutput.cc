@@ -191,10 +191,7 @@ BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::varia
     }
     return new DumbReadOutput();
 }
-const std::string BamReadOutputFactory::name() const
-{
-    return "BAM";
-}
+const std::string BamReadOutputFactory::name() const { return "BAM"; }
 
 BamReadOutputFactory::~BamReadOutputFactory() = default;
 }

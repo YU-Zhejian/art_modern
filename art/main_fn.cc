@@ -25,8 +25,8 @@ void print_banner()
 #endif
 }
 
-
-void generate_wgs(const ArtParams& art_params){
+void generate_wgs(const ArtParams& art_params)
+{
     const auto out_dispatcher_factory = get_output_dispatcher_factory();
     BaseReadOutput* out_dispatcher;
     int job_id = 0;
@@ -62,7 +62,6 @@ void generate_wgs(const ArtParams& art_params){
     out_dispatcher->close();
     delete out_dispatcher;
 }
-
 
 void generate_all(const ArtParams& art_params)
 {

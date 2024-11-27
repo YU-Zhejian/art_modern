@@ -3,16 +3,16 @@
 #include <boost/lockfree/queue.hpp>
 #include <thread>
 
-namespace labw::art_modern{
+namespace labw::art_modern {
 
-
-template<typename T>
-class LockFreeIO {
+template <typename T> class LockFreeIO {
 public:
-    LockFreeIO(): queue(1<<20){};
-    ~LockFreeIO()=default;
-    void push(T* value){
-        while(!queue.push(value)){
+    LockFreeIO()
+        : queue(1 << 20) {};
+    ~LockFreeIO() = default;
+    void push(T* value)
+    {
+        while (!queue.push(value)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
     }
@@ -27,7 +27,6 @@ public:
     }
     virtual void write(T*) = 0;
 
-
 private:
     boost::lockfree::queue<T*, boost::lockfree::fixed_sized<false>> queue;
     std::thread thread_;
@@ -39,20 +38,18 @@ private:
         T* retp;
         while (!should_stop_) {
             pop_ret = queue.pop(retp);
-            if(pop_ret){
+            if (pop_ret) {
                 write(retp);
-            }
-            else{
+            } else {
                 std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
         pop_ret = queue.pop(retp);
-        while(pop_ret){
+        while (pop_ret) {
             write(retp);
             pop_ret = queue.pop(retp);
         }
     }
 };
-
 
 }
