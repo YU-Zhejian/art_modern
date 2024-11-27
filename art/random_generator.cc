@@ -48,6 +48,13 @@ std::vector<int> Rprob::rand_quality()
     return result;
 }
 
+std::vector<double> Rprob::r_probs(const std::size_t count)
+{
+    std::vector<double> result(count);
+    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
+    return result;
+}
+
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
 
 int Rprob::rand_pos_on_read() { return pos_on_read_(gen_); }
@@ -71,6 +78,13 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
 }
 
 double Rprob::r_prob() { return dis_(gen_); }
+
+std::vector<double> Rprob::r_probs(const std::size_t count)
+{
+    std::vector<double> result(count);
+    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
+    return result;
+}
 
 int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussian_(gen_)); }
 
@@ -105,6 +119,13 @@ double Rprob::r_prob()
     double result;
     vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 0.0, 1.0);
     return result;
+}
+
+std::vector<double> Rprob::r_probs(const std::size_t count)
+{
+    double result[count];
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<long long>(count), result, 0.0, 1.0);
+    return { result, result + read_length_ };
 }
 
 int Rprob::insertion_length()
@@ -170,6 +191,13 @@ Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_len
 Rprob::~Rprob() { gsl_rng_free(r); }
 
 double Rprob::r_prob() { return gsl_rng_uniform(r); }
+
+std::vector<double> Rprob::r_probs(const std::size_t count)
+{
+    std::vector<double> result(count);
+    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
+    return result;
+}
 
 int Rprob::insertion_length()
 {

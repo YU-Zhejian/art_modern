@@ -20,6 +20,7 @@ class Rprob {
 public:
     Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length);
     double r_prob();
+    std::vector<double> r_probs(std::size_t count);
     int insertion_length();
     char rand_base();
     std::vector<int> rand_quality();

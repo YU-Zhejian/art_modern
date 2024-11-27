@@ -42,7 +42,7 @@ void PwaReadOutput::close()
 }
 void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
-    boost::program_options::options_description pwa_desc("pwa Output");
+    boost::program_options::options_description pwa_desc("PWA Output");
     pwa_desc.add_options()("o-pwa", boost::program_options::value<std::string>(),
         "Destination of output pwa file. Unset to disable the writer.");
     desc.add(pwa_desc);

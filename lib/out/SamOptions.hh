@@ -34,7 +34,7 @@ struct SamOptions {
     /**
      * Use `M` instead of `X` or `=` for matching.
      */
-    bool use_m = false;
+    bool use_m;
 
     /**
      * If `false`, will write SAM instead.

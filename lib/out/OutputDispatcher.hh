@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <memory>
 
 #include "BaseReadOutput.hh"
 
@@ -32,14 +33,17 @@ private:
 
 class OutputDispatcherFactory : public BaseReadOutputFactory {
 public:
-    void add(BaseReadOutputFactory* factory);
+    const std::string name() const override{
+        return "OD";
+    }
+    void add(std::shared_ptr<BaseReadOutputFactory> factory);
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const override;
     ~OutputDispatcherFactory() override;
 
 private:
-    std::vector<BaseReadOutputFactory*> factories_;
+    std::vector<std::shared_ptr<BaseReadOutputFactory>> factories_;
 };
 
 OutputDispatcherFactory get_output_dispatcher_factory() noexcept;

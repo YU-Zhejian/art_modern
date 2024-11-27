@@ -53,8 +53,8 @@ std::string comp(const std::string& dna)
 {
     std::string rets;
     rets.resize(dna.length());
-    for (auto i = 0; i < dna.length(); i++) {
-        rets[i] = rev_comp_trans_2[dna[i]];
+    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
+        rets[i] = rev_comp_trans_2[dna[i] & 0xFF];
     }
     return rets;
 }

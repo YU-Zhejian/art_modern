@@ -55,22 +55,18 @@ BaseReadOutput* OutputDispatcherFactory::create(const boost::program_options::va
     BOOST_LOG_TRIVIAL(info) << "All writers added";
     return output_dispatcher;
 }
-void OutputDispatcherFactory::add(BaseReadOutputFactory* factory) { factories_.emplace_back(factory); }
-
-OutputDispatcherFactory::~OutputDispatcherFactory()
-{
-    for (auto& factory : factories_) {
-        delete factory;
-    }
+void OutputDispatcherFactory::add(std::shared_ptr<BaseReadOutputFactory> factory) {
+    factories_.emplace_back(std::move(factory));
 }
 
+OutputDispatcherFactory::~OutputDispatcherFactory()=default;
 OutputDispatcherFactory get_output_dispatcher_factory() noexcept
 {
     OutputDispatcherFactory out_dispatcher_factory;
-    out_dispatcher_factory.add(new FastqReadOutputFactory());
-    out_dispatcher_factory.add(new BamReadOutputFactory());
-    out_dispatcher_factory.add(new HeadlessBamReadOutputFactory());
-    out_dispatcher_factory.add(new PwaReadOutputFactory());
+    out_dispatcher_factory.add(std::make_shared<PwaReadOutputFactory>());
+    out_dispatcher_factory.add(std::make_shared<FastqReadOutputFactory>());
+    out_dispatcher_factory.add(std::make_shared<BamReadOutputFactory>());
+    out_dispatcher_factory.add(std::make_shared<HeadlessBamReadOutputFactory>());
     return out_dispatcher_factory;
 }
 }

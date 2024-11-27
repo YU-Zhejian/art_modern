@@ -26,7 +26,7 @@ public:
 private:
     samFile* sam_file_;
     sam_hdr_t* sam_header_;
-    SamOptions sam_options_;
+    const SamOptions sam_options_;
     std::mutex mutex_;
     const std::string filename;
     bool is_closed_ = false;
@@ -34,6 +34,7 @@ private:
 
 class BamReadOutputFactory : public BaseReadOutputFactory {
 public:
+    const std::string name() const override;
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const override;

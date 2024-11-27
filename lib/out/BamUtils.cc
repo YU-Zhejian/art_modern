@@ -7,21 +7,7 @@
 #include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {
-std::string BamUtils::generate_oa_tag(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
-{
-    const hts_pos_t pos = pwa.pos_on_contig + 1; // SAM is 1-based
-    const auto strand = pwa.is_plus_strand ? '+' : '-';
-    const auto cigar_str = cigar_arr_to_str(cigar);
-    std::ostringstream oss;
-    const auto nm_tag = "";
-    oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ',' << nm_tag
-        << ';';
-    return oss.str();
-}
-BamUtils::BamUtils(const SamOptions& sam_options)
-    : sam_options_(sam_options)
-{
-}
+
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
 {
@@ -39,24 +25,32 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     hts_pos_t pos_on_query = 0;
     uint32_t matched = 0;
     hts_pos_t pos_on_ref = 0;
-    std::stringstream md_str_ss;
+    std::ostringstream md_str_ss;
     int32_t nm = 0;
     uint32_t this_cigar_len;
     uint32_t this_cigar_ops;
 
-    for (auto i = 0; i < cigar.size(); ++i) {
+    for (decltype(cigar.size()) i = 0; i < cigar.size(); ++i) {
         this_cigar_len = bam_cigar_oplen(cigar[i]);
         this_cigar_ops = bam_cigar_op(cigar[i]);
         if (this_cigar_ops == BAM_CEQUAL) {
             matched += this_cigar_len;
             pos_on_query += this_cigar_len;
             pos_on_ref += this_cigar_len;
-        } else if (this_cigar_ops == BAM_CMATCH || this_cigar_ops == BAM_CDIFF) {
+        } else if (this_cigar_ops == BAM_CDIFF) {
+            for (decltype(this_cigar_len) j = 0; j < this_cigar_len; ++j) {
+                md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                matched = 0;
+                ++nm;
+                pos_on_query++;
+                pos_on_ref++;
+            }
+        }else if (this_cigar_ops == BAM_CMATCH) {
             for (int j = 0; j < this_cigar_len; ++j) {
-                if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) { // a match. TODO: Support IUB code
+                if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) {
                     ++matched;
                 } else {
-                    md_str_ss << matched << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                    md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                     matched = 0;
                     ++nm;
                 }
@@ -64,24 +58,22 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_ref++;
             }
         } else if (this_cigar_ops == BAM_CDEL) {
-            md_str_ss << matched << '^';
-            for (int j = 0; j < this_cigar_len; ++j) {
-                md_str_ss << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
-                pos_on_ref++;
-                nm++;
-            }
+            md_str_ss << std::to_string(matched) << '^'<< pwa.ref.substr(pos_on_ref, this_cigar_len);
+            pos_on_ref += this_cigar_len;
+            nm+=static_cast<int32_t>(this_cigar_len);
             matched = 0;
-        } else if (this_cigar_ops == BAM_CINS || this_cigar_ops == BAM_CSOFT_CLIP) {
+        } else if (this_cigar_ops == BAM_CINS) {
             pos_on_query += this_cigar_len;
-            if (this_cigar_ops == BAM_CINS) {
-                nm += static_cast<int32_t>(this_cigar_len);
-            }
-        } else if (this_cigar_ops == BAM_CREF_SKIP) {
+            nm += static_cast<int32_t>(this_cigar_len);
+        } else if (this_cigar_ops == BAM_CSOFT_CLIP) {
+            pos_on_query += this_cigar_len;
+        }else if (this_cigar_ops == BAM_CREF_SKIP) {
             pos_on_ref += this_cigar_len;
         }
     }
-    md_str_ss << matched;
+    md_str_ss << std::to_string(matched);
     const auto md_str = md_str_ss.str();
+
     return { nm, md_str };
 }
 bam1_t* BamUtils::init()
@@ -93,7 +85,7 @@ void BamUtils::write(samFile* fp, const sam_hdr_t* h, const bam1_t* b)
     CExceptionsProxy::assert_numeric(sam_write1(fp, h, b), USED_HTSLIB_NAME, "Failed to write SAM/BAM record", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 }
-void assert_correct_cigar(const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
+void assert_correct_cigar([[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
 {
 #ifdef CEU_CM_IS_DEBUG
     const auto n_cigar = static_cast<int>(cigar.size());
@@ -196,38 +188,6 @@ void BamTags::add_string(const std::string& key, const std::string& value)
     data[static_cast<std::ptrdiff_t>(len)] = '\0';
     tags_.emplace_back(key, 'Z', len + 1, data);
 }
-void BamTags::add_int_c(const std::string& key, int8_t value)
-{
-    data_type data(new uint8_t[1]);
-    data[0] = static_cast<uint8_t>(value);
-    tags_.emplace_back(key, 'c', 1, data);
-}
-void BamTags::add_int_C(const std::string& key, uint8_t value)
-{
-    data_type data(new uint8_t[1]);
-    data[0] = value;
-    tags_.emplace_back(key, 'C', 1, data);
-}
-void BamTags::add_int_s(const std::string& key, int16_t value)
-{
-    data_type data(new uint8_t[2]);
-    std::memcpy(data.get(), &value, 2);
-#ifdef HTS_LITTLE_ENDIAN
-#else
-    reverse(data.get(), 2);
-#endif
-    tags_.emplace_back(key, 's', 2, data);
-}
-void BamTags::add_int_S(const std::string& key, uint16_t value)
-{
-    data_type data(new uint8_t[2]);
-    std::memcpy(data.get(), &value, 2);
-#ifdef HTS_LITTLE_ENDIAN
-#else
-    reverse(data.get(), 2);
-#endif
-    tags_.emplace_back(key, 'S', 2, data);
-}
 void BamTags::add_int_i(const std::string& key, int32_t value)
 {
     data_type data(new uint8_t[4]);
@@ -237,16 +197,6 @@ void BamTags::add_int_i(const std::string& key, int32_t value)
     reverse(data.get(), 4);
 #endif
     tags_.emplace_back(key, 'i', 4, data);
-}
-void BamTags::add_int_I(const std::string& key, uint32_t value)
-{
-    data_type data(new uint8_t[4]);
-    std::memcpy(data.get(), &value, 4);
-#ifdef HTS_LITTLE_ENDIAN
-#else
-    reverse(data.get(), 4);
-#endif
-    tags_.emplace_back(key, 'I', 4, data);
 }
 
 }

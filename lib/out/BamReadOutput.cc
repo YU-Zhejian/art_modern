@@ -157,7 +157,6 @@ BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* 
 
 void BamReadOutput::close()
 {
-
     if (is_closed_) {
         return;
     }
@@ -191,6 +190,10 @@ BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::varia
         return new BamReadOutput(vm["o-sam"].as<std::string>(), fasta_fetch, so);
     }
     return new DumbReadOutput();
+}
+const std::string BamReadOutputFactory::name() const
+{
+    return "BAM";
 }
 
 BamReadOutputFactory::~BamReadOutputFactory() = default;

@@ -18,13 +18,13 @@ public:
     void execute();
     std::size_t num_reads;
     std::string thread_info() const;
+    const ArtParams& art_params;
 
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
     bool generate_se(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
 
     SimulationJob job_;
-    const ArtParams& art_params_;
     Rprob rprob_;
     BaseReadOutput* output_dispatcher_;
     const std::string mpi_rank_;

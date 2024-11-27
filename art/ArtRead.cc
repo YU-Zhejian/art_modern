@@ -49,12 +49,13 @@ void ArtRead::generate_snv_on_qual(bool is_first_read)
         art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
     }
     char achar;
+    const auto probs = rprob_.r_probs(qual_.size());
     for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
         if (seq_read_[i] == 'N') {
             qual_[i] = MIN_QUAL;
             continue;
         }
-        if (rprob_.r_prob() < art_params_.err_prob[qual_[i]]) {
+        if (probs[i] < art_params_.err_prob[qual_[i]]) {
             achar = seq_read_[i];
             while (seq_read_[i] == achar) {
                 achar = rprob_.rand_base();
@@ -71,15 +72,17 @@ int ArtRead::generate_indels(const bool is_read_1)
     int del_len = 0;
     int i;
     int j;
+    int pos;
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
     // deletion
+    const auto probs_del = rprob_.r_probs(per_base_ins_rate.size());
     for (i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_del_rate[i] >= rprob_.r_prob()) {
+        if (per_base_del_rate[i] >= probs_del[i]) {
             del_len = i + 1;
             j = i;
             while (j >= 0) {
-                auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
+                pos = rprob_.rand_pos_on_read_not_head_and_tail();
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = ALN_GAP;
                     j--;
@@ -88,16 +91,16 @@ int ArtRead::generate_indels(const bool is_read_1)
             break;
         }
     }
-
+    const auto probs_ins = rprob_.r_probs(per_base_ins_rate.size());
     for (i = static_cast<int>(per_base_ins_rate.size() - 1); i >= 0; i--) {
         if ((art_params_.read_len - del_len - ins_len) < (i + 1)) {
             continue; // ensure that enough unchanged position for mutation
         }
-        if (per_base_ins_rate[i] >= rprob_.r_prob()) {
+        if (per_base_ins_rate[i] >= probs_ins[i]) {
             ins_len = i + 1;
             j = i;
             while (j >= 0) {
-                auto pos = rprob_.rand_pos_on_read();
+                pos = rprob_.rand_pos_on_read();
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
@@ -117,8 +120,9 @@ int ArtRead::generate_indels_2(const bool is_read_1)
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
+    const auto probs_ins = rprob_.r_probs(per_base_ins_rate.size());
     for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_ins_rate[i] >= rprob_.r_prob()) {
+        if (per_base_ins_rate[i] >= probs_ins[i]) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
                 auto pos = rprob_.rand_pos_on_read();
@@ -132,6 +136,7 @@ int ArtRead::generate_indels_2(const bool is_read_1)
     }
 
     // deletion
+    const auto probs_del = rprob_.r_probs(per_base_ins_rate.size());
     for (auto i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
         if (del_len == ins_len) {
             break;
@@ -141,7 +146,7 @@ int ArtRead::generate_indels_2(const bool is_read_1)
             continue; // ensure that enough unchanged position for mutation
         }
 
-        if (per_base_del_rate[i] >= rprob_.r_prob()) {
+        if (per_base_del_rate[i] >= probs_del[i]) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
                 auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
@@ -186,12 +191,11 @@ void ArtRead::ref2read()
     }
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob, std::string contig_name, std::string read_name)
+ArtRead::ArtRead(const ArtParams& art_params, Rprob& rprob, const std::string &contig_name, const std::string &read_name)
     : art_params_(art_params)
     , rprob_(rprob)
-    , read_name_(std::move(read_name))
-    , contig_name_(std::move(contig_name))
-{
+    , read_name_(read_name)
+    , contig_name_(contig_name){
     seq_read_.resize(art_params_.read_len);
     seq_ref.reserve(art_params_.read_len);
     qual_.resize(art_params_.read_len);

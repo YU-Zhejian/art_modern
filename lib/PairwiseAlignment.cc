@@ -1,6 +1,7 @@
 #include "PairwiseAlignment.hh"
 #include "art_modern_config.h" // For CEU_CM_IS_DEBUG
 #include "art_modern_constants.hh"
+#include "utils/seq_utils.hh"
 
 #include <boost/algorithm/string/erase.hpp>
 #include <htslib/sam.h>
@@ -32,20 +33,23 @@ PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_n
 
 std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
 {
+    const uint32_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
+    const uint32_t bam_diff= use_m ? BAM_CMATCH : BAM_CDIFF;
+
     std::vector<uint32_t> cigar;
-    uint32_t current_cigar = BAM_CMATCH;
-    uint32_t prev_cigar = BAM_CMATCH;
+    uint32_t current_cigar;
+    uint32_t prev_cigar = bam_eq;
     uint32_t cigar_len = 0;
     const auto ref_len = aligned_ref.length();
-    for (auto i = 0; i < ref_len; i++) {
+    for (decltype(aligned_ref.length()) i = 0; i < ref_len; i++) {
         if (aligned_ref[i] == aligned_query[i]) {
-            current_cigar = use_m ? BAM_CMATCH : BAM_CEQUAL;
+            current_cigar = bam_eq;
         } else if (aligned_ref[i] == ALN_GAP) {
             current_cigar = BAM_CINS;
         } else if (aligned_query[i] == ALN_GAP) {
             current_cigar = BAM_CDEL;
         } else {
-            current_cigar = use_m ? BAM_CMATCH : BAM_CDIFF;
+            current_cigar = bam_diff;
         }
         if (current_cigar != prev_cigar && cigar_len > 0) {
             cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));

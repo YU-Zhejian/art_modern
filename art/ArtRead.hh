@@ -27,7 +27,7 @@ public:
     // Enable move constructors
     ArtRead(ArtRead&& other) noexcept = default;
 
-    ArtRead(const ArtParams& art_params, Rprob& rprob, std::string contig_name, std::string read_name);
+    ArtRead(const ArtParams& art_params, Rprob& rprob, const std::string &contig_name, const std::string &read_name);
     PairwiseAlignment to_pwa() const;
 
     int generate_indels(bool is_read_1);

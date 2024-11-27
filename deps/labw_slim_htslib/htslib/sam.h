@@ -1531,8 +1531,9 @@ static inline const uint8_t *sam_format_aux1(const uint8_t *key,
         r |= kputc_(type, ks) < 0;
         r |= kputc_(':', ks) < 0;
         while (s < end && *s) r |= kputc_(*s++, ks) < 0;
-        if (s >= end)
+        if (s >= end) {
             goto bad_aux;
+        }
         ++s;
     } else if (type == 'B') {
         uint8_t sub_type = *(s++);
