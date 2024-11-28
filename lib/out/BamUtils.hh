@@ -22,6 +22,8 @@ public:
     static std::pair<int32_t, std::string> generate_nm_md_tag(
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
     static bam1_t* init();
+    static sam_hdr_t * init_header(const SamOptions& sam_options);
+    static samFile * open_file(const std::string& filename, const SamOptions& sam_options);
     static void write(samFile* fp, const sam_hdr_t* h, const bam1_t* b);
 };
 

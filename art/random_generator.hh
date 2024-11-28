@@ -60,7 +60,6 @@ private:
     double pe_frag_dist_std_dev_;
     int read_length_;
 #elif defined(USE_GSL_RANDOM)
-    const gsl_rng_type* T;
     gsl_rng* r;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;

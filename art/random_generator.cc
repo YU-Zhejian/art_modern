@@ -182,10 +182,7 @@ Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_len
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
-    gsl_rng_env_setup();
-
-    T = gsl_rng_default; // FIXMEL Change to gsl_rng_mt19937
-    r = gsl_rng_alloc(T);
+    r = gsl_rng_alloc(gsl_rng_mt19937);
     gsl_rng_set(r, seed());
 }
 Rprob::~Rprob() { gsl_rng_free(r); }

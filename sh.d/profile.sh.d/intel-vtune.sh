@@ -42,14 +42,14 @@ for collect in threading hotspots; do # hpc-performance memory-access memory-con
         --del_rate_1 0.1 \
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500 \
-        --o-sam test_small_se_wgs_memory.bam \
-        --o-sam-write_bam \
-        --o-hl_sam test_small_se_wgs_memory.hl.sam \
-        --o-fastq test_small_se_wgs_memory.fastq \
-        --o-pwa test_small_se_wgs_memory.pwa
+        --o-fastq test_small_se_wgs_memory.fastq
     vtune-gui ./vtune-"${collect}"
 done
 cd ..
-#
-#    --o-sam test_small_se_wgs_memory.sam \
-#    --o-sam-write_bam \
+exit
+ \
+        --o-sam test_small_se_wgs_memory.bam
+        --o-sam-write_bam \
+        --o-hl_sam test_small_se_wgs_memory.hl.sam \
+         \
+        --o-pwa test_small_se_wgs_memory.pwa

@@ -48,6 +48,8 @@ SOURCES=$(
     git ls-files |
         grep -v '\.idea' |
         grep -v 'deps' |
+        grep -v 'Illumina_profiles' |
+        grep -v 'benchmark_other_simulators/src' |
         xargs
 )
 echo "Enumerating sources FIN"

@@ -15,7 +15,7 @@ public:
     BamReadOutput& operator=(BamReadOutput&&) = delete;
     BamReadOutput& operator=(const BamReadOutput&) = delete;
 
-    BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options);
+    BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, const SamOptions &sam_options);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;

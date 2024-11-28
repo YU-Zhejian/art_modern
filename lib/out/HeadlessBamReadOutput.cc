@@ -9,20 +9,12 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options)
-    : sam_options_(std::move(sam_options))
+    : sam_file_(BamUtils::open_file(filename,sam_options))
+    , sam_header_(BamUtils::init_header(sam_options))
+    , sam_options_(sam_options)
     , filename(filename)
-    , sam_file_(CExceptionsProxy::assert_not_null(
-          sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file"))
-    , sam_header_(
-          CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header"))
     , lfio_(sam_file_, sam_header_)
 {
-    CExceptionsProxy::assert_numeric(
-        sam_hdr_add_line(sam_header_, "HD", "VN", sam_options_.HD_VN.c_str(), "SO", sam_options_.HD_SO.c_str(), NULL),
-        USED_HTSLIB_NAME, "Failed to add HD header line");
-    CExceptionsProxy::assert_numeric(sam_hdr_add_line(sam_header_, "PG", "ID", sam_options_.PG_ID.c_str(), "PN",
-                                         sam_options_.PG_PN.c_str(), "CL", sam_options_.PG_CL.c_str(), NULL),
-        USED_HTSLIB_NAME, "Failed to add PG header line", false, CExceptionsProxy::EXPECTATION::ZERO);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
     lfio_.start();
