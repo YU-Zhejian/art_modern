@@ -72,7 +72,7 @@ include_directories(${CMAKE_INCLUDE_PATH})
 file(GLOB ART_MODERN_LIB_SOURCE "lib/*.cc" "lib/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE} lib/art_modern_constants.hh)
 
-file(GLOB ART_SOURCE "art/*.cpp" "art/*.cc")
+file(GLOB ART_SOURCE "art/*.cc")
 add_executable(art_modern ${ART_SOURCE})
 
 target_link_libraries(art_modern_lib PUBLIC ${ART_MODERN_LINK_LIBS})

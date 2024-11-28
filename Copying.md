@@ -1,6 +1,6 @@
 # Copyright
 
-This project uses MIT License, a copy of which is available at <License.md>.
+This project uses GPL v3 License, a copy of which is available at <License.md>.
 
 Except those acknowledged in Readme, this project uses code from the following projects:
 
@@ -40,3 +40,5 @@ Except those acknowledged in Readme, this project uses code from the following p
   - `/deps/slim_libceu/**`
   
   With MIT License.
+
+  **NOTE** This program is no-longer in active development.

@@ -30,11 +30,6 @@ testsmall: build raw_data
 raw_data:
 	$(MAKE) -C raw_data
 
-.PHONY: sync-ceu-cm
-sync-ceu-cm:
-	rm -fr deps/cmake_collections
-	cp -rv ../libceu/cmake_collections/ deps/
-
 .PHONY: clean
 clean:
 	rm -fr build build_profile tmp

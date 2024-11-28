@@ -33,7 +33,7 @@ public:
 private:
     static long seed();
 #if defined(USE_STL_RANDOM)
-    std::mt19937_64 gen_;
+    std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
     std::normal_distribution<double> insertion_length_gaussian_;
     std::uniform_int_distribution<int> base_;
@@ -44,7 +44,7 @@ private:
     std::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
     int read_length_;
 #elif defined(USE_BOOST_RANDOM)
-    boost::mt19937_64 gen_;
+    boost::mt19937 gen_;
     boost::uniform_real<double> dis_;
     boost::normal_distribution<double> insertion_length_gaussian_;
     boost::uniform_smallint<int> base_;
