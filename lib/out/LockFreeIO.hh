@@ -7,8 +7,9 @@ namespace labw::art_modern {
 
 template <typename T> class LockFreeIO {
 public:
+    static const int QUEUE_SIZE = 65534;
     LockFreeIO()
-        : queue(1 << 20) {};
+        : queue() {};
     ~LockFreeIO() = default;
     void push(T* value)
     {
@@ -28,7 +29,7 @@ public:
     virtual void write(T*) = 0;
 
 private:
-    boost::lockfree::queue<T*, boost::lockfree::fixed_sized<false>> queue;
+    boost::lockfree::queue<T*, boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<QUEUE_SIZE>> queue;
     std::thread thread_;
     std::atomic<bool> should_stop_ = false;
 
@@ -41,9 +42,10 @@ private:
             if (pop_ret) {
                 write(retp);
             } else {
-                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+                // std::this_thread::sleep_for(std::chrono::milliseconds(10));
             }
         }
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         pop_ret = queue.pop(retp);
         while (pop_ret) {
             write(retp);

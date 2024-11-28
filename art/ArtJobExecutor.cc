@@ -26,52 +26,6 @@
 
 namespace labw::art_modern {
 
-class Tick {
-public:
-    explicit Tick(ArtJobExecutor& aje)
-        : aje_(aje)
-        , read_size(
-              aje.art_params.read_len * (this->aje_.art_params.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2))
-        , thread_info(aje.thread_info())
-    {
-    }
-
-    void start() { thread_ = std::thread(&Tick::run, this); }
-
-    void stop()
-    {
-        should_stop_ = true;
-        if (thread_.joinable()) {
-            thread_.join();
-        }
-    }
-
-private:
-    std::atomic<bool> should_stop_ = false;
-    std::thread thread_;
-    ArtJobExecutor& aje_;
-    const int read_size;
-    const int sleep_time = 5;
-    const std::string thread_info;
-
-    void run() const
-    {
-        std::chrono::time_point start = std::chrono::system_clock::now();
-        size_t prev_num_reads = 0;
-        while (!should_stop_) {
-            std::this_thread::sleep_for(std::chrono::seconds(sleep_time));
-
-            const size_t num_reads = this->aje_.num_reads;
-            std::chrono::time_point now = std::chrono::system_clock::now();
-            const auto num_secs = std::chrono::duration_cast<std::chrono::seconds>((now - start)).count();
-            BOOST_LOG_TRIVIAL(info) << "Tick:" << thread_info << " " << num_reads << " reads generated. Speed: "
-                                    << (num_reads - prev_num_reads) * read_size / sleep_time
-                                    << " nt/s; Avg. Speed: " << num_reads * read_size / num_secs << " nt/s";
-            prev_num_reads = num_reads;
-        }
-    }
-};
-
 bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
 {
     std::ostringstream osID;
@@ -132,8 +86,7 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
 
 void ArtJobExecutor::execute()
 {
-    Tick tick(*this);
-    tick.start();
+    is_running = true;
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
         return;
@@ -178,21 +131,21 @@ void ArtJobExecutor::execute()
             GENERATE(num_neg_reads, false, generate_pe)
         }
     }
-    tick.stop();
 
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
                             << " reads generated.";
     if (job_.free_fasta_fetch_after_execution) {
         delete job_.fasta_fetch;
     }
+    is_running = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : num_reads(other.num_reads)
-    , art_params(other.art_params)
+    : art_params(other.art_params)
     , job_(std::move(other.job_))
     , rprob_(Rprob(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len))
     , output_dispatcher_(other.output_dispatcher_)
     , mpi_rank_(other.mpi_rank_)
+    , num_reads(other.num_reads.load())
 {
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }

@@ -67,11 +67,7 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
 std::string PairwiseAlignment::serialize() const
 {
     std::ostringstream os;
-    os << ">" << read_name << "\t" << contig_name << ":" << std::to_string(pos_on_contig) << ":"
-       << (is_plus_strand ? '+' : '-') << "\n";
-    os << aligned_query << "\n";
-    os << aligned_ref << "\n";
-    os << qual << "\n";
+    serialize(os);
     return os.str();
 }
 
@@ -98,6 +94,14 @@ PairwiseAlignment PairwiseAlignment::deserialize(const std::vector<std::string>&
     boost::algorithm::erase_all(ref_, ALN_GAP_STR);
     return { read_name_, contig_name_, query_, ref_, qual_, aligned_query_, aligned_ref_, pos_on_contig_,
         is_plus_strand_ };
+}
+void PairwiseAlignment::serialize(std::ostream& os) const
+{
+    os << ">" << read_name << "\t" << contig_name << ":" << std::to_string(pos_on_contig) << ":"
+       << (is_plus_strand ? '+' : '-') << "\n";
+    os << aligned_query << "\n";
+    os << aligned_ref << "\n";
+    os << qual << "\n";
 }
 
 PWAException::PWAException(const char* msg)

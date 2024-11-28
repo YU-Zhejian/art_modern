@@ -6,8 +6,6 @@
 #include "out/BaseReadOutput.hh"
 #include <htslib/sam.h>
 
-#include <mutex>
-
 namespace labw::art_modern {
 
 class BamReadOutput : public BaseReadOutput {
@@ -27,9 +25,9 @@ private:
     samFile* sam_file_;
     sam_hdr_t* sam_header_;
     const SamOptions sam_options_;
-    std::mutex mutex_;
     const std::string filename;
     bool is_closed_ = false;
+    BamLFIO lfio_;
 };
 
 class BamReadOutputFactory : public BaseReadOutputFactory {

@@ -1,9 +1,9 @@
 #pragma once
+#include "LockFreeIO.hh"
 #include "PairwiseAlignment.hh"
 #include "SamOptions.hh"
 #include <htslib/sam.h>
 
-#include <memory>
 #include <string>
 
 namespace labw::art_modern {
@@ -36,6 +36,24 @@ public:
 
 private:
     std::vector<tag_type> tags_;
+};
+
+class BamLFIO : public LockFreeIO<bam1_t> {
+public:
+    void write(bam1_t* ss) override
+    {
+        BamUtils::write(fp_, h_, ss);
+        bam_destroy1(ss);
+    }
+    BamLFIO(samFile* fp, sam_hdr_t* h)
+        : fp_(fp)
+        , h_(h)
+    {
+    }
+
+private:
+    samFile* fp_;
+    sam_hdr_t* h_;
 };
 
 } // namespace labw::art_modern

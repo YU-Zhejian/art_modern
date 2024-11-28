@@ -9,8 +9,10 @@ void PwaReadOutput::writeSE(const PairwiseAlignment& pwa)
     if (is_closed_) {
         return;
     }
-    std::scoped_lock lock(mutex_);
-    file_ << pwa.serialize();
+    auto os = new std::ostringstream();
+    pwa.serialize(*os);
+
+    lfio_.push(os);
 }
 
 void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -18,8 +20,11 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     if (is_closed_) {
         return;
     }
-    std::scoped_lock lock(mutex_);
-    file_ << pwa1.serialize() << pwa2.serialize();
+    auto os = new std::ostringstream();
+    pwa1.serialize(*os);
+    pwa2.serialize(*os);
+
+    lfio_.push(os);
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
@@ -27,7 +32,9 @@ PwaReadOutput::PwaReadOutput(const std::string& filename)
     : file_(filename)
     , filename(filename)
     , is_closed_(false)
+    , lfio_(file_)
 {
+    lfio_.start();
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
@@ -36,9 +43,10 @@ void PwaReadOutput::close()
     if (is_closed_) {
         return;
     }
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
+    lfio_.stop();
     file_.flush();
     file_.close();
+    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
 }
 void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

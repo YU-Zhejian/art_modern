@@ -68,7 +68,7 @@ std::string ceu_check_get_compiler_info(void)
 
 #if defined(CEU_COMPILER_IS_NVHPC)
     oss << "\t"
-        << "NVidia High-Performance Compiler (HVHPC) compatible version number: " << __NVCOMPILER_MAJOR__ << '.'
+        << "NVidia High-Performance Compiler (NVHPC) compatible version number: " << __NVCOMPILER_MAJOR__ << '.'
         << __NVCOMPILER_MINOR__ << '.' << __NVCOMPILER_PATCHLEVEL__ << std::endl;
 #endif
 #if defined(CEU_COMPILER_IS_PGIC)
@@ -81,20 +81,20 @@ std::string ceu_check_get_compiler_info(void)
     oss << "\t"
         << "Tiny C Compiler (TCC) compatible version number: ";
     int tcc_major = __TINYC__ / 10000;
-    int tcc_minor = (__TINYC__ - major * 10000) / 100;
+    int tcc_minor = (__TINYC__ - tcc_major * 10000) / 100;
     int tcc_patchlevel = __TINYC__ % 100;
     oss << tcc_major << '.' << tcc_minor << '.' << tcc_patchlevel << std::endl;
 #endif
 #if defined(CEU_COMPILER_IS_EDG)
     int edg_major = __EDG_VERSION__ / 100;
-    int edg_minor = (__EDG_VERSION__ - major * 100);
+    int edg_minor = (__EDG_VERSION__ - edg_major * 100);
     oss << "\t"
         << "EDG compatible version number: " << edg_major << '.' << edg_minor << std::endl;
 #endif
 
 #if defined(CEU_COMPILER_IS_BORLAND)
     int borland_major = __BORLANDC__ / 256;
-    int borland_revision = (__BORLANDC__ - 256 * major) / 16 + __BORLANDC__ % 16;
+    int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
     oss << "\t"
         << "Borland compatible version number: " << borland_major << '.' << borland_revision << ", with "
         << CEU_CPPB_VERSION << std::endl;

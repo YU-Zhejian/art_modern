@@ -22,9 +22,9 @@ private:
     samFile* sam_file_;
     sam_hdr_t* sam_header_;
     const SamOptions sam_options_;
-    std::mutex mutex_;
     bool is_closed_ = false;
     const std::string filename;
+    BamLFIO lfio_;
 };
 
 class HeadlessBamReadOutputFactory : public BaseReadOutputFactory {

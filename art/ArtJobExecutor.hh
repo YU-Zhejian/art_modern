@@ -4,6 +4,7 @@
 #include "jobs/SimulationJob.hh"
 #include "out/BaseReadOutput.hh"
 #include "random_generator.hh"
+#include <atomic>
 
 namespace labw::art_modern {
 
@@ -16,9 +17,10 @@ public:
 
     ~ArtJobExecutor();
     void execute();
-    std::size_t num_reads;
+    std::atomic<std::size_t> num_reads;
     std::string thread_info() const;
     const ArtParams& art_params;
+    std::atomic<bool> is_running = false;
 
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);

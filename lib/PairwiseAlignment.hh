@@ -38,6 +38,7 @@ public:
     static PairwiseAlignment deserialize(const std::vector<std::string>& serialized);
     std::vector<uint32_t> generate_cigar_array(bool use_m) const;
     std::string serialize() const;
+    void serialize(std::ostream& os) const;
 
     /**
      * Query sequence with gap inserted using -

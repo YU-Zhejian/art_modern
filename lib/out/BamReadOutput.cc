@@ -52,9 +52,7 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
 
     tags.patch(sam_record);
 
-    std::unique_lock rhs_lk(mutex_);
-    BamUtils::write(sam_file_, sam_header_, sam_record);
-    bam_destroy1(sam_record);
+    lfio_.push(sam_record);
 }
 
 void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -126,22 +124,19 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);
-
-    std::scoped_lock rhs_lk(mutex_);
-    BamUtils::write(sam_file_, sam_header_, sam_record1);
-    BamUtils::write(sam_file_, sam_header_, sam_record2);
-    bam_destroy1(sam_record1);
-    bam_destroy1(sam_record2);
+    lfio_.push(sam_record1);
+    lfio_.push(sam_record2);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, SamOptions sam_options)
     : sam_options_(std::move(sam_options))
     , filename(filename)
+    , sam_file_(CExceptionsProxy::assert_not_null(
+          sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file"))
+    , sam_header_(
+          CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header"))
+    , lfio_(sam_file_, sam_header_)
 {
-    sam_file_ = CExceptionsProxy::assert_not_null(
-        sam_open(filename.c_str(), sam_options_.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
-    sam_header_
-        = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
     CExceptionsProxy::assert_numeric(
         sam_hdr_add_line(sam_header_, "HD", "VN", sam_options_.HD_VN.c_str(), "SO", sam_options_.HD_SO.c_str(), NULL),
         USED_HTSLIB_NAME, "Failed to add HD header line");
@@ -152,6 +147,7 @@ BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* 
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
+    lfio_.start();
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
@@ -160,9 +156,10 @@ void BamReadOutput::close()
     if (is_closed_) {
         return;
     }
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
+    lfio_.stop();
     sam_close(sam_file_);
     sam_hdr_destroy(sam_header_);
+    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
     is_closed_ = true;
 }
 void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const

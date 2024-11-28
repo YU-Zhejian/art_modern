@@ -2,11 +2,27 @@
 
 #include <fstream>
 #include <iostream>
-#include <mutex>
 
+#include "LockFreeIO.hh"
 #include "out/BaseReadOutput.hh"
 
 namespace labw::art_modern {
+class PwaLFIO : public LockFreeIO<std::ostringstream> {
+public:
+    void write(std::ostringstream* ss) override
+    {
+        out_ << ss->str();
+        delete ss;
+    }
+    explicit PwaLFIO(std::ostream& out)
+        : out_(out)
+    {
+    }
+
+private:
+    std::ostream& out_;
+};
+
 class PwaReadOutput : public BaseReadOutput {
 public:
     PwaReadOutput(PwaReadOutput&& other) = delete;
@@ -24,9 +40,9 @@ public:
 
 private:
     std::ofstream file_;
-    std::mutex mutex_;
     const std::string filename;
     bool is_closed_;
+    PwaLFIO lfio_;
 };
 
 class PwaReadOutputFactory : public BaseReadOutputFactory {

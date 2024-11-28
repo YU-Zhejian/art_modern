@@ -2,9 +2,7 @@
 set -ue
 cd "$(readlink -f "$(dirname "${0}")")"
 if [ -f "sh.d/profile.sh.d/${1:-}.sh" ]; then
-    env -i \
-        PATH="/usr/bin" \
-        bash --norc --noprofile "sh.d/profile.sh.d/${1}.sh"
+    bash --norc --noprofile "sh.d/profile.sh.d/${1}.sh"
 else
     echo "Unknown profile: ${1:-}" >&2
     echo "Available profilers:"

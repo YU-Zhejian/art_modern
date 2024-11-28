@@ -1,7 +1,6 @@
 #pragma once
 
 #include <fstream>
-#include <mutex>
 
 #include "LockFreeIO.hh"
 #include "out/BaseReadOutput.hh"
@@ -15,7 +14,7 @@ public:
         out_ << ss->str();
         delete ss;
     }
-    FastqLFIO(std::ostream& out)
+    explicit FastqLFIO(std::ostream& out)
         : out_(out)
     {
     }
@@ -30,13 +29,10 @@ public:
     FastqReadOutput(const FastqReadOutput&) = delete;
     FastqReadOutput& operator=(FastqReadOutput&&) = delete;
     FastqReadOutput& operator=(const FastqReadOutput&) = delete;
-
     explicit FastqReadOutput(const std::string& filename);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
-
     void close() override;
-
     ~FastqReadOutput() override;
 
 private:
