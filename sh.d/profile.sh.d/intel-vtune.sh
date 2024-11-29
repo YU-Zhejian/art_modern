@@ -22,7 +22,7 @@ ninja -j120
 ./art_modern --version
 ldd ./art_modern
 
-for collect in threading hotspots; do # hpc-performance memory-access memory-consumption
+for collect in io threading hotspots; do # hpc-performance memory-access memory-consumption
     rm -fr ./vtune-"${collect}"
     vtune \
         -collect="${collect}" \
@@ -46,10 +46,3 @@ for collect in threading hotspots; do # hpc-performance memory-access memory-con
     vtune-gui ./vtune-"${collect}"
 done
 cd ..
-exit
- \
-        --o-sam test_small_se_wgs_memory.bam
-        --o-sam-write_bam \
-        --o-hl_sam test_small_se_wgs_memory.hl.sam \
-         \
-        --o-pwa test_small_se_wgs_memory.pwa
