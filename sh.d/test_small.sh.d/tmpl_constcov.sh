@@ -2,10 +2,10 @@
 FCOV=10
 parser=memory
 for lc in se pe mp; do
-    build/art_modern \
-        --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
-        --i-file raw_data/ce11.mRNA_head.fa \
+    "${ART}" \
+        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --i-file "${MRNA_HEAD}" \
         --read_len 125 \
         --mode template \
         --lc "${lc}" \
@@ -14,16 +14,16 @@ for lc in se pe mp; do
         --parallel "${PARALLEL}" \
         --ins_rate_1 "${IDRATE}" \
         --del_rate_1 "${IDRATE}" \
-        --o-sam tmp/test_small_"${lc}"_template_"${parser}".sam
-    sam2bam tmp/test_small_"${lc}"_template_"${parser}" raw_data/ce11.mRNA_head.fa
+        --o-sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".sam
+    sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}" "${MRNA_HEAD}"
 done
 
 parser=stream
 for lc in se pe mp; do
-    build/art_modern \
-        --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
-        --i-file raw_data/ce11.mRNA_head.fa \
+    "${ART}" \
+        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --i-file "${MRNA_HEAD}" \
         --read_len 125 \
         --i-batch_size 100 \
         --mode template \
@@ -33,7 +33,8 @@ for lc in se pe mp; do
         --parallel "${PARALLEL}" \
         --ins_rate_1 "${IDRATE}" \
         --del_rate_1 "${IDRATE}" \
-        --o-hl_sam tmp/test_small_"${lc}"_template_"${parser}".hl.sam
-    sam2bam tmp/test_small_"${lc}"_template_"${parser}".hl raw_data/ce11.mRNA_head.fa
+        --o-hl_sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl.sam
+    sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl "${MRNA_HEAD}"
 done
-rm -fr tmp/test_small_??_template_stream.hl.sam
+rm -fr "${OUT_DIR}"/test_small_??_template_stream.hl.sam
+unset FCOV

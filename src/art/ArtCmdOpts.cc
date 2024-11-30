@@ -264,6 +264,27 @@ INPUT_FILE_PARSER get_input_file_parser(
     }
 }
 
+void validate_input_filename(const std::string& input_file_path, const std::string& arg_name)
+{
+    if (input_file_path.empty()) {
+        BOOST_LOG_TRIVIAL(fatal) << "An input file path for --" << arg_name << " must be specified.";
+        abort_mpi();
+    }
+    if (!boost::filesystem::exists(input_file_path)) {
+        BOOST_LOG_TRIVIAL(fatal) << "Input file for --" << arg_name << " at '" << input_file_path
+                                 << "' does not exist.";
+        abort_mpi();
+    }
+    if (!boost::filesystem::is_regular_file(input_file_path)) {
+        BOOST_LOG_TRIVIAL(warning) << "Input file for --" << arg_name << " at '" << input_file_path
+                                   << "' is not a regular file.";
+#ifdef WITH_MPI
+        BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
+        abort_mpi();
+#endif
+    }
+}
+
 CoverageInfo get_coverage_info(
     const std::string& fcov_arg_str, const INPUT_FILE_TYPE input_file_type, const SIMULATION_MODE simulation_mode)
 {
@@ -279,6 +300,7 @@ CoverageInfo get_coverage_info(
             return CoverageInfo(d);
         }
     } catch (const boost::bad_lexical_cast&) {
+        validate_input_filename(fcov_arg_str, ARG_FCOV);
         std::ifstream cov_fs(fcov_arg_str, std::ios::binary);
         auto coverage_info = CoverageInfo(cov_fs);
         cov_fs.close();
@@ -300,26 +322,7 @@ void validate_min_max_qual(const int min_qual, const int max_qual)
     }
 }
 
-void validate_input_filename(const std::string& input_file_path, const std::string& arg_name)
-{
-    if (input_file_path.empty()) {
-        BOOST_LOG_TRIVIAL(fatal) << "An input file path for --" << arg_name << " must be specified.";
-        abort_mpi();
-    }
-    if (!boost::filesystem::exists(input_file_path)) {
-        BOOST_LOG_TRIVIAL(fatal) << "Input file for --" << arg_name << " at '" << input_file_path
-                                 << "' does not exist.";
-        abort_mpi();
-    }
-    if (!boost::filesystem::is_regular_file(input_file_path)) {
-        BOOST_LOG_TRIVIAL(warning) << "Input file for --" << arg_name << " at '" << input_file_path
-                                   << "' is not a regular file.";
-#ifdef WITH_MPI
-        BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
-        abort_mpi();
-#endif
-    }
-}
+
 void validate_qual_files(
     const std::string& qual_file_1, const std::string& qual_file_2, const ART_LIB_CONST_MODE art_lib_const_mode)
 {

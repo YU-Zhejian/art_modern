@@ -36,28 +36,39 @@ sets `BUILD_SHARED_LIBS` to `ON`.
 
 Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), YUM/DNF, PacMan, etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
-- [Boost C++ Library](https://www.boost.org/). This is an umbrella project of diverse small modules that can be used independently. The modules used in this project are namely:
-    - **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
-    - **REQUIRED** [Regex](https://www.boost.org/doc/libs/1_85_0/libs/regex/).
-    - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
-    - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
-    - **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
-    - **REQUIRED** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html).
-    - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
-    - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
-    - **OPTIONAL** `stacktrace_backtrace`: For a more developer-friendly stack trace. See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details. Can be absent for non-developers.
-- A working [HTSLib](https://www.htslib.org/). You may either use the one bundled with the project or an external one that had already been installed inside your system.
-    - To use bundled HTSLib sources, you need to have:
-        - **REQUIRED** [zlib](https://www.zlib.net/).
-        - **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
-        - **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression, which is now not supported.
-        - **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression, which is now not supported.
-        - **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
-        - See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
-    - To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so` with optional version suffixes.
-- Other libraries for accelerating random number generation. Including:
-    - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
-    - **OPTIONAL** [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
+### [Boost C++ Library](https://www.boost.org/)
+
+This is an umbrella project of diverse small modules that can be used independently. The modules used in this project are namely:
+
+- **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
+- **REQUIRED** [Regex](https://www.boost.org/doc/libs/1_85_0/libs/regex/).
+- **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
+- **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
+- **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
+- **REQUIRED** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html).
+- **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
+- **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
+- **OPTIONAL** `stacktrace_backtrace`: For a more developer-friendly stack trace. See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details. Can be absent for non-developers.
+
+### [HTSLib](https://www.htslib.org/)
+
+You may either use the one bundled with the project or an external one that had already been installed inside your system. To use bundled HTSLib sources, you need to have:
+
+- **REQUIRED** [zlib](https://www.zlib.net/).
+- **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
+- **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression, which is now not supported.
+- **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression, which is now not supported.
+- **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
+
+See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
+
+To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so` with optional version suffixes.
+
+### Other Optional Libraries
+
+- Various libraries for accelerating random number generation. Including:
+  - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+  - **OPTIONAL** [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
 
 ## Reference on CMake Variables
 

@@ -18,18 +18,6 @@ Except those acknowledged in Readme, this project uses code from the following p
 
 ---
 
-- **Gregory Popovitch's Parallel Hashmap Project**
-
-  Available from <https://github.com/greg7mdp/parallel-hashmap>, commit `0bad0987`
-
-  Affected files:
-
-  - `/deps/parallel-hashmap/**`
-
-  With [Apache 2.0](https://opensource.org/licenses/Apache-2.0) License.
-
----
-
 - **YU Zhejian's `libceu` Projecy**
 
   Available from <https://github.com/YU-Zhejian/libceu>, commit `d1c043d8`.

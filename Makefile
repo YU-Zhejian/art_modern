@@ -1,14 +1,14 @@
 .PHONY: build
 build:
-	mkdir -p build
-	env -C build cmake \
+	mkdir -p opt/build_debug
+	env -C opt/build_debug cmake \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		-G Ninja ..
-	env -C build ninja -j40
-	env -C build ctest --output-on-failure
-	build/art_modern --help
-	mpiexec --verbose -n 5 build/art_modern --version
+		-G Ninja $(CURDIR)
+	env -C opt/build_debug ninja -j40
+	env -C opt/build_debug ctest --output-on-failure
+	opt/build_debug/art_modern --help
+	opt/build_debug/art_modern --version # mpiexec --verbose -n 5 
 
 .PHONY: fmt
 fmt:
@@ -28,8 +28,8 @@ testsmall: build raw_data
 
 .PHONY: raw_data
 raw_data:
-	$(MAKE) -C raw_data
+	$(MAKE) -C data/raw_data
 
 .PHONY: clean
 clean:
-	rm -fr build build_profile tmp
+	rm -fr opt tmp build

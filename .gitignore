@@ -43,3 +43,4 @@ _cmake_test_compile/
 backtrace.dump
 log.d/
 tutorial_data
+/opt

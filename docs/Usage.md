@@ -17,3 +17,9 @@ A compatibility matrix is as follows:
 ## Library Construction Methods
 
 ## FASTA Parsers
+
+## Performance Hint
+
+Set `USE_HTSLIB` to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been linked with [libdeflate](https://github.com/ebiggers/libdeflate). Set `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL` on Intel/AMD machines.
+
+Also, when executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.

@@ -35,7 +35,7 @@ build_release/art_modern \
    --lc se \
    --i-file tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna \
    --o-fastq tutorial_data/e_coli_wgs_se.fastq \
-   --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
+   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
    --read_len 125 \
    --parallel 4 \
    --i-fcov 10
@@ -51,8 +51,8 @@ build_release/art_modern \
    --lc pe \
    --i-file tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna \
    --o-fastq tutorial_data/e_coli_wgs_pe.fastq \
-   --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
-   --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
+   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+   --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
    --read_len 125 \
    --parallel 4 \
    --i-fcov 10 \

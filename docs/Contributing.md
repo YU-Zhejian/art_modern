@@ -114,7 +114,7 @@ You're welcome to submit issues on GitHub. Please make sure to include the follo
             bool        (1 size):      0 -> 1
     [2024-11-28 19:45:39.174414] info: EXIT
     ```
-   
+
     You're expected to see more information if you link `art_modern` with Intel OneMKL, GSL, etc.
 2. The CMake commandline you used to build the code.
 3. The compilation log, if possible.
