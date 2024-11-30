@@ -42,3 +42,4 @@ _cmake_test_compile/
 /expr/
 backtrace.dump
 log.d/
+tutorial_data

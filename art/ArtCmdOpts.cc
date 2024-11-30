@@ -325,7 +325,7 @@ void validate_qual_files(
 {
     validate_input_filename(qual_file_1, ARG_QUAL_FILE_1);
     if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-        validate_input_filename(qual_file_2, ARG_QUAL_FILE_1);
+        validate_input_filename(qual_file_2, ARG_QUAL_FILE_2);
     }
 }
 

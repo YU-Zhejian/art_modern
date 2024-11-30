@@ -7,7 +7,7 @@ Build the project using:
 ```shell
 mkdir -p build_release
 env -C build_release cmake -DCMAKE_BUILD_TYPE=Release -DCEU_CM_SHOULD_ENABLE_TEST=FALSE ..
-env -C build_release make
+env -C build_release make -j40
 ```
 
 The project binary will be available at `build_release/art_modern`. Now we can test whether the program runs:
@@ -17,7 +17,56 @@ build_release/art_modern --help
 build_release/art_modern --version # For version information
 ```
 
-TODO
+### Simulating WGS Data using _E. Coli_ Genome
+
+Download _E. Coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 substrand as an example.
+
+```shell
+mkdir -p tutorial_data
+wget -4 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz -O tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna.gz
+gunzip tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna.gz
+```
+
+Now we can simulate WGS data using E. Coli reference genome. Let's satrt with single-end sequencing using HiSeq 2500 with 125bp read length and 10X coverage.
+
+```shell
+build_release/art_modern \
+   --mode wgs \
+   --lc se \
+   --i-file tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna \
+   --o-fastq tutorial_data/e_coli_wgs_se.fastq \
+   --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
+   --read_len 125 \
+   --parallel 4 \
+   --i-fcov 10
+```
+
+The generated FASTQ file will be at `tutorial_data/e_coli_wgs_se.fastq`.
+
+We may also simulate paired-end data with following configuration:
+
+```shell
+build_release/art_modern \
+   --mode wgs \
+   --lc pe \
+   --i-file tutorial_data/GCF_000005845.2_ASM584v2_genomic.fna \
+   --o-fastq tutorial_data/e_coli_wgs_pe.fastq \
+   --qual_file_1 art/Illumina_profiles/HiSeq2500L125R1.txt \
+   --qual_file_2 art/Illumina_profiles/HiSeq2500L125R2.txt \
+   --read_len 125 \
+   --parallel 4 \
+   --i-fcov 10 \
+   --pe_frag_dist_mean 300 \
+   --pe_frag_dist_std_dev 50
+```
+
+Please note that we have additionally specified quality file for read 2 with the mean and standard diviation of fragment lengths.
+
+### Simulating RNA-Seq Data using _C. Elegans_ Transcriptome
+
+### Simulating Targeted Amplification Data
+
+### Simulating WGS Data on Large Genomes
 
 ## Building
 
@@ -140,7 +189,7 @@ seqtk seq tmp/test_small_pe/NC_001416.1.fq -1 > tmp/test_small_pe/NC_001416.1_1.
 seqtk seq tmp/test_small_pe/NC_001416.1.fq -2 > tmp/test_small_pe/NC_001416.1_2.fq
 ```
 
-You may also generate SAM/BAM files and split it using SAMtools.
+You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`.
 
 ### Is there an interface for Python, Java, and more?
 
