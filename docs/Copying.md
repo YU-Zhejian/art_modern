@@ -1,6 +1,6 @@
 # Copyright
 
-This project uses GPL v3 License, a copy of which is available at <License.md>.
+This project uses GPL v3 License, a copy of which is available at [License.md](..%2FLicense.md).
 
 Except those acknowledged in Readme, this project uses code from the following projects:
 
