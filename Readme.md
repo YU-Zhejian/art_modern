@@ -191,7 +191,7 @@ opt/build_release/art_modern \
    --i-type pbsim3_template
 ```
 
-### Simulating Targeted Amplification Data
+### Template-Based Simulation
 
 ### Simulating WGS Data on Large Genomes
 

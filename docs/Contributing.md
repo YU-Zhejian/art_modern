@@ -41,7 +41,7 @@ Run `make testsmall` to run the integration tests using executables produced in 
 
 ### Profiling
 
-Run `./profile.sh intel-advisor` to run the profiler using Intel Advisor. You have to have it installed to run this. We're now working on supporting Valgrind.
+Run `./profile.sh intel-advisor` to run the profiler using Intel Advisor. You have to have it installed to run this. You may also profile the software using `intel-vtune` (for Intyel VTune Profiler), `nsys` (For NVidia Nsight Systems), or `valgrind` (for Valgrind Callgrind) as the first parameter.
 
 ### Others
 
@@ -51,7 +51,7 @@ Run `./profile.sh intel-advisor` to run the profiler using Intel Advisor. You ha
 - Run `make touch` to touch all files in the repository. This works when CMake does strange things like compiling the source files again and again.
 - Run `make raw_data` to download essential test data useful to various integration tests, benchmarks, etc.
 
-## Topics of `art_modern`
+## Design Topics
 
 ### Parallelism
 
@@ -63,60 +63,31 @@ The parallelization strategy of different modes and input parsers are as follows
 | `htslib`      | Coverage  | **ERROR** | **ERROR** |
 | `stream`      | **ERROR** | Batch     | Batch     |
 
-A proposed MPI-based parallelization strategy is in TODO.
+A proposed MPI-based parallelization strategy is in [TODO.md](TODO.md).
 
 ## Get Engaged
 
-You're welcome to submit issues on GitHub. Please make sure to include the following information:
+### Issues
 
-1. `art_modern --version` output. In my own computer it generates some report like this:
+You're welcome to submit issues on GitHub if you've encountered any problems while using this software. Please make sure to include the following information:
 
-    ```text
-    ART: 2.5.8, ART_MODERN: 1.0.0
-    ART_MODERN_LINK_LIBS: Boost::filesystem;Boost::regex;Boost::program_options;Boost::thread;Boost::log_setup;Boost::log;Boost::timer;Boost::stacktrace_backtrace;labw_slim_htslib;OpenMP::OpenMP_C;OpenMP::OpenMP_CXX;libceu
-    USING HTSLib: labw_slim_htslib, ver. 1.15
-            Features: build=CMake libcurl=no S3=no GCS=no libdeflate=yes lzma=yes bzip2=yes plugins=no htscodecs=1.2.1-2-g663bb94
-            CC: /usr/bin/cc
-            CPPFLAGS: 
-            CFLAGS: -O0;-pg;-g3;-Og;-pedantic;-Wextra;-Wall
-            LDFLAGS:
-            HTSlib URL scheme handlers present:
-                    built-in: preload, data, file
-                    crypt4gh-needed: crypt4gh
-                    mem: mem
-    BOOST: 1.83.0
-    GSL: not used
-    MKL: not used
-    MPI: not used
-    Protobuf: not used
-    OpenMP (C): 201511 v4.5
-    OpenMP (CXX): 201511 v4.5
-    Compile-time C std.: ver. unknown ISO C (__STDC_VERSION__ undefined)
-    Compile-time C++ std.: ver. 17 (201703)
-    Compiled at: Nov 28 2024, 19:44:44
-    Compiler Identification:
-            GCC compatible version number: 14.2.0
-            __VERSION__ string: 14.2.0
-    Compile-time C Types max, min, etc. limits:
-            char           (8 bits, 1 size):                       -128 ->                  +127
-            schar          (1 size):                       -128 ->                  +127
-            uchar          (1 size):                         +0 ->                  +255
-            std::size_t    (8 size):                         +0 ->  18446744073709551615
-            std::ptrdiff_t (8 size):       -9223372036854775808 ->  +9223372036854775807
-            short          (2 size):                     -32768 ->                +32767
-            ushort          (2 size):                          0 ->                +65535
-            int          (4 size):                -2147483648 ->           +2147483647
-            uint         (4 size):                          0 ->            4294967295
-            long         (8 size):       -9223372036854775808 ->  +9223372036854775807
-            ulong        (8 size):                         +0 ->  18446744073709551615
-            llong        (8 size):       -9223372036854775808 ->  +9223372036854775807
-            ullong       (8 size):                         +0 ->  18446744073709551615
-            bool        (1 size):      0 -> 1
-    [2024-11-28 19:45:39.174414] info: EXIT
-    ```
+- The version of your operating system and kernel, given by `uname -a`.
+- Version information of the compiler, given by `gcc -v --verbose` or similiar.
+- `art_modern --version` output.
+- The CMake commandline you used to build the code.
+- The compilation log, if possible.
+- The actual libraries linked to the executable. You may find that out using `ldd` or `readelf -d`.
+- The git commit hash of the code you used.
+- Attaching Valgrind memcheck output or profiler output is highly encouraged if possible.
 
-    You're expected to see more information if you link `art_modern` with Intel OneMKL, GSL, etc.
-2. The CMake commandline you used to build the code.
-3. The compilation log, if possible.
-4. If you're familiar with Valgrind, please run `valgrind --tool=memcheck --leak-check=full --track-origins=yes --verbose --log-file=valgrind.log ./art_modern ...` and attach the `valgrind.log` file.
-5. The git commit hash of the code you used.
+You may also submit issues if you're unclear about the docs or have some ideas improving the software itself.
+
+### Pull Requests (PRs)
+
+You're welcomed to send pull requests (PRs) to this project using the standard fork-and-pull-request workflow. However, please send an issue first to discuss the changes you're going to make (except spelling \& punctuation \& grammar issues), otherwise we may not be able to accept your PR.
+
+Before you send a PR, please make sure that:
+
+- `make testsmall` passes.
+- You've run `make fmt` to format the code.
+- You used Valgrind to check for memory leaks.
