@@ -12,6 +12,14 @@ The following compilers are tested and supported:
   - See [here](https://clang.llvm.org/cxx_status.html#cxx17) for support over C++17 in Clang.
 - [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html): For accelerated binaries on Intel CPUs.
 
+You may test whether your compiler (GCC for example) supports C++17 using:
+
+```shell
+echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
+```
+
+If there's no error, the compiler is supported.
+
 Although not tested, the following compilers can also theoretically be of use:
 
 - Intel C++ Compiler Classic (ICC).

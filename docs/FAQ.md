@@ -1,15 +1,5 @@
 # Frequently Asked Questions (FAQs)
 
-## Who are the intended user of this simulator?
-
-The intended user of this simulator is anyone who wants to simulate sequencing data for their own research. Typical scenarios includes:
-
-- Benchmarking of DNA- or RNA-Seq alignment algorithms.
-- Test whether the RNA-Seq pipeline built by your lab performs well.
-- Perform pressure testing of pipelines on a cluster.
-
-This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. The current version does not have cross-node parallelism, but we're working on supporting this through MPI.
-
 ## What kinds of CPUs are supported by the simulator?
 
 Although this application should theoretically support both endianness, only little endian is tested. That is, if you're working on an Intel or AMD CPU, this application should work fine.
