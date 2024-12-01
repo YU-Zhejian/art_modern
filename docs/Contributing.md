@@ -75,6 +75,7 @@ You're welcome to submit issues on GitHub if you've encountered any problems whi
 - Version information of the compiler, given by `gcc -v --verbose` or similiar.
 - `art_modern --version` output.
 - The CMake commandline you used to build the code.
+- The CMake configuration log, if possible.
 - The compilation log, if possible.
 - The actual libraries linked to the executable. You may find that out using `ldd` or `readelf -d`.
 - The git commit hash of the code you used.

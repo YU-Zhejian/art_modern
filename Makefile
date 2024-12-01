@@ -10,6 +10,12 @@ build:
 	opt/build_debug/art_modern --help
 	opt/build_debug/art_modern --version # mpiexec --verbose -n 5 
 
+.PHONY: release
+release:
+	mkdir -p opt/build_release
+	env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release -G Ninja $(CURDIR)
+	env -C opt/build_release ninja -j40
+
 .PHONY: fmt
 fmt:
 	bash sh.d/fmt.sh
