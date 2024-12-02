@@ -193,7 +193,22 @@ opt/build_release/art_modern \
 
 ### Template-Based Simulation
 
-### Simulating WGS Data on Large Genomes
+Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports PBSIM3 Template format. For example:
+
+```shell
+opt/build_release/art_modern \
+   --mode template \
+   --lc pe \
+   --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
+   --o-fastq opt/build_release/c_elegans_template_pbsim3_se.fastq \
+   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+   --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+   --read_len 125 \
+   --parallel 4 \
+   --i-type pbsim3_template
+```
+
+Please note that the mean and standard deviation of fragment length is not specified since in template-based simulation, a template is considered a fragment.
 
 ## What's Next?
 
