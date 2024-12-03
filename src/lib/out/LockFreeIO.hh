@@ -27,7 +27,7 @@ public:
             thread_.join();
         }
     }
-    virtual void write(T*) = 0;
+    virtual void write(T* value) = 0;
 
 private:
     boost::lockfree::queue<T*, boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<QUEUE_SIZE>> queue;

@@ -2,26 +2,11 @@
 
 #include <fstream>
 
-#include "LockFreeIO.hh"
+#include "SimpleLFIO.hh"
 #include "out/BaseReadOutput.hh"
 
 namespace labw::art_modern {
 
-class FastqLFIO : public LockFreeIO<std::stringstream> {
-public:
-    void write(std::stringstream* ss) override
-    {
-        out_ << ss->str();
-        delete ss;
-    }
-    explicit FastqLFIO(std::ostream& out)
-        : out_(out)
-    {
-    }
-
-private:
-    std::ostream& out_;
-};
 
 class FastqReadOutput : public BaseReadOutput {
 public:
@@ -39,7 +24,7 @@ private:
     std::ofstream file_;
     const std::string filename;
     bool is_closed_;
-    FastqLFIO lfio_;
+    SimpleLFIO lfio_;
 };
 
 class FastqReadOutputFactory : public BaseReadOutputFactory {

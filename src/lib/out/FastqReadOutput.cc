@@ -5,14 +5,30 @@
 
 namespace labw::art_modern {
 
+    std::string* format_fastq(const PairwiseAlignment& pwa){
+        auto* outs = new std::string;
+        std::size_t strsize = pwa.read_name.size() +( pwa.query.size() <<1) + 6;
+        outs->resize(strsize);
+        outs->at(0) = 0;
+        std::snprintf(outs->data(), strsize, "@%s\n%s\n+\n%s\n", pwa.read_name.c_str(), pwa.query.c_str(), pwa.qual.c_str());
+        return outs;
+    }
+
+    std::string* format_fastq(const PairwiseAlignment& pwa, bool is_read1){
+        auto* outs = new std::string;
+        std::size_t strsize = pwa.read_name.size() +(pwa.query.size() <<1) + 8;
+        outs->resize(strsize);
+        outs->at(0) = 0;
+        std::snprintf(outs->data(), strsize, "@%s/%d\n%s\n+\n%s\n", pwa.read_name.c_str(), is_read1? 1:2, pwa.query.c_str(), pwa.qual.c_str());
+        return outs;
+    }
+
 void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
     if (is_closed_) {
         return;
     }
-    auto* ss = new std::stringstream();
-    *ss << "@" << pwa.read_name << "\n" << pwa.query << "\n+\n" << pwa.qual << "\n";
-    lfio_.push(ss);
+    lfio_.push(format_fastq(pwa));
 }
 
 void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -20,10 +36,8 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
     if (is_closed_) {
         return;
     }
-    auto* ss = new std::stringstream();
-    *ss << "@" << pwa1.read_name << "/1\n" << pwa1.query << "\n+\n" << pwa1.qual << "\n";
-    *ss << "@" << pwa2.read_name << "/1\n" << pwa2.query << "\n+\n" << pwa2.qual << "\n";
-    lfio_.push(ss);
+    lfio_.push(format_fastq(pwa1, true));
+    lfio_.push(format_fastq(pwa2, false));
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
