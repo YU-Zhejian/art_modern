@@ -31,6 +31,8 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, con
     std::ostringstream osID;
     osID << art_contig.seq_name << ':' << art_params.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
          << current_num_reads;
+
+    // std::snprintf(nullptr, 20, "%s:%s:%d:%s:%zu", art_params.id.c_str(), art_contig.seq_name.c_str(), job_.job_id, mpi_rank_.c_str(),current_num_reads);
     ArtRead read_1(art_params, rprob_, art_contig.seq_name, osID.str());
     ArtRead read_2(art_params, rprob_, art_contig.seq_name, osID.str());
 

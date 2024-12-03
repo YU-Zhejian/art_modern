@@ -8,7 +8,7 @@ for lc in se pe mp; do
         --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
         --i-file data/raw_data/ce11.mRNA_head.pbsim3.transcript \
         --read_len 125 \
-        --i-type pbsim3_template \
+        --i-type pbsim3_transcripts \
         --mode trans \
         --lc "${lc}" \
         --i-parser "${parser}" \

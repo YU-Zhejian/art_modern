@@ -2,7 +2,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `aer_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well, or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We beleive with such simulator, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `aer_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well, or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulator, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
 
 ## Quick Start
 
@@ -37,7 +37,9 @@ opt/build_release/art_modern --version # For version information
 Download _E. Coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 substrand as an example.
 
 ```shell
-wget -4 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz -O opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
+wget \
+    -4 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz \
+    -O opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
 gunzip opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
 
@@ -161,9 +163,9 @@ opt/build_release/art_modern \
    --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
 ```
 
-#### The PBSIM3 Template Input Format
+#### The PBSIM3 Transcripts Input Format
 
-The PBSIM3 template input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarily, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
+The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarily, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
 
 ```tsv
 NR_056112	3.47140212944225	1.7229707866816995	aaaa
@@ -173,7 +175,7 @@ NM_061905	0.9618664937744315	1.3989801728399471	aaaa
 NR_054174	3.591258844822635	4.92434801892288	aaaa
 ```
 
-The following example converts the FASTA file to the PBSIM3 template input format with the help of [seqkit](https://bioinf.shenwei.me/seqkit) with random coverage generated using GNU AWK.
+The following example converts the FASTA file to the PBSIM3 Transcripts input format with the help of [seqkit](https://bioinf.shenwei.me/seqkit) with random coverage generated using GNU AWK.
 
 ```shell
 seqkit fx2tab opt/build_release/ce11_mrna_1000.fa | \
@@ -188,12 +190,12 @@ opt/build_release/art_modern \
    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
    --read_len 125 \
    --parallel 4 \
-   --i-type pbsim3_template
+   --i-type pbsim3_transcripts
 ```
 
 ### Template-Based Simulation
 
-Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports PBSIM3 Template format. For example:
+Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports PBSIM3 Transcripts format. For example:
 
 ```shell
 opt/build_release/art_modern \
@@ -205,7 +207,7 @@ opt/build_release/art_modern \
    --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
    --read_len 125 \
    --parallel 4 \
-   --i-type pbsim3_template
+   --i-type pbsim3_transcripts
 ```
 
 Please note that the mean and standard deviation of fragment length is not specified since in template-based simulation, a template is considered a fragment.
@@ -217,7 +219,8 @@ The `art_modern` project provides diverse documentations to satisfy your needs.
 - If you want to build the software with different options, see [Install](docs/Install.md).
 - For detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).
 - For developers, please refer to:
-  - [Contributing](docs/Contributing.md) for design principle and contribution guidelines.
+  - [Contributing](docs/Contributing.md) for software engineering tasks and contribution guidelines. See also [Code of Conduct](docs/CODE_OF_CONDUCT.md).
+  - [Design](docs/Design.md) for the latest design of the software.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
   - [News](docs/News.md) for changes over the project.
 - For a comparison of this project with other simulators, see [Benchmark](explore/benchmark_other_simulators).

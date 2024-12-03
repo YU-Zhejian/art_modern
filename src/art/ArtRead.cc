@@ -9,34 +9,37 @@ namespace labw::art_modern {
 void ArtRead::generate_pairwise_aln()
 {
     int k = 0;
-    int pos_on_read = 0;
-    std::ostringstream aln_seq_ss;
-    std::ostringstream aln_ref_ss;
+    std::size_t pos_on_read = 0;
+    std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
+    char aln_seq_c[maxk];
+    char aln_ref_c[maxk];
+    std::memset(aln_seq_c, 0, maxk);
+    std::memset(aln_ref_c, 0, maxk);
     for (decltype(seq_ref.size()) pos_on_ref = 0; pos_on_ref < seq_ref.size();) {
         if (indel_.find(k) == indel_.end()) { // No indel
-            aln_seq_ss << seq_read_[pos_on_read];
-            aln_ref_ss << seq_ref[pos_on_ref];
+            aln_seq_c[k] = seq_read_[pos_on_read];
+            aln_ref_c[k] = seq_ref[pos_on_ref];
             pos_on_read++;
             pos_on_ref++;
         } else if (indel_[k] == ALN_GAP) { // Deletion
-            aln_seq_ss << ALN_GAP;
-            aln_ref_ss << seq_ref[pos_on_ref];
+            aln_seq_c[k] = ALN_GAP;
+            aln_ref_c[k] =seq_ref[pos_on_ref];
             pos_on_ref++;
         } else { // Insertion
-            aln_seq_ss << indel_[k];
-            aln_ref_ss << ALN_GAP;
+            aln_seq_c[k] =indel_[k];
+            aln_ref_c[k] = ALN_GAP;
             pos_on_read++;
         }
         k++;
     }
     while (indel_.find(k) != indel_.end()) { // Insertions after reference
-        aln_seq_ss << indel_[k];
-        aln_ref_ss << ALN_GAP;
+        aln_seq_c[k] = indel_[k];
+        aln_ref_c[k] = ALN_GAP;
         pos_on_read++;
         k++;
     }
-    aln_read_ = aln_seq_ss.str();
-    aln_ref_ = aln_ref_ss.str();
+    aln_read_ = aln_seq_c;
+    aln_ref_ = aln_ref_c;
 }
 
 void ArtRead::generate_snv_on_qual(bool is_first_read)

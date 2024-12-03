@@ -89,7 +89,6 @@ void generate_all(const ArtParams& art_params)
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
-                // FIXME: fetch not closed!
             } else {
                 std::ifstream fasta_stream(art_params.input_file_name);
                 FastaStreamBatcher fsb(art_params.batch_size, fasta_stream);
@@ -107,7 +106,7 @@ void generate_all(const ArtParams& art_params)
                 }
                 fasta_stream.close();
             }
-        } else if (art_params.art_input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
+        } else if (art_params.art_input_file_type == INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS) {
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 std::ifstream input_file_stream(art_params.input_file_name);
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
@@ -130,8 +129,8 @@ void generate_all(const ArtParams& art_params)
             } else { // Stream
                 out_dispatcher
                     = out_dispatcher_factory.create(art_params.vm, new InMemoryFastaFetch(), art_params.args);
-                std::ifstream pbsim3_template_stream(art_params.input_file_name);
-                Pbsim3TranscriptBatcher fsb(art_params.batch_size, pbsim3_template_stream);
+                std::ifstream pbsim3_transcript_stream(art_params.input_file_name);
+                Pbsim3TranscriptBatcher fsb(art_params.batch_size, pbsim3_transcript_stream);
                 while (true) {
                     auto [fa_view, coverage_info] = fsb.fetch();
                     if (fa_view.num_seqs() == 0) {
@@ -142,7 +141,7 @@ void generate_all(const ArtParams& art_params)
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
-                pbsim3_template_stream.close();
+                pbsim3_transcript_stream.close();
             }
         } else {
             throw std::runtime_error("Unsupported input file type");
