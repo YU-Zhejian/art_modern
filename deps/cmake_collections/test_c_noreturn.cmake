@@ -40,7 +40,7 @@ ceu_cm_enhanced_try_run(
 
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        TRUE
+        ON
         CACHE INTERNAL "This file was included")
     ceu_cm_print_test_status("_Noreturn (c)" C__NORETURN)
     ceu_cm_print_test_status("noreturn (c)" C_NORETURN)

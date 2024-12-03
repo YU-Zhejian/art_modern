@@ -11,7 +11,7 @@ namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
 {
-    const hts_pos_t pos = pwa.pos_on_contig + 1; // SAM is 1-based
+    const auto pos = pwa.pos_on_contig + 1; // SAM is 1-based
     const auto strand = pwa.is_plus_strand ? '+' : '-';
     const auto cigar_str = cigar_arr_to_str(cigar);
     std::ostringstream oss;
@@ -46,7 +46,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_ref++;
             }
         } else if (this_cigar_ops == BAM_CMATCH) {
-            for (int j = 0; j < this_cigar_len; ++j) {
+            for (decltype(this_cigar_len) j = 0; j < this_cigar_len; ++j) {
                 if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) {
                     ++matched;
                 } else {

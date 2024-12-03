@@ -27,7 +27,7 @@ function(ceu_cm_enhanced_try_run)
     # Unconditional skip
     if(DEFINED SKIP_ALL_TRY_RUN)
         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-            TRUE
+            ON
             CACHE INTERNAL "SKIP_ALL_TRY_RUN was set, skip all tests.")
         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
             0
@@ -57,7 +57,7 @@ function(ceu_cm_enhanced_try_run)
             endif()
 
             set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                TRUE
+                ON
                 CACHE INTERNAL "doc")
             set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
                 0
@@ -67,11 +67,12 @@ function(ceu_cm_enhanced_try_run)
     endif()
 
     # Start processing
-    if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX})
+    if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX} OR
+            NOT CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX} EQUAL 0)
         message(STATUS "CEU_CM: Finding and assessing ${TARGET_POSTFIX} ${CEU_CM_ENHANCED_TRY_RUN_VARNAME}")
 
         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-            FALSE
+            OFF
             CACHE INTERNAL "Default to fail.")
         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
             127
@@ -85,7 +86,7 @@ function(ceu_cm_enhanced_try_run)
                 if(DEFINED CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX})
                     if(NOT ${CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX}})
                         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                                FALSE
+                                OFF
                                 CACHE INTERNAL
                                 "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX} failed.")
                     endif()
@@ -104,7 +105,7 @@ function(ceu_cm_enhanced_try_run)
                     endif()
                 else()
                     set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                        FALSE
+                        OFF
                         CACHE INTERNAL
                               "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_RUN_${TARGET_POSTFIX} undefined.")
                     message(FATAL_ERROR "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_RUN_${TARGET_POSTFIX} is not undefined")
@@ -118,7 +119,7 @@ function(ceu_cm_enhanced_try_run)
                     continue()
                 elseif(NOT CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARY) # If the library is not found
                     set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                        FALSE
+                        OFF
                         CACHE INTERNAL "Dependency ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARY} not found.")
                     set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
                         127

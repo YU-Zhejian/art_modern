@@ -43,7 +43,7 @@ ceu_cm_enhanced_try_run(
     ${LIBM_LIBRARY_STATIC})
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        TRUE
+        ON
         CACHE INTERNAL "This file was included")
     ceu_cm_print_test_status("libm: without -lm (c)" C_NO_LIBM)
     ceu_cm_print_test_status("libm: with -lm (c)" C_WITH_LIBM)

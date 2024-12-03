@@ -11,7 +11,7 @@ Function:
     - Check whether the CMake variable `CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED` was set. If so, skip all processes described below. if not, set this variable.
     - Detect C/C++ preprocessor macros. If this is not a C/C++ project, this step would be omitted.
     - Detect whether test should be built. If CMake variable `CEU_CM_SHOULD_ENABLE_TEST` was set, would skip this step. Otherwise, will setup test if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`.
-    - Detect whether we should build the application with native hardware support. If CMake variable `CEU_CM_SHOULD_USE_NATIVE` was not set, would set it to `FALSE`. If this variable was set `TRUE`, would try and set `-march=native` `-mtune=native` `-mtune` flags.
+    - Detect whether we should build the application with native hardware support. If CMake variable `CEU_CM_SHOULD_USE_NATIVE` was not set, would set it to `OFF`. If this variable was set `ON`, would try and set `-march=native` `-mtune=native` `-mtune` flags.
     - Detect build type using CMake variable `CMAKE_BUILD_TYPE`.
         - If `Release`, will supress warnings (`-W0` `-w`), supress debug information (`-g0`) and enable optimization (`-Ofast` `-O3` `-O2`)
         - If `RelWithDebInfo` (Release with Debug Information), will supress warnings, enable debug information (`-g`) and enable optimization.
@@ -75,12 +75,12 @@ function(ceu_cm_global_enhanced_check_compiler_flag)
             check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
         else()
             # If no C support is added, bypass the test.
-            set(C_COMPILER_HAVE_${FLAG} TRUE)
+            set(C_COMPILER_HAVE_${FLAG} ON)
         endif()
         if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER)
             check_cxx_compiler_flag(${FLAG} CXX_COMPILER_HAVE_${FLAG})
         else()
-            set(CXX_COMPILER_HAVE_${FLAG} TRUE)
+            set(CXX_COMPILER_HAVE_${FLAG} ON)
         endif()
         if(C_COMPILER_HAVE_${FLAG} AND CXX_COMPILER_HAVE_${FLAG})
             add_compile_options(${FLAG})
@@ -96,7 +96,7 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     set(CEU_CM_ADDITIONAL_COMPILER_FLAGS "")
     set(CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED
-        TRUE
+        ON
         CACHE INTERNAL "Whether a description on environment was printed.")
     # Detect C/CXX Pre-Processor Macros
     if(NOT MSVC)
@@ -107,11 +107,11 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     if(NOT DEFINED CEU_CM_SHOULD_ENABLE_TEST)
         if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
             set(CEU_CM_SHOULD_ENABLE_TEST
-                FALSE
+                OFF
                 CACHE INTERNAL "Test automatically disabled")
         else()
             set(CEU_CM_SHOULD_ENABLE_TEST
-                TRUE
+                ON
                 CACHE INTERNAL "Test automatically enabled")
         endif()
     endif()
@@ -120,7 +120,7 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     endif()
     # Detect native.
     if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
-        set(CEU_CM_SHOULD_USE_NATIVE FALSE)
+        set(CEU_CM_SHOULD_USE_NATIVE OFF)
     endif()
     if(CEU_CM_SHOULD_USE_NATIVE)
         ceu_cm_global_enhanced_check_compiler_flag(-march=native -mtune=native -mtune)

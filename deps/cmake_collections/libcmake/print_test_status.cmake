@@ -15,7 +15,7 @@ Requires:
 #]=======================================================================]
 macro(ceu_cm_print_test_status NAME VARNAME)
     set(CEU_CM_PRINTED_${NAME}
-        TRUE
+        ON
         CACHE INTERNAL "")
     message(
         STATUS
