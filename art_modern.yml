@@ -22,3 +22,7 @@ dependencies:
   - curl
   - pyfastx
   - fastqc
+  # Build tools
+  # - conda-forge::ninja
+  # - conda-forge::cmake
+  # - conda-forge::make

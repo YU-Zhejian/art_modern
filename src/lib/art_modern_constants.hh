@@ -20,9 +20,9 @@ const char SIMULATION_MODE_WGS[] = "wgs";
 const char SIMULATION_MODE_TRANS[] = "trans";
 const char SIMULATION_MODE_TEMPLATE[] = "template";
 
-enum class INPUT_FILE_TYPE { FASTA, PBSIM3_TEMPLATE };
+enum class INPUT_FILE_TYPE { FASTA, PBSIM3_TRANSCRIPTS };
 const char INPUT_FILE_TYPE_FASTA[] = "fasta";
-const char INPUT_FILE_TYPE_PBSIM3_TEMPLATE[] = "pbsim3_template";
+const char INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS[] = "pbsim3_transcripts";
 const char INPUT_FILE_TYPE_AUTO[] = "auto";
 
 enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM };

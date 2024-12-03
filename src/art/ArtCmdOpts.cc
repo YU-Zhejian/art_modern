@@ -78,7 +78,7 @@ po::options_description option_parser() noexcept
             .c_str());
     required_opts.add_options()(ARG_INPUT_FILE_TYPE, po::value<std::string>()->default_value(INPUT_FILE_TYPE_AUTO),
         (std::string() + "input file type, should be " + INPUT_FILE_TYPE_AUTO + ", " + INPUT_FILE_TYPE_FASTA + ", "
-            + INPUT_FILE_TYPE_PBSIM3_TEMPLATE + ".")
+            + INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS + ".")
             .c_str());
     required_opts.add_options()(ARG_BATCH_SIZE, po::value<int>()->default_value(DEFAULT_BATCH_SIZE),
         (std::string() + "Batch size for " + INPUT_FILE_PARSER_STREAM + " input parser").c_str());
@@ -200,8 +200,8 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
 {
     if (input_file_type_str == INPUT_FILE_TYPE_FASTA) {
         return INPUT_FILE_TYPE::FASTA;
-    } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TEMPLATE) {
-        return INPUT_FILE_TYPE::PBSIM3_TEMPLATE;
+    } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS) {
+        return INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS;
     } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
         for (const auto& fasta_file_end : std::vector<std::string> { "fna", "faa", "fa", "fasta" }) {
             if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
@@ -210,11 +210,11 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
         }
         BOOST_LOG_TRIVIAL(fatal) << "Automatic inference of input file type failed! Modify value of this param (--"
                                  << ARG_INPUT_FILE_TYPE << ") to be one of " << INPUT_FILE_TYPE_FASTA << ", "
-                                 << INPUT_FILE_TYPE_PBSIM3_TEMPLATE << ".";
+                                 << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ".";
         abort_mpi();
     } else {
         BOOST_LOG_TRIVIAL(fatal) << "Input file type (--" << ARG_INPUT_FILE_TYPE << ") should be one of "
-                                 << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TEMPLATE << ", "
+                                 << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ", "
                                  << INPUT_FILE_TYPE_AUTO << ".";
         abort_mpi();
     }
@@ -288,7 +288,7 @@ void validate_input_filename(const std::string& input_file_path, const std::stri
 CoverageInfo get_coverage_info(
     const std::string& fcov_arg_str, const INPUT_FILE_TYPE input_file_type, const SIMULATION_MODE simulation_mode)
 {
-    if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
+    if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS) {
         return CoverageInfo(0.0);
     }
 
@@ -480,12 +480,12 @@ void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_
 void validate_comp_mtx(const INPUT_FILE_PARSER input_file_parser, const SIMULATION_MODE art_simulation_mode,
     const INPUT_FILE_TYPE input_file_type)
 {
-    if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TEMPLATE) {
+    if (input_file_type == INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS) {
         if (art_simulation_mode == SIMULATION_MODE::WGS) {
-            BOOST_LOG_TRIVIAL(fatal) << "Input using PBSim3 transcripts format are not supported for WGS simulation.";
+            BOOST_LOG_TRIVIAL(fatal) << "Input using PBSIM3 transcripts format are not supported for WGS simulation.";
             abort_mpi();
         } else if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
-            BOOST_LOG_TRIVIAL(fatal) << "Input using PBSim3 transcripts format are not supported for HTSLib parser";
+            BOOST_LOG_TRIVIAL(fatal) << "Input using PBSIM3 transcripts format are not supported for HTSLib parser";
             abort_mpi();
         }
     }
