@@ -31,9 +31,9 @@ The simulators were asked to generate a 10X sequencing data of FASTQ format on b
 ### PC 2
 
 - **MODEL** Self-assembled HEDT.
-- **CPU** TODO
-- **MEM** TODO
-- **SSD** TODO
+- **CPU** Intel Core i9-10980XE
+- **MEM** G.Skill F4-3600C18-32GTRS
+- **SSD** WDC/HGST Ultrastar DC SA210 0TS1655 HBS3A1948A4M4B1
 - **OS** TODO
 - **KERNEL** TODO
 
