@@ -89,7 +89,6 @@ void generate_all(const ArtParams& art_params)
                     ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
-                // FIXME: fetch not closed!
             } else {
                 std::ifstream fasta_stream(art_params.input_file_name);
                 FastaStreamBatcher fsb(art_params.batch_size, fasta_stream);
