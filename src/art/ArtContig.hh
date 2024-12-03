@@ -22,13 +22,13 @@ public:
     const std::string seq_name;
 
 private:
-    hts_pos_t generate_fragment_length() const;
-    BaseFastaFetch* fasta_fetch_;
+    [[nodiscard]] hts_pos_t generate_fragment_length() const;
     const ArtParams& art_params_;
+    BaseFastaFetch* fasta_fetch_;
+    const hts_pos_t ref_len_;
     Rprob& rprob_;
     const size_t seq_id_;
     const hts_pos_t valid_region_;
-    const hts_pos_t ref_len_;
 };
 
 } // namespace labw::art_modern // namespace labw

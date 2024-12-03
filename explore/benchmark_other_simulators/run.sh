@@ -13,7 +13,7 @@ mkdir -p "${OUT_DIR}"
 function run() {
     /bin/time -a -o time.tsv -f "${1}"'\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c\t%C' "${@:2}"
 }
-function recreate_data_out(){
+function recreate_data_out() {
     rm -rf "${OUT_DIR:?}"/*
     mkdir -p "${OUT_DIR}"
 }

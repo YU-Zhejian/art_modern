@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include "LockFreeIO.hh"
-#include "out/BaseReadOutput.hh"
+#include "out/BaseFileReadOutput.hh"
 
 namespace labw::art_modern {
 class PwaLFIO : public LockFreeIO<std::ostringstream> {
@@ -23,7 +23,7 @@ private:
     std::ostream& out_;
 };
 
-class PwaReadOutput : public BaseReadOutput {
+class PwaReadOutput : public BaseFileReadOutput {
 public:
     PwaReadOutput(PwaReadOutput&& other) = delete;
     PwaReadOutput(const PwaReadOutput&) = delete;
@@ -40,8 +40,6 @@ public:
 
 private:
     std::ofstream file_;
-    const std::string filename;
-    bool is_closed_;
     PwaLFIO lfio_;
 };
 

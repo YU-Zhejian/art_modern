@@ -1,11 +1,11 @@
 #pragma once
 
 #include "BamUtils.hh"
-#include "out/BamReadOutput.hh"
+#include "out/BaseFileReadOutput.hh"
 
 namespace labw::art_modern {
 
-class HeadlessBamReadOutput : public BaseReadOutput {
+class HeadlessBamReadOutput : public BaseFileReadOutput {
 public:
     HeadlessBamReadOutput(HeadlessBamReadOutput&& other) = delete;
     HeadlessBamReadOutput(const HeadlessBamReadOutput&) = delete;
@@ -22,8 +22,6 @@ private:
     samFile* sam_file_;
     sam_hdr_t* sam_header_;
     const SamOptions sam_options_;
-    bool is_closed_ = false;
-    const std::string filename;
     BamLFIO lfio_;
 };
 

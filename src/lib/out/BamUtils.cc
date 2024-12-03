@@ -85,19 +85,20 @@ void BamUtils::write(samFile* fp, const sam_hdr_t* h, const bam1_t* b)
     CExceptionsProxy::assert_numeric(sam_write1(fp, h, b), USED_HTSLIB_NAME, "Failed to write SAM/BAM record", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 }
-sam_hdr_t *BamUtils::init_header(const SamOptions &sam_options)
+sam_hdr_t* BamUtils::init_header(const SamOptions& sam_options)
 {
-    auto sam_header = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
+    auto sam_header
+        = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
 
     CExceptionsProxy::assert_numeric(
         sam_hdr_add_line(sam_header, "HD", "VN", sam_options.HD_VN.c_str(), "SO", sam_options.HD_SO.c_str(), NULL),
         USED_HTSLIB_NAME, "Failed to add HD header line");
     CExceptionsProxy::assert_numeric(sam_hdr_add_line(sam_header, "PG", "ID", sam_options.PG_ID.c_str(), "PN",
-                                                      sam_options.PG_PN.c_str(), "CL", sam_options.PG_CL.c_str(), NULL),
-                                     USED_HTSLIB_NAME, "Failed to add PG header line", false, CExceptionsProxy::EXPECTATION::ZERO);
+                                         sam_options.PG_PN.c_str(), "CL", sam_options.PG_CL.c_str(), NULL),
+        USED_HTSLIB_NAME, "Failed to add PG header line", false, CExceptionsProxy::EXPECTATION::ZERO);
     return sam_header;
 }
-samFile *BamUtils::open_file(const std::string &filename, const SamOptions& sam_options)
+samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_options)
 {
     return CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");

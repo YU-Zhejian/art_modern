@@ -12,7 +12,7 @@
 
 namespace labw::art_modern {
 
-    class ArtJobPool {
+class ArtJobPool {
 public:
     explicit ArtJobPool(const ArtParams& art_params);
     void add(ArtJobExecutor aje);

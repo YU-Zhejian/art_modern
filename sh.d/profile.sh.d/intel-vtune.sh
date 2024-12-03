@@ -19,7 +19,7 @@ env -C "${PROFILE_DIR}" ninja -j120
 "${PROFILE_DIR}"/art_modern --version
 ldd "${PROFILE_DIR}"/art_modern
 
-for collect in memory-consumption io threading hotspots; do # hpc-performance memory-access
+for collect in threading hotspots; do # hpc-performance memory-access memory-consumption io
     rm -fr "${PROFILE_DIR}"/vtune-"${collect}"
     vtune \
         -collect="${collect}" \
@@ -33,7 +33,7 @@ for collect in memory-consumption io threading hotspots; do # hpc-performance me
         --mode wgs \
         --lc pe \
         --i-parser memory \
-        --i-fcov 4 \
+        --i-fcov 40 \
         --parallel 0 \
         --ins_rate_1 0.1 \
         --del_rate_1 0.1 \

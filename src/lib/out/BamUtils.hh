@@ -8,7 +8,8 @@
 
 namespace labw::art_modern {
 
-void assert_correct_cigar([[maybe_unused]] const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
+void assert_correct_cigar(
+    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar);
 
 class BamUtils {
 public:
@@ -22,8 +23,8 @@ public:
     static std::pair<int32_t, std::string> generate_nm_md_tag(
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
     static bam1_t* init();
-    static sam_hdr_t * init_header(const SamOptions& sam_options);
-    static samFile * open_file(const std::string& filename, const SamOptions& sam_options);
+    static sam_hdr_t* init_header(const SamOptions& sam_options);
+    static samFile* open_file(const std::string& filename, const SamOptions& sam_options);
     static void write(samFile* fp, const sam_hdr_t* h, const bam1_t* b);
 };
 
@@ -52,6 +53,7 @@ public:
         , h_(h)
     {
     }
+    ~BamLFIO() override { stop(); };
 
 private:
     samFile* fp_;

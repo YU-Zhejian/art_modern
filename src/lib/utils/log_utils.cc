@@ -52,17 +52,13 @@ void init_file_logger(const std::string& log_dir)
             logging::keywords::filter = expr::attr<int>("MPIRank") == i);
     }
     std::stringstream file_name_ss;
-    file_name_ss << log_dir << "/"
-                 << "nompi"
-                 << ".log";
+    file_name_ss << log_dir << "/" << "nompi" << ".log";
     logging::add_file_log(logging::keywords::file_name = file_name_ss.str(),
         logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%",
         logging::keywords::filter = expr::attr<int>("MPIRank") == MPI_UNAVAILABLE_RANK);
 #else
     std::stringstream file_name_ss;
-    file_name_ss << log_dir << "/"
-                 << "nompi"
-                 << ".log";
+    file_name_ss << log_dir << "/" << "nompi" << ".log";
     logging::add_file_log(logging::keywords::file_name = file_name_ss.str(),
         logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%] %Severity%: %Message%");
 #endif

@@ -30,12 +30,10 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
 PwaReadOutput::PwaReadOutput(const std::string& filename)
     : file_(filename)
-    , filename(filename)
-    , is_closed_(false)
+    , BaseFileReadOutput(filename)
     , lfio_(file_)
 {
     lfio_.start();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
 void PwaReadOutput::close()
@@ -45,8 +43,7 @@ void PwaReadOutput::close()
     }
     lfio_.stop();
     file_.flush();
-    file_.close();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
+    BaseFileReadOutput::close();
 }
 void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

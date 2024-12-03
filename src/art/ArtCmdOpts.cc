@@ -322,7 +322,6 @@ void validate_min_max_qual(const int min_qual, const int max_qual)
     }
 }
 
-
 void validate_qual_files(
     const std::string& qual_file_1, const std::string& qual_file_2, const ART_LIB_CONST_MODE art_lib_const_mode)
 {

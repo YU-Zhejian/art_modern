@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
-#include <utility>
 
 #include "BamReadOutput.hh"
 #include "CExceptionsProxy.hh"
@@ -127,18 +126,18 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     lfio_.push(sam_record2);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
-BamReadOutput::BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, const SamOptions &sam_options)
-    : sam_file_(BamUtils::open_file(filename,sam_options))
+BamReadOutput::BamReadOutput(
+    const std::string& filename, const BaseFastaFetch* fasta_fetch, const SamOptions& sam_options)
+    : BaseFileReadOutput(filename)
+    , sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
-    , filename(filename)
     , lfio_(sam_file_, sam_header_)
 {
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
     lfio_.start();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
 void BamReadOutput::close()
@@ -149,8 +148,7 @@ void BamReadOutput::close()
     lfio_.stop();
     sam_close(sam_file_);
     sam_hdr_destroy(sam_header_);
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
-    is_closed_ = true;
+    BaseFileReadOutput::close();
 }
 void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

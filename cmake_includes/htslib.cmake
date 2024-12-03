@@ -1,6 +1,7 @@
 if(DEFINED USE_HTSLIB)
     if(BUILD_SHARED_LIBS)
-        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG ${USE_HTSLIB} PKGCONFIG_NAME htslib)
+        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG ${USE_HTSLIB} PKGCONFIG_NAME
+                                     htslib)
     else()
         ceu_cm_enhanced_find_library(
             OUTPUT_VARIABLE

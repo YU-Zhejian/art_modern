@@ -3,12 +3,11 @@
 #include <fstream>
 
 #include "SimpleLFIO.hh"
-#include "out/BaseReadOutput.hh"
+#include "out/BaseFileReadOutput.hh"
 
 namespace labw::art_modern {
 
-
-class FastqReadOutput : public BaseReadOutput {
+class FastqReadOutput : public BaseFileReadOutput {
 public:
     FastqReadOutput(FastqReadOutput&& other) = delete;
     FastqReadOutput(const FastqReadOutput&) = delete;
@@ -22,8 +21,6 @@ public:
 
 private:
     std::ofstream file_;
-    const std::string filename;
-    bool is_closed_;
     SimpleLFIO lfio_;
 };
 

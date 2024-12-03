@@ -1,5 +1,6 @@
 #include "HeadlessBamReadOutput.hh"
 #include "CExceptionsProxy.hh"
+#include "DumbReadOutput.hh"
 #include "art_modern_config.h"
 #include "utils/seq_utils.hh"
 #include <boost/algorithm/string/join.hpp>
@@ -9,16 +10,15 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options)
-    : sam_file_(BamUtils::open_file(filename,sam_options))
+    : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
-    , filename(filename)
+    , BaseFileReadOutput(filename)
     , lfio_(sam_file_, sam_header_)
 {
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
     lfio_.start();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
@@ -72,9 +72,6 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
     const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
 
-    auto qual1 = pwa1.qual;
-    auto qual2 = pwa2.qual;
-
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
 
@@ -82,11 +79,9 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     assert_correct_cigar(pwa2, cigar2);
 
     if (!pwa1.is_plus_strand) {
-        std::reverse(qual1.begin(), qual1.end());
         std::reverse(cigar1.begin(), cigar1.end());
     }
-    if (!pwa1.is_plus_strand) {
-        std::reverse(qual2.begin(), qual2.end());
+    if (!pwa2.is_plus_strand) {
         std::reverse(cigar2.begin(), cigar2.end());
     }
 
@@ -117,7 +112,7 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq1.c_str(), qual1.c_str(), tags1.size()),
+            rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2, pwa2.read_name.size(), pwa2.read_name.c_str(),
@@ -130,8 +125,14 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq2.c_str(), qual2.c_str(), tags2.size()),
+            rlen, seq2.c_str(), pwa2.qual.c_str(), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+
+    if (!pwa1.is_plus_strand) {
+        reverse(bam_get_qual(sam_record1), rlen);
+    } else {
+        reverse(bam_get_qual(sam_record2), rlen);
+    }
 
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);
@@ -147,8 +148,7 @@ void HeadlessBamReadOutput::close()
     lfio_.stop();
     sam_close(sam_file_);
     sam_hdr_destroy(sam_header_);
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
-    is_closed_ = true;
+    BaseFileReadOutput::close();
 }
 HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close(); }
 
