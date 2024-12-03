@@ -1,8 +1,8 @@
 #pragma once
 
 #include <boost/lockfree/queue.hpp>
-#include <thread>
 #include <random>
+#include <thread>
 
 namespace labw::art_modern {
 
@@ -10,12 +10,13 @@ template <typename T> class LockFreeIO {
 public:
     static const int QUEUE_SIZE = 65534;
     LockFreeIO()
-        : queue(), dis_(100, 1000) {};
-    ~LockFreeIO() = default;
+        : dis_(100, 1000)
+        , queue() {};
+    virtual ~LockFreeIO() { stop(); };
     void push(T* value)
     {
         while (!queue.push(value)) {
-            std::this_thread::sleep_for(std::chrono::nanoseconds (dis_(gen_)));
+            // std::this_thread::sleep_for(std::chrono::nanoseconds(dis_(gen_)));
         }
     }
     void start() { thread_ = std::thread(&LockFreeIO::run, this); }
@@ -30,11 +31,11 @@ public:
     virtual void write(T* value) = 0;
 
 private:
-    boost::lockfree::queue<T*, boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<QUEUE_SIZE>> queue;
-    std::thread thread_;
-    std::atomic<bool> should_stop_ = false;
-    std::minstd_rand gen_;
     std::uniform_int_distribution<int> dis_;
+    std::minstd_rand gen_;
+    boost::lockfree::queue<T*, boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<QUEUE_SIZE>> queue;
+    std::atomic<bool> should_stop_ = false;
+    std::thread thread_;
 
     void run()
     {

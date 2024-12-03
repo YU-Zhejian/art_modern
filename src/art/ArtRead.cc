@@ -22,10 +22,10 @@ void ArtRead::generate_pairwise_aln()
             pos_on_ref++;
         } else if (indel_[k] == ALN_GAP) { // Deletion
             aln_read_[k] = ALN_GAP;
-            aln_ref_[k] =seq_ref[pos_on_ref];
+            aln_ref_[k] = seq_ref[pos_on_ref];
             pos_on_ref++;
         } else { // Insertion
-            aln_read_[k] =indel_[k];
+            aln_read_[k] = indel_[k];
             aln_ref_[k] = ALN_GAP;
             pos_on_read++;
         }

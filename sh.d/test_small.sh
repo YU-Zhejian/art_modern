@@ -20,7 +20,6 @@ function sam2bam() {
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
-
 . sh.d/test_small.sh.d/out_fmts.sh       # Test all output is working
 . sh.d/test_small.sh.d/wgs.sh            # WGS mode (with constant coverage)
 . sh.d/test_small.sh.d/trans_constcov.sh # Transcript mode with constant coverage
@@ -29,4 +28,4 @@ function sam2bam() {
 . sh.d/test_small.sh.d/tmpl_scov.sh      # Template mode with stranded/strandless coverage
 . sh.d/test_small.sh.d/trans_pbsim3.sh   # Transcript mode with pbsim3-formatted coverage
 . sh.d/test_small.sh.d/tmpl_pbsim3.sh    # Template mode with pbsim3-formatted coverage
-rm -d "${OUT_DIR}"                                # Which should now be empty
+rm -d "${OUT_DIR}"                       # Which should now be empty

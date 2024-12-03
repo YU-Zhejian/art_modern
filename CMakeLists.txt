@@ -61,7 +61,8 @@ message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 if(CEU_CM_SHOULD_ENABLE_TEST)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
 endif()
-configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in" "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in"
+               "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src/lib")
 include_directories("${CMAKE_BINARY_DIR}/include/")
@@ -100,22 +101,16 @@ else()
     message(NOTICE "Testing disabled since Boost::unit_test_framework was not found")
 endif()
 
-# if(CEU_CM_SHOULD_ENABLE_TEST)
-#     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
+# if(CEU_CM_SHOULD_ENABLE_TEST) file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
-#     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
-#         get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE)
-#         set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
-#         add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
-#         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
-#     endforeach()
-# endif()
+# foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES}) get_filename_component(ART_MODERN_BENCHMARK_EXEC
+# "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE) set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
+# add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
+# target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib) endforeach() endif()
 
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
 
-# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES})
-#     get_filename_component(ART_MODERN_UTIL_EXEC "${ART_MODERN_UTIL_SOURCE}" NAME_WLE)
-#     set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
-#     add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}")
-#     target_link_libraries("${ART_MODERN_UTIL_EXEC}" art_modern_lib)
-# endforeach()
+# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES}) get_filename_component(ART_MODERN_UTIL_EXEC
+# "${ART_MODERN_UTIL_SOURCE}" NAME_WLE) set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
+# add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}") target_link_libraries("${ART_MODERN_UTIL_EXEC}"
+# art_modern_lib) endforeach()

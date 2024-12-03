@@ -28,15 +28,10 @@ ArtJobPool::ArtJobPool(const ArtParams& art_params)
 
 void ArtJobPool::add(ArtJobExecutor aje)
 {
-    boost::asio::post(pool_, [this_aje = std::move(aje)]() mutable {
-        this_aje.execute();
-    });
+    boost::asio::post(pool_, [this_aje = std::move(aje)]() mutable { this_aje.execute(); });
 }
 
-void ArtJobPool::stop()
-{
-    pool_.join();
-}
+void ArtJobPool::stop() { pool_.join(); }
 
 #endif
 

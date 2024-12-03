@@ -5,23 +5,27 @@
 
 namespace labw::art_modern {
 
-    std::string* format_fastq(const PairwiseAlignment& pwa){
-        auto* outs = new std::string;
-        std::size_t strsize = pwa.read_name.size() +( pwa.query.size() <<1) + 6;
-        outs->resize(strsize);
-        outs->at(0) = 0;
-        std::snprintf(outs->data(), strsize, "@%s\n%s\n+\n%s\n", pwa.read_name.c_str(), pwa.query.c_str(), pwa.qual.c_str());
-        return outs;
-    }
+std::string* format_fastq(const PairwiseAlignment& pwa)
+{
+    auto* outs = new std::string;
+    std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 6;
+    outs->resize(strsize);
+    outs->at(0) = 0;
+    std::snprintf(
+        outs->data(), strsize + 1, "@%s\n%s\n+\n%s\n", pwa.read_name.c_str(), pwa.query.c_str(), pwa.qual.c_str());
+    return outs;
+}
 
-    std::string* format_fastq(const PairwiseAlignment& pwa, bool is_read1){
-        auto* outs = new std::string;
-        std::size_t strsize = pwa.read_name.size() +(pwa.query.size() <<1) + 8;
-        outs->resize(strsize);
-        outs->at(0) = 0;
-        std::snprintf(outs->data(), strsize, "@%s/%d\n%s\n+\n%s\n", pwa.read_name.c_str(), is_read1? 1:2, pwa.query.c_str(), pwa.qual.c_str());
-        return outs;
-    }
+std::string* format_fastq(const PairwiseAlignment& pwa, bool is_read1)
+{
+    auto* outs = new std::string;
+    std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;
+    outs->resize(strsize);
+    outs->at(0) = 0;
+    std::snprintf(outs->data(), strsize + 1, "@%s/%d\n%s\n+\n%s\n", pwa.read_name.c_str(), is_read1 ? 1 : 2,
+        pwa.query.c_str(), pwa.qual.c_str());
+    return outs;
+}
 
 void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
@@ -43,12 +47,10 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
     : file_(filename)
-    , filename(filename)
-    , is_closed_(false)
+    , BaseFileReadOutput(filename)
     , lfio_(file_)
 {
     lfio_.start();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 
 void FastqReadOutput::close()
@@ -59,8 +61,7 @@ void FastqReadOutput::close()
     lfio_.stop();
     file_.flush();
     file_.close();
-    BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' closed.";
-    is_closed_ = true;
+    BaseFileReadOutput::close();
 }
 void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
@@ -69,8 +70,8 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
         "Destination of output FASTQ file. Unset to disable the writer.");
     desc.add(fastq_desc);
 }
-BaseReadOutput* FastqReadOutputFactory::create(
-    const boost::program_options::variables_map& vm, const BaseFastaFetch*, [[maybe_unused]] const std::vector<std::string>& args) const
+BaseReadOutput* FastqReadOutputFactory::create(const boost::program_options::variables_map& vm, const BaseFastaFetch*,
+    [[maybe_unused]] const std::vector<std::string>& args) const
 {
     if (vm.count("o-fastq")) {
         return new FastqReadOutput(vm["o-fastq"].as<std::string>());

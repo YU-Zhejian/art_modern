@@ -1,23 +1,22 @@
 #pragma once
 #include "out/LockFreeIO.hh"
 
-    namespace labw::art_modern {
+namespace labw::art_modern {
 
 class SimpleLFIO : public LockFreeIO<std::string> {
-        public:
-            void write(std::string* value) override
-            {
-                out_ << *value;
-                delete value;
-            }
-            explicit SimpleLFIO(std::ostream& out)
-                    : out_(out)
-            {
-            }
+public:
+    void write(std::string* value) override
+    {
+        out_ << *value;
+        delete value;
+    }
+    explicit SimpleLFIO(std::ostream& out)
+        : out_(out)
+    {
+    }
 
-        private:
-            std::ostream& out_;
-        };
-    } // art_modern
+private:
+    std::ostream& out_;
+};
+} // art_modern
 // labw
-
