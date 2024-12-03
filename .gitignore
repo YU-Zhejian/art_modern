@@ -44,6 +44,7 @@ backtrace.dump
 log.d/
 tutorial_data
 /opt
+!.markdownlint.json
 
 # History files
 .Rhistory

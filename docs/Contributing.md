@@ -22,7 +22,7 @@ So, we developed `art_modern` with the following ideas:
 
 ### Create Development Environment
 
-Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
+Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also requires other dependencies. Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
 
 ```shell
 conda env create -f art_modern.yml
@@ -30,7 +30,7 @@ conda env create -f art_modern.yml
 
 Additional dependencies may include:
 
-- [GNU Make](https://www.gnu.org/software/makel) is required to perform miscellaneous tasks, such as formatting the code, running test cases, performing profiling, etc.
+- [GNU Make](https://www.gnu.org/software/make) is required to perform miscellaneous tasks, such as formatting the code, running test cases, performing profiling, etc.
 - [Ninja](https://ninja-build.org) is used as the generator for the build system in the development environment.
 
 ### Testing
@@ -41,29 +41,21 @@ Run `make testsmall` to run the integration tests using executables produced in 
 
 ### Profiling
 
-Run `./profile.sh intel-advisor` to run the profiler using Intel Advisor. You have to have it installed to run this. You may also profile the software using `intel-vtune` (for Intyel VTune Profiler), `nsys` (For NVidia Nsight Systems), or `valgrind` (for Valgrind Callgrind) as the first parameter.
+We have `./profile.sh ${PROFILER}` to perform profiling of the software with profiler `${PROFILER}`. Profilers may include:
+
+- `intel-advisor` for Intel Advisor. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
+- `intel-vtune` for Intel VTune Profiler. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
+- `nsys` for NVIDIA Nsight Systems. NVidia compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
+- `valgrind` for Valgrind Callgrind. GCC with `Debug` mode will be used since optimization may produce instructions that are not supported by Valgrind.
 
 ### Others
 
 - Run `make fmt` to format the code.
 - Run `make build` to build the executable using debug mode with default compiler found by CMake.
+- Run `make release` to build the executable using release mode with default compiler found by CMake.
 - Run `make scc` to count lines of code written.
 - Run `make touch` to touch all files in the repository. This works when CMake does strange things like compiling the source files again and again.
 - Run `make raw_data` to download essential test data useful to various integration tests, benchmarks, etc.
-
-## Design Topics
-
-### Parallelism
-
-The parallelization strategy of different modes and input parsers are as follows:
-
-| Parser \ Mode | `wgs`     | `trans`   | `templ`   |
-|---------------|-----------|-----------|-----------|
-| `memory`      | Coverage  | Batch     | Batch     |
-| `htslib`      | Coverage  | **ERROR** | **ERROR** |
-| `stream`      | **ERROR** | Batch     | Batch     |
-
-A proposed MPI-based parallelization strategy is in [TODO.md](TODO.md).
 
 ## Get Engaged
 
