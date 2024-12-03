@@ -68,7 +68,7 @@ std::string revcomp(const std::string& dna)
 std::string normalize(const std::string& dna)
 {
     std::string rets = dna;
-    std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c]; });
+    std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
     return rets;
 }
 

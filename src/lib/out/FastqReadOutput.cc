@@ -56,7 +56,7 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
     desc.add(fastq_desc);
 }
 BaseReadOutput* FastqReadOutputFactory::create(
-    const boost::program_options::variables_map& vm, const BaseFastaFetch*, const std::vector<std::string>& args) const
+    const boost::program_options::variables_map& vm, const BaseFastaFetch*, [[maybe_unused]] const std::vector<std::string>& args) const
 {
     if (vm.count("o-fastq")) {
         return new FastqReadOutput(vm["o-fastq"].as<std::string>());

@@ -9,7 +9,6 @@
 #ifndef LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 #define LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 
-#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -25,7 +24,7 @@ static inline int perform_sqrt(int num_of_rounds, int num_to_sqrt)
     }
     for (int round = 0; round < num_of_rounds; round++) {
         for (int i = 0; i < num_to_sqrt; i++) {
-            result[i] = sqrt(i);
+            result[i] = (i) / 2;
         }
     }
     free(result);

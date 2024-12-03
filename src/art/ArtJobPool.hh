@@ -11,32 +11,14 @@
 #endif
 
 namespace labw::art_modern {
-class Tick {
-public:
-    explicit Tick(const ArtParams& art_params);
-    void add(ArtJobExecutor* aje);
-    void start();
 
-    void stop();
-
-private:
-    std::atomic<bool> should_stop_ = false;
-    std::thread thread_;
-    std::vector<ArtJobExecutor*> ajes_;
-    const int read_size;
-    const int sleep_time = 5;
-
-    void run();
-};
-
-class ArtJobPool {
+    class ArtJobPool {
 public:
     explicit ArtJobPool(const ArtParams& art_params);
     void add(ArtJobExecutor aje);
     void stop();
 
 private:
-    Tick tick_;
 #if defined(USE_NOP_PARALLEL)
     std::mutex mutex_;
 #elif defined(USE_ASIO_PARALLEL)

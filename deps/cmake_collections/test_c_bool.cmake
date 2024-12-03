@@ -50,7 +50,7 @@ ceu_cm_enhanced_try_run(
 
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        TRUE
+        ON
         CACHE INTERNAL "This file was included")
     ceu_cm_print_test_status("_Bool (c)" C_UNDERLINE_BOOL_KEYWORD)
     ceu_cm_print_test_status("<stdbool.h> + bool (c)" C_STDBOOL)

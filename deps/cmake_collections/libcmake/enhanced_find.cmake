@@ -13,8 +13,8 @@ Params:
     - `IS_STATIC`: Whether to find static or dynamic libraries.
 
 Sample:
-    - `ceu_cm_get_abspath_from_linker_flag(OV z TRUE)` -> `libz.a`
-    - `ceu_cm_get_abspath_from_linker_flag(OV z FALSE)` -> `libz.so`
+    - `ceu_cm_get_abspath_from_linker_flag(OV z ON)` -> `libz.a`
+    - `ceu_cm_get_abspath_from_linker_flag(OV z OFF)` -> `libz.so`
 
 Sets:
     - `OUTPUT_VARIABLE`: Parent scope level.
@@ -90,8 +90,8 @@ Params:
     - `IS_STATIC`: Whether to find static or dynamic libraries.
 
 Sample:
-    - `ceu_cm_get_linker_flags_from_pkg_config(OV xrender TRUE)` -> `Xrender;X11;pthread;xcb;Xau;Xdmcp`
-    - `ceu_cm_get_linker_flags_from_pkg_config(OV xrender FALSE)` -> `Xrender;X11`
+    - `ceu_cm_get_linker_flags_from_pkg_config(OV xrender ON)` -> `Xrender;X11;pthread;xcb;Xau;Xdmcp`
+    - `ceu_cm_get_linker_flags_from_pkg_config(OV xrender OFF)` -> `Xrender;X11`
 
 Sets:
     - `OUTPUT_VARIABLE`: Parent scope level.
@@ -130,8 +130,8 @@ Params:
     - `IS_STATIC`: Whether to find static or dynamic libraries.
 
 Sample:
-    - `ceu_cm_get_library_abspath_from_pkg_config(OV xrender TRUE)` -> `/usr/lib/x86_64-linux-gnu/libXrender.a;/usr/lib/x86_64-linux-gnu/libX11.a;/usr/lib/x86_64-linux-gnu/libpthread.a;/usr/lib/x86_64-linux-gnu/libxcb.a;/usr/lib/x86_64-linux-gnu/libXau.a;/usr/lib/x86_64-linux-gnu/libXdmcp.a`
-    - `ceu_cm_get_library_abspath_from_pkg_config(OV xrender FALSE)` -> `/usr/lib/x86_64-linux-gnu/libXrender.so;/usr/lib/x86_64-linux-gnu/libX11.so`
+    - `ceu_cm_get_library_abspath_from_pkg_config(OV xrender ON)` -> `/usr/lib/x86_64-linux-gnu/libXrender.a;/usr/lib/x86_64-linux-gnu/libX11.a;/usr/lib/x86_64-linux-gnu/libpthread.a;/usr/lib/x86_64-linux-gnu/libxcb.a;/usr/lib/x86_64-linux-gnu/libXau.a;/usr/lib/x86_64-linux-gnu/libXdmcp.a`
+    - `ceu_cm_get_library_abspath_from_pkg_config(OV xrender OFF)` -> `/usr/lib/x86_64-linux-gnu/libXrender.so;/usr/lib/x86_64-linux-gnu/libX11.so`
 
 Sets:
     - `OUTPUT_VARIABLE`: Parent scope level.

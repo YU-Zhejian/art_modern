@@ -1,6 +1,6 @@
 if(NOT DEFINED CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED)
     set(CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED
-        TRUE
+        ON
         CACHE INTERNAL "Whether the CEU CM Git adapter was already included.")
     set(CEU_CM_GIT_COMMIT_HASH
         "Do not have Git VCS"

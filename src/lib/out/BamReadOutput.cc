@@ -25,16 +25,11 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     auto sam_record = BamUtils::init();
     const auto rlen = static_cast<long>(pwa.query.size());
-    auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
+    const auto& cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
 
     const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
-    auto qual = pwa.qual;
     const hts_pos_t pos = pwa.pos_on_contig;
-    if (!pwa.is_plus_strand) {
-        std::reverse(qual.begin(), qual.end());
-        std::reverse(cigar.begin(), cigar.end());
-    }
 
     const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
     BamTags tags;
@@ -47,9 +42,12 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
             0, // Unset for SE reads
             0, // Unset for SE reads
             0, // Unset for SE reads
-            rlen, seq.c_str(), qual.c_str(), tags.size()),
+            rlen, seq.c_str(), pwa.qual.c_str(), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-
+    if (!pwa.is_plus_strand) {
+        reverse(bam_get_qual(sam_record), rlen);
+        reverse(bam_get_cigar(sam_record), sam_record->core.n_cigar);
+    }
     tags.patch(sam_record);
 
     lfio_.push(sam_record);
@@ -66,8 +64,8 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     const auto rlen = static_cast<long>(pwa1.query.size());
 
-    auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
-    auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
+    const auto& cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
+    const auto& cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
 
     assert_correct_cigar(pwa1, cigar1);
     assert_correct_cigar(pwa2, cigar2);
@@ -89,22 +87,15 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     const hts_pos_t pos1 = pwa1.pos_on_contig;
     const hts_pos_t pos2 = pwa2.pos_on_contig;
 
-    auto qual1 = pwa1.qual;
-    auto qual2 = pwa2.qual;
-
     uint16_t flag1 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD1;
     uint16_t flag2 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD2;
 
     if (pwa1.is_plus_strand) {
         flag1 |= BAM_FMREVERSE;
         flag2 |= BAM_FREVERSE;
-        std::reverse(qual2.begin(), qual2.end());
-        std::reverse(cigar2.begin(), cigar2.end());
     } else {
         flag1 |= BAM_FREVERSE;
         flag2 |= BAM_FMREVERSE;
-        std::reverse(qual1.begin(), qual1.end());
-        std::reverse(cigar1.begin(), cigar1.end());
     }
 
     const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
@@ -115,12 +106,20 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
-            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(), qual1.c_str(), tags1.size()),
+            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2, pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
-            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(), qual2.c_str(), tags2.size()),
+            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(), pwa2.qual.c_str(), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+
+    if (pwa1.is_plus_strand) {
+        reverse(bam_get_qual(sam_record2), rlen);
+        reverse(bam_get_cigar(sam_record2), sam_record2->core.n_cigar);
+    } else {
+        reverse(bam_get_qual(sam_record1), rlen);
+        reverse(bam_get_cigar(sam_record1), sam_record1->core.n_cigar);
+    }
 
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);

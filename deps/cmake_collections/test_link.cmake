@@ -10,11 +10,11 @@ if(NOT DEFINED CEU_CM_TRY_COMP_LINK_STATIC)
 
     if(NOT CEU_CM_TRY_COMP_LINK_STATIC_RETV EQUAL 0)
         set(CEU_CM_TRY_COMP_LINK_STATIC
-            FALSE
+            OFF
             CACHE INTERNAL "doc")
     else()
         set(CEU_CM_TRY_COMP_LINK_STATIC
-            TRUE
+            ON
             CACHE INTERNAL "doc")
     endif()
 endif()
@@ -29,11 +29,11 @@ if(NOT DEFINED CEU_CM_TRY_COMP_LINK_SHARED)
         ERROR_FILE "${CMAKE_BINARY_DIR}/compile_logs/test_link_proj_shared_compile.err")
     if(NOT CEU_CM_TRY_COMP_LINK_SHARED_RETV EQUAL 0)
         set(CEU_CM_TRY_COMP_LINK_SHARED
-            FALSE
+            OFF
             CACHE INTERNAL "doc")
     else()
         set(CEU_CM_TRY_COMP_LINK_SHARED
-            TRUE
+            ON
             CACHE INTERNAL "doc")
     endif()
 endif()
