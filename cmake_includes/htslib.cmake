@@ -1,19 +1,19 @@
 if(DEFINED USE_HTSLIB)
     if(BUILD_SHARED_LIBS)
-        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG hts PKGCONFIG_NAME htslib)
+        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CMAKE_CM_LIBHTS_LIBRARY LINKER_FLAG ${USE_HTSLIB} PKGCONFIG_NAME htslib)
     else()
         ceu_cm_enhanced_find_library(
             OUTPUT_VARIABLE
             CMAKE_CM_LIBHTS_LIBRARY
             STATIC
             LINKER_FLAG
-            hts
+            ${USE_HTSLIB}
             PKGCONFIG_NAME
             htslib)
     endif()
 
     if(NOT CMAKE_CM_LIBHTS_LIBRARY)
-        message(FATAL_ERROR "htslib not found!")
+        message(FATAL_ERROR "htslib (${USE_HTSLIB}) not found!")
     endif()
 
     set(USED_HTSLIB_NAME "${CMAKE_CM_LIBHTS_LIBRARY}")
