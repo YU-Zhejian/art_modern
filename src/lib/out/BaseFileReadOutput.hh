@@ -1,11 +1,10 @@
 #pragma once
-#include <string>
 #include "BaseReadOutput.hh"
+#include <string>
 
 namespace labw::art_modern {
 
-
-class BaseFileReadOutput  : public BaseReadOutput {
+class BaseFileReadOutput : public BaseReadOutput {
 public:
     explicit BaseFileReadOutput(const std::string& filename);
     void close() override;
