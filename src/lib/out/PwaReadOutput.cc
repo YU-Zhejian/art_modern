@@ -1,3 +1,4 @@
+#include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
 
 #include "DumbReadOutput.hh"
@@ -28,11 +29,15 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
-PwaReadOutput::PwaReadOutput(const std::string& filename)
+PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args)
     : file_(filename)
     , BaseFileReadOutput(filename)
     , lfio_(file_)
 {
+    file_ << "#PWA\n";
+    file_ << "#ARGS: " << boost::algorithm::join(args, " ") << "\n";
+    file_.flush();
+
     lfio_.start();
 }
 
@@ -56,7 +61,7 @@ BaseReadOutput* PwaReadOutputFactory::create(
     const boost::program_options::variables_map& vm, const BaseFastaFetch*, const std::vector<std::string>& args) const
 {
     if (vm.count("o-pwa")) {
-        return new PwaReadOutput(vm["o-pwa"].as<std::string>());
+        return new PwaReadOutput(vm["o-pwa"].as<std::string>(), args);
     }
     return new DumbReadOutput();
 }

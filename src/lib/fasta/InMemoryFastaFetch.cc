@@ -69,10 +69,5 @@ InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
 {
 }
 
-// InMemoryFastaFetch::InMemoryFastaFetch(const InMemoryFastaFetch& other) noexcept
-//     : InMemoryFastaFetch(other.seq_names_, other.seqs_)
-//{
-// }
-
 InMemoryFastaFetch::~InMemoryFastaFetch() = default;
 }

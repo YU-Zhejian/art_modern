@@ -71,7 +71,7 @@ std::string PairwiseAlignment::serialize() const
     return os.str();
 }
 
-PairwiseAlignment PairwiseAlignment::deserialize(const std::vector<std::string>& serialized)
+PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)
 {
     const auto sep_pos = serialized[0].find('\t');
     const std::string& read_name_ = serialized[0].substr(1, sep_pos - 1);

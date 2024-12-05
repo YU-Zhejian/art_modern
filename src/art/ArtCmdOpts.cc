@@ -15,6 +15,7 @@
 #include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/Pbsim3TranscriptBatcher.hh"
 #include "out/OutputDispatcher.hh"
+#include "utils/fs_utils.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/version_utils.hh"
 
@@ -203,7 +204,7 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
     } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS) {
         return INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS;
     } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
-        for (const auto& fasta_file_end : std::vector<std::string> { "fna", "faa", "fa", "fasta" }) {
+        for (const auto& fasta_file_end : std::vector<std::string> { "fna", "fsa", "fa", "fasta" }) {
             if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
                 return INPUT_FILE_TYPE::FASTA;
             }
@@ -217,19 +218,6 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
                                  << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ", "
                                  << INPUT_FILE_TYPE_AUTO << ".";
         abort_mpi();
-    }
-}
-
-long get_file_size(const std::string& file_path) noexcept
-{
-    if (!boost::filesystem::is_regular_file(file_path)) {
-        return -1;
-    } else {
-        try {
-            return static_cast<long>(boost::filesystem::file_size(file_path));
-        } catch (const boost::filesystem::filesystem_error&) {
-            return -1;
-        }
     }
 }
 
@@ -261,27 +249,6 @@ INPUT_FILE_PARSER get_input_file_parser(
                                  << INPUT_FILE_PARSER_MEMORY << ", " << INPUT_FILE_PARSER_HTSLIB << ", "
                                  << INPUT_FILE_PARSER_STREAM << ", " << INPUT_FILE_PARSER_AUTO << ".";
         abort_mpi();
-    }
-}
-
-void validate_input_filename(const std::string& input_file_path, const std::string& arg_name)
-{
-    if (input_file_path.empty()) {
-        BOOST_LOG_TRIVIAL(fatal) << "An input file path for --" << arg_name << " must be specified.";
-        abort_mpi();
-    }
-    if (!boost::filesystem::exists(input_file_path)) {
-        BOOST_LOG_TRIVIAL(fatal) << "Input file for --" << arg_name << " at '" << input_file_path
-                                 << "' does not exist.";
-        abort_mpi();
-    }
-    if (!boost::filesystem::is_regular_file(input_file_path)) {
-        BOOST_LOG_TRIVIAL(warning) << "Input file for --" << arg_name << " at '" << input_file_path
-                                   << "' is not a regular file.";
-#ifdef WITH_MPI
-        BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
-        abort_mpi();
-#endif
     }
 }
 

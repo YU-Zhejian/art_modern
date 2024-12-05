@@ -30,7 +30,7 @@ public:
     PwaReadOutput& operator=(PwaReadOutput&&) = delete;
     PwaReadOutput& operator=(const PwaReadOutput&) = delete;
 
-    explicit PwaReadOutput(const std::string& filename);
+    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
 
