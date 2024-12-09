@@ -1,13 +1,11 @@
-#include <boost/log/trivial.hpp>
-
 #include "DumbReadOutput.hh"
 #include "FastqReadOutput.hh"
 
 namespace labw::art_modern {
 
-std::string* format_fastq(const PairwiseAlignment& pwa)
+std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
 {
-    auto* outs = new std::string;
+    auto outs = std::make_unique<std::string>();
     std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 6;
     outs->resize(strsize);
     outs->at(0) = 0;
@@ -16,9 +14,9 @@ std::string* format_fastq(const PairwiseAlignment& pwa)
     return outs;
 }
 
-std::string* format_fastq(const PairwiseAlignment& pwa, bool is_read1)
+std::unique_ptr<std::string>  format_fastq(const PairwiseAlignment& pwa, bool is_read1)
 {
-    auto* outs = new std::string;
+    auto outs = std::make_unique<std::string>();
     std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;
     outs->resize(strsize);
     outs->at(0) = 0;
@@ -46,8 +44,8 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
-    : file_(filename)
-    , BaseFileReadOutput(filename)
+    : BaseFileReadOutput(filename)
+    , file_(filename)
     , lfio_(file_)
 {
     lfio_.start();

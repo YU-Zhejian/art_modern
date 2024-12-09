@@ -10,10 +10,10 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const SamOptions& sam_options)
-    : sam_file_(BamUtils::open_file(filename, sam_options))
+    : BaseFileReadOutput(filename)
+    , sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
-    , BaseFileReadOutput(filename)
     , lfio_(sam_file_, sam_header_)
 {
     CExceptionsProxy::assert_numeric(
@@ -56,8 +56,8 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
                                          rlen, seq.c_str(), qual.c_str(), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     tags.patch(sam_record);
-
-    lfio_.push(sam_record);
+    auto unique_sam_record = std::make_unique<bam1_t*>(sam_record);
+    lfio_.push(std::move(unique_sam_record));
 }
 void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
@@ -137,8 +137,10 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);
 
-    lfio_.push(sam_record1);
-    lfio_.push(sam_record2);
+    auto unique_sam_record1 = std::make_unique<bam1_t*>(sam_record1);
+    auto unique_sam_record2 = std::make_unique<bam1_t*>(sam_record2);
+    lfio_.push(std::move(unique_sam_record1));
+    lfio_.push(std::move(unique_sam_record2));
 }
 void HeadlessBamReadOutput::close()
 {

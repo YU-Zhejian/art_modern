@@ -1,8 +1,30 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2317
-AMD_COMPILER_PATH="/opt/AMD/aocc-compiler-5.0.0/"
-AMD_UPROF_PATH="/opt/AMDuProf_5.0-1479/"
-AMD_AOCL_PATH="/opt/AMD/aocl/aocl-linux-aocc-5.0.0/aocc/"
+AMD_COMPILER_PATH="${AMD_COMPILER_PATH:-/opt/AMD/aocc-compiler-5.0.0/}"
+AMD_UPROF_PATH="${AMD_COMPILER_PATH:-/opt/AMDuProf_5.0-1479/}"
+AMD_AOCL_PATH="${AMD_COMPILER_PATH:-/opt/AMD/aocl/aocl-linux-aocc-5.0.0/aocc/}"
+
+if [ ! -d "${AMD_COMPILER_PATH}" ]; then
+    echo "AMD compiler not found at ${AMD_COMPILER_PATH}"
+    exit 1
+else
+    echo "AMD compiler found at ${AMD_COMPILER_PATH}"
+fi
+
+if [ ! -d "${AMD_UPROF_PATH}" ]; then
+    echo "AMD uprof not found at ${AMD_UPROF_PATH}"
+    exit 1
+else
+    echo "AMD uprof found at ${AMD_UPROF_PATH}"
+fi
+
+if [ ! -d "${AMD_AOCL_PATH}" ]; then
+    echo "AMD AOCL not found at ${AMD_AOCL_PATH}"
+    exit 1
+else
+    echo "AMD AOCL found at ${AMD_AOCL_PATH}"
+fi
+
 set +ue
 . "${AMD_COMPILER_PATH}"/setenv_AOCC.sh
 . "${AMD_AOCL_PATH}"/amd-libs.cfg

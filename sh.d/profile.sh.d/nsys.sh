@@ -1,7 +1,14 @@
 #!/usr/bin/env bash
-export NVIDIA_HPC_SDK_PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/2024/"
-
 set -ue
+export NVIDIA_HPC_SDK_PATH="${NVIDIA_HPC_SDK_PATH:-/opt/nvidia/hpc_sdk/Linux_x86_64/2024/}"
+
+if [ ! -d "${NVIDIA_HPC_SDK_PATH}" ]; then
+    echo "NVIDIA HPC SDK not found at ${NVIDIA_HPC_SDK_PATH}"
+    exit 1
+else
+    echo "NVIDIA HPC SDK found at ${NVIDIA_HPC_SDK_PATH}"
+fi
+
 PROFILE_DIR=opt/build_profile_nsys
 mkdir -p "${PROFILE_DIR}"
 
