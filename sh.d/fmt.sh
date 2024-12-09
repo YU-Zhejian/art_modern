@@ -79,7 +79,7 @@ which dos2unix &>/dev/null &&
         if [ -e "${line}" ]; then
             {
                 echo DOS2UNIX "${line}"
-                dos2unix --newline --keepdate "${line}" &>>/dev/null
+                dos2unix --keepdate "${line}" &>>/dev/null
             } &
         fi
     done

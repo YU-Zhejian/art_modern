@@ -22,7 +22,7 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    auto sam_record = BamUtils::init();
+    auto sam_record = BamUtils::init_uptr();
     const auto rlen = static_cast<long>(pwa.query.size());
     const auto& cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
@@ -36,21 +36,20 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     tags.add_int_i("NM", nm_tag);
 
     CExceptionsProxy::assert_numeric(
-        bam_set1(sam_record, pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE, tid,
-            pos, MAPQ_MAX, cigar.size(), cigar.data(),
+        bam_set1(sam_record.get(), pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE,
+            tid, pos, MAPQ_MAX, cigar.size(), cigar.data(),
             0, // Unset for SE reads
             0, // Unset for SE reads
             0, // Unset for SE reads
             rlen, seq.c_str(), pwa.qual.c_str(), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
-        reverse(bam_get_qual(sam_record), rlen);
-        reverse(bam_get_cigar(sam_record), sam_record->core.n_cigar);
+        reverse(bam_get_qual(sam_record.get()), rlen);
+        reverse(bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
     }
-    tags.patch(sam_record);
-    auto unique_sam_record = std::make_unique<bam1_t*>(sam_record);
+    tags.patch(sam_record.get());
 
-    lfio_.push(std::move(unique_sam_record));
+    lfio_.push(std::move(sam_record));
 }
 
 void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -101,32 +100,30 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
     const hts_pos_t isize2 = -isize1;
 
-    auto sam_record1 = BamUtils::init();
-    auto sam_record2 = BamUtils::init();
+    auto sam_record1 = BamUtils::init_uptr();
+    auto sam_record2 = BamUtils::init_uptr();
 
     CExceptionsProxy::assert_numeric(
-        bam_set1(sam_record1, pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
+        bam_set1(sam_record1.get(), pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
             cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
-        bam_set1(sam_record2, pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
+        bam_set1(sam_record2.get(), pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
             cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(), pwa2.qual.c_str(), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     if (pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record2), rlen);
-        reverse(bam_get_cigar(sam_record2), sam_record2->core.n_cigar);
+        reverse(bam_get_qual(sam_record2.get()), rlen);
+        reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
     } else {
-        reverse(bam_get_qual(sam_record1), rlen);
-        reverse(bam_get_cigar(sam_record1), sam_record1->core.n_cigar);
+        reverse(bam_get_qual(sam_record1.get()), rlen);
+        reverse(bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
     }
 
-    tags1.patch(sam_record1);
-    tags2.patch(sam_record2);
-    auto unique_sam_record1 = std::make_unique<bam1_t*>(sam_record1);
-    auto unique_sam_record2 = std::make_unique<bam1_t*>(sam_record2);
-    lfio_.push(std::move(unique_sam_record1));
-    lfio_.push(std::move(unique_sam_record2));
+    tags1.patch(sam_record1.get());
+    tags2.patch(sam_record2.get());
+    lfio_.push(std::move(sam_record1));
+    lfio_.push(std::move(sam_record2));
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(

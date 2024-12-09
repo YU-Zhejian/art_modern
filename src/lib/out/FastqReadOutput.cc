@@ -1,5 +1,5 @@
-#include "DumbReadOutput.hh"
 #include "FastqReadOutput.hh"
+#include "DumbReadOutput.hh"
 
 namespace labw::art_modern {
 
@@ -14,7 +14,7 @@ std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
     return outs;
 }
 
-std::unique_ptr<std::string>  format_fastq(const PairwiseAlignment& pwa, bool is_read1)
+std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa, bool is_read1)
 {
     auto outs = std::make_unique<std::string>();
     std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;

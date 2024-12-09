@@ -24,6 +24,7 @@ public:
     static std::pair<int32_t, std::string> generate_nm_md_tag(
         const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
     static bam1_t* init();
+    static std::unique_ptr<bam1_t> init_uptr();
     static sam_hdr_t* init_header(const SamOptions& sam_options);
     static samFile* open_file(const std::string& filename, const SamOptions& sam_options);
     static void write(samFile* fp, const sam_hdr_t* h, const bam1_t* b);
@@ -42,12 +43,14 @@ private:
     std::vector<tag_type> tags_;
 };
 
-class BamLFIO : public LockFreeIO<bam1_t*> {
+class BamLFIO : public LockFreeIO<bam1_t> {
 public:
-    void write(std::unique_ptr<bam1_t*> ss) override
+    void write(std::unique_ptr<bam1_t> ss) override
     {
-        BamUtils::write(fp_, h_, *ss);
-        bam_destroy1(*ss);
+        BamUtils::write(fp_, h_, ss.get());
+        // Free data only
+        bam_set_mempolicy(ss.get(), BAM_USER_OWNS_STRUCT);
+        bam_destroy1(ss.get());
     }
     BamLFIO(samFile* fp, const sam_hdr_t* h)
         : fp_(fp)
