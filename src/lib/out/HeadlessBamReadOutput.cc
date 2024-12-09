@@ -158,8 +158,8 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
         "Destination of output headless SAM/BAM file. Unset to disable the writer.");
     bam_desc.add_options()("o-hl_sam-use_m", "Whether to use CIGAR 'M' instead of '=/X' for alignment");
     bam_desc.add_options()("o-hl_sam-write_bam", "Enforce BAM instead of SAM output.");
-    bam_desc.add_options()("o-hl_sam-num_threads", po::value<int>()->default_value(4),
-                           "Number of threads used in BAM compression.");
+    bam_desc.add_options()(
+        "o-hl_sam-num_threads", po::value<int>()->default_value(4), "Number of threads used in BAM compression.");
     desc.add(bam_desc);
 }
 

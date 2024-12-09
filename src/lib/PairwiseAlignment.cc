@@ -66,9 +66,16 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
 
 std::string PairwiseAlignment::serialize() const
 {
-    std::ostringstream os;
-    serialize(os);
-    return os.str();
+    auto pos_on_contig_s = std::to_string(pos_on_contig);
+    std::size_t buff_len = read_name.length() + contig_name.length() + pos_on_contig_s.length() + aligned_query.length()
+        + aligned_ref.length() + qual.length() + 9;
+    std::string buff;
+    buff.resize(buff_len);
+    buff[0] = 0;
+    std::snprintf(buff.data(), buff_len + 1, ">%s\t%s:%s:%c\n%s\n%s\n%s\n", read_name.c_str(), contig_name.c_str(),
+        pos_on_contig_s.c_str(), is_plus_strand ? '+' : '-', aligned_query.c_str(), aligned_ref.c_str(), qual.c_str());
+
+    return buff;
 }
 
 PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)

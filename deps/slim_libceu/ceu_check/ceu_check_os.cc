@@ -1,4 +1,4 @@
-// FIXME: I am too tired to fix this **
+// FIXME: I am too tired to fix this file. So it is excluded from CMake targets.
 
 #include "ceu_check/ceu_check_os.hh"
 #include "libceu_stddef.h"
@@ -25,10 +25,13 @@
 #include <windows.h>
 #endif
 
-std::string get_compile_time_mingw_version(void)
+std::string ceu_check_get_compile_time_os_info()
 {
-#if defined(CEU_ON_CYGWIN_LIKE)
-#if defined(CEU_HAVE_INCLUDE__MINGW_H) && CEU_HAVE_INCLUDE__MINGW_H == 1
+    std::stringstream oss;
+    oss << "Compile-time OS info:" << std::endl;
+    oss << "\tPRIMIARY OS='" << CEU_PRIMARY_OS_TYPE<< "'" << std::endl;
+#if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
+    #if defined(CEU_HAVE_INCLUDE__MINGW_H) && CEU_HAVE_INCLUDE__MINGW_H == 1
 
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("MinGW ver. ", 128);
 #if defined(__MINGW32_MAJOR_VERSION) && defined(__MINGW32_MINOR_VERSION)
@@ -59,15 +62,9 @@ std::string get_compile_time_mingw_version(void)
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr("MinGW ver. undefined");
 #endif
     return rets;
-#else
-    return CEU_NULL;
 #endif
-}
-
-ceu_ystr_t* get_compile_time_cygwin_version(void)
-{
-#if defined(CEU_ON_CYGWIN_LIKE)
-#if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
+#if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
+    #if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("CYGWIN API ver. ", 128);
     ceu_ystr_t* cygwin_api_ver = convert_version_to_ystr2(CYGWIN_VERSION_API_MAJOR, CYGWIN_VERSION_API_MINOR);
     ceu_ystr_t* cygwin_dll_ver = convert_version_to_ystr2(CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
@@ -82,19 +79,56 @@ ceu_ystr_t* get_compile_time_cygwin_version(void)
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr("CYGWIN API ver. undefined\n\tCYGWIN DLL (undefined) ver. undefined");
 #endif
     return rets;
-#else
-    return CEU_NULL;
 #endif
+
+#ifdef CEU_ON_POSIX
+    oss << "\tPOSIX.1 Version: ";
+#ifdef _POSIX_VERSION
+    oss << std::to_string(_POSIX_VERSION);
+#else
+    oss << "undefined";
+#endif
+    oss << std::endl;
+    oss << "\tPOSIX.2 Version: ";
+#ifdef _POSIX2_VERSION
+    oss << std::to_string(_POSIX2_VERSION);
+#else
+    oss << "undefined";
+#endif
+    oss << std::endl;
+    oss << "\tSingle UNIX Specification (SUS) Version: ";
+
+#ifdef _XOPEN_VERSION
+    oss << std::to_string(_XOPEN_VERSION);
+#elif defined(_XOPEN_UNIX)
+    oss << "unknown";
+#else
+    oss << "undefined";
+#endif
+    oss << std::endl;
+#endif
+    return oss.str();
 }
 
-std::string get_run_time_haiku_version(void)
+std::string ceu_check_get_run_time_os_info()
 {
-    return nullptr; // TODO
-}
-
-std::string get_run_time_windows_version(void)
-{
-#if defined(CEU_ON_WINDOWS) && !defined(CEU_ON_CYGWIN)
+    std::stringstream oss;
+    oss << "Run-time OS info:" << std::endl;
+#ifdef CEU_ON_POSIX
+#if defined(CEU_HAVE_INCLUDE_SYS_UTSNAME_H) && CEU_HAVE_INCLUDE_SYS_UTSNAME_H == 1
+    struct utsname ceu_utsname;
+    uname(&ceu_utsname);
+    oss << "\tPOSIX UTSINFO:" << std::endl;
+    oss << "\t\tsysname="<< ceu_utsname.sysname << std::endl;
+    oss << "\t\tnodename="<< ceu_utsname.nodename << std::endl;
+    oss << "\t\trelease="<< ceu_utsname.release<< std::endl;
+    oss << "\t\tversion=" << ceu_utsname.version << std::endl;
+    oss << "\t\tmachine=" << ceu_utsname.machine << std::endl;
+#else
+    oss <<  "\tPOSIX UTSINFO=undefined" << std::endl;
+#endif
+#endif
+#if defined(CEU_ON_WINDOWS) && !defined(CEU_ON_CYGWIN) && (0) // TODO: Temporarily disabled.
     ceu_ystr_t* readable_version_number; /// Human-readable Windows version like Microsoft Windows 10.
     ceu_ystr_t* win_ver; /// Windows version like 10.0.0.
     ceu_ystr_t* win_spver; /// Windows service pack version.
@@ -163,113 +197,6 @@ std::string get_run_time_windows_version(void)
     ceu_ystr_destroy(win_ver);
     ceu_ystr_destroy(readable_version_number);
     return rets;
-#else // Supress on CygWin.
-    return nullptr;
 #endif
-}
-
-ceu_ystr_t* get_run_time_posix_uts_info(void)
-{
-#ifdef CEU_ON_POSIX
-#if defined(CEU_HAVE_INCLUDE_SYS_UTSNAME_H) && CEU_HAVE_INCLUDE_SYS_UTSNAME_H == 1
-    struct utsname ceu_utsname;
-    uname(&ceu_utsname);
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("POSIX UTSINFO='", 128);
-    ceu_ystr_t* utsname = ceu_ystr_cstr_join(" ", ceu_false, 5, ceu_utsname.sysname, ceu_utsname.nodename,
-        ceu_utsname.release, ceu_utsname.version, ceu_utsname.machine);
-    ceu_ystr_concat_inplace(rets, utsname);
-    ceu_ystr_destroy(utsname);
-    return rets;
-#else
-    return ceu_ystr_create_from_cstr("POSIX UTSINFO=undefined");
-#endif
-#else
-    return CEU_NULL;
-#endif
-}
-
-ceu_ystr_t* get_compile_time_posix_standard(void)
-{
-
-#ifdef CEU_ON_POSIX
-    ceu_ystr_t* posix1_ver = ceu_ystr_create_from_cstr_guarantee("POSIX.1 Version: ", 128);
-#ifdef _POSIX_VERSION
-    ceu_ystr_t* posix1_ver_s = ceu_ystr_from_uint(10, _POSIX_VERSION);
-#else
-    ceu_ystr_t* posix1_ver_s = ceu_ystr_create_from_cstr("undefined");
-#endif
-    ceu_ystr_concat_inplace(posix1_ver, posix1_ver_s);
-    ceu_ystr_destroy(posix1_ver_s);
-
-    ceu_ystr_t* posix2_ver = ceu_ystr_create_from_cstr_guarantee("POSIX.2 Version: ", 128);
-#ifdef _POSIX2_VERSION
-    ceu_ystr_t* posix2_ver_s = ceu_ystr_from_uint(10, _POSIX2_VERSION);
-#else
-    ceu_ystr_t* posix2_ver_s = ceu_ystr_create_from_cstr("undefined");
-#endif
-    ceu_ystr_concat_inplace(posix2_ver, posix2_ver_s);
-    ceu_ystr_destroy(posix2_ver_s);
-
-    ceu_ystr_t* sus_ver = ceu_ystr_create_from_cstr_guarantee("Single UNIX Specification (SUS) Version: ", 128);
-#ifdef _XOPEN_VERSION
-    ceu_ystr_t* sus_ver_s = ceu_ystr_from_uint(10, _POSIX2_VERSION);
-#elif defined(_XOPEN_UNIX)
-    ceu_ystr_t* sus_ver_s = ceu_ystr_create_from_cstr("unknown");
-#else
-    ceu_ystr_t* sus_ver_s = ceu_ystr_create_from_cstr("undefined");
-#endif
-    ceu_ystr_concat_inplace(sus_ver, sus_ver_s);
-    ceu_ystr_destroy(sus_ver_s);
-
-    ceu_ystr_t* sep = ceu_ystr_create_from_cstr("\n\t");
-    ceu_ystr_t* rets = ceu_ystr_join(sep, ceu_false, 3, posix1_ver, posix2_ver, sus_ver);
-    ceu_ystr_destroy(sep);
-    ceu_ystr_destroy(posix1_ver);
-    ceu_ystr_destroy(posix2_ver);
-    ceu_ystr_destroy(sus_ver);
-    return rets;
-#else
-    return CEU_NULL;
-#endif
-}
-
-ceu_ystr_t* ceu_check_get_compile_time_os_info(void)
-{
-    ceu_ystr_t* haiku_version_buff = get_run_time_haiku_version();
-    ceu_ystr_t* mingw_version_buff = get_compile_time_mingw_version();
-    ceu_ystr_t* cygwin_version_buff = get_compile_time_cygwin_version();
-    ceu_ystr_t* posix_version_buff = get_compile_time_posix_standard();
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("Compile-time OS info: '", 128);
-    ceu_ystr_t* sep = ceu_ystr_create_from_cstr("\n\t");
-    ceu_ystr_t* info;
-    ceu_ystr_cstr_concat_inplace(rets, CEU_PRIMARY_OS_TYPE);
-    ceu_ystr_cstr_concat_inplace(rets, "'\n\t");
-    info = ceu_ystr_join(
-        sep, ceu_true, 4, haiku_version_buff, mingw_version_buff, cygwin_version_buff, posix_version_buff);
-    ceu_ystr_concat_inplace(rets, info);
-    ceu_ystr_destroy(cygwin_version_buff);
-    ceu_ystr_destroy(mingw_version_buff);
-    ceu_ystr_destroy(haiku_version_buff);
-    ceu_ystr_destroy(posix_version_buff);
-    ceu_ystr_destroy(sep);
-    ceu_ystr_destroy(info);
-    return rets;
-}
-
-ceu_ystr_t* ceu_check_get_run_time_os_info(void)
-{
-    ceu_ystr_t* posix_uts_buff = get_run_time_posix_uts_info();
-    ceu_ystr_t* windows_buff = get_run_time_windows_version();
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("Run-time OS info: '", 128);
-    ceu_ystr_t* sep = ceu_ystr_create_from_cstr("\n\t");
-    ceu_ystr_t* info;
-    ceu_ystr_cstr_concat_inplace(rets, CEU_PRIMARY_OS_TYPE);
-    ceu_ystr_cstr_concat_inplace(rets, "'\n\t");
-    info = ceu_ystr_join(sep, ceu_true, 2, posix_uts_buff, windows_buff);
-    ceu_ystr_concat_inplace(rets, info);
-    ceu_ystr_destroy(windows_buff);
-    ceu_ystr_destroy(posix_uts_buff);
-    ceu_ystr_destroy(sep);
-    ceu_ystr_destroy(info);
-    return rets;
+    return oss.str();
 }

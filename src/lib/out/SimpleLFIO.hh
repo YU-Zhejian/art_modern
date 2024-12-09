@@ -3,7 +3,7 @@
 
 namespace labw::art_modern {
 
-class SimpleLFIO : public LockFreeIO<std::string> {
+class SimpleLFIO : public LockFreeIO<std::unique_ptr<std::string>> {
 public:
     void write(std::unique_ptr<std::string> value) override { out_ << *value; }
     explicit SimpleLFIO(std::ostream& out)

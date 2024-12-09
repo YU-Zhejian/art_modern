@@ -2,7 +2,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `aer_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well, or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulator, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well, or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulator, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
 
 ## Quick Start
 
@@ -34,27 +34,27 @@ opt/build_release/art_modern --version # For version information
 
 ### Simulating WGS Data using _E. Coli_ Genome
 
-Download _E. Coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 substrand as an example.
+Download _E. Coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 sub-strand as an example.
 
 ```shell
 wget \
     -4 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz \
     -O opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
-gunzip opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
+gunzip -k opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
 
-Now we can simulate WGS data using E. Coli reference genome. Let's satrt with single-end sequencing using HiSeq 2500 with 125bp read length and 10X coverage.
+Now we can simulate WGS data using E. Coli reference genome. Let's start with single-end sequencing using HiSeq 2500 with 125bp read length and 10X coverage.
 
 ```shell
 opt/build_release/art_modern \
-   --mode wgs \
-   --lc se \
-   --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
-   --o-fastq opt/build_release/e_coli_wgs_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-fcov 10
+    --mode wgs \
+    --lc se \
+    --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
+    --o-fastq opt/build_release/e_coli_wgs_se.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov 10
 ```
 
 The generated FASTQ file will be at `opt/build_release/e_coli_wgs_se.fastq`.
@@ -63,17 +63,17 @@ We may also simulate paired-end data with following configuration:
 
 ```shell
 opt/build_release/art_modern \
-   --mode wgs \
-   --lc pe \
-   --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
-   --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-fcov 10 \
-   --pe_frag_dist_mean 300 \
-   --pe_frag_dist_std_dev 50
+    --mode wgs \
+    --lc pe \
+    --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
+    --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov 10 \
+    --pe_frag_dist_mean 300 \
+    --pe_frag_dist_std_dev 50
 ```
 
 Please note that we have additionally specified quality file for read 2 with the mean and standard deviation of fragment lengths.
@@ -94,14 +94,14 @@ curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/bigZips/mrna.fa.gz | \
     seqtk sample /dev/stdin 1000 > opt/build_release/ce11_mrna_1000.fa
 
 opt/build_release/art_modern \
-   --mode trans \
-   --lc se \
-   --i-file opt/build_release/ce11_mrna_1000.fa \
-   --o-fastq opt/build_release/c_elegans_trans_unified_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-fcov 10
+    --mode trans \
+    --lc se \
+    --i-file opt/build_release/ce11_mrna_1000.fa \
+    --o-fastq opt/build_release/c_elegans_trans_unified_se.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov 10
 ```
 
 #### Unstranded Coverage
@@ -124,14 +124,14 @@ awk 'BEGIN{print "#ID\tCOV";}{printf "%s\t%f\n", $1, (rand()*10);}' \
     > opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
 
 opt/build_release/art_modern \
-   --mode trans \
-   --lc se \
-   --i-file opt/build_release/ce11_mrna_1000.fa \
-   --o-fastq opt/build_release/c_elegans_trans_unstranded_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-fcov opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
+    --mode trans \
+    --lc se \
+    --i-file opt/build_release/ce11_mrna_1000.fa \
+    --o-fastq opt/build_release/c_elegans_trans_unstranded_se.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
 ```
 
 #### Stranded Coverage
@@ -153,19 +153,19 @@ awk 'BEGIN{print "#ID\tCOV_POS\tCOV_NEG";}{printf "%s\t%f\t%f\n", $1, (rand()*5)
     > opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
 
 opt/build_release/art_modern \
-   --mode trans \
-   --lc se \
-   --i-file opt/build_release/ce11_mrna_1000.fa \
-   --o-fastq opt/build_release/c_elegans_trans_stranded_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
+    --mode trans \
+    --lc se \
+    --i-file opt/build_release/ce11_mrna_1000.fa \
+    --o-fastq opt/build_release/c_elegans_trans_stranded_se.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
 ```
 
 #### The PBSIM3 Transcripts Input Format
 
-The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarily, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
+The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarly, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
 
 ```tsv
 NR_056112	3.47140212944225	1.7229707866816995	aaaa
@@ -183,14 +183,14 @@ seqkit fx2tab opt/build_release/ce11_mrna_1000.fa | \
     > opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv
 
 opt/build_release/art_modern \
-   --mode trans \
-   --lc se \
-   --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
-   --o-fastq opt/build_release/c_elegans_trans_pbsim3_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --read_len 125 \
-   --parallel 4 \
-   --i-type pbsim3_transcripts
+    --mode trans \
+    --lc se \
+    --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
+    --o-fastq opt/build_release/c_elegans_trans_pbsim3_se.fastq \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-type pbsim3_transcripts
 ```
 
 ### Template-Based Simulation
@@ -211,6 +211,31 @@ opt/build_release/art_modern \
 ```
 
 Please note that the mean and standard deviation of fragment length is not specified since in template-based simulation, a template is considered a fragment.
+
+### Using UNIX Pipelines
+
+With UNIX pipelines, we can redirect the input and output of `art_modern` from or to another files of processes. Following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, PWA, and sorted BAM file.
+
+This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [xz-utils](https://tukaani.org/xz/).
+
+```shell
+zcat opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
+    opt/build_release/art_modern \
+    --mode wgs \
+    --lc se \
+    --i-file /dev/stdin \
+    --i-type fasta \
+    --i-parser memory \
+    --o-fastq >(pigz -p8 -9 -v -cf - > opt/build_release/e_coli_wgs_se.fastq.gz) \
+    --o-pwa >(xz -9 -T5 -vv -cf - > opt/build_release/e_coli_wgs_se.pwa.xz) \
+    --o-sam >(samtools sort -@9 --write-index -o opt/build_release/e_coli_wgs_se.sorted.bam) \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov 5
+```
+
+Please wait for a while for the compression to finish.
 
 ## What's Next?
 
@@ -234,3 +259,5 @@ This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com)
 The bundled HTSLib library used MIT License with the following reference:
 
 - J. K. Bonfield et al., _HTSlib: C library for reading/writing high-throughput sequencing data_, GigaScience, vol. 10, no. 2, p. giab007, Jan. 2021, doi: [10.1093/gigascience/giab007](https://doi.org/10.1093/gigascience/giab007).
+
+Other libraries used in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.

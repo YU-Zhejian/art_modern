@@ -10,9 +10,7 @@ void PwaReadOutput::writeSE(const PairwiseAlignment& pwa)
     if (is_closed_) {
         return;
     }
-    auto os = std::make_unique<std::ostringstream>();
-    pwa.serialize(*os);
-
+    auto os = std::make_unique<std::string>(pwa.serialize());
     lfio_.push(std::move(os));
 }
 
@@ -21,11 +19,10 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     if (is_closed_) {
         return;
     }
-    auto os = std::make_unique<std::ostringstream>();
-    pwa1.serialize(*os);
-    pwa2.serialize(*os);
-
-    lfio_.push(std::move(os));
+    auto os1 = std::make_unique<std::string>(pwa1.serialize());
+    lfio_.push(std::move(os1));
+    auto os2 = std::make_unique<std::string>(pwa2.serialize());
+    lfio_.push(std::move(os2));
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
