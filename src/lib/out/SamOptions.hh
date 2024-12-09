@@ -40,5 +40,9 @@ struct SamOptions {
      * If `false`, will write SAM instead.
      */
     bool write_bam = true;
+    /**
+     * Number of threads used by htslib.
+     */
+    int hts_io_threads = 1;
 };
 }

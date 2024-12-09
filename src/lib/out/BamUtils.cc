@@ -102,7 +102,8 @@ samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_
 {
     auto retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
-    hts_set_threads(retv, 5); // FIXME: Change this into a parameter.
+    CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads),
+                                     USED_HTSLIB_NAME, "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
     return retv;
 }
 std::unique_ptr<bam1_t> BamUtils::init_uptr()
