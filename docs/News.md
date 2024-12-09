@@ -27,4 +27,4 @@ Changes on software implementation:
 - [X] Multithreading support implemented using Boost.
 - [X] Largely eliminated POSIX-only routines by Boost.
 - [X] Argument parser implemented in Boost.
-- [X]  Output writers were made asynchronous.
+- [X] Output writers were made asynchronous using `moodycamel::ConcurrentQueue<T>`.

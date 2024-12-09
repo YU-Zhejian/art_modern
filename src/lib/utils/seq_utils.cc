@@ -74,7 +74,6 @@ std::string normalize(const std::string& dna)
 
 std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr)
 {
-    // FIXME: Refactor this using std::snprintf
     std::ostringstream oss;
     for (size_t i = 0; i < cigar_arr.size(); i += 1) {
         oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);

@@ -12,7 +12,6 @@ endif()
 find_package(
     Boost REQUIRED
     COMPONENTS filesystem regex program_options thread log_setup log
-    # signals2 is header-only lockfree is header-only
     OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
 include_directories(${Boost_INCLUDE_DIRS})
 
