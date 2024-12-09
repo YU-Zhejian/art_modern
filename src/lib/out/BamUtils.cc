@@ -100,8 +100,14 @@ sam_hdr_t* BamUtils::init_header(const SamOptions& sam_options)
 }
 samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_options)
 {
-    return CExceptionsProxy::assert_not_null(
+    auto retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
+    hts_set_threads(retv, 5); // FIXME: Change this into a parameter.
+    return retv;
+}
+std::unique_ptr<bam1_t> BamUtils::init_uptr()
+{
+    return std::unique_ptr<bam1_t>(static_cast<bam1_t*>(std::calloc(1, sizeof(bam1_t))));
 }
 void assert_correct_cigar(
     [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)

@@ -25,7 +25,7 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     if (is_closed_) {
         return;
     }
-    auto sam_record = BamUtils::init();
+    auto sam_record = BamUtils::init_uptr();
     const auto rlen = static_cast<long>(pwa.query.size());
     const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
     auto qual = pwa.qual;
@@ -43,7 +43,7 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     tags.add_string("MD", md_tag);
     tags.add_int_i("NM", nm_tag);
 
-    CExceptionsProxy::assert_numeric(bam_set1(sam_record, pwa.read_name.size(), pwa.read_name.c_str(),
+    CExceptionsProxy::assert_numeric(bam_set1(sam_record.get(), pwa.read_name.size(), pwa.read_name.c_str(),
                                          BAM_FUNMAP, // Alignment info moved to OA tag
                                          TID_FOR_UNMAPPED, // Alignment info moved to OA tag
                                          0, // Alignment info moved to OA tag
@@ -55,17 +55,16 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
                                          0, // Unset for SE reads
                                          rlen, seq.c_str(), qual.c_str(), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    tags.patch(sam_record);
-    auto unique_sam_record = std::make_unique<bam1_t*>(sam_record);
-    lfio_.push(std::move(unique_sam_record));
+    tags.patch(sam_record.get());
+    lfio_.push(std::move(sam_record));
 }
 void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (is_closed_) {
         return;
     }
-    auto sam_record1 = BamUtils::init();
-    auto sam_record2 = BamUtils::init();
+    auto sam_record1 = BamUtils::init_uptr();
+    auto sam_record2 = BamUtils::init_uptr();
 
     const auto rlen = static_cast<long>(pwa1.query.size());
 
@@ -102,7 +101,7 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
     tags2.add_int_i("NM", nm_tag2);
 
     CExceptionsProxy::assert_numeric(
-        bam_set1(sam_record1, pwa1.read_name.size(), pwa1.read_name.c_str(),
+        bam_set1(sam_record1.get(), pwa1.read_name.size(), pwa1.read_name.c_str(),
             BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD1, // Alignment info moved to OA tag
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
@@ -115,7 +114,7 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
             rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
-        bam_set1(sam_record2, pwa2.read_name.size(), pwa2.read_name.c_str(),
+        bam_set1(sam_record2.get(), pwa2.read_name.size(), pwa2.read_name.c_str(),
             BAM_FPAIRED | BAM_FUNMAP | BAM_FMUNMAP | BAM_FREAD2, // Alignment info moved to OA tag
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
@@ -134,13 +133,11 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
         reverse(bam_get_qual(sam_record2), rlen);
     }
 
-    tags1.patch(sam_record1);
-    tags2.patch(sam_record2);
+    tags1.patch(sam_record1.get());
+    tags2.patch(sam_record2.get());
 
-    auto unique_sam_record1 = std::make_unique<bam1_t*>(sam_record1);
-    auto unique_sam_record2 = std::make_unique<bam1_t*>(sam_record2);
-    lfio_.push(std::move(unique_sam_record1));
-    lfio_.push(std::move(unique_sam_record2));
+    lfio_.push(std::move(sam_record1));
+    lfio_.push(std::move(sam_record2));
 }
 void HeadlessBamReadOutput::close()
 {
