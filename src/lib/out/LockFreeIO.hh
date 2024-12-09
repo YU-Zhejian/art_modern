@@ -1,23 +1,25 @@
 #pragma once
 
-#include <boost/lockfree/queue.hpp>
-#include <random>
+#include <concurrentqueue.h>
 #include <thread>
+#include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {
 
 template <typename T> class LockFreeIO {
 public:
-    static const int QUEUE_SIZE = 65534;
-    LockFreeIO()
-        : dis_(100, 1000)
-        , queue() {};
+    static const int QUEUE_SIZE = 1<<20;
+    LockFreeIO(): queue_(QUEUE_SIZE){
+
+    }
+
     virtual ~LockFreeIO() { stop(); };
-    void push(T* value)
+    void push(std::unique_ptr<T>&& value)
     {
-        while (!queue.push(value)) {
-            // std::this_thread::sleep_for(std::chrono::nanoseconds(dis_(gen_)));
+        while (!queue_.try_enqueue(std::move(value))) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
+        num_reads_in_ ++;
     }
     void start() { thread_ = std::thread(&LockFreeIO::run, this); }
 
@@ -28,33 +30,38 @@ public:
             thread_.join();
         }
     }
-    virtual void write(T* value) = 0;
+    virtual void write(std::unique_ptr<T> value) = 0;
 
 private:
-    std::uniform_int_distribution<int> dis_;
-    std::minstd_rand gen_;
-    boost::lockfree::queue<T*, boost::lockfree::fixed_sized<true>, boost::lockfree::capacity<QUEUE_SIZE>> queue;
+    moodycamel::ConcurrentQueue<std::unique_ptr<T>> queue_;
     std::atomic<bool> should_stop_ = false;
     std::thread thread_;
+    std::atomic<std::size_t > num_reads_in_ = 0;
+    std::atomic<std::size_t > num_reads_out_ = 0;
 
     void run()
     {
-        bool pop_ret = false;
-        T* retp;
+        int pop_ret_cnt = 0;
+        auto retp_a = std::array<std::unique_ptr<T>, 1<<10>();
         while (!should_stop_) {
-            pop_ret = queue.pop(retp);
-            if (pop_ret) {
-                write(retp);
-            } else {
-                // std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), 1<<10) - 1;
+            while (pop_ret_cnt> 0) {
+                write(std::move(retp_a[pop_ret_cnt]));
+                pop_ret_cnt --;
+                num_reads_out_++;
             }
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        pop_ret = queue.pop(retp);
-        while (pop_ret) {
-            write(retp);
-            pop_ret = queue.pop(retp);
+        pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), 1<<10) - 1;
+        while (pop_ret_cnt> 0) {
+            while (pop_ret_cnt> 0) {
+                write(std::move(retp_a[pop_ret_cnt]));
+                pop_ret_cnt --;
+                num_reads_out_++;
+            }
+            pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), 1<<10) - 1;
         }
+        BOOST_LOG_TRIVIAL(info) << "LockFreeIO::run() finished, consuming " << num_reads_in_ << " reads and writes " << num_reads_out_ << " reads";
     }
 };
 

@@ -19,7 +19,7 @@ env -C "${PROFILE_DIR}" ninja -j120
 "${PROFILE_DIR}"/art_modern --version
 ldd "${PROFILE_DIR}"/art_modern
 
-for collect in threading hotspots; do # hpc-performance memory-access memory-consumption io
+for collect in hotspots threading; do # hpc-performance memory-access memory-consumption io
     rm -fr "${PROFILE_DIR}"/vtune-"${collect}"
     vtune \
         -collect="${collect}" \
@@ -39,6 +39,10 @@ for collect in threading hotspots; do # hpc-performance memory-access memory-con
         --del_rate_1 0.1 \
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500 \
-        --o-fastq "${PROFILE_DIR}"/test_small_se_wgs_memory.fastq
+        --o-fastq "${PROFILE_DIR}"/test_small_se_wgs_memory.fastq \
+        --o-sam "${PROFILE_DIR}"/test_small_se_wgs_memory.bam \
+        --o-sam-write_bam \
+        --o-hl_sam "${PROFILE_DIR}"/test_small_se_wgs_memory.hl.sam \
+        --o-pwa "${PROFILE_DIR}"/test_small_se_wgs_memory.pwa
     vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
 done

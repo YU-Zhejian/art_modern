@@ -48,8 +48,9 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
         reverse(bam_get_cigar(sam_record), sam_record->core.n_cigar);
     }
     tags.patch(sam_record);
+    auto unique_sam_record = std::make_unique<bam1_t*>(sam_record);
 
-    lfio_.push(sam_record);
+    lfio_.push(std::move(unique_sam_record));
 }
 
 void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
@@ -122,8 +123,10 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 
     tags1.patch(sam_record1);
     tags2.patch(sam_record2);
-    lfio_.push(sam_record1);
-    lfio_.push(sam_record2);
+    auto unique_sam_record1 = std::make_unique<bam1_t*>(sam_record1);
+    auto unique_sam_record2 = std::make_unique<bam1_t*>(sam_record2);
+    lfio_.push(std::move(unique_sam_record1));
+    lfio_.push(std::move(unique_sam_record2));
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(

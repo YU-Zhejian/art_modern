@@ -3,6 +3,7 @@
 #include "PairwiseAlignment.hh"
 #include "SamOptions.hh"
 #include <htslib/sam.h>
+#include <memory>
 
 #include <string>
 
@@ -41,14 +42,14 @@ private:
     std::vector<tag_type> tags_;
 };
 
-class BamLFIO : public LockFreeIO<bam1_t> {
+class BamLFIO : public LockFreeIO<bam1_t*> {
 public:
-    void write(bam1_t* ss) override
+    void write(std::unique_ptr<bam1_t*> ss) override
     {
-        BamUtils::write(fp_, h_, ss);
-        bam_destroy1(ss);
+        BamUtils::write(fp_, h_, *ss);
+        bam_destroy1(*ss);
     }
-    BamLFIO(samFile* fp, sam_hdr_t* h)
+    BamLFIO(samFile* fp, const sam_hdr_t* h)
         : fp_(fp)
         , h_(h)
     {
@@ -57,7 +58,7 @@ public:
 
 private:
     samFile* fp_;
-    sam_hdr_t* h_;
+    const sam_hdr_t* h_;
 };
 
 } // namespace labw::art_modern
