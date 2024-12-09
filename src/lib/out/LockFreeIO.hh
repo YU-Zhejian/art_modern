@@ -16,7 +16,7 @@ public:
     }
 
     virtual ~LockFreeIO() { stop(); };
-    void push(std::unique_ptr<T>&& value)
+    void push(T&& value)
     {
         while (!queue_.try_enqueue(std::move(value))) {
             std::this_thread::sleep_for(std::chrono::milliseconds(1));
@@ -32,10 +32,10 @@ public:
             thread_.join();
         }
     }
-    virtual void write(std::unique_ptr<T> value) = 0;
+    virtual void write(T value) = 0;
 
 private:
-    moodycamel::ConcurrentQueue<std::unique_ptr<T>> queue_;
+    moodycamel::ConcurrentQueue<T> queue_;
     std::atomic<bool> should_stop_ = false;
     std::thread thread_;
     std::atomic<std::size_t> num_reads_in_ = 0;
@@ -44,7 +44,7 @@ private:
     void run()
     {
         std::size_t pop_ret_cnt = 0;
-        auto retp_a = std::array<std::unique_ptr<T>, BULK_SIZE>();
+        std::array<T, BULK_SIZE> retp_a;
         while (!should_stop_) {
             pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), BULK_SIZE);
 

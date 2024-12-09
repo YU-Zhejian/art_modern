@@ -14,4 +14,4 @@
  *
  * @return Returned buffer, should be freed manually.
  */
-std::string ceu_check_get_compiler_info(void);
+std::string ceu_check_get_compiler_info();

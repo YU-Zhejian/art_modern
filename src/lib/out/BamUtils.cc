@@ -11,9 +11,10 @@ namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
 {
-    const auto pos = pwa.pos_on_contig + 1; // SAM is 1-based
+    const auto pos = std::to_string(pwa.pos_on_contig + 1); // SAM is 1-based
     const auto strand = pwa.is_plus_strand ? '+' : '-';
     const auto cigar_str = cigar_arr_to_str(cigar);
+    // TODO: Refactor this using std::snprintf
     std::ostringstream oss;
     oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ','
         << std::to_string(nm_tag) << ';';
@@ -102,14 +103,11 @@ samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_
 {
     auto retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
-    CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads),
-                                     USED_HTSLIB_NAME, "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
+    CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
+        "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
     return retv;
 }
-std::unique_ptr<bam1_t> BamUtils::init_uptr()
-{
-    return std::unique_ptr<bam1_t>(static_cast<bam1_t*>(std::calloc(1, sizeof(bam1_t))));
-}
+BamUtils::bam1_t_uptr BamUtils::init_uptr() { return BamUtils::bam1_t_uptr { init() }; }
 void assert_correct_cigar(
     [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
 {

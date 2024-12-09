@@ -3,21 +3,10 @@
 #include <fstream>
 #include <iostream>
 
-#include "LockFreeIO.hh"
+#include "SimpleLFIO.hh"
 #include "out/BaseFileReadOutput.hh"
 
 namespace labw::art_modern {
-class PwaLFIO : public LockFreeIO<std::ostringstream> {
-public:
-    void write(std::unique_ptr<std::ostringstream> ss) override { out_ << ss->str(); }
-    explicit PwaLFIO(std::ostream& out)
-        : out_(out)
-    {
-    }
-
-private:
-    std::ostream& out_;
-};
 
 class PwaReadOutput : public BaseFileReadOutput {
 public:
@@ -36,7 +25,7 @@ public:
 
 private:
     std::ofstream file_;
-    PwaLFIO lfio_;
+    SimpleLFIO lfio_;
 };
 
 class PwaReadOutputFactory : public BaseReadOutputFactory {

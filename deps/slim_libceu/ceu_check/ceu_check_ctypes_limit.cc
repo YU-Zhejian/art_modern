@@ -7,7 +7,7 @@
 
 #include <boost/format.hpp>
 
-std::string ceu_check_get_ctypes_limit_info(void)
+std::string ceu_check_get_ctypes_limit_info()
 {
     std::ostringstream oss;
     oss << "Compile-time C Types max, min, etc. limits:" << std::endl;

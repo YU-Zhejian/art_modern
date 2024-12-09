@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_cc.hh"
 #include <sstream>
 
-std::string ceu_check_get_compiler_info(void)
+std::string ceu_check_get_compiler_info()
 {
     std::ostringstream oss;
 #if defined(__DATE__)
