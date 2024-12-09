@@ -47,14 +47,15 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 - `intel-vtune` for Intel VTune Profiler. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `nsys` for NVIDIA Nsight Systems. NVidia compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `valgrind` for Valgrind Callgrind. GCC with `Debug` mode will be used since optimization may produce instructions that are not supported by Valgrind.
+- `amd-uprof` for AMD uProf. AMD compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 
 ### Others
 
-- Run `make fmt` to format the code.
+- Run `make fmt` to format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
 - Run `make build` to build the executable using debug mode with default compiler found by CMake.
 - Run `make release` to build the executable using release mode with default compiler found by CMake.
-- Run `make scc` to count lines of code written.
-- Run `make touch` to touch all files in the repository. This works when CMake does strange things like compiling the source files again and again.
+- Run `make scc` to count lines of code written. Note that this excludes third-party codes so should be preferred over pure `scc` in project root.
+- Run `make touch` to touch all files in the repository. This **MAY** work when CMake does strange things like compiling the source files again and again.
 - Run `make raw_data` to download essential test data useful to various integration tests, benchmarks, etc.
 
 ## Get Engaged

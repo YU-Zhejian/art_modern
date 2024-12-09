@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_c_cxx_std.hh"
 #include <sstream>
 
-std::string ceu_interpret_c_std_version(void)
+std::string ceu_interpret_c_std_version()
 {
     std::ostringstream oss;
     std::string cstd_macro;
@@ -15,7 +15,7 @@ std::string ceu_interpret_c_std_version(void)
     return oss.str();
 }
 
-std::string ceu_interpret_cxx_std_version(void)
+std::string ceu_interpret_cxx_std_version()
 {
     std::string cxxstd_macro;
     std::ostringstream oss;

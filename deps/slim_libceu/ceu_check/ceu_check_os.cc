@@ -1,5 +1,3 @@
-// FIXME: I am too tired to fix this file. So it is excluded from CMake targets.
-
 #include "ceu_check/ceu_check_os.hh"
 #include "libceu_stddef.h"
 #include <sstream>
@@ -29,9 +27,9 @@ std::string ceu_check_get_compile_time_os_info()
 {
     std::stringstream oss;
     oss << "Compile-time OS info:" << std::endl;
-    oss << "\tPRIMIARY OS='" << CEU_PRIMARY_OS_TYPE<< "'" << std::endl;
+    oss << "\tPRIMIARY OS='" << CEU_PRIMARY_OS_TYPE << "'" << std::endl;
 #if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
-    #if defined(CEU_HAVE_INCLUDE__MINGW_H) && CEU_HAVE_INCLUDE__MINGW_H == 1
+#if defined(CEU_HAVE_INCLUDE__MINGW_H) && CEU_HAVE_INCLUDE__MINGW_H == 1
 
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("MinGW ver. ", 128);
 #if defined(__MINGW32_MAJOR_VERSION) && defined(__MINGW32_MINOR_VERSION)
@@ -64,7 +62,7 @@ std::string ceu_check_get_compile_time_os_info()
     return rets;
 #endif
 #if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
-    #if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
+#if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
     ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("CYGWIN API ver. ", 128);
     ceu_ystr_t* cygwin_api_ver = convert_version_to_ystr2(CYGWIN_VERSION_API_MAJOR, CYGWIN_VERSION_API_MINOR);
     ceu_ystr_t* cygwin_dll_ver = convert_version_to_ystr2(CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
@@ -119,13 +117,13 @@ std::string ceu_check_get_run_time_os_info()
     struct utsname ceu_utsname;
     uname(&ceu_utsname);
     oss << "\tPOSIX UTSINFO:" << std::endl;
-    oss << "\t\tsysname="<< ceu_utsname.sysname << std::endl;
-    oss << "\t\tnodename="<< ceu_utsname.nodename << std::endl;
-    oss << "\t\trelease="<< ceu_utsname.release<< std::endl;
+    oss << "\t\tsysname=" << ceu_utsname.sysname << std::endl;
+    oss << "\t\tnodename=" << ceu_utsname.nodename << std::endl;
+    oss << "\t\trelease=" << ceu_utsname.release << std::endl;
     oss << "\t\tversion=" << ceu_utsname.version << std::endl;
     oss << "\t\tmachine=" << ceu_utsname.machine << std::endl;
 #else
-    oss <<  "\tPOSIX UTSINFO=undefined" << std::endl;
+    oss << "\tPOSIX UTSINFO: undefined" << std::endl;
 #endif
 #endif
 #if defined(CEU_ON_WINDOWS) && !defined(CEU_ON_CYGWIN) && (0) // TODO: Temporarily disabled.
