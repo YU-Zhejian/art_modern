@@ -157,6 +157,8 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
         "o-sam", po::value<std::string>(), "Destination of output SAM/BAM file. Unset to disable the writer.");
     bam_desc.add_options()("o-sam-use_m", "Whether to use CIGAR 'M' instead of '=/X' for alignment");
     bam_desc.add_options()("o-sam-write_bam", "Enforce BAM instead of SAM output.");
+    bam_desc.add_options()("o-sam-num_threads", po::value<int>()->default_value(4),
+                           "Number of threads used in BAM compression.");
     desc.add(bam_desc);
 }
 BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
@@ -172,6 +174,7 @@ BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::varia
         so.use_m = vm.count("o-sam-use_m") > 0;
         so.write_bam = vm.count("o-sam-write_bam") > 0;
         so.PG_CL = boost::algorithm::join(args, " ");
+        so.hts_io_threads = vm["o-hl_sam-num_threads"].as<int>();
         return new BamReadOutput(vm["o-sam"].as<std::string>(), fasta_fetch, so);
     }
     return new DumbReadOutput();
