@@ -143,12 +143,13 @@ void ArtJobExecutor::execute()
     is_running = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : art_params(other.art_params)
+    : num_reads(other.num_reads.load())
+    , art_params(other.art_params)
     , job_(std::move(other.job_))
     , rprob_(Rprob(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len))
     , output_dispatcher_(other.output_dispatcher_)
     , mpi_rank_(other.mpi_rank_)
-    , num_reads(other.num_reads.load())
+
 {
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }

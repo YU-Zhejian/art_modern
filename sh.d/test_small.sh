@@ -12,8 +12,6 @@ export OUT_DIR="opt/tmp/"
 export ART="opt/build_debug/art_modern"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
 
-mkdir -p "${OUT_DIR}"
-
 function sam2bam() {
     samtools sort -@20 --write-index "${1}".sam -o "${1}".bam
     python sh.d/test_small.sh.d/test_sam.py "${2}" "${1}".bam

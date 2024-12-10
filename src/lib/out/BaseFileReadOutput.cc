@@ -1,6 +1,6 @@
-#include <boost/log/trivial.hpp>
-
 #include "BaseFileReadOutput.hh"
+#include "utils/fs_utils.hh"
+#include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {
 
@@ -13,6 +13,7 @@ BaseFileReadOutput::BaseFileReadOutput(const std::string& filename)
     : filename(filename)
     , is_closed_(false)
 {
+    prepare_writer(filename);
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";
 }
 }

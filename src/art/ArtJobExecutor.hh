@@ -27,9 +27,9 @@ private:
     bool generate_se(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
 
     SimulationJob job_;
-    Rprob rprob_;
-    BaseReadOutput* output_dispatcher_;
     const std::string mpi_rank_;
+    BaseReadOutput* output_dispatcher_;
+    Rprob rprob_;
 };
 
 } // namespace labw::art_modern

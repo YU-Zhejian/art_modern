@@ -159,6 +159,9 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
     bam_desc.add_options()("o-sam-write_bam", "Enforce BAM instead of SAM output.");
     bam_desc.add_options()(
         "o-sam-num_threads", po::value<int>()->default_value(4), "Number of threads used in BAM compression.");
+    bam_desc.add_options()("o-sam-compress_level", po::value<char>()->default_value('4'),
+        "Compression level in BAM. Support `u` for uncompressed raw BAM output and [0-9] for underlying zlib "
+        "compression.");
     desc.add(bam_desc);
 }
 BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
@@ -174,7 +177,13 @@ BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::varia
         so.use_m = vm.count("o-sam-use_m") > 0;
         so.write_bam = vm.count("o-sam-write_bam") > 0;
         so.PG_CL = boost::algorithm::join(args, " ");
-        so.hts_io_threads = vm["o-hl_sam-num_threads"].as<int>();
+        so.hts_io_threads = vm["o-sam-num_threads"].as<int>();
+        so.compress_level = vm["o-sam-compress_level"].as<char>();
+        if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {
+            BOOST_LOG_TRIVIAL(fatal) << "Invalid compression level: " << so.compress_level
+                                     << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
+            abort_mpi();
+        }
         return new BamReadOutput(vm["o-sam"].as<std::string>(), fasta_fetch, so);
     }
     return new DumbReadOutput();

@@ -39,5 +39,22 @@ long get_file_size(const std::string& file_path) noexcept
         }
     }
 }
+void ensure_directory_exists(const std::string& dir_path)
+{
+    if (boost::filesystem::exists(dir_path)) {
+        if (boost::filesystem::is_directory(dir_path)) {
+            return;
+        } else {
+            BOOST_LOG_TRIVIAL(fatal) << "Path '" << dir_path << "' exists but is not a directory.";
+            abort_mpi();
+        }
+    }
+    BOOST_LOG_TRIVIAL(info) << "Boost::filesystem: mkdir -p '" << dir_path << "'";
+    boost::filesystem::create_directories(dir_path);
+}
+void prepare_writer(const std::string& output_file_path)
+{
+    ensure_directory_exists(boost::filesystem::path(output_file_path).parent_path().string());
+}
 } // art_modern
 // labw

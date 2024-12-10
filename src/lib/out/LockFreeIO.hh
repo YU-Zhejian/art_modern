@@ -1,11 +1,17 @@
 #pragma once
 
+#include "art_modern_config.h" // For USE_ASIO_PARALLEL
 #include <boost/log/trivial.hpp>
+#ifdef USE_ASIO_PARALLEL
 #include <concurrentqueue.h>
+#endif
+#include <atomic>
+#include <mutex>
 #include <thread>
 
 namespace labw::art_modern {
 
+#ifdef USE_ASIO_PARALLEL
 template <typename T> class LockFreeIO {
 public:
     static const int QUEUE_SIZE = 1 << 20;
@@ -69,4 +75,38 @@ private:
     }
 };
 
+#elif defined(USE_NOP_PARALLEL)
+template <typename T> class LockFreeIO {
+public:
+    LockFreeIO() = default;
+
+    virtual ~LockFreeIO()
+    {
+        BOOST_LOG_TRIVIAL(info) << "LockFreeIO::run() finished, consuming " << num_reads_in_ << " reads and writes "
+                                << num_reads_out_ << " reads";
+    };
+    void push(T&& value)
+    {
+        std::scoped_lock lock(mutex_);
+        num_reads_in_++;
+        write(std::move(value));
+        num_reads_out_++;
+    }
+    void start()
+    {
+        // Do nothing!
+    }
+
+    void stop()
+    {
+        // Do nothing!
+    }
+    virtual void write(T value) = 0;
+
+private:
+    std::atomic<std::size_t> num_reads_in_ = 0;
+    std::atomic<std::size_t> num_reads_out_ = 0;
+    std::mutex mutex_;
+};
+#endif
 }
