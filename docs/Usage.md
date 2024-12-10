@@ -1,14 +1,95 @@
 # Usage
 
+## Reading the Documentation
+
+In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
+
 ## Simulation Modes (`--mode`)
 
 ## Library Construction Methods (`--lc`)
 
-## Input Formats (`--i-*`)
+## Input (`--i-*`)
 
-Currently, we support input in FASTA and PBSIM3 Transcripts format.
+Currently, we support input in FASTA and PBSIM3 Transcripts format. They are controlled by the following major parameters:
 
-**FOR FASTA FORMAT**: For read names, only characters before blank space are read.
+- `--i-file`: The input reference file path.
+- `--i-type`: The file type of input reference sequences. Currently, FASTA and PBSIM3 Transcripts format are supported.
+  - **`auto` (DEFAULT) for extension-based decision.**
+    - If the file ends with `.fna`, `.fsa`, `.fa`, `.fasta`, resolve to `fasta`.
+    - Otherwise, an error will be raised.
+  - `fasta` for FASTA files.
+  - `pbsim3_transcripts` for PBSIM3 Transcripts format.
+
+Following are detailed constrains of the aforementioned format:
+
+### Input Parser (`--i-parser`)
+
+- **`auto` (DEFAULT) for size-based determination.**
+  - If the file size larger than 1GiB or can not be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode).
+  - Otherwise, use `memory`.
+- `memory`: The entire file will be read into the memory.
+  - Fast for small reference files.
+- `htslib`: Store FASTA Index in memory and fetch sequences from disk using [HTSLib](https://github.com/samtools/htslib).
+  - A FASTA Index (Usually ends with `.fai` and can be built using `samtools faidx`) will be needed.
+  - Memory-efficient for large genome assembly FASTA files with limited number of long contigs.
+  - Inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+  - Each thread will hold its own FASTA Index in memory.
+  - **DO NOT SUPPORT PBSIM3 TRANSCRIPT FORMAT.**
+- `stream`: Streamline the input reference as microbatches and process them one by one.
+  - Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+  - **CONTIG NUMBER AND LENGTH INFORMAION NOT AVAILABLE**, so use headless SAM/BAM output if a SAM/BAM output is needed.
+  - Batch size controlled by `--i-batch_size`.
+
+### More Instructions on FASTA Format
+
+FASTA format can be parsed by all parsers. However, please keep in mind that:
+
+**NOTE** For `htslib` parser, identical line lengths (except the last line) inside a contig is assumed. That means the following FASTA file is legal for `htslib` parser:
+
+```text
+>chr1
+AAAAAAAAAAAA
+AAAA
+>chr2
+AAAAAAAAAAAA
+AAAAAAAAAAAA
+AAAAAAAAAAAA
+AA
+>chr3
+AA
+```
+
+But the following is not:
+
+```text
+>chr2
+AAAA
+AAAAAAAAAA
+AAAAAAAA
+AA
+```
+
+**NOTE** For read names, only characters before the first whitespace characters (space ` `, tabs `\t`, etc.) are read. That is, the FASTA file:
+
+```text
+>chr1 some attrs
+AAAAAATTTTTT
+>chr2 more attrs
+AAAAAATTTTTT
+```
+
+Will be parsed into identical data structure with:
+
+```text
+>chr1
+AAAAAATTTTTT
+>chr2
+AAAAAATTTTTT
+```
+
+### Coverage (`--i-fcov`)
+
+### Conclusive Remarks
 
 A compatibility matrix is as follows:
 
@@ -17,12 +98,6 @@ A compatibility matrix is as follows:
 | `memory`      | FASTA     | FASTA \| PBSIM3 Transcripts | FASTA \| PBSIM3 Transcripts |
 | `htslib`      | FASTA     | **ERROR**                   | **ERROR**                   |
 | `stream`      | **ERROR** | FASTA \| PBSIM3 Transcripts | FASTA \| PBSIM3 Transcripts |
-
-`--i-parser`
-`--i-type`
-`--i-batch_size`
-`--i-file`
-`--i-fcov`
 
 ## Output Formats (`--o-*`)
 
@@ -51,7 +126,7 @@ BCCCCGGGGGGGFGGGGGGGFGGGGGGG1GGGGGGGFG1GGFGGG:GGG/GDGGGGGGG:GGGEGGGGGCGGGGGGGGEG
 
 ### FASTQ Format (`--o-fastq`)
 
-The good old FASTQ format. The qualities are phread encoded in ASCII with an offset of 33.
+The good old FASTQ format. The qualities are Phread encoded in ASCII with an offset of 33.
 
 ```text
 @NM_069135:art_modern:1:nompi:0
@@ -60,11 +135,22 @@ AGCCAAACGGGCAACCAGACTCCGCCCATTTCTCAACTCTCTAAGTACCCTGAGAGGTAGTTAGAGAAAACGAGAAACAC
 BCCCCGGGGGGGFGGGGGGGFGGGGGGG1GGGGGGGFG1GGFGGG:GGG/GDGGGGGGG:GGGEGGGGGCGGGGGGGGEGGD<DGGGGGGDF>GGGG0GG:FGGGGGGGGGGCG.GEGGGGGGGG
 ```
 
+FASTQ files can be easily converted to FASTA using [`seqtk`](https://github.com/lh3/seqtk):
+
+```shell
+cat in.fq | seqtk seq -A > out.fa
+```
+
+See also:
+
+- [Specifications of Common File Formats Used by the ENCODE Consortium at UCSC](https://genome.ucsc.edu/ENCODE/fileFormats.html#FASTQ).
+- [Common File Formats Used by the ENCODE Consortium](https://www.encodeproject.org/help/file-formats/#fastq)
+
 ### SAM/BAM Format (`--o-sam`)
 
-This writes canonical SAM/BAM format using [HTSLib](https://github.com/samtools/htslib). The generated SAM format can be parsed using [samtools](https://github.com/samtools/samtools), and can be used as ground-truth when benchmarking sequence aligners.
+Sequence Alignment/Map (SAM) and Binary Alignment/Map (BAM) format supports storing of ground-truth alignment information and other miscellaneous parameters. They can be parsed using [samtools](https://github.com/samtools/samtools), [`pysam`](https://pysam.readthedocs.io/) and other libraries, and can be used as ground-truth when benchmarking sequence aligners.
 
-This output writer supports computing `NM` and `MD` tag. The mapping qualities for all reads are set to 255.
+This writes canonical SAM/BAM format using [HTSLib](https://github.com/samtools/htslib). This output writer supports computing `NM` and `MD` tag. The mapping qualities for all reads are set to 255.
 
 Example:
 
@@ -77,7 +163,16 @@ NM_069135:art_modern:1:nompi:0	0	NM_069135	1	255	3=1D4=1I41=1X27=1I5=1X36=1D5=	=
 [...]
 ```
 
-This output writer supports BAM format (with default compression rate) and computing CIGAR string using `M` (`BAM_CMATCH`) instead of `=`/`X` (`BAM_CEQUAL`/`BAM_CDIFF`).
+Other SAM/BAM formatting parameters includes:
+
+- `--o-sam-use_m`: Computing CIGAR string using `M` (`BAM_CMATCH`) instead of `=`/`X` (`BAM_CEQUAL`/`BAM_CDIFF`). Rarely used in next-generation sequencing but common for long-read sequencing alignments.
+- `--o-sam-write_bam`: Write BAM instead of SAM.
+- `--o-sam-num_threads`: Number of threads used to compress BAM output.
+- `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream and 1--9 for fastest to best compression ratio. Defaults to `4`.
+
+    Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
+
+Please refer to [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
 
 ### Headless SAM/BAM Format (`--o-hl_sam`)
 
@@ -92,7 +187,7 @@ NM_069135:art_modern:1:nompi:0	4	*	1	0	*	*	1	0	AGCCAAACGGGCAACCAGACTCCGCCCATTTCT
 [...]
 ```
 
-This output writer also supports BAM format and computing CIGAR string using `M` (`BAM_CMATCH`) instead of `=`/`X` (`BAM_CEQUAL`/`BAM_CDIFF`).
+This output writer supports other BAM formatting parameters.
 
 ## ART-Specific Parameters
 
