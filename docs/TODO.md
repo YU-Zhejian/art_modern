@@ -15,9 +15,9 @@
         - [OpenMPI](https://www.open-mpi.org/).
         - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
         - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
-      - Google Protocol Buffers (Protobuf) for serialization/deserialization of MPI.
+      - Google Protocol Buffers (`protobuf`) for serialization/deserialization of MPI.
 - Revise support over other random number generation functions.
-- Survillence of each thread needs improving. We may implement a biliboard-like data structure that allows each thread update its status to a locked `std::map` and ask a thread to display the status every few seconds.
+- Surveillance of each thread needs improving. We may implement a data structure that allows each thread update its status to a locked `std::map` and ask a thread to display the status every few seconds.
 
 ## I/O Formats
 

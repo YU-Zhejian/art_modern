@@ -204,7 +204,7 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
     } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS) {
         return INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS;
     } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
-        for (const auto& fasta_file_end : std::vector<std::string> { "fna", "fsa", "fa", "fasta" }) {
+        for (const auto& fasta_file_end : std::vector<std::string> { ".fna", ".fsa", ".fa", ".fasta" }) {
             if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
                 return INPUT_FILE_TYPE::FASTA;
             }
