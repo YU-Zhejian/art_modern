@@ -4,6 +4,7 @@
 #include "art_modern_constants.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/seq_utils.hh"
+#include <boost/algorithm/string.hpp>
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 
 namespace labw::art_modern {
@@ -16,7 +17,7 @@ std::string BamUtils::generate_oa_tag(
     const auto cigar_str = cigar_arr_to_str(cigar);
     // TODO: Refactor this using std::snprintf
     std::ostringstream oss;
-    oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX << ','
+    oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX_STR << ','
         << std::to_string(nm_tag) << ';';
     return oss.str();
 }
@@ -31,9 +32,9 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     uint32_t this_cigar_len;
     uint32_t this_cigar_ops;
 
-    for (decltype(cigar.size()) i = 0; i < cigar.size(); ++i) {
-        this_cigar_len = bam_cigar_oplen(cigar[i]);
-        this_cigar_ops = bam_cigar_op(cigar[i]);
+    for (const auto& this_cigar : cigar) {
+        this_cigar_len = bam_cigar_oplen(this_cigar);
+        this_cigar_ops = bam_cigar_op(this_cigar);
         if (this_cigar_ops == BAM_CEQUAL) {
             matched += this_cigar_len;
             pos_on_query += this_cigar_len;
@@ -101,8 +102,22 @@ sam_hdr_t* BamUtils::init_header(const SamOptions& sam_options)
 }
 samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_options)
 {
+    std::string mode;
+    if (sam_options.write_bam) {
+        if (!boost::ends_with(filename, ".bam")) {
+            BOOST_LOG_TRIVIAL(warning) << "BAM file name was not end with .bam: " << filename;
+        }
+        mode += "wb";
+        mode += std::to_string(sam_options.compress_level);
+    } else {
+        if (!boost::ends_with(filename, ".sam")) {
+            BOOST_LOG_TRIVIAL(warning) << "SAM file name was not end with .bam: " << filename;
+        }
+        mode += "wh";
+    }
+
     auto retv = CExceptionsProxy::assert_not_null(
-        sam_open(filename.c_str(), sam_options.write_bam ? "wb" : "wh"), USED_HTSLIB_NAME, "Failed to open SAM file");
+        sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");
     CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
         "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
     return retv;
@@ -122,17 +137,20 @@ void assert_correct_cigar(
     uint32_t this_cigar_len;
     uint8_t this_cigar_type;
 
-    if (cigar_qlen != pwa.query.length()) {
-        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << pwa.query.length();
+    const auto qlen = static_cast<hts_pos_t>(pwa.query.length());
+    const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());
+    const auto qual_len = static_cast<hts_pos_t>(pwa.qual.length());
+
+    if (cigar_qlen != qlen) {
+        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << qlen;
         goto err;
     }
-    if (cigar_rlen != pwa.ref.length()) {
-        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << pwa.ref.length();
+    if (cigar_rlen != rlen) {
+        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << rlen;
         goto err;
     }
-    if (pwa.query.length() != pwa.qual.length()) {
-        BOOST_LOG_TRIVIAL(error) << "Qual length mismatch with query: " << pwa.qual.length()
-                                 << " != " << pwa.query.length();
+    if (qlen != qual_len) {
+        BOOST_LOG_TRIVIAL(error) << "Qual length mismatch with query: " << qual_len << " != " << qual_len;
         goto err;
     }
     bool is_equal;
@@ -168,7 +186,7 @@ void assert_correct_cigar(
             abort_mpi();
         }
     }
-    if (pos_on_read != pwa.query.length() || pos_on_ref != pwa.ref.length()) {
+    if (pos_on_read != qlen || pos_on_ref != rlen) {
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query and ref: " << pos_on_read
                                  << " != " << pwa.query.length() << " or " << pos_on_ref << " != " << pwa.ref.length();
         goto err;

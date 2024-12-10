@@ -4,6 +4,7 @@
 #include <string>
 
 namespace labw::art_modern {
+const std::string ALLOWED_COMPRESSION_LEVELS = "0123456789u";
 struct SamOptions {
     /**
      * Format version. Accepted format: `/^[0-9]+\.[0-9]+$`.
@@ -44,5 +45,10 @@ struct SamOptions {
      * Number of threads used by htslib.
      */
     int hts_io_threads = 1;
+
+    /**
+     * Compression level `[u0-9]`.
+     */
+    char compress_level = '4';
 };
 }

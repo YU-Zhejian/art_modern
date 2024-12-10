@@ -25,6 +25,6 @@ We may develop a C interface in the future after the APIs and design of the core
 
 Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adapters to them, and use `templ` mode to introduce sequencing errors.
 
-## My Question is Still Unanswered
+## My question is still unanswered
 
 Please feel free to open an issue on GitHub.

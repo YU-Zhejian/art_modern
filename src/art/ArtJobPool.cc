@@ -5,20 +5,15 @@ namespace labw::art_modern {
 
 #if defined(USE_NOP_PARALLEL)
 
-void ArtJobPool::stop() { tick_.stop(); }
+void ArtJobPool::stop() { }
 
 void ArtJobPool::add(ArtJobExecutor aje)
 {
-    tick_.add(&this_aje);
     std::scoped_lock lock(mutex_);
     aje.execute();
 }
 
-ArtJobPool::ArtJobPool(const ArtParams&)
-    : tick_(art_params)
-{
-    tick_.start();
-}
+ArtJobPool::ArtJobPool(const ArtParams&) { }
 
 #elif defined(USE_ASIO_PARALLEL)
 ArtJobPool::ArtJobPool(const ArtParams& art_params)
