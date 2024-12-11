@@ -13,8 +13,8 @@ build:
 .PHONY: release
 release:
 	mkdir -p opt/build_release
-	env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release -G Ninja $(CURDIR)
-	env -C opt/build_release ninja -j40
+	env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release $(CURDIR)
+	cmake --build opt/build_release -j40
 
 .PHONY: fmt
 fmt:
@@ -39,3 +39,11 @@ raw_data:
 .PHONY: clean
 clean:
 	rm -fr opt tmp build
+
+.PHONY: paper
+paper:
+	docker run --rm \
+        --volume $(CURDIR)/paper:/data \
+        --user $(command id -u):$(command id -g) \
+        --env JOURNAL=joss \
+        openjournals/inara

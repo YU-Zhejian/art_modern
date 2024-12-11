@@ -59,7 +59,7 @@ opt/build_release/art_modern \
 
 The generated FASTQ file will be at `opt/build_release/e_coli_wgs_se.fastq`.
 
-We may also simulate paired-end data with following configuration:
+We may also simulate paired-end data with the following configuration:
 
 ```shell
 opt/build_release/art_modern \
@@ -76,7 +76,7 @@ opt/build_release/art_modern \
     --pe_frag_dist_std_dev 50
 ```
 
-Please note that we have additionally specified quality file for read 2 with the mean and standard deviation of fragment lengths.
+Please note that we have additionally specified a quality file for read 2 with the mean and standard deviation of fragment lengths.
 
 ### Simulating RNA-Seq Data using _C. Elegans_ Transcriptome
 
@@ -242,7 +242,7 @@ Please wait for a while for the compression to finish.
 The `art_modern` project provides diverse documentations to satisfy your needs.
 
 - If you want to build the software with different options, see [Install](docs/Install.md).
-- For detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).
+- For a detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).
 - For developers, please refer to:
   - [Contributing](docs/Contributing.md) for software engineering tasks and contribution guidelines. See also [Code of Conduct](docs/CODE_OF_CONDUCT.md).
   - [Design](docs/Design.md) for the latest design of the software.
