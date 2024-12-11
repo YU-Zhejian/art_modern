@@ -32,7 +32,6 @@ if(NOT DEFINED USE_RANDOM_GENERATOR)
 endif()
 
 set(WITH_MPI OFF) # TODO
-set(WITH_PROTOBUF OFF) # TODO
 
 # Installation
 include(GNUInstallDirs)
@@ -46,7 +45,6 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/protobuf.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")

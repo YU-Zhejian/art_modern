@@ -25,6 +25,7 @@ public:
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
     bool generate_se(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
+    void generate(long targeted_num_reads, bool is_positive, ArtContig& art_contig);
 
     SimulationJob job_;
     const std::string mpi_rank_;

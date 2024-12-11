@@ -4,7 +4,7 @@
 
 The first release of `art_modern`.
 
-**NOTE** This version does **NOT** come with an MPI support.
+**NOTE** This version does **NOT** come with MPI support.
 
 Changes on software function:
 
@@ -18,7 +18,7 @@ Changes on software function:
 - [X] Built-in profiles are no longer supported. Users must specify the path to the existing profile they want to use.
 - [X] Parallelization using Boost ASIO.
 
-Changes on software implementation:
+Changes in software implementation:
 
 - [X] Build systems changed to CMake.
 - [X] All C++ code was re-implemented in C++17 with radical removal of duplicated or unused code.

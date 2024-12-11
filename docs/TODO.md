@@ -2,8 +2,9 @@
 
 ## Performance
 
-- The home-made "asyncronous IO" may be inefficient in SSDs. May consider refactor into Boost::ASIO.
+- The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost::ASIO.
 - The massive use of `std::stringstream` should be replaced by `std::snprintf`, which is considerably faster and makes advantages of pre-allocated memory.
+- The memory consumption is ridiculous. Consider have it profiled using Intel VTune Profiler.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -15,9 +16,9 @@
         - [OpenMPI](https://www.open-mpi.org/).
         - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
         - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
-      - Google Protocol Buffers (`protobuf`) for serialization/deserialization of MPI.
+  - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
-- Surveillance of each thread needs improving. We may implement a data structure that allows each thread update its status to a locked `std::map` and ask a thread to display the status every few seconds.
+- Surveillance of each thread needs improving. We may implement a data structure that allows each thread to update its status to a locked `std::map` and ask a thread to display the status every few seconds.
 
 ## I/O Formats
 

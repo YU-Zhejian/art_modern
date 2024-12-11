@@ -11,6 +11,7 @@ export IDRATE=0.1
 export OUT_DIR="opt/tmp/"
 export ART="opt/build_debug/art_modern"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
+export ERR_FA="data/raw_data/err.fa"
 
 function sam2bam() {
     samtools sort -@20 --write-index "${1}".sam -o "${1}".bam
@@ -19,6 +20,7 @@ function sam2bam() {
 }
 
 . sh.d/test_small.sh.d/out_fmts.sh       # Test all output is working
+. sh.d/test_small.sh.d/fail.sh           # FASTA that would fail the simulator
 . sh.d/test_small.sh.d/wgs.sh            # WGS mode (with constant coverage)
 . sh.d/test_small.sh.d/trans_constcov.sh # Transcript mode with constant coverage
 . sh.d/test_small.sh.d/tmpl_constcov.sh  # Template mode with constant coverage

@@ -33,7 +33,7 @@ public:
 private:
     static long seed();
 #if defined(USE_STL_RANDOM)
-    std::random_device gen_;
+    std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
     std::normal_distribution<double> insertion_length_gaussian_;
     std::uniform_int_distribution<int> base_;

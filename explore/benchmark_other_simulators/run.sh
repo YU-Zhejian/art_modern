@@ -19,7 +19,7 @@ function recreate_data_out() {
 }
 
 printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\tCMD\n' >time.tsv
-for i in {1..10}; do
+for i in {1..3}; do
     echo "Run ${i}"
     run wgsim-genome bin/wgsim \
         -1 150 -2 150 -N 1671440 -d 300 -s 20 \
