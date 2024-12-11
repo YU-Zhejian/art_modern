@@ -1,26 +1,35 @@
 # Usage
 
-## Reading the Documentation
-
-In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
+This is the detailed usage of `art_modern`. Every parameter and their combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
 
 ## Simulation Modes (`--mode`)
 
+- **`wgs` (DEFAULT) for whole-genome sequencing.**
+- `trans` for transcriptome simulation.
+- `template` for template simulation.
+
 ## Library Construction Methods (`--lc`)
+
+- **`se` (DEFAULT) for single-end reads.**
+- `pe` for paired-end reads. Additional parameters are needed.
+- `mp` for mate-paired reads. Additional parameters are needed.
+
+### Additional Parameters for Paired-End/Mate-Paired  (`--pe_frag_dist_mean`, `--pe_frag_dist_std_dev`)
+
+These parameters describe the length distribution of fragments.
+
 
 ## Input (`--i-*`)
 
 Currently, we support input in FASTA and PBSIM3 Transcripts format. They are controlled by the following major parameters:
 
-- `--i-file`: The input reference file path.
+- `--i-file`: The input reference file path. It must exist in the filesystem.
 - `--i-type`: The file type of input reference sequences. Currently, FASTA and PBSIM3 Transcripts format are supported.
   - **`auto` (DEFAULT) for extension-based decision.**
     - If the file ends with `.fna`, `.fsa`, `.fa`, `.fasta`, resolve to `fasta`.
     - Otherwise, an error will be raised.
   - `fasta` for FASTA files.
   - `pbsim3_transcripts` for PBSIM3 Transcripts format.
-
-Following are detailed constrains of the aforementioned format:
 
 ### Input Parser (`--i-parser`)
 
@@ -89,17 +98,37 @@ AAAAAATTTTTT
 
 ### Coverage (`--i-fcov`)
 
+**NOTE** This parameter is ignored if file type is set to `pbsim3_transcripts`.
+
+This option allows you to specify coverage. `art_modern` supports the following coverage mode:
+
+- Unified coverage in `double` data type (e.g., 10.0). Under this scenario, the coverage is identical for all contigs.
+- Per-contig coverage without strand information.
+- Per-contig coverage with strand information.
+
 ### Conclusive Remarks
 
-A compatibility matrix is as follows:
+Compatibility matrix of file type, simulation mode, and parser:
 
-| Parser \ Mode | `wgs`     | `trans`                     | `template`                  |
-|---------------|-----------|-----------------------------|-----------------------------|
-| `memory`      | FASTA     | FASTA \| PBSIM3 Transcripts | FASTA \| PBSIM3 Transcripts |
-| `htslib`      | FASTA     | **ERROR**                   | **ERROR**                   |
-| `stream`      | **ERROR** | FASTA \| PBSIM3 Transcripts | FASTA \| PBSIM3 Transcripts |
+| Parser \ Simulation Mode | `wgs`     | `trans`                        | `template`                     |
+|--------------------------|-----------|--------------------------------|--------------------------------|
+| `memory`                 | `fasta`   | `fasta` / `pbsim3_transcripts` | `fasta` / `pbsim3_transcripts` |
+| `htslib`                 | `fasta`   | **ERROR**                      | **ERROR**                      |
+| `stream`                 | **ERROR** | `fasta` / `pbsim3_transcripts` | `fasta` / `pbsim3_transcripts` |
+
+Compatibility matrix of coverage mode, simulation mode, and file type:
+
+| Simulation Mode \ File Type | `fasta`                         | `pbsim3_transcripts` | 
+|-----------------------------|---------------------------------|----------------------|
+| `wgs`                       | Unified                         | **ERROR**            |
+| `trans`                     | Unified / Strandless / Stranded | **IGNORED**          |
+| `template`                  | Unified / Strandless / Stranded | **IGNORED**          |
 
 ## Output Formats (`--o-*`)
+
+Here introduces diverse output formats supported by `art_modern`. You may specify none of them to perform simulation without any output for benchmarking purposes.
+
+If the parent directory does not exist, it will be created using a `mkdir -p`-like manner.
 
 ### Pairwise Alignment Format (`--o-pwa`)
 
@@ -170,7 +199,7 @@ Other SAM/BAM formatting parameters includes:
 - `--o-sam-num_threads`: Number of threads used to compress BAM output.
 - `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream and 1--9 for fastest to best compression ratio. Defaults to `4`.
 
-    Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
+  Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
 
 Please refer to [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
 
@@ -191,19 +220,14 @@ This output writer supports other BAM formatting parameters.
 
 ## ART-Specific Parameters
 
-### Read ID Prefix (`--id`)
-
-The prefix of read IDs. Used to distinguish between different runs.
+- `--id`: Read ID Prefix. Used to distinguish between different runs.
+- `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
 
 ### Quality Distribution File (`--qual_file_?`, `--q_shift_?`, `--min_qual`, and `--max_qual`)
 
 ### Indel Rate (`--ins_rate_?`, `--del_rate_?`, `--max_indel`)
 
 ### Separated Quality Profile for Different Bases (`--sep_flag`)
-
-### Read Length (`--read_len`)
-
-### Paired-End Parameters (`--pe_frag_dist_mean`, `--pe_frag_dist_std_dev`)
 
 ## Performance Hint
 
