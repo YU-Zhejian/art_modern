@@ -11,11 +11,11 @@ const char ALN_GAP = '-';
 
 const std::string ALN_GAP_STR = "-";
 
-const int MAX_QUAL = 93;
-
+/**
+ * 10^{-40} error rate, which is quite low.
+ */
+const int MAX_QUAL = 40;
 const int MIN_QUAL = 0;
-
-// !"#$%&\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~
 
 const char ART_VERSION[] = "2.5.8";
 

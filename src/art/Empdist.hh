@@ -12,18 +12,19 @@ namespace labw::art_modern {
 
 class Empdist {
 public:
-    std::vector<std::map<int, int, std::less<>>> qual_dist_first;
-    std::vector<std::map<int, int, std::less<>>> qual_dist_second;
+    using dist_type = std::vector<std::map<int, int, std::less<>>>;
+    dist_type qual_dist_first;
+    dist_type qual_dist_second;
 
-    std::vector<std::map<int, int, std::less<>>> a_qual_dist_first;
-    std::vector<std::map<int, int, std::less<>>> t_qual_dist_first;
-    std::vector<std::map<int, int, std::less<>>> g_qual_dist_first;
-    std::vector<std::map<int, int, std::less<>>> c_qual_dist_first;
+    dist_type a_qual_dist_first;
+    dist_type t_qual_dist_first;
+    dist_type g_qual_dist_first;
+    dist_type c_qual_dist_first;
 
-    std::vector<std::map<int, int, std::less<>>> a_qual_dist_second;
-    std::vector<std::map<int, int, std::less<>>> t_qual_dist_second;
-    std::vector<std::map<int, int, std::less<>>> g_qual_dist_second;
-    std::vector<std::map<int, int, std::less<>>> c_qual_dist_second;
+    dist_type a_qual_dist_second;
+    dist_type t_qual_dist_second;
+    dist_type g_qual_dist_second;
+    dist_type c_qual_dist_second;
 
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual);
     void get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, bool first = true) const;

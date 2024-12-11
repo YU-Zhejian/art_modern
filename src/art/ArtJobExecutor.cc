@@ -5,37 +5,50 @@
 #include <atomic>
 #include <boost/log/trivial.hpp>
 #include <boost/timer/progress_display.hpp>
-#include <chrono>
-#include <thread>
-
-#define GENERATE(NUM_WHAT_READS, IS_POSITIVE, GEN_FUNC)                                                                \
-    max_tolerance = std::max(5, static_cast<int>(NUM_WHAT_READS * MAX_TRIAL_RATIO_BEFORE_FAIL));                       \
-    while (NUM_WHAT_READS > 0) {                                                                                       \
-        if (GEN_FUNC(art_contig, IS_POSITIVE, num_reads)) {                                                            \
-            NUM_WHAT_READS -= num_reads_to_reduce;                                                                     \
-            num_reads += num_reads_to_reduce;                                                                          \
-        } else {                                                                                                       \
-            num_cont_fail++;                                                                                           \
-        }                                                                                                              \
-        if (num_cont_fail >= max_tolerance) {                                                                          \
-            BOOST_LOG_TRIVIAL(debug) << "Failed to generate reads for " << contig_name << " sized " << contig_size     \
-                                     << " after " << max_tolerance << " attempts.";                                    \
-            break;                                                                                                     \
-        }                                                                                                              \
-    }
 
 namespace labw::art_modern {
 
-bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
+void ArtJobExecutor::generate(const long targeted_num_reads, bool is_positive, ArtContig& art_contig)
+{
+    int num_cont_fail = 0;
+    const auto max_tolerance
+        = std::max(5L, static_cast<long>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
+    const int num_reads_to_reduce = art_params.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2;
+    bool retv;
+    long remaining_num_reads = targeted_num_reads;
+    long current_num_reads = 0;
+    while (remaining_num_reads > 0) {
+        if (art_params.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
+            retv = generate_se(art_contig, is_positive, current_num_reads);
+        } else {
+            retv = generate_pe(art_contig, is_positive, current_num_reads);
+        }
+        if (retv) {
+            remaining_num_reads -= num_reads_to_reduce;
+            num_reads += num_reads_to_reduce;
+            current_num_reads++;
+        } else {
+            num_cont_fail++;
+        }
+        if (num_cont_fail >= max_tolerance) {
+            BOOST_LOG_TRIVIAL(debug) << "Failed to generate reads for " << art_contig.seq_name << " sized "
+                                     << art_contig.seq_size << " after " << max_tolerance << " attempts.";
+            break;
+        }
+    }
+}
+
+bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
     std::ostringstream osID;
     osID << art_contig.seq_name << ':' << art_params.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
          << current_num_reads;
+    const std::string read_name = osID.str();
 
     // std::snprintf(nullptr, 20, "%s:%s:%d:%s:%zu", art_params.id.c_str(), art_contig.seq_name.c_str(), job_.job_id,
     // mpi_rank_.c_str(),current_num_reads);
-    ArtRead read_1(art_params, rprob_, art_contig.seq_name, osID.str());
-    ArtRead read_2(art_params, rprob_, art_contig.seq_name, osID.str());
+    ArtRead read_1(art_params, rprob_, art_contig.seq_name, read_name);
+    ArtRead read_2(art_params, rprob_, art_contig.seq_name, read_name);
 
     try {
         art_contig.generate_read_pe(
@@ -57,7 +70,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, bool is_plus_strand, con
     return true;
 }
 
-bool ArtJobExecutor::generate_se(ArtContig& art_contig, bool is_plus_strand, const std::size_t current_num_reads)
+bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
     std::ostringstream osID;
     osID << art_contig.seq_name << ':' << art_params.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
@@ -94,7 +107,6 @@ void ArtJobExecutor::execute()
     if (num_contigs == 0) {
         return;
     }
-    const int num_reads_to_reduce = art_params.art_lib_const_mode != ART_LIB_CONST_MODE::SE ? 2 : 1;
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
@@ -115,24 +127,16 @@ void ArtJobExecutor::execute()
         const auto cov_pos = job_.coverage_info.coverage_positive(contig_name);
         const auto cov_neg = job_.coverage_info.coverage_negative(contig_name);
 
-        auto num_pos_reads = static_cast<long>(cov_pos * cov_ratio);
-        auto num_neg_reads = static_cast<long>(cov_neg * cov_ratio);
+        const auto num_pos_reads = static_cast<long>(cov_pos * cov_ratio);
+        const auto num_neg_reads = static_cast<long>(cov_neg * cov_ratio);
 
         if (num_pos_reads + num_neg_reads == 0) {
             BOOST_LOG_TRIVIAL(debug) << "No read will be generated for the reference sequence " << contig_name
                                      << " due to insufficient coverage (pos=" << cov_pos << ", neg=" << cov_neg << ")";
             continue;
         }
-        int num_cont_fail = 0;
-        int max_tolerance;
-
-        if (art_params.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            GENERATE(num_pos_reads, true, generate_se)
-            GENERATE(num_neg_reads, false, generate_se)
-        } else {
-            GENERATE(num_pos_reads, true, generate_pe)
-            GENERATE(num_neg_reads, false, generate_pe)
-        }
+        generate(num_pos_reads, true, art_contig);
+        generate(num_neg_reads, false, art_contig);
     }
 
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads

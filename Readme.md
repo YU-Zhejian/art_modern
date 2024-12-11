@@ -2,7 +2,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well, or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulator, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulators, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
 
 ## Quick Start
 
@@ -249,6 +249,7 @@ The `art_modern` project provides diverse documentations to satisfy your needs.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
   - [News](docs/News.md) for changes over the project.
 - For a comparison of this project with other simulators, see [Benchmark](explore/benchmark_other_simulators).
+- The original ART documentation is copied to [here](docs/original_art_docs).
 
 ## Acknowledgements
 

@@ -6,7 +6,7 @@ This project requires a working C++ compiler that supports C++17 (due to the int
 
 The following compilers are tested and supported:
 
-- [GCC](https://gcc.gnu.org/): The most widely-used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
+- [GCC](https://gcc.gnu.org/): The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
   - See [here](https://gcc.gnu.org/projects/cxx-status.html#cxx17) for support over C++17 in GCC.
 - [Clang](https://clang.llvm.org/): Another popular compiler for GNU/Linux. Also, the default C++ compiler for FreeBSD and Apple macOS.
   - See [here](https://clang.llvm.org/cxx_status.html#cxx17) for support over C++17 in Clang.
@@ -30,7 +30,7 @@ If there's no error, the compiler is supported.
 
 [CMake](https://cmake.org/) 3.17 or above is required to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., macOS, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
-This project relies on diverse CMake variables that control the build behaviour. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
+This project relies on diverse CMake variables that control the build behavior. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
 
 ```shell
 cmake -DBUILD_SHARED_LIBS=ON
@@ -80,14 +80,14 @@ To use external HTSLib, consult your system administrator. Those libraries usual
 
 ### [`BUILD_SHARED_LIBS`](https://cmake.org/cmake/help/latest/variable/BUILD_SHARED_LIBS.html)
 
-This instructs CMake whether to build shared libraries. It will also affect behaviour while searching for libraries.
+This instructs CMake whether to build shared libraries. It will also affect behavior while searching for libraries.
 
 - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
 - `OFF`: Will search for static libraries and use static linking.
 
 ### [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
 
-This instructs CMake to build executables/libraries with different optimisation and debugging levels.
+This instructs CMake to build executables/libraries with different optimization and debugging levels.
 
 - **`Debug` (DEFAULT): For developers with debugging needs.**
 - `Release`: Optimized executables/libraries without debug symbols. Used for daily use.

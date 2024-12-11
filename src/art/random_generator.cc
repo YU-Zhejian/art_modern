@@ -22,7 +22,7 @@ long Rprob::seed()
 #if defined(USE_STL_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_() // seed()
+    : gen_(seed())
     , dis_(0.0, 1.0)
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)

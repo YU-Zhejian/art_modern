@@ -9,12 +9,13 @@
 
 namespace labw::art_modern {
 
-void shift_emp(
-    std::map<int, int, std::less<>>& map_to_process, const int q_shift, const int min_qual, const int max_qual)
+void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
 {
-    for (auto& map_to_proces : map_to_process) {
-        map_to_proces.second+= q_shift;
-        map_to_proces.second = std::min(std::max(map_to_proces.second, min_qual), max_qual);
+    for (auto& i : map_to_process) {
+        for (auto& j : i) {
+            j.second += q_shift;
+            j.second = std::min(std::max(j.second, min_qual), max_qual);
+        }
     }
 }
 
@@ -239,40 +240,17 @@ void Empdist::shift_all_emp(
 
 {
     if (!sep_flag) {
-        for ( auto& i : qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for ( auto& i : qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
+        shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);
+        shift_emp(qual_dist_second, q_shift_2, min_qual, max_qual);
     } else {
-        for ( auto& i : a_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for ( auto& i : a_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for ( auto& i : c_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for ( auto& i : c_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for ( auto& i : g_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for ( auto& i : g_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
-
-        for ( auto& i : t_qual_dist_first) {
-            shift_emp(i, q_shift_1, min_qual, max_qual);
-        }
-        for ( auto& i : t_qual_dist_second) {
-            shift_emp(i, q_shift_2, min_qual, max_qual);
-        }
+        shift_emp(a_qual_dist_first, q_shift_1, min_qual, max_qual);
+        shift_emp(a_qual_dist_second, q_shift_2, min_qual, max_qual);
+        shift_emp(t_qual_dist_first, q_shift_1, min_qual, max_qual);
+        shift_emp(t_qual_dist_second, q_shift_2, min_qual, max_qual);
+        shift_emp(c_qual_dist_first, q_shift_1, min_qual, max_qual);
+        shift_emp(c_qual_dist_second, q_shift_2, min_qual, max_qual);
+        shift_emp(g_qual_dist_first, q_shift_1, min_qual, max_qual);
+        shift_emp(g_qual_dist_second, q_shift_2, min_qual, max_qual);
     }
 }
 

@@ -1,0 +1,30 @@
+README FILES
+
+ 1) art_illumina_README for art_illumina 
+ 2) art_454_README for art_454 
+ 3) art_SOLiD_README for art_SOLiD 
+
+COMPILATION AND INSTALLATION
+
+	PREREQUISITES: 
+
+		1) GNU g++ 4.0 or above (http://gcc.gnu.org/install) 
+		2) GNU gsl library (http://www.gnu.org/s/gsl/)
+
+	COMPILATION & INSTALLATION
+		1) add gsl library installation directory to compiler's search path
+
+	       	If your GSL library is not installed in system standard search path, your GSL installation 
+		directory need to be added to gcc/g++ complier FLAGS. For example, gsl is typically installed
+	       	in /opt/local or /usr/local directory in MacOS X. You can add the directory to the search path
+		 of gcc/g++ complier by run the following command: 
+		
+		export CFLAGS="$CFLAGS -I/opt/local/include" CPPFLAGS="$CPPFLAGS -I/opt/local/include" LDFLAGS="$LDFLAGS -L/opt/local/lib"
+		export CFLAGS="$CFLAGS -I/usr/local/include" CPPFLAGS="$CPPFLAGS -I/usr/local/include" LDFLAGS="$LDFLAGS -L/usr/local/lib"
+
+		2) compile and install 
+
+		./configure --prefix=$HOME
+	       	make
+	       	make install
+

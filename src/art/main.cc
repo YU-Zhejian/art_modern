@@ -17,7 +17,6 @@
 #include "utils/dump_utils.hh"
 #include "utils/log_utils.hh"
 #include "utils/mpi_utils.hh"
-#include "utils/protobuf_utils.hh"
 
 using namespace labw::art_modern;
 
@@ -79,7 +78,6 @@ int main(int argc, char* argv[])
     init_file_logger("log.d");
     handle_mpi_child();
     handle_dumps();
-    validate_protobuf_version();
 
     const auto& art_params = parse_args(argc, argv);
     BOOST_LOG_TRIVIAL(info) << "Argument parsing finished. Start generating...";
