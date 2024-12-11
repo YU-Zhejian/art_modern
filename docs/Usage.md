@@ -4,20 +4,30 @@ This is the detailed usage of `art_modern`. Every parameter and their combinatio
 
 ## Simulation Modes (`--mode`)
 
-- **`wgs` (DEFAULT) for whole-genome sequencing.**
-- `trans` for transcriptome simulation.
-- `template` for template simulation.
+- **`wgs` (DEFAULT) for whole-genome sequencing.** For scenarios with a limited number of sized contigs.
+- `trans` for transcriptome simulation. For scenarios with many short contigs.
+- `template` for template simulation. Often being used with a high-level simulator that produces read fragments.
 
 ## Library Construction Methods (`--lc`)
 
-- **`se` (DEFAULT) for single-end reads.**
-- `pe` for paired-end reads. Additional parameters are needed.
-- `mp` for mate-paired reads. Additional parameters are needed.
+See [here](https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/paired-end-vs-single-read.html) and [here](https://www.illumina.com/science/technology/next-generation-sequencing/mate-pair-sequencing.html) for details on library construction methods.
 
-### Additional Parameters for Paired-End/Mate-Paired  (`--pe_frag_dist_mean`, `--pe_frag_dist_std_dev`)
+- **`se` (DEFAULT) for single-end reads.** That includes:
+  - **For `wgs` and `trans` mode:** A read may start from any position in the reference contig that is long enough to contain the read.
+  - **For `template` mode:** A read will start from 0 position in the reference contig.
+- `pe` for paired-end reads. That includes:
+  - **For `wgs` and `trans` mode:** A fragment, whose length is drawn from a Gaussian distribution specified by `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev`, is created from any position in the reference contig that is long enough to contain the fragment.
+  - **For `template` mode:** A fragment that spans the entire length of the reference contig is created.
+  - Paired-end reads facing inward of the fragment are then created from both ends of the fragment.
+- `mp` for mate-paired reads. That includes:
+  - Extraction of the fragment as-is in `pe` mode.
+  - Mate-paired reads facing outward of the fragment are created from both ends of the fragment.
 
-These parameters describe the length distribution of fragments.
+Parameters `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev` are needed to specify the length distribution of fragments. In original ART, the fragment lengths obey Gaussian (normal) distribution.
 
+## Parallelism (`--parallel`)
+
+TODO
 
 ## Input (`--i-*`)
 
@@ -98,13 +108,15 @@ AAAAAATTTTTT
 
 ### Coverage (`--i-fcov`)
 
-**NOTE** This parameter is ignored if file type is set to `pbsim3_transcripts`.
+**NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`.
 
 This option allows you to specify coverage. `art_modern` supports the following coverage mode:
 
 - Unified coverage in `double` data type (e.g., 10.0). Under this scenario, the coverage is identical for all contigs.
 - Per-contig coverage without strand information.
 - Per-contig coverage with strand information.
+
+**NOTE** We prefer unified coverage. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify per-contig coverage.
 
 ### Conclusive Remarks
 
@@ -222,15 +234,23 @@ This output writer supports other BAM formatting parameters.
 
 - `--id`: Read ID Prefix. Used to distinguish between different runs.
 - `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
+- `--qual_file_1` and `--qual_file_2`: Quality distribution files for read 1 and read 2 respectively. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode.
+- `--q_shift_1` and `--q_shift_2`: Shift the base quality of the quality distribution by the specified value. Please note that the shifted quality distribution will be bounded to `--min_qual` and `--max_qual`.
+- `--min_qual` and `--max_qual`: Clip the quality distribution to the specified range.
+- `--sep_flag`: Separate quality distributions for different bases in the same position.
+  - **unset (DEFAULT)**: Use the same quality distribution for different bases in the same position. For example, the quality distribution of pos 10 will be the same regardless whether the incoming base is `A` or `T`.
+  - set: Use different quality distributions for different bases in the same position. For example, the quality distribution of pos 10 may **NOT** be the same regardless whether the incoming base is `A` or `T`.
+- `--ins_rate_1`, `--ins_rate_2`, `--del_rate_1`, and `--del_rate_2`: Targeted insertion and deletion rate for read 1 and 2.
+- `--max_indel`: The maximum total number of insertions and deletions per read.
 
-### Quality Distribution File (`--qual_file_?`, `--q_shift_?`, `--min_qual`, and `--max_qual`)
-
-### Indel Rate (`--ins_rate_?`, `--del_rate_?`, `--max_indel`)
-
-### Separated Quality Profile for Different Bases (`--sep_flag`)
+Quality distributions bundled with the original ART can be found [here](../data/Illumina_profiles).
 
 ## Performance Hint
 
 When building `art_modern`, set `USE_HTSLIB` to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native` and linked with [libdeflate](https://github.com/ebiggers/libdeflate). Set `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL` on Intel/AMD machines.
 
 Also, when executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.
+
+## Generate Illumina Profile
+
+See [ART_profiler_illumina](../deps/ART_profiler_illumina).

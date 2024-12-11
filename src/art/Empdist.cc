@@ -10,16 +10,10 @@
 namespace labw::art_modern {
 
 void shift_emp(
-    std::map<int, int, std::less<>> map_to_process, const int q_shift, const int min_qual, const int max_qual)
+    std::map<int, int, std::less<>>& map_to_process, const int q_shift, const int min_qual, const int max_qual)
 {
     for (auto& map_to_proces : map_to_process) {
-        if (q_shift != 0) {
-            if (q_shift < 0 && (-q_shift > map_to_proces.second)) {
-                map_to_proces.second = min_qual;
-            } else {
-                map_to_proces.second = std::min(map_to_proces.second + q_shift, max_qual);
-            }
-        }
+        map_to_proces.second+= q_shift;
         map_to_proces.second = std::min(std::max(map_to_proces.second, min_qual), max_qual);
     }
 }
@@ -199,7 +193,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             abort_mpi();
         }
 
-        auto denom = static_cast<double>(count[count.size() - 1]) / MAX_DIST_NUMBER;
+        auto denom = static_cast<double>(count.back()) / MAX_DIST_NUMBER;
         dist.clear();
 
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
@@ -245,38 +239,38 @@ void Empdist::shift_all_emp(
 
 {
     if (!sep_flag) {
-        for (const auto& i : qual_dist_first) {
+        for ( auto& i : qual_dist_first) {
             shift_emp(i, q_shift_1, min_qual, max_qual);
         }
-        for (const auto& i : qual_dist_second) {
+        for ( auto& i : qual_dist_second) {
             shift_emp(i, q_shift_2, min_qual, max_qual);
         }
     } else {
-        for (const auto& i : a_qual_dist_first) {
+        for ( auto& i : a_qual_dist_first) {
             shift_emp(i, q_shift_1, min_qual, max_qual);
         }
-        for (const auto& i : a_qual_dist_second) {
+        for ( auto& i : a_qual_dist_second) {
             shift_emp(i, q_shift_2, min_qual, max_qual);
         }
 
-        for (const auto& i : c_qual_dist_first) {
+        for ( auto& i : c_qual_dist_first) {
             shift_emp(i, q_shift_1, min_qual, max_qual);
         }
-        for (const auto& i : c_qual_dist_second) {
+        for ( auto& i : c_qual_dist_second) {
             shift_emp(i, q_shift_2, min_qual, max_qual);
         }
 
-        for (const auto& i : g_qual_dist_first) {
+        for ( auto& i : g_qual_dist_first) {
             shift_emp(i, q_shift_1, min_qual, max_qual);
         }
-        for (const auto& i : g_qual_dist_second) {
+        for ( auto& i : g_qual_dist_second) {
             shift_emp(i, q_shift_2, min_qual, max_qual);
         }
 
-        for (const auto& i : t_qual_dist_first) {
+        for ( auto& i : t_qual_dist_first) {
             shift_emp(i, q_shift_1, min_qual, max_qual);
         }
-        for (const auto& i : t_qual_dist_second) {
+        for ( auto& i : t_qual_dist_second) {
             shift_emp(i, q_shift_2, min_qual, max_qual);
         }
     }

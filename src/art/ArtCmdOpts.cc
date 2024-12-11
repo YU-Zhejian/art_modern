@@ -334,9 +334,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
         }
         abort_mpi();
     }
-    if (q_shift_1 != 0 || q_shift_2 != 0) {
-        qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
-    }
+    qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
     return qdist;
 }
 
@@ -356,10 +354,10 @@ void validate_htslib_parser(const std::string& input_file_path)
     }
 }
 
-std::vector<double> gen_per_base_mutation_rate(const int read_len, const double p, const int max_num)
+std::vector<double> gen_per_base_mutation_rate(const int read_len, const double p, const int max_indel)
 {
     std::vector<double> rate;
-    if (max_num == 0 || p < 1E-30) {
+    if (max_indel == 0 || p < 1E-30) {
         return rate;
     }
 
@@ -368,7 +366,7 @@ std::vector<double> gen_per_base_mutation_rate(const int read_len, const double 
     for (auto i = 0; i < read_len; i++) {
         tp = boost::math::cdf(boost::math::complement(boost::math::binomial(read_len, p), i));
         rate.emplace_back(tp);
-        if (max_num > 0 && (i >= max_num)) {
+        if (max_indel > 0 && (i >= max_indel)) {
             break;
         }
         p_cdf += tp;
