@@ -65,7 +65,7 @@ std::string revcomp(const std::string& dna)
     return rets;
 }
 
-std::string normalize(const std::string& dna)
+[[maybe_unused]] std::string normalize(const std::string& dna)
 {
     std::string rets = dna;
     std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
@@ -80,6 +80,25 @@ std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr)
         oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
     }
     return oss.str();
+}
+void comp_inplace(std::string& dna)
+{
+    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
+        dna[i] = rev_comp_trans_2[dna[i] & 0xFF];
+    }
+}
+
+void revcomp_inplace(std::string& dna)
+{
+    comp_inplace(dna);
+    reverse(dna.data(), dna.size());
+}
+
+void normalize_inplace(std::string& dna)
+{
+    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
+        dna[i] = normalization_matrix[dna[i] & 0xFF];
+    }
 }
 
 } // namespace labw::art_modern // namespace labw

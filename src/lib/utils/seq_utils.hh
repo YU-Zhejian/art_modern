@@ -8,10 +8,13 @@
 namespace labw::art_modern {
 std::string comp(const std::string& dna);
 std::string revcomp(const std::string& dna);
+[[maybe_unused]] std::string normalize(const std::string& dna);
+void comp_inplace(std::string& dna);
+void revcomp_inplace(std::string& dna);
+void normalize_inplace(std::string& dna);
 std::string qual_to_str(const std::vector<int>& qual);
-std::string qual_to_str(const uint8_t* qual, size_t qlen);
+[[maybe_unused]] std::string qual_to_str(const uint8_t* qual, size_t qlen);
 std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr);
-std::string normalize(const std::string& dna);
 
 /**
  * Reverse an arbitrary sequence.

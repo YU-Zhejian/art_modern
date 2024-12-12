@@ -9,6 +9,7 @@ class InMemoryFastaFetch : public BaseFastaFetch {
 public:
     InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept;
     InMemoryFastaFetch(const InMemoryFastaFetch& other) = delete;
+    InMemoryFastaFetch(const InMemoryFastaFetch& other, std::ptrdiff_t from, std::ptrdiff_t to);
     InMemoryFastaFetch();
     explicit InMemoryFastaFetch(const std::string& file_name);
     explicit InMemoryFastaFetch(const std::tuple<std::vector<std::string>, std::vector<std::string>>& seq_map);

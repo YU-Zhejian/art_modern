@@ -17,9 +17,9 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
     int i = 0;
     while (true) {
         try {
-            auto fa_record = fai.next();
-            BOOST_TEST(fa_record.id == chrNames[i]);
-            BOOST_TEST(fa_record.sequence == seqs[i]);
+            const auto& [id, sequence] = fai.next();
+            BOOST_TEST(id == chrNames[i]);
+            BOOST_TEST(sequence == seqs[i]);
         } catch (EOFException&) {
             break;
         }

@@ -5,41 +5,31 @@
 #include <string>
 #include <utility>
 
-namespace labw {
-namespace art_modern {
+namespace labw::art_modern {
 
-    struct FastaRecord {
-        const std::string id;
-        const std::string sequence;
+using FastaRecord = std::pair<std::string, std::string>;
 
-        FastaRecord(const FastaRecord&) = delete;
-        FastaRecord(FastaRecord&&) = default; // Allow move constructor
-        FastaRecord& operator=(const FastaRecord&) = delete;
-        FastaRecord& operator=(FastaRecord&&) = delete;
-    };
+struct EOFException : std::exception { };
+struct MalformedFastaException : std::exception {
+public:
+    const char* what() const noexcept override;
+};
 
-    struct EOFException : std::exception { };
-    struct MalformedFastaException : std::exception {
-    public:
-        const char* what() const noexcept override;
-    };
+class FastaIterator {
+public:
+    explicit FastaIterator(std::istream& istream);
 
-    class FastaIterator {
-    public:
-        explicit FastaIterator(std::istream& istream);
+    FastaRecord next();
 
-        FastaRecord next();
+    FastaIterator(const FastaIterator&) = delete;
+    FastaIterator(FastaIterator&&) = delete;
+    FastaIterator& operator=(const FastaIterator&) = delete;
+    FastaIterator& operator=(FastaIterator&&) = delete;
 
-        FastaIterator(const FastaIterator&) = delete;
-        FastaIterator(FastaIterator&&) = delete;
-        FastaIterator& operator=(const FastaIterator&) = delete;
-        FastaIterator& operator=(FastaIterator&&) = delete;
+private:
+    std::istream& _istream;
+    std::size_t _lineno = 0;
+    std::mutex mutex_;
+};
 
-    private:
-        std::istream& _istream;
-        std::size_t _lineno = 0;
-        std::mutex mutex_;
-    };
-
-} // namespace art_modern
-} // namespace labw
+} // namespace labw::art_modern // namespace labw

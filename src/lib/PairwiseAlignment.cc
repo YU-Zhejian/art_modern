@@ -1,7 +1,6 @@
 #include "PairwiseAlignment.hh"
 #include "art_modern_config.h" // For CEU_CM_IS_DEBUG
 #include "art_modern_constants.hh"
-#include "utils/seq_utils.hh"
 
 #include <boost/algorithm/string/erase.hpp>
 #include <htslib/sam.h>
@@ -78,31 +77,31 @@ std::string PairwiseAlignment::serialize() const
     return buff;
 }
 
-PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)
+[[maybe_unused]] PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)
 {
     const auto sep_pos = serialized[0].find('\t');
-    const std::string& read_name_ = serialized[0].substr(1, sep_pos - 1);
-    const std::string& coordinate_ = serialized[0].substr(sep_pos + 1);
+    std::string read_name = serialized[0].substr(1, sep_pos - 1);
+    const std::string& coordinate = serialized[0].substr(sep_pos + 1);
     std::string token;
-    std::istringstream iss(coordinate_);
+    std::istringstream iss(coordinate);
     std::getline(iss, token, ':');
-    const std::string& contig_name_ = token;
+    std::string contig_name = std::move(token);
     std::getline(iss, token, ':');
-    const hts_pos_t pos_on_contig_ = std::stol(token);
+    const hts_pos_t pos_on_contig = std::stol(token);
     std::getline(iss, token, ':');
-    const bool is_plus_strand_ = token[0] == '+';
+    const bool is_plus_strand = token[0] == '+';
 
-    const std::string& aligned_query_ = serialized[1];
-    const std::string& aligned_ref_ = serialized[2];
-    std::string query_ = serialized[1];
-    std::string ref_ = serialized[2];
-    const std::string& qual_ = serialized[3];
-    boost::algorithm::erase_all(query_, ALN_GAP_STR);
-    boost::algorithm::erase_all(ref_, ALN_GAP_STR);
-    return { read_name_, contig_name_, query_, ref_, qual_, aligned_query_, aligned_ref_, pos_on_contig_,
-        is_plus_strand_ };
+    std::string aligned_query = serialized[1];
+    std::string aligned_ref = serialized[2];
+    std::string query = serialized[1];
+    std::string ref = serialized[2];
+    std::string qual = serialized[3];
+    boost::algorithm::erase_all(query, ALN_GAP_STR);
+    boost::algorithm::erase_all(ref, ALN_GAP_STR);
+    return { std::move(read_name), std::move(contig_name), std::move(query), std::move(ref), std::move(qual),
+        std::move(aligned_query), std::move(aligned_ref), pos_on_contig, is_plus_strand };
 }
-void PairwiseAlignment::serialize(std::ostream& os) const
+[[maybe_unused]] void PairwiseAlignment::serialize(std::ostream& os) const
 {
     os << ">" << read_name << "\t" << contig_name << ":" << std::to_string(pos_on_contig) << ":"
        << (is_plus_strand ? '+' : '-') << "\n";

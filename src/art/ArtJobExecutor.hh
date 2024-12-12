@@ -19,7 +19,6 @@ public:
     void execute();
     std::atomic<std::size_t> num_reads;
     std::string thread_info() const;
-    const ArtParams& art_params;
     std::atomic<bool> is_running = false;
 
 private:
@@ -27,10 +26,13 @@ private:
     bool generate_se(ArtContig& art_contig, bool is_plus_strand, std::size_t current_num_reads);
     void generate(long targeted_num_reads, bool is_positive, ArtContig& art_contig);
 
+    const ArtParams& art_params_;
     SimulationJob job_;
     const std::string mpi_rank_;
     BaseReadOutput* output_dispatcher_;
     Rprob rprob_;
+    std::vector<double> tmp_qual_probs_;
+    std::vector<double> probs_indel_;
 };
 
 } // namespace labw::art_modern
