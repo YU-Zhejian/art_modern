@@ -34,7 +34,7 @@ BaseFastaFetch::BaseFastaFetch(const std::tuple<std::vector<std::string>, std::v
 {
 }
 bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
-std::string BaseFastaFetch::fetch(std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
+std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
 BaseFastaFetch::BaseFastaFetch() = default;
 BaseFastaFetch::~BaseFastaFetch() = default;
 }

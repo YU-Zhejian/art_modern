@@ -6,7 +6,7 @@ namespace labw::art_modern {
 std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
 {
     auto outs = std::make_unique<std::string>();
-    std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 6;
+    const std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 6;
     outs->resize(strsize);
     outs->at(0) = 0;
     std::snprintf(
@@ -14,10 +14,10 @@ std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
     return outs;
 }
 
-std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa, bool is_read1)
+std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa, const bool is_read1)
 {
     auto outs = std::make_unique<std::string>();
-    std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;
+    const std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;
     outs->resize(strsize);
     outs->at(0) = 0;
     std::snprintf(outs->data(), strsize + 1, "@%s/%d\n%s\n+\n%s\n", pwa.read_name.c_str(), is_read1 ? 1 : 2,

@@ -12,14 +12,14 @@ namespace labw::art_modern {
 void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
 {
     for (auto& i : map_to_process) {
-        for (auto& j : i) {
-            j.second += q_shift;
-            j.second = std::min(std::max(j.second, min_qual), max_qual);
+        for (auto& [fst, snd] : i) {
+            snd += q_shift;
+            snd = std::min(std::max(snd, min_qual), max_qual);
         }
     }
 }
 
-Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual)
+Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual)
     : sep_qual_(sep_qual)
 {
     read_emp_dist_(emp_filename_1, true);
@@ -55,7 +55,7 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<int>& qual, int len, Rprob& rprob, const bool first) const
+void Empdist::get_read_qual(std::vector<int>& qual, const int len, Rprob& rprob, const bool first) const
 {
     qual.resize(len);
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
@@ -194,7 +194,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             abort_mpi();
         }
 
-        auto denom = static_cast<double>(count.back()) / MAX_DIST_NUMBER;
+        const auto denom = static_cast<double>(count.back()) / MAX_DIST_NUMBER;
         dist.clear();
 
         for (decltype(count.size()) i = 0; i < count.size(); i++) {

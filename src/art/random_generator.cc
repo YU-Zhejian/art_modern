@@ -103,7 +103,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
-    vslNewStream(&stream_, VSL_BRNG_MT19937, Rprob::seed());
+    vslNewStream(&stream_, VSL_BRNG_MT19937, seed());
 }
 
 double Rprob::r_prob()
@@ -115,7 +115,7 @@ double Rprob::r_prob()
 
 void Rprob::r_probs(std::vector<double>& result)
 {
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<long long>(result.size()), result.data(), 0.0, 1.0);
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, result.size(), result.data(), 0.0, 1.0);
 }
 
 int Rprob::insertion_length()
@@ -157,7 +157,7 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 1, read_length_ - 2);
     return result;
 }
-int Rprob::randint(int min, int max)
+int Rprob::randint(const int min, const int max)
 {
     int result;
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, min, max);

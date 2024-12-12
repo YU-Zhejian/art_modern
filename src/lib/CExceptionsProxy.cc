@@ -1,7 +1,6 @@
 #include <boost/log/trivial.hpp>
 
 #include <boost/stacktrace.hpp>
-#include <sstream>
 #include <utility>
 
 #include "CExceptionsProxy.hh"

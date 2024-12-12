@@ -16,6 +16,7 @@ const std::string ALN_GAP_STR = "-";
  */
 const int MAX_QUAL = 40;
 const int MIN_QUAL = 0;
+const int G_SIZE = 1 << 30;
 
 const char ART_VERSION[] = "2.5.8";
 

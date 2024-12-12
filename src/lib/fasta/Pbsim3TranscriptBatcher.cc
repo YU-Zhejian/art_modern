@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace labw::art_modern {
-Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream)
+Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(const std::size_t batch_size, std::istream& istream)
     : batch_size_(batch_size)
     , istream_(istream)
 {
@@ -31,7 +31,7 @@ std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
         if (line.empty() || line.at(0) == '#') {
             continue;
         }
-        boost::algorithm::split(tokens, line, boost::is_any_of("\t"));
+        split(tokens, line, boost::is_any_of("\t"));
         if (tokens.size() == 4) {
             coverage_positive.emplace(tokens.at(0), std::stod(tokens.at(1)));
             coverage_negative.emplace(tokens.at(0), std::stod(tokens.at(2)));

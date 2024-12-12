@@ -8,7 +8,7 @@
 
 namespace labw::art_modern {
 
-void ArtJobExecutor::generate(const long targeted_num_reads, bool is_positive, ArtContig& art_contig)
+void ArtJobExecutor::generate(const long targeted_num_reads, const bool is_positive, ArtContig& art_contig)
 {
     int num_cont_fail = 0;
     const auto max_tolerance
@@ -45,8 +45,6 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
          << current_num_reads;
     const std::string read_name = osID.str();
 
-    // std::snprintf(nullptr, 20, "%s:%s:%d:%s:%zu", art_params.id.c_str(), art_contig.seq_name.c_str(), job_.job_id,
-    // mpi_rank_.c_str(),current_num_reads);
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
 
@@ -94,11 +92,11 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank())
+    , num_reads(0)
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
 {
     tmp_qual_probs_.resize(art_params_.read_len);
-    num_reads = 0;
 }
 
 void ArtJobExecutor::execute()
@@ -148,10 +146,10 @@ void ArtJobExecutor::execute()
     is_running = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : num_reads(other.num_reads.load())
-    , art_params_(other.art_params_)
+    : art_params_(other.art_params_)
     , job_(std::move(other.job_))
     , mpi_rank_(other.mpi_rank_)
+    , num_reads(other.num_reads.load())
     , output_dispatcher_(other.output_dispatcher_)
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , tmp_qual_probs_(other.tmp_qual_probs_)

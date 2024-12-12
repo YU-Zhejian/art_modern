@@ -65,9 +65,9 @@ std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) 
 
 std::string PairwiseAlignment::serialize() const
 {
-    auto pos_on_contig_s = std::to_string(pos_on_contig);
-    std::size_t buff_len = read_name.length() + contig_name.length() + pos_on_contig_s.length() + aligned_query.length()
-        + aligned_ref.length() + qual.length() + 9;
+    const auto pos_on_contig_s = std::to_string(pos_on_contig);
+    const std::size_t buff_len = read_name.length() + contig_name.length() + pos_on_contig_s.length()
+        + aligned_query.length() + aligned_ref.length() + qual.length() + 9;
     std::string buff;
     buff.resize(buff_len);
     buff[0] = 0;

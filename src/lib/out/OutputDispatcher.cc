@@ -48,7 +48,7 @@ void OutputDispatcherFactory::patch_options(boost::program_options::options_desc
 BaseReadOutput* OutputDispatcherFactory::create(const boost::program_options::variables_map& vm,
     const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
-    auto output_dispatcher = new OutputDispatcher();
+    const auto output_dispatcher = new OutputDispatcher();
     for (auto const& factory : factories_) {
         output_dispatcher->add(factory->create(vm, fasta_fetch, args));
     }

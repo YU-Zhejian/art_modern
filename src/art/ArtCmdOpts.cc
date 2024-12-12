@@ -25,36 +25,36 @@
 
 namespace po = boost::program_options;
 
-const char ARG_VERSION[] = "version";
-const char ARG_HELP[] = "help";
-const char ARG_SIMULATION_MODE[] = "mode";
-const char ARG_LIB_CONST_MODE[] = "lc";
-
-const char ARG_INPUT_FILE_NAME[] = "i-file";
-const char ARG_INPUT_FILE_PARSER[] = "i-parser";
-const char ARG_INPUT_FILE_TYPE[] = "i-type";
-const char ARG_FCOV[] = "i-fcov";
-const char ARG_BATCH_SIZE[] = "i-batch_size";
-
-const char ARG_ID[] = "id";
-const char ARG_PARALLEL[] = "parallel";
-const char ARG_QUAL_FILE_1[] = "qual_file_1";
-const char ARG_QUAL_FILE_2[] = "qual_file_2";
-const char ARG_READ_LEN[] = "read_len";
-const char ARG_MAX_INDEL[] = "max_indel";
-const char ARG_INS_RATE_1[] = "ins_rate_1";
-const char ARG_INS_RATE_2[] = "ins_rate_2";
-const char ARG_DEL_RATE_1[] = "del_rate_1";
-const char ARG_DEL_RATE_2[] = "del_rate_2";
-const char ARG_SEP_FLAG[] = "sep_flag";
-const char ARG_PE_FRAG_DIST_MEAN[] = "pe_frag_dist_mean";
-const char ARG_PE_FRAG_DIST_STD_DEV[] = "pe_frag_dist_std_dev";
-const char ARG_MIN_QUAL[] = "min_qual";
-const char ARG_MAX_QUAL[] = "max_qual";
-const char ARG_Q_SHIFT_1[] = "q_shift_1";
-const char ARG_Q_SHIFT_2[] = "q_shift_2";
-
 namespace labw::art_modern {
+
+constexpr char ARG_VERSION[] = "version";
+constexpr char ARG_HELP[] = "help";
+constexpr char ARG_SIMULATION_MODE[] = "mode";
+constexpr char ARG_LIB_CONST_MODE[] = "lc";
+
+constexpr char ARG_INPUT_FILE_NAME[] = "i-file";
+constexpr char ARG_INPUT_FILE_PARSER[] = "i-parser";
+constexpr char ARG_INPUT_FILE_TYPE[] = "i-type";
+constexpr char ARG_FCOV[] = "i-fcov";
+constexpr char ARG_BATCH_SIZE[] = "i-batch_size";
+
+constexpr char ARG_ID[] = "id";
+constexpr char ARG_PARALLEL[] = "parallel";
+constexpr char ARG_QUAL_FILE_1[] = "qual_file_1";
+constexpr char ARG_QUAL_FILE_2[] = "qual_file_2";
+constexpr char ARG_READ_LEN[] = "read_len";
+constexpr char ARG_MAX_INDEL[] = "max_indel";
+constexpr char ARG_INS_RATE_1[] = "ins_rate_1";
+constexpr char ARG_INS_RATE_2[] = "ins_rate_2";
+constexpr char ARG_DEL_RATE_1[] = "del_rate_1";
+constexpr char ARG_DEL_RATE_2[] = "del_rate_2";
+constexpr char ARG_SEP_FLAG[] = "sep_flag";
+constexpr char ARG_PE_FRAG_DIST_MEAN[] = "pe_frag_dist_mean";
+constexpr char ARG_PE_FRAG_DIST_STD_DEV[] = "pe_frag_dist_std_dev";
+constexpr char ARG_MIN_QUAL[] = "min_qual";
+constexpr char ARG_MAX_QUAL[] = "max_qual";
+constexpr char ARG_Q_SHIFT_1[] = "q_shift_1";
+constexpr char ARG_Q_SHIFT_2[] = "q_shift_2";
 
 po::options_description option_parser() noexcept
 {
@@ -145,7 +145,7 @@ po::variables_map generate_vm_while_handling_help_version(
     po::variables_map vm_;
 
     try {
-        store(po::parse_command_line(argc, argv, po_desc), vm_);
+        store(parse_command_line(argc, argv, po_desc), vm_);
         notify(vm_);
     } catch (const std::exception& exp) {
         BOOST_LOG_TRIVIAL(fatal) << exp.what();
@@ -157,7 +157,8 @@ po::variables_map generate_vm_while_handling_help_version(
         print_version();
         bye_mpi();
         exit_mpi(EXIT_SUCCESS);
-    } else if (vm_.count(ARG_HELP)) {
+    }
+    if (vm_.count(ARG_HELP)) {
         print_help(po_desc);
         bye_mpi();
         exit_mpi(EXIT_SUCCESS);
@@ -169,41 +170,47 @@ SIMULATION_MODE get_simulation_mode(const std::string& simulation_mode_str)
 {
     if (simulation_mode_str == SIMULATION_MODE_WGS) {
         return SIMULATION_MODE::WGS;
-    } else if (simulation_mode_str == SIMULATION_MODE_TRANS) {
-        return SIMULATION_MODE::TRANS;
-    } else if (simulation_mode_str == SIMULATION_MODE_TEMPLATE) {
-        return SIMULATION_MODE::TEMPLATE;
-    } else {
-        BOOST_LOG_TRIVIAL(fatal) << "Simulation mode (--" << ARG_SIMULATION_MODE << ") should be one of "
-                                 << SIMULATION_MODE_WGS << ", " << SIMULATION_MODE_TRANS << ", "
-                                 << SIMULATION_MODE_TEMPLATE << ".";
-        abort_mpi();
     }
+    if (simulation_mode_str == SIMULATION_MODE_TRANS) {
+        return SIMULATION_MODE::TRANS;
+    }
+    if (simulation_mode_str == SIMULATION_MODE_TEMPLATE) {
+        return SIMULATION_MODE::TEMPLATE;
+    }
+
+    BOOST_LOG_TRIVIAL(fatal) << "Simulation mode (--" << ARG_SIMULATION_MODE << ") should be one of "
+                             << SIMULATION_MODE_WGS << ", " << SIMULATION_MODE_TRANS << ", " << SIMULATION_MODE_TEMPLATE
+                             << ".";
+    abort_mpi();
 }
 
 ART_LIB_CONST_MODE get_art_lib_const_mode(const std::string& lib_const_mode_str)
 {
     if (lib_const_mode_str == ART_LIB_CONST_MODE_SE) {
         return ART_LIB_CONST_MODE::SE;
-    } else if (lib_const_mode_str == ART_LIB_CONST_MODE_PE) {
-        return ART_LIB_CONST_MODE::PE;
-    } else if (lib_const_mode_str == ART_LIB_CONST_MODE_MP) {
-        return ART_LIB_CONST_MODE::MP;
-    } else {
-        BOOST_LOG_TRIVIAL(fatal) << "Library construction mode (--" << ARG_LIB_CONST_MODE << ") should be one of "
-                                 << ART_LIB_CONST_MODE_SE << ", " << ART_LIB_CONST_MODE_PE << ", "
-                                 << ART_LIB_CONST_MODE_MP << ".";
-        abort_mpi();
     }
+    if (lib_const_mode_str == ART_LIB_CONST_MODE_PE) {
+        return ART_LIB_CONST_MODE::PE;
+    }
+    if (lib_const_mode_str == ART_LIB_CONST_MODE_MP) {
+        return ART_LIB_CONST_MODE::MP;
+    }
+
+    BOOST_LOG_TRIVIAL(fatal) << "Library construction mode (--" << ARG_LIB_CONST_MODE << ") should be one of "
+                             << ART_LIB_CONST_MODE_SE << ", " << ART_LIB_CONST_MODE_PE << ", " << ART_LIB_CONST_MODE_MP
+                             << ".";
+    abort_mpi();
 }
 
 INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, const std::string& input_file_name)
 {
     if (input_file_type_str == INPUT_FILE_TYPE_FASTA) {
         return INPUT_FILE_TYPE::FASTA;
-    } else if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS) {
+    }
+    if (input_file_type_str == INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS) {
         return INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS;
-    } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
+    }
+    if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
         for (const auto& fasta_file_end : std::vector<std::string> { ".fna", ".fsa", ".fa", ".fasta" }) {
             if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
                 return INPUT_FILE_TYPE::FASTA;
@@ -213,12 +220,12 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
                                  << ARG_INPUT_FILE_TYPE << ") to be one of " << INPUT_FILE_TYPE_FASTA << ", "
                                  << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ".";
         abort_mpi();
-    } else {
-        BOOST_LOG_TRIVIAL(fatal) << "Input file type (--" << ARG_INPUT_FILE_TYPE << ") should be one of "
-                                 << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ", "
-                                 << INPUT_FILE_TYPE_AUTO << ".";
-        abort_mpi();
     }
+
+    BOOST_LOG_TRIVIAL(fatal) << "Input file type (--" << ARG_INPUT_FILE_TYPE << ") should be one of "
+                             << INPUT_FILE_TYPE_FASTA << ", " << INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS << ", "
+                             << INPUT_FILE_TYPE_AUTO << ".";
+    abort_mpi();
 }
 
 INPUT_FILE_PARSER get_input_file_parser(
@@ -226,30 +233,33 @@ INPUT_FILE_PARSER get_input_file_parser(
 {
     if (input_file_parser_str == INPUT_FILE_PARSER_MEMORY) {
         return INPUT_FILE_PARSER::MEMORY;
-    } else if (input_file_parser_str == INPUT_FILE_PARSER_HTSLIB) {
+    }
+    if (input_file_parser_str == INPUT_FILE_PARSER_HTSLIB) {
         return INPUT_FILE_PARSER::HTSLIB;
-    } else if (input_file_parser_str == INPUT_FILE_PARSER_STREAM) {
+    }
+    if (input_file_parser_str == INPUT_FILE_PARSER_STREAM) {
         return INPUT_FILE_PARSER::STREAM;
-    } else if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
+    }
+    if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
         const auto file_size = get_file_size(input_file_path);
-        const auto file_too_large = file_size == -1 || file_size > (1 << 30);
+        const auto file_too_large = file_size == -1 || file_size > G_SIZE;
         if (simulation_mode == SIMULATION_MODE::WGS) {
             if (file_too_large) {
                 return INPUT_FILE_PARSER::HTSLIB;
             }
             return INPUT_FILE_PARSER::MEMORY;
-        } else {
-            if (file_too_large) {
-                return INPUT_FILE_PARSER::STREAM;
-            }
-            return INPUT_FILE_PARSER::MEMORY;
         }
-    } else {
-        BOOST_LOG_TRIVIAL(fatal) << "Input file parser (--" << ARG_INPUT_FILE_PARSER << ") should be one of "
-                                 << INPUT_FILE_PARSER_MEMORY << ", " << INPUT_FILE_PARSER_HTSLIB << ", "
-                                 << INPUT_FILE_PARSER_STREAM << ", " << INPUT_FILE_PARSER_AUTO << ".";
-        abort_mpi();
+
+        if (file_too_large) {
+            return INPUT_FILE_PARSER::STREAM;
+        }
+        return INPUT_FILE_PARSER::MEMORY;
     }
+
+    BOOST_LOG_TRIVIAL(fatal) << "Input file parser (--" << ARG_INPUT_FILE_PARSER << ") should be one of "
+                             << INPUT_FILE_PARSER_MEMORY << ", " << INPUT_FILE_PARSER_HTSLIB << ", "
+                             << INPUT_FILE_PARSER_STREAM << ", " << INPUT_FILE_PARSER_AUTO << ".";
+    abort_mpi();
 }
 
 CoverageInfo get_coverage_info(
@@ -263,9 +273,10 @@ CoverageInfo get_coverage_info(
         auto d = boost::lexical_cast<double>(fcov_arg_str);
         if (simulation_mode == SIMULATION_MODE::TEMPLATE) {
             return CoverageInfo(d, 0.0);
-        } else {
-            return CoverageInfo(d);
         }
+
+        return CoverageInfo(d);
+
     } catch (const boost::bad_lexical_cast&) {
         validate_input_filename(fcov_arg_str, ARG_FCOV);
         std::ifstream cov_fs(fcov_arg_str, std::ios::binary);
@@ -325,7 +336,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
         abort_mpi();
     }
 
-    if ((read_len > r2_profile_size) && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
+    if (read_len > r2_profile_size && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
         if (r2_profile_size == 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << qual_file_2 << ", is not a valid profile.";
         } else {
@@ -344,7 +355,7 @@ void validate_htslib_parser(const std::string& input_file_path)
     BOOST_LOG_TRIVIAL(info) << "HTSLib parser requested. Checking FAI...";
     const auto seq_file_fai_path
         = std::string(CExceptionsProxy::assert_not_null(fai_path(fasta_path), USED_HTSLIB_NAME, "Failed to load FAI"));
-    if (!boost::filesystem::exists(boost::filesystem::path(seq_file_fai_path))) {
+    if (!exists(boost::filesystem::path(seq_file_fai_path))) {
         BOOST_LOG_TRIVIAL(info) << "Building missing FAI...";
         CExceptionsProxy::assert_numeric(fai_build(fasta_path), USED_HTSLIB_NAME, "Failed to build FAI");
     } else {
@@ -364,9 +375,9 @@ std::vector<double> gen_per_base_mutation_rate(const int read_len, const double 
     double tp;
     double p_cdf = 0;
     for (auto i = 0; i < read_len; i++) {
-        tp = boost::math::cdf(boost::math::complement(boost::math::binomial(read_len, p), i));
+        tp = cdf(complement(boost::math::binomial(read_len, p), i));
         rate.emplace_back(tp);
-        if (max_indel > 0 && (i >= max_indel)) {
+        if (max_indel > 0 && i >= max_indel) {
             break;
         }
         p_cdf += tp;
@@ -448,7 +459,8 @@ void validate_comp_mtx(const INPUT_FILE_PARSER input_file_parser, const SIMULATI
         if (art_simulation_mode == SIMULATION_MODE::WGS) {
             BOOST_LOG_TRIVIAL(fatal) << "Input using PBSIM3 transcripts format are not supported for WGS simulation.";
             abort_mpi();
-        } else if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
+        }
+        if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
             BOOST_LOG_TRIVIAL(fatal) << "Input using PBSIM3 transcripts format are not supported for HTSLib parser";
             abort_mpi();
         }
@@ -463,12 +475,12 @@ void validate_comp_mtx(const INPUT_FILE_PARSER input_file_parser, const SIMULATI
     }
 }
 
-ArtParams parse_args(int argc, char** argv)
+ArtParams parse_args(const int argc, char** argv)
 {
     const boost::program_options::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
 
-    std::vector<std::string> args { argv, argv + argc };
+    const std::vector<std::string> args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
