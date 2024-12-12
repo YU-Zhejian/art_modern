@@ -12,6 +12,7 @@ namespace labw::art_modern {
                                <-----------|
  * @endcode
  * @param is_plus_strand
+ * @param probs_indel
  * @param read_1
  */
 void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std::vector<double>& probs_indel)
@@ -25,7 +26,7 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std
         slen_1 = read_1.generate_indels_2(true, probs_indel);
     }
     auto seq_ref = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
-    read_1.ref2read(seq_ref, is_plus_strand, pos_1);
+    read_1.ref2read(std::move(seq_ref), is_plus_strand, pos_1);
 }
 
 /**
@@ -47,6 +48,7 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std
  * @param is_mp
  * @param read_1
  * @param read_2
+ * @param probs_indel
  */
 void ArtContig::generate_read_pe(
     const bool is_plus_strand, const bool is_mp, ArtRead& read_1, ArtRead& read_2, std::vector<double>& probs_indel)
@@ -64,17 +66,17 @@ void ArtContig::generate_read_pe(
     int slen_2 = read_2.generate_indels(false, probs_indel);
 
     // ensure get a fixed read length
-    if ((pos_1 + art_params_.read_len - slen_1) > seq_size) {
+    if (pos_1 + art_params_.read_len - slen_1 > seq_size) {
         slen_1 = read_1.generate_indels_2(true, probs_indel);
     }
-    if ((pos_2 + art_params_.read_len - slen_2) > seq_size) {
+    if (pos_2 + art_params_.read_len - slen_2 > seq_size) {
         slen_2 = read_2.generate_indels_2(false, probs_indel);
     }
     auto seq_ref_1 = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
     auto seq_ref_2 = fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len - slen_2);
 
-    read_1.ref2read(seq_ref_1, is_plus_strand, pos_1);
-    read_2.ref2read(seq_ref_2, !is_plus_strand, pos_2);
+    read_1.ref2read(std::move(seq_ref_1), is_plus_strand, pos_1);
+    read_2.ref2read(std::move(seq_ref_2), !is_plus_strand, pos_2);
 }
 
 ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, const size_t seq_id, const ArtParams& art_params, Rprob& rprob)

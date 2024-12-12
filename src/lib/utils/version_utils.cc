@@ -79,9 +79,9 @@ void print_htslib_version()
 
 void print_boost_version()
 {
-    int patch_level = BOOST_VERSION % 100;
-    int minor = BOOST_VERSION / 100 % 1000;
-    int major = BOOST_VERSION / 100000;
+    constexpr int patch_level = BOOST_VERSION % 100;
+    constexpr int minor = BOOST_VERSION / 100 % 1000;
+    constexpr int major = BOOST_VERSION / 100000;
     std::cout << "BOOST: " << major << "." << minor << "." << patch_level << std::endl;
 }
 

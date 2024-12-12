@@ -31,12 +31,12 @@ long get_file_size(const std::string& file_path) noexcept
 {
     if (!boost::filesystem::is_regular_file(file_path)) {
         return -1;
-    } else {
-        try {
-            return static_cast<long>(boost::filesystem::file_size(file_path));
-        } catch (const boost::filesystem::filesystem_error&) {
-            return -1;
-        }
+    }
+
+    try {
+        return static_cast<long>(boost::filesystem::file_size(file_path));
+    } catch (const boost::filesystem::filesystem_error&) {
+        return -1;
     }
 }
 void ensure_directory_exists(const std::string& dir_path)
@@ -44,10 +44,10 @@ void ensure_directory_exists(const std::string& dir_path)
     if (boost::filesystem::exists(dir_path)) {
         if (boost::filesystem::is_directory(dir_path)) {
             return;
-        } else {
-            BOOST_LOG_TRIVIAL(fatal) << "Path '" << dir_path << "' exists but is not a directory.";
-            abort_mpi();
         }
+
+        BOOST_LOG_TRIVIAL(fatal) << "Path '" << dir_path << "' exists but is not a directory.";
+        abort_mpi();
     }
     BOOST_LOG_TRIVIAL(info) << "Boost::filesystem: mkdir -p '" << dir_path << "'";
     boost::filesystem::create_directories(dir_path);

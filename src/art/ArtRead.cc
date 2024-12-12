@@ -10,7 +10,7 @@ void ArtRead::generate_pairwise_aln()
 {
     int k = 0;
     std::size_t pos_on_read = 0;
-    std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
+    const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
 
@@ -97,8 +97,8 @@ int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_in
     probs_indel.resize(per_base_ins_rate.size());
     rprob_.r_probs(probs_indel);
     for (i = static_cast<int>(per_base_ins_rate.size() - 1); i >= 0; i--) {
-        if ((art_params_.read_len - del_len - ins_len) < (i + 1)) {
-            continue; // ensure that enough unchanged position for mutation
+        if (art_params_.read_len - del_len - ins_len < i + 1) {
+            continue; // ensure that there are stil enough unchanged position for mutation
         }
         if (per_base_ins_rate[i] >= probs_indel[i]) {
             ins_len = i + 1;
@@ -113,14 +113,15 @@ int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_in
             break;
         }
     }
-    return (ins_len - del_len);
-};
+    return ins_len - del_len;
+}
 
 int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_indel)
 {
     indel_.clear();
     int ins_len = 0;
     int del_len = 0;
+    int pos;
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
@@ -130,7 +131,7 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
         if (per_base_ins_rate[i] >= probs_indel[i]) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = rprob_.rand_pos_on_read();
+                pos = rprob_.rand_pos_on_read();
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
@@ -148,14 +149,14 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
             break;
         }
 
-        if ((art_params_.read_len - del_len - ins_len) < (i + 1)) {
+        if (art_params_.read_len - del_len - ins_len < i + 1) {
             continue; // ensure that enough unchanged position for mutation
         }
 
         if (per_base_del_rate[i] >= probs_indel[i]) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                auto pos = rprob_.rand_pos_on_read_not_head_and_tail();
+                pos = rprob_.rand_pos_on_read_not_head_and_tail();
                 if (pos == 0) {
                     continue;
                 }
@@ -167,8 +168,8 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
             break;
         }
     }
-    return (ins_len - del_len);
-};
+    return ins_len - del_len;
+}
 
 void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts_pos_t pos_on_contig)
 {
@@ -209,6 +210,7 @@ ArtRead::ArtRead(
     const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob)
     : art_params_(art_params)
     , contig_name_(contig_name)
+    , pos_on_contig_(0) // Defaults
     , read_name_(read_name)
     , rprob_(rprob)
 {
@@ -238,11 +240,7 @@ bool ArtRead::is_good() const
     }
     return true;
 error:
-    // #ifdef CEU_CM_IS_DEBUG
-    //         abort_mpi();
-    // #else
     return false; // FIXME: No idea why this occurs.
-    // #endif
 }
 
 } // namespace labw::art_modern; // namespace labw

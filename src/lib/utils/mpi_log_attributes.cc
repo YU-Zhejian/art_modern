@@ -8,7 +8,7 @@
 
 namespace labw::art_modern {
 
-class MPIRankLoggerAttributeImpl : public boost::log::attribute::impl {
+class MPIRankLoggerAttributeImpl final : public boost::log::attribute::impl {
 public:
     boost::log::attribute_value get_value() override
     {
@@ -36,7 +36,7 @@ MPIRankLoggerAttribute::MPIRankLoggerAttribute()
 {
 }
 
-class MPIHostNameLoggerAttributeImpl : public boost::log::attribute::impl {
+class MPIHostNameLoggerAttributeImpl final : public boost::log::attribute::impl {
 public:
     boost::log::attribute_value get_value() override
     {
@@ -57,11 +57,11 @@ public:
 };
 
 MPIHostNameLoggerAttribute::MPIHostNameLoggerAttribute(const boost::log::attributes::cast_source& source)
-    : boost::log::attribute(source.as<MPIHostNameLoggerAttributeImpl>())
+    : attribute(source.as<MPIHostNameLoggerAttributeImpl>())
 {
 }
 MPIHostNameLoggerAttribute::MPIHostNameLoggerAttribute()
-    : boost::log::attribute(new MPIHostNameLoggerAttributeImpl())
+    : attribute(new MPIHostNameLoggerAttributeImpl())
 {
 }
 }

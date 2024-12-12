@@ -25,23 +25,22 @@ FastaRecord FastaIterator::next()
         }
         if (nextLine[0] != '>') {
             throw MalformedFastaException();
-        } else {
-            std::vector<std::string> parts;
-            // TODO: Optimize this
-            boost::split(parts, nextLine.substr(1), boost::is_any_of(" \t\f"));
-            if (!parts.empty()) {
-                next_record_id = parts[0];
-            } else {
-                throw MalformedFastaException();
-            }
-            break;
         }
+        std::vector<std::string> parts;
+        // TODO: Optimize this
+        split(parts, nextLine.substr(1), boost::is_any_of(" \t\f"));
+        if (!parts.empty()) {
+            next_record_id = parts[0];
+        } else {
+            throw MalformedFastaException();
+        }
+        break;
     }
     while (true) {
         if (_istream.eof()) {
-            return { next_record_id, next_record_sequence };
+            return { std::move(next_record_id), std::move(next_record_sequence) };
         }
-        auto curPos = _istream.tellg();
+        const auto cur_pos = _istream.tellg();
         std::getline(_istream, nextLine);
         _lineno += 1;
         if (nextLine.empty()) {
@@ -51,11 +50,10 @@ FastaRecord FastaIterator::next()
             nextLine.pop_back();
         }
         if (nextLine[0] == '>') {
-            _istream.seekg(curPos);
-            return { next_record_id, next_record_sequence };
-        } else {
-            next_record_sequence += nextLine;
+            _istream.seekg(cur_pos); // TODO: This seek may be errornous in streams
+            return { std::move(next_record_id), std::move(next_record_sequence) };
         }
+        next_record_sequence += nextLine;
     }
 }
 FastaIterator::FastaIterator(std::istream& istream)

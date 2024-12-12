@@ -17,7 +17,6 @@ public:
 
     ~ArtJobExecutor();
     void execute();
-    std::atomic<std::size_t> num_reads;
     std::string thread_info() const;
     std::atomic<bool> is_running = false;
 
@@ -29,6 +28,7 @@ private:
     const ArtParams& art_params_;
     SimulationJob job_;
     const std::string mpi_rank_;
+    std::atomic<std::size_t> num_reads;
     BaseReadOutput* output_dispatcher_;
     Rprob rprob_;
     std::vector<double> tmp_qual_probs_;

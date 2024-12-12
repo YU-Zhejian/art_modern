@@ -89,7 +89,7 @@ void BamUtils::write(samFile* fp, const sam_hdr_t* h, const bam1_t* b)
 }
 sam_hdr_t* BamUtils::init_header(const SamOptions& sam_options)
 {
-    auto sam_header
+    const auto sam_header
         = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
 
     CExceptionsProxy::assert_numeric(
@@ -116,13 +116,13 @@ samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_
         mode += "wh";
     }
 
-    auto retv = CExceptionsProxy::assert_not_null(
+    const auto retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");
     CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
         "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
     return retv;
 }
-BamUtils::bam1_t_uptr BamUtils::init_uptr() { return BamUtils::bam1_t_uptr { init() }; }
+BamUtils::bam1_t_uptr BamUtils::init_uptr() { return bam1_t_uptr { init() }; }
 void assert_correct_cigar(
     [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
 {
@@ -218,7 +218,7 @@ size_t BamTags::size() const
 {
     size_t size = 0;
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
-        size += (tag_len + 3);
+        size += tag_len + 3;
     }
     return size;
 }
@@ -230,7 +230,7 @@ void BamTags::add_string(const std::string& key, const std::string& value)
     data[static_cast<std::ptrdiff_t>(len)] = '\0';
     tags_.emplace_back(key, 'Z', len + 1, data);
 }
-void BamTags::add_int_i(const std::string& key, int32_t value)
+void BamTags::add_int_i(const std::string& key, const int32_t value)
 {
     data_type data(new uint8_t[4]);
     std::memcpy(data.get(), &value, 4);

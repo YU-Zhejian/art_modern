@@ -15,8 +15,7 @@ std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
     return retv;
 }
 
-InMemoryFastaFetch::InMemoryFastaFetch()
-    : BaseFastaFetch() {};
+InMemoryFastaFetch::InMemoryFastaFetch() = default;
 
 std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
 {
@@ -44,7 +43,7 @@ InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
 }
 
 InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
-    : InMemoryFastaFetch(std::vector<std::string> { { contig_name } }, std::vector<std::string> { { seq } })
+    : InMemoryFastaFetch(std::vector { { contig_name } }, std::vector { { seq } })
 {
 }
 std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
@@ -70,8 +69,8 @@ InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
 }
 InMemoryFastaFetch::InMemoryFastaFetch(
     const InMemoryFastaFetch& other, const std::ptrdiff_t from, const std::ptrdiff_t to)
-    : InMemoryFastaFetch(std::vector<std::string>(other.seq_names_.begin() + from, other.seq_names_.begin() + to),
-          std::vector<std::string>(other.seqs_.begin() + from, other.seqs_.begin() + to))
+    : InMemoryFastaFetch(std::vector(other.seq_names_.begin() + from, other.seq_names_.begin() + to),
+          std::vector(other.seqs_.begin() + from, other.seqs_.begin() + to))
 {
 }
 

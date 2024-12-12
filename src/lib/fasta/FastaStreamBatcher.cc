@@ -2,7 +2,7 @@
 #include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {
-FastaStreamBatcher::FastaStreamBatcher(std::size_t batch_size, std::istream& stream)
+FastaStreamBatcher::FastaStreamBatcher(const std::size_t batch_size, std::istream& stream)
     : batch_size_(batch_size)
     , fasta_iterator_(stream)
 {
@@ -51,7 +51,7 @@ InMemoryFastaFetch InMemoryFastaStreamBatcher::fetch()
     return fetch;
 }
 
-InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(std::size_t batch_size, const InMemoryFastaFetch& stream)
+InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(const std::size_t batch_size, const InMemoryFastaFetch& stream)
     : batch_size_(batch_size)
     , current_index_(0)
     , stream_(stream)

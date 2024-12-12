@@ -48,14 +48,14 @@ void test_fasta(BaseFastaFetch* fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)
 {
-    auto faidx_fetch = new FaidxFetch(TEST_RESOURCES_PATH "test.fasta");
+    const auto faidx_fetch = new FaidxFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(faidx_fetch);
     delete faidx_fetch;
 }
 
 BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
 {
-    auto in_memory_fasta_fetch = new InMemoryFastaFetch(TEST_RESOURCES_PATH "test.fasta");
+    const auto in_memory_fasta_fetch = new InMemoryFastaFetch(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(in_memory_fasta_fetch);
     delete in_memory_fasta_fetch;
 }
