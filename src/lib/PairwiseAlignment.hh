@@ -22,23 +22,23 @@ public:
 
     /*!
      *
-     * @param read_name Number of read.
-     * @param contig_name Name of the contig.
-     * @param query Gapless query sequence.
-     * @param ref Gapless reference sequence.
-     * @param qual Quality sequence whose length should be the same as query.
-     * @param aligned_query Aligned query sequence with gaps.
-     * @param aligned_ref Aligned reference sequence with gaps.
+     * @param read_name Number of read. Will be moved inside.
+     * @param contig_name Name of the contig. Will be moved inside.
+     * @param query Gapless query sequence. Will be moved inside.
+     * @param ref Gapless reference sequence. Will be moved inside.
+     * @param qual Quality sequence whose length should be the same as query. Will be moved inside.
+     * @param aligned_query Aligned query sequence with gaps. Will be moved inside.
+     * @param aligned_ref Aligned reference sequence with gaps. Will be moved inside.
      * @param pos_on_contig
      * @param is_plus_strand Whether the reference is reverse-complemented.
      */
     PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
         std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig,
         bool is_plus_strand);
-    static PairwiseAlignment deserialize(const std::array<std::string, NUM_LINES>& serialized);
-    std::vector<uint32_t> generate_cigar_array(bool use_m) const;
-    std::string serialize() const;
-    void serialize(std::ostream& os) const;
+    [[maybe_unused]] static PairwiseAlignment deserialize(const std::array<std::string, NUM_LINES>& serialized);
+    [[nodiscard]] std::vector<uint32_t> generate_cigar_array(bool use_m) const;
+    [[nodiscard]] std::string serialize() const;
+    [[maybe_unused]] void serialize(std::ostream& os) const;
 
     /**
      * Query sequence with gap inserted using -

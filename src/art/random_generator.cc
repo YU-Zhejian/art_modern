@@ -41,18 +41,14 @@ int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussia
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-std::vector<int> Rprob::rand_quality()
+void Rprob::rand_quality(std::vector<int>& qual_dist)
 {
-    std::vector<int> result(read_length_);
-    std::generate_n(result.begin(), read_length_, [this]() { return quality_(gen_); });
-    return result;
+    std::generate_n(qual_dist.begin(), read_length_, [this]() { return quality_(gen_); });
 }
 
-std::vector<double> Rprob::r_probs(const std::size_t count)
+void Rprob::r_probs(std::vector<double>& result)
 {
-    std::vector<double> result(count);
-    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
-    return result;
+    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
 }
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
@@ -79,22 +75,18 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
 
 double Rprob::r_prob() { return dis_(gen_); }
 
-std::vector<double> Rprob::r_probs(const std::size_t count)
+void Rprob::r_probs(std::vector<double>& result)
 {
-    std::vector<double> result(count);
-    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
-    return result;
+    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
 }
 
 int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussian_(gen_)); }
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-std::vector<int> Rprob::rand_quality()
+void Rprob::rand_quality(std::vector<int>& qual_dist)
 {
-    std::vector<int> result(read_length_);
-    std::generate_n(result.begin(), read_length_, [this]() { return quality_(gen_); });
-    return result;
+    std::generate_n(qual_dist.begin(), read_length_, [this]() { return quality_(gen_); });
 }
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
@@ -121,11 +113,9 @@ double Rprob::r_prob()
     return result;
 }
 
-std::vector<double> Rprob::r_probs(const std::size_t count)
+void Rprob::r_probs(std::vector<double>& result)
 {
-    double result[count];
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<long long>(count), result, 0.0, 1.0);
-    return { result, result + read_length_ };
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<long long>(result.size()), result.data(), 0.0, 1.0);
 }
 
 int Rprob::insertion_length()
@@ -142,11 +132,9 @@ char Rprob::rand_base()
     return "ACGT"[index & 0b11];
 }
 
-std::vector<int> Rprob::rand_quality()
+void Rprob::rand_quality(std::vector<int>& qual_dist)
 {
-    int result[read_length_];
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, result, 1, MAX_DIST_NUMBER);
-    return { result, result + read_length_ };
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, qual_dist.data(), 1, MAX_DIST_NUMBER);
 }
 
 int Rprob::rand_quality_less_than_10()
@@ -189,11 +177,9 @@ Rprob::~Rprob() { gsl_rng_free(r); }
 
 double Rprob::r_prob() { return gsl_rng_uniform(r); }
 
-std::vector<double> Rprob::r_probs(const std::size_t count)
+void Rprob::r_probs(std::vector<double>& result)
 {
-    std::vector<double> result(count);
-    std::generate_n(result.begin(), count, [this]() { return r_prob(); });
-    return result;
+    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
 }
 
 int Rprob::insertion_length()
@@ -203,13 +189,12 @@ int Rprob::insertion_length()
 
 char Rprob::rand_base() { return ART_ACGT[gsl_rng_uniform_int(r, 4)]; }
 
-std::vector<int> Rprob::rand_quality()
+void Rprob::rand_quality(std::vector<int>& qual_dist)
 {
-    std::vector<int> result(read_length_);
-    std::generate_n(result.begin(), read_length_,
+    std::generate_n(qual_dist.begin(), read_length_,
         [this]() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER) + 1); });
-    return result;
 }
+
 int Rprob::rand_quality_less_than_10() { return static_cast<int>(gsl_rng_uniform_int(r, 9) + 1); }
 
 int Rprob::rand_pos_on_read() { return static_cast<int>(gsl_rng_uniform_int(r, read_length_)); }

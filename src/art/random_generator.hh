@@ -20,10 +20,10 @@ class Rprob {
 public:
     Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length);
     double r_prob();
-    std::vector<double> r_probs(std::size_t count);
+    void r_probs(std::vector<double>& result);
     int insertion_length();
     char rand_base();
-    std::vector<int> rand_quality();
+    void rand_quality(std::vector<int>& qual_dist);
     int rand_quality_less_than_10();
     ~Rprob();
     int rand_pos_on_read();

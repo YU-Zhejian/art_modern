@@ -11,14 +11,14 @@ export ART_MODERN_THREADS=20
 mkdir -p "${OUT_DIR}"
 
 function run() {
-    /bin/time -a -o time.tsv -f "${1}"'\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c\t%C' "${@:2}"
+    /bin/time -a -o time.tsv -f "${1}"'\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' "${@:2}"
 }
 function recreate_data_out() {
     rm -rf "${OUT_DIR:?}"/*
     mkdir -p "${OUT_DIR}"
 }
 
-printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\tCMD\n' >time.tsv
+printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\n' >time.tsv
 for i in {1..3}; do
     echo "Run ${i}"
     run wgsim-genome bin/wgsim \

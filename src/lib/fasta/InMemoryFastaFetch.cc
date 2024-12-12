@@ -27,9 +27,9 @@ std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const
     FastaIterator fai(file_reader);
     while (true) {
         try {
-            auto fasta_record = fai.next();
-            seq_names.emplace_back(fasta_record.id);
-            seqs.emplace_back(fasta_record.sequence);
+            auto [id, sequence] = fai.next();
+            seq_names.emplace_back(std::move(id));
+            seqs.emplace_back(std::move(sequence));
         } catch (EOFException&) {
             break;
         }
@@ -66,6 +66,12 @@ std::string InMemoryFastaFetch::fetch(const size_t seq_id) { return seqs_[seq_id
 
 InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
     : InMemoryFastaFetch(other.seq_names_, other.seqs_)
+{
+}
+InMemoryFastaFetch::InMemoryFastaFetch(
+    const InMemoryFastaFetch& other, const std::ptrdiff_t from, const std::ptrdiff_t to)
+    : InMemoryFastaFetch(std::vector<std::string>(other.seq_names_.begin() + from, other.seq_names_.begin() + to),
+          std::vector<std::string>(other.seqs_.begin() + from, other.seqs_.begin() + to))
 {
 }
 

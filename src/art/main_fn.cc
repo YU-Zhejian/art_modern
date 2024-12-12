@@ -77,7 +77,7 @@ void generate_all(const ArtParams& art_params)
             auto const& coverage_info = art_params.coverage_info;
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 InMemoryFastaFetch fetch(art_params.input_file_name);
-                InMemoryFastaStreamBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), &fetch);
+                InMemoryFastaStreamBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), fetch);
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fetch, art_params.args);
                 while (true) {
                     auto fa_view = fsb.fetch();
@@ -115,7 +115,7 @@ void generate_all(const ArtParams& art_params)
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fasta_fetch, art_params.args);
 
                 InMemoryFastaStreamBatcher fsb(
-                    static_cast<int>(fasta_fetch.num_seqs() / art_params.parallel + 1), &fasta_fetch);
+                    static_cast<int>(fasta_fetch.num_seqs() / art_params.parallel + 1), fasta_fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();
                     if (fa_view.num_seqs() == 0) {

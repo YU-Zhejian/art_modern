@@ -37,7 +37,7 @@ public:
      */
     InMemoryFastaFetch fetch();
 
-    InMemoryFastaStreamBatcher(std::size_t batch_size, BaseFastaFetch* stream);
+    InMemoryFastaStreamBatcher(std::size_t batch_size, const InMemoryFastaFetch& stream);
 
     InMemoryFastaStreamBatcher(const InMemoryFastaStreamBatcher&) = delete;
     InMemoryFastaStreamBatcher(InMemoryFastaStreamBatcher&&) = delete;
@@ -47,7 +47,7 @@ public:
 private:
     std::size_t batch_size_;
     std::size_t current_index_;
-    BaseFastaFetch* stream_;
+    const InMemoryFastaFetch& stream_;
     std::mutex mutex_;
 };
 
