@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="self-written-cc" pattern="file:src/*.cc||file:src/*.hh" />
+</component>

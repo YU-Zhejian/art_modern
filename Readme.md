@@ -2,7 +2,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generates data that does not reflect the real-world error profile of simulators. Here we introduces `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulators, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generate data that does not reflect the real-world error profile of simulators. Here we introduces `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on Laptops, or high-performance clusters (HPCs) with only one node. We believe with such simulators, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
 
 ## Quick Start
 
@@ -34,7 +34,7 @@ opt/build_release/art_modern --version # For version information
 
 ### Simulating WGS Data using _E. Coli_ Genome
 
-Download _E. Coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 sub-strand as an example.
+Download _E. coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 sub-strand as an example.
 
 ```shell
 wget \
@@ -43,7 +43,7 @@ wget \
 gunzip -k opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
 
-Now we can simulate WGS data using E. Coli reference genome. Let's start with single-end sequencing using HiSeq 2500 with 125bp read length and 10X coverage.
+Now we can simulate WGS data using E. coli reference genome. Let's start with single-end sequencing using HiSeq 2500 with 125 bp read length and 10X coverage.
 
 ```shell
 opt/build_release/art_modern \
@@ -80,7 +80,7 @@ Please note that we have additionally specified a quality file for read 2 with t
 
 ### Simulating RNA-Seq Data using _C. Elegans_ Transcriptome
 
-Simulating transcriptome is a little bit more complicated since each cDNA molecules have different counts. Strand-specific library technologies also generates RNA-Seq data on one strand only. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate expression for each cDNA molecule. You may also easily convert outputs from [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kalisto](https://pachterlab.github.io/kallisto/) or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
+Simulating transcriptome is a little bit more complicated since each cDNA molecule has different counts. Strand-specific library technologies also generate RNA-Seq data on one strand only. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate expression for each cDNA molecule. You may also easily convert outputs from [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kallisto](https://pachterlab.github.io/kallisto/) or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
 
 Please note that cDNAs with insufficient length will be ignored. We also do not support circular RNA simulation.
 
@@ -115,7 +115,7 @@ NR_051843	3.4504965075273137
 NR_066512	4.73632003156384
 ```
 
-The following example generates a coverage file using [GNU AWK](https://www.gnu.org/software/gawk/) with random coverage ranged between 0 and 10 assigned to each cDNA molecule.
+The following example generates a coverage file using [GNU AWK](https://www.gnu.org/software/gawk/) with random coverage ranging between 0 and 10 assigned to each cDNA molecule.
 
 ```shell
 samtools faidx opt/build_release/ce11_mrna_1000.fa
@@ -195,7 +195,7 @@ opt/build_release/art_modern \
 
 ### Template-Based Simulation
 
-Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports PBSIM3 Transcripts format. For example:
+Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports the PBSIM3 Transcripts format. For example:
 
 ```shell
 opt/build_release/art_modern \
@@ -214,7 +214,7 @@ Please note that the mean and standard deviation of fragment length is not speci
 
 ### Using UNIX Pipelines
 
-With UNIX pipelines, we can redirect the input and output of `art_modern` from or to another files of processes. Following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, PWA, and sorted BAM file.
+With UNIX pipelines, we can redirect the input and output of `art_modern` from/to another file/processes. Following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, PWA, and sorted BAM files.
 
 This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [xz-utils](https://tukaani.org/xz/).
 
