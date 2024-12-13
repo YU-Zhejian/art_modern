@@ -26,4 +26,4 @@ The current version does not support the specification of seed since it will res
 
 The generated read data, which is represented as `PairwiseAlignment` class (`src/lib/PairwiseAlignment.hh`), will be passed to an output dispatcher which dispatches the data to all output writers registered to it.
 
-Output writers are asyncronous. The `PairwiseAlignment`s are firstly formatted by each thread (since setting of `bam1_t*` is time-consuming) and then passed to an multi-producer single-consumer lock-free queue, which is then consumed by the file appender in a separate thread.
+Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted by each thread (since setting of `bam1_t*` is time-consuming) and then passed to a multi-producer single-consumer lock-free queue, which is then consumed by the file appender in a separate thread.

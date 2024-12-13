@@ -15,7 +15,7 @@ So, we developed `art_modern` with the following ideas:
 - Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread, etc.
 - Writer for SAM output format was re-implemented using [HTSLib](https://www.htslib.org/), which allows supporting BAM and headless SAM/BAM output format with minimal modifications of code.
 - Multiple FASTA parsers were added. For example, the `htslib` parser allows on-disk random access of enormous genomes without reading them into memory, while the `stream` parser allows streaming of FASTA files.
-- The low-level I/O routines are made asyncronized to improve performance.
+- The low-level I/O routines are made asynchronize to improve performance.
 - Support other random number generators like Intel OneAPI Math Kernel Library (OneMKL).
 
 ## Common Development-Oriented Tasks
@@ -65,7 +65,7 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 You're welcome to submit issues on GitHub if you've encountered any problems while using this software. Please make sure to include the following information:
 
 - The version of your operating system and kernel, given by `uname -a`.
-- Version information of the compiler, given by `gcc -v --verbose` or similiar.
+- Version information of the compiler, given by `gcc -v --verbose` or similar.
 - `art_modern --version` output.
 - The CMake commandline you used to build the code.
 - The CMake configuration log, if possible.

@@ -54,9 +54,9 @@ Currently, we support input in FASTA and PBSIM3 Transcripts format. They are con
   - Inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
   - Each thread will hold its own FASTA Index in memory.
   - **DO NOT SUPPORT PBSIM3 TRANSCRIPT FORMAT.**
-- `stream`: Streamline the input reference as microbatches and process them one by one.
+- `stream`: Streamline the input reference as batches and process them one by one.
   - Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
-  - **CONTIG NUMBER AND LENGTH INFORMAION NOT AVAILABLE**, so use headless SAM/BAM output if a SAM/BAM output is needed.
+  - **CONTIG NUMBER AND LENGTH INFORMATION NOT AVAILABLE**, so use headless SAM/BAM output if a SAM/BAM output is needed.
   - Batch size controlled by `--i-batch_size`.
 
 ### More Instructions on FASTA Format
@@ -130,11 +130,11 @@ Compatibility matrix of file type, simulation mode, and parser:
 
 Compatibility matrix of coverage mode, simulation mode, and file type:
 
-| Simulation Mode \ File Type | `fasta`                         | `pbsim3_transcripts` | 
-|-----------------------------|---------------------------------|----------------------|
-| `wgs`                       | Unified                         | **ERROR**            |
-| `trans`                     | Unified / Strandless / Stranded | **IGNORED**          |
-| `template`                  | Unified / Strandless / Stranded | **IGNORED**          |
+| Simulation Mode \ File Type | `fasta`                        | `pbsim3_transcripts` | 
+|-----------------------------|--------------------------------|----------------------|
+| `wgs`                       | Unified                        | **ERROR**            |
+| `trans`                     | Unified / Unstraded / Stranded | **IGNORED**          |
+| `template`                  | Unified / Unstraded / Stranded | **IGNORED**          |
 
 ## Output Formats (`--o-*`)
 

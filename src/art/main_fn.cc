@@ -11,6 +11,7 @@
 #include "fasta/Pbsim3TranscriptBatcher.hh"
 #include "main_fn.hh"
 #include "out/OutputDispatcher.hh"
+#include "utils/profile_utils.hh"
 
 namespace labw::art_modern {
 
@@ -28,12 +29,11 @@ void print_banner()
 void generate_wgs(const ArtParams& art_params)
 {
     const auto out_dispatcher_factory = get_output_dispatcher_factory();
-    BaseReadOutput* out_dispatcher;
     int job_id = 0;
     ArtJobPool job_pool(art_params);
 
     // Coverage-based parallelism
-    const auto& coverage_info = art_params.coverage_info.div(art_params.parallel);
+    const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
 
     BaseFastaFetch* fetch;
     if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
@@ -41,7 +41,7 @@ void generate_wgs(const ArtParams& art_params)
     } else {
         fetch = new FaidxFetch(art_params.input_file_name);
     }
-    out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
+    BaseReadOutput*  out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
     if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
         for (int i = 0; i < art_params.parallel; ++i) {
             SimulationJob sj(fetch, coverage_info, ++job_id, false);
@@ -50,7 +50,7 @@ void generate_wgs(const ArtParams& art_params)
         }
     } else {
         for (int i = 0; i < art_params.parallel; ++i) {
-            BaseFastaFetch* thread_fetch = new InMemoryFastaFetch(art_params.input_file_name);
+            BaseFastaFetch* thread_fetch = new FaidxFetch(art_params.input_file_name);
             SimulationJob sj(thread_fetch, coverage_info, ++job_id, true);
             ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
             job_pool.add(std::move(aje));
@@ -76,10 +76,15 @@ void generate_all(const ArtParams& art_params)
         if (art_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
             auto const& coverage_info = art_params.coverage_info;
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+                PRINT_MEMORY_USAGE
                 InMemoryFastaFetch fetch(art_params.input_file_name);
+                PRINT_MEMORY_USAGE
                 InMemoryFastaStreamBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), fetch);
+                PRINT_MEMORY_USAGE
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fetch, art_params.args);
+                PRINT_MEMORY_USAGE
                 while (true) {
+                    PRINT_MEMORY_USAGE
                     auto fa_view = fsb.fetch();
                     if (fa_view.num_seqs() == 0) {
                         break;
