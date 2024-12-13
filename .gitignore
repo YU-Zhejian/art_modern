@@ -7,7 +7,14 @@ uniprot*
 *.bed
 *.msgpack
 .vscode
-.idea
+
+/.idea/*
+!/.idea/encodings.xml
+!/.idea/scopes/
+!/.idea/dictionaries/
+/.idea/dictionaries/*
+!/.idea/dictionaries/default_user.xml
+
 *.txt
 !requirements.txt
 *.tsv
