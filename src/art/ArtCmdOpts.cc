@@ -5,9 +5,9 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/program_options.hpp>
-#include <boost/thread.hpp>
 #include <fstream>
 #include <iostream>
+#include <thread>
 
 #include "ArtConstants.hh"
 #include "CExceptionsProxy.hh"
@@ -18,6 +18,7 @@
 #include "utils/fs_utils.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/version_utils.hh"
+#include "utils/param_utils.hh"
 
 #ifdef WITH_OPENMP
 #include <omp.h>
@@ -44,6 +45,7 @@ constexpr char ARG_QUAL_FILE_1[] = "qual_file_1";
 constexpr char ARG_QUAL_FILE_2[] = "qual_file_2";
 constexpr char ARG_READ_LEN[] = "read_len";
 constexpr char ARG_MAX_INDEL[] = "max_indel";
+constexpr char ARG_MAX_N[] = "max_n";
 constexpr char ARG_INS_RATE_1[] = "ins_rate_1";
 constexpr char ARG_INS_RATE_2[] = "ins_rate_2";
 constexpr char ARG_DEL_RATE_1[] = "del_rate_1";
@@ -112,7 +114,9 @@ po::options_description option_parser() noexcept
         "use separate quality profiles for different bases. Default "
         "is to use same quality profile regardless its position");
     art_opts.add_options()(ARG_MAX_INDEL, po::value<int>()->default_value(DEFAULT_MAX_INDEL),
-        "the maximum total number of insertion and deletion per read");
+    "the maximum total number of insertion and deletion per read");
+    art_opts.add_options()(ARG_MAX_N, po::value<int>()->default_value(DEFAULT_MAX_N),
+        "the maximum total number of ambiguous bases (N) per read");
     art_opts.add_options()(ARG_READ_LEN, po::value<int>(), "read length to be simulated");
     art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
         "Mean distance between DNA/RNA fragments for paired-end simulations");
@@ -403,7 +407,7 @@ void validate_read_length(const int read_len)
 int validate_parallel(const int parallel_arg)
 {
     int parallel = parallel_arg;
-    const auto max_threads = static_cast<int>(boost::thread::hardware_concurrency());
+    const auto max_threads = static_cast<int>(std::thread::hardware_concurrency());
     if (parallel_arg == PARALLEL_ALL) {
         parallel = max_threads;
     } else if (parallel_arg == PARALLEL_DISABLE) {
@@ -480,45 +484,46 @@ ArtParams parse_args(const int argc, char** argv)
     const boost::program_options::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_ = get_output_dispatcher_factory();
 
-    const std::vector<std::string> args { argv, argv + argc };
+    std::vector<std::string> args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
-    const auto& art_simulation_mode = get_simulation_mode(vm_[ARG_SIMULATION_MODE].as<std::string>());
-    const auto& art_lib_const_mode = get_art_lib_const_mode(vm_[ARG_LIB_CONST_MODE].as<std::string>());
-    const auto& input_file_name = vm_[ARG_INPUT_FILE_NAME].as<std::string>();
+    const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));
+    const auto& art_lib_const_mode = get_art_lib_const_mode(get_param<std::string>(vm_, ARG_LIB_CONST_MODE));
+    const auto& input_file_name = get_param<std::string>(vm_, ARG_INPUT_FILE_NAME);
     validate_input_filename(input_file_name, ARG_INPUT_FILE_NAME);
-    const auto& input_file_type = get_input_file_type(vm_[ARG_INPUT_FILE_TYPE].as<std::string>(), input_file_name);
+    const auto& input_file_type = get_input_file_type(get_param<std::string>(vm_, ARG_INPUT_FILE_TYPE), input_file_name);
     const auto& input_file_parser
-        = get_input_file_parser(vm_[ARG_INPUT_FILE_PARSER].as<std::string>(), input_file_name, art_simulation_mode);
+        = get_input_file_parser(get_param<std::string>(vm_, ARG_INPUT_FILE_PARSER), input_file_name, art_simulation_mode);
     validate_comp_mtx(input_file_parser, art_simulation_mode, input_file_type);
     if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
         validate_htslib_parser(input_file_name);
     }
-    auto coverage_info = get_coverage_info(vm_[ARG_FCOV].as<std::string>(), input_file_type, art_simulation_mode);
+    auto coverage_info = get_coverage_info(get_param<std::string>(vm_, ARG_FCOV), input_file_type, art_simulation_mode);
 
-    const auto& id = vm_[ARG_ID].as<std::string>();
+    auto id = get_param<std::string>(vm_, ARG_ID);
 
-    const auto& sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
-    const auto& max_indel = vm_[ARG_MAX_INDEL].as<int>();
-    const auto& read_len = vm_[ARG_READ_LEN].as<int>();
+    const auto sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
+    const auto max_indel = get_param<int>(vm_, ARG_MAX_INDEL);
+    const auto max_n = get_param<int>(vm_, ARG_MAX_N);
+    const auto read_len = get_param<int>(vm_, ARG_READ_LEN);
     validate_read_length(read_len);
 
-    const auto& per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_1].as<double>(), max_indel);
-    const auto& per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_1].as<double>(), max_indel);
-    const auto& per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_INS_RATE_2].as<double>(), max_indel);
-    const auto& per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, vm_[ARG_DEL_RATE_2].as<double>(), max_indel);
+    auto per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
+    auto per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel);
+    auto per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
+    auto per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel);
 
-    const auto pe_frag_dist_mean = vm_[ARG_PE_FRAG_DIST_MEAN].as<double>();
-    const auto pe_frag_dist_std_dev = vm_[ARG_PE_FRAG_DIST_STD_DEV].as<double>();
+    const auto pe_frag_dist_mean = get_param<double>(vm_, ARG_PE_FRAG_DIST_MEAN);
+    const auto pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
     validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len, art_lib_const_mode, art_simulation_mode);
     const auto pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
 
-    const auto& parallel = validate_parallel(vm_[ARG_PARALLEL].as<int>());
+    const auto& parallel = validate_parallel(get_param<int>(vm_, ARG_PARALLEL));
 
-    const auto& qdist = read_emp(vm_[ARG_QUAL_FILE_1].as<std::string>(), vm_[ARG_QUAL_FILE_2].as<std::string>(),
-        read_len, art_lib_const_mode, sep_flag, vm_[ARG_Q_SHIFT_1].as<int>(), vm_[ARG_Q_SHIFT_2].as<int>(),
-        vm_[ARG_MIN_QUAL].as<int>(), vm_[ARG_MAX_QUAL].as<int>());
+    auto qdist = read_emp(get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2),
+        read_len, art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
+        get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
 #ifdef WITH_OPENMP
 #pragma omp simd
@@ -526,15 +531,15 @@ ArtParams parse_args(const int argc, char** argv)
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
     }
-    const auto& batch_size = vm_[ARG_BATCH_SIZE].as<int>();
+    const auto& batch_size = get_param<int>(vm_, ARG_BATCH_SIZE);
     if (batch_size < 1) {
         BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
         abort_mpi();
     }
     return { art_simulation_mode, art_lib_const_mode, input_file_name, input_file_type, input_file_parser, parallel,
-        sep_flag, id, std::move(coverage_info), read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, per_base_ins_rate_1,
-        per_base_del_rate_1, per_base_ins_rate_2, per_base_del_rate_2, err_prob, pe_dist_mean_minus_2_std, qdist,
-        batch_size, vm_, args };
+        sep_flag, std::move(id), std::move(coverage_info), max_n, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, std::move(per_base_ins_rate_1),
+        std::move(per_base_del_rate_1), std::move(per_base_ins_rate_2), std::move(per_base_del_rate_2), err_prob, pe_dist_mean_minus_2_std, std::move(qdist),
+        batch_size, vm_, std::move(args) };
 }
 
 }

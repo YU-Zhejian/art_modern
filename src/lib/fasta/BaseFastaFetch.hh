@@ -52,26 +52,26 @@ public:
      * @param seq_id As described.
      * @return As described.
      */
-    hts_pos_t seq_len(std::size_t seq_id) const;
+    [[nodiscard]] hts_pos_t seq_len(std::size_t seq_id) const;
 
     /**
      * Get the name of the desired sequence.
      * @param seq_id As described.
      * @return As described.
      */
-    std::string seq_name(std::size_t seq_id) const;
+    [[nodiscard]] std::string seq_name(std::size_t seq_id) const;
 
     /**
      * Get number of sequences inside.
      *
      * @return As described.
      */
-    size_t num_seqs() const;
+    [[nodiscard]] size_t num_seqs() const;
 
-    bool empty() const;
+    [[nodiscard]] bool empty() const;
 
 protected:
-    const std::vector<std::string> seq_names_;
-    const std::vector<hts_pos_t> seq_lengths_;
+    std::vector<std::string> seq_names_;
+    std::vector<hts_pos_t> seq_lengths_;
 };
 }

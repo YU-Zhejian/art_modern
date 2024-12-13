@@ -38,7 +38,7 @@ for i in {1..3}; do
         --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
         --qual_file_1 ../../data/Illumina_profiles/HiSeq2500L150R1.txt \
         --qual_file_2 ../../data/Illumina_profiles/HiSeq2500L150R2.txt \
-        --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel ${ART_MODERN_THREADS}
+        --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
     recreate_data_out
 
     run wgsim-transcriptome bin/wgsim -1 150 -2 150 -N 13347847 -d 300 -s 20 \
@@ -53,11 +53,12 @@ for i in {1..3}; do
 
     run art_modern-transcriptome opt/art_modern_build/art_modern \
         --mode trans --lc pe \
-        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 150 --i-parser memory \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 150 --i-parser stream \
         --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
         --qual_file_1 ../../data/Illumina_profiles/HiSeq2500L150R1.txt \
         --qual_file_2 ../../data/Illumina_profiles/HiSeq2500L150R2.txt \
-        --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel ${ART_MODERN_THREADS}
+        --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
+        --i-batch_size 1024
     recreate_data_out
 done
 rm -fr "${OUT_DIR}"

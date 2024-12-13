@@ -34,7 +34,7 @@ std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const
         }
     }
     file_reader.close();
-    return std::tie(seq_names, seqs);
+    return { std::move(seq_names), std::move(seqs) };
 }
 
 InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
@@ -42,29 +42,25 @@ InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
 {
 }
 
-InMemoryFastaFetch::InMemoryFastaFetch(const std::string& contig_name, const std::string& seq)
-    : InMemoryFastaFetch(std::vector { { contig_name } }, std::vector { { seq } })
-{
-}
 std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
     return seqs_[seq_id].substr(start, end - start);
 }
 
-InMemoryFastaFetch::InMemoryFastaFetch(const std::vector<std::string>& seq_name, const std::vector<std::string>& seq)
-    : BaseFastaFetch(seq_name, get_seq_lengths(seq))
-    , seqs_(seq)
+InMemoryFastaFetch::InMemoryFastaFetch(std::vector<std::string> seq_name, std::vector<std::string> seq)
+    : BaseFastaFetch(std::move(seq_name), get_seq_lengths(seq))
+    , seqs_(std::move(seq))
 {
 }
-InMemoryFastaFetch::InMemoryFastaFetch(const std::tuple<std::vector<std::string>, std::vector<std::string>>& seq_map)
-    : BaseFastaFetch(std::get<0>(seq_map), get_seq_lengths(std::get<1>(seq_map)))
-    , seqs_(std::get<1>(seq_map))
+InMemoryFastaFetch::InMemoryFastaFetch(std::tuple<std::vector<std::string>, std::vector<std::string>> seq_map)
+    : BaseFastaFetch(std::move(std::get<0>(seq_map)), get_seq_lengths(std::get<1>(seq_map)))
+    , seqs_(std::move(std::get<1>(seq_map)))
 {
 }
 std::string InMemoryFastaFetch::fetch(const size_t seq_id) { return seqs_[seq_id]; }
 
 InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
-    : InMemoryFastaFetch(other.seq_names_, other.seqs_)
+    : InMemoryFastaFetch(std::move(other.seq_names_), std::move(other.seqs_))
 {
 }
 InMemoryFastaFetch::InMemoryFastaFetch(

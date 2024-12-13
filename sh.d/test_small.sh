@@ -19,6 +19,7 @@ function sam2bam() {
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
+rm -fr "${OUT_DIR}"                      # Remove previous runs
 . sh.d/test_small.sh.d/out_fmts.sh       # Test all output is working
 . sh.d/test_small.sh.d/fail.sh           # FASTA that would fail the simulator
 . sh.d/test_small.sh.d/wgs.sh            # WGS mode (with constant coverage)
