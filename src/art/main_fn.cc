@@ -41,18 +41,18 @@ void generate_wgs(const ArtParams& art_params)
     } else {
         fetch = new FaidxFetch(art_params.input_file_name);
     }
-    BaseReadOutput*  out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
+    BaseReadOutput* out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
     if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
         for (int i = 0; i < art_params.parallel; ++i) {
             SimulationJob sj(fetch, coverage_info, ++job_id, false);
-            ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+            auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
             job_pool.add(std::move(aje));
         }
     } else {
         for (int i = 0; i < art_params.parallel; ++i) {
             BaseFastaFetch* thread_fetch = new FaidxFetch(art_params.input_file_name);
             SimulationJob sj(thread_fetch, coverage_info, ++job_id, true);
-            ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+            auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
             job_pool.add(std::move(aje));
         }
     }
@@ -76,22 +76,17 @@ void generate_all(const ArtParams& art_params)
         if (art_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
             auto const& coverage_info = art_params.coverage_info;
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-                PRINT_MEMORY_USAGE
                 InMemoryFastaFetch fetch(art_params.input_file_name);
-                PRINT_MEMORY_USAGE
                 InMemoryFastaStreamBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), fetch);
-                PRINT_MEMORY_USAGE
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fetch, art_params.args);
-                PRINT_MEMORY_USAGE
                 while (true) {
-                    PRINT_MEMORY_USAGE
                     auto fa_view = fsb.fetch();
-                    if (fa_view.num_seqs() == 0) {
+                    if (fa_view.empty()) {
                         break;
                     }
                     job_id += 1;
                     SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
-                    ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+                    auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
             } else {
@@ -101,12 +96,12 @@ void generate_all(const ArtParams& art_params)
                     = out_dispatcher_factory.create(art_params.vm, new InMemoryFastaFetch(), art_params.args);
                 while (true) {
                     auto fa_view = fsb.fetch();
-                    if (fa_view.num_seqs() == 0) {
+                    if (fa_view.empty()) {
                         break;
                     }
                     job_id += 1;
                     SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
-                    ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+                    auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
                 fasta_stream.close();
@@ -123,12 +118,12 @@ void generate_all(const ArtParams& art_params)
                     static_cast<int>(fasta_fetch.num_seqs() / art_params.parallel + 1), fasta_fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();
-                    if (fa_view.num_seqs() == 0) {
+                    if (fa_view.empty()) {
                         break;
                     }
                     job_id += 1;
                     SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
-                    ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+                    auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
             } else { // Stream
@@ -138,12 +133,12 @@ void generate_all(const ArtParams& art_params)
                 Pbsim3TranscriptBatcher fsb(art_params.batch_size, pbsim3_transcript_stream);
                 while (true) {
                     auto [fa_view, coverage_info] = fsb.fetch();
-                    if (fa_view.num_seqs() == 0) {
+                    if (fa_view.empty()) {
                         break;
                     }
                     job_id += 1;
                     SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
-                    ArtJobExecutor aje(std::move(sj), art_params, out_dispatcher);
+                    auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(std::move(aje));
                 }
                 pbsim3_transcript_stream.close();

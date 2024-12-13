@@ -6,7 +6,6 @@
 #include "out/BaseReadOutput.hh"
 #include <array>
 #include <boost/program_options.hpp>
-#include <unordered_map>
 
 #include <string>
 #include <vector>
@@ -23,6 +22,7 @@ struct ArtParams {
     const bool sep_flag;
     const std::string id;
     const CoverageInfo coverage_info;
+    const int max_n;
     const int read_len;
     const double pe_frag_dist_mean;
     const double pe_frag_dist_std_dev;

@@ -16,7 +16,7 @@ public:
     ArtJobExecutor(SimulationJob job, const ArtParams& art_params, BaseReadOutput* output_dispatcher);
 
     ~ArtJobExecutor();
-    void execute();
+    void operator()();
     std::string thread_info() const;
     std::atomic<bool> is_running = false;
 

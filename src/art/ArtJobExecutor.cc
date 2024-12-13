@@ -99,7 +99,7 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
     tmp_qual_probs_.resize(art_params_.read_len);
 }
 
-void ArtJobExecutor::execute()
+void ArtJobExecutor::operator()()
 {
     is_running = true;
     const auto num_contigs = job_.fasta_fetch->num_seqs();

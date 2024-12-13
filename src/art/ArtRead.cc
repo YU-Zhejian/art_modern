@@ -226,7 +226,7 @@ PairwiseAlignment ArtRead::to_pwa()
 }
 bool ArtRead::is_good() const
 {
-    if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > 0) { // TODO: Add params back.
+    if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > art_params_.max_n) {
         return false;
     }
     if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {

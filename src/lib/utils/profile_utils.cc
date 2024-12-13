@@ -13,11 +13,9 @@ void print_memory_usage(const char* file, const int line)
 #ifdef CEU_ON_POSIX
     struct rusage usage;
     if (getrusage(RUSAGE_SELF, &usage) == 0) {
-        BOOST_LOG_TRIVIAL(info) << file << ":" << line << ": "
-                                << "Memory usage: " << usage.ru_maxrss * 1024;
+        BOOST_LOG_TRIVIAL(info) << file << ":" << line << ": " << "Memory usage: " << usage.ru_maxrss * 1024;
     }
 #endif
 }
-
 
 } // lab

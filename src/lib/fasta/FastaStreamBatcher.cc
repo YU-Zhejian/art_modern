@@ -34,7 +34,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
     }
     BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << seq_names.size()
                             << "） created";
-    return { seq_names, seqs };
+    return { std::move(seq_names), std::move(seqs) };
 }
 
 InMemoryFastaFetch InMemoryFastaStreamBatcher::fetch()
