@@ -1,4 +1,5 @@
 #pragma once
+#include "art_modern_dtypes.hh"
 
 #include <cstdint>
 #include <sstream>
@@ -12,9 +13,9 @@ std::string revcomp(const std::string& dna);
 void comp_inplace(std::string& dna);
 void revcomp_inplace(std::string& dna);
 void normalize_inplace(std::string& dna);
-std::string qual_to_str(const std::vector<int>& qual);
-[[maybe_unused]] std::string qual_to_str(const uint8_t* qual, size_t qlen);
-std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr);
+std::string qual_to_str(const std::vector<am_qual_t>& qual);
+std::string qual_to_str(const am_qual_t* qual, size_t qlen);
+std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr);
 
 /**
  * Reverse an arbitrary sequence.

@@ -20,10 +20,10 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std
     const auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
         : rprob_.randint(0, static_cast<int>(valid_region_) + 1);
-    auto slen_1 = read_1.generate_indels(true, probs_indel);
+    auto slen_1 = read_1.generate_indels(true);
     // ensure get a fixed read length
     if (pos_1 + art_params_.read_len - slen_1 > seq_size) {
-        slen_1 = read_1.generate_indels_2(true, probs_indel);
+        slen_1 = read_1.generate_indels_2(true);
     }
     auto seq_ref = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
     read_1.ref2read(std::move(seq_ref), is_plus_strand, pos_1);
@@ -62,15 +62,15 @@ void ArtContig::generate_read_pe(
     const hts_pos_t pos_1 = is_mp == is_plus_strand ? fragment_end - art_params_.read_len : fragment_start;
     const hts_pos_t pos_2 = is_mp == is_plus_strand ? fragment_start : fragment_end - art_params_.read_len;
 
-    int slen_1 = read_1.generate_indels(true, probs_indel);
-    int slen_2 = read_2.generate_indels(false, probs_indel);
+    int slen_1 = read_1.generate_indels(true);
+    int slen_2 = read_2.generate_indels(false);
 
     // ensure get a fixed read length
     if (pos_1 + art_params_.read_len - slen_1 > seq_size) {
-        slen_1 = read_1.generate_indels_2(true, probs_indel);
+        slen_1 = read_1.generate_indels_2(true);
     }
     if (pos_2 + art_params_.read_len - slen_2 > seq_size) {
-        slen_2 = read_2.generate_indels_2(false, probs_indel);
+        slen_2 = read_2.generate_indels_2(false);
     }
     auto seq_ref_1 = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
     auto seq_ref_2 = fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len - slen_2);

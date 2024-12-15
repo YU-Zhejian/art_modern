@@ -2,6 +2,7 @@
 #include "CExceptionsProxy.hh"
 #include "art_modern_config.h"
 #include "art_modern_constants.hh"
+#include "art_modern_dtypes.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/seq_utils.hh"
 #include <boost/algorithm/string.hpp>
@@ -10,7 +11,7 @@
 namespace labw::art_modern {
 
 std::string BamUtils::generate_oa_tag(
-    const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, const int32_t nm_tag)
+    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const int32_t nm_tag)
 {
     const auto pos = std::to_string(pwa.pos_on_contig + 1); // SAM is 1-based
     const auto strand = pwa.is_plus_strand ? '+' : '-';
@@ -22,15 +23,15 @@ std::string BamUtils::generate_oa_tag(
     return oss.str();
 }
 std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
-    const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar)
+    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar)
 {
     hts_pos_t pos_on_query = 0;
     uint32_t matched = 0;
     hts_pos_t pos_on_ref = 0;
     std::ostringstream md_str_ss;
     int32_t nm = 0;
-    uint32_t this_cigar_len;
-    uint32_t this_cigar_ops;
+    am_cigar_t this_cigar_len;
+    am_cigar_t this_cigar_ops;
 
     for (const auto& this_cigar : cigar) {
         this_cigar_len = bam_cigar_oplen(this_cigar);
@@ -124,7 +125,7 @@ samFile* BamUtils::open_file(const std::string& filename, const SamOptions& sam_
 }
 BamUtils::bam1_t_uptr BamUtils::init_uptr() { return bam1_t_uptr { init() }; }
 void assert_correct_cigar(
-    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar)
+    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<am_cigar_t>& cigar)
 {
 #ifdef CEU_CM_IS_DEBUG
     const auto n_cigar = static_cast<int>(cigar.size());
@@ -133,9 +134,9 @@ void assert_correct_cigar(
 
     hts_pos_t pos_on_read = 0;
     hts_pos_t pos_on_ref = 0;
-    uint32_t this_cigar_ops;
-    uint32_t this_cigar_len;
-    uint8_t this_cigar_type;
+    am_cigar_t this_cigar_ops;
+    am_cigar_t this_cigar_len;
+    am_cigar_type_t this_cigar_type;
 
     const auto qlen = static_cast<hts_pos_t>(pwa.query.length());
     const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());

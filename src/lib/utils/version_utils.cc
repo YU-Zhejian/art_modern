@@ -41,6 +41,9 @@
 #include <google/protobuf/stubs/common.h>
 #endif
 
+#include <boost/algorithm/string/join.hpp>
+
+
 namespace labw::art_modern {
 void print_htslib_version()
 {
@@ -155,9 +158,57 @@ void print_openmp_version()
         " v" << OpenMP_CXX_VERSION <<
 #endif
         std::endl;
+    std::cout << "OpenMP Macros: _OPENMP=";
+#ifdef _OPENMP
+    try{
+        std::cout << _OPENMP;
+    } catch (std::exception& e) {
+        std::cout << "YES";
+    }
+#else
+    std::cout << "NO";
+#endif
+    std::cout << " _OPENMP_SIMD=";
+#ifdef _OPENMP_SIMD
+    try{
+        std::cout << _OPENMP_SIMD;
+    } catch (std::exception& e) {
+        std::cout << "YES";
+    }
+    std::cout << "YES";
+#else
+    std::cout << "NO";
+#endif
+    std::cout << std::endl;
+
 #else
     std::cout << "OpenMP: not used" << std::endl;
 #endif
+}
+
+void print_simde_version(){
+    #if (0)
+    std::cout << "SIMDE: " << SIMDE_VERSION_MAJOR << "." << SIMDE_VERSION_MINOR << "." << SIMDE_VERSION_MICRO << std::endl;
+    std::vector<std::string> simd_info;
+#ifdef SIMDE_X86_SSE_NATIVE
+    simd_info.emplace_back("SSE");
+#endif
+#ifdef SIMDE_X86_SSE2_NATIVE
+    simd_info.emplace_back("SSE2");
+#endif
+    std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+    #else
+
+    std::cout << "SIMDE: N/A" << std::endl;
+    std::vector<std::string> simd_info;
+#ifdef __SSE__
+    simd_info.emplace_back("SSE");
+#endif
+#ifdef __SSE2__
+    simd_info.emplace_back("SSE2");
+#endif
+    std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+    #endif
 }
 
 void print_version()
@@ -171,6 +222,7 @@ void print_version()
     print_mpi_version();
     print_protobuf_version();
     print_openmp_version();
+    print_simde_version();
     std::cout << ceu_interpret_c_std_version();
     std::cout << ceu_interpret_cxx_std_version();
     std::cout << ceu_check_get_compiler_info();

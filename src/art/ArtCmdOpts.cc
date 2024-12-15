@@ -5,6 +5,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/program_options.hpp>
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <thread>
@@ -17,12 +18,8 @@
 #include "out/OutputDispatcher.hh"
 #include "utils/fs_utils.hh"
 #include "utils/mpi_utils.hh"
-#include "utils/version_utils.hh"
 #include "utils/param_utils.hh"
-
-#ifdef WITH_OPENMP
-#include <omp.h>
-#endif
+#include "utils/version_utils.hh"
 
 namespace po = boost::program_options;
 
@@ -114,7 +111,7 @@ po::options_description option_parser() noexcept
         "use separate quality profiles for different bases. Default "
         "is to use same quality profile regardless its position");
     art_opts.add_options()(ARG_MAX_INDEL, po::value<int>()->default_value(DEFAULT_MAX_INDEL),
-    "the maximum total number of insertion and deletion per read");
+        "the maximum total number of insertion and deletion per read");
     art_opts.add_options()(ARG_MAX_N, po::value<int>()->default_value(DEFAULT_MAX_N),
         "the maximum total number of ambiguous bases (N) per read");
     art_opts.add_options()(ARG_READ_LEN, po::value<int>(), "read length to be simulated");
@@ -319,7 +316,7 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
 {
     validate_min_max_qual(min_qual, max_qual);
     validate_qual_files(qual_file_1, qual_file_2, art_lib_const_mode);
-    auto qdist = Empdist(qual_file_1, qual_file_2, sep_flag);
+    auto qdist = Empdist(qual_file_1, qual_file_2, sep_flag, read_len, art_lib_const_mode != ART_LIB_CONST_MODE::SE);
     size_t r1_profile_size;
     size_t r2_profile_size;
     if (sep_flag) {
@@ -492,9 +489,10 @@ ArtParams parse_args(const int argc, char** argv)
     const auto& art_lib_const_mode = get_art_lib_const_mode(get_param<std::string>(vm_, ARG_LIB_CONST_MODE));
     const auto& input_file_name = get_param<std::string>(vm_, ARG_INPUT_FILE_NAME);
     validate_input_filename(input_file_name, ARG_INPUT_FILE_NAME);
-    const auto& input_file_type = get_input_file_type(get_param<std::string>(vm_, ARG_INPUT_FILE_TYPE), input_file_name);
-    const auto& input_file_parser
-        = get_input_file_parser(get_param<std::string>(vm_, ARG_INPUT_FILE_PARSER), input_file_name, art_simulation_mode);
+    const auto& input_file_type
+        = get_input_file_type(get_param<std::string>(vm_, ARG_INPUT_FILE_TYPE), input_file_name);
+    const auto& input_file_parser = get_input_file_parser(
+        get_param<std::string>(vm_, ARG_INPUT_FILE_PARSER), input_file_name, art_simulation_mode);
     validate_comp_mtx(input_file_parser, art_simulation_mode, input_file_type);
     if (input_file_parser == INPUT_FILE_PARSER::HTSLIB) {
         validate_htslib_parser(input_file_name);
@@ -525,9 +523,6 @@ ArtParams parse_args(const int argc, char** argv)
         read_len, art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
         get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
-#ifdef WITH_OPENMP
-#pragma omp simd
-#endif
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
     }
@@ -537,9 +532,10 @@ ArtParams parse_args(const int argc, char** argv)
         abort_mpi();
     }
     return { art_simulation_mode, art_lib_const_mode, input_file_name, input_file_type, input_file_parser, parallel,
-        sep_flag, std::move(id), std::move(coverage_info), max_n, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev, std::move(per_base_ins_rate_1),
-        std::move(per_base_del_rate_1), std::move(per_base_ins_rate_2), std::move(per_base_del_rate_2), err_prob, pe_dist_mean_minus_2_std, std::move(qdist),
-        batch_size, vm_, std::move(args) };
+        sep_flag, std::move(id), std::move(coverage_info), max_n, read_len, pe_frag_dist_mean, pe_frag_dist_std_dev,
+        std::move(per_base_ins_rate_1), std::move(per_base_del_rate_1), std::move(per_base_ins_rate_2),
+        std::move(per_base_del_rate_2), err_prob, pe_dist_mean_minus_2_std, std::move(qdist), batch_size, vm_,
+        std::move(args) };
 }
 
 }

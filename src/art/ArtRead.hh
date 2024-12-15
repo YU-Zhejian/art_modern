@@ -26,9 +26,9 @@ public:
     ArtRead(const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
-    int generate_indels(bool is_read_1, std::vector<double>& probs_indel);
+    int generate_indels(const bool is_read_1);
     // number of deletions <= number of insertions
-    int generate_indels_2(bool is_read_1, std::vector<double>& probs_indel);
+    int generate_indels_2(const bool is_read_1);
 
     /**
      * Populate the read while adding insertions and deletions.
@@ -40,7 +40,7 @@ public:
     /**
      * Add point mutations to random bases based on empirical dist of quali scores
      */
-    void generate_snv_on_qual(bool is_first_read, std::vector<double>& tmp_qual_probs);
+    void generate_snv_on_qual(const bool is_first_read);
     [[nodiscard]] bool is_good() const;
 
 private:
@@ -51,7 +51,7 @@ private:
     std::map<int, char, std::less<>> indel_;
     bool is_plus_strand_ = false;
     long pos_on_contig_;
-    std::vector<int> qual_;
+    std::vector<am_qual_t> qual_;
     std::string read_name_;
     Rprob& rprob_;
     std::string seq_read_;

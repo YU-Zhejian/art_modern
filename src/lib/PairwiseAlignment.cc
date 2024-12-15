@@ -30,15 +30,15 @@ PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_n
 #endif
 }
 
-std::vector<uint32_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
+std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
 {
-    const uint32_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
-    const uint32_t bam_diff = use_m ? BAM_CMATCH : BAM_CDIFF;
+    const am_cigar_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
+    const am_cigar_t bam_diff = use_m ? BAM_CMATCH : BAM_CDIFF;
 
-    std::vector<uint32_t> cigar;
-    uint32_t current_cigar;
-    uint32_t prev_cigar = bam_eq;
-    uint32_t cigar_len = 0;
+    std::vector<am_cigar_t> cigar;
+    am_cigar_t current_cigar;
+    am_cigar_t prev_cigar = bam_eq;
+    am_cigar_t cigar_len = 0;
     const auto ref_len = aligned_ref.length();
     for (decltype(aligned_ref.length()) i = 0; i < ref_len; i++) {
         if (aligned_ref[i] == aligned_query[i]) {

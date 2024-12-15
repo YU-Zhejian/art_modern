@@ -1,6 +1,7 @@
 #pragma once
 #include "LockFreeIO.hh"
 #include "PairwiseAlignment.hh"
+#include "art_modern_dtypes.hh"
 #include "SamOptions.hh"
 #include <htslib/sam.h>
 #include <memory>
@@ -10,7 +11,7 @@
 namespace labw::art_modern {
 
 void assert_correct_cigar(
-    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<uint32_t>& cigar);
+    [[maybe_unused]] const PairwiseAlignment& pwa, [[maybe_unused]] const std::vector<am_cigar_t>& cigar);
 
 struct BamDestroyer {
     void operator()(bam1_t* b) const { bam_destroy1(b); }
@@ -25,9 +26,9 @@ public:
     using bam1_t_uptr = std::unique_ptr<bam1_t, BamDestroyer>;
 
     static std::string generate_oa_tag(
-        const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar, int32_t nm_tag);
+        const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, int32_t nm_tag);
     static std::pair<int32_t, std::string> generate_nm_md_tag(
-        const PairwiseAlignment& pwa, const std::vector<uint32_t>& cigar);
+        const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar);
     static bam1_t* init();
     static bam1_t_uptr init_uptr();
     static sam_hdr_t* init_header(const SamOptions& sam_options);

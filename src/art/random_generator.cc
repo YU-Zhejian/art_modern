@@ -19,6 +19,16 @@ long Rprob::seed()
         * static_cast<long>(std::hash<std::thread::id>()(std::this_thread::get_id()));
 }
 
+void Rprob::public_init_(){
+    tmp_qual_dists_.resize(read_length_);
+    tmp_probs_.resize(read_length_);
+}
+void Rprob::r_probs()
+{
+    r_probs(read_length_);
+}
+
+
 #if defined(USE_STL_RANDOM)
 Rprob::~Rprob() = default;
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
@@ -33,6 +43,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pos_on_read_not_head_and_tail_(1, read_length - 2)
     , read_length_(read_length)
 {
+    public_init_();
 }
 
 double Rprob::r_prob() { return dis_(gen_); }
@@ -41,14 +52,14 @@ int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussia
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-void Rprob::rand_quality(std::vector<int>& qual_dist)
+void Rprob::rand_quality()
 {
-    std::generate_n(qual_dist.begin(), read_length_, [this]() { return quality_(gen_); });
+    std::generate_n(tmp_qual_dists_.begin(), read_length_, [this]() { return quality_(gen_); });
 }
 
-void Rprob::r_probs(std::vector<double>& result)
+void Rprob::r_probs(int n)
 {
-    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
+    std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
@@ -71,22 +82,23 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pos_on_read_not_head_and_tail_(1, read_length - 2)
     , read_length_(read_length)
 {
+    public_init_();
 }
 
 double Rprob::r_prob() { return dis_(gen_); }
 
-void Rprob::r_probs(std::vector<double>& result)
+void Rprob::r_probs(int n)
 {
-    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
+    std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
 
 int Rprob::insertion_length() { return static_cast<int>(insertion_length_gaussian_(gen_)); }
 
 char Rprob::rand_base() { return ART_ACGT[base_(gen_)]; }
 
-void Rprob::rand_quality(std::vector<int>& qual_dist)
+void Rprob::rand_quality()
 {
-    std::generate_n(qual_dist.begin(), read_length_, [this]() { return quality_(gen_); });
+    std::generate_n(tmp_qual_dists_.begin(), read_length_, [this]() { return quality_(gen_); });
 }
 
 int Rprob::rand_quality_less_than_10() { return quality_less_than_10_(gen_); }
@@ -104,6 +116,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , read_length_(read_length)
 {
     vslNewStream(&stream_, VSL_BRNG_MT19937, seed());
+    public_init_();
 }
 
 double Rprob::r_prob()
@@ -113,9 +126,9 @@ double Rprob::r_prob()
     return result;
 }
 
-void Rprob::r_probs(std::vector<double>& result)
+void Rprob::r_probs(int n)
 {
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, result.size(), result.data(), 0.0, 1.0);
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, n, tmp_probs_.data(), 0.0, 1.0);
 }
 
 int Rprob::insertion_length()
@@ -132,9 +145,9 @@ char Rprob::rand_base()
     return "ACGT"[index & 0b11];
 }
 
-void Rprob::rand_quality(std::vector<int>& qual_dist)
+void Rprob::rand_quality()
 {
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, qual_dist.data(), 1, MAX_DIST_NUMBER);
+    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, tmp_qual_dists_.data(), 1, MAX_DIST_NUMBER);
 }
 
 int Rprob::rand_quality_less_than_10()
@@ -172,14 +185,15 @@ Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_len
 {
     r = gsl_rng_alloc(gsl_rng_mt19937);
     gsl_rng_set(r, seed());
+    public_init_();
 }
 Rprob::~Rprob() { gsl_rng_free(r); }
 
 double Rprob::r_prob() { return gsl_rng_uniform(r); }
 
-void Rprob::r_probs(std::vector<double>& result)
+void Rprob::r_probs(int n)
 {
-    std::generate_n(result.begin(), result.size(), [this]() { return r_prob(); });
+    std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
 
 int Rprob::insertion_length()
@@ -189,9 +203,9 @@ int Rprob::insertion_length()
 
 char Rprob::rand_base() { return ART_ACGT[gsl_rng_uniform_int(r, 4)]; }
 
-void Rprob::rand_quality(std::vector<int>& qual_dist)
+void Rprob::rand_quality()
 {
-    std::generate_n(qual_dist.begin(), read_length_,
+    std::generate_n(tmp_qual_dists_.begin(), read_length_,
         [this]() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER) + 1); });
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "art_modern_config.h"
+#include "art_modern_dtypes.hh"
 #include <vector>
 
 #if defined(USE_STL_RANDOM)
@@ -20,18 +21,23 @@ class Rprob {
 public:
     Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length);
     double r_prob();
-    void r_probs(std::vector<double>& result);
+    void r_probs(int n);
+    void r_probs();
     int insertion_length();
     char rand_base();
-    void rand_quality(std::vector<int>& qual_dist);
+    void rand_quality();
     int rand_quality_less_than_10();
     ~Rprob();
     int rand_pos_on_read();
     int rand_pos_on_read_not_head_and_tail();
     int randint(int min, int max);
+    std::vector<double> tmp_probs_;
+    std::vector<int> tmp_qual_dists_;
 
 private:
     static long seed();
+    void public_init_();
+    int read_length_;
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
@@ -42,7 +48,6 @@ private:
     std::uniform_int_distribution<int> quality_;
     std::uniform_int_distribution<int> pos_on_read_;
     std::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
-    int read_length_;
 #elif defined(USE_BOOST_RANDOM)
     boost::mt19937 gen_;
     boost::uniform_real<double> dis_;
@@ -53,17 +58,14 @@ private:
     boost::uniform_int<int> quality_;
     boost::uniform_int<int> pos_on_read_;
     boost::uniform_int<int> pos_on_read_not_head_and_tail_;
-    int read_length_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
-    int read_length_;
 #elif defined(USE_GSL_RANDOM)
     gsl_rng* r;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
-    int read_length_;
 #endif
 };
 }
