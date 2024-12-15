@@ -42,3 +42,17 @@ Except those acknowledged in Readme, this project uses code from the following p
   - `/deps/concurrentqueue/**`
 
   Dual-licensed under Simplified BSD License and Boost Software License.
+
+---
+
+- **Evan Nemerson's SIMD Everywhere (SIMDe) Project**
+
+  Available from <https://github.com/simd-everywhere/simde>, commit `6daf5356`.
+
+  Affected files:
+
+  - `/deps/simde/**`
+
+  Under an MIT-like License.
+
+  **UPDATE** Only used in some test scripts currently.

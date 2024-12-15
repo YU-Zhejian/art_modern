@@ -36,6 +36,11 @@ for collect in hotspots threading memory-consumption; do # hpc-performance memor
         --i-fcov 4 \
         --parallel 0 \
         --pe_frag_dist_std_dev 20 \
-        --pe_frag_dist_mean 500
+        --pe_frag_dist_mean 500 \
+        --o-sam "${PROFILE_DIR}"/test_small_se_wgs_memory.bam \
+        --o-sam-write_bam \
+        --o-hl_sam "${PROFILE_DIR}"/test_small_se_wgs_memory.hl.sam \
+        --o-fastq "${PROFILE_DIR}"/test_small_se_wgs_memory.fastq \
+        --o-pwa "${PROFILE_DIR}"/test_small_se_wgs_memory.pwa
     vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
 done

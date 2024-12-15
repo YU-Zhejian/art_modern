@@ -1,5 +1,6 @@
 #pragma once
 
+#include "art_modern_dtypes.hh"
 #include <htslib/hts.h>
 #include <string>
 #include <vector>
@@ -36,7 +37,7 @@ public:
         std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig,
         bool is_plus_strand);
     [[maybe_unused]] static PairwiseAlignment deserialize(const std::array<std::string, NUM_LINES>& serialized);
-    [[nodiscard]] std::vector<uint32_t> generate_cigar_array(bool use_m) const;
+    [[nodiscard]] std::vector<am_cigar_t> generate_cigar_array(bool use_m) const;
     [[nodiscard]] std::string serialize() const;
     [[maybe_unused]] void serialize(std::ostream& os) const;
 

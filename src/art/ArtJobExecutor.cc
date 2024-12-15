@@ -13,7 +13,6 @@ void ArtJobExecutor::generate(const long targeted_num_reads, const bool is_posit
     int num_cont_fail = 0;
     const auto max_tolerance
         = std::max(5L, static_cast<long>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
-    const int num_reads_to_reduce = art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2;
     bool retv;
     long remaining_num_reads = targeted_num_reads;
     long current_num_reads = 0;
@@ -55,8 +54,8 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
         return false;
     }
 
-    read_1.generate_snv_on_qual(true, tmp_qual_probs_);
-    read_2.generate_snv_on_qual(false, tmp_qual_probs_);
+    read_1.generate_snv_on_qual(true);
+    read_2.generate_snv_on_qual(false);
     read_1.generate_pairwise_aln();
     read_2.generate_pairwise_aln();
     if (!(read_1.is_good() && read_2.is_good())) {
@@ -79,7 +78,7 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     } catch (ReadGenerationException&) {
         return false;
     }
-    art_read.generate_snv_on_qual(true, tmp_qual_probs_);
+    art_read.generate_snv_on_qual(true);
     art_read.generate_pairwise_aln();
     if (!art_read.is_good()) {
         return false;
@@ -95,8 +94,9 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
     , num_reads(0)
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
+    ,
+      num_reads_to_reduce(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
 {
-    tmp_qual_probs_.resize(art_params_.read_len);
 }
 
 void ArtJobExecutor::operator()()
@@ -106,6 +106,7 @@ void ArtJobExecutor::operator()()
     if (num_contigs == 0) {
         return;
     }
+    hts_pos_t accumulated_contig_len = 0;
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
@@ -118,6 +119,7 @@ void ArtJobExecutor::operator()()
                                      << " bps)";
             continue;
         }
+        accumulated_contig_len += contig_size;
 
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
         const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
@@ -139,7 +141,7 @@ void ArtJobExecutor::operator()()
     }
 
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
-                            << " reads generated.";
+                            << " reads (mean depth=" << static_cast<double>(num_reads) * art_params_.read_len / static_cast<double>(accumulated_contig_len) / num_reads_to_reduce <<   ") generated.";
     if (job_.free_fasta_fetch_after_execution) {
         delete job_.fasta_fetch;
     }
@@ -152,7 +154,8 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , num_reads(other.num_reads.load())
     , output_dispatcher_(other.output_dispatcher_)
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
-    , tmp_qual_probs_(other.tmp_qual_probs_)
+    ,
+      num_reads_to_reduce(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
 {
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }

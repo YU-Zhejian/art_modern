@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "art_modern_dtypes.hh"
 
 namespace labw::art_modern {
 
@@ -14,8 +15,8 @@ const std::string ALN_GAP_STR = "-";
 /**
  * 10^{-40} error rate, which is quite low.
  */
-const int MAX_QUAL = 40;
-const int MIN_QUAL = 0;
+const am_qual_t MAX_QUAL = 40;
+const am_qual_t MIN_QUAL = 0;
 const int G_SIZE = 1 << 30;
 
 const char ART_VERSION[] = "2.5.8";

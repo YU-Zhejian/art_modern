@@ -1,4 +1,5 @@
 #include "ArtRead.hh"
+#include "art_modern_config.h" // For CEU_IS_DEBUG
 #include "art_modern_constants.hh"
 #include "random_generator.hh"
 
@@ -15,24 +16,29 @@ void ArtRead::generate_pairwise_aln()
     aln_ref_.resize(maxk);
 
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
-        if (indel_.find(k) == indel_.end()) { // No indel
+        const auto find = indel_.find(k);
+        if (find == indel_.end()) { // No indel
             aln_read_[k] = seq_read_[pos_on_read];
             aln_ref_[k] = seq_ref_[pos_on_ref];
             pos_on_read++;
             pos_on_ref++;
-        } else if (indel_[k] == ALN_GAP) { // Deletion
+        } else if (find->second == ALN_GAP) { // Deletion
             aln_read_[k] = ALN_GAP;
             aln_ref_[k] = seq_ref_[pos_on_ref];
             pos_on_ref++;
         } else { // Insertion
-            aln_read_[k] = indel_[k];
+            aln_read_[k] = find->second;
             aln_ref_[k] = ALN_GAP;
             pos_on_read++;
         }
         k++;
     }
-    while (indel_.find(k) != indel_.end()) { // Insertions after reference
-        aln_read_[k] = indel_[k];
+    while (true) { // Insertions after reference
+        const auto find = indel_.find(k);
+        if (find == indel_.end()) {
+            break;
+        }
+        aln_read_[k] = find->second;
         aln_ref_[k] = ALN_GAP;
         pos_on_read++;
         k++;
@@ -41,7 +47,7 @@ void ArtRead::generate_pairwise_aln()
     aln_ref_.resize(k);
 }
 
-void ArtRead::generate_snv_on_qual(const bool is_first_read, std::vector<double>& tmp_qual_probs)
+void ArtRead::generate_snv_on_qual(const bool is_first_read)
 {
     if (!art_params_.sep_flag) {
         art_params_.qdist.get_read_qual(qual_, art_params_.read_len, rprob_, is_first_read);
@@ -51,13 +57,13 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read, std::vector<double>
         art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
     }
     char achar;
-    rprob_.r_probs(tmp_qual_probs);
+    rprob_.r_probs();
     for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
         if (seq_read_[i] == 'N') {
             qual_[i] = MIN_QUAL;
             continue;
         }
-        if (tmp_qual_probs[i] < art_params_.err_prob[qual_[i]]) {
+        if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
             achar = seq_read_[i];
             while (seq_read_[i] == achar) {
                 achar = rprob_.rand_base();
@@ -67,7 +73,7 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read, std::vector<double>
     }
 }
 
-int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_indel)
+int ArtRead::generate_indels(const bool is_read_1)
 {
     indel_.clear();
     int ins_len = 0;
@@ -78,10 +84,9 @@ int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_in
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
     // deletion
-    probs_indel.resize(per_base_del_rate.size());
-    rprob_.r_probs(probs_indel);
+    rprob_.r_probs(per_base_del_rate.size());
     for (i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_del_rate[i] >= probs_indel[i]) {
+        if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
             del_len = i + 1;
             j = i;
             while (j >= 0) {
@@ -94,13 +99,12 @@ int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_in
             break;
         }
     }
-    probs_indel.resize(per_base_ins_rate.size());
-    rprob_.r_probs(probs_indel);
+    rprob_.r_probs(per_base_ins_rate.size());
     for (i = static_cast<int>(per_base_ins_rate.size() - 1); i >= 0; i--) {
         if (art_params_.read_len - del_len - ins_len < i + 1) {
             continue; // ensure that there are stil enough unchanged position for mutation
         }
-        if (per_base_ins_rate[i] >= probs_indel[i]) {
+        if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
             ins_len = i + 1;
             j = i;
             while (j >= 0) {
@@ -116,7 +120,7 @@ int ArtRead::generate_indels(const bool is_read_1, std::vector<double>& probs_in
     return ins_len - del_len;
 }
 
-int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_indel)
+int ArtRead::generate_indels_2(const bool is_read_1)
 {
     indel_.clear();
     int ins_len = 0;
@@ -125,10 +129,9 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
-    probs_indel.resize(per_base_ins_rate.size());
-    rprob_.r_probs(probs_indel);
+    rprob_.r_probs(per_base_ins_rate.size());
     for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_ins_rate[i] >= probs_indel[i]) {
+        if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
                 pos = rprob_.rand_pos_on_read();
@@ -142,8 +145,7 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
     }
 
     // deletion
-    probs_indel.resize(per_base_ins_rate.size());
-    rprob_.r_probs(probs_indel);
+    rprob_.r_probs(per_base_del_rate.size());
     for (auto i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
         if (del_len == ins_len) {
             break;
@@ -153,7 +155,7 @@ int ArtRead::generate_indels_2(const bool is_read_1, std::vector<double>& probs_
             continue; // ensure that enough unchanged position for mutation
         }
 
-        if (per_base_del_rate[i] >= probs_indel[i]) {
+        if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
                 pos = rprob_.rand_pos_on_read_not_head_and_tail();
@@ -184,26 +186,33 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     int k = 0;
     int pos_on_read = 0;
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
-        if (indel_.find(k) == indel_.end()) { // No indel
+        const auto find = indel_.find(k);
+        if (find == indel_.end()) { // No indel
             seq_read_[pos_on_read] = seq_ref_[pos_on_ref];
             pos_on_ref++;
             pos_on_read++;
-        } else if (indel_[k] == ALN_GAP) { // Deletion
+        } else if (find->second == ALN_GAP) { // Deletion
             pos_on_ref++;
         } else { // Insertion
-            seq_read_[pos_on_read] = indel_[k];
+            seq_read_[pos_on_read] = find->second;
             pos_on_read++;
         }
         k++;
     }
-    while (indel_.find(k) != indel_.end()) { // Insertions after reference
-        seq_read_[pos_on_read] = indel_[k];
+    while (true) { // Insertions after reference
+        const auto find = indel_.find(k);
+        if (find == indel_.end()) {
+            break;
+        }
+        seq_read_[pos_on_read] = find->second;
         pos_on_read++;
         k++;
     }
+#ifdef CEU_IS_DEBUG
     if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
         throw ReadGenerationException("Generated seq_read_ with unequal sizes");
     }
+#endif
 }
 
 ArtRead::ArtRead(
@@ -221,7 +230,7 @@ ArtRead::ArtRead(
 PairwiseAlignment ArtRead::to_pwa()
 {
     std::string qual_str = qual_to_str(qual_);
-    return { std::move(read_name_), std::move(contig_name_), std::move(seq_read_), std::move(seq_ref_), qual_str,
+    return { std::move(read_name_), std::move(contig_name_), std::move(seq_read_), std::move(seq_ref_), std::move(qual_str),
         std::move(aln_read_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
 }
 bool ArtRead::is_good() const

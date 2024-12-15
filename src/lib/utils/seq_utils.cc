@@ -1,10 +1,17 @@
 #include "seq_utils.hh"
 
+#ifdef __SSE2__
+#include <immintrin.h>
+#endif
+
 #include "art_modern_constants.hh"
+#include "art_modern_dtypes.hh"
 #include "htslib/sam.h"
 #include <algorithm>
 #include <sstream>
 #include <vector>
+
+
 
 namespace labw::art_modern {
 constexpr char rev_comp_trans_2[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
@@ -26,27 +33,34 @@ constexpr char normalization_matrix[] = { 78, 78, 78, 78, 78, 78, 78, 78, 78, 78
     78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 65, 78, 67, 78, 78, 78, 71, 78, 78, 78, 78, 78,
     78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 65, 78, 67, 78, 78, 78, 71, 78, 78,
     78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78
-
 };
 
-std::string qual_to_str(const uint8_t* qual, const size_t qlen)
+std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
     retq.resize(qlen);
-    for (size_t k = 0; k < qlen; k++) {
-        retq[k] = static_cast<char>(qual[k] + PHRED_OFFSET);
+    size_t i = 0;
+#ifdef __SSE2__
+    const size_t num_elements_per_simd = 16; // SSE2 processes 16 uint8_t elements at a time
+    const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
+    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
+
+    for (; i < aligned_size; i += num_elements_per_simd) {
+        __m128i qual_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&qual[i]));
+        __m128i result_vec = _mm_add_epi8(qual_vec, phred_offset_vec);
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(&retq[i]), result_vec);
+    }
+#endif
+    // Handle the remaining elements that do not fit into a full SIMD register
+    for (; i < qlen; ++i) {
+        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
     }
     return retq;
 }
 
-std::string qual_to_str(const std::vector<int>& qual)
+std::string qual_to_str(const std::vector<am_qual_t>& qual)
 {
-    std::string retq;
-    retq.resize(qual.size());
-    for (size_t k = 0; k < qual.size(); k++) {
-        retq[k] = static_cast<char>(qual[k] + PHRED_OFFSET);
-    }
-    return retq;
+    return qual_to_str(qual.data(), qual.size());
 }
 
 std::string comp(const std::string& dna)
@@ -72,7 +86,7 @@ std::string revcomp(const std::string& dna)
     return rets;
 }
 
-std::string cigar_arr_to_str(const std::vector<uint32_t>& cigar_arr)
+std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
     std::ostringstream oss;
     for (size_t i = 0; i < cigar_arr.size(); i += 1) {

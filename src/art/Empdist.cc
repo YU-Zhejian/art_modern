@@ -19,113 +19,82 @@ void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int 
     }
 }
 
-Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual)
+Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
+    const bool is_pe, const bool read_len)
     : sep_qual_(sep_qual)
+    , is_pe_(is_pe)
+    , read_len_(read_len)
 {
     read_emp_dist_(emp_filename_1, true);
     if (!emp_filename_2.empty()) {
         read_emp_dist_(emp_filename_2, false);
     }
-    if (sep_qual_) {
-        if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size()
-            || c_qual_dist_first.size() != t_qual_dist_first.size()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
-            abort_mpi();
-        }
-        if (a_qual_dist_second.size() != g_qual_dist_second.size()
-            || g_qual_dist_second.size() != c_qual_dist_second.size()
-            || c_qual_dist_second.size() != t_qual_dist_second.size()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
-            abort_mpi();
-        }
-    }
+    validate_();
     BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
-    if (sep_qual_) {
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first.size()
-                                << ", C: " << c_qual_dist_first.size() << ", G: " << g_qual_dist_first.size()
-                                << ", T: " << t_qual_dist_first.size();
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: A: " << a_qual_dist_second.size()
-                                << ", C: " << c_qual_dist_second.size() << ", G: " << g_qual_dist_second.size()
-                                << ", T: " << t_qual_dist_second.size();
-    } else {
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: " << qual_dist_first.size();
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second.size();
-    }
+    print_();
 }
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<int>& qual, const int len, Rprob& rprob, const bool first) const
+void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& rprob, const bool first) const
 {
     qual.resize(len);
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
-    rprob.rand_quality(qual);
+    rprob.rand_quality();
     for (auto i = 0; i < len; i++) {
-        qual[i] = qual_dist[i].lower_bound(qual[i])->second;
+        qual[i] = qual_dist[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
     }
 }
 
-void Empdist::get_read_qual_sep_1(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const
+void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
     qual.resize(len);
 
-    if (a_qual_dist_first.size() < len || t_qual_dist_first.size() < len || g_qual_dist_first.size() < len
-        || c_qual_dist_first.size() < len) {
-        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << len
-                                 << ") exceeds the length of the read quality profile (A: " << a_qual_dist_first.size()
-                                 << ", C: " << c_qual_dist_first.size() << ", G: " << g_qual_dist_first.size()
-                                 << ", T: " << t_qual_dist_first.size()
-
-                                 << ")";
-        abort_mpi();
-    }
-
-    rprob.rand_quality(qual);
+    rprob.rand_quality();
 
     for (decltype(seq.size()) i = 0; i < len; i++) {
-        if (seq[i] == 'A') {
-            qual[i] = a_qual_dist_first[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'C') {
-            qual[i] = c_qual_dist_first[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'G') {
-            qual[i] = g_qual_dist_first[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'T') {
-            qual[i] = t_qual_dist_first[i].lower_bound(qual[i])->second;
-        } else {
-            // return random quality less than 10
+        switch (seq[i]) {
+        case 'A':
+            qual[i] = a_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'C':
+            qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'G':
+            qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'T':
+            qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        default:
             qual[i] = rprob.rand_quality_less_than_10();
         }
     }
 }
 
-void Empdist::get_read_qual_sep_2(std::vector<int>& qual, const std::string& seq, Rprob& rprob) const
+void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
     qual.resize(len);
 
-    if (a_qual_dist_second.size() < len || t_qual_dist_second.size() < len || g_qual_dist_second.size() < len
-        || c_qual_dist_second.size() < len) {
-        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << len
-                                 << ") exceeds the "
-                                    "length of the read quality profile (A: "
-                                 << a_qual_dist_second.size() << ", C: " << c_qual_dist_second.size()
-                                 << ", G: " << g_qual_dist_second.size() << ", T: " << t_qual_dist_second.size() << ")";
-        abort_mpi();
-    }
-    rprob.rand_quality(qual);
+    rprob.rand_quality();
     for (size_t i = 0; i < len; i++) {
-        if (seq[i] == 'A') {
-            qual[i] = a_qual_dist_second[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'C') {
-            qual[i] = c_qual_dist_second[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'G') {
-            qual[i] = g_qual_dist_second[i].lower_bound(qual[i])->second;
-        } else if (seq[i] == 'T') {
-            qual[i] = t_qual_dist_second[i].lower_bound(qual[i])->second;
-        } else {
-            // return random quality less than 10
-            qual[i] = rprob.rand_quality_less_than_10();
+        switch (seq[i]) {
+            case 'A':
+                qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+                break;
+            case 'C':
+                qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+                break;
+            case 'G':
+                qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+                break;
+            case 'T':
+                qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+                break;
+            default:
+                qual[i] = rprob.rand_quality_less_than_10();
         }
     }
 }
@@ -237,7 +206,6 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
 
 void Empdist::shift_all_emp(
     const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
-
 {
     if (!sep_flag) {
         shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);
@@ -251,6 +219,74 @@ void Empdist::shift_all_emp(
         shift_emp(c_qual_dist_second, q_shift_2, min_qual, max_qual);
         shift_emp(g_qual_dist_first, q_shift_1, min_qual, max_qual);
         shift_emp(g_qual_dist_second, q_shift_2, min_qual, max_qual);
+    }
+}
+
+void Empdist::validate_() const
+{
+    if (sep_qual_) {
+        if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size()
+            || c_qual_dist_first.size() != t_qual_dist_first.size()) {
+            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: The length of 1st read in each qual dist is not equal!";
+            print_();
+            abort_mpi();
+        }
+        if (a_qual_dist_second.size() != g_qual_dist_second.size()
+            || g_qual_dist_second.size() != c_qual_dist_second.size()
+            || c_qual_dist_second.size() != t_qual_dist_second.size()) {
+            BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: The length of 2nd read in each qual dist is not equal!";
+            print_();
+            abort_mpi();
+        }
+    }
+    if (sep_qual_) {
+        if (a_qual_dist_first.size() < read_len_) {
+            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_
+                                     << ") exceeds the "
+                                        "length of the read quality profile.";
+            print_();
+            abort_mpi();
+        }
+        if (is_pe_) {
+            if (a_qual_dist_second.size() < read_len_) {
+                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_
+                                         << ") exceeds the "
+                                            "length of the read quality profile.";
+                print_();
+                abort_mpi();
+            }
+        }
+    } else {
+        if (qual_dist_first.size() < read_len_) {
+            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_
+                                     << ") exceeds the "
+                                        "length of the read quality profile.";
+            print_();
+            abort_mpi();
+        }
+        if (is_pe_) {
+            if (qual_dist_second.size() < read_len_) {
+                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_
+                                         << ") exceeds the "
+                                            "length of the read quality profile ("
+                                         << qual_dist_second.size() << ")";
+            }
+        }
+    }
+}
+
+void Empdist::print_() const
+{
+    if (sep_qual_) {
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first.size()
+                                << ", C: " << c_qual_dist_first.size() << ", G: " << g_qual_dist_first.size()
+                                << ", T: " << t_qual_dist_first.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: A: " << a_qual_dist_second.size()
+                                << ", C: " << c_qual_dist_second.size() << ", G: " << g_qual_dist_second.size()
+                                << ", T: " << t_qual_dist_second.size();
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: " << qual_dist_first.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second.size();
     }
 }
 
