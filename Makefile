@@ -16,6 +16,17 @@ release:
 	env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release $(CURDIR)
 	cmake --build opt/build_release -j40
 
+.PHONY: rel_with_dbg_alpine
+rel_with_dbg_alpine:
+	mkdir -p opt/build_rel_with_dbg_alpine
+	env -C opt/build_rel_with_dbg_alpine cmake \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
+		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
+		-DBUILD_SHARED_LIBS=OFF \
+		-G Ninja $(CURDIR)
+	cmake --build opt/build_rel_with_dbg_alpine -j40
+
 .PHONY: fmt
 fmt:
 	bash sh.d/fmt.sh
