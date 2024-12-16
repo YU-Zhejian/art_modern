@@ -15,7 +15,7 @@ namespace labw::art_modern {
  * @param probs_indel
  * @param read_1
  */
-void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std::vector<double>& probs_indel)
+void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
 {
     const auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
@@ -48,10 +48,8 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1, std
  * @param is_mp
  * @param read_1
  * @param read_2
- * @param probs_indel
  */
-void ArtContig::generate_read_pe(
-    const bool is_plus_strand, const bool is_mp, ArtRead& read_1, ArtRead& read_2, std::vector<double>& probs_indel)
+void ArtContig::generate_read_pe(const bool is_plus_strand, const bool is_mp, ArtRead& read_1, ArtRead& read_2)
 {
     const hts_pos_t fragment_len = generate_fragment_length();
     const hts_pos_t fragment_start = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE

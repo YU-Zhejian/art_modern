@@ -6,7 +6,7 @@ if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python sh.d/test_small.sh.d/gen_cov.py
 fi
 
-export PARALLEL=0
+export PARALLEL="0"
 export IDRATE=0.1
 export OUT_DIR="opt/tmp/"
 export ART="opt/build_debug/art_modern"

@@ -28,13 +28,14 @@ void HeadlessBamReadOutput::writeSE(const PairwiseAlignment& pwa)
     }
     auto sam_record = BamUtils::init_uptr();
     const auto rlen = static_cast<long>(pwa.query.size());
-    const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+    auto seq = pwa.query;
     auto qual = pwa.qual;
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
     if (!pwa.is_plus_strand) {
         std::reverse(qual.begin(), qual.end());
         std::reverse(cigar.begin(), cigar.end());
+        revcomp_inplace(seq);
     }
 
     const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
@@ -69,8 +70,8 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
 
     const auto rlen = static_cast<long>(pwa1.query.size());
 
-    const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
-    const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
+    auto seq1 = pwa1.query;
+    auto seq2 = pwa2.query;
 
     auto cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     auto cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
@@ -80,9 +81,11 @@ void HeadlessBamReadOutput::writePE(const PairwiseAlignment& pwa1, const Pairwis
 
     if (!pwa1.is_plus_strand) {
         std::reverse(cigar1.begin(), cigar1.end());
+        revcomp_inplace(seq1);
     }
     if (!pwa2.is_plus_strand) {
         std::reverse(cigar2.begin(), cigar2.end());
+        revcomp_inplace(seq2);
     }
 
     const auto& [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);

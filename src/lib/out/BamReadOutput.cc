@@ -27,7 +27,10 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     const auto& cigar = pwa.generate_cigar_array(sam_options_.use_m);
     assert_correct_cigar(pwa, cigar);
 
-    const auto& seq = pwa.is_plus_strand ? pwa.query : revcomp(pwa.query);
+    auto seq = pwa.query;
+    if (!pwa.is_plus_strand) {
+        revcomp_inplace(seq);
+    }
     const hts_pos_t pos = pwa.pos_on_contig;
 
     const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
@@ -80,8 +83,8 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     tags2.add_string("MD", md_tag2);
     tags2.add_int_i("NM", nm_tag2);
 
-    const auto& seq1 = pwa1.is_plus_strand ? pwa1.query : revcomp(pwa1.query);
-    const auto& seq2 = pwa2.is_plus_strand ? pwa2.query : revcomp(pwa2.query);
+    auto seq1 = pwa1.query;
+    auto seq2 = pwa2.query;
 
     const hts_pos_t pos1 = pwa1.pos_on_contig;
     const hts_pos_t pos2 = pwa2.pos_on_contig;
@@ -92,9 +95,11 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
     if (pwa1.is_plus_strand) {
         flag1 |= BAM_FMREVERSE;
         flag2 |= BAM_FREVERSE;
+        revcomp_inplace(seq2);
     } else {
         flag1 |= BAM_FREVERSE;
         flag2 |= BAM_FMREVERSE;
+        revcomp_inplace(seq1);
     }
 
     const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);

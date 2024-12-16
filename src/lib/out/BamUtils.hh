@@ -1,8 +1,8 @@
 #pragma once
 #include "LockFreeIO.hh"
 #include "PairwiseAlignment.hh"
-#include "art_modern_dtypes.hh"
 #include "SamOptions.hh"
+#include "art_modern_dtypes.hh"
 #include <htslib/sam.h>
 #include <memory>
 

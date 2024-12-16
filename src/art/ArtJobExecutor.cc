@@ -23,8 +23,8 @@ void ArtJobExecutor::generate(const long targeted_num_reads, const bool is_posit
             retv = generate_pe(art_contig, is_positive, current_num_reads);
         }
         if (retv) {
-            remaining_num_reads -= num_reads_to_reduce;
-            num_reads += num_reads_to_reduce;
+            remaining_num_reads -= num_reads_to_reduce_;
+            num_reads += num_reads_to_reduce_;
             current_num_reads++;
         } else {
             num_cont_fail++;
@@ -49,7 +49,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
     try {
         art_contig.generate_read_pe(
-            is_plus_strand, art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP, read_1, read_2, probs_indel_);
+            is_plus_strand, art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP, read_1, read_2);
     } catch (ReadGenerationException&) {
         return false;
     }
@@ -74,7 +74,7 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
          << current_num_reads;
     ArtRead art_read(art_params_, art_contig.seq_name, osID.str(), rprob_);
     try {
-        art_contig.generate_read_se(is_plus_strand, art_read, probs_indel_);
+        art_contig.generate_read_se(is_plus_strand, art_read);
     } catch (ReadGenerationException&) {
         return false;
     }
@@ -94,8 +94,7 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, B
     , num_reads(0)
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
-    ,
-      num_reads_to_reduce(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
+    , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
 {
 }
 
@@ -141,7 +140,10 @@ void ArtJobExecutor::operator()()
     }
 
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
-                            << " reads (mean depth=" << static_cast<double>(num_reads) * art_params_.read_len / static_cast<double>(accumulated_contig_len) / num_reads_to_reduce <<   ") generated.";
+                            << " reads (mean depth="
+                            << static_cast<double>(num_reads) * art_params_.read_len
+            / static_cast<double>(accumulated_contig_len) / num_reads_to_reduce_
+                            << ") generated.";
     if (job_.free_fasta_fetch_after_execution) {
         delete job_.fasta_fetch;
     }
@@ -154,8 +156,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , num_reads(other.num_reads.load())
     , output_dispatcher_(other.output_dispatcher_)
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
-    ,
-      num_reads_to_reduce(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
+    , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
 {
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }

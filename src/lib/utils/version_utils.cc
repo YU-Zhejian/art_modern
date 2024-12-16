@@ -43,7 +43,6 @@
 
 #include <boost/algorithm/string/join.hpp>
 
-
 namespace labw::art_modern {
 void print_htslib_version()
 {
@@ -160,7 +159,7 @@ void print_openmp_version()
         std::endl;
     std::cout << "OpenMP Macros: _OPENMP=";
 #ifdef _OPENMP
-    try{
+    try {
         std::cout << _OPENMP;
     } catch (std::exception& e) {
         std::cout << "YES";
@@ -170,7 +169,7 @@ void print_openmp_version()
 #endif
     std::cout << " _OPENMP_SIMD=";
 #ifdef _OPENMP_SIMD
-    try{
+    try {
         std::cout << _OPENMP_SIMD;
     } catch (std::exception& e) {
         std::cout << "YES";
@@ -186,9 +185,11 @@ void print_openmp_version()
 #endif
 }
 
-void print_simde_version(){
-    #if (0)
-    std::cout << "SIMDE: " << SIMDE_VERSION_MAJOR << "." << SIMDE_VERSION_MINOR << "." << SIMDE_VERSION_MICRO << std::endl;
+void print_simde_version()
+{
+#if (0)
+    std::cout << "SIMDE: " << SIMDE_VERSION_MAJOR << "." << SIMDE_VERSION_MINOR << "." << SIMDE_VERSION_MICRO
+              << std::endl;
     std::vector<std::string> simd_info;
 #ifdef SIMDE_X86_SSE_NATIVE
     simd_info.emplace_back("SSE");
@@ -197,7 +198,7 @@ void print_simde_version(){
     simd_info.emplace_back("SSE2");
 #endif
     std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
-    #else
+#else
 
     std::cout << "SIMDE: N/A" << std::endl;
     std::vector<std::string> simd_info;
@@ -208,7 +209,7 @@ void print_simde_version(){
     simd_info.emplace_back("SSE2");
 #endif
     std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
-    #endif
+#endif
 }
 
 void print_version()

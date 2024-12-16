@@ -15,10 +15,9 @@ class ArtContig {
 public:
     ArtContig(BaseFastaFetch* fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob);
 
-    void generate_read_se(bool is_plus_strand, ArtRead& read_1, std::vector<double>& probs_indel);
+    void generate_read_se(bool is_plus_strand, ArtRead& read_1);
 
-    void generate_read_pe(
-        bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2, std::vector<double>& probs_indel);
+    void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);
 
     const std::string seq_name;
     const hts_pos_t seq_size;
