@@ -1,6 +1,6 @@
 #pragma once
-#include <string>
 #include "art_modern_dtypes.hh"
+#include <string>
 
 namespace labw::art_modern {
 

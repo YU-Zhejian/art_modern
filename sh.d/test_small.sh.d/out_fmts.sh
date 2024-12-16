@@ -1,14 +1,14 @@
 # shell=bash
 
 "${ART}" \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --qual_file_1 data/Illumina_profiles/HiSeq2500L150R1.txt \
     --sep_flag \
     --i-file "${MRNA_HEAD}" \
-    --read_len 125 \
+    --read_len 150 \
     --mode template \
     --lc se \
     --i-parser memory \
-    --i-fcov 1 \
+    --i-fcov 5 \
     --parallel "${PARALLEL}" \
     --ins_rate_1 "${IDRATE}" \
     --del_rate_1 "${IDRATE}" \
@@ -19,4 +19,7 @@
     --o-hl_sam-num_threads 2 \
     --o-hl_sam-compress_level u \
     --o-hl_sam-write_bam
-rm -fr "${OUT_DIR}"/test_small_se_template_memory_sep.*
+fastqc "${OUT_DIR}"/test_small_se_template_memory_sep.fastq
+x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
+sleep 3
+rm -fr "${OUT_DIR}"/test_small_se_template_memory_sep.* "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.*

@@ -19,15 +19,12 @@ long Rprob::seed()
         * static_cast<long>(std::hash<std::thread::id>()(std::this_thread::get_id()));
 }
 
-void Rprob::public_init_(){
+void Rprob::public_init_()
+{
     tmp_qual_dists_.resize(read_length_);
     tmp_probs_.resize(read_length_);
 }
-void Rprob::r_probs()
-{
-    r_probs(read_length_);
-}
-
+void Rprob::r_probs() { r_probs(read_length_); }
 
 #if defined(USE_STL_RANDOM)
 Rprob::~Rprob() = default;
@@ -126,10 +123,7 @@ double Rprob::r_prob()
     return result;
 }
 
-void Rprob::r_probs(int n)
-{
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, n, tmp_probs_.data(), 0.0, 1.0);
-}
+void Rprob::r_probs(int n) { vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, n, tmp_probs_.data(), 0.0, 1.0); }
 
 int Rprob::insertion_length()
 {

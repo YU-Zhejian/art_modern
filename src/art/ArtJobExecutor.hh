@@ -31,8 +31,7 @@ private:
     std::atomic<std::size_t> num_reads;
     BaseReadOutput* output_dispatcher_;
     Rprob rprob_;
-    std::vector<double> probs_indel_;
-    const int num_reads_to_reduce;
+    const int num_reads_to_reduce_;
 };
 
 } // namespace labw::art_modern

@@ -11,8 +11,6 @@
 #include <sstream>
 #include <vector>
 
-
-
 namespace labw::art_modern {
 constexpr char rev_comp_trans_2[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
     23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51,
@@ -32,8 +30,7 @@ constexpr char normalization_matrix[] = { 78, 78, 78, 78, 78, 78, 78, 78, 78, 78
     78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78,
     78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 65, 78, 67, 78, 78, 78, 71, 78, 78, 78, 78, 78,
     78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 65, 78, 67, 78, 78, 78, 71, 78, 78,
-    78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78
-};
+    78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78 };
 
 std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
 {
@@ -58,10 +55,7 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
     return retq;
 }
 
-std::string qual_to_str(const std::vector<am_qual_t>& qual)
-{
-    return qual_to_str(qual.data(), qual.size());
-}
+std::string qual_to_str(const std::vector<am_qual_t>& qual) { return qual_to_str(qual.data(), qual.size()); }
 
 std::string comp(const std::string& dna)
 {

@@ -26,21 +26,26 @@ public:
     ArtRead(const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
-    int generate_indels(const bool is_read_1);
+    int generate_indels(bool is_read_1);
     // number of deletions <= number of insertions
-    int generate_indels_2(const bool is_read_1);
+    int generate_indels_2(bool is_read_1);
 
     /**
      * Populate the read while adding insertions and deletions.
      */
     void ref2read(std::string seq_ref, bool is_plus_strand, hts_pos_t pos_on_contig);
 
+    /**
+     * Populate aln_read_ and aln_ref_
+     *
+     * TODO: This stuff is not needed for FASTQ. Need to modify the control flow.
+     */
     void generate_pairwise_aln();
 
     /**
      * Add point mutations to random bases based on empirical dist of quali scores
      */
-    void generate_snv_on_qual(const bool is_first_read);
+    void generate_snv_on_qual(bool is_first_read);
     [[nodiscard]] bool is_good() const;
 
 private:

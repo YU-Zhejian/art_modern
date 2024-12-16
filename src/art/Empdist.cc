@@ -38,7 +38,6 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 // read]
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& rprob, const bool first) const
 {
-    qual.resize(len);
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
     rprob.rand_quality();
     for (auto i = 0; i < len; i++) {
@@ -49,7 +48,6 @@ void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& 
 void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
-    qual.resize(len);
 
     rprob.rand_quality();
 
@@ -76,25 +74,24 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
 void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
-    qual.resize(len);
 
     rprob.rand_quality();
     for (size_t i = 0; i < len; i++) {
         switch (seq[i]) {
-            case 'A':
-                qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-                break;
-            case 'C':
-                qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-                break;
-            case 'G':
-                qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-                break;
-            case 'T':
-                qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-                break;
-            default:
-                qual[i] = rprob.rand_quality_less_than_10();
+        case 'A':
+            qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'C':
+            qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'G':
+            qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        case 'T':
+            qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            break;
+        default:
+            qual[i] = rprob.rand_quality_less_than_10();
         }
     }
 }
