@@ -1,6 +1,6 @@
 # Benchmarks
 
-Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler with `-O3` and `-mtune=native`.
+Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler with `-Ofast` and `-mtune=native`.
 
 ## Instructions
 
@@ -13,7 +13,7 @@ Use `run.sh` to run benchmark.
 ## Datasets
 
 1. Reference genome of _C. Elegans_ with 10X coverage.
-2. Long mRNAs of human that exceeds 500 nucleotides with 4X coverage.
+2. Long mRNAs of humans that exceed 500 nucleotides with 4X coverage.
 
 The simulators were asked to generate a FASTQ on both datasets with paired-end reads lengthen 150bp.
 
