@@ -142,7 +142,7 @@ void ArtJobExecutor::operator()()
     BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
                             << " reads (mean depth="
                             << static_cast<double>(num_reads) * art_params_.read_len
-            / static_cast<double>(accumulated_contig_len) / num_reads_to_reduce_
+            / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
     if (job_.free_fasta_fetch_after_execution) {
         delete job_.fasta_fetch;

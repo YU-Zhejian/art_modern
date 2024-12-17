@@ -58,3 +58,13 @@ Affected files:
 - `src/art_original/*`
 
 With GNU GPL v3 License.
+
+### DWGSIM 0.1.15 Repo
+
+Available from <https://github.com/nh13/DWGSIM>, commit `163fede`.
+
+Affected files:
+
+- `src/dwgsim/*`
+
+With GNU GPL v2 License.
