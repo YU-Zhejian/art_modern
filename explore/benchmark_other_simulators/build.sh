@@ -11,9 +11,21 @@ env -C src/htslib-1.21 \
 env -C src/htslib-1.21 make -j20
 env -C src/htslib-1.21 make -j20 install
 
+env -C src/gsl-2.8 \
+    ./configure --prefix="$(pwd)"/opt \
+    --enable-shared=yes \
+    --enable-static=yes  \
+    CC=icx \
+    CFLAGS='-Ofast -mtune=native'
+env -C src/gsl-2.8 make -j20
+env -C src/gsl-2.8 make -j20 install
+
 # Build Original ART
 icpx -Ofast -w -mtune=native \
-    -lgsl \
+    -lgsl -lgslcblas \
+    -Lopt/lib/ \
+    -Iopt/include \
+    -Wl,-rpath,"$(pwd)"/opt/lib \
     -o bin/art_original src/art_original/*.cpp
 
 # Build wgsim
