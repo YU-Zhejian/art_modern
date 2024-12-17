@@ -46,3 +46,4 @@ p <- df %>%
     theme_bw()
 ggsave("fig/page_faults.png", p)
 
+sessionInfo()

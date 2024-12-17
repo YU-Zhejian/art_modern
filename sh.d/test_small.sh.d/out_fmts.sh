@@ -20,6 +20,8 @@
     --o-hl_sam-compress_level u \
     --o-hl_sam-write_bam
 fastqc "${OUT_DIR}"/test_small_se_template_memory_sep.fastq
-x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
-sleep 3
+if which x-www-browser &>/dev/null; then
+    x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
+    sleep 3
+fi
 rm -fr "${OUT_DIR}"/test_small_se_template_memory_sep.* "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.*

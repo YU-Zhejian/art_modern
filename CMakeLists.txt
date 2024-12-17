@@ -101,12 +101,16 @@ else()
     message(NOTICE "Testing disabled since Boost::unit_test_framework was not found")
 endif()
 
-# if(CEU_CM_SHOULD_ENABLE_TEST) file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
+if(CEU_CM_SHOULD_ENABLE_TEST)
+    file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
-# foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES}) get_filename_component(ART_MODERN_BENCHMARK_EXEC
-# "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE) set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
-# add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
-# target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib) endforeach() endif()
+    foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
+        get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE)
+        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
+        add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
+        target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
+    endforeach()
+endif()
 
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
 
