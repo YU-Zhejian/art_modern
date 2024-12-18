@@ -21,6 +21,16 @@ function recreate_data_out() {
 printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\n' >time.tsv
 for i in {1..3}; do
     echo "Run ${i}"
+
+    run pirs-genome bin/pirs simulate -A dist -m 300 -l 100 -x 10 -v 20 -t 20 \
+        -B data/yeast_baseCalling_Matrix.count.matrix \
+        -I data/yeast_indelstat_sam_bam.InDel.matrix \
+        --no-gc-bias \
+        -o "${OUT_DIR}"/Illumina \
+        -c text \
+        data/ce11.fa
+    recreate_data_out
+
     run wgsim-genome bin/wgsim \
         -1 150 -2 150 -N 3409740 -d 300 -s 20 -r 0 \
         data/ce11.fa \
