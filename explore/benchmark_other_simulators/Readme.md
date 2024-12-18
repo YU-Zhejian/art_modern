@@ -26,7 +26,7 @@ The simulators were asked to generate a FASTQ on both datasets with paired-end r
 - **MEM** 2 * 16GB Hynix/Hyundai 5600MHz No-ECC (HMCG78AGBSA095N)
 - **SSD** WD_BLACK SN750 NVMe SSD (WDS200T3X0C-00SJG0)
 - **OS** Linux Mint 22
-- **KERNEL** Linux 6.8.0-49-generic (x86_64) #49-Ubuntu SMP PREEMPT_DYNAMIC Mon Nov 4 02:06:24 UTC 2024
+- **KERNEL** Linux 6.8.0-49-generic
 
 ### PC 2
 
@@ -34,8 +34,8 @@ The simulators were asked to generate a FASTQ on both datasets with paired-end r
 - **CPU** Intel Core i9-10980XE
 - **MEM** G.Skill F4-3600C18-32GTRS
 - **SSD** WDC/HGST Ultrastar DC SA210 0TS1655 HBS3A1948A4M4B1
-- **OS** TODO
-- **KERNEL** TODO
+- **OS** Debian Testing (Trixie)
+- **KERNEL** Linux 6.5.0-2-amd64
 
 ## Used Third-Party Codes
 
