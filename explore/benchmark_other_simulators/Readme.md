@@ -68,3 +68,13 @@ Affected files:
 - `src/dwgsim/*`
 
 With GNU GPL v2 License.
+
+### pIRS 2 Repo
+
+Available from <https://git.code.sf.net/p/pirsim/code>, commit `bee9b594`.
+
+Affected files:
+
+- `src/pirs/*`
+
+With GNU GPL v2 License. Some minor changes were made to comfort Intel compilers.
