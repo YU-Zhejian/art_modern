@@ -50,11 +50,3 @@ raw_data:
 .PHONY: clean
 clean:
 	rm -fr opt tmp build
-
-.PHONY: paper
-paper:
-	docker run --rm \
-        --volume $(CURDIR)/paper:/data \
-        --user $(command id -u):$(command id -g) \
-        --env JOURNAL=joss \
-        openjournals/inara
