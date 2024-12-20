@@ -28,9 +28,7 @@ constexpr char MAPQ_MAX_STR[] = "255"; // 255
 
 constexpr int PHRED_OFFSET = 33;
 
-enum class SIMULATION_MODE {
-    WGS, TRANS, TEMPLATE
-};
+enum class SIMULATION_MODE { WGS, TRANS, TEMPLATE };
 
 constexpr char SIMULATION_MODE_WGS[] = "wgs";
 

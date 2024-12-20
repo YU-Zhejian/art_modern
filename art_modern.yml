@@ -23,6 +23,8 @@ dependencies:
   - pyfastx
   - fastqc
   - bwa
+  - numpy
+  - pandas
   # Build tools
   # - conda-forge::ninja
   # - conda-forge::cmake

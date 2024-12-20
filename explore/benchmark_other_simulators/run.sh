@@ -23,8 +23,8 @@ for i in {1..3}; do
     echo "Run ${i}"
 
     run pirs-genome bin/pirs simulate -A dist -m 300 -l 100 -x 10 -v 20 -t 20 \
-        -B data/yeast_baseCalling_Matrix.count.matrix \
-        -I data/yeast_indelstat_sam_bam.InDel.matrix \
+        -B data/e_coli_HiSeq2K_pirs_bcm.count.matrix \
+        -I data/e_coli_pirs_indelstat.InDel.matrix \
         --no-gc-bias \
         -o "${OUT_DIR}"/Illumina \
         -c text \
@@ -32,48 +32,52 @@ for i in {1..3}; do
     recreate_data_out
 
     run wgsim-genome bin/wgsim \
-        -1 150 -2 150 -N 3409740 -d 300 -s 20 -r 0 \
+        -1 100 -2 100 -N 3409740 -d 300 -s 20 -r 0 \
         data/ce11.fa \
         "${OUT_DIR}"/ce11_wgsim_1.fq "${OUT_DIR}"/ce11_wgsim_2.fq
     recreate_data_out
 
     run dwgsim-genome bin/dwgsim \
-        -1 150 -2 150 -C 10 -d 300 -s 20 -o 2 -r 0 -y 0 \
+        -1 100 -2 100 -C 10 -d 300 -s 20 -o 2 -r 0 -y 0 \
         data/ce11.fa \
         "${OUT_DIR}"/ce11_dwgsim
     recreate_data_out
 
     run art_original-genome bin/art_original \
         --in data/ce11.fa --out "${OUT_DIR}"/ce11_art_ \
-        -f 10 --len 150 --mflen 300 --sdev 20 --noALN --paired --seqSys HS25
+        --qprof1 data/e_coli_art_R1.txt \
+        --qprof2 data/e_coli_art_R2.txt \
+        -f 10 --len 100 --mflen 300 --sdev 20 --noALN --paired
     recreate_data_out
 
     run art_modern-genome opt/art_modern_build/art_modern \
         --mode wgs --lc pe \
-        --i-file data/ce11.fa --i-fcov 10 --read_len 150 \
+        --i-file data/ce11.fa --i-fcov 10 --read_len 100 \
         --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
-        --qual_file_1 ../../data/Illumina_profiles/HiSeq2500L150R1filter.txt \
-        --qual_file_2 ../../data/Illumina_profiles/HiSeq2500L150R2filter.txt \
+        --qual_file_1 data/e_coli_art_R1.txt \
+        --qual_file_2 data/e_coli_art_R2.txt \
         --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
     recreate_data_out
 
     run wgsim-transcriptome bin/wgsim \
-        -1 150 -2 150 -N 13393233 -d 300 -s 20 -r 0 \
+        -1 100 -2 100 -N 13393233 -d 300 -s 20 -r 0 \
         data/hg38_long_mrna.fa \
         "${OUT_DIR}"/hg38_long_mrna_wgsim_1.fq "${OUT_DIR}"/hg38_long_mrna_wgsim_2.fq
     recreate_data_out
 
     run art_original-transcriptome bin/art_original \
         --in data/hg38_long_mrna.fa --out "${OUT_DIR}"/hg38_long_mrna_art_ \
-        -f 4 --len 150 --mflen 300 --sdev 20 --noALN --paired --seqSys HS25
+        --qprof1 data/e_coli_art_R1.txt \
+        --qprof2 data/e_coli_art_R2.txt \
+        -f 4 --len 100 --mflen 300 --sdev 20 --noALN --paired
     recreate_data_out
 
     run art_modern-transcriptome opt/art_modern_build/art_modern \
         --mode trans --lc pe \
-        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 150 --i-parser stream \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 100 --i-parser stream \
         --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
-        --qual_file_1 ../../data/Illumina_profiles/HiSeq2500L150R1filter.txt \
-        --qual_file_2 ../../data/Illumina_profiles/HiSeq2500L150R2filter.txt \
+        --qual_file_1 data/e_coli_art_R1.txt \
+        --qual_file_2 data/e_coli_art_R2.txt \
         --pe_frag_dist_mean 300 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
     recreate_data_out

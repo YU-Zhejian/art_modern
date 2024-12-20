@@ -108,6 +108,8 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     std::vector<int> qual;
     std::map<int, int, std::less<>> dist;
     std::vector<long> count;
+    int qmin = std::numeric_limits<int>::max();
+    int qmax = std::numeric_limits<int>::min();
 
     while (!input.eof()) {
         std::getline(input, line);
@@ -135,6 +137,8 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         while (ss >> t_int) {
             qual.emplace_back(t_int);
         }
+        qmin = std::min(qmin, *std::min_element(qual.begin(), qual.end()));
+        qmax = std::max(qmax, *std::min_element(qual.begin(), qual.end()));
 
         std::getline(input, line);
         ss.clear();
@@ -189,6 +193,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Profile empty!";
         abort_mpi();
     }
+    BOOST_LOG_TRIVIAL(info) << "QRange for R" << (is_first ? 1 : 2) << ": [" << qmin << ", " << qmax << "].";
 }
 
 void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)

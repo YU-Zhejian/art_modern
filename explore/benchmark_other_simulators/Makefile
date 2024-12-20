@@ -1,5 +1,5 @@
 .PHONY: all
-all: src/htslib-1.21 src/gsl-2.8 data/ce11.fa data/hg38_long_mrna.fa
+all: src/htslib-1.21 src/gsl-2.8 data/ce11.fa data/hg38_long_mrna.fa data/yeast.fa
 
 src/htslib-1.21:
 	env -C src wget -4 \
@@ -19,3 +19,5 @@ data/ce11.fa:
 data/hg38_long_mrna.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/mrna.fa.gz | gunzip | seqtk seq -L 500 > data/hg38_long_mrna.fa
 
+data/yeast.fa:
+	curl http://ftp.ensemblgenomes.org/pub/fungi/release-60/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz | gzip -cdf > data/yeast.fa
