@@ -14,14 +14,15 @@ std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
     return outs;
 }
 
-std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa, const bool is_read1)
+std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     auto outs = std::make_unique<std::string>();
-    const std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 8;
+    const std::size_t strsize = (pwa1.read_name.size() + (pwa1.query.size() << 1) + 8)
+        + (pwa2.read_name.size() + (pwa2.query.size() << 1) + 8);
     outs->resize(strsize);
     outs->at(0) = 0;
-    std::snprintf(outs->data(), strsize + 1, "@%s/%d\n%s\n+\n%s\n", pwa.read_name.c_str(), is_read1 ? 1 : 2,
-        pwa.query.c_str(), pwa.qual.c_str());
+    std::snprintf(outs->data(), strsize + 1, "@%s/1\n%s\n+\n%s\n@%s/2\n%s\n+\n%s\n", pwa1.read_name.c_str(),
+        pwa1.query.c_str(), pwa1.qual.c_str(), pwa2.read_name.c_str(), pwa2.query.c_str(), pwa2.qual.c_str());
     return outs;
 }
 
@@ -38,8 +39,7 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
     if (is_closed_) {
         return;
     }
-    lfio_.push(format_fastq(pwa1, true));
-    lfio_.push(format_fastq(pwa2, false));
+    lfio_.push(format_fastq(pwa1, pwa2));
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }

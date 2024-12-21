@@ -6,9 +6,9 @@ import pyfastx
 import tqdm
 
 qual_max = 45
-rlen = 100
 
 if __name__ == "__main__":
+    rlen = int(sys.argv[3])
     df = np.zeros((qual_max, rlen), dtype=int)
     fq = pyfastx.Fastx(sys.argv[1])
     for _, _, qual in tqdm.tqdm(fq):

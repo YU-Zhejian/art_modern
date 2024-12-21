@@ -25,6 +25,7 @@ dependencies:
   - bwa
   - numpy
   - pandas
+  - scipy
   # Build tools
   # - conda-forge::ninja
   # - conda-forge::cmake
