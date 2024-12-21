@@ -6,7 +6,7 @@ set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
 
-export OUT_DIR="$(pwd)"/data_out
+export OUT_DIR="$(pwd)"/data_out/fastqc
 export FCOV=3
 
 rm -fr "${OUT_DIR}"

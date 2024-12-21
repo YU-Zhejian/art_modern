@@ -1,7 +1,7 @@
 .PHONY: all
 all: src/htslib-1.21 src/gsl-2.8 \
 	data/ce11.fa data/hg38_long_mrna.fa \
-	data/yeast.fa data/e_coli.fa data/soybean.fa
+	data/yeast.fa data/e_coli.fa data/soybean.fa data/lambda_phage.fa
 
 src/htslib-1.21:
 	env -C src wget -4 \
@@ -32,3 +32,6 @@ data/e_coli.fa:
 
 data/soybean.fa:
 	curl https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/004/515/GCF_000004515.6_Glycine_max_v4.0/GCF_000004515.6_Glycine_max_v4.0_genomic.fna.gz | gzip -cdf >data/soybean.fa
+
+data/lambda_phage.fa:
+	curl https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/840/245/GCF_000840245.1_ViralProj14204/GCF_000840245.1_ViralProj14204_genomic.fna.gz | gzip -cdf >data/lambda_phage.fa
