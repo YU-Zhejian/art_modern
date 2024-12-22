@@ -19,10 +19,11 @@ data/ce11.fa:
 	curl https://hgdownload.cse.ucsc.edu/goldenPath/ce11/bigZips/ce11.fa.gz | gunzip > data/ce11.fa
 
 data/hg38_long_mrna.fa:
-	curl https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/mrna.fa.gz | \
-	gunzip | \
+	curl https://hgdownload.soe.ucsc.edu/goldenPath/hg38/bigZips/mrna.fa.gz \
+		-o data/hg38_mrna.fa.gz
+	zcat data/hg38_mrna.fa.gz | \
 	seqtk seq -L 500 -N | \
-	seqkit seq head -n 25000 > data/hg38_long_mrna.fa
+	seqkit head -n 25000 > data/hg38_long_mrna.fa
 
 data/yeast.fa:
 	curl http://ftp.ensemblgenomes.org/pub/fungi/release-60/fasta/saccharomyces_cerevisiae/dna/Saccharomyces_cerevisiae.R64-1-1.dna_sm.toplevel.fa.gz | gzip -cdf > data/yeast.fa

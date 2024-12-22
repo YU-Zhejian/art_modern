@@ -13,7 +13,7 @@ for i in 1 2; do
     mv data/e_coli_CNR0028307_"${i}".fastq.gz data/e_coli_CNR0028307_"${i}".fastq.gz.deleted
 
     wget ftp://ftp.sra.ebi.ac.uk/vol1/fastq/SRR160/089/SRR16074289/SRR16074289_"${i}".fastq.gz \
-        -O data/soybean_SRR16074289"${i}".fastq.gz
+        -O data/soybean_SRR16074289_"${i}".fastq.gz
 done
 
 mkdir -p data/e_coli_HiSeq2K data/soybean_HiSeq2500
@@ -41,7 +41,7 @@ perl src/pirs/baseCalling_Matrix_calculator.pl \
     -m 0
 samtools view -@20 -F 256 -F 2048 -F 4 data/e_coli_CNR0028307.bam -o data/e_coli_CNR0028307_primary_alignments.bam
 perl src/pirs/indelstat_sam_bam.pl \
-    data/e_coli_primary_alignments.bam \
+    data/e_coli_CNR0028307_primary_alignments.bam \
     data/e_coli_HiSeq2K_pirs_indelstat
 
 bwa mem -t 20 \
@@ -52,7 +52,7 @@ bwa mem -t 20 \
 perl src/pirs/baseCalling_Matrix_calculator.pl \
     -i data/soybean_SRR16074289.bam \
     -o data/soybean_HiSeq2500_pirs_bcm \
-    -r data/e_coli.fa \
+    -r data/soybean.fa \
     -m 0
 samtools view -@20 -F 256 -F 2048 -F 4 data/soybean_SRR16074289.bam \
     -o data/soybean_SRR16074289_primary_alignments.bam

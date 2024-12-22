@@ -6,9 +6,10 @@ set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
 
-export OUT_DIR="$(pwd)"/data_out/fastqc
-export FCOV=3
-export REF="$(pwd)/data/yeast.fa"
+export OUT_DIR="$(pwd)"/data_out/depth
+export FCOV=100
+export REF="$(pwd)/data/lambda_phage.fa"
+bwa index "${REF}"
 
 rm -fr "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
@@ -70,7 +71,6 @@ opt/art_modern_build/art_modern --lc pe \
     --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
     --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 &
 
-wait
 for i in 1 2; do
     for rlen in 100 300; do
         mv "${OUT_DIR}"/pirs/Sim_"${rlen}"_500_"${i}".fq "${OUT_DIR}"/pe"${rlen}"_pirs_"${i}".fq
@@ -87,25 +87,15 @@ rm -fr \
     "${OUT_DIR}"/pirs \
     "${OUT_DIR}"/*.mutations.*
 
-mkdir -p "${OUT_DIR}"/fastqc
-fastqc \
-    --outdir "${OUT_DIR}"/fastqc \
-    --extract \
-    --svg \
-    --threads 20 \
-    "${OUT_DIR}"/*.fq &
-
-mkdir -p profiles
 for rlen in 100 300; do
     for software in art_modern art pirs wgsim dwgsim; do
-        for i in 1 2; do
-            python get_profile.py \
-                "${OUT_DIR}"/pe"${rlen}"_"${software}"_"${i}".fq \
-                profiles/pe"${rlen}"_"${software}"_"${i}".profile "${rlen}" &
-        done
+         bwa mem -t 20 \
+             "${REF}" \
+             "${OUT_DIR}"/pe"${rlen}"_"${software}"_1.fq \
+             "${OUT_DIR}"/pe"${rlen}"_"${software}"_2.fq |
+             samtools sort -@ 20 --write-index -o "${OUT_DIR}"/pe"${rlen}"_"${software}".bam
+        samtools depth -aa "${OUT_DIR}"/pe"${rlen}"_"${software}".bam >"${OUT_DIR}"/pe"${rlen}"_"${software}".depth
     done
 done
-wait
 
-python cmp_profile.py >correlation.tsv
-Rscript plot_corr.R
+Rscript plot_depth.R
