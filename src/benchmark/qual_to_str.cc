@@ -3,10 +3,12 @@
 #include <chrono>
 #include <iostream>
 #include <random>
-#include <simde/simde-common.h>
-#include <simde/x86/sse2.h>
 #include <string>
 #include <vector>
+
+#ifdef __SSE2__
+#include <immintrin.h>
+#endif
 
 using namespace labw::art_modern;
 
@@ -15,15 +17,15 @@ std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
     std::string retq;
     retq.resize(qlen);
     size_t i = 0;
-#ifdef SIMDE_X86_SSE2_NATIVE
+#ifdef __SSE2__
     const size_t num_elements_per_simd = 16; // SSE2 processes 16 uint8_t elements at a time
     const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
-    simde__m128i phred_offset_vec = simde_mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
+    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
 
     for (; i < aligned_size; i += num_elements_per_simd) {
-        simde__m128i qual_vec = simde_mm_loadu_si128(reinterpret_cast<const simde__m128i*>(&qual[i]));
-        simde__m128i result_vec = simde_mm_add_epi8(qual_vec, phred_offset_vec);
-        simde_mm_storeu_si128(reinterpret_cast<simde__m128i*>(&retq[i]), result_vec);
+        __m128i qual_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&qual[i]));
+        __m128i result_vec = _mm_add_epi8(qual_vec, phred_offset_vec);
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(&retq[i]), result_vec);
     }
 #endif
     // Handle the remaining elements that do not fit into a full SIMD register

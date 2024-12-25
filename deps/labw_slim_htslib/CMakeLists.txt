@@ -35,7 +35,7 @@ if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "CMake cannot compile & run a hello world program!")
     endif()
 
-    if(${CEU_CM_LIBPTHREAD_SHARED} STREQUAL "")
+    if("${CEU_CM_LIBPTHREAD_SHARED}" STREQUAL "")
         # PASS
     elseif(NOT CEU_CM_LIBPTHREAD_SHARED)
         message(FATAL_ERROR "-lpthread not found! Is: ${CEU_CM_LIBPTHREAD_SHARED}")
