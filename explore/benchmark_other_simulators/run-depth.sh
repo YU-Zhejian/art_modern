@@ -89,11 +89,11 @@ rm -fr \
 
 for rlen in 100 300; do
     for software in art_modern art pirs wgsim dwgsim; do
-         bwa mem -t 20 \
-             "${REF}" \
-             "${OUT_DIR}"/pe"${rlen}"_"${software}"_1.fq \
-             "${OUT_DIR}"/pe"${rlen}"_"${software}"_2.fq |
-             samtools sort -@ 20 --write-index -o "${OUT_DIR}"/pe"${rlen}"_"${software}".bam
+        bwa mem -t 20 \
+            "${REF}" \
+            "${OUT_DIR}"/pe"${rlen}"_"${software}"_1.fq \
+            "${OUT_DIR}"/pe"${rlen}"_"${software}"_2.fq |
+            samtools sort -@ 20 --write-index -o "${OUT_DIR}"/pe"${rlen}"_"${software}".bam
         samtools depth -aa "${OUT_DIR}"/pe"${rlen}"_"${software}".bam >"${OUT_DIR}"/pe"${rlen}"_"${software}".depth
     done
 done

@@ -202,11 +202,14 @@ void print_simde_version()
 
     std::cout << "SIMDE: N/A" << std::endl;
     std::vector<std::string> simd_info;
-#ifdef __SSE__
-    simd_info.emplace_back("SSE");
+#ifdef __MMX__
+    simd_info.emplace_back("MMX");
 #endif
 #ifdef __SSE2__
     simd_info.emplace_back("SSE2");
+#endif
+#ifdef __AVX2__
+    simd_info.emplace_back("AVX2");
 #endif
     std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
 #endif

@@ -1,55 +1,17 @@
-#include "art_modern_constants.hh"
 #include "art_modern_dtypes.hh"
+#include "utils/seq_utils.hh"
+#include <algorithm>
 #include <chrono>
 #include <iostream>
 #include <random>
 #include <string>
 #include <vector>
 
-#ifdef __SSE2__
-#include <immintrin.h>
-#endif
-
 using namespace labw::art_modern;
 
-std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
+void bench(const int run_times, const int rlen)
 {
-    std::string retq;
-    retq.resize(qlen);
-    size_t i = 0;
-#ifdef __SSE2__
-    const size_t num_elements_per_simd = 16; // SSE2 processes 16 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
-    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
-
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m128i qual_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&qual[i]));
-        __m128i result_vec = _mm_add_epi8(qual_vec, phred_offset_vec);
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(&retq[i]), result_vec);
-    }
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (size_t i = 0; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-int main()
-{
-    const int run_times = 100000;
-    const int rlen = 151;
+    std::cout << "run_times: " << run_times << " rlen: " << rlen << std::endl;
     std::vector<am_qual_t> q;
     q.reserve(rlen);
     std::random_device rd;
@@ -59,21 +21,70 @@ int main()
         q.emplace_back(dis(gen));
     }
     std::chrono::high_resolution_clock::time_point start, end;
+
+    start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < run_times; i++) {
+        volatile auto s = qual_to_str_avx2(q.data(), rlen);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "AVX2: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
+
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
         volatile auto s = qual_to_str_sse2(q.data(), rlen);
     }
     end = std::chrono::high_resolution_clock::now();
     std::cout << "SSE2: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
+
+    start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < run_times; i++) {
+        volatile auto s = qual_to_str_mmx(q.data(), rlen);
+    }
+
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "MMX: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
+
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
         volatile auto s = qual_to_str(q.data(), rlen);
     }
     end = std::chrono::high_resolution_clock::now();
-    std::cout << "Scala: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
+    std::cout << "Scala (for loop): " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+              << std::endl;
 
-    if (qual_to_str_sse2(q.data(), rlen) != qual_to_str(q.data(), rlen)) {
+    start = std::chrono::high_resolution_clock::now();
+    for (int i = 0; i < run_times; i++) {
+        volatile auto s = qual_to_str_foreach(q.data(), rlen);
+    }
+    end = std::chrono::high_resolution_clock::now();
+    std::cout << "Scala (std::for_each): " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
+              << std::endl;
+
+    if (qual_to_str_sse2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
         throw std::exception();
     }
+
+    if (qual_to_str_mmx(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
+        throw std::exception();
+    }
+
+    if (qual_to_str_for_loop(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
+        throw std::exception();
+    }
+
+    if (qual_to_str_avx2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
+        throw std::exception();
+    }
+}
+
+int main()
+{
+    bench(1000000, 36);
+    bench(1000000, 100);
+    bench(1000000, 150);
+    bench(1000000, 200);
+    bench(1000000, 300);
+    bench(100000, 1000);
+    bench(10000, 10000);
     return 0;
 }

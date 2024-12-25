@@ -12,7 +12,7 @@ mkdir -p "${OUT_DIR}"
 
 function run() {
     echo "${1}"
-    /bin/time -a -o time.tsv -f "${1}"'\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' "${@:2}" &> "${OUT_DIR}"/"${1}".log || return 1
+    /bin/time -a -o time.tsv -f "${1}"'\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' "${@:2}" &>"${OUT_DIR}"/"${1}".log || return 1
     rm -rf "${OUT_DIR:?}"/*
     mkdir -p "${OUT_DIR}"
 }
@@ -67,7 +67,7 @@ for i in {1..3}; do
         "${OUT_DIR}"/hg38_long_mrna_dwgsim
 
     run wgsim-transcriptome-pe100 bin/wgsim \
-        -1 100 -2 100 -N "$(echo "4 * $(wc -c <data/hg38_long_mrna.fa ) / 200" | bc -q)" -d 500 -s 20 -r 0 \
+        -1 100 -2 100 -N "$(echo "4 * $(wc -c <data/hg38_long_mrna.fa) / 200" | bc -q)" -d 500 -s 20 -r 0 \
         data/hg38_long_mrna.fa \
         "${OUT_DIR}"/hg38_long_mrna_wgsim_1.fq "${OUT_DIR}"/hg38_long_mrna_wgsim_2.fq
 
@@ -134,7 +134,7 @@ for i in {1..3}; do
         "${OUT_DIR}"/hg38_long_mrna_dwgsim
 
     run wgsim-transcriptome-pe300 bin/wgsim \
-        -1 300 -2 300 -N "$(echo "4 * $(wc -c <data/hg38_long_mrna.fa ) / 200" | bc -q)" -d 500 -s 20 -r 0 \
+        -1 300 -2 300 -N "$(echo "4 * $(wc -c <data/hg38_long_mrna.fa) / 200" | bc -q)" -d 500 -s 20 -r 0 \
         data/hg38_long_mrna.fa \
         "${OUT_DIR}"/hg38_long_mrna_wgsim_1.fq "${OUT_DIR}"/hg38_long_mrna_wgsim_2.fq
 

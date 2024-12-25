@@ -39,10 +39,6 @@ void ArtRead::generate_pairwise_aln()
     std::memcpy(aln_read_.data() + pos_on_aln_str, seq_read_.data() + pos_on_read, num_match);
     std::memcpy(aln_ref_.data() + pos_on_aln_str, seq_ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
-#ifdef CEU_CM_IS_DEBUG
-
-#endif
-
 #if (0) // Old version for historical purposes
     while (pos_on_ref < seq_ref_.size()) {
         const auto find = indel_.find(pos_on_aln_str);
