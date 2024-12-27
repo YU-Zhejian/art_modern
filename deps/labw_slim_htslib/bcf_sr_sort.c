@@ -155,7 +155,7 @@ static uint32_t pairing_score(sr_sort_t *srt, int ivset, int jvset)
     varset_t *jv = &srt->vset[jvset];
 
     // Restrictive logic: the strictest type from a group is selected,
-    // so that, for example, snp+ref does not lead to the inclusion of an indel_
+    // so that, for example, snp+ref does not lead to the inclusion of an indel
     int i,j;
     uint32_t min = UINT32_MAX;
     for (i=0; i<iv->nvar; i++)

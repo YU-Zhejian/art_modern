@@ -53,6 +53,8 @@
 #include "htslib/hts.h"
 #include "htslib/hts_endian.h"
 
+#ifndef HAVE_OPENSSL
+
 #include <string.h>
 
 /* Any 32-bit or wider unsigned integer data type will do */
@@ -328,6 +330,44 @@ hts_md5_context *hts_md5_init(void)
     return ctx;
 }
 
+#else
+
+#include <openssl/md5.h>
+#include <assert.h>
+
+/*
+ * Wrappers around the OpenSSL libcrypto.so MD5 implementation.
+ *
+ * These are here to ensure they end up in the symbol table of the
+ * library regardless of the static inline in the headers.
+ */
+hts_md5_context *hts_md5_init(void)
+{
+    MD5_CTX *ctx = malloc(sizeof(*ctx));
+    if (!ctx)
+        return NULL;
+
+    MD5_Init(ctx);
+
+    return (hts_md5_context *)ctx;
+}
+
+void hts_md5_reset(hts_md5_context *ctx)
+{
+    MD5_Init((MD5_CTX *)ctx);
+}
+
+void hts_md5_update(hts_md5_context *ctx, const void *data, unsigned long size)
+{
+    MD5_Update((MD5_CTX *)ctx, data, size);
+}
+
+void hts_md5_final(unsigned char *result, hts_md5_context *ctx)
+{
+    MD5_Final(result, (MD5_CTX *)ctx);
+}
+
+#endif
 
 void hts_md5_destroy(hts_md5_context *ctx)
 {

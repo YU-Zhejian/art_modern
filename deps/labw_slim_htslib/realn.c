@@ -1,6 +1,6 @@
 /*  realn.c -- BAQ calculation and realignment.
 
-    Copyright (C) 2009-2011, 2014-2016, 2018, 2021 Genome Research Ltd.
+    Copyright (C) 2009-2011, 2014-2016, 2018, 2021, 2023 Genome Research Ltd.
     Portions copyright (C) 2009-2011 Broad Institute.
 
     Author: Heng Li <lh3@sanger.ac.uk>
@@ -240,7 +240,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
             goto fail;
         }
 
-        if (!extend_baq) { // in this block, bq[] is capped by base quality qual_[]
+        if (!extend_baq) { // in this block, bq[] is capped by base quality qual[]
             for (k = 0, x = c->pos, y = 0; k < c->n_cigar; ++k) {
                 int op = cigar[k]&0xf, l = cigar[k]>>4;
                 if (l == 0) continue;
@@ -264,12 +264,32 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
                 }
             }
             for (i = 0; i < c->l_qseq; ++i) bq[i] = qual[i] - bq[i] + 64; // finalize BQ
-        } else { // in this block, bq[] is BAQ that can be larger than qual_[] (different from the above!)
+        } else { // in this block, bq[] is BAQ that can be larger than qual[] (different from the above!)
             // tseq,tref are no longer needed, so we can steal them to avoid mallocs
             uint8_t *left = tseq;
             uint8_t *rght = tref;
+            int len = 0;
+
             for (k = 0, x = c->pos, y = 0; k < c->n_cigar; ++k) {
                 int op = cigar[k]&0xf, l = cigar[k]>>4;
+
+                // concatenate alignment matches (including sequence (mis)matches)
+                // otherwise 50M50M gives a different result to 100M
+                if (op == BAM_CMATCH || op == BAM_CEQUAL || op == BAM_CDIFF) {
+                    if ((k + 1) < c->n_cigar) {
+                        int next_op = bam_cigar_op(cigar[k + 1]);
+
+                        if (next_op == BAM_CMATCH || next_op == BAM_CEQUAL || next_op == BAM_CDIFF) {
+                            len += l;
+                            continue;
+                        }
+                    }
+
+                    // last of M/X/= ops
+                    l += len;
+                    len = 0;
+                }
+
                 if (l == 0) continue;
                 if (op == BAM_CMATCH || op == BAM_CEQUAL || op == BAM_CDIFF) {
                     // Sanity check running off the end of the sequence
@@ -297,7 +317,7 @@ int sam_prob_realn(bam1_t *b, const char *ref, hts_pos_t ref_len, int flag) {
             for (i = 0; i < c->l_qseq; ++i) bq[i] = 64 + (qual[i] <= bq[i]? 0 : qual[i] - bq[i]); // finalize BQ
         }
         if (apply_baq) {
-            for (i = 0; i < c->l_qseq; ++i) qual[i] -= bq[i] - 64; // modify qual_
+            for (i = 0; i < c->l_qseq; ++i) qual[i] -= bq[i] - 64; // modify qual
             bam_aux_append(b, "ZQ", 'Z', c->l_qseq + 1, bq);
         } else bam_aux_append(b, "BQ", 'Z', c->l_qseq + 1, bq);
         free(bq); free(state);
