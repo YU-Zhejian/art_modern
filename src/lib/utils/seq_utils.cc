@@ -163,15 +163,23 @@ std::string revcomp(const std::string& dna)
     return rets;
 }
 
+
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
+    return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
+}
+
+std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n)
+{
     std::ostringstream oss;
-    for (size_t i = 0; i < cigar_arr.size(); i += 1) {
+    for (size_t i = 0; i < n; i += 1) {
         oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);
         oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
     }
     return oss.str();
 }
+
+
 void comp_inplace(std::string& dna)
 {
     for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
