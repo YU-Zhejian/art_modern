@@ -2,16 +2,18 @@ cmake_minimum_required(VERSION 3.17)
 project(
     htslib
     VERSION 1.15
-    LANGUAGES C CXX)
+    LANGUAGES C)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
+find_package(Threads REQUIRED)
+
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_c_helloworld.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libm.cmake")
-include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libpthread.cmake")
+# FIXME include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libpthread.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libz.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libbz2.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_liblzma.cmake")
@@ -33,14 +35,6 @@ if(BUILD_SHARED_LIBS)
     message(NOTICE "Wanting shared htslib.")
     if(NOT ${CEU_CM_HAVE_WORKING_C_HELLOWORLD_RUN_SHARED} EQUAL 0)
         message(FATAL_ERROR "CMake cannot compile & run a hello world program!")
-    endif()
-
-    if("${CEU_CM_LIBPTHREAD_SHARED}" STREQUAL "")
-        # PASS
-    elseif(NOT CEU_CM_LIBPTHREAD_SHARED)
-        message(FATAL_ERROR "-lpthread not found! Is: ${CEU_CM_LIBPTHREAD_SHARED}")
-    else()
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBPTHREAD_SHARED}")
     endif()
 
     if(NOT ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
@@ -76,12 +70,6 @@ else()
     message(NOTICE "Wanting static htslib.")
     if(NOT ${CEU_CM_HAVE_WORKING_C_HELLOWORLD_RUN_STATIC} EQUAL 0)
         message(FATAL_ERROR "CMake cannot compile & run a hello world program!")
-    endif()
-
-    if(NOT ${CEU_CM_LIBPTHREAD_STATIC})
-        message(FATAL_ERROR "-lpthread not found!")
-    else()
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} "${CEU_CM_LIBPTHREAD_STATIC}")
     endif()
 
     if(NOT ${CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC} EQUAL 0)
@@ -129,4 +117,4 @@ endif()
 
 target_link_libraries(
         labw_slim_htslib
-        ${LABW_SLIM_HTSLIB_LINK_LIBRARIES})
+        ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} Threads::Threads)
