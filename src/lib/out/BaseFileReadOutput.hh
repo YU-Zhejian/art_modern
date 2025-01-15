@@ -1,5 +1,6 @@
 #pragma once
-#include "BaseReadOutput.hh"
+#include "out/BaseReadOutput.hh"
+
 #include <string>
 
 namespace labw::art_modern {

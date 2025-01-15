@@ -1,10 +1,16 @@
 #pragma once
 
-#include "BamUtils.hh"
-#include "DumbReadOutput.hh"
-#include "fasta/BaseFastaFetch.hh"
+#include "ds/PairwiseAlignment.hh"
+#include "out/BamUtils.hh"
 #include "out/BaseFileReadOutput.hh"
+#include "out/SamOptions.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+
 #include <htslib/sam.h>
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
+#include <string>
 
 namespace labw::art_modern {
 
@@ -39,4 +45,4 @@ public:
 private:
     SamOptions sam_options_;
 };
-}
+} // namespace labw::art_modern

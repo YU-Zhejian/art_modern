@@ -1,8 +1,14 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <boost/format.hpp>
+#include <boost/format.hpp> // NOLINT
 
-#include "fasta_parser.hh"
+#include "ref/parser/fasta_parser.hh"
+
+#include <istream>
+#include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace labw::art_modern {
 FastaRecord FastaIterator::next()

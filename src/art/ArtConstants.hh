@@ -1,7 +1,7 @@
 #pragma once
 #include "art_modern_dtypes.hh"
-#include <string>
 
+#include <string>
 
 namespace labw::art_modern {
 constexpr am_qual_t HIGHEST_QUAL = 80;
@@ -25,4 +25,4 @@ const std::string ART_ACGT_STR = "ACGT";
 // If 20% attempts failed
 constexpr double MAX_TRIAL_RATIO_BEFORE_FAIL = 0.2;
 
-}
+} // namespace labw::art_modern

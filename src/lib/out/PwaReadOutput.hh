@@ -1,10 +1,17 @@
 #pragma once
 
 #include <fstream>
-#include <iostream>
+#include <string>
+#include <vector>
 
-#include "SimpleLFIO.hh"
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+#include "ds/PairwiseAlignment.hh"
+#include "lockfree/SimpleLFIO.hh"
 #include "out/BaseFileReadOutput.hh"
+#include "out/BaseReadOutput.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 
@@ -35,4 +42,4 @@ public:
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const override;
 };
-}
+} // namespace labw::art_modern

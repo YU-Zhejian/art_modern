@@ -4,6 +4,7 @@
  * Note: This queue contains locks.
  */
 #pragma once
+
 #include <condition_variable>
 #include <cstddef>
 #include <deque>
@@ -162,4 +163,4 @@ private:
     std::condition_variable not_full_;
 };
 
-}
+} // namespace labw::art_modern

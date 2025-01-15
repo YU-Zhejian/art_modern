@@ -1,7 +1,8 @@
-#include "ArtConstants.hh"
-#include "ArtContig.hh"
-#include "ArtJobExecutor.hh"
-#include "ArtRead.hh"
+#include "art/ArtJobExecutor.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/ArtContig.hh"
+#include "art/ArtRead.hh"
 
 #include "art_modern_constants.hh"
 

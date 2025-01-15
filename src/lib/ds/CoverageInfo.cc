@@ -1,7 +1,11 @@
-#include "CoverageInfo.hh"
+#include "ds/CoverageInfo.hh"
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
-#include <sstream>
+
+#include <istream>
+#include <string>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -102,4 +106,4 @@ CoverageInfo::CoverageInfo(const std::tuple<coverage_map, coverage_map>& coverag
 {
 }
 
-} // namespace labw::art_modern // labw
+} // namespace labw::art_modern

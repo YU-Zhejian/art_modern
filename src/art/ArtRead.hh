@@ -1,13 +1,19 @@
 #pragma once
 
+#include <functional>
 #include <map>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
-#include "ArtParams.hh"
-#include "Empdist.hh"
-#include "PairwiseAlignment.hh"
-#include "random_generator.hh"
-#include "utils/seq_utils.hh"
+#include <htslib/hts.h>
+
+#include "art/ArtParams.hh"
+#include "art/random_generator.hh"
+
+#include "art_modern_dtypes.hh"
+#include "ds/PairwiseAlignment.hh"
+#include "utils/class_macros_utils.hh"
 
 namespace labw::art_modern {
 
@@ -18,10 +24,8 @@ struct ReadGenerationException : public std::runtime_error {
 class ArtRead {
 public:
     // Disable constructors
-    ArtRead(const ArtRead&) = delete;
-    ArtRead operator=(const ArtRead&) = delete;
-    ArtRead& operator=(ArtRead&&) = delete;
-    ArtRead(ArtRead&& other) noexcept = delete;
+    DELETE_MOVE(ArtRead)
+    DELETE_COPY(ArtRead)
 
     ArtRead(const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
@@ -63,4 +67,4 @@ private:
     std::string seq_ref_;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

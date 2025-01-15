@@ -1,10 +1,11 @@
 #pragma once
 #include <cstddef>
-#include <htslib/hts.h>
-#include <htslib/sam.h>
 #include <string>
 #include <tuple>
 #include <vector>
+
+#include <htslib/hts.h>
+#include <htslib/sam.h>
 
 namespace labw::art_modern {
 /**
@@ -76,4 +77,4 @@ protected:
     std::vector<std::string> seq_names_;
     std::vector<hts_pos_t> seq_lengths_;
 };
-}
+} // namespace labw::art_modern

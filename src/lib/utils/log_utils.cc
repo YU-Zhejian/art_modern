@@ -5,8 +5,8 @@
 #include <boost/log/attributes/current_thread_id.hpp>
 #include <boost/log/core/core.hpp>
 #include <boost/log/keywords/file_name.hpp>
-#include <boost/log/keywords/format.hpp>
 #include <boost/log/keywords/filter.hpp>
+#include <boost/log/keywords/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>

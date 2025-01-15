@@ -1,7 +1,9 @@
-#include "ArtConstants.hh"
-#include "Empdist.hh"
+#include "art/Empdist.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/random_generator.hh"
+
 #include "art_modern_dtypes.hh"
-#include "random_generator.hh"
 #include "utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -10,7 +12,6 @@
 #include <cmath>
 #include <cstddef>
 #include <fstream>
-#include <functional>
 #include <istream>
 #include <limits>
 #include <map>

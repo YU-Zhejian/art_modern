@@ -1,7 +1,9 @@
 #pragma once
+
+#include <cstddef>
 #include <exception>
+#include <istream>
 #include <mutex>
-#include <sstream>
 #include <string>
 #include <utility>
 
@@ -32,4 +34,4 @@ private:
     std::mutex mutex_;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

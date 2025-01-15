@@ -1,5 +1,17 @@
-#include "FastaStreamBatcher.hh"
+#include "ref/batcher/FastaStreamBatcher.hh"
+
+#include "ref/fetch/InMemoryFastaFetch.hh"
+#include "ref/parser/fasta_parser.hh"
+
 #include <boost/log/trivial.hpp>
+
+#include <cstddef>
+#include <istream>
+#include <limits>
+#include <mutex>
+#include <string>
+#include <utility>
+#include <vector>
 
 namespace labw::art_modern {
 FastaStreamBatcher::FastaStreamBatcher(const std::size_t batch_size, std::istream& stream)
@@ -37,24 +49,4 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
     return { std::move(seq_names), std::move(seqs) };
 }
 
-InMemoryFastaFetch InMemoryFastaStreamBatcher::fetch()
-{
-    std::scoped_lock lock(mutex_);
-    const auto from = current_index_;
-    const auto to = std::min(current_index_ + batch_size_, stream_.num_seqs());
-    InMemoryFastaFetch fetch = { stream_, static_cast<ptrdiff_t>(from), static_cast<ptrdiff_t>(to) };
-    if (!fetch.empty()) {
-        BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch.seq_name(0) << " to "
-                                << fetch.seq_name(fetch.num_seqs() - 1) << " (" << fetch.num_seqs() << "） created";
-    }
-    current_index_ = to;
-    return fetch;
-}
-
-InMemoryFastaStreamBatcher::InMemoryFastaStreamBatcher(const std::size_t batch_size, const InMemoryFastaFetch& stream)
-    : batch_size_(batch_size)
-    , current_index_(0)
-    , stream_(stream)
-{
-}
-}
+} // namespace labw::art_modern

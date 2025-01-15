@@ -14,8 +14,8 @@
 
 #include <cstdlib>
 
-#include "ArtCmdOpts.hh"
-#include "main_fn.hh"
+#include "art/ArtCmdOpts.hh"
+#include "art/main_fn.hh"
 
 #include "utils/dump_utils.hh"
 #include "utils/log_utils.hh"

@@ -1,4 +1,5 @@
-#include "ArtRead.hh"
+#include "art/ArtRead.hh"
+#include "art/random_generator.hh"
 
 #include <algorithm>
 #include <cstddef>
@@ -9,9 +10,8 @@
 
 #include "art_modern_config.h" // NOLINT: For CEU_IS_DEBUG
 #include "art_modern_constants.hh"
-#include "random_generator.hh"
 
-#include "PairwiseAlignment.hh"
+#include "ds/PairwiseAlignment.hh"
 #include "utils/seq_utils.hh"
 
 namespace labw::art_modern {

@@ -5,10 +5,11 @@
 
 #include <htslib/hts.h>
 
-#include "ArtParams.hh"
-#include "ArtRead.hh"
-#include "fasta/BaseFastaFetch.hh"
-#include "random_generator.hh"
+#include "art/ArtParams.hh"
+#include "art/ArtRead.hh"
+#include "art/random_generator.hh"
+
+#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 

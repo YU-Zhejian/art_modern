@@ -1,6 +1,6 @@
-#include "fasta/BaseFastaFetch.hh"
-#include "fasta/FaidxFetch.hh"
-#include "fasta/InMemoryFastaFetch.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+#include "ref/fetch/FaidxFetch.hh"
+#include "ref/fetch/InMemoryFastaFetch.hh"
 
 #include <htslib/hts.h>
 
@@ -11,7 +11,6 @@
 #include <string>
 #include <tuple>
 #include <vector>
-
 
 using namespace labw::art_modern;
 

@@ -1,7 +1,8 @@
-#include "ArtCmdOpts.hh"
-#include "ArtConstants.hh"
-#include "Empdist.hh"
-#include "ArtParams.hh"
+#include "art/ArtCmdOpts.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/ArtParams.hh"
+#include "art/Empdist.hh"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -24,7 +25,7 @@
 #include "CExceptionsProxy.hh"
 #include "art_modern_constants.hh"
 
-#include "fasta/CoverageInfo.hh"
+#include "ds/CoverageInfo.hh"
 
 #include "out/OutputDispatcher.hh"
 

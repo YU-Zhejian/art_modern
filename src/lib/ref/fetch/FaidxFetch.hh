@@ -1,9 +1,11 @@
 #pragma once
 
-#include <htslib/faidx.h>
-#include <mutex>
+#include <cstddef>
+#include <string>
 
-#include "BaseFastaFetch.hh"
+#include <htslib/faidx.h>
+
+#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 

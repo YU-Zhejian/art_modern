@@ -1,9 +1,12 @@
 #pragma once
 
 #include "art_modern_dtypes.hh"
+#include "utils/class_macros_utils.hh"
+
+#include "htslib/hts.h"
 #include <array>
 #include <exception>
-#include <htslib/hts.h>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -17,10 +20,9 @@ public:
 
 class PairwiseAlignment {
 public:
-    PairwiseAlignment(PairwiseAlignment&& other) = delete;
-    PairwiseAlignment(const PairwiseAlignment&) = delete;
-    PairwiseAlignment& operator=(PairwiseAlignment&&) = delete;
-    PairwiseAlignment& operator=(const PairwiseAlignment&) = delete;
+    DELETE_COPY(PairwiseAlignment)
+    DELETE_MOVE(PairwiseAlignment)
+
     static const int NUM_LINES = 4;
 
     /*!
@@ -69,4 +71,4 @@ public:
     const bool is_plus_strand;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

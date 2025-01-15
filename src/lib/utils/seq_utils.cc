@@ -175,7 +175,6 @@ std::string revcomp(const std::string& dna)
     return rets;
 }
 
-
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
     return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
@@ -190,7 +189,6 @@ std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n)
     }
     return oss.str();
 }
-
 
 void comp_inplace(std::string& dna)
 {

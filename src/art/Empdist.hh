@@ -6,8 +6,9 @@
 #include <string>
 #include <vector>
 
+#include "art/random_generator.hh"
+
 #include "art_modern_dtypes.hh"
-#include "random_generator.hh"
 
 namespace labw::art_modern {
 

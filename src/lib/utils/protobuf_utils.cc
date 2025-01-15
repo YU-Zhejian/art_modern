@@ -1,5 +1,5 @@
-#include "art_modern_config.h" // NOLINT: For WITH_PROTOBUF
 #include "protobuf_utils.hh"
+#include "art_modern_config.h" // NOLINT: For WITH_PROTOBUF
 
 #ifdef WITH_PROTOBUF
 #include <google/protobuf/stubs/common.h>

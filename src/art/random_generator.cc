@@ -1,9 +1,10 @@
-#include "random_generator.hh"
-#include "ArtConstants.hh"
+#include "art/random_generator.hh"
+
+#include "art/ArtConstants.hh"
 
 #include <algorithm> // NOLINT
 #include <chrono>
-#include <random>
+#include <random> // NOLINT
 #include <thread>
 #include <vector>
 

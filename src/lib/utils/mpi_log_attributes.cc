@@ -1,5 +1,5 @@
-#include "art_modern_constants.hh"
 #include "utils/mpi_log_attributes.hh"
+#include "art_modern_constants.hh"
 
 #include <boost/log/attributes/attribute_cast.hpp>
 #include <boost/log/attributes/attribute_value.hpp>

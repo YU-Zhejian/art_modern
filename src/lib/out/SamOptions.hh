@@ -1,6 +1,8 @@
 #pragma once
+
 #include "art_modern_config.h"
 #include "art_modern_constants.hh"
+
 #include <string>
 
 namespace labw::art_modern {

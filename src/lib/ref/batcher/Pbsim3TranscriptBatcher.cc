@@ -1,6 +1,8 @@
-#include "Pbsim3TranscriptBatcher.hh"
+#include "ref/batcher/Pbsim3TranscriptBatcher.hh"
+
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+
 #include <iostream>
 #include <utility>
 #include <vector>

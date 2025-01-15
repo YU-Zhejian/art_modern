@@ -1,9 +1,10 @@
 #pragma once
-#include "ArtContig.hh"
-#include "ArtParams.hh"
+#include "art/ArtContig.hh"
+#include "art/ArtParams.hh"
+#include "art/random_generator.hh"
+
 #include "jobs/SimulationJob.hh"
 #include "out/BaseReadOutput.hh"
-#include "random_generator.hh"
 
 #include <atomic>
 #include <string>

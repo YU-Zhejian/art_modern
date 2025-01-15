@@ -1,7 +1,7 @@
-#include "ArtJobExecutor.hh"
-#include "ArtJobPool.hh"
-#include "ArtParams.hh"
+#include "art/ArtJobPool.hh"
 
+#include "art/ArtJobExecutor.hh"
+#include "art/ArtParams.hh"
 
 #include <boost/asio/post.hpp>
 

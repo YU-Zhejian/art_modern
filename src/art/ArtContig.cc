@@ -1,15 +1,15 @@
-#include "ArtContig.hh"
-#include "ArtRead.hh"
-#include "art_modern_constants.hh"
-#include "random_generator.hh"
+#include "art/ArtContig.hh"
+
+#include "art/ArtRead.hh"
+#include "art/random_generator.hh"
 
 #include <htslib/hts.h>
 
 #include <cstddef>
-#include <string>
 #include <utility>
 
-#include "fasta/BaseFastaFetch.hh"
+#include "art_modern_constants.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 

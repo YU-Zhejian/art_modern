@@ -1,5 +1,5 @@
 #pragma once
-#include "ArtParams.hh"
+#include "art/ArtParams.hh"
 
 namespace labw::art_modern {
 

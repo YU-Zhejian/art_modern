@@ -1,12 +1,14 @@
 #pragma once
-#include "BaseFastaFetch.hh"
+
+#include "ref/fetch/BaseFastaFetch.hh"
+
 #include <cstddef>
-#include <vector>
-#include <tuple>
 #include <string>
-#include <memory>
+#include <tuple>
+#include <vector>
+
 #include <htslib/hts.h>
-#include <cstdint>
+
 namespace labw::art_modern {
 
 /**
@@ -31,4 +33,4 @@ public:
 private:
     std::vector<std::string> seqs_;
 };
-}
+} // namespace labw::art_modern

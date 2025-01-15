@@ -1,12 +1,26 @@
-#include "FastqReadOutput.hh"
-#include "DumbReadOutput.hh"
+#include "out/FastqReadOutput.hh"
+
+#include <cstdio>
+#include <memory>
+#include <string>
+#include <vector>
+
+#include "ds/PairwiseAlignment.hh"
+#include "out/BaseFileReadOutput.hh"
+#include "out/BaseReadOutput.hh"
+#include "out/DumbReadOutput.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+
+#include <boost/program_options.hpp> // NOLINT
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 namespace labw::art_modern {
 
 std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
 {
     auto outs = std::make_unique<std::string>();
-    const std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1) + 6;
+    const std::size_t strsize = pwa.read_name.size() + (pwa.query.size() << 1U) + 6;
     outs->resize(strsize);
     outs->at(0) = 0;
     std::snprintf(
@@ -17,8 +31,8 @@ std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
 std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     auto outs = std::make_unique<std::string>();
-    const std::size_t strsize = (pwa1.read_name.size() + (pwa1.query.size() << 1) + 8)
-        + (pwa2.read_name.size() + (pwa2.query.size() << 1) + 8);
+    const std::size_t strsize = (pwa1.read_name.size() + (pwa1.query.size() << 1U) + 8)
+        + (pwa2.read_name.size() + (pwa2.query.size() << 1U) + 8);
     outs->resize(strsize);
     outs->at(0) = 0;
     std::snprintf(outs->data(), strsize + 1, "@%s/1\n%s\n+\n%s\n@%s/2\n%s\n+\n%s\n", pwa1.read_name.c_str(),
@@ -68,12 +82,12 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
         "Destination of output FASTQ file. Unset to disable the writer.");
     desc.add(fastq_desc);
 }
-BaseReadOutput* FastqReadOutputFactory::create(const boost::program_options::variables_map& vm, const BaseFastaFetch*,
-    [[maybe_unused]] const std::vector<std::string>& args) const
+BaseReadOutput* FastqReadOutputFactory::create(const boost::program_options::variables_map& vm,
+    [[maybe_unused]] const BaseFastaFetch*, [[maybe_unused]] const std::vector<std::string>&) const
 {
     if (vm.count("o-fastq")) {
         return new FastqReadOutput(vm["o-fastq"].as<std::string>());
     }
     return new DumbReadOutput();
 }
-}
+} // namespace labw::art_modern

@@ -1,11 +1,32 @@
-#include "HeadlessBamReadOutput.hh"
-#include "CExceptionsProxy.hh"
-#include "DumbReadOutput.hh"
-#include "art_modern_config.h"
-#include "utils/mpi_utils.hh"
-#include "utils/seq_utils.hh"
+#include "out/HeadlessBamReadOutput.hh"
+
+#include <algorithm>
+#include <string>
+#include <utility>
+#include <vector>
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/program_options.hpp> // NOLINT
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+#include <htslib/sam.h>
+
+#include "CExceptionsProxy.hh"
+#include "art_modern_config.h" // For USED_HTSLIB_NAME
+#include "art_modern_constants.hh"
+#include "ds/PairwiseAlignment.hh"
+
+#include "out/BamUtils.hh"
+#include "out/BaseFileReadOutput.hh"
+#include "out/BaseReadOutput.hh"
+#include "out/DumbReadOutput.hh"
+#include "out/SamOptions.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+
+#include "utils/mpi_utils.hh"
+#include "utils/seq_utils.hh"
 
 namespace po = boost::program_options;
 
@@ -195,4 +216,4 @@ BaseReadOutput* HeadlessBamReadOutputFactory::create(const boost::program_option
 }
 
 HeadlessBamReadOutputFactory::~HeadlessBamReadOutputFactory() = default;
-}
+} // namespace labw::art_modern

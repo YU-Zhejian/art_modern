@@ -2,7 +2,7 @@
 #include <boost/test/unit_test.hpp>
 #include <htslib/sam.h>
 
-#include "PairwiseAlignment.hh"
+#include "ds/PairwiseAlignment.hh"
 #include "utils/seq_utils.hh"
 
 using namespace labw::art_modern;

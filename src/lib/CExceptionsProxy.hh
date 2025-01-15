@@ -4,6 +4,7 @@
  */
 #pragma once
 #include "utils/exception_utils.hh"
+
 #include <cerrno>
 #include <cstring>
 #include <exception>

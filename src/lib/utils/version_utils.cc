@@ -1,6 +1,6 @@
+#include "version_utils.hh"
 #include "art_modern_config.h"
 #include "art_modern_constants.hh"
-#include "version_utils.hh"
 
 #include <ceu_check/ceu_check_c_cxx_std.hh>
 #include <ceu_check/ceu_check_cc.hh>
@@ -43,7 +43,6 @@
 #ifdef WITH_PROTOBUF
 #include <google/protobuf/stubs/common.h>
 #endif
-
 
 namespace labw::art_modern {
 void print_htslib_version()
