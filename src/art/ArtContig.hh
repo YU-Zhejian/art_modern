@@ -1,7 +1,9 @@
 #pragma once
 
-#include <set>
+#include <cstddef>
 #include <string>
+
+#include <htslib/hts.h>
 
 #include "ArtParams.hh"
 #include "ArtRead.hh"
@@ -31,4 +33,4 @@ private:
     const hts_pos_t valid_region_;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

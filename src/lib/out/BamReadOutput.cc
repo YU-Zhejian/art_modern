@@ -1,13 +1,27 @@
 #include <algorithm>
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/program_options.hpp>
 
-#include "BamReadOutput.hh"
+#include <htslib/hts.h>
+#include <htslib/sam.h>
+
 #include "CExceptionsProxy.hh"
-#include "DumbReadOutput.hh"
+#include "PairwiseAlignment.hh"
 #include "art_modern_config.h" // For USED_HTSLIB_NAME
+
+#include "fasta/BaseFastaFetch.hh"
+
+#include "out/BamReadOutput.hh"
+#include "out/BamUtils.hh"
+#include "out/SamOptions.hh"
+#include "out/DumbReadOutput.hh"
+
 #include "utils/mpi_utils.hh"
 #include "utils/seq_utils.hh"
+
+
 
 namespace po = boost::program_options;
 

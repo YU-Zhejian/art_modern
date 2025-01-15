@@ -35,4 +35,4 @@ void bye_mpi();
 
 std::string mpi_rank();
 
-}
+} // namespace labw::art_modern

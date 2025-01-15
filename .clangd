@@ -1,0 +1,5 @@
+If:
+  PathMatch: deps/.*
+Diagnostics:
+  ClangTidy:
+    Remove: "*"

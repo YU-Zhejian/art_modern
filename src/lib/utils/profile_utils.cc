@@ -1,6 +1,7 @@
 #include "profile_utils.hh"
 
 #include "ceu_check/ceu_check_os_macro.h"
+
 #ifdef CEU_ON_POSIX
 #include <sys/resource.h>
 #endif
@@ -18,4 +19,4 @@ void print_memory_usage(const char* file, const int line)
 #endif
 }
 
-} // lab
+} // namespace lab::art_modern::details

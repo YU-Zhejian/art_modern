@@ -1,8 +1,9 @@
 #include "random_generator.hh"
 #include "ArtConstants.hh"
 
-#include <algorithm>
+#include <algorithm> // NOLINT
 #include <chrono>
+#include <random>
 #include <thread>
 #include <vector>
 
@@ -214,4 +215,4 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
 
 int Rprob::randint(int min, int max) { return static_cast<int>(gsl_rng_uniform_int(r, max - min) + min); }
 #endif
-}
+} // namespace labw::art_modern

@@ -1,6 +1,7 @@
 #include <boost/log/trivial.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
 
-#include <boost/stacktrace.hpp>
+#include <string>
 #include <utility>
 
 #include "CExceptionsProxy.hh"
@@ -20,5 +21,4 @@ void CExceptionsProxy::log() const
     BOOST_LOG_TRIVIAL(fatal) << boost::stacktrace::stacktrace();
 }
 
-} // art_modern
-// labw
+} // namespace labw::art_modern

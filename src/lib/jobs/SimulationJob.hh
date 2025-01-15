@@ -2,7 +2,6 @@
 
 #include "fasta/BaseFastaFetch.hh"
 #include "fasta/CoverageInfo.hh"
-#include "fasta/InMemoryFastaFetch.hh"
 
 namespace labw::art_modern {
 

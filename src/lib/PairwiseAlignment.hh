@@ -1,6 +1,8 @@
 #pragma once
 
 #include "art_modern_dtypes.hh"
+#include <array>
+#include <exception>
 #include <htslib/hts.h>
 #include <string>
 #include <vector>
@@ -8,7 +10,7 @@
 namespace labw::art_modern {
 class PWAException : public std::exception {
 public:
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
     const char* msg;
     explicit PWAException(const char* msg);
 };

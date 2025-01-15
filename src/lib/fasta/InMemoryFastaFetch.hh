@@ -1,5 +1,12 @@
 #pragma once
 #include "BaseFastaFetch.hh"
+#include <cstddef>
+#include <vector>
+#include <tuple>
+#include <string>
+#include <memory>
+#include <htslib/hts.h>
+#include <cstdint>
 namespace labw::art_modern {
 
 /**

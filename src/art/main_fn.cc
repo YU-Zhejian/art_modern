@@ -1,17 +1,27 @@
 #include "art_modern_config.h"
-#include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
+
 #include <fstream>
-#include <iostream>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <utility>
 
 #include "ArtConstants.hh"
 #include "ArtJobPool.hh"
+#include "ArtJobExecutor.hh"
+#include "ArtParams.hh"
+#include "main_fn.hh"
+
+#include "art_modern_constants.hh"
+#include "fasta/BaseFastaFetch.hh"
+#include "fasta/InMemoryFastaFetch.hh"
 #include "fasta/FaidxFetch.hh"
 #include "fasta/FastaStreamBatcher.hh"
 #include "fasta/Pbsim3TranscriptBatcher.hh"
-#include "main_fn.hh"
+#include "jobs/SimulationJob.hh"
+#include "out/BaseReadOutput.hh"
 #include "out/OutputDispatcher.hh"
-#include "utils/profile_utils.hh"
 
 namespace labw::art_modern {
 
@@ -35,7 +45,7 @@ void generate_wgs(const ArtParams& art_params)
     // Coverage-based parallelism
     const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
 
-    BaseFastaFetch* fetch;
+    BaseFastaFetch* fetch = nullptr;
     if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
         fetch = new InMemoryFastaFetch(art_params.input_file_name);
     } else {

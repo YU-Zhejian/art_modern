@@ -1,7 +1,9 @@
 #pragma once
-#include <htslib/faidx.h>
+#include <cstddef>
+#include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <string>
+#include <tuple>
 #include <vector>
 
 namespace labw::art_modern {

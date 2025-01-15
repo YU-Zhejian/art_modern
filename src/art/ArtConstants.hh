@@ -1,10 +1,10 @@
 #pragma once
 #include "art_modern_dtypes.hh"
 #include <string>
+
+
 namespace labw::art_modern {
-
 constexpr am_qual_t HIGHEST_QUAL = 80;
-
 constexpr am_qual_dist_t MAX_DIST_NUMBER = 1000000;
 constexpr double DEFAULT_INS_RATE_1 = 0.00009;
 constexpr double DEFAULT_DEL_RATE_1 = 0.00011;

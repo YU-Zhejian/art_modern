@@ -4,6 +4,7 @@
 #if defined(USE_NOP_PARALLEL)
 #include <mutex>
 #elif defined(USE_ASIO_PARALLEL)
+#include <mutex>
 #include <boost/asio.hpp>
 #else
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_ASIO_PARALLEL"

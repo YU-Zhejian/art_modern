@@ -1,7 +1,9 @@
 #include "dump_utils.hh"
 
-#include <boost/filesystem.hpp>
-#include <boost/stacktrace.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/stacktrace/safe_dump_to.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 #include <csignal>
 #include <fstream>
 #include <iostream>
@@ -30,4 +32,4 @@ void handle_dumps()
         boost::filesystem::remove(DUMP_FILENAME);
     }
 }
-}
+} // namespace labw::art_modern

@@ -1,4 +1,5 @@
 #include "art_modern_config.h"
+
 #include <boost/log/trivial.hpp>
 
 // Boost timer
@@ -10,6 +11,8 @@
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
+
+#include <cstdlib>
 
 #include "ArtCmdOpts.hh"
 #include "main_fn.hh"

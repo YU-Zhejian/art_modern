@@ -1,5 +1,8 @@
 #include "SimulationJob.hh"
 
+#include "fasta/BaseFastaFetch.hh"
+#include "fasta/CoverageInfo.hh"
+
 namespace labw::art_modern {
 SimulationJob::~SimulationJob() = default;
 

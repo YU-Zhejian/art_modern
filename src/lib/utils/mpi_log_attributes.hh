@@ -1,6 +1,8 @@
 #pragma once
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_cast.hpp>
+
+
 namespace labw::art_modern {
 
 /**
@@ -20,4 +22,4 @@ public:
     MPIHostNameLoggerAttribute();
     [[maybe_unused]] explicit MPIHostNameLoggerAttribute(boost::log::attributes::cast_source const& source);
 };
-}
+} // namespace labw::art_modern
