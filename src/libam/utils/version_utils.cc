@@ -192,10 +192,10 @@ namespace {
 
     void print_simde_version()
     {
+        std::vector<std::string> simd_info;
 #if (0)
         std::cout << "SIMDE: " << SIMDE_VERSION_MAJOR << "." << SIMDE_VERSION_MINOR << "." << SIMDE_VERSION_MICRO
                   << std::endl;
-        std::vector<std::string> simd_info;
 #ifdef SIMDE_X86_SSE_NATIVE
         simd_info.emplace_back("SSE");
 #endif
@@ -204,9 +204,7 @@ namespace {
 #endif
         std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
 #else
-
         std::cout << "SIMDE: N/A" << std::endl;
-        std::vector<std::string> simd_info;
 #ifdef __MMX__
         simd_info.emplace_back("MMX");
 #endif
