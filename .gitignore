@@ -11,6 +11,7 @@ uniprot*
 /.idea/*
 !/.idea/encodings.xml
 !/.idea/scopes/
+!/.idea/codeStyles/
 
 
 *.txt
