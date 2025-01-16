@@ -1,6 +1,7 @@
 #pragma once
 #include "libam/Dtypes.hh"
 
+#include <cstdint>
 #include <string>
 
 namespace labw::art_modern {
@@ -29,7 +30,7 @@ constexpr char MAPQ_MAX_STR[] = "255"; // 255
 
 constexpr int PHRED_OFFSET = 33;
 
-enum class SIMULATION_MODE { WGS, TRANS, TEMPLATE };
+enum class SIMULATION_MODE : std::int8_t { WGS, TRANS, TEMPLATE };
 
 constexpr char SIMULATION_MODE_WGS[] = "wgs";
 
@@ -37,7 +38,7 @@ constexpr char SIMULATION_MODE_TRANS[] = "trans";
 
 constexpr char SIMULATION_MODE_TEMPLATE[] = "template";
 
-enum class INPUT_FILE_TYPE { FASTA, PBSIM3_TRANSCRIPTS };
+enum class INPUT_FILE_TYPE : std::int8_t { FASTA, PBSIM3_TRANSCRIPTS };
 
 constexpr char INPUT_FILE_TYPE_FASTA[] = "fasta";
 
@@ -45,7 +46,7 @@ constexpr char INPUT_FILE_TYPE_PBSIM3_TRANSCRIPTS[] = "pbsim3_transcripts";
 
 constexpr char INPUT_FILE_TYPE_AUTO[] = "auto";
 
-enum class INPUT_FILE_PARSER { MEMORY, HTSLIB, STREAM };
+enum class INPUT_FILE_PARSER : std::int8_t { MEMORY, HTSLIB, STREAM };
 
 constexpr char INPUT_FILE_PARSER_MEMORY[] = "memory";
 

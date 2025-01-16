@@ -2,6 +2,8 @@
 
 #include "art_modern_config.h"
 
+#include "libam/utils/class_macros_utils.hh"
+
 #if defined(USE_STL_RANDOM)
 #include <random>
 #elif defined(USE_BOOST_RANDOM)
@@ -22,6 +24,10 @@ namespace labw::art_modern {
 class Rprob {
 public:
     Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length);
+
+    DELETE_COPY(Rprob)
+    DELETE_MOVE(Rprob)
+
     double r_prob();
     void r_probs(std::size_t n);
     void r_probs();
@@ -70,4 +76,4 @@ private:
 #endif
     int read_length_;
 };
-}
+} // namespace labw::art_modern

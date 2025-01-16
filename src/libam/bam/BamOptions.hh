@@ -37,7 +37,7 @@ struct BamOptions {
     /**
      * Use `M` instead of `X` or `=` for matching.
      */
-    bool use_m;
+    bool use_m = false;
 
     /**
      * If `false`, will write SAM instead.

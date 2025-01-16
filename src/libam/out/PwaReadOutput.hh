@@ -40,8 +40,9 @@ public:
     DELETE_MOVE(PwaReadOutputFactory)
     DELETE_COPY(PwaReadOutputFactory)
     PwaReadOutputFactory() = default;
+    ~PwaReadOutputFactory() override = default;
 
-    const std::string name() const override { return "PWA"; }
+    [[nodiscard]] const std::string name() const override { return "PWA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const override;

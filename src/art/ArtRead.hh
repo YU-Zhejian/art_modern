@@ -26,6 +26,7 @@ public:
     // Disable constructors
     DELETE_MOVE(ArtRead)
     DELETE_COPY(ArtRead)
+    ~ArtRead() = default;
 
     ArtRead(const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
@@ -59,7 +60,7 @@ private:
     std::string contig_name_;
     std::map<int, char, std::less<>> indel_;
     bool is_plus_strand_ = false;
-    long pos_on_contig_;
+    hts_pos_t pos_on_contig_;
     std::vector<am_qual_t> qual_;
     std::string read_name_;
     Rprob& rprob_;

@@ -20,7 +20,7 @@ public:
     virtual void writeSE(const PairwiseAlignment& pwa) = 0;
     virtual void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
     virtual void close() = 0;
-    virtual ~BaseReadOutput();
+    virtual ~BaseReadOutput() = default;
 };
 
 class BaseReadOutputFactory {
@@ -34,7 +34,7 @@ public:
     virtual BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
         const std::vector<std::string>& args) const
         = 0;
-    virtual ~BaseReadOutputFactory();
+    virtual ~BaseReadOutputFactory() = default;
 };
 
 } // namespace labw::art_modern

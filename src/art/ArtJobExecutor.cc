@@ -174,5 +174,4 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }
 
-ArtJobExecutor::~ArtJobExecutor() = default;
 } // namespace labw::art_modern

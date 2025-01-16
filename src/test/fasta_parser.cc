@@ -1,14 +1,19 @@
-#define BOOST_TEST_MODULE test_fasta_parser
-
-#include "ref/parser/fasta_parser.hh"
-#include "ref/fetch/BaseFastaFetch.hh"
-#include "ref/fetch/FaidxFetch.hh"
-#include "ref/fetch/InMemoryFastaFetch.hh"
 #include "test_adaptor.h"
 
-#include <boost/test/unit_test.hpp>
+#define BOOST_TEST_MODULE test_fasta_parser // NOLINT
 
-using namespace labw::art_modern;
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+#include "libam/ref/fetch/FaidxFetch.hh"
+#include "libam/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam/ref/parser/fasta_parser.hh"
+
+#include <boost/test/unit_test.hpp> // NOLINT
+
+#include <sstream>
+#include <string>
+#include <vector>
+
+using namespace labw::art_modern; // NOLINT
 
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {

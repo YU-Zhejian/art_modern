@@ -30,4 +30,4 @@ private:
     faidx_t* faidx_;
     char* cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end) const;
 };
-}
+} // namespace labw::art_modern

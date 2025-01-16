@@ -30,4 +30,4 @@ private:
     std::size_t pool_size_ = 1;
 };
 
-}
+} // namespace labw::art_modern

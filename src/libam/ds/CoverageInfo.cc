@@ -10,6 +10,32 @@
 #include <vector>
 
 namespace labw::art_modern {
+namespace {
+
+    std::tuple<CoverageInfo::coverage_map, CoverageInfo::coverage_map> read(std::istream& istream)
+    {
+        CoverageInfo::coverage_map coverage_positive;
+        CoverageInfo::coverage_map coverage_negative;
+        std::string buff;
+        std::vector<std::string> tokens;
+        while (!istream.eof()) {
+            std::getline(istream, buff);
+            if (buff.empty() || buff.front() == '#') {
+                continue;
+            }
+            split(tokens, buff, boost::is_any_of("\t"));
+            if (tokens.size() == 3) {
+                coverage_positive.try_emplace(tokens.at(0), std::stod(tokens.at(1)));
+                coverage_negative.try_emplace(tokens.at(0), std::stod(tokens.at(2)));
+            } else if (tokens.size() == 2) {
+                coverage_positive.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
+                coverage_negative.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
+            }
+        }
+        return { coverage_positive, coverage_negative };
+    }
+
+} // namespace
 CoverageInfo::CoverageInfo(const double static_coverage)
     : static_coverage_positive_(static_coverage / 2)
     , static_coverage_negative_(static_coverage / 2)
@@ -46,29 +72,6 @@ double CoverageInfo::coverage_negative(const std::string& contig_name) const
         return find_result->second;
     }
     return 0.0;
-}
-
-std::tuple<CoverageInfo::coverage_map, CoverageInfo::coverage_map> read(std::istream& istream)
-{
-    CoverageInfo::coverage_map coverage_positive;
-    CoverageInfo::coverage_map coverage_negative;
-    std::string buff;
-    std::vector<std::string> tokens;
-    while (!istream.eof()) {
-        std::getline(istream, buff);
-        if (buff.empty() || buff.front() == '#') {
-            continue;
-        }
-        split(tokens, buff, boost::is_any_of("\t"));
-        if (tokens.size() == 3) {
-            coverage_positive.try_emplace(tokens.at(0), std::stod(tokens.at(1)));
-            coverage_negative.try_emplace(tokens.at(0), std::stod(tokens.at(2)));
-        } else if (tokens.size() == 2) {
-            coverage_positive.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
-            coverage_negative.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
-        }
-    }
-    return { coverage_positive, coverage_negative };
 }
 
 CoverageInfo::CoverageInfo(std::istream& istream)

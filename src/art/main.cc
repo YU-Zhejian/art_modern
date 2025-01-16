@@ -51,6 +51,7 @@ int main_mpi_child()
     }
 }
 #endif
+namespace {
 
 void handle_mpi_child()
 {
@@ -71,6 +72,7 @@ void handle_mpi_child()
     BOOST_LOG_TRIVIAL(warning) << "MPI not found! Cross-node parallelism disabled.";
 #endif
 }
+} // namespace
 
 int main(int argc, char* argv[])
 {

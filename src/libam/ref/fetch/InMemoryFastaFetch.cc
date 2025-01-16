@@ -13,38 +13,39 @@
 #include "libam/ref/parser/fasta_parser.hh"
 
 namespace labw::art_modern {
-
-std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
-{
-    std::vector<hts_pos_t> retv;
-    retv.reserve(seq.size());
-    for (auto const& s : seq) {
-        retv.emplace_back(s.size());
+namespace {
+    std::vector<hts_pos_t> get_seq_lengths(const std::vector<std::string>& seq)
+    {
+        std::vector<hts_pos_t> retv;
+        retv.reserve(seq.size());
+        for (auto const& s : seq) {
+            retv.emplace_back(s.size());
+        }
+        return retv;
     }
-    return retv;
-}
+
+    std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
+    {
+        std::vector<std::string> seq_names;
+        std::vector<std::string> seqs;
+
+        auto file_reader = std::ifstream(file_name);
+        FastaIterator fai(file_reader);
+        while (true) {
+            try {
+                auto [id, sequence] = fai.next();
+                seq_names.emplace_back(std::move(id));
+                seqs.emplace_back(std::move(sequence));
+            } catch (EOFException&) {
+                break;
+            }
+        }
+        file_reader.close();
+        return { std::move(seq_names), std::move(seqs) };
+    }
+} // namespace
 
 InMemoryFastaFetch::InMemoryFastaFetch() = default;
-
-std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
-{
-    std::vector<std::string> seq_names;
-    std::vector<std::string> seqs;
-
-    auto file_reader = std::ifstream(file_name);
-    FastaIterator fai(file_reader);
-    while (true) {
-        try {
-            auto [id, sequence] = fai.next();
-            seq_names.emplace_back(std::move(id));
-            seqs.emplace_back(std::move(sequence));
-        } catch (EOFException&) {
-            break;
-        }
-    }
-    file_reader.close();
-    return { std::move(seq_names), std::move(seqs) };
-}
 
 InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
     : InMemoryFastaFetch(get_seq_map(file_name))

@@ -18,6 +18,7 @@ public:
     InMemoryFastaFetch fetch();
 
     InMemoryFastaBatcher(std::size_t batch_size, const InMemoryFastaFetch& stream);
+    ~InMemoryFastaBatcher() = default;
 
     DELETE_COPY(InMemoryFastaBatcher)
     DELETE_MOVE(InMemoryFastaBatcher)

@@ -1,9 +1,17 @@
-#include "Pbsim3TranscriptBatcher.hh"
+#include "libam/ref/batcher/Pbsim3TranscriptBatcher.hh"
+
+#include "libam/ds/CoverageInfo.hh"
+#include "libam/ref/fetch/InMemoryFastaFetch.hh"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <cstddef>
 #include <iostream>
+#include <limits>
+#include <mutex>
+#include <stdexcept>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -45,5 +53,4 @@ std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
     }
     return { InMemoryFastaFetch(seq_names, seqs), CoverageInfo(coverage_positive, coverage_negative) };
 }
-} // art_modern
-// labw
+} // namespace labw::art_modern

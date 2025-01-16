@@ -1,5 +1,7 @@
 #pragma once
 
+#include "libam/utils/class_macros_utils.hh"
+
 #include <cstddef>
 #include <exception>
 #include <istream>
@@ -14,7 +16,7 @@ using FastaRecord = std::pair<std::string, std::string>;
 struct EOFException : std::exception { };
 struct MalformedFastaException : std::exception {
 public:
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
 };
 
 class FastaIterator {
@@ -23,10 +25,9 @@ public:
 
     FastaRecord next();
 
-    FastaIterator(const FastaIterator&) = delete;
-    FastaIterator(FastaIterator&&) = delete;
-    FastaIterator& operator=(const FastaIterator&) = delete;
-    FastaIterator& operator=(FastaIterator&&) = delete;
+    DELETE_COPY(FastaIterator)
+    DELETE_MOVE(FastaIterator)
+    ~FastaIterator() = default;
 
 private:
     std::istream& _istream;

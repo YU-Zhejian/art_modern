@@ -7,7 +7,7 @@
 
 namespace labw::art_modern {
 std::string comp(const std::string& dna);
-std::string revcomp(const std::string& dna);
+[[maybe_unused]] std::string revcomp(const std::string& dna);
 [[maybe_unused]] std::string normalize(const std::string& dna);
 void comp_inplace(std::string& dna);
 void revcomp_inplace(std::string& dna);

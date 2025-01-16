@@ -28,6 +28,46 @@
 
 namespace labw::art_modern {
 
+namespace {
+    void generate_wgs(const ArtParams& art_params)
+    {
+        const OutputDispatcherFactory out_dispatcher_factory;
+        int job_id = 0;
+        ArtJobPool job_pool(art_params);
+
+        // Coverage-based parallelism
+        const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
+
+        BaseFastaFetch* fetch = nullptr;
+        if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+            fetch = new InMemoryFastaFetch(art_params.input_file_name);
+        } else {
+            fetch = new FaidxFetch(art_params.input_file_name);
+        }
+        BaseReadOutput* out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
+        if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+            for (int i = 0; i < art_params.parallel; ++i) {
+                SimulationJob sj(fetch, coverage_info, ++job_id, false);
+                auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
+                job_pool.add(aje);
+            }
+        } else {
+            for (int i = 0; i < art_params.parallel; ++i) {
+                BaseFastaFetch* thread_fetch = new FaidxFetch(art_params.input_file_name);
+                SimulationJob sj(thread_fetch, coverage_info, ++job_id, true);
+                auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
+                job_pool.add(aje);
+            }
+        }
+        job_pool.stop();
+        BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
+        delete fetch;
+        out_dispatcher->close();
+        delete out_dispatcher;
+    }
+
+} // namespace
+
 void print_banner()
 {
     BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << " v. " ART_MODERN_VERSION << ")";
@@ -37,43 +77,6 @@ void print_banner()
 #ifdef CEU_CM_IS_DEBUG
     BOOST_LOG_TRIVIAL(info) << "Debugging functions enabled.";
 #endif
-}
-
-void generate_wgs(const ArtParams& art_params)
-{
-    const OutputDispatcherFactory out_dispatcher_factory;
-    int job_id = 0;
-    ArtJobPool job_pool(art_params);
-
-    // Coverage-based parallelism
-    const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
-
-    BaseFastaFetch* fetch = nullptr;
-    if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-        fetch = new InMemoryFastaFetch(art_params.input_file_name);
-    } else {
-        fetch = new FaidxFetch(art_params.input_file_name);
-    }
-    BaseReadOutput* out_dispatcher = out_dispatcher_factory.create(art_params.vm, fetch, art_params.args);
-    if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-        for (int i = 0; i < art_params.parallel; ++i) {
-            SimulationJob sj(fetch, coverage_info, ++job_id, false);
-            auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
-            job_pool.add(aje);
-        }
-    } else {
-        for (int i = 0; i < art_params.parallel; ++i) {
-            BaseFastaFetch* thread_fetch = new FaidxFetch(art_params.input_file_name);
-            SimulationJob sj(thread_fetch, coverage_info, ++job_id, true);
-            auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
-            job_pool.add(aje);
-        }
-    }
-    job_pool.stop();
-    BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
-    delete fetch;
-    out_dispatcher->close();
-    delete out_dispatcher;
 }
 
 void generate_all(const ArtParams& art_params)

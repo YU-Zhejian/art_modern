@@ -37,6 +37,7 @@ public:
     DELETE_MOVE(FastqReadOutputFactory)
     DELETE_COPY(FastqReadOutputFactory)
     FastqReadOutputFactory() = default;
+    ~FastqReadOutputFactory() override = default;
 
     [[nodiscard]] const std::string name() const override { return "FASTQ"; }
     void patch_options(boost::program_options::options_description& desc) const override;
