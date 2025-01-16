@@ -1,9 +1,9 @@
 #define BOOST_TEST_MODULE test_fasta_parser
 
+#include "ref/parser/fasta_parser.hh"
 #include "ref/fetch/BaseFastaFetch.hh"
 #include "ref/fetch/FaidxFetch.hh"
 #include "ref/fetch/InMemoryFastaFetch.hh"
-#include "ref/parser/fasta_parser.hh"
 #include "test_adaptor.h"
 
 #include <boost/test/unit_test.hpp>

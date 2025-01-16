@@ -1,5 +1,5 @@
 #pragma once
-#include "art_modern_dtypes.hh"
+#include "libam/Dtypes.hh"
 
 #include <cstdint>
 #include <string>
@@ -15,14 +15,13 @@ constexpr int DEFAULT_MAX_INDEL = -1;
 constexpr int DEFAULT_MAX_N = 0;
 constexpr int DEFAULT_BATCH_SIZE = 1U << 14U;
 
-enum class ART_LIB_CONST_MODE: std::int8_t {
-    SE = 0, PE = 1, MP = 2
-};
+enum class ART_LIB_CONST_MODE : std::int8_t { SE = 0, PE = 1, MP = 2 };
 
 constexpr char ART_LIB_CONST_MODE_SE[] = "se";
 constexpr char ART_LIB_CONST_MODE_PE[] = "pe";
 constexpr char ART_LIB_CONST_MODE_MP[] = "mp";
-constexpr  char const* ART_LIB_CONST_MODE_STR[] = {ART_LIB_CONST_MODE_SE, ART_LIB_CONST_MODE_PE, ART_LIB_CONST_MODE_MP};
+constexpr char const* ART_LIB_CONST_MODE_STR[]
+    = { ART_LIB_CONST_MODE_SE, ART_LIB_CONST_MODE_PE, ART_LIB_CONST_MODE_MP };
 constexpr char ART_PROGRAM_NAME[] = "art_modern";
 constexpr char ART_ACGT[] = "ACGT";
 const std::string ART_ACGT_STR = "ACGT";

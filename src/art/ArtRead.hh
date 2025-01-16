@@ -1,19 +1,19 @@
 #pragma once
 
+#include "art/ArtParams.hh"
+#include "art/random_generator.hh"
+
+#include "libam/Dtypes.hh"
+#include "libam/ds/PairwiseAlignment.hh"
+#include "libam/utils/class_macros_utils.hh"
+
+#include <htslib/hts.h>
+
 #include <functional>
 #include <map>
 #include <stdexcept>
 #include <string>
 #include <vector>
-
-#include <htslib/hts.h>
-
-#include "art/ArtParams.hh"
-#include "art/random_generator.hh"
-
-#include "art_modern_dtypes.hh"
-#include "ds/PairwiseAlignment.hh"
-#include "utils/class_macros_utils.hh"
 
 namespace labw::art_modern {
 

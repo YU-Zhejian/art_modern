@@ -5,8 +5,8 @@
 #include <fstream>
 #include <iostream>
 
-#include "art_modern_constants.hh"
 #include "ds/PairwiseAlignment.hh"
+#include "libam/Constants.hh"
 #include "out/OutputDispatcher.hh"
 #include "ref/batcher/Pbsim3TranscriptBatcher.hh"
 #include "ref/fetch/FaidxFetch.hh"

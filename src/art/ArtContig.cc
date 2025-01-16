@@ -3,13 +3,13 @@
 #include "art/ArtRead.hh"
 #include "art/random_generator.hh"
 
+#include "libam/Constants.hh"
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+
 #include <htslib/hts.h>
 
 #include <cstddef>
 #include <utility>
-
-#include "art_modern_constants.hh"
-#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 

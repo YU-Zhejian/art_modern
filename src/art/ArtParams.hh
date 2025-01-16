@@ -2,16 +2,16 @@
 #include "art/ArtConstants.hh"
 #include "art/Empdist.hh"
 
-#include "art_modern_constants.hh"
-#include "ds/CoverageInfo.hh"
-
-#include <array>
-#include <string>
-#include <vector>
+#include "libam/Constants.hh"
+#include "libam/ds/CoverageInfo.hh"
 
 #include <boost/program_options.hpp>
 
 #include <htslib/hts.h>
+
+#include <array>
+#include <string>
+#include <vector>
 
 namespace labw::art_modern {
 

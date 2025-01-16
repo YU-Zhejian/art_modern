@@ -1,5 +1,12 @@
 #include "art_modern_config.h"
 
+#include "art/ArtCmdOpts.hh"
+#include "art/main_fn.hh"
+
+#include "libam/utils/dump_utils.hh"
+#include "libam/utils/log_utils.hh"
+#include "libam/utils/mpi_utils.hh"
+
 #include <boost/log/trivial.hpp>
 
 // Boost timer
@@ -14,14 +21,7 @@
 
 #include <cstdlib>
 
-#include "art/ArtCmdOpts.hh"
-#include "art/main_fn.hh"
-
-#include "utils/dump_utils.hh"
-#include "utils/log_utils.hh"
-#include "utils/mpi_utils.hh"
-
-using namespace labw::art_modern;
+using namespace labw::art_modern; // NOLINT
 
 #ifdef WITH_MPI
 int main_mpi_child()

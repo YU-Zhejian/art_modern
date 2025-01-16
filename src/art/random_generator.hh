@@ -1,9 +1,6 @@
 #pragma once
 
 #include "art_modern_config.h"
-#include "art_modern_dtypes.hh"
-
-#include <vector>
 
 #if defined(USE_STL_RANDOM)
 #include <random>
@@ -17,13 +14,16 @@
 #error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM or USE_GSL_RANDOM for random generators!"
 #endif
 
+#include <cstdint>
+#include <vector>
+
 namespace labw::art_modern {
 
 class Rprob {
 public:
     Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length);
     double r_prob();
-    void r_probs(int n);
+    void r_probs(std::size_t n);
     void r_probs();
     int insertion_length();
     char rand_base();
@@ -37,9 +37,8 @@ public:
     std::vector<int> tmp_qual_dists_;
 
 private:
-    static long seed();
+    static uint64_t seed();
     void public_init_();
-    int read_length_;
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
     std::uniform_real_distribution<double> dis_;
@@ -69,5 +68,6 @@ private:
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
 #endif
+    int read_length_;
 };
 }

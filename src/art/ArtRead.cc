@@ -1,18 +1,18 @@
 #include "art/ArtRead.hh"
+
 #include "art/random_generator.hh"
+
+#include "art_modern_config.h" // NOLINT: For CEU_IS_DEBUG
+#include "libam/Constants.hh"
+#include "libam/ds/PairwiseAlignment.hh"
+#include "libam/utils/seq_utils.hh"
+
+#include <htslib/hts.h>
 
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
 #include <utility>
-
-#include <htslib/hts.h>
-
-#include "art_modern_config.h" // NOLINT: For CEU_IS_DEBUG
-#include "art_modern_constants.hh"
-
-#include "ds/PairwiseAlignment.hh"
-#include "utils/seq_utils.hh"
 
 namespace labw::art_modern {
 
@@ -222,7 +222,7 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
-    std::size_t num_match;
+    std::size_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;

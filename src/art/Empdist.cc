@@ -3,8 +3,8 @@
 #include "art/ArtConstants.hh"
 #include "art/random_generator.hh"
 
-#include "art_modern_dtypes.hh"
-#include "utils/mpi_utils.hh"
+#include "libam/Dtypes.hh"
+#include "libam/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -12,6 +12,7 @@
 #include <cmath>
 #include <cstddef>
 #include <fstream>
+#include <functional>
 #include <istream>
 #include <limits>
 #include <map>
@@ -116,12 +117,12 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     int read_pos = 0;
     char alt_read_pos = 0;
     char leading_base = 0;
-    long t_uint = 0;
+    am_qual_dist_t t_uint = 0;
     std::string line;
     int t_int = 0;
     std::vector<int> qual;
     std::map<int, int, std::less<>> dist;
-    std::vector<long> count;
+    std::vector<am_qual_dist_t> count;
     int qmin = std::numeric_limits<int>::max();
     int qmax = std::numeric_limits<int>::min();
 
@@ -132,7 +133,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         }
         leading_base = line[0];
         if ((!sep_qual_ || ART_ACGT_STR.find(leading_base) == std::string::npos)
-                && (sep_qual_ || leading_base != '.')) {
+            && (sep_qual_ || leading_base != '.')) {
             continue;
         }
 

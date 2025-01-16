@@ -3,8 +3,8 @@
 #include "art/ArtParams.hh"
 #include "art/random_generator.hh"
 
-#include "jobs/SimulationJob.hh"
-#include "out/BaseReadOutput.hh"
+#include "libam/jobs/SimulationJob.hh"
+#include "libam/out/BaseReadOutput.hh"
 
 #include <atomic>
 #include <string>
