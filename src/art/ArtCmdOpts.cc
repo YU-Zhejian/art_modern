@@ -37,6 +37,7 @@
 namespace po = boost::program_options;
 
 namespace labw::art_modern {
+namespace {
 
 constexpr char ARG_VERSION[] = "version";
 constexpr char ARG_HELP[] = "help";
@@ -72,7 +73,7 @@ po::options_description option_parser() noexcept
 {
     const OutputDispatcherFactory& out_dispatcher_factory_ = get_output_dispatcher_factory();
     po::options_description general_opts("General Options");
-    general_opts.add_options()(ARG_HELP, "print out usage information");
+    general_opts.add_options()(static_cast<const char*>(ARG_HELP), "print out usage information");
     general_opts.add_options()(ARG_VERSION, "display version info");
 
     po::options_description required_opts("Required Options");
@@ -167,12 +168,12 @@ po::variables_map generate_vm_while_handling_help_version(
         abort_mpi();
     }
 
-    if (vm_.count(ARG_VERSION)) {
+    if (vm_.count(ARG_VERSION) != 0U) {
         print_version();
         bye_mpi();
         exit_mpi(EXIT_SUCCESS);
     }
-    if (vm_.count(ARG_HELP)) {
+    if (vm_.count(ARG_HELP) != 0U) {
         print_help(po_desc);
         bye_mpi();
         exit_mpi(EXIT_SUCCESS);
@@ -200,14 +201,10 @@ SIMULATION_MODE get_simulation_mode(const std::string& simulation_mode_str)
 
 ART_LIB_CONST_MODE get_art_lib_const_mode(const std::string& lib_const_mode_str)
 {
-    if (lib_const_mode_str == ART_LIB_CONST_MODE_SE) {
-        return ART_LIB_CONST_MODE::SE;
-    }
-    if (lib_const_mode_str == ART_LIB_CONST_MODE_PE) {
-        return ART_LIB_CONST_MODE::PE;
-    }
-    if (lib_const_mode_str == ART_LIB_CONST_MODE_MP) {
-        return ART_LIB_CONST_MODE::MP;
+    for (int i =0; i < 3;i++) {
+        if (lib_const_mode_str == ART_LIB_CONST_MODE_STR[i]) {
+            return static_cast<ART_LIB_CONST_MODE>(i);
+        }
     }
 
     BOOST_LOG_TRIVIAL(fatal) << "Library construction mode (--" << ARG_LIB_CONST_MODE << ") should be one of "
@@ -386,7 +383,7 @@ std::vector<double> gen_per_base_mutation_rate(const int read_len, const double 
         return rate;
     }
 
-    double tp;
+    double tp = 0;
     double p_cdf = 0;
     for (auto i = 0; i < read_len; i++) {
         tp = cdf(complement(boost::math::binomial(read_len, p), i));
@@ -444,7 +441,7 @@ void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_
                                            << SIMULATION_MODE_TEMPLATE << " mode.";
             }
         } else {
-            if (!(pe_frag_dist_std_dev > 0 && pe_frag_dist_mean > 0)) {
+            if (pe_frag_dist_std_dev <= 0 || pe_frag_dist_mean <= 0) {
                 BOOST_LOG_TRIVIAL(fatal) << "set pe_frag_dist_std_dev and "
                                             "pe_frag_dist_mean for PE reads for "
                                          << SIMULATION_MODE_WGS << " or " << SIMULATION_MODE_TRANS << " mode)";
@@ -488,6 +485,8 @@ void validate_comp_mtx(const INPUT_FILE_PARSER input_file_parser, const SIMULATI
         abort_mpi();
     }
 }
+
+} // namespace
 
 ArtParams parse_args(const int argc, char** argv)
 {
@@ -551,4 +550,4 @@ ArtParams parse_args(const int argc, char** argv)
         std::move(args) };
 }
 
-}
+} // namespace labw::art_modern

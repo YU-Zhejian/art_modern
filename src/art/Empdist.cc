@@ -21,18 +21,20 @@
 
 namespace labw::art_modern {
 
-void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
-{
-    for (auto& i : map_to_process) {
-        for (auto& [fst, snd] : i) {
-            snd += q_shift;
-            snd = std::min(std::max(snd, min_qual), max_qual);
+namespace {
+    void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
+    {
+        for (auto& i : map_to_process) {
+            for (auto& [fst, snd] : i) {
+                snd += q_shift;
+                snd = std::min(std::max(snd, min_qual), max_qual);
+            }
         }
     }
-}
+} // namespace
 
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
-    const bool is_pe, const int read_len)
+    const bool is_pe, const std::size_t read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)
@@ -129,8 +131,8 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             continue;
         }
         leading_base = line[0];
-        if (!((sep_qual_ && ART_ACGT_STR.find(leading_base) != std::string::npos)
-                || (!sep_qual_ && leading_base == '.'))) {
+        if ((!sep_qual_ || ART_ACGT_STR.find(leading_base) == std::string::npos)
+                && (sep_qual_ || leading_base != '.')) {
             continue;
         }
 

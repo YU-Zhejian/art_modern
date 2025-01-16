@@ -22,7 +22,6 @@ namespace labw::art_modern {
                                <-----------|
  * @endcode
  * @param is_plus_strand
- * @param probs_indel
  * @param read_1
  */
 void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
