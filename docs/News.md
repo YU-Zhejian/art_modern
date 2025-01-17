@@ -31,7 +31,12 @@ Changes in software implementation:
 
 ## 1.0.1
 
-Fixed miscelaneous bugs.
+Fixed miscellaneous bugs.
 
 - Further fixed issue #2.
 - More compiler versions tested; The software now supports Clang 10.0.0+, GCC 9.5.0+, and AOCC 3.2.0+.
+
+## 1.1.0 (In-Progress)
+
+- Bumped bundled HTSLib to 1.21.
+- Miscellaneous bug fixes.
