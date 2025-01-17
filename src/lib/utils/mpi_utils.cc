@@ -1,11 +1,16 @@
 #include "mpi_utils.hh"
-#include "art_modern_config.h" // for WITH_MPI
-#include "art_modern_constants.hh"
+
+#include "art_modern_config.h" // NOLINT: for WITH_MPI
+#include "art_modern_constants.hh" // NOLINT: Used in MPI functions
+
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
 #include <boost/log/trivial.hpp>
-#include <cstring>
+
+#include <cstdlib>
+#include <cstring> // NOLINT: Used in MPI functions
+#include <string>
 
 namespace labw::art_modern {
 [[noreturn]] void exit_mpi(const int status)
@@ -22,7 +27,7 @@ namespace labw::art_modern {
         BOOST_LOG_TRIVIAL(debug) << "MPI already finalized.";
     }
 #endif
-    exit(status);
+    std::exit(status);
 }
 
 [[noreturn]] void abort_mpi([[maybe_unused]] const int status)
@@ -70,4 +75,4 @@ std::string mpi_rank()
     return "nompi";
 #endif
 }
-}
+} // namespace labw::art_modern

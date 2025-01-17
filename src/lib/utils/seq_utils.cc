@@ -1,15 +1,20 @@
 #include "seq_utils.hh"
 
+// NOLINTBEGIN
 #if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
 #include <immintrin.h>
 #endif
+// NOLINTEND
 
 #include "art_modern_constants.hh"
 #include "art_modern_dtypes.hh"
-#include "htslib/sam.h"
+
+#include <htslib/sam.h>
+
 #include <algorithm>
 #include <cstring>
 #include <sstream>
+#include <string>
 #include <vector>
 
 namespace labw::art_modern {
@@ -39,6 +44,7 @@ std::string qual_to_str_mmx(const am_qual_t* qual, const size_t qlen)
     retq.resize(qlen);
     size_t i = 0;
 #ifdef __MMX__
+    // NOLINTBEGIN
     const size_t num_elements_per_simd = 8; // MMX processes 8 uint8_t elements at a time
     const size_t aligned_size = (qlen >> 3) << 3; // Align to 8-byte boundary
     __m64 phred_offset_vec = _mm_set1_pi8(static_cast<uint8_t>(PHRED_OFFSET));
@@ -49,6 +55,7 @@ std::string qual_to_str_mmx(const am_qual_t* qual, const size_t qlen)
         *reinterpret_cast<__m64*>(&retq[i]) = result_vec;
     }
     _mm_empty(); // Empty the MMX state
+    // NOLINTEND
 #endif
     // Handle the remaining elements that do not fit into a full SIMD register
     for (; i < qlen; ++i) {
@@ -63,6 +70,7 @@ std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
     retq.resize(qlen);
     size_t i = 0;
 #ifdef __SSE2__
+    // NOLINTBEGIN
     const size_t num_elements_per_simd = 16; // SSE2 processes 16 uint8_t elements at a time
     const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
     __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
@@ -72,6 +80,7 @@ std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
         __m128i result_vec = _mm_add_epi8(qual_vec, phred_offset_vec);
         _mm_storeu_si128(reinterpret_cast<__m128i*>(&retq[i]), result_vec);
     }
+    // NOLINTEND
 #endif
     // Handle the remaining elements that do not fit into a full SIMD register
     for (; i < qlen; ++i) {
@@ -86,6 +95,7 @@ std::string qual_to_str_avx2(const am_qual_t* qual, const size_t qlen)
     retq.resize(qlen);
     size_t i = 0;
 #ifdef __AVX2__
+    // NOLINTBEGIN
     const size_t num_elements_per_simd = 32; // AVX2 processes 32 uint8_t elements at a time
     const size_t aligned_size = (qlen >> 5) << 5; // Align to 32-byte boundary
     __m256i phred_offset_vec = _mm256_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
@@ -95,6 +105,7 @@ std::string qual_to_str_avx2(const am_qual_t* qual, const size_t qlen)
         __m256i result_vec = _mm256_add_epi8(qual_vec, phred_offset_vec);
         _mm256_storeu_si256(reinterpret_cast<__m256i*>(&retq[i]), result_vec);
     }
+    // NOLINTEND
 #endif
     // Handle the remaining elements that do not fit into a full SIMD register
     for (; i < qlen; ++i) {
@@ -128,7 +139,8 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
 #if defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__)
     if (qlen <= 100) {
         return qual_to_str_mmx(qual, qlen);
-    } else if (qlen <= 400) {
+    }
+    if (qlen <= 400) {
         return qual_to_str_sse2(qual, qlen);
     } else {
         return qual_to_str_avx2(qual, qlen);
@@ -163,7 +175,6 @@ std::string revcomp(const std::string& dna)
     return rets;
 }
 
-
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
     return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
@@ -178,7 +189,6 @@ std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n)
     }
     return oss.str();
 }
-
 
 void comp_inplace(std::string& dna)
 {
@@ -200,4 +210,4 @@ void normalize_inplace(std::string& dna)
     }
 }
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

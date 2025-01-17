@@ -10,12 +10,15 @@
 #include <iostream>
 
 // Boost
-#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string/join.hpp>
 #include <boost/version.hpp>
 
 // HTSLib
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+
+#include <string>
+#include <vector>
 
 #ifdef WITH_OPENMP
 #include <omp.h>
@@ -40,8 +43,6 @@
 #ifdef WITH_PROTOBUF
 #include <google/protobuf/stubs/common.h>
 #endif
-
-#include <boost/algorithm/string/join.hpp>
 
 namespace labw::art_modern {
 void print_htslib_version()
@@ -234,5 +235,5 @@ void print_version()
     std::cout << ceu_check_get_compile_time_os_info();
     std::cout << ceu_check_get_run_time_os_info();
 }
-} // art_modern
+} // namespace labw::art_modern
 // labw

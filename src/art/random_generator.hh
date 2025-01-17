@@ -1,6 +1,8 @@
 #pragma once
+
 #include "art_modern_config.h"
 #include "art_modern_dtypes.hh"
+
 #include <vector>
 
 #if defined(USE_STL_RANDOM)

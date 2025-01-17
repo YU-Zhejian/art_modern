@@ -1,5 +1,9 @@
 #pragma once
-#include "out/LockFreeIO.hh"
+#include "lockfree/LockFreeIO.hh"
+
+#include <memory>
+#include <ostream>
+#include <string>
 
 namespace labw::art_modern {
 
@@ -14,5 +18,4 @@ public:
 private:
     std::ostream& out_;
 };
-} // art_modern
-// labw
+} // namespace labw::art_modern

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ArtParams.hh"
+#include "art/ArtParams.hh"
 
 namespace labw::art_modern {
 // when max_num =-1, no limit on the number of indels
@@ -8,4 +8,4 @@ namespace labw::art_modern {
 void print_banner();
 void generate_all(const ArtParams& art_params);
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

@@ -1,8 +1,21 @@
-#include <boost/filesystem.hpp>
-#include <boost/format.hpp>
+#include "ref/fetch/FaidxFetch.hh"
+
+#include "ref/fetch/BaseFastaFetch.hh"
+
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/format.hpp> // NOLINT
 #include <boost/log/trivial.hpp>
 
-#include "FaidxFetch.hh"
+#include <htslib/faidx.h>
+#include <htslib/hts.h>
+
+#include <cstddef>
+#include <cstdlib>
+#include <string>
+#include <tuple>
+#include <vector>
+
 #include "utils/mpi_utils.hh"
 
 namespace labw::art_modern {
@@ -10,7 +23,7 @@ namespace labw::art_modern {
 char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
 {
     const auto reg = boost::format("%s:%d-%d") % seq_name % (start + 1) % end;
-    hts_pos_t pos;
+    hts_pos_t pos = 0;
     const auto rets = fai_fetch64(faidx_, reg.str().c_str(), &pos);
     if (!rets) {
         BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
@@ -29,7 +42,7 @@ std::tuple<std::vector<std::string>, std::vector<hts_pos_t>> get_seq_names_lengt
     seq_lengths.reserve(size);
 
     for (int i = 0; i < size; i++) {
-        auto seq_name = faidx_iseq(faidx, i);
+        const auto seq_name = faidx_iseq(faidx, i);
         if (!seq_name) {
             BOOST_LOG_TRIVIAL(fatal) << "Sequence name of seq " << i << " is null!";
             abort_mpi();
@@ -72,4 +85,4 @@ std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const 
     std::free(cfetch_str);
     return rets;
 }
-}
+} // namespace labw::art_modern

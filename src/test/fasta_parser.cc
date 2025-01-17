@@ -1,10 +1,10 @@
 #define BOOST_TEST_MODULE test_fasta_parser
 #include <boost/test/unit_test.hpp>
 
-#include "fasta/BaseFastaFetch.hh"
-#include "fasta/FaidxFetch.hh"
-#include "fasta/InMemoryFastaFetch.hh"
-#include "fasta/fasta_parser.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+#include "ref/fetch/FaidxFetch.hh"
+#include "ref/fetch/InMemoryFastaFetch.hh"
+#include "ref/parser/fasta_parser.hh"
 #include "test_adaptor.h"
 using namespace labw::art_modern;
 

@@ -1,7 +1,16 @@
-#include <fstream>
+#include "ref/fetch/InMemoryFastaFetch.hh"
 
-#include "InMemoryFastaFetch.hh"
-#include "fasta_parser.hh"
+#include <cstddef>
+#include <fstream>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <htslib/hts.h>
+
+#include "ref/fetch/BaseFastaFetch.hh"
+#include "ref/parser/fasta_parser.hh"
 
 namespace labw::art_modern {
 
@@ -71,4 +80,4 @@ InMemoryFastaFetch::InMemoryFastaFetch(
 }
 
 InMemoryFastaFetch::~InMemoryFastaFetch() = default;
-}
+} // namespace labw::art_modern

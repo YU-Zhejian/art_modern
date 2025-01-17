@@ -43,6 +43,10 @@ touch:
 testsmall: build raw_data
 	bash sh.d/test_small.sh
 
+.PHONY: testsmall-release
+testsmall-release: release raw_data
+	env ART=opt/build_release/art_modern bash sh.d/test_small.sh
+
 .PHONY: raw_data
 raw_data:
 	$(MAKE) -C data/raw_data

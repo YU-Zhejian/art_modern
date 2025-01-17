@@ -116,3 +116,4 @@ Temporary Items
 .apdisk
 /config
 /deps/simde
+CMakeLists.txt.user

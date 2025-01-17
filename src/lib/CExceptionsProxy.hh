@@ -4,11 +4,15 @@
  */
 #pragma once
 #include "utils/exception_utils.hh"
+
+#include <cerrno>
+#include <cstring>
 #include <exception>
+#include <sstream>
 #include <string>
 
 namespace labw::art_modern {
-const char UNKNOWN_C_EXCEPTION[] = "UNKNOWN";
+static const std::string UNKNOWN_C_EXCEPTION = "UNKNOWN";
 
 /*!
  * An exception proxy for C exceptions.

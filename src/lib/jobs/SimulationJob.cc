@@ -1,4 +1,7 @@
-#include "SimulationJob.hh"
+#include "jobs/SimulationJob.hh"
+
+#include "ds/CoverageInfo.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 SimulationJob::~SimulationJob() = default;

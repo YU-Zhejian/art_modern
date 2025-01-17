@@ -4,12 +4,11 @@
  * Note: This queue contains locks.
  */
 #pragma once
-#include <atomic>
+
 #include <condition_variable>
+#include <cstddef>
 #include <deque>
-#include <exception>
 #include <mutex>
-#include <stdexcept>
 
 namespace labw::art_modern {
 /**
@@ -78,7 +77,7 @@ public:
      * @param item
      * @param block
      */
-    bool put(T&& item, const bool block = false)
+    bool put(T&& item, bool block = false)
     {
         {
             std::unique_lock lock(mutex_);
@@ -107,7 +106,7 @@ public:
      * @param item
      * @param block
      */
-    bool get(T& item, const bool block = false)
+    bool get(T& item, bool block = false)
     {
         {
             std::unique_lock lock(mutex_);
@@ -164,4 +163,4 @@ private:
     std::condition_variable not_full_;
 };
 
-}
+} // namespace labw::art_modern

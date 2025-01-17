@@ -15,7 +15,7 @@ function(ceu_cm_enhanced_try_run)
     # Parse args
     set(options STATIC)
     set(oneValueArgs SRC_PATH VARNAME)
-    set(multiValueArgs LINK_LIBRARIES COMPILE_DEFS DEPENDS)
+    set(multiValueArgs LINK_LIBRARIES LINK_FLAGS COMPILE_DEFS DEPENDS)
     cmake_parse_arguments(CEU_CM_ENHANCED_TRY_RUN "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
     if(CEU_CM_ENHANCED_TRY_RUN_STATIC)
@@ -131,53 +131,46 @@ function(ceu_cm_enhanced_try_run)
             set(CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES "")
         endif()
 
-        set(CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN "")
+        set(THIS_COMPILE_DEFS "")
 
         if(DEFINED CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS)
             foreach(FLAG ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS})
-                set(CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN}
+                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS}
                                                                  -D${FLAG})
             endforeach()
         endif()
 
         if(DEFINED CEU_CM_ADDITIONAL_COMPILER_FLAGS)
             foreach(FLAG ${CEU_CM_ADDITIONAL_COMPILER_FLAGS})
-                set(CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN}
+                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS}
                                                                  ${FLAG})
             endforeach()
         endif()
 
         if(CEU_CM_ENHANCED_TRY_RUN_STATIC AND NOT BORLAND) # Borland compiler does not support such functions
-            set(LINK_OPTIONS PRIVATE -static -static-libgcc -static-libstdc++ -static-libgfortran)
+            set(THIS_LINK_FLAGS -static -static-libgcc -static-libstdc++ -static-libgfortran)
         else()
-            set(LINK_OPTIONS "")
+            set(THIS_LINK_FLAGS "")
         endif()
 
-        if(CMAKE_VERSION GREATER_EQUAL 3.14)
-            try_run(
+        if(DEFINED CEU_CM_ENHANCED_TRY_RUN_LINK_FLAGS)
+            foreach(FLAG ${CEU_CM_ENHANCED_TRY_RUN_LINK_FLAGS})
+                set(THIS_LINK_FLAGS ${THIS_LINK_FLAGS}
+                        ${FLAG})
+            endforeach()
+        endif()
+
+        try_run(
                 CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
                 CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
                 "${CMAKE_BINARY_DIR}/CEU_TRC" "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}"
-                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES}" LINK_OPTIONS ${LINK_OPTIONS}
+                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES} -DLINK_FLAGS=${THIS_LINK_FLAGS}"
                             LINK_LIBRARIES ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES}
-                COMPILE_DEFINITIONS ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN}
+                COMPILE_DEFINITIONS ${THIS_COMPILE_DEFS}
                 COMPILE_OUTPUT_VARIABLE
                     CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}_VAR
                 RUN_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
-        else()
-            try_run(
-                CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
-                CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                "${CMAKE_BINARY_DIR}/CEU_TRC"
-                "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}"
-                # LINK_OPTIONS ${LINK_OPTIONS}
-                LINK_LIBRARIES
-                ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES}
-                COMPILE_DEFINITIONS ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS_TRY_RUN}
-                COMPILE_OUTPUT_VARIABLE
-                    CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}_VAR
-                RUN_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
-        endif()
+
 
         if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
             set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR "")

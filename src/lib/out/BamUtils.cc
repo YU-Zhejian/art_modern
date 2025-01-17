@@ -1,11 +1,30 @@
-#include "BamUtils.hh"
+#include "out/BamUtils.hh"
+
 #include "CExceptionsProxy.hh"
 #include "art_modern_config.h"
 #include "art_modern_constants.hh"
 #include "art_modern_dtypes.hh"
-#include "utils/mpi_utils.hh"
+#include "ds/PairwiseAlignment.hh"
+#include "out/SamOptions.hh"
+#include "utils/mpi_utils.hh" // NOLINT
 #include "utils/seq_utils.hh"
-#include <boost/algorithm/string.hpp>
+
+#include <algorithm>
+#include <cctype>
+#include <cstddef>
+#include <cstdint>
+#include <cstring>
+#include <ostream>
+#include <sstream>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <htslib/hts.h>
+#include <htslib/sam.h>
+
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 
 namespace labw::art_modern {
@@ -242,4 +261,4 @@ void BamTags::add_int_i(const std::string& key, const int32_t value)
     tags_.emplace_back(key, 'i', 4, data);
 }
 
-}
+} // namespace labw::art_modern

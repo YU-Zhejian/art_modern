@@ -1,15 +1,14 @@
 #pragma once
-#include "PairwiseAlignment.hh"
+#include "ds/PairwiseAlignment.hh"
 #include "out/BaseReadOutput.hh"
+#include "utils/class_macros_utils.hh"
 
 namespace labw::art_modern {
 
 class DumbReadOutput final : public BaseReadOutput {
 public:
-    DumbReadOutput(DumbReadOutput&& other) = delete;
-    DumbReadOutput(const DumbReadOutput&) = delete;
-    DumbReadOutput& operator=(DumbReadOutput&&) = delete;
-    DumbReadOutput& operator=(const DumbReadOutput&) = delete;
+    DELETE_COPY(DumbReadOutput)
+    DELETE_MOVE(DumbReadOutput)
 
     DumbReadOutput();
     void writeSE(const PairwiseAlignment& pwa) override;
@@ -18,5 +17,4 @@ public:
     ~DumbReadOutput() override;
 };
 
-} // art_modern
-// labw
+} // namespace labw::art_modern

@@ -1,11 +1,23 @@
-#include "Empdist.hh"
-#include "ArtConstants.hh"
-#include "random_generator.hh"
+#include "art/Empdist.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/random_generator.hh"
+
+#include "art_modern_dtypes.hh"
 #include "utils/mpi_utils.hh"
+
 #include <boost/log/trivial.hpp>
+
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <fstream>
+#include <istream>
+#include <limits>
+#include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace labw::art_modern {
 
@@ -20,7 +32,7 @@ void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int 
 }
 
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
-    const bool is_pe, const bool read_len)
+    const bool is_pe, const int read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)
@@ -99,12 +111,12 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
 void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
 {
     int linenum = 0;
-    int read_pos;
-    char alt_read_pos;
-    char leading_base;
-    long t_uint;
+    int read_pos = 0;
+    char alt_read_pos = 0;
+    char leading_base = 0;
+    long t_uint = 0;
     std::string line;
-    int t_int;
+    int t_int = 0;
     std::vector<int> qual;
     std::map<int, int, std::less<>> dist;
     std::vector<long> count;
@@ -292,4 +304,4 @@ void Empdist::print_() const
     }
 }
 
-}
+} // namespace labw::art_modern

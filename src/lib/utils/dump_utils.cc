@@ -1,10 +1,13 @@
-#include "dump_utils.hh"
+#include "utils/dump_utils.hh"
 
-#include <boost/filesystem.hpp>
-#include <boost/stacktrace.hpp>
+#include <boost/filesystem/operations.hpp>
+#include <boost/stacktrace/safe_dump_to.hpp>
+#include <boost/stacktrace/stacktrace.hpp>
+
 #include <csignal>
 #include <fstream>
 #include <iostream>
+
 namespace labw::art_modern {
 constexpr char DUMP_FILENAME[] = "./backtrace.dump";
 void my_signal_handler(const int signum)
@@ -30,4 +33,4 @@ void handle_dumps()
         boost::filesystem::remove(DUMP_FILENAME);
     }
 }
-}
+} // namespace labw::art_modern

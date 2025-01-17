@@ -1,8 +1,21 @@
-#include <boost/algorithm/string/join.hpp>
-#include <boost/log/trivial.hpp>
+#include "out/PwaReadOutput.hh"
 
-#include "DumbReadOutput.hh"
-#include "PwaReadOutput.hh"
+#include <fstream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <vector>
+
+#include <boost/algorithm/string/join.hpp>
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
+
+#include "ds/PairwiseAlignment.hh"
+#include "out/BaseFileReadOutput.hh"
+#include "out/BaseReadOutput.hh"
+#include "out/DumbReadOutput.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+
 namespace labw::art_modern {
 
 void PwaReadOutput::writeSE(const PairwiseAlignment& pwa)
@@ -62,4 +75,4 @@ BaseReadOutput* PwaReadOutputFactory::create(
     }
     return new DumbReadOutput();
 }
-}
+} // namespace labw::art_modern

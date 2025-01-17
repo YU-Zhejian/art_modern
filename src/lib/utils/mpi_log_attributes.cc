@@ -1,7 +1,12 @@
 #include "utils/mpi_log_attributes.hh"
 #include "art_modern_constants.hh"
 
+#include <boost/log/attributes/attribute_cast.hpp>
+#include <boost/log/attributes/attribute_value.hpp>
 #include <boost/log/attributes/attribute_value_impl.hpp>
+
+#include <string>
+
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
@@ -64,4 +69,4 @@ MPIHostNameLoggerAttribute::MPIHostNameLoggerAttribute()
     : attribute(new MPIHostNameLoggerAttributeImpl())
 {
 }
-}
+} // namespace labw::art_modern

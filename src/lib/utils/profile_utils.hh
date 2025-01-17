@@ -5,4 +5,4 @@
 namespace lab::art_modern::details {
 [[maybe_unused]] void print_memory_usage(const char* file, int line);
 
-} // lab
+} // namespace lab::art_modern::details

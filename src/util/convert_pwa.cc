@@ -5,12 +5,12 @@
 #include <fstream>
 #include <iostream>
 
-#include "PairwiseAlignment.hh"
 #include "art_modern_constants.hh"
-#include "fasta/FaidxFetch.hh"
-#include "fasta/InMemoryFastaFetch.hh"
-#include "fasta/Pbsim3TranscriptBatcher.hh"
+#include "ds/PairwiseAlignment.hh"
 #include "out/OutputDispatcher.hh"
+#include "ref/batcher/Pbsim3TranscriptBatcher.hh"
+#include "ref/fetch/FaidxFetch.hh"
+#include "ref/fetch/InMemoryFastaFetch.hh"
 #include "utils/fs_utils.hh"
 #include "utils/mpi_utils.hh"
 

@@ -1,24 +1,28 @@
 #pragma once
 
 #include "art_modern_dtypes.hh"
-#include <htslib/hts.h>
+#include "utils/class_macros_utils.hh"
+
+#include "htslib/hts.h"
+#include <array>
+#include <exception>
+#include <ostream>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
 class PWAException : public std::exception {
 public:
-    const char* what() const noexcept override;
+    [[nodiscard]] const char* what() const noexcept override;
     const char* msg;
     explicit PWAException(const char* msg);
 };
 
 class PairwiseAlignment {
 public:
-    PairwiseAlignment(PairwiseAlignment&& other) = delete;
-    PairwiseAlignment(const PairwiseAlignment&) = delete;
-    PairwiseAlignment& operator=(PairwiseAlignment&&) = delete;
-    PairwiseAlignment& operator=(const PairwiseAlignment&) = delete;
+    DELETE_COPY(PairwiseAlignment)
+    DELETE_MOVE(PairwiseAlignment)
+
     static const int NUM_LINES = 4;
 
     /*!
@@ -67,4 +71,4 @@ public:
     const bool is_plus_strand;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

@@ -1,8 +1,5 @@
 #pragma once
-#include <boost/program_options/options_description.hpp>
-
-#include "ArtParams.hh"
-#include "out/OutputDispatcher.hh"
+#include "art/ArtParams.hh"
 
 namespace labw::art_modern {
 

@@ -1,8 +1,16 @@
-#include <utility>
+#include "ref/fetch/BaseFastaFetch.hh"
 
-#include "BaseFastaFetch.hh"
 #include "CExceptionsProxy.hh"
 #include "art_modern_config.h"
+
+#include <cstddef>
+#include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
+
+#include <htslib/hts.h>
+#include <htslib/sam.h>
 
 namespace labw::art_modern {
 
@@ -37,4 +45,4 @@ bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
 std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
 BaseFastaFetch::BaseFastaFetch() = default;
 BaseFastaFetch::~BaseFastaFetch() = default;
-}
+} // namespace labw::art_modern

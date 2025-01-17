@@ -1,5 +1,9 @@
-#include "BaseFileReadOutput.hh"
+#include "out/BaseFileReadOutput.hh"
+
 #include "utils/fs_utils.hh"
+
+#include <string>
+
 #include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {

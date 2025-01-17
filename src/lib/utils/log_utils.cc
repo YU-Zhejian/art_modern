@@ -1,13 +1,19 @@
 #include "art_modern_config.h" // For WITH_MPI
-#include <boost/filesystem.hpp>
+
+#include <boost/filesystem/operations.hpp>
 #include <boost/log/attributes/clock.hpp>
 #include <boost/log/attributes/current_thread_id.hpp>
-#include <boost/log/expressions.hpp>
+#include <boost/log/core/core.hpp>
+#include <boost/log/keywords/file_name.hpp>
+#include <boost/log/keywords/filter.hpp>
+#include <boost/log/keywords/format.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
 #include <iostream>
+#include <sstream>
+#include <string>
 
 #ifdef WITH_MPI
 #include "utils/mpi_log_attributes.hh"
@@ -63,4 +69,4 @@ void init_file_logger(const std::string& log_dir)
         logging::keywords::format = "[%TimeStamp%] [T=%ThreadID%] %Severity%: %Message%");
 #endif
 }
-}
+} // namespace labw::art_modern

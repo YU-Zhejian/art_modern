@@ -17,9 +17,9 @@ const static std::string ALN_GAP_STR = "-";
  */
 constexpr am_qual_t MAX_QUAL = 40;
 constexpr am_qual_t MIN_QUAL = 0;
-constexpr int K_SIZE = 1 << 10;
-constexpr int M_SIZE = K_SIZE * K_SIZE;
-constexpr int G_SIZE = M_SIZE * K_SIZE;
+constexpr int K_SIZE = 1U << 10U;
+constexpr int M_SIZE = 1U << 20U;
+constexpr int G_SIZE = 1U << 30U;
 
 constexpr char ART_VERSION[] = "2.5.8";
 
@@ -79,4 +79,4 @@ constexpr int CONSUME_QUERY = 0b01;
  *  BAM_CDEL, BAM_CREF_SKIP; Consume reference
  */
 constexpr int CONSUME_REFERENCE = 0b10;
-}
+} // namespace labw::art_modern

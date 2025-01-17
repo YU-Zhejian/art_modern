@@ -1,21 +1,34 @@
-#include "ArtCmdOpts.hh"
+#include "art/ArtCmdOpts.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/ArtParams.hh"
+#include "art/Empdist.hh"
+
 #include <boost/algorithm/string/join.hpp>
 #include <boost/algorithm/string/predicate.hpp>
-#include <boost/filesystem.hpp>
+#include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/program_options.hpp>
+
+#include <htslib/faidx.h>
+
 #include <cmath>
+#include <cstddef>
+#include <cstdlib>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <vector>
 
-#include "ArtConstants.hh"
 #include "CExceptionsProxy.hh"
 #include "art_modern_constants.hh"
-#include "fasta/InMemoryFastaFetch.hh"
-#include "fasta/Pbsim3TranscriptBatcher.hh"
+
+#include "ds/CoverageInfo.hh"
+
 #include "out/OutputDispatcher.hh"
+
 #include "utils/fs_utils.hh"
 #include "utils/mpi_utils.hh"
 #include "utils/param_utils.hh"
@@ -316,9 +329,9 @@ Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2,
 {
     validate_min_max_qual(min_qual, max_qual);
     validate_qual_files(qual_file_1, qual_file_2, art_lib_const_mode);
-    auto qdist = Empdist(qual_file_1, qual_file_2, sep_flag, read_len, art_lib_const_mode != ART_LIB_CONST_MODE::SE);
-    size_t r1_profile_size;
-    size_t r2_profile_size;
+    auto qdist = Empdist(qual_file_1, qual_file_2, sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
+    size_t r1_profile_size = 0;
+    size_t r2_profile_size = 0;
     if (sep_flag) {
         r1_profile_size = qdist.a_qual_dist_first.size();
         r2_profile_size = qdist.a_qual_dist_second.size();

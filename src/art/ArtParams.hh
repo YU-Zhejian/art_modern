@@ -1,14 +1,17 @@
 #pragma once
-#include "ArtConstants.hh"
-#include "Empdist.hh"
-#include "art_modern_constants.hh"
-#include "fasta/CoverageInfo.hh"
-#include "out/BaseReadOutput.hh"
-#include <array>
-#include <boost/program_options.hpp>
+#include "art/ArtConstants.hh"
+#include "art/Empdist.hh"
 
+#include "art_modern_constants.hh"
+#include "ds/CoverageInfo.hh"
+
+#include <array>
 #include <string>
 #include <vector>
+
+#include <boost/program_options.hpp>
+
+#include <htslib/hts.h>
 
 namespace labw::art_modern {
 

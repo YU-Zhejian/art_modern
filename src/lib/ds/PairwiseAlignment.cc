@@ -1,11 +1,22 @@
-#include "PairwiseAlignment.hh"
-#include "art_modern_config.h" // For CEU_CM_IS_DEBUG
+#include "ds/PairwiseAlignment.hh"
+
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 #include "art_modern_constants.hh"
+#include "art_modern_dtypes.hh"
 
 #include <boost/algorithm/string/erase.hpp>
-#include <htslib/sam.h>
+
+#include <array>
+#include <cstddef>
+#include <cstdio>
+#include <ostream>
 #include <sstream>
+#include <string>
 #include <utility>
+#include <vector>
+
+#include "htslib/hts.h"
+#include "htslib/sam.h"
 
 namespace labw::art_modern {
 PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
@@ -116,4 +127,4 @@ PWAException::PWAException(const char* msg)
 }
 
 const char* PWAException::what() const noexcept { return msg; }
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

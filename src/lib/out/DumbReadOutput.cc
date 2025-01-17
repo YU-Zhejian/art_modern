@@ -1,4 +1,6 @@
-#include "DumbReadOutput.hh"
+#include "out/DumbReadOutput.hh"
+
+#include "ds/PairwiseAlignment.hh"
 
 namespace labw::art_modern {
 void DumbReadOutput::close()
@@ -6,15 +8,15 @@ void DumbReadOutput::close()
     // Do nothing!
 }
 DumbReadOutput::~DumbReadOutput() { DumbReadOutput::close(); }
-void DumbReadOutput::writePE(const PairwiseAlignment&, const PairwiseAlignment&)
+void DumbReadOutput::writePE([[maybe_unused]] const PairwiseAlignment&, [[maybe_unused]] const PairwiseAlignment&)
 {
     // Do nothing!
 }
-void DumbReadOutput::writeSE(const PairwiseAlignment&)
+void DumbReadOutput::writeSE([[maybe_unused]] const PairwiseAlignment&)
 {
     // Do nothing!
 }
 DumbReadOutput::DumbReadOutput() = default;
 
-} // art_modern
+} // namespace labw::art_modern
 // labw

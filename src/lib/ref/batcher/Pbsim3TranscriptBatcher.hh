@@ -1,6 +1,6 @@
 #pragma once
-#include "fasta/CoverageInfo.hh"
-#include "fasta/InMemoryFastaFetch.hh"
+#include "ds/CoverageInfo.hh"
+#include "ref/fetch/InMemoryFastaFetch.hh"
 #include <mutex>
 #include <sstream>
 #include <string>

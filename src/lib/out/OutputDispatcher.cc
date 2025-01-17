@@ -1,8 +1,9 @@
-#include "OutputDispatcher.hh"
-#include "BamReadOutput.hh"
-#include "FastqReadOutput.hh"
-#include "HeadlessBamReadOutput.hh"
-#include "PwaReadOutput.hh"
+#include "out/OutputDispatcher.hh"
+#include "out/BamReadOutput.hh"
+#include "out/FastqReadOutput.hh"
+#include "out/HeadlessBamReadOutput.hh"
+#include "out/PwaReadOutput.hh"
+
 #include <boost/log/trivial.hpp>
 
 namespace labw::art_modern {

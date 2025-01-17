@@ -1,6 +1,6 @@
 #pragma once
-#include <boost/exception/all.hpp>
-#include <boost/stacktrace.hpp>
+#include <boost/exception/all.hpp> // NOLINT
+#include <boost/stacktrace/stacktrace.hpp>
 
 namespace labw::art_modern {
 template <class E> [[noreturn]] void throw_with_trace(const E& e)

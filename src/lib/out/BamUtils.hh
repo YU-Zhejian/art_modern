@@ -1,12 +1,19 @@
 #pragma once
-#include "LockFreeIO.hh"
-#include "PairwiseAlignment.hh"
-#include "SamOptions.hh"
-#include "art_modern_dtypes.hh"
-#include <htslib/sam.h>
-#include <memory>
 
+#include "art_modern_dtypes.hh"
+#include "ds/PairwiseAlignment.hh"
+#include "lockfree/LockFreeIO.hh"
+#include "out/SamOptions.hh"
+
+#include <htslib/sam.h>
+
+#include <cstddef>
+#include <cstdint>
+#include <memory>
 #include <string>
+#include <tuple>
+#include <utility>
+#include <vector>
 
 namespace labw::art_modern {
 

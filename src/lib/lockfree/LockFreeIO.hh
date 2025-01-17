@@ -1,12 +1,18 @@
 #pragma once
-
 #include "art_modern_config.h" // For USE_ASIO_PARALLEL
+#include "art_modern_constants.hh" // For USE_ASIO_PARALLEL
+
 #include <boost/log/trivial.hpp>
+
 #ifdef USE_ASIO_PARALLEL
-#include <concurrentqueue.h>
+#include "concurrentqueue.h"
 #endif
+
+#include <array>
 #include <atomic>
-#include <mutex>
+#include <chrono>
+#include <cstddef>
+#include <mutex> // NOLINT
 #include <thread>
 
 namespace labw::art_modern {
@@ -14,8 +20,8 @@ namespace labw::art_modern {
 #ifdef USE_ASIO_PARALLEL
 template <typename T> class LockFreeIO {
 public:
-    static const int QUEUE_SIZE = 1 << 20;
-    static const int BULK_SIZE = 1 << 10;
+    static const int QUEUE_SIZE = M_SIZE;
+    static const int BULK_SIZE = K_SIZE;
     LockFreeIO()
         : queue_(QUEUE_SIZE)
     {
@@ -109,4 +115,4 @@ private:
     std::mutex mutex_;
 };
 #endif
-}
+} // namespace labw::art_modern

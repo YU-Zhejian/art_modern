@@ -1,9 +1,15 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
-#include "BaseReadOutput.hh"
+#include "ds/PairwiseAlignment.hh"
+#include "out/BaseReadOutput.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+
+#include <boost/program_options/options_description.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 namespace labw::art_modern {
 
@@ -33,7 +39,7 @@ private:
 
 class OutputDispatcherFactory : public BaseReadOutputFactory {
 public:
-    const std::string name() const override { return "OD"; }
+    [[nodiscard]] const std::string name() const override { return "OD"; }
     void add(std::shared_ptr<BaseReadOutputFactory> factory);
     void patch_options(boost::program_options::options_description& desc) const override;
     BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
@@ -45,4 +51,4 @@ private:
 };
 
 OutputDispatcherFactory get_output_dispatcher_factory() noexcept;
-}
+} // namespace labw::art_modern

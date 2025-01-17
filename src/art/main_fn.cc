@@ -1,17 +1,30 @@
 #include "art_modern_config.h"
-#include <boost/filesystem.hpp>
-#include <boost/log/trivial.hpp>
-#include <fstream>
-#include <iostream>
 
-#include "ArtConstants.hh"
-#include "ArtJobPool.hh"
-#include "fasta/FaidxFetch.hh"
-#include "fasta/FastaStreamBatcher.hh"
-#include "fasta/Pbsim3TranscriptBatcher.hh"
-#include "main_fn.hh"
+#include "art/main_fn.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/ArtJobExecutor.hh"
+#include "art/ArtJobPool.hh"
+#include "art/ArtParams.hh"
+
+#include <boost/log/trivial.hpp>
+
+#include <fstream>
+#include <limits>
+#include <memory>
+#include <stdexcept>
+#include <utility>
+
+#include "art_modern_constants.hh"
+#include "jobs/SimulationJob.hh"
+#include "out/BaseReadOutput.hh"
 #include "out/OutputDispatcher.hh"
-#include "utils/profile_utils.hh"
+#include "ref/batcher/FastaStreamBatcher.hh"
+#include "ref/batcher/InMemoryFastaBatcher.hh"
+#include "ref/batcher/Pbsim3TranscriptBatcher.hh"
+#include "ref/fetch/BaseFastaFetch.hh"
+#include "ref/fetch/FaidxFetch.hh"
+#include "ref/fetch/InMemoryFastaFetch.hh"
 
 namespace labw::art_modern {
 
@@ -35,7 +48,7 @@ void generate_wgs(const ArtParams& art_params)
     // Coverage-based parallelism
     const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
 
-    BaseFastaFetch* fetch;
+    BaseFastaFetch* fetch = nullptr;
     if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
         fetch = new InMemoryFastaFetch(art_params.input_file_name);
     } else {
@@ -77,7 +90,7 @@ void generate_all(const ArtParams& art_params)
             auto const& coverage_info = art_params.coverage_info;
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 InMemoryFastaFetch fetch(art_params.input_file_name);
-                InMemoryFastaStreamBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), fetch);
+                InMemoryFastaBatcher fsb(static_cast<int>(fetch.num_seqs() / art_params.parallel + 1), fetch);
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fetch, art_params.args);
                 while (true) {
                     auto fa_view = fsb.fetch();
@@ -114,7 +127,7 @@ void generate_all(const ArtParams& art_params)
                 input_file_stream.close();
                 out_dispatcher = out_dispatcher_factory.create(art_params.vm, &fasta_fetch, art_params.args);
 
-                InMemoryFastaStreamBatcher fsb(
+                InMemoryFastaBatcher fsb(
                     static_cast<int>(fasta_fetch.num_seqs() / art_params.parallel + 1), fasta_fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();

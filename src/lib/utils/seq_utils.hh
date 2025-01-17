@@ -1,7 +1,7 @@
 #pragma once
 #include "art_modern_dtypes.hh"
 
-#include <cstdint>
+#include <cstddef>
 #include <sstream>
 #include <string>
 #include <vector>
