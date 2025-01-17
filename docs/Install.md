@@ -4,19 +4,36 @@
 
 This project requires a working C++ compiler that supports C++17 (due to the introduction of Google ProtoBuff library) and a working C compiler that supports C11 (for bundled HTSLib).
 
-The following compilers are tested and supported:
+### [GCC](https://gcc.gnu.org/)
 
-- [GCC](https://gcc.gnu.org/): The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
-  - See [here](https://gcc.gnu.org/projects/cxx-status.html#cxx17) for support over C++17 in GCC.
-- [Clang](https://clang.llvm.org/): Another popular compiler for GNU/Linux. Also, the default C++ compiler for FreeBSD and Apple macOS.
-  - See [here](https://clang.llvm.org/cxx_status.html#cxx17) for support over C++17 in Clang.
-- [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html): For accelerated binaries on Intel CPUs.
+The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
+
+- The minimal version of GCC required should be GCC 7, although not tested.
+- Reference: Minimal GCC version that supports [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
+
+### [Clang](https://clang.llvm.org/)
+
+Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple macOS.
+
+- The minimal version of Clang tested is Clang 10.0.0.
+- However, earlier Clang versions may be supported with ealier operating systems, GCC, and Boost library.
+- Reference: Minimal Clang version that supports [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
+
+### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)
+
+For accelerated binaries on Intel CPUs.
+
+### Others
 
 Although not tested, the following compilers can also theoretically be of use:
 
-- Intel C++ Compiler Classic (ICC).
+- Intel C++ Compiler Classic (ICC) **MAY** work with legacy systems and Boost libraries.
 - [NVidia HPC compilers](https://developer.nvidia.com/hpc-compilers).
+  - All versions of this compiler support C++17.
 - [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html).
+  - All (>=3.2.0) versions of this compiler support C++17. Specifcically,
+    - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
+    - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
 
 See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC for example) supports C++17 using:
 
@@ -24,7 +41,7 @@ See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum comp
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-If there's no error, the compiler is supported.
+If there's no error, the compiler is supported. You may also test your compiler using [`MericLuc/Cpp17-Features-tests`](https://github.com/MericLuc/Cpp17-Features-tests/) or other C++17 test suites.
 
 ## Using CMake Building System
 
@@ -131,3 +148,37 @@ The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
+
+## Appendix
+
+Tested compilers:
+
+- On my x86\_64 6.8.0-51-generic (GCC 13.3.0-6ubuntu2~24.04) Linux Mint 12:
+  - Clang 5.X.X (due to GCC14 libstdc++),, 6.X.X (due to GCC14 libstdc++),, 7.X.X (due to GCC14 libstdc++), 8.X.X (due to `boost::math`), and 9.X.X (due to `boost::math`) from LLVM website were tested **NOT** work with my GCC 14.2.0 and Boost 1.83.0 (which were compiled with GCC ABI) from the distribution.
+  - Clang 10.0.0 from LLVM website works.
+  - Clang 11.1.0-6 from the distribution works.
+  - GCC 9.5.0-6ubuntu2 from the distribution works.
+  - Intel C++ compiler classic (`icc`, `icpc`) 2021.1.1 and 2023.2.4 do **NOT** work.
+
+Test script for Clang 10.0.0 from LLVM website:
+
+```shell
+CLANG_TARNAME="clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04"
+CLANG_DIR="${HOME}/opt/${CLANG_TARNAME}/"
+
+env -C "${HOME}/opt/" wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/${CLANG_TARNAME}.tar.xz
+env -C "${HOME}/opt/" tar xvJf "${CLANG_TARNAME}.tar.xz"
+
+make clean release \
+    PATH="${CLANG_DIR}/bin/:${PATH}" \
+    CMAKE_FLAGS="-DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang"
+```
+
+Test script for ICC 2023.2.4, its latest release:
+
+```shell
+. /opt/intel/oneapi/compiler/2023.2.4/env/vars.sh
+make clean release \
+    PATH="${CLANG_DIR}/bin/:${PATH}" \
+    CMAKE_FLAGS="-DCMAKE_CXX_COMPILER=icpc -DCMAKE_C_COMPILER=icc"
+```

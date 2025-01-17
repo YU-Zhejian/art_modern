@@ -1,10 +1,9 @@
-#include "art_modern_dtypes.hh"
-#include "utils/seq_utils.hh"
-#include <algorithm>
+#include "libam/Dtypes.hh"
+#include "libam/utils/seq_utils.hh"
+
 #include <chrono>
 #include <iostream>
 #include <random>
-#include <string>
 #include <vector>
 
 using namespace labw::art_modern;

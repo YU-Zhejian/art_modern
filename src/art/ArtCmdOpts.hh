@@ -11,5 +11,4 @@ namespace labw::art_modern {
  */
 ArtParams parse_args(int argc, char** argv);
 
-} // art_modern
-// labw
+} // namespace labw::art_modern

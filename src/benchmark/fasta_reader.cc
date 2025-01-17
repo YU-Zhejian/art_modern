@@ -1,6 +1,6 @@
-#include "ref/fetch/BaseFastaFetch.hh"
-#include "ref/fetch/FaidxFetch.hh"
-#include "ref/fetch/InMemoryFastaFetch.hh"
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+#include "libam/ref/fetch/FaidxFetch.hh"
+#include "libam/ref/fetch/InMemoryFastaFetch.hh"
 
 #include <htslib/hts.h>
 
@@ -12,7 +12,7 @@
 #include <tuple>
 #include <vector>
 
-using namespace labw::art_modern;
+using namespace labw::art_modern; // NOLINT
 
 void bench_ff(BaseFastaFetch* ff, const std::string& name)
 {

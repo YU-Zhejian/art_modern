@@ -1,22 +1,30 @@
-#include "ds/PyQueue.hh"
+#include "libam/ds/PyQueue.hh"
+
+#include <boost/lockfree/queue.hpp> // NOLINT
+
+#include <concurrentqueue.h>
+
 #include <array>
-#include <boost/lockfree/queue.hpp>
 #include <chrono>
 #include <climits>
-#include <concurrentqueue.h>
+#include <cstddef>
+#include <cstdlib>
 #include <iostream>
+#include <mutex>
 #include <random>
+#include <string>
 #include <thread>
+#include <utility>
 #include <vector>
 
-#define VERBOSE_IO 0
+#define VERBOSE_IO 0 // NOLINT
 
-using namespace labw::art_modern;
+using namespace labw::art_modern; // NOLINT
 
-constexpr std::size_t data_len = (1 << 10);
-constexpr std::size_t queue_size = (1 << 10);
-constexpr std::size_t nitems = 1 << 15;
-constexpr std::size_t bulk_size = (1 << 5);
+constexpr std::size_t data_len = 1U << 10U;
+constexpr std::size_t queue_size = 1U << 10U;
+constexpr std::size_t nitems = 1U << 15U;
+constexpr std::size_t bulk_size = 1U << 5U;
 constexpr std::size_t nthreads = 40;
 
 std::mutex iolock;

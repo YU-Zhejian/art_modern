@@ -3,13 +3,13 @@
 #include "art/ArtRead.hh"
 #include "art/random_generator.hh"
 
+#include "libam/Constants.hh"
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+
 #include <htslib/hts.h>
 
 #include <cstddef>
 #include <utility>
-
-#include "art_modern_constants.hh"
-#include "ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 
@@ -22,7 +22,6 @@ namespace labw::art_modern {
                                <-----------|
  * @endcode
  * @param is_plus_strand
- * @param probs_indel
  * @param read_1
  */
 void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)

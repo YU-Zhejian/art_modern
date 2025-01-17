@@ -150,8 +150,6 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Information
         ceu_cm_global_enhanced_check_compiler_flag(-Ofast -O3 -O2)
         ceu_cm_global_enhanced_check_compiler_flag(-g)
-        ceu_cm_global_enhanced_check_compiler_flag(-qopt-report -vec-report /Qvec-report)
-        ceu_cm_global_enhanced_check_compiler_flag(-fdump-tree-vect-details)
     else() # Debug, the default.
         # ceu_cm_global_enhanced_check_compiler_flag(-fsanitize=address)
         ceu_cm_global_enhanced_check_compiler_flag(-Wall)
@@ -203,14 +201,14 @@ if(NOT DEFINED ENV{CEU_CM_DEBUG_BANNER_SHOWN})
     if(DEFINED CMAKE_C_COMPILER)
         message(
             STATUS
-                "|CMAKE_C_COMPILER=${CMAKE_C_COMPILER} (${CMAKE_C_COMPILER_ABI}) ver. ${CMAKE_C_COMPILER_VERSION} std. ${CMAKE_C_STANDARD}"
+                "|CMAKE_C_COMPILER=${CMAKE_C_COMPILER} (${CMAKE_C_COMPILER_ID}|${CMAKE_C_COMPILER_ABI}) ver. ${CMAKE_C_COMPILER_VERSION} std. ${CMAKE_C_STANDARD}"
         )
         message(STATUS "|CMAKE_C_LINK_EXECUTABLE=${CMAKE_C_LINK_EXECUTABLE}")
     endif()
     if(DEFINED CMAKE_CXX_COMPILER)
         message(
             STATUS
-                "|CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ABI}) ver. ${CMAKE_CXX_COMPILER_VERSION} std. ${CMAKE_CXX_STANDARD}"
+                "|CMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID}|${CMAKE_CXX_COMPILER_ABI}) ver. ${CMAKE_CXX_COMPILER_VERSION} std. ${CMAKE_CXX_STANDARD}"
         )
         message(STATUS "|CMAKE_CXX_LINK_EXECUTABLE=${CMAKE_CXX_LINK_EXECUTABLE}")
     endif()

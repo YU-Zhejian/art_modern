@@ -27,7 +27,7 @@ private:
     std::mutex mutex_;
 #endif
     std::vector<std::shared_ptr<ArtJobExecutor>> ajes_;
-    int pool_size_ = 1;
+    std::size_t pool_size_ = 1;
 };
 
-}
+} // namespace labw::art_modern

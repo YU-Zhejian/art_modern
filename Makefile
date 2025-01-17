@@ -1,11 +1,15 @@
+CMAKE_FLAGS ?= 
+
+
 .PHONY: build
 build:
 	mkdir -p opt/build_debug
 	env -C opt/build_debug cmake \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		-G Ninja $(CURDIR)
-	env -C opt/build_debug ninja -j40
+		$(CMAKE_FLAGS) \
+		$(CURDIR)
+	cmake --build opt/build_debug -j40
 	env -C opt/build_debug ctest --output-on-failure
 	opt/build_debug/art_modern --help
 	opt/build_debug/art_modern --version # mpiexec --verbose -n 5 
@@ -13,7 +17,11 @@ build:
 .PHONY: release
 release:
 	mkdir -p opt/build_release
-	env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release $(CURDIR)
+	env -C opt/build_release cmake \
+		-DCMAKE_BUILD_TYPE=Release \
+		-DCEU_CM_SHOULD_USE_NATIVE=ON \
+		$(CMAKE_FLAGS) \
+		$(CURDIR)
 	cmake --build opt/build_release -j40
 
 .PHONY: rel_with_dbg_alpine
@@ -24,7 +32,9 @@ rel_with_dbg_alpine:
 		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
 		-DBUILD_SHARED_LIBS=OFF \
-		-G Ninja $(CURDIR)
+		-G Ninja $(CURDIR) \
+		-DCMAKE_C_COMPILER=$(CC) \
+		-DCMAKE_CXX_COMPILER=$(CXX)
 	cmake --build opt/build_rel_with_dbg_alpine -j40
 
 .PHONY: fmt
