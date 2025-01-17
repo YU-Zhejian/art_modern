@@ -7,7 +7,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.0.0)
+    VERSION 1.0.1)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
@@ -64,12 +64,12 @@ endif()
 configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in"
                "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
 
-include_directories("${CMAKE_CURRENT_LIST_DIR}/src/lib")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 include_directories("${CMAKE_BINARY_DIR}/include/")
 include_directories(${env.INCLUDE})
 include_directories(${CMAKE_INCLUDE_PATH})
 
-file(GLOB ART_MODERN_LIB_SOURCE "src/lib/*.cc" "src/lib/*/*.cc")
+file(GLOB ART_MODERN_LIB_SOURCE "src/libam/*.cc" "src/libam/*/*/*.cc" "src/libam/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
 
 file(GLOB ART_SOURCE "src/art/*.cc")

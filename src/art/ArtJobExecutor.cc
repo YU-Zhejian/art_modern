@@ -1,21 +1,34 @@
-#include "ArtJobExecutor.hh"
-#include "ArtConstants.hh"
-#include "ArtContig.hh"
-#include "utils/mpi_utils.hh"
-#include <atomic>
+#include "art/ArtJobExecutor.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/ArtContig.hh"
+#include "art/ArtRead.hh"
+
+#include "libam/Constants.hh"
+#include "libam/Dtypes.hh"
+#include "libam/utils/mpi_utils.hh"
+
 #include <boost/log/trivial.hpp>
-#include <boost/timer/progress_display.hpp>
+
+#include <htslib/hts.h>
+
+#include <algorithm>
+#include <atomic>
+#include <cstddef>
+#include <sstream>
+#include <string>
+#include <utility>
 
 namespace labw::art_modern {
 
-void ArtJobExecutor::generate(const long targeted_num_reads, const bool is_positive, ArtContig& art_contig)
+void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig)
 {
     int num_cont_fail = 0;
-    const auto max_tolerance
-        = std::max(5L, static_cast<long>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
-    bool retv;
-    long remaining_num_reads = targeted_num_reads;
-    long current_num_reads = 0;
+    const auto max_tolerance = std::max(
+        5L, static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
+    bool retv = false;
+    am_readnum_t remaining_num_reads = targeted_num_reads;
+    am_readnum_t current_num_reads = 0;
     while (remaining_num_reads > 0) {
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             retv = generate_se(art_contig, is_positive, current_num_reads);
@@ -127,8 +140,8 @@ void ArtJobExecutor::operator()()
         const auto cov_pos = job_.coverage_info.coverage_positive(contig_name);
         const auto cov_neg = job_.coverage_info.coverage_negative(contig_name);
 
-        const auto num_pos_reads = static_cast<long>(cov_pos * cov_ratio);
-        const auto num_neg_reads = static_cast<long>(cov_neg * cov_ratio);
+        const auto num_pos_reads = static_cast<am_readnum_t>(cov_pos * cov_ratio);
+        const auto num_neg_reads = static_cast<am_readnum_t>(cov_neg * cov_ratio);
 
         if (num_pos_reads + num_neg_reads == 0) {
             BOOST_LOG_TRIVIAL(debug) << "No read will be generated for the reference sequence " << contig_name
@@ -161,5 +174,4 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }
 
-ArtJobExecutor::~ArtJobExecutor() = default;
-}
+} // namespace labw::art_modern

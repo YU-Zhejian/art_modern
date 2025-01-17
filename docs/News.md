@@ -28,3 +28,10 @@ Changes in software implementation:
 - [X] Largely eliminated POSIX-only routines by Boost.
 - [X] Argument parser implemented in Boost.
 - [X] Output writers were made asynchronous using `moodycamel::ConcurrentQueue<T>`.
+
+## 1.0.1
+
+Fixed miscelaneous bugs.
+
+- Further fixed issue #2.
+- More compiler versions tested; The software now supports Clang 10.0.0+, GCC 9.5.0+, and AOCC 3.2.0+.

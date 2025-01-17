@@ -3,12 +3,16 @@ include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_c_helloworld.cmake")
+add_compile_options("-pthread")
+add_link_options("-pthread")
 
 ceu_cm_enhanced_try_run(
         VARNAME
         C_NO_LIBPTHREAD
         SRC_PATH
         "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+        LINK_FLAGS
+        "-pthread"
         DEPENDS
         C_HELLOWORLD
 )
@@ -18,6 +22,8 @@ ceu_cm_enhanced_try_run(
         C_NO_LIBPTHREAD
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+        LINK_FLAGS
+        "-pthread"
     DEPENDS
     C_HELLOWORLD
 )
@@ -39,6 +45,8 @@ ceu_cm_enhanced_try_run(
     C_HELLOWORLD
     LINK_LIBRARIES
     "${LIBPTHREAD_LIBRARY_SHARED}"
+        LINK_FLAGS
+        "-pthread"
 )
 ceu_cm_enhanced_try_run(
     STATIC
@@ -49,7 +57,10 @@ ceu_cm_enhanced_try_run(
     DEPENDS
     C_HELLOWORLD
     LINK_LIBRARIES
-    "${LIBPTHREAD_LIBRARY_STATIC}")
+    "${LIBPTHREAD_LIBRARY_STATIC}"
+        LINK_FLAGS
+        "-pthread"
+)
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
         ON

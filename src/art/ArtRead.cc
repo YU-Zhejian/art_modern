@@ -1,9 +1,18 @@
-#include "ArtRead.hh"
-#include "art_modern_config.h" // For CEU_IS_DEBUG
-#include "art_modern_constants.hh"
-#include "random_generator.hh"
+#include "art/ArtRead.hh"
 
-using namespace std;
+#include "art/random_generator.hh"
+
+#include "art_modern_config.h" // NOLINT: For CEU_IS_DEBUG
+#include "libam/Constants.hh"
+#include "libam/ds/PairwiseAlignment.hh"
+#include "libam/utils/seq_utils.hh"
+
+#include <htslib/hts.h>
+
+#include <algorithm>
+#include <cstddef>
+#include <cstring>
+#include <utility>
 
 namespace labw::art_modern {
 
@@ -15,7 +24,7 @@ void ArtRead::generate_pairwise_aln()
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
-    std::size_t num_match;
+    std::size_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
@@ -81,7 +90,7 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read)
     } else {
         art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
     }
-    char achar;
+    char achar = 0;
     rprob_.r_probs();
     for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
         if (seq_read_[i] == 'N') {
@@ -103,9 +112,9 @@ int ArtRead::generate_indels(const bool is_read_1)
     indel_.clear();
     int ins_len = 0;
     int del_len = 0;
-    int i;
-    int j;
-    int pos;
+    int i = 0;
+    int j = 0;
+    int pos = 0;
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
     // deletion
@@ -150,7 +159,7 @@ int ArtRead::generate_indels_2(const bool is_read_1)
     indel_.clear();
     int ins_len = 0;
     int del_len = 0;
-    int pos;
+    int pos = 0;
     const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
@@ -213,7 +222,7 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
-    std::size_t num_match;
+    std::size_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
@@ -297,4 +306,4 @@ error:
     return false; // FIXME: No idea why this occurs.
 }
 
-} // namespace labw::art_modern; // namespace labw
+} // namespace labw::art_modern

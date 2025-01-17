@@ -1,4 +1,14 @@
-#include "ArtJobPool.hh"
+#include "art/ArtJobPool.hh"
+
+#include "art/ArtJobExecutor.hh"
+#include "art/ArtParams.hh"
+
+#include <boost/asio/post.hpp>
+
+#include <chrono>
+#include <cstddef>
+#include <memory>
+#include <mutex>
 #include <thread>
 
 namespace labw::art_modern {
@@ -48,4 +58,4 @@ std::size_t ArtJobPool::n_running_ajes()
     }
     return n_running;
 }
-}
+} // namespace labw::art_modern

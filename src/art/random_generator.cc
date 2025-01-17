@@ -1,22 +1,26 @@
-#include "random_generator.hh"
-#include "ArtConstants.hh"
+#include "art/random_generator.hh"
 
-#include <algorithm>
-#include <chrono>
-#include <thread>
-#include <vector>
+#include "art/ArtConstants.hh"
 
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
 #endif
 
+#include <algorithm> // NOLINT
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <random> // NOLINT
+#include <thread>
+#include <vector>
+
 namespace labw::art_modern {
 
-long Rprob::seed()
+uint64_t Rprob::seed()
 {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
                .count()
-        * static_cast<long>(std::hash<std::thread::id>()(std::this_thread::get_id()));
+        * static_cast<uint64_t>(std::hash<std::thread::id>()(std::this_thread::get_id()));
 }
 
 void Rprob::public_init_()
@@ -54,7 +58,7 @@ void Rprob::rand_quality()
     std::generate_n(tmp_qual_dists_.begin(), read_length_, [this]() { return quality_(gen_); });
 }
 
-void Rprob::r_probs(int n)
+void Rprob::r_probs(const std::size_t n)
 {
     std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
@@ -84,7 +88,7 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
 
 double Rprob::r_prob() { return dis_(gen_); }
 
-void Rprob::r_probs(int n)
+void Rprob::r_probs(const std::size_t n)
 {
     std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
@@ -123,7 +127,10 @@ double Rprob::r_prob()
     return result;
 }
 
-void Rprob::r_probs(int n) { vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, n, tmp_probs_.data(), 0.0, 1.0); }
+void Rprob::r_probs(const std::size_t n)
+{
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, n, tmp_probs_.data(), 0.0, 1.0);
+}
 
 int Rprob::insertion_length()
 {
@@ -185,7 +192,7 @@ Rprob::~Rprob() { gsl_rng_free(r); }
 
 double Rprob::r_prob() { return gsl_rng_uniform(r); }
 
-void Rprob::r_probs(int n)
+void Rprob::r_probs(const std::size_t n)
 {
     std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
 }
@@ -214,4 +221,4 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
 
 int Rprob::randint(int min, int max) { return static_cast<int>(gsl_rng_uniform_int(r, max - min) + min); }
 #endif
-}
+} // namespace labw::art_modern

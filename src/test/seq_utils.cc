@@ -1,11 +1,13 @@
-#define BOOST_TEST_MODULE test_seq_utils
+#define BOOST_TEST_MODULE test_seq_utils // NOLINT
+
+#include "libam/utils/seq_utils.hh"
+#include "libam/ds/PairwiseAlignment.hh"
+
 #include <boost/test/unit_test.hpp>
+
 #include <htslib/sam.h>
 
-#include "PairwiseAlignment.hh"
-#include "utils/seq_utils.hh"
-
-using namespace labw::art_modern;
+using namespace labw::art_modern; // NOLINT
 
 BOOST_AUTO_TEST_CASE(test_seq_utils_1)
 {

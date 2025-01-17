@@ -1,6 +1,16 @@
-#include "ArtContig.hh"
-#include "art_modern_constants.hh"
-#include "random_generator.hh"
+#include "art/ArtContig.hh"
+
+#include "art/ArtRead.hh"
+#include "art/random_generator.hh"
+
+#include "libam/Constants.hh"
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+
+#include <htslib/hts.h>
+
+#include <cstddef>
+#include <utility>
+
 namespace labw::art_modern {
 
 /**
@@ -12,7 +22,6 @@ namespace labw::art_modern {
                                <-----------|
  * @endcode
  * @param is_plus_strand
- * @param probs_indel
  * @param read_1
  */
 void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
@@ -89,7 +98,7 @@ ArtContig::ArtContig(BaseFastaFetch* fasta_fetch, const size_t seq_id, const Art
 }
 hts_pos_t ArtContig::generate_fragment_length() const
 {
-    hts_pos_t fragment_len;
+    hts_pos_t fragment_len = 0;
     if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         || art_params_.pe_dist_mean_minus_2_std > seq_size) {
         // when reference length < pe_frag_dist_mean-2*std, fragment_len sets to
@@ -104,4 +113,4 @@ hts_pos_t ArtContig::generate_fragment_length() const
     return fragment_len;
 }
 
-}
+} // namespace labw::art_modern

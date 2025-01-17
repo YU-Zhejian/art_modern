@@ -1,10 +1,11 @@
 #pragma once
-#include "ArtJobExecutor.hh"
+#include "art/ArtJobExecutor.hh"
 
 #if defined(USE_NOP_PARALLEL)
 #include <mutex>
 #elif defined(USE_ASIO_PARALLEL)
 #include <boost/asio.hpp>
+#include <mutex>
 #else
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_ASIO_PARALLEL"
 #endif
@@ -26,7 +27,7 @@ private:
     std::mutex mutex_;
 #endif
     std::vector<std::shared_ptr<ArtJobExecutor>> ajes_;
-    int pool_size_ = 1;
+    std::size_t pool_size_ = 1;
 };
 
-}
+} // namespace labw::art_modern

@@ -1,26 +1,41 @@
-#include "Empdist.hh"
-#include "ArtConstants.hh"
-#include "random_generator.hh"
-#include "utils/mpi_utils.hh"
+#include "art/Empdist.hh"
+
+#include "art/ArtConstants.hh"
+#include "art/random_generator.hh"
+
+#include "libam/Dtypes.hh"
+#include "libam/utils/mpi_utils.hh"
+
 #include <boost/log/trivial.hpp>
+
+#include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <fstream>
+#include <functional>
+#include <istream>
+#include <limits>
+#include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace labw::art_modern {
 
-void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
-{
-    for (auto& i : map_to_process) {
-        for (auto& [fst, snd] : i) {
-            snd += q_shift;
-            snd = std::min(std::max(snd, min_qual), max_qual);
+namespace {
+    void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
+    {
+        for (auto& i : map_to_process) {
+            for (auto& [fst, snd] : i) {
+                snd += q_shift;
+                snd = std::min(std::max(snd, min_qual), max_qual);
+            }
         }
     }
-}
+} // namespace
 
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
-    const bool is_pe, const bool read_len)
+    const bool is_pe, const std::size_t read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)
@@ -99,15 +114,15 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
 void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
 {
     int linenum = 0;
-    int read_pos;
-    char alt_read_pos;
-    char leading_base;
-    long t_uint;
+    int read_pos = 0;
+    char alt_read_pos = 0;
+    char leading_base = 0;
+    am_qual_dist_t t_uint = 0;
     std::string line;
-    int t_int;
+    int t_int = 0;
     std::vector<int> qual;
     std::map<int, int, std::less<>> dist;
-    std::vector<long> count;
+    std::vector<am_qual_dist_t> count;
     int qmin = std::numeric_limits<int>::max();
     int qmax = std::numeric_limits<int>::min();
 
@@ -117,8 +132,8 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             continue;
         }
         leading_base = line[0];
-        if (!((sep_qual_ && ART_ACGT_STR.find(leading_base) != std::string::npos)
-                || (!sep_qual_ && leading_base == '.'))) {
+        if ((!sep_qual_ || ART_ACGT_STR.find(leading_base) == std::string::npos)
+            && (sep_qual_ || leading_base != '.')) {
             continue;
         }
 
@@ -292,4 +307,4 @@ void Empdist::print_() const
     }
 }
 
-}
+} // namespace labw::art_modern

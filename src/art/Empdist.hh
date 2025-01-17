@@ -1,12 +1,15 @@
 #pragma once
-#include <array>
+
+#include "art/random_generator.hh"
+
+#include "libam/Dtypes.hh"
+
+#include <cstddef>
+#include <functional>
 #include <istream>
 #include <map>
 #include <string>
-#include <unordered_map>
 #include <vector>
-
-#include "random_generator.hh"
 
 namespace labw::art_modern {
 
@@ -26,8 +29,8 @@ public:
     dist_type g_qual_dist_second;
     dist_type c_qual_dist_second;
 
-    Empdist(
-        const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe, bool read_len);
+    Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe,
+        std::size_t read_len);
     void get_read_qual(std::vector<am_qual_t>& qual, int len, Rprob& rprob, bool first = true) const;
     void get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;
     void get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;
@@ -40,7 +43,7 @@ private:
     void print_() const;
     bool sep_qual_;
     bool is_pe_;
-    int read_len_;
+    std::size_t read_len_;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

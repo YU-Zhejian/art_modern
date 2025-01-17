@@ -11,6 +11,7 @@ uniprot*
 /.idea/*
 !/.idea/encodings.xml
 !/.idea/scopes/
+!/.idea/codeStyles/
 
 
 *.txt
@@ -116,3 +117,4 @@ Temporary Items
 .apdisk
 /config
 /deps/simde
+CMakeLists.txt.user

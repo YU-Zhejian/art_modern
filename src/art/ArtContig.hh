@@ -1,12 +1,15 @@
 #pragma once
 
-#include <set>
+#include <cstddef>
 #include <string>
 
-#include "ArtParams.hh"
-#include "ArtRead.hh"
-#include "fasta/BaseFastaFetch.hh"
-#include "random_generator.hh"
+#include <htslib/hts.h>
+
+#include "art/ArtParams.hh"
+#include "art/ArtRead.hh"
+#include "art/random_generator.hh"
+
+#include "libam/ref/fetch/BaseFastaFetch.hh"
 
 namespace labw::art_modern {
 
@@ -31,4 +34,4 @@ private:
     const hts_pos_t valid_region_;
 };
 
-} // namespace labw::art_modern // namespace labw
+} // namespace labw::art_modern

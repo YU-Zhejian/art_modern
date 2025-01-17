@@ -1,6 +1,8 @@
 ---
-Checks: 'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-cplusplus*,-bugprone-reserved-identifier'
+Checks: '*,-readability-identifier-length,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-llvmlibc-*,-cppcoreguidelines-avoid-magic-numbers,-llvm-header-guard,-readability-magic-numbers,-bugprone-easily-swappable-parameters,-modernize-use-trailing-return-type,-google-readability-namespace-comments,-*-avoid-c-arrays,-fuchsia-default-arguments-*,-performance-avoid-endl,-cert-err33-c,-altera-unroll-loops,-altera-id-dependent-backward-branch,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-non-private-member-variables-in-classes,-fuchsia-overloaded-operator,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-readability-avoid-unconditional-preprocessor-if,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-avoid-const-or-ref-data-members,-misc-non-private-member-variables-in-classes,-*-no-array-decay,-readability-function-cognitive-complexity,-readability-math-missing-parentheses,-abseil-*,-boost-*,-*vararg,-fuchsia-statically-constructed-objects,-cert-err58-cpp,-cppcoreguidelines-avoid-goto'
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit
 ...
+
+# /home/yuzj/Documents/pbsim3_modern/src/art/ArtJobExecutor.cc:114:1: warning: overloading 'operator()' is disallowed []
