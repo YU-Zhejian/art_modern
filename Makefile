@@ -5,6 +5,7 @@ CMAKE_FLAGS ?=
 build:
 	mkdir -p opt/build_debug
 	env -C opt/build_debug cmake \
+		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS) \
@@ -23,6 +24,7 @@ release:
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build opt/build_release -j40
+	# cpack --config opt/build_release/CPackSourceConfig.cmake
 
 .PHONY: rel_with_dbg_alpine
 rel_with_dbg_alpine:

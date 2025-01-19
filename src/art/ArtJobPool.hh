@@ -5,10 +5,14 @@
 #include <mutex>
 #elif defined(USE_ASIO_PARALLEL)
 #include <boost/asio.hpp>
-#include <mutex>
+#include <boost/asio/thread_pool.hpp> // NOLINT: Have to set this for Boost 1.65.1
+
 #else
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_ASIO_PARALLEL"
 #endif
+
+#include <cstddef>
+#include <mutex>
 
 namespace labw::art_modern {
 

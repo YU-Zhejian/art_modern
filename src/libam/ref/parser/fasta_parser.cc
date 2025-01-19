@@ -34,9 +34,9 @@ FastaRecord FastaIterator::next()
         }
         std::vector<std::string> parts;
         // TODO: Optimize this
-        split(parts, nextLine.substr(1), boost::is_any_of(" \t\f"));
+        split(parts, nextLine, boost::is_any_of(" \t\f"));
         if (!parts.empty()) {
-            next_record_id = parts[0];
+            next_record_id = parts[0].substr(1);
         } else {
             throw MalformedFastaException();
         }

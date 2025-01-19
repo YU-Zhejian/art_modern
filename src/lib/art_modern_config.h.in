@@ -20,6 +20,7 @@
 #cmakedefine WITH_MPI
 #cmakedefine WITH_GSL
 #cmakedefine WITH_ONEMKL
+#cmakedefine WITH_BOOST_STACKTRACE
 
 // Debug
 #cmakedefine CEU_CM_IS_DEBUG

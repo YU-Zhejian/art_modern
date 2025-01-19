@@ -3,6 +3,7 @@
 ## Performance
 
 - The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost::ASIO.
+- Boost::ASIO does not provide a thread pool in Boost 1.65.1. Consider refactor this using Eigen thread pool.
 - The massive use of `std::stringstream` should be replaced by `std::snprintf`, which is considerably faster and makes advantages of pre-allocated memory.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.

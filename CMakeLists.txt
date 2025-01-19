@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.10)
 
 if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
     cmake_policy(SET CMP0167 NEW)
@@ -23,6 +23,10 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
+if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
+    set(CEU_CM_SHOULD_USE_NATIVE OFF)
+endif()
+
 if(NOT DEFINED USE_THREAD_PARALLEL)
     set(USE_THREAD_PARALLEL ASIO)
 endif()
@@ -42,6 +46,7 @@ set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collection
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
+set(ART_MODERN_LINK_LIBS "")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
@@ -66,8 +71,12 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in"
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 include_directories("${CMAKE_BINARY_DIR}/include/")
-include_directories(${env.INCLUDE})
-include_directories(${CMAKE_INCLUDE_PATH})
+if(DEFINED env.INCLUDE)
+    include_directories(${env.INCLUDE})
+endif ()
+if(DEFINED CMAKE_INCLUDE_PATH)
+    include_directories(${CMAKE_INCLUDE_PATH})
+endif()
 
 file(GLOB ART_MODERN_LIB_SOURCE "src/libam/*.cc" "src/libam/*/*/*.cc" "src/libam/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
@@ -91,7 +100,7 @@ elseif(Boost_unit_test_framework_FOUND)
     file(GLOB ART_MODERN_TEST_SOURCES "src/test/*.cc")
 
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
-        get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WLE)
+        get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
         set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
         target_link_libraries("${ART_MODERN_TEST_EXEC}" art_modern_lib Boost::unit_test_framework)
@@ -105,7 +114,7 @@ if(CEU_CM_SHOULD_ENABLE_TEST)
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
-        get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WLE)
+        get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WE)
         set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
         add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
@@ -115,6 +124,8 @@ endif()
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
 
 # foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES}) get_filename_component(ART_MODERN_UTIL_EXEC
-# "${ART_MODERN_UTIL_SOURCE}" NAME_WLE) set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
+# "${ART_MODERN_UTIL_SOURCE}" NAME_WE) set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
 # add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}") target_link_libraries("${ART_MODERN_UTIL_EXEC}"
 # art_modern_lib) endforeach()
+
+# include(CPack)
