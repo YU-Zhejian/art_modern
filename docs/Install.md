@@ -1,29 +1,52 @@
 # Installing `art_modern`
 
-## Compiler
+## Operating System
+
+The project assumes x86\_64 (Intel, AMD, Zhaoxin, etc.) platforms. Other platform support is not guaranteed.
+
+The project assumes modern GNU/Linux. That is, GNU/Linux that is under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus).
+
+Other POSIX platforms like \*BSD, macOS, and patent UNIX theoretically supported but not tested. POSIX-on-Windows platforms like Cygwin, MSYS2, and MinGW are neither supported nor tested.
+
+## Compiler Infrastructure
 
 This project requires a working C++ compiler that supports C++17 (due to the introduction of Google ProtoBuff library) and a working C compiler that supports C11 (for bundled HTSLib).
+
+See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC for example) supports C++17 using:
+
+```shell
+echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
+```
+
+If there's no error, the compiler is supported. You may also test your compiler using [`MericLuc/Cpp17-Features-tests`](https://github.com/MericLuc/Cpp17-Features-tests/) or other C++17 test suites.
 
 ### [GCC](https://gcc.gnu.org/)
 
 The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
 
-- The minimal version of GCC required should be GCC 7, although not tested.
-- Reference: Minimal GCC version that supports [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
+- **NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library (libstdc++).
+- The minimal version of GCC tested is GCC 9.5.0.
+- Reference:
+  - GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
+  - libstdc++ support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
 
 ### [Clang](https://clang.llvm.org/)
 
 Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple macOS.
 
+- **NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
 - The minimal version of Clang tested is Clang 10.0.0.
-- However, earlier Clang versions may be supported with ealier operating systems, GCC, and Boost library.
-- Reference: Minimal Clang version that supports [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
+- However, earlier Clang versions may be supported with earlier operating systems, GCC, and Boost library.
+- Reference:
+  - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
+  - Libc++ support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of libstdc++ (GNU C++ Standard Library).
+  - [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
 
 ### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)
 
-For accelerated binaries on Intel CPUs.
+For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`).
 
-### Others
+### Other Compilers
 
 Although not tested, the following compilers can also theoretically be of use:
 
@@ -35,13 +58,11 @@ Although not tested, the following compilers can also theoretically be of use:
     - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
     - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
 
-See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC for example) supports C++17 using:
+### Essential Tools for Building
 
-```shell
-echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
-```
+You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. The latter may require additional CMake variables to be set.
 
-If there's no error, the compiler is supported. You may also test your compiler using [`MericLuc/Cpp17-Features-tests`](https://github.com/MericLuc/Cpp17-Features-tests/) or other C++17 test suites.
+For C library, this project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested.
 
 ## Using CMake Building System
 
@@ -154,7 +175,7 @@ The thread-level parallelism strategy.
 Tested compilers:
 
 - On my x86\_64 6.8.0-51-generic (GCC 13.3.0-6ubuntu2~24.04) Linux Mint 12:
-  - Clang 5.X.X (due to GCC14 libstdc++),, 6.X.X (due to GCC14 libstdc++),, 7.X.X (due to GCC14 libstdc++), 8.X.X (due to `boost::math`), and 9.X.X (due to `boost::math`) from LLVM website were tested **NOT** work with my GCC 14.2.0 and Boost 1.83.0 (which were compiled with GCC ABI) from the distribution.
+  - Clang 5.X.X (due to GCC14 libstdc++), 6.X.X (due to GCC14 libstdc++), 7.X.X (due to GCC14 libstdc++), 8.X.X (due to `boost::math`), and 9.X.X (due to `boost::math`) from LLVM website were tested **NOT** work with my GCC 14.2.0 and Boost 1.83.0 (which were compiled with GCC ABI) from the distribution.
   - Clang 10.0.0 from LLVM website works.
   - Clang 11.1.0-6 from the distribution works.
   - GCC 9.5.0-6ubuntu2 from the distribution works.

@@ -3,7 +3,7 @@
 #include "libam/utils/log_utils.hh"
 
 #ifdef WITH_MPI
-#include "utils/mpi_log_attributes.hh"
+#include "libam/utils/mpi_log_attributes.hh"
 #endif
 
 #include <boost/filesystem/operations.hpp>
