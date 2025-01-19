@@ -2,7 +2,6 @@
 
 #include "libam/utils/dump_utils.hh"
 
-
 #include <boost/filesystem/operations.hpp>
 
 #ifdef WITH_BOOST_STACKTRACE
@@ -46,6 +45,6 @@ void handle_dumps()
     }
 }
 #else
-void handle_dumps(){}
+void handle_dumps() { }
 #endif
 } // namespace labw::art_modern

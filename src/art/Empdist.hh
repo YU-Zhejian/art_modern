@@ -1,5 +1,6 @@
 #pragma once
 
+#include "art/BuiltinProfile.hh"
 #include "art/random_generator.hh"
 
 #include "libam/Dtypes.hh"
@@ -31,6 +32,8 @@ public:
 
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe,
         std::size_t read_len);
+
+    Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_pe, std::size_t read_len);
     void get_read_qual(std::vector<am_qual_t>& qual, int len, Rprob& rprob, bool first = true) const;
     void get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;
     void get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;

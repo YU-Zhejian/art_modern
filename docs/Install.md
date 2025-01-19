@@ -25,7 +25,7 @@ If there's no error, the compiler is supported. You may also test your compiler 
 The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
 
 - **NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library (libstdc++).
-- The minimal version of GCC tested is GCC 9.5.0.
+- The minimal version of GCC tested is GCC 7.4.0.
 - Reference:
   - GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
   - libstdc++ support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
@@ -35,7 +35,7 @@ The most widely used compiler for GNU/Linux that provides the best compatibility
 Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple macOS.
 
 - **NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
-- The minimal version of Clang tested is Clang 10.0.0.
+- The minimal version of Clang tested is Clang 5.0.1.
 - However, earlier Clang versions may be supported with earlier operating systems, GCC, and Boost library.
 - Reference:
   - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
@@ -93,6 +93,9 @@ This is an umbrella project of diverse small modules that can be used independen
 - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
 - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
 - **OPTIONAL** `stacktrace_backtrace`: For a more developer-friendly stack trace. See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details. Can be absent for non-developers.
+
+- **NOTE** Clang <=9 with Boost >= 1.76 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
+- **NOTE** Boost <=1.65 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction.
 
 ### [HTSLib](https://www.htslib.org/)
 
@@ -170,18 +173,16 @@ The thread-level parallelism strategy.
 - **`ASIO` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
+### `BOOST_CONFIG_PROVIDED_BY_BOOST`
+
+Configures the behaviour of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html).
+
+- **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
+- `OFF`: Will use the set the policy to `OLD`.
+
+There's ususally no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
+
 ## Appendix
-
-Tested compilers:
-
-- On my x86\_64 6.8.0-51-generic (GCC 13.3.0-6ubuntu2~24.04) Linux Mint 12:
-  - Clang 5.X.X (due to GCC14 libstdc++), 6.X.X (due to GCC14 libstdc++), 7.X.X (due to GCC14 libstdc++), 8.X.X (due to `boost::math`), and 9.X.X (due to `boost::math`) from LLVM website were tested **NOT** work with my GCC 14.2.0 and Boost 1.83.0 (which were compiled with GCC ABI) from the distribution.
-  - Clang 10.0.0 from LLVM website works.
-  - Clang 11.1.0-6 from the distribution works.
-  - GCC 9.5.0-6ubuntu2 from the distribution works.
-  - Intel C++ compiler classic (`icc`, `icpc`) 2021.1.1 and 2023.2.4 do **NOT** work.
-
-Test script for Clang 10.0.0 from LLVM website:
 
 ```shell
 CLANG_TARNAME="clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04"

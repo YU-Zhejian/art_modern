@@ -29,7 +29,7 @@ Except those acknowledged in Readme, this project uses code from the following p
   
   With MIT License.
 
-  **NOTE** This program is no-longer in active development.
+  **NOTE** This program was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
 ---
 
@@ -56,3 +56,17 @@ Except those acknowledged in Readme, this project uses code from the following p
   Under an MIT-like License.
 
   **UPDATE** Only used in some test scripts currently.
+
+---
+
+- **William Sherif's Nibble And A Half Project**
+
+  Originally from <https://github.com/superwills/NibbleAndAHalf>.
+
+  Affected files:
+
+  - `/deps/base64/**`
+
+  Under an MIT-like License.
+
+  **NOTE** The version used in this project comes from [MMseqs2](https://github.com/soedinglab/MMseqs2), commit `b804fbe3`, which is copyrighted by The MMseqs2 Development Team under the MIT License.

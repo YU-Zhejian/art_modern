@@ -1,19 +1,27 @@
 # Build Logs
 
+Here contains some build logs for unsupported platforms. If you insist to build `art_modern` on those platforms, they may be of help.
+
 ## Ubuntu 18.04 chroot
+
+Git commit: `8ccdf5f57ce81993cecebe116007c3b73bb28c3c`.
+
+Host: Linux Mint 12 with `6.8.0-51-generic` x86\_64 kernel.
 
 Installed packages:
 
 | Package | Version |
 |---------|---------|
 | `build-essential` | 12.4ubuntu1 |
-| `cmake` | 3.26.4 |
+| `cmake` | 3.31.4 |
 | `g++` | 7.4.0-1ubuntu2.3 |
+| `clang++-5` | 1:5.0.1-4 |
 | `binutils` | 2.30-21ubuntu1~18.04.9 |
 | `cmake` | 3.10.2-1ubuntu2.18.04.2 |
 | `libboost-all-dev` | 1.65.1.0ubuntu1 |
 | `make` | 4.1-9.1ubuntu1 |
 | `libstdc++6` | 8.4.0-1ubuntu1~18.04 |
+| `libc6` | 2.27-3ubuntu1.6 |
 
 `art_modern --version` output:
 
@@ -80,3 +88,17 @@ Run-time OS info:
 		machine=x86_64
 [2025-01-19 15:10:58.506351] : EXIT
 ```
+
+```text
+[...]
+Compiler Identification:
+	Clang compatible version number: 5.0.1 (5.0.1 (tags/RELEASE_501/final))
+	GCC compatible version number: 4.2.1
+	__VERSION__ string: 4.2.1 Compatible Clang 5.0.1 (tags/RELEASE_501/final)
+[...]
+```
+
+Other notes:
+
+- Threading disabled. Boost 1.65.1 does not provide `boost::asio::thread_pool`.
+- Final chroot size: 2.0G.

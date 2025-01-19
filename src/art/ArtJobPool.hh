@@ -1,18 +1,23 @@
 #pragma once
+#include "art_modern_config.h" // NOLINT: For USE_ASIO_PARALLEL
+
 #include "art/ArtJobExecutor.hh"
+#include "art/ArtParams.hh"
 
 #if defined(USE_NOP_PARALLEL)
 #include <mutex>
+#elif defined(USE_EIGEN_PARALLEL)
+#include <eigen3/unsupported/Eigen/CXX11/ThreadPool> // NOLINT
 #elif defined(USE_ASIO_PARALLEL)
-#include <boost/asio.hpp>
-#include <boost/asio/thread_pool.hpp> // NOLINT: Have to set this for Boost 1.65.1
-
+#include <boost/asio/thread_pool.hpp>
 #else
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_ASIO_PARALLEL"
 #endif
 
 #include <cstddef>
+#include <memory>
 #include <mutex>
+#include <vector>
 
 namespace labw::art_modern {
 
@@ -25,6 +30,9 @@ public:
 
 private:
 #if defined(USE_NOP_PARALLEL)
+    std::mutex mutex_;
+#elif defined(USE_EIGEN_PARALLEL)
+    Eigen::ThreadPool pool_;
     std::mutex mutex_;
 #elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;

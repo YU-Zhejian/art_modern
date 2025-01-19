@@ -3,8 +3,7 @@ FCOV=10
 parser=memory
 for lc in se pe mp; do
     "${ART}" \
-        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_HEAD}" \
         --read_len 125 \
         --mode template \
@@ -21,8 +20,7 @@ done
 parser=stream
 for lc in se pe mp; do
     "${ART}" \
-        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_HEAD}" \
         --read_len 125 \
         --i-batch_size 100 \

@@ -21,10 +21,10 @@ CExceptionsProxy::CExceptionsProxy(std::string c_lib_name, std::string details)
 void CExceptionsProxy::log() const
 {
     BOOST_LOG_TRIVIAL(fatal) << "Error occurred in C library '" << c_lib_name_ << "' due to '" << details_ << "'";
-    #ifdef WITH_BOOST_STACKTRACE
+#ifdef WITH_BOOST_STACKTRACE
     BOOST_LOG_TRIVIAL(fatal) << "Stack trace:";
     BOOST_LOG_TRIVIAL(fatal) << boost::stacktrace::stacktrace();
-    #endif
+#endif
 }
 
 } // namespace labw::art_modern

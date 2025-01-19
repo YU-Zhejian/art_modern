@@ -1,5 +1,9 @@
 # TODO
 
+## IMPORTANT
+
+- `--builtin_qual_file` added back; However, this requires a working Python3 installation. Add corresponding instructions in `Readme.md`, `Install.md`, and CMake.
+
 ## Performance
 
 - The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost::ASIO.
