@@ -7,7 +7,7 @@ rm -rf "${CHROOT_DIR}"
 mkdir -p "${CHROOT_DIR}"
 
 git ls-files | while read -r line; do
-  if [ -f "${line}" ]; then
-    install -D "${line}" "${CHROOT_DIR}/${line}"
-  fi
+    if [ -f "${line}" ]; then
+        install -D "${line}" "${CHROOT_DIR}/${line}"
+    fi
 done

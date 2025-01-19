@@ -26,8 +26,7 @@ for collect in hotspots threading memory-consumption; do # hpc-performance memor
         -source-search-dir=".." \
         -result-dir="${PROFILE_DIR}"/vtune-"${collect}" -- \
         "${PROFILE_DIR}"/art_modern \
-        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --builtin_qual_file HiSeq2500_125bp \
         --i-file data/raw_data/ce11.mRNA.fa \
         --read_len 125 \
         --mode trans \

@@ -4,8 +4,7 @@ parser=memory
 coverage=pbsim3
 for lc in se pe mp; do
     "${ART}" \
-        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --builtin_qual_file HiSeq2500_125bp \
         --i-file data/raw_data/ce11.mRNA_head.pbsim3.transcript \
         --read_len 125 \
         --i-type pbsim3_transcripts \
@@ -22,8 +21,7 @@ done
 parser=stream
 for lc in se pe mp; do
     "${ART}" \
-        --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-        --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+        --builtin_qual_file HiSeq2500_125bp \
         --i-file data/raw_data/ce11.mRNA_head.pbsim3.transcript \
         --read_len 125 \
         --i-type pbsim3_transcripts \

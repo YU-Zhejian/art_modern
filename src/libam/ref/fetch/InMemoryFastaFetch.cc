@@ -75,8 +75,8 @@ InMemoryFastaFetch::InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
 }
 InMemoryFastaFetch::InMemoryFastaFetch(
     const InMemoryFastaFetch& other, const std::ptrdiff_t from, const std::ptrdiff_t to)
-    : InMemoryFastaFetch({other.seq_names_.begin() + from, other.seq_names_.begin() + to},
-          {other.seqs_.begin() + from, other.seqs_.begin() + to})
+    : InMemoryFastaFetch({ other.seq_names_.begin() + from, other.seq_names_.begin() + to },
+          { other.seqs_.begin() + from, other.seqs_.begin() + to })
 {
 }
 

@@ -1,9 +1,17 @@
+#include "art_modern_config.h"
+
 #include "art/ArtJobPool.hh"
 
 #include "art/ArtJobExecutor.hh"
 #include "art/ArtParams.hh"
 
-#include <boost/asio.hpp> // NOLINT: Have to set this for Boost 1.65.1
+#if defined(USE_ASIO_PARALLEL)
+#include <boost/asio/post.hpp> // NOLINT: Have to set this for Boost 1.65.1
+#endif
+
+#if defined(USE_EIGEN_PARALLEL)
+#include <eigen3/unsupported/Eigen/CXX11/ThreadPool> // NOLINT
+#endif
 
 #include <chrono>
 #include <cstddef>
@@ -25,6 +33,27 @@ void ArtJobPool::add(const std::shared_ptr<ArtJobExecutor>& aje)
 }
 
 ArtJobPool::ArtJobPool(const ArtParams&) { }
+#elif defined(USE_EIGEN_PARALLEL)
+// FIXME: Not working!
+// The data type associated with the pointer will be forgotten.
+ArtJobPool::ArtJobPool(const ArtParams& art_params)
+    : pool_(art_params.parallel)
+    , pool_size_(art_params.parallel)
+{
+}
+
+void ArtJobPool::add(const std::shared_ptr<ArtJobExecutor>& aje)
+{
+    std::scoped_lock lock(mutex_);
+    // Spin until there's a slot
+    while (n_running_ajes() >= pool_size_) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+    ajes_.emplace_back(aje);
+    pool_.Schedule([this_aje = aje]() mutable { this_aje->operator()(); });
+}
+
+void ArtJobPool::stop() { pool_.Cancel(); }
 
 #elif defined(USE_ASIO_PARALLEL)
 ArtJobPool::ArtJobPool(const ArtParams& art_params)
