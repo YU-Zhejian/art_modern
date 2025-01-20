@@ -9,4 +9,4 @@ struct BuiltinProfile {
     std::string r2_profile;
     BuiltinProfile(const char* profile1_encoded, const char* profile2_encoded);
 };
-}; // namespace labw::art_modern
+} // namespace labw::art_modern

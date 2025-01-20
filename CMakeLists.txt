@@ -27,6 +27,10 @@ if(CYGWIN)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
+if(NOT DEFINED Python3_EXECUTABLE)
+    set(Python3_EXECUTABLE python3)
+endif()
+
 if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
@@ -67,10 +71,21 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 # include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/simde")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} libceu)
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
 
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
+    execute_process(
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/sh.d/gen_builtin_profiles.py"
+                "${CMAKE_BINARY_DIR}/gen/src/art/"
+        WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" COMMAND_ECHO STDERR
+        RESULT_VARIABLE PYTHON_RES)
+    if(NOT "${PYTHON_RES}" EQUAL 0)
+        message(FATAL_ERROR "Generation of builtin profiles failed!")
+    endif()
+endif()
 # Main
 if(CEU_CM_SHOULD_ENABLE_TEST)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
@@ -80,6 +95,8 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in"
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/src")
 include_directories("${CMAKE_BINARY_DIR}/include/")
+include_directories("${CMAKE_BINARY_DIR}/gen/src/")
+
 if(DEFINED env.INCLUDE)
     include_directories(${env.INCLUDE})
 endif()
@@ -87,10 +104,11 @@ if(DEFINED CMAKE_INCLUDE_PATH)
     include_directories(${CMAKE_INCLUDE_PATH})
 endif()
 
-file(GLOB ART_MODERN_LIB_SOURCE "src/libam/*.cc" "src/libam/*/*/*.cc" "src/libam/*/*.cc")
+file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/libam/*.cc"
+     "${CMAKE_CURRENT_LIST_DIR}/src/libam/*/*/*.cc" "${CMAKE_CURRENT_LIST_DIR}/src/libam/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
 
-file(GLOB ART_SOURCE "src/art/*.cc")
+file(GLOB ART_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.cc")
 add_executable(art_modern ${ART_SOURCE})
 
 target_link_libraries(art_modern_lib PUBLIC ${ART_MODERN_LINK_LIBS})
@@ -106,7 +124,7 @@ if(NOT CEU_CM_SHOULD_ENABLE_TEST)
 elseif(Boost_unit_test_framework_FOUND)
     message(NOTICE "Testing enabled.")
     enable_testing()
-    file(GLOB ART_MODERN_TEST_SOURCES "src/test/*.cc")
+    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/test/*.cc")
 
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)

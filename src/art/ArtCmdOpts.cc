@@ -25,7 +25,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/math/distributions/complement.hpp>
-#include <boost/program_options/detail/parsers.hpp>
+#include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>

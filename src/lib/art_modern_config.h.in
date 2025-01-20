@@ -25,6 +25,7 @@
 // Debug
 #cmakedefine CEU_CM_IS_DEBUG
 #cmakedefine USE_ASIO_PARALLEL
+#cmakedefine USE_BS_PARALLEL
 #cmakedefine USE_NOP_PARALLEL
 
 // OpenMP

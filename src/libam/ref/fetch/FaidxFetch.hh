@@ -1,11 +1,13 @@
 #pragma once
 
+#include "libam/ref/fetch/BaseFastaFetch.hh"
+#include "libam/utils/class_macros_utils.hh"
+
 #include <cstddef>
 #include <string>
 
-#include "htslib/faidx.h"
-
-#include "BaseFastaFetch.hh"
+#include <htslib/faidx.h>
+#include <htslib/hts.h>
 
 namespace labw::art_modern {
 
@@ -16,15 +18,13 @@ namespace labw::art_modern {
  */
 class FaidxFetch : public BaseFastaFetch {
 public:
+    DELETE_COPY(FaidxFetch)
+    DELETE_MOVE(FaidxFetch)
+
     explicit FaidxFetch(faidx_t* faidx);
     explicit FaidxFetch(const std::string& file_name);
     std::string fetch(size_t seq_id, hts_pos_t start, hts_pos_t end) override;
     ~FaidxFetch() override;
-
-    FaidxFetch(const FaidxFetch&) = delete;
-    FaidxFetch(FaidxFetch&&) = delete;
-    FaidxFetch& operator=(const FaidxFetch&) = delete;
-    FaidxFetch& operator=(FaidxFetch&&) = delete;
 
 private:
     faidx_t* faidx_;

@@ -68,6 +68,8 @@ For C library, this project works on [GNU C Library](https://www.gnu.org/softwar
 
 [CMake](https://cmake.org/) 3.17 or above is recommended to build this project, although this project **MAY** work with CMake >= 3.10. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., macOS, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
+The CMake modules used in this project further requires [Python](https://www.python.org/) >= 3.7 and a POSIX-compiliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+
 This project relies on diverse CMake variables that control the build behavior. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
 
 ```shell
@@ -134,6 +136,10 @@ This instructs CMake to build executables/libraries with different optimization 
 - `Release`: Optimized executables/libraries without debug symbols. Used for daily use.
 - `RelWithDebInfo`: Optimized executables/libraries with debug symbols. Used for profiling.
 
+### `Python3_EXECUTABLE`
+
+Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
+
 ### `CEU_CM_SHOULD_USE_NATIVE`
 
 Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable with impaired portability (i.e., do not run on other machines).
@@ -170,7 +176,9 @@ The random number generator used.
 
 The thread-level parallelism strategy.
 
-- **`ASIO` (DEFAULT): Will use Boost ASIO for thread-based parallelism.**
+- **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
+  - **NOTE** This is only available in Boost >= 1.66.
+- `BS`: Will use [`BS::thread_pool`](https://github.com/bshoshany/thread-pool).
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
 ### `BOOST_CONFIG_PROVIDED_BY_BOOST`

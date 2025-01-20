@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 
 sname_file_mapping = {
     # TODO: Separate this data to some INI/JSON file
@@ -26,41 +27,40 @@ sname_file_mapping = {
 
 
 if __name__ == "__main__":
-    with (
-        open(os.path.join("src", "art", "builtin_profiles.cc"), "w") as w,
-        open(os.path.join("src", "art", "builtin_profiles.hh"), "w") as wh,
-    ):
-        wh.write("#pragma once\n")
-        wh.write("namespace labw::art_modern {\n")
-        w.write("namespace labw::art_modern {\n")
-        wh.write(f'char NULL_PROFILE[] = "\\0";\n')
-        snames = []
-        snames_constructed = []
-        for sname, files in sname_file_mapping.items():
-            snames.append(sname)
-            for i, file in enumerate(files):
-                with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
-                    data = str(base64.b64encode(r.read()), encoding="US-ASCII")
+    os.makedirs(sys.argv[1], exist_ok=True)
+    with open(os.path.join(sys.argv[1], "builtin_profiles.cc"), "w") as w:
+        with open(os.path.join(sys.argv[1], "builtin_profiles.hh"), "w") as wh:
+            wh.write("#pragma once\n")
+            wh.write("namespace labw::art_modern {\n")
+            w.write("namespace labw::art_modern {\n")
+            wh.write(f'char NULL_PROFILE[] = "\\0";\n')
+            snames = []
+            snames_constructed = []
+            for sname, files in sname_file_mapping.items():
+                snames.append(sname)
+                for i, file in enumerate(files):
+                    with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
+                        data = str(base64.b64encode(r.read()), encoding="US-ASCII")
 
-                w.write(f"char {sname}_{i}[] = \\")
-                while data:
-                    w.write('\n"')
-                    w.write(data[:80])
-                    data = data[80:]
-                    w.write('"')
-                w.write(";\n")
+                    w.write(f"char {sname}_{i}[] = \\")
+                    while data:
+                        w.write('\n"')
+                        w.write(data[:80])
+                        data = data[80:]
+                        w.write('"')
+                    w.write(";\n")
 
-                wh.write(f"extern char {sname}_{i}[];\n")
-            snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if i == 0 else f"{sname}_1") + "}")
-        wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
-        wh.write("char* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
-        for sname_constructed in snames_constructed:
-            wh.write(f"    {sname_constructed},\n")
-        wh.write("};\n")
+                    wh.write(f"extern char {sname}_{i}[];\n")
+                snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if i == 0 else f"{sname}_1") + "}")
+            wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
+            wh.write("char* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
+            for sname_constructed in snames_constructed:
+                wh.write(f"    {sname_constructed},\n")
+            wh.write("};\n")
 
-        wh.write("const char* const BUILTIN_PROFILE_NAMES[N_BUILTIN_PROFILE] = {\n")
-        for sname in snames:
-            wh.write(f'    "{sname}",\n')
-        wh.write("};\n")
-        wh.write("} // namespace labw::art_modern\n")
-        w.write("} // namespace labw::art_modern\n")
+            wh.write("const char* const BUILTIN_PROFILE_NAMES[N_BUILTIN_PROFILE] = {\n")
+            for sname in snames:
+                wh.write(f'    "{sname}",\n')
+            wh.write("};\n")
+            wh.write("} // namespace labw::art_modern\n")
+            w.write("} // namespace labw::art_modern\n")

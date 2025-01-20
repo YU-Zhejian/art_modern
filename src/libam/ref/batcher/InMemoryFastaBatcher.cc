@@ -15,7 +15,7 @@ InMemoryFastaFetch InMemoryFastaBatcher::fetch()
     std::scoped_lock lock(mutex_);
     const auto from = current_index_;
     const auto to = std::min(current_index_ + batch_size_, stream_.num_seqs());
-    InMemoryFastaFetch fetch = { stream_, static_cast<ptrdiff_t>(from), static_cast<ptrdiff_t>(to) };
+    InMemoryFastaFetch const fetch = { stream_, static_cast<ptrdiff_t>(from), static_cast<ptrdiff_t>(to) };
     if (!fetch.empty()) {
         BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch.seq_name(0) << " to "
                                 << fetch.seq_name(fetch.num_seqs() - 1) << " (" << fetch.num_seqs() << "） created";

@@ -10,18 +10,19 @@ Host: Linux Mint 12 with `6.8.0-51-generic` x86\_64 kernel.
 
 Installed packages:
 
-| Package | Version |
-|---------|---------|
-| `build-essential` | 12.4ubuntu1 |
-| `cmake` | 3.31.4 |
-| `g++` | 7.4.0-1ubuntu2.3 |
-| `clang++-5` | 1:5.0.1-4 |
-| `binutils` | 2.30-21ubuntu1~18.04.9 |
-| `cmake` | 3.10.2-1ubuntu2.18.04.2 |
-| `libboost-all-dev` | 1.65.1.0ubuntu1 |
-| `make` | 4.1-9.1ubuntu1 |
-| `libstdc++6` | 8.4.0-1ubuntu1~18.04 |
-| `libc6` | 2.27-3ubuntu1.6 |
+| Package            | Version                 |
+|--------------------|-------------------------|
+| `build-essential`  | 12.4ubuntu1             |
+| `cmake`            | 3.31.4                  |
+| `g++`              | 7.4.0-1ubuntu2.3        |
+| `clang++-5`        | 1:5.0.1-4               |
+| `binutils`         | 2.30-21ubuntu1~18.04.9  |
+| `cmake`            | 3.10.2-1ubuntu2.18.04.2 |
+| `libboost-all-dev` | 1.65.1.0ubuntu1         |
+| `make`             | 4.1-9.1ubuntu1          |
+| `libstdc++6`       | 8.4.0-1ubuntu1~18.04    |
+| `libc6`            | 2.27-3ubuntu1.6         |
+| `python3`          | 3.6.7-1~18.04           |
 
 `art_modern --version` output:
 
@@ -100,5 +101,5 @@ Compiler Identification:
 
 Other notes:
 
-- Threading disabled. Boost 1.65.1 does not provide `boost::asio::thread_pool`.
+- Threading disabled. Boost 1.65.1 does not provide `boost::asio::thread_pool`, so [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) is used instead.
 - Final chroot size: 2.0G.

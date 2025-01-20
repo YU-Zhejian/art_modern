@@ -19,6 +19,7 @@ public:
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
 
     DELETE_COPY(ArtJobExecutor)
+    ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
 
     ArtJobExecutor(SimulationJob job, const ArtParams& art_params, BaseReadOutput* output_dispatcher);
 

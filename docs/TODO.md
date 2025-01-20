@@ -2,12 +2,11 @@
 
 ## IMPORTANT
 
-- `--builtin_qual_file` added back; However, this requires a working Python3 installation. Add corresponding instructions in `Readme.md`, `Install.md`, and CMake.
+None now.
 
 ## Performance
 
-- The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost::ASIO.
-- Boost::ASIO does not provide a thread pool in Boost 1.65.1. Consider refactor this using Eigen thread pool.
+- The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost.ASIO.
 - The massive use of `std::stringstream` should be replaced by `std::snprintf`, which is considerably faster and makes advantages of pre-allocated memory.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
@@ -24,6 +23,11 @@
 - Revise support over other random number generation functions.
 - Surveillance of each thread needs improving. We may implement a data structure that allows each thread to update its status to a locked `std::map` and ask a thread to display the status every few seconds.
 - Add `--no_alignment` parameter to stop synthesizing alignments for FASTQ and headless SAM/BAM output.
+- Builtin profiles takes too much space on the executable. May consider:
+  - Use an CMake option that disables embedding of builtin profiles.
+  - Compress builtin profiles using XZ, etc., and then encode it using base64.
+    - May depend on Boost.IO or use ZLib/libLZMA/libzstd directly.
+    - Only a decoder is needed in the executable.
 
 ## I/O Formats
 

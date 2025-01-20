@@ -1,6 +1,7 @@
-#include "version_utils.hh"
-
 #include "art_modern_config.h"
+
+#include "libam/utils/version_utils.hh"
+
 #include "libam/Constants.hh"
 
 #include "ceu_check/ceu_check_c_cxx_std.hh"
@@ -13,8 +14,12 @@
 #include <boost/version.hpp>
 
 // HTSLib
-#include "htslib/hfile.h"
-#include "htslib/hts.h"
+#include <htslib/hfile.h>
+#include <htslib/hts.h>
+
+#ifdef USE_BS_PARALLEL
+#include <BS_thread_pool.hpp>
+#endif
 
 #ifdef WITH_OPENMP
 #include <omp.h>
@@ -98,6 +103,16 @@ namespace {
         std::cout << "GSL: " << gsl_version << std::endl;
 #else
         std::cout << "GSL: not used" << std::endl;
+#endif
+    }
+
+    void print_bs_version()
+    {
+#ifdef USE_BS_PARALLEL
+        std::cout << "BS::thread_pool: " << BS_THREAD_POOL_VERSION_MAJOR << "." << BS_THREAD_POOL_VERSION_MINOR << "."
+                  << BS_THREAD_POOL_VERSION_PATCH << std::endl;
+#else
+        std::cout << "BS::thread_pool: not used" << std::endl;
 #endif
     }
 
@@ -232,6 +247,7 @@ void print_version()
     print_protobuf_version();
     print_openmp_version();
     print_simde_version();
+    print_bs_version();
     std::cout << ceu_interpret_c_std_version();
     std::cout << ceu_interpret_cxx_std_version();
     std::cout << ceu_check_get_compiler_info();

@@ -5,9 +5,9 @@
 #include "art/ArtParams.hh"
 
 #if defined(USE_NOP_PARALLEL)
-#include <mutex>
-#elif defined(USE_EIGEN_PARALLEL)
-#include <eigen3/unsupported/Eigen/CXX11/ThreadPool> // NOLINT
+// Do nothing!
+#elif defined(USE_BS_PARALLEL)
+#include <BS_thread_pool.hpp>
 #elif defined(USE_ASIO_PARALLEL)
 #include <boost/asio/thread_pool.hpp>
 #else
@@ -31,8 +31,8 @@ public:
 private:
 #if defined(USE_NOP_PARALLEL)
     std::mutex mutex_;
-#elif defined(USE_EIGEN_PARALLEL)
-    Eigen::ThreadPool pool_;
+#elif defined(USE_BS_PARALLEL)
+    BS::thread_pool<BS::tp::none> pool_;
     std::mutex mutex_;
 #elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;

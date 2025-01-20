@@ -101,7 +101,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -116,7 +116,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -138,7 +138,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -153,7 +153,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }

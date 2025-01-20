@@ -38,5 +38,8 @@ Fixed miscellaneous bugs.
 
 ## 1.1.0 (In-Progress)
 
+- `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
+- [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
+- Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
