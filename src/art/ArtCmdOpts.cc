@@ -121,7 +121,7 @@ namespace {
         art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
             "the prefix identification tag for read ID");
 
-        std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
+        const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
             + boost::algorithm::join(
                 std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";

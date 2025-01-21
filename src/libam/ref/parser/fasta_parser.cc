@@ -13,7 +13,7 @@
 namespace labw::art_modern {
 FastaRecord FastaIterator::next()
 {
-    std::scoped_lock rhs_lk(mutex_);
+    const std::scoped_lock rhs_lk(mutex_);
     std::string next_record_id;
     std::string next_record_sequence;
     std::string nextLine;

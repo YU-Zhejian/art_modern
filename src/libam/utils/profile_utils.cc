@@ -11,12 +11,14 @@
 namespace lab::art_modern::details {
 void print_memory_usage(const char* file, const int line)
 {
+    // NOLINTBEGIN
 #ifdef CEU_ON_POSIX
     struct rusage usage;
     if (getrusage(RUSAGE_SELF, &usage) == 0) {
         BOOST_LOG_TRIVIAL(info) << file << ":" << line << ": " << "Memory usage: " << usage.ru_maxrss * 1024;
     }
 #endif
+    // NOLINTEND
 }
 
 } // namespace lab::art_modern::details

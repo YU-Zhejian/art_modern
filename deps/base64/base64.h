@@ -27,16 +27,18 @@
 
   YWxsIHlvdXIgYmFzZSBhcmUgYmVsb25nIHRvIHVz
 
+  YU Zhejian fixed some clang-tidy warnings.
 */
 #ifndef BASE64_H
 #define BASE64_H
 
+#include <cstddef>
 #include <string>
 
-const static char *b64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+constexpr static char b64[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 
 // maps A=>0,B=>1..
-const static unsigned char unb64[] = {
+constexpr static unsigned char unb64[] = {
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //10
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //20
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, //30
@@ -66,12 +68,12 @@ const static unsigned char unb64[] = {
 }; // This array has 256 elements
 
 // Converts binary data of length=len to base64 characters.
-std::string base64_encode(const void *data, int length) {
-    const unsigned char *bin = (const unsigned char *) data;
+std::string base64_encode(const void *data, std::size_t length) {
+    const auto *bin = (const unsigned char *) data;
 
-    int modLength = length % 3;
+    auto modLength = length % 3;
     // 2 gives 1 and 1 gives 2, but 0 gives 0.
-    int padding = ((modLength & 1) << 1) + ((modLength & 2) >> 1);
+    auto padding = ((modLength & 1U) << 1U) + ((modLength & 2U) >> 1U);
 
     std::string res;
     res.reserve(4 * (length + padding) / 3);
@@ -102,8 +104,8 @@ std::string base64_encode(const void *data, int length) {
     return res;
 }
 
-std::string base64_decode(const char *base64, int length) {
-    const unsigned char *data = (const unsigned char *) base64;
+std::string base64_decode(const char *base64, std::size_t length) {
+    const auto *data = (const unsigned char *) base64;
     // 2 accesses below would be OOB.
     if (length < 2) {
         return "";

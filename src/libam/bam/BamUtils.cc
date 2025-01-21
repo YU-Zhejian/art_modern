@@ -101,7 +101,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
 
 sam_hdr_t* BamUtils::init_header(const BamOptions& sam_options)
 {
-    const auto sam_header
+    auto* const sam_header
         = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
 
     CExceptionsProxy::assert_numeric(
@@ -128,7 +128,7 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
         mode += "wh";
     }
 
-    const auto retv = CExceptionsProxy::assert_not_null(
+    auto* const retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");
     CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
         "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);

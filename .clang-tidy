@@ -1,8 +1,90 @@
 ---
-Checks: '*,-readability-identifier-length,-clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,-llvmlibc-*,-cppcoreguidelines-avoid-magic-numbers,-llvm-header-guard,-readability-magic-numbers,-bugprone-easily-swappable-parameters,-modernize-use-trailing-return-type,-google-readability-namespace-comments,-*-avoid-c-arrays,-fuchsia-default-arguments-*,-performance-avoid-endl,-cert-err33-c,-altera-unroll-loops,-altera-id-dependent-backward-branch,-cppcoreguidelines-pro-bounds-array-to-pointer-decay,-cppcoreguidelines-non-private-member-variables-in-classes,-fuchsia-overloaded-operator,-cppcoreguidelines-pro-bounds-pointer-arithmetic,-readability-avoid-unconditional-preprocessor-if,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-avoid-const-or-ref-data-members,-misc-non-private-member-variables-in-classes,-*-no-array-decay,-readability-function-cognitive-complexity,-readability-math-missing-parentheses,-abseil-*,-boost-*,-*vararg,-fuchsia-statically-constructed-objects,-cert-err58-cpp,-cppcoreguidelines-avoid-goto'
+Checks:
+  # Enable all checks by default and disable some of them.
+  - '*'
+
+  # This warning is nonsense.
+  - -readability-identifier-length
+
+  # As we're not using LLVM LibC
+  - -llvmlibc-*
+
+  # We used std::snprintf family of functions for acceleration purposes.
+  # Clang would suggest snprintf_s, which is not available in all platforms.
+  - -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+
+  # We use magic numbers for some constants that are associated with specific
+  # bioinformatics file formats & algorithms & conventions that appears only once.
+  - -cppcoreguidelines-avoid-magic-numbers
+  - -readability-magic-numbers
+
+  # For C headers, we use our own format of header guard
+  # For C++ headers, we use `#pragma once` which is implemented in almost all C++ compilers.
+  - -llvm-header-guard
+
+  # This warning is nonsense.
+  - -bugprone-easily-swappable-parameters
+
+  # This warning is nonsense.
+  - -readability-math-missing-parentheses
+
+  # We used C arrays to improve performance.
+  - -*-avoid-c-arrays
+
+  - -modernize-use-trailing-return-type
+  - -fuchsia-default-arguments-*
+  - -performance-avoid-endl
+  - -cert-err33-c
+  - -altera-unroll-loops
+  - -altera-id-dependent-backward-branch
+  - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+  - -cppcoreguidelines-non-private-member-variables-in-classes
+  - -fuchsia-overloaded-operator
+  - -cppcoreguidelines-pro-bounds-pointer-arithmetic
+  - -readability-avoid-unconditional-preprocessor-if
+  - -cppcoreguidelines-pro-bounds-constant-array-index
+  - -cppcoreguidelines-avoid-const-or-ref-data-members
+  - -misc-non-private-member-variables-in-classes
+  - -*-no-array-decay
+  - -readability-function-cognitive-complexity
+  - -fuchsia-statically-constructed-objects
+  - -cert-err58-cpp
+
+  # We don't use Abseil.
+  - -abseil-*
+
+  # We minimize the use of Boost.
+  # Those checks would suggest boost replacements over STL, so disabled.
+  - -boost-use-*
+
+  # This prevents us from using std::snprintf, so we disable it.
+  - -*vararg
+
+  # Sometimes we use goto for error handling.
+  - -*-avoid-goto
+
+  # Numerous third-party header files violates this warning.
+  # So disabled to avoid false positives.
+  - -hicpp-signed-bitwise
+
+  # Seems there's no other people who's maintaining the code.
+  - -google-readability-todo
+
+  # This feature requires GSL, which is an optional dependency in this project
+  - -cppcoreguidelines-owning-memory
+
+  # Memory management by hand of temporary objects are needed
+  # to interact with third-party C libraries.
+  - -*-no-malloc
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit
+
+HeaderFileExtensions:
+  - h
+  - hh
+ImplementationFileExtensions:
+  - c
+  - cc
 ...
 
-# /home/yuzj/Documents/pbsim3_modern/src/art/ArtJobExecutor.cc:114:1: warning: overloading 'operator()' is disallowed []

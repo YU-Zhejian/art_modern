@@ -61,7 +61,7 @@ namespace {
 char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
 {
     std::size_t const reg_len = std::strlen(seq_name) + 42;
-    char* reg = static_cast<char*>(std::calloc(reg_len, sizeof(char)));
+    auto* reg = static_cast<char*>(std::calloc(reg_len, sizeof(char)));
     if (reg == nullptr) {
         BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
         abort_mpi();

@@ -12,7 +12,7 @@ namespace labw::art_modern {
 
 InMemoryFastaFetch InMemoryFastaBatcher::fetch()
 {
-    std::scoped_lock lock(mutex_);
+    const std::scoped_lock lock(mutex_);
     const auto from = current_index_;
     const auto to = std::min(current_index_ + batch_size_, stream_.num_seqs());
     InMemoryFastaFetch const fetch = { stream_, static_cast<ptrdiff_t>(from), static_cast<ptrdiff_t>(to) };

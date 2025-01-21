@@ -32,14 +32,14 @@ size_t BamTags::size() const
 void BamTags::add_string(const std::string& key, const std::string& value)
 {
     const auto len = value.size();
-    data_type data(new uint8_t[len + 1]);
+    const data_type data(new uint8_t[len + 1]);
     std::copy(value.begin(), value.end(), data.get());
     data[static_cast<std::ptrdiff_t>(len)] = '\0';
     tags_.emplace_back(key, 'Z', len + 1, data);
 }
 void BamTags::add_int_i(const std::string& key, const int32_t value)
 {
-    data_type data(new uint8_t[4]);
+    const data_type data(new uint8_t[4]);
     std::memcpy(data.get(), &value, 4);
 #ifdef HTS_LITTLE_ENDIAN
 #else
