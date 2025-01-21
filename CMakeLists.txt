@@ -64,7 +64,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
-# OpenMP temporarily disabled. include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
+# OpenMP temporarily disabled.
+# include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
@@ -150,9 +151,11 @@ endif()
 
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
 
-# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES}) get_filename_component(ART_MODERN_UTIL_EXEC
-# "${ART_MODERN_UTIL_SOURCE}" NAME_WE) set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
-# add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}") target_link_libraries("${ART_MODERN_UTIL_EXEC}"
-# art_modern_lib) endforeach()
+# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES})
+# get_filename_component(ART_MODERN_UTIL_EXEC "${ART_MODERN_UTIL_SOURCE}" NAME_WE)
+# set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
+# add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}")
+# target_link_libraries("${ART_MODERN_UTIL_EXEC}" art_modern_lib)
+# endforeach()
 
 # include(CPack)
