@@ -10,7 +10,7 @@
 namespace labw::art_modern {
 class FastaStreamBatcher {
 public:
-    /**
+    /*!
      *
      * @return A {@link InMemoryFastaFetch} of less or equal than {@link batch_size} items.
      * Empty {@link InMemoryFastaFetch} if the stream is exhausted.

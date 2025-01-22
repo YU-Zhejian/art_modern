@@ -14,6 +14,7 @@
 #include "libam/utils/fs_utils.hh"
 #include "libam/utils/mpi_utils.hh"
 #include "libam/utils/param_utils.hh"
+#include "libam/utils/seq_utils.hh"
 #include "libam/utils/version_utils.hh"
 
 #include <boost/algorithm/string/join.hpp>
@@ -243,7 +244,7 @@ namespace {
         }
         if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
             for (const auto& fasta_file_end : std::vector<std::string> { ".fna", ".fsa", ".fa", ".fasta" }) {
-                if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
+                if (ends_with(input_file_name, fasta_file_end)) {
                     return INPUT_FILE_TYPE::FASTA;
                 }
             }
@@ -531,7 +532,7 @@ namespace {
 
 ArtParams parse_args(const int argc, char** argv)
 {
-    const boost::program_options::options_description po_desc_ = option_parser();
+    const po::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_;
 
     std::vector<std::string> args { argv, argv + argc };

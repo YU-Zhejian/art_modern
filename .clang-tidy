@@ -92,9 +92,6 @@ Checks:
   # Seems there's no other people who's maintaining the code.
   - -google-readability-todo
 
-  # This feature requires GSL, which is an optional dependency in this project
-  - -cppcoreguidelines-owning-memory
-
   # Memory management by hand of temporary objects are needed
   # to interact with third-party C libraries.
   - -*-no-malloc

@@ -12,7 +12,7 @@
 
 namespace labw::art_modern {
 
-/**
+/*!
  * This class has move constructor only.
  */
 class InMemoryFastaFetch : public BaseFastaFetch {

@@ -1,6 +1,8 @@
 /*!
  * @brief Utility functions for MPI.
  *
+ * Here defines some utility functions that would work under MPI.
+ *
  */
 
 #pragma once
@@ -33,6 +35,13 @@ void init_mpi(int* argc, char*** argv);
  */
 void bye_mpi();
 
+/*£¡
+ * Get the current MPI rank in string.
+ *
+ * @return The current MPI rank in string.
+ * MPI_UNAVAILABLE_RANK if MPI had stopped.
+ * "nompi" if MPI is not available.
+ */
 std::string mpi_rank();
 
 } // namespace labw::art_modern

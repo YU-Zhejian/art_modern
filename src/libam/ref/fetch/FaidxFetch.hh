@@ -11,7 +11,7 @@
 
 namespace labw::art_modern {
 
-/**
+/*!
  * Please note that this method have no lock.
  *
  * That is, all threads MUST own their own FaidxFetch.

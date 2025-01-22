@@ -18,7 +18,7 @@ enum class FastaFetchType : std::uint8_t {
     FAIDX_FETCH,
 };
 
-/**
+/*!
  * Random access FASTA file.
  */
 class BaseFastaFetch {
@@ -33,7 +33,7 @@ public:
 
     BaseFastaFetch() = default;
 
-    /**
+    /*!
      * Default destructor.
      */
     virtual ~BaseFastaFetch() = default;
@@ -42,7 +42,7 @@ public:
     BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector<hts_pos_t>&& seq_lengths);
     BaseFastaFetch(const std::vector<std::string>& seq_names, const std::vector<hts_pos_t>& seq_lengths);
 
-    /**
+    /*!
      * This method is thread-safe since mutex is used for non-thread-safe implementations.
      *
      * @param seq_id Contig name.
@@ -52,7 +52,7 @@ public:
      */
     virtual std::string fetch(std::size_t seq_id, hts_pos_t start, hts_pos_t end) = 0;
 
-    /**
+    /*!
      * This method is thread-safe since mutex is used for non-thread-safe implementations.
      * Fetch the entire contig.
      *
@@ -63,7 +63,7 @@ public:
 
     void update_sam_header(sam_hdr_t* header) const;
 
-    /**
+    /*!
      * Get the length of the desired sequence.
      * This operation should take $O(1)$ complexity.
      *
@@ -72,14 +72,14 @@ public:
      */
     [[nodiscard]] hts_pos_t seq_len(std::size_t seq_id) const;
 
-    /**
+    /*!
      * Get the name of the desired sequence.
      * @param seq_id As described.
      * @return As described.
      */
     [[nodiscard]] std::string seq_name(std::size_t seq_id) const;
 
-    /**
+    /*!
      * Get number of sequences inside.
      *
      * @return As described.

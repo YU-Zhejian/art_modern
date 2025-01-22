@@ -73,6 +73,7 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 # include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/simde")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
 
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} libceu)
 message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")

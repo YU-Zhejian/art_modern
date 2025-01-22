@@ -11,7 +11,6 @@
 #include "libam/utils/mpi_utils.hh" // NOLINT
 #include "libam/utils/seq_utils.hh"
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 
 #include <htslib/hts.h>
@@ -116,13 +115,13 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
 {
     std::string mode;
     if (sam_options.write_bam) {
-        if (!boost::ends_with(filename, ".bam")) {
+        if (!ends_with(filename, ".bam")) {
             BOOST_LOG_TRIVIAL(warning) << "BAM file name was not end with .bam: " << filename;
         }
         mode += "wb";
         mode += std::to_string(sam_options.compress_level);
     } else {
-        if (!boost::ends_with(filename, ".sam")) {
+        if (!ends_with(filename, ".sam")) {
             BOOST_LOG_TRIVIAL(warning) << "SAM file name was not end with .bam: " << filename;
         }
         mode += "wh";

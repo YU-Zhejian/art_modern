@@ -108,8 +108,9 @@ std::string PairwiseAlignment::serialize() const
     std::string query = serialized[1];
     std::string ref = serialized[2];
     std::string qual = serialized[3];
-    boost::algorithm::erase_all(query, ALN_GAP_STR);
-    boost::algorithm::erase_all(ref, ALN_GAP_STR);
+    query.erase(std::remove(str.begin(), str.end(), ALN_GAP), str.end());
+    ref.erase(std::remove(str.begin(), str.end(), ALN_GAP), str.end());
+
     return { std::move(read_name), std::move(contig_name), std::move(query), std::move(ref), std::move(qual),
         std::move(aligned_query), std::move(aligned_ref), pos_on_contig, is_plus_strand };
 }

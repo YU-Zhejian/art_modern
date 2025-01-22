@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include <cstddef>
@@ -19,10 +20,11 @@ public:
     ArtContig(BaseFastaFetch* fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob);
 
     void generate_read_se(bool is_plus_strand, ArtRead& read_1);
-
     void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);
 
+    /** Name of the contig */
     const std::string seq_name;
+    /**Size of the contig */
     const hts_pos_t seq_size;
 
 private:

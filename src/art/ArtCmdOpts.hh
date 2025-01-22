@@ -1,3 +1,7 @@
+/*!
+ * @brief Argument parser
+ */
+
 #pragma once
 #include "art/ArtParams.hh"
 

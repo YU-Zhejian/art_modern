@@ -4,7 +4,7 @@
 
 namespace labw::art_modern {
 
-/**
+/*!
  * An integer rank, returning MPI_UNAVAILABLE_RANK if unavailable.
  */
 class MPIRankLoggerAttribute : public boost::log::attribute {
@@ -13,7 +13,7 @@ public:
     [[maybe_unused]] explicit MPIRankLoggerAttribute(boost::log::attributes::cast_source const& source);
 };
 
-/**
+/*!
  * A string representing the hostname of the MPI process. Reyturn "N/A" if unavailable.
  */
 class MPIHostNameLoggerAttribute : public boost::log::attribute {

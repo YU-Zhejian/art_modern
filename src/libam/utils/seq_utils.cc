@@ -210,4 +210,12 @@ void normalize_inplace(std::string& dna)
     }
 }
 
+bool ends_with(const std::string& str, const std::string& suffix)
+{
+    if (str.length() < suffix.length()) {
+        return false;
+    }
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
+}
+
 } // namespace labw::art_modern
