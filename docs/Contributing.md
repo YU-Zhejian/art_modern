@@ -62,19 +62,7 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 
 ### Issues
 
-You're welcome to submit issues on GitHub if you've encountered any problems while using this software. Please make sure to include the following information:
-
-- The version of your operating system and kernel, given by `uname -a`.
-- Version information of the compiler, given by `gcc -v --verbose` or similar.
-- `art_modern --version` output.
-- The CMake commandline you used to build the code.
-- The CMake configuration log, if possible.
-- The compilation log, if possible.
-- The actual libraries linked to the executable. You may find that out using `ldd` or `readelf -d`.
-- The git commit hash of the code you used.
-- Attaching Valgrind memcheck output or profiler output is highly encouraged if possible.
-
-You may also submit issues if you're unclear about the docs or have some ideas improving the software itself.
+You're welcome to submit issues on GitHub if you've encountered any problems while using this software. You're recommended to take advantage of the bug report templates, which will help us to understand your problem better. You may also submit issues if you're unclear about the docs or have some ideas improving the software itself.
 
 ### Pull Requests (PRs)
 
