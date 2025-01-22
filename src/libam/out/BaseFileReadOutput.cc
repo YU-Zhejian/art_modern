@@ -15,7 +15,6 @@ void BaseFileReadOutput::close()
 }
 BaseFileReadOutput::BaseFileReadOutput(const std::string& filename)
     : filename(filename)
-    , is_closed_(false)
 {
     prepare_writer(filename);
     BOOST_LOG_TRIVIAL(info) << "Writer to '" << filename << "' added.";

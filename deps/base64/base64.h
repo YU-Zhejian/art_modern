@@ -68,8 +68,8 @@ constexpr static unsigned char unb64[] = {
 }; // This array has 256 elements
 
 // Converts binary data of length=len to base64 characters.
-std::string base64_encode(const void *data, std::size_t length) {
-    const auto *bin = (const unsigned char *) data;
+[[maybe_unused]] static inline std::string base64_encode(const void *data, std::size_t length) {
+    const auto *bin = static_cast<const unsigned char *>(data);
 
     auto modLength = length % 3;
     // 2 gives 1 and 1 gives 2, but 0 gives 0.
@@ -78,70 +78,69 @@ std::string base64_encode(const void *data, std::size_t length) {
     std::string res;
     res.reserve(4 * (length + padding) / 3);
 
-    int byteNo;
-    for (byteNo = 0; byteNo <= length - 3; byteNo += 3) {
-        unsigned char BYTE0 = bin[byteNo];
-        unsigned char BYTE1 = bin[byteNo + 1];
-        unsigned char BYTE2 = bin[byteNo + 2];
-        res.append(1, b64[BYTE0 >> 2]);
-        res.append(1, b64[((0x3 & BYTE0) << 4) + (BYTE1 >> 4)]);
-        res.append(1, b64[((0x0f & BYTE1) << 2) + (BYTE2 >> 6)]);
+    std::size_t byteNo = 0;
+    for (; byteNo <= length - 3; byteNo += 3) {
+        const unsigned char BYTE0 = bin[byteNo];
+        const unsigned char BYTE1 = bin[byteNo + 1];
+        const unsigned char BYTE2 = bin[byteNo + 2];
+        res.append(1, b64[BYTE0 >> 2U]);
+        res.append(1, b64[((0x3 & BYTE0) << 4U) + (BYTE1 >> 4U)]);
+        res.append(1, b64[((0x0f & BYTE1) << 2U) + (BYTE2 >> 6U)]);
         res.append(1, b64[0x3f & BYTE2]);
     }
 
     if (padding == 2) {
-        res.append(1, b64[bin[byteNo] >> 2]);
-        res.append(1, b64[(0x3 & bin[byteNo]) << 4]);
+        res.append(1, b64[bin[byteNo] >> 2U]);
+        res.append(1, b64[(0x3 & bin[byteNo]) << 4U]);
         res.append(1, '=');
         res.append(1, '=');
     } else if (padding == 1) {
-        res.append(1, b64[bin[byteNo] >> 2]);
-        res.append(1, b64[((0x3 & bin[byteNo]) << 4) + (bin[byteNo + 1] >> 4)]);
+        res.append(1, b64[bin[byteNo] >> 2U]);
+        res.append(1, b64[((0x3 & bin[byteNo]) << 4) + (bin[byteNo + 1] >> 4U)]);
         res.append(1, b64[(0x0f & bin[byteNo + 1]) << 2]);
         res.append(1, '=');
     }
-
     return res;
 }
 
-std::string base64_decode(const char *base64, std::size_t length) {
-    const auto *data = (const unsigned char *) base64;
+static inline std::string base64_decode(const char *base64, std::size_t length) {
+    const auto *data = reinterpret_cast<const unsigned char *>(base64);
     // 2 accesses below would be OOB.
     if (length < 2) {
         return "";
     }
 
     int padding = 0;
-    if (data[length - 1] == '=') ++padding;
-    if (data[length - 2] == '=') ++padding;
+    if (data[length - 1] == '=') { ++padding; }
+    if (data[length - 2] == '=') { ++padding; }
 
     std::string res;
-    res.reserve(3 * length / 4 - padding);
+    res.reserve(3 * (length >> 2U) - padding);
 
-    int charNo;
-    for (charNo = 0; charNo <= length - 4 - padding; charNo += 4) {
-        int A = unb64[data[charNo]];
-        int B = unb64[data[charNo + 1]];
-        int C = unb64[data[charNo + 2]];
-        int D = unb64[data[charNo + 3]];
+    std::size_t charNo = 0;
+    for (; charNo <= length - 4 - padding; charNo += 4) {
+        const unsigned char A = unb64[data[charNo]];
+        const unsigned char B = unb64[data[charNo + 1]];
+        const unsigned char C = unb64[data[charNo + 2]];
+        const unsigned char D = unb64[data[charNo + 3]];
 
-        res.append(1, (A << 2) | (B >> 4));
-        res.append(1, (B << 4) | (C >> 2));
-        res.append(1, (C << 6) | (D));
+        res.append(1, static_cast<char>((A << 2U) | (B >> 4U)));
+        res.append(1, static_cast<char>((B << 4U) | (C >> 2U)));
+        res.append(1, static_cast<char>((C << 6U) | (D)));
     }
 
     if (padding == 1) {
-        int A = unb64[data[charNo]];
-        int B = unb64[data[charNo + 1]];
-        int C = unb64[data[charNo + 2]];
+        const unsigned char A = unb64[data[charNo]];
+        const unsigned char B = unb64[data[charNo + 1]];
+        const unsigned char C = unb64[data[charNo + 2]];
 
-        res.append(1, (A << 2) | (B >> 4));
-        res.append(1, (B << 4) | (C >> 2));
+        res.append(1, static_cast<char>((A << 2U) | (B >> 4U)));
+        res.append(1, static_cast<char>((B << 4U) | (C >> 2U)));
     } else if (padding == 2) {
-        int A = unb64[data[charNo]];
-        int B = unb64[data[charNo + 1]];
+        const unsigned char A = unb64[data[charNo]];
+        const unsigned char B = unb64[data[charNo + 1]];
 
-        res.append(1, (A << 2) | (B >> 4));
+        res.append(1, static_cast<char>((A << 2U) | (B >> 4U)));
     }
 
     return res;

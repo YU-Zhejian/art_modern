@@ -12,7 +12,7 @@ public:
 
 protected:
     const std::string filename;
-    bool is_closed_;
+    bool is_closed_ = false;
 };
 
 } // namespace labw::art_modern

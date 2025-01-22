@@ -69,8 +69,9 @@ Except those acknowledged in Readme, this project uses code from the following p
 
   Under an MIT-like License.
 
-  **NOTE** The version used in this project comes from [MMseqs2](https://github.com/soedinglab/MMseqs2), commit `b804fbe3`, which is copyrighted by The MMseqs2 Development Team under the MIT License.
+  **NOTE** The version used in this project comes from [MMseqs2](https://github.com/soedinglab/MMseqs2), commit `b804fbe3`, which is copyrighted by The MMseqs2 Development Team under the MIT License. We use this version instead of the latest one since this version is clean and header-only.
 
+  **NOTE** Some modifications were done to supress clang-tidy warnings.
 ---
 
 - **Barak Shoshany's `BS::thread_pool` Project**

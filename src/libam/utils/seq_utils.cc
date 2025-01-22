@@ -129,7 +129,7 @@ std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
     retq.resize(qlen);
-    std::memcpy(retq.data(), reinterpret_cast<const char*>(qual), qlen);
+    std::memcpy(retq.data(), static_cast<const void*>(qual), qlen);
     std::for_each(retq.begin(), retq.end(), [](char& c) { c += PHRED_OFFSET; });
     return retq;
 }

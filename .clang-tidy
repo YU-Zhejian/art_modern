@@ -28,27 +28,49 @@ Checks:
   # This warning is nonsense.
   - -readability-math-missing-parentheses
 
-  # We used C arrays to improve performance.
+  # We used C arrays (and pointer arithmetics) to improve performance.
   - -*-avoid-c-arrays
+  - -cppcoreguidelines-pro-bounds-constant-array-index
+  - -cppcoreguidelines-pro-bounds-pointer-arithmetic
 
+  # This warning generates wierd code.
   - -modernize-use-trailing-return-type
-  - -fuchsia-default-arguments-*
+
+  # As we're only using std::endl in user-interface-related IO,
+  # using std::endl is acceptable.
   - -performance-avoid-endl
-  - -cert-err33-c
+
+  # This warning is nonsense.
+  - -fuchsia-overloaded-operator
+
+  # This warning is nonsense.
+  # Those FORTRAN people write functions with thousands lines of code.
+  - -readability-function-cognitive-complexity
+
+  # We use this function to preserve some historical code in case
+  # our own implementation fails.
+  - -readability-avoid-unconditional-preprocessor-if
+
+  # We allow default atguments.
+  - -fuchsia-default-arguments-*
+
+  # In compiler we trust.
   - -altera-unroll-loops
   - -altera-id-dependent-backward-branch
-  - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
-  - -cppcoreguidelines-non-private-member-variables-in-classes
-  - -fuchsia-overloaded-operator
-  - -cppcoreguidelines-pro-bounds-pointer-arithmetic
-  - -readability-avoid-unconditional-preprocessor-if
-  - -cppcoreguidelines-pro-bounds-constant-array-index
+
+  # TODO: No idea why const or ref data members are not recommended.
   - -cppcoreguidelines-avoid-const-or-ref-data-members
-  - -misc-non-private-member-variables-in-classes
-  - -*-no-array-decay
-  - -readability-function-cognitive-complexity
+
+  # TODO: No idea why private member variables are not recommended.
+  - -*-non-private-member-variables-in-classes
+
+  # TODO: No idea why static objects are not recommended.
   - -fuchsia-statically-constructed-objects
   - -cert-err58-cpp
+
+  # TODO: No idea why implicit array to pointer conversions are not recommended.
+  - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
+  - -*-no-array-decay
 
   # We don't use Abseil.
   - -abseil-*
