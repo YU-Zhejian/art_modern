@@ -60,9 +60,11 @@ Although not tested, the following compilers can also theoretically be of use:
 
 ### Essential Tools for Building
 
-You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. The latter may require additional CMake variables to be set.
+You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. Under normal circumstances they should come together with your compiler if you install them using your package management systems. The latter may require additional CMake variables to be set.
 
 For C library, this project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested.
+
+For Apple macOS X, FreeBSD, and Alpine Linux users: Please install [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [GNU Bash](https://www.gnu.org/software/bash/) and [GNU Make](https://www.gnu.org/software/make) as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
 ## Using CMake Building System
 
