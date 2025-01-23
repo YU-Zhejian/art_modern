@@ -2,7 +2,9 @@
 
 #include "art/ArtConstants.hh"
 #include "art/ArtParams.hh"
+#include "art/BuiltinProfile.hh"
 #include "art/Empdist.hh"
+#include "art/builtin_profiles.hh"
 
 #include "art_modern_config.h"
 #include "libam/CExceptionsProxy.hh"
@@ -12,6 +14,7 @@
 #include "libam/utils/fs_utils.hh"
 #include "libam/utils/mpi_utils.hh"
 #include "libam/utils/param_utils.hh"
+#include "libam/utils/seq_utils.hh"
 #include "libam/utils/version_utils.hh"
 
 #include <boost/algorithm/string/join.hpp>
@@ -23,7 +26,7 @@
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/math/distributions/complement.hpp>
-#include <boost/program_options/detail/parsers.hpp>
+#include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
@@ -60,6 +63,7 @@ namespace {
 
     constexpr char ARG_ID[] = "id";
     constexpr char ARG_PARALLEL[] = "parallel";
+    constexpr char ARG_BUILTIN_QUAL_FILE[] = "builtin_qual_file";
     constexpr char ARG_QUAL_FILE_1[] = "qual_file_1";
     constexpr char ARG_QUAL_FILE_2[] = "qual_file_2";
     constexpr char ARG_READ_LEN[] = "read_len";
@@ -118,10 +122,16 @@ namespace {
         art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
             "the prefix identification tag for read ID");
 
+        const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
+            + boost::algorithm::join(
+                std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
+            + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(
-            ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "the first-read quality profile");
+            ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(""), arg_builtin_qual_file_desc.c_str());
+        art_opts.add_options()(
+            ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "path to the first-read quality profile");
         art_opts.add_options()(ARG_QUAL_FILE_2, po::value<std::string>()->default_value(""),
-            "the second-read quality profile. For PE/MP only.");
+            "path to the second-read quality profile. For PE/MP only.");
         art_opts.add_options()(
             ARG_INS_RATE_1, po::value<double>()->default_value(DEFAULT_INS_RATE_1), "the first-read insertion rate");
         art_opts.add_options()(
@@ -234,7 +244,7 @@ namespace {
         }
         if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
             for (const auto& fasta_file_end : std::vector<std::string> { ".fna", ".fsa", ".fa", ".fasta" }) {
-                if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
+                if (ends_with(input_file_name, fasta_file_end)) {
                     return INPUT_FILE_TYPE::FASTA;
                 }
             }
@@ -331,14 +341,10 @@ namespace {
         }
     }
 
-    Empdist read_emp(const std::string& qual_file_1, const std::string& qual_file_2, const size_t read_len,
-        const ART_LIB_CONST_MODE art_lib_const_mode, const bool sep_flag, const int q_shift_1, const int q_shift_2,
-        const int min_qual, const int max_qual)
+    void validate_and_shift_emp(Empdist& qdist, const size_t read_len, const ART_LIB_CONST_MODE art_lib_const_mode,
+        const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
     {
-        validate_min_max_qual(min_qual, max_qual);
-        validate_qual_files(qual_file_1, qual_file_2, art_lib_const_mode);
-        auto qdist
-            = Empdist(qual_file_1, qual_file_2, sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
+
         size_t r1_profile_size = 0;
         size_t r2_profile_size = 0;
         if (sep_flag) {
@@ -350,28 +356,48 @@ namespace {
         }
 
         if (read_len > r1_profile_size) {
-            if (r1_profile_size == 0) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << qual_file_1 << ", is not a valid profile.";
-            } else {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
-                                         << ", exceeds the maximum first read profile length, " << r1_profile_size
-                                         << ".";
-            }
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
+                                     << ", exceeds the maximum first read profile length, " << r1_profile_size << ".";
             abort_mpi();
         }
-
         if (read_len > r2_profile_size && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            if (r2_profile_size == 0) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << qual_file_2 << ", is not a valid profile.";
-            } else {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
-                                         << ", exceeds the maximum second read profile length, " << r2_profile_size
-                                         << ".";
-            }
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
+                                     << ", exceeds the maximum second read profile length, " << r2_profile_size << ".";
             abort_mpi();
         }
         qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
-        return qdist;
+    }
+
+    Empdist read_emp(const std::string& builtin_profile_name, const std::string& qual_file_1,
+        const std::string& qual_file_2, const size_t read_len, const ART_LIB_CONST_MODE art_lib_const_mode,
+        const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
+    {
+        validate_min_max_qual(min_qual, max_qual);
+
+        if (!builtin_profile_name.empty()) {
+            for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
+                if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
+                    if (ENCODED_BUILTIN_PROFILES[i][1][0] == '\0' && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
+                        BOOST_LOG_TRIVIAL(fatal)
+                            << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
+                    }
+                    auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], ENCODED_BUILTIN_PROFILES[i][1]),
+                        sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
+                    validate_and_shift_emp(
+                        qdist, read_len, art_lib_const_mode, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+                    return qdist;
+                }
+            }
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
+            abort_mpi();
+        } else {
+            validate_qual_files(qual_file_1, qual_file_2, art_lib_const_mode);
+            auto qdist
+                = Empdist(qual_file_1, qual_file_2, sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
+            validate_and_shift_emp(
+                qdist, read_len, art_lib_const_mode, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+            return qdist;
+        }
     }
 
     void validate_htslib_parser(const std::string& input_file_path)
@@ -506,7 +532,7 @@ namespace {
 
 ArtParams parse_args(const int argc, char** argv)
 {
-    const boost::program_options::options_description po_desc_ = option_parser();
+    const po::options_description po_desc_ = option_parser();
     const OutputDispatcherFactory out_dispatcher_factory_;
 
     std::vector<std::string> args { argv, argv + argc };
@@ -547,8 +573,9 @@ ArtParams parse_args(const int argc, char** argv)
 
     const auto& parallel = validate_parallel(get_param<int>(vm_, ARG_PARALLEL));
 
-    auto qdist = read_emp(get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2),
-        read_len, art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
+    auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
+        get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
+        art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
         get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
     for (int i = 0; i < HIGHEST_QUAL; i++) {

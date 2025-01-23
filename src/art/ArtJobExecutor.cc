@@ -6,6 +6,7 @@
 
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
+#include "libam/utils/arithmetic_utils.hh"
 #include "libam/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -24,8 +25,8 @@ namespace labw::art_modern {
 void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig)
 {
     int num_cont_fail = 0;
-    const auto max_tolerance = std::max(
-        5L, static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
+    const auto max_tolerance = am_max(static_cast<am_readnum_t>(5),
+        static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     bool retv = false;
     am_readnum_t remaining_num_reads = targeted_num_reads;
     am_readnum_t current_num_reads = 0;

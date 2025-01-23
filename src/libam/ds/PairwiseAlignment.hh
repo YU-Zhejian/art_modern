@@ -47,23 +47,23 @@ public:
     [[nodiscard]] std::string serialize() const;
     [[maybe_unused]] void serialize(std::ostream& os) const;
 
-    /**
+    /*!
      * Query sequence with gap inserted using -
      */
     const std::string aligned_query;
-    /**
+    /*!
      * Reference sequence with gap inserted using -
      */
     const std::string aligned_ref;
-    /**
+    /*!
      * Query sequence without gap.
      */
     const std::string query;
-    /**
+    /*!
      * Reference sequence without gap.
      */
     const std::string ref;
-    /**
+    /*!
      * Quality sequence whose elngth should be the same as query.
      */
     const std::string qual;

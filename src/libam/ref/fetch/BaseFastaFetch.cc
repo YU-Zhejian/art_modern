@@ -1,16 +1,16 @@
-#include "BaseFastaFetch.hh"
+#include "libam/ref/fetch/BaseFastaFetch.hh"
 
 #include "art_modern_config.h"
 #include "libam/CExceptionsProxy.hh"
+
+#include <htslib/hts.h>
+#include <htslib/sam.h>
 
 #include <cstddef>
 #include <string>
 #include <tuple>
 #include <utility>
 #include <vector>
-
-#include "htslib/hts.h"
-#include "htslib/sam.h"
 
 namespace labw::art_modern {
 
@@ -31,9 +31,14 @@ std::string BaseFastaFetch::seq_name(const std::size_t seq_id) const { return se
 
 size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
 
-BaseFastaFetch::BaseFastaFetch(std::vector<std::string> seq_names, std::vector<hts_pos_t> seq_lengths)
+BaseFastaFetch::BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector<hts_pos_t>&& seq_lengths)
     : seq_names_(std::move(seq_names))
     , seq_lengths_(std::move(seq_lengths))
+{
+}
+BaseFastaFetch::BaseFastaFetch(const std::vector<std::string>& seq_names, const std::vector<hts_pos_t>& seq_lengths)
+    : seq_names_(seq_names)
+    , seq_lengths_(seq_lengths)
 {
 }
 BaseFastaFetch::BaseFastaFetch(const std::tuple<std::vector<std::string>, std::vector<hts_pos_t>>& seq_names_lengths)
@@ -43,6 +48,4 @@ BaseFastaFetch::BaseFastaFetch(const std::tuple<std::vector<std::string>, std::v
 }
 bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
 std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
-BaseFastaFetch::BaseFastaFetch() = default;
-BaseFastaFetch::~BaseFastaFetch() = default;
 } // namespace labw::art_modern

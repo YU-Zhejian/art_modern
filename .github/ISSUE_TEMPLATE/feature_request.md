@@ -20,7 +20,7 @@ Please describe it in detail here.
 
 - Does your request require us to depend on new software?
   - [ ] Yes. It requires `foo` available at <https://foo.org> using [Bar License](https://bar-license.org).
-  - [ ] Yes. It requires `foo` available at <https://foo.org>, with a property license.
+  - [ ] Yes. It requires `foo` available at <https://foo.org>, with a property/unknown license.
   - [ ] Yes. It requires `foo` that is still under internal development.
   - [ ] No.
   - [ ] I don't know.

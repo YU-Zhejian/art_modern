@@ -4,8 +4,7 @@ parser=memory
 for coverage in stranded strandless; do
     for lc in se pe mp; do
         "${ART}" \
-            --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-            --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${MRNA_HEAD}" \
             --read_len 125 \
             --mode trans \

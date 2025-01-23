@@ -11,23 +11,31 @@ assignees: ''
 
 Please provide the following information about your system by replacing the placeholders. Avoid any blanks that may expose your personal information by deleting the placeholder while unticking the box. You may use `/workbench` as a placeholder to your working directory.
 
-- [ ] The version of your operating system and kernel, given by e.g., `uname -a`.
+- [ ] Name and version of your current operating system in an human-readable way.
+
+  `Linux Mint 22 Wilma`
+
+- [ ] Version of the kernel.
 
   ```text
   Linux SOME-WSL 5.15.167.4-microsoft-standard-WSL2 #1 SMP Tue Nov 5 00:21:55 UTC 2024 x86_64 x86_64 x86_64 GNU/Linux
   ```
 
-- [ ] Version information of the compiler, given by e.g., `gcc -v --verbose` or similiar.
+- [ ] Version of the compiler.
 
   ```text
-  Using built-in specs.
-  COLLECT_GCC=gcc
-  COLLECT_LTO_WRAPPER=/usr/lib64/gcc/x86_64-suse-linux/14/lto-wrapper
-  [...]
-  Thread model: posix
-  Supported LTO compression algorithms: zlib zstd
-  gcc version 14.2.1 20241007 [revision 4af44f2cf7d281f3e4f3957efce10e8b2ccb2ad3] (SUSE Linux)
+  gcc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0
   ```
+
+- [ ] Version of dependencies and how they're installed. List those in the following format while removing those unused ones.
+
+  - GNU Binutils; `2.42-4ubuntu2.3`; Official APT Source.
+  - GNU Science Library; `2.7.1==he838d99_0`; Conda under `conda-forge` channel.
+  - Boost; `1.87.0`; Compiled from official source tarballs.
+  - HTSLib; `1.21`; Bundled.
+  - Intel Math Kernel Library; `2023.0.0`; From official binary distribution.
+  - LLVM; `14.2.0`; Compiled from source against musl libc with instructions from [here](https://wiki.musl-libc.org/building-llvm.html).
+  - GNU Compiler Collection; `14.2.0`; Unknown origin.
 
 - [ ] `art_modern --version` output.
 
@@ -102,7 +110,7 @@ Please provide the following information about your system by replacing the plac
 
 **NOTE: IF YOU'RE IN A CONTROLLED ACCESS ENVIRONMENT PLEASE MAKE SURE THE INFORMATION YOU SEND DOES NOT CONTAIN ANYTHING THAT MAY BE CONSIDERED CONFIDENTIAL!**
 
-**NOTE: DO NOT SEND THE CMAKE BUILD FORDER. IT MAY CONTAIN SENSITIVE INFORMATION!**
+**NOTE: DO NOT SEND THE CMAKE BUILD FORDER AS IT MAY CONTAIN SENSITIVE INFORMATION!**
 
 ## Optional Questions
 

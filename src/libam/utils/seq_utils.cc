@@ -129,7 +129,7 @@ std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
     retq.resize(qlen);
-    std::memcpy(retq.data(), reinterpret_cast<const char*>(qual), qlen);
+    std::memcpy(retq.data(), static_cast<const void*>(qual), qlen);
     std::for_each(retq.begin(), retq.end(), [](char& c) { c += PHRED_OFFSET; });
     return retq;
 }
@@ -208,6 +208,14 @@ void normalize_inplace(std::string& dna)
     for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
         dna[i] = normalization_matrix[dna[i] & 0xFF];
     }
+}
+
+bool ends_with(const std::string& str, const std::string& suffix)
+{
+    if (str.length() < suffix.length()) {
+        return false;
+    }
+    return str.compare(str.length() - suffix.length(), suffix.length(), suffix) == 0;
 }
 
 } // namespace labw::art_modern

@@ -1,3 +1,6 @@
+/**
+ * @brief Constants used acceoss the library.
+ */
 #pragma once
 #include "libam/Dtypes.hh"
 
@@ -6,25 +9,39 @@
 
 namespace labw::art_modern {
 
+/** Parallelization diabled. */
 constexpr int PARALLEL_DISABLE = -1;
 
+/** Parallelization with all cores. */
 constexpr int PARALLEL_ALL = 0;
 
+/*!
+ * Alignment gap character.
+ */
 constexpr char ALN_GAP = '-';
 
-const static std::string ALN_GAP_STR = "-";
-
-/**
+/*!
+ * Maximum phred-based quality score.
  * 10^{-40} error rate, which is quite low.
  */
 constexpr am_qual_t MAX_QUAL = 40;
+/** Minimum phred-based quality score. */
 constexpr am_qual_t MIN_QUAL = 0;
+
+/** Size of 1K under SI units. */
 constexpr int K_SIZE = 1U << 10U;
+/** Size of 1M under SI units. */
 constexpr int M_SIZE = 1U << 20U;
+/** Size of 1G under SI units. */
 constexpr int G_SIZE = 1U << 30U;
 
+/**
+ * Version of ART this program is based on.
+ * TODO: Move this to art/ArtConstants.hh.
+ */
 constexpr char ART_VERSION[] = "2.5.8";
 
+/** Maximum mapping quality */
 constexpr int MAPQ_MAX = ((1 << 8) - 1); // 255
 constexpr char MAPQ_MAX_STR[] = "255"; // 255
 
@@ -62,23 +79,23 @@ constexpr int MPI_UNAVAILABLE_RANK = -1;
 
 constexpr int TID_FOR_UNMAPPED = -1;
 
-/**
+/*!
  * BAM_CMATCH, BAM_CEQUAL, BAM_CDIFF; Consume both
  */
-constexpr int CONSUME_QUERY_AND_REFERENCE = 0b11;
+constexpr am_cigar_type_t CONSUME_QUERY_AND_REFERENCE = 0b11;
 
-/**
+/*!
  * BAM_CHARD_CLIP, BAM_CPAD, BAM_CBACK; Consume neither
  */
-constexpr int CONSUME_NEITHER_QUERY_NOR_REFERENCE = 0b00;
+constexpr am_cigar_type_t CONSUME_NEITHER_QUERY_NOR_REFERENCE = 0b00;
 
-/**
+/*!
  *  BAM_CINS, BAM_CSOFT_CLIP; Consume query
  */
-constexpr int CONSUME_QUERY = 0b01;
+constexpr am_cigar_type_t CONSUME_QUERY = 0b01;
 
-/**
+/*!
  *  BAM_CDEL, BAM_CREF_SKIP; Consume reference
  */
-constexpr int CONSUME_REFERENCE = 0b10;
+constexpr am_cigar_type_t CONSUME_REFERENCE = 0b10;
 } // namespace labw::art_modern

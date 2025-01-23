@@ -118,3 +118,8 @@ Temporary Items
 /config
 /deps/simde
 CMakeLists.txt.user
+.cache
+*.tar
+*.tar.[gx]z
+*.tar.bz2
+*.t[gxb]z

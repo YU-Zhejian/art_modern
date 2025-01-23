@@ -11,7 +11,6 @@
 #include "libam/utils/mpi_utils.hh" // NOLINT
 #include "libam/utils/seq_utils.hh"
 
-#include <boost/algorithm/string/predicate.hpp>
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 
 #include <htslib/hts.h>
@@ -101,7 +100,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
 
 sam_hdr_t* BamUtils::init_header(const BamOptions& sam_options)
 {
-    const auto sam_header
+    auto* const sam_header
         = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
 
     CExceptionsProxy::assert_numeric(
@@ -116,19 +115,19 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
 {
     std::string mode;
     if (sam_options.write_bam) {
-        if (!boost::ends_with(filename, ".bam")) {
+        if (!ends_with(filename, ".bam")) {
             BOOST_LOG_TRIVIAL(warning) << "BAM file name was not end with .bam: " << filename;
         }
         mode += "wb";
         mode += std::to_string(sam_options.compress_level);
     } else {
-        if (!boost::ends_with(filename, ".sam")) {
+        if (!ends_with(filename, ".sam")) {
             BOOST_LOG_TRIVIAL(warning) << "SAM file name was not end with .bam: " << filename;
         }
         mode += "wh";
     }
 
-    const auto retv = CExceptionsProxy::assert_not_null(
+    auto* const retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");
     CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
         "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);

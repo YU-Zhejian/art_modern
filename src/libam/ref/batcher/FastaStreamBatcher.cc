@@ -21,7 +21,7 @@ FastaStreamBatcher::FastaStreamBatcher(const std::size_t batch_size, std::istrea
 }
 InMemoryFastaFetch FastaStreamBatcher::fetch()
 {
-    std::scoped_lock lock(mutex_);
+    const std::scoped_lock lock(mutex_);
     std::vector<std::string> seq_names;
     std::vector<std::string> seqs;
     if (batch_size_ != std::numeric_limits<int>::max()) {

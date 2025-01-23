@@ -1,6 +1,7 @@
 #include "art/Empdist.hh"
 
 #include "art/ArtConstants.hh"
+#include "art/BuiltinProfile.hh"
 #include "art/random_generator.hh"
 
 #include "libam/Dtypes.hh"
@@ -33,6 +34,22 @@ namespace {
         }
     }
 } // namespace
+
+Empdist::Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_pe, std::size_t read_len)
+    : sep_qual_(sep_qual)
+    , is_pe_(is_pe)
+    , read_len_(read_len)
+{
+    std::istringstream ss(builtin_profile.r1_profile);
+    read_emp_dist_(ss, true);
+    if (!builtin_profile.r2_profile.empty()) {
+        std::istringstream ss2(builtin_profile.r2_profile);
+        read_emp_dist_(ss2, false);
+    }
+    validate_();
+    BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
+    print_();
+}
 
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
     const bool is_pe, const std::size_t read_len)
@@ -287,6 +304,8 @@ void Empdist::validate_() const
                                          << ") exceeds the "
                                             "length of the read quality profile ("
                                          << qual_dist_second.size() << ")";
+                print_();
+                abort_mpi();
             }
         }
     }

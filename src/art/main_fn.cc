@@ -4,8 +4,8 @@
 
 #include "art/ArtConstants.hh"
 #include "art/ArtJobExecutor.hh"
-#include "art/ArtJobPool.hh"
 #include "art/ArtParams.hh"
+#include "libam/JobPool.hh"
 
 #include "libam/Constants.hh"
 #include "libam/jobs/SimulationJob.hh"
@@ -33,7 +33,7 @@ namespace {
     {
         const OutputDispatcherFactory out_dispatcher_factory;
         int job_id = 0;
-        ArtJobPool job_pool(art_params);
+        JobPool<ArtJobExecutor> job_pool(art_params.parallel);
 
         // Coverage-based parallelism
         const auto coverage_info = art_params.coverage_info.div(art_params.parallel);
@@ -87,7 +87,7 @@ void generate_all(const ArtParams& art_params)
         const OutputDispatcherFactory out_dispatcher_factory;
         BaseReadOutput* out_dispatcher = nullptr;
         int job_id = 0;
-        ArtJobPool job_pool(art_params);
+        JobPool<ArtJobExecutor> job_pool(art_params.parallel);
         // Batch-based parallelism
         if (art_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
             auto const& coverage_info = art_params.coverage_info;
@@ -101,7 +101,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -116,7 +116,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -138,7 +138,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }
@@ -153,7 +153,7 @@ void generate_all(const ArtParams& art_params)
                         break;
                     }
                     job_id += 1;
-                    SimulationJob sj(new InMemoryFastaFetch(std::move(fa_view)), coverage_info, job_id, true);
+                    SimulationJob sj(new InMemoryFastaFetch(fa_view), coverage_info, job_id, true);
                     auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params, out_dispatcher);
                     job_pool.add(aje);
                 }

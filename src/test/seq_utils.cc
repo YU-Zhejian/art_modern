@@ -3,9 +3,9 @@
 #include "libam/utils/seq_utils.hh"
 #include "libam/ds/PairwiseAlignment.hh"
 
-#include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test.hpp> // NOLINT
 
-#include <htslib/sam.h>
+#include <string>
 
 using namespace labw::art_modern; // NOLINT
 

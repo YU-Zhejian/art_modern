@@ -13,7 +13,7 @@
 namespace labw::art_modern {
 FastaRecord FastaIterator::next()
 {
-    std::scoped_lock rhs_lk(mutex_);
+    const std::scoped_lock rhs_lk(mutex_);
     std::string next_record_id;
     std::string next_record_sequence;
     std::string nextLine;
@@ -34,9 +34,9 @@ FastaRecord FastaIterator::next()
         }
         std::vector<std::string> parts;
         // TODO: Optimize this
-        split(parts, nextLine.substr(1), boost::is_any_of(" \t\f"));
+        split(parts, nextLine, boost::is_any_of(" \t\f"));
         if (!parts.empty()) {
-            next_record_id = parts[0];
+            next_record_id = parts[0].substr(1);
         } else {
             throw MalformedFastaException();
         }

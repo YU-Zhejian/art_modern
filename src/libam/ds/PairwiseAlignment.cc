@@ -5,6 +5,7 @@
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
 
+#include <algorithm>
 #include <boost/algorithm/string/erase.hpp>
 
 #include <htslib/hts.h>
@@ -108,8 +109,9 @@ std::string PairwiseAlignment::serialize() const
     std::string query = serialized[1];
     std::string ref = serialized[2];
     std::string qual = serialized[3];
-    boost::algorithm::erase_all(query, ALN_GAP_STR);
-    boost::algorithm::erase_all(ref, ALN_GAP_STR);
+    query.erase(std::remove(query.begin(), query.end(), ALN_GAP), query.end());
+    ref.erase(std::remove(ref.begin(), ref.end(), ALN_GAP), ref.end());
+
     return { std::move(read_name), std::move(contig_name), std::move(query), std::move(ref), std::move(qual),
         std::move(aligned_query), std::move(aligned_ref), pos_on_contig, is_plus_strand };
 }

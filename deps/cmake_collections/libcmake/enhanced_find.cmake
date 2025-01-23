@@ -31,6 +31,8 @@ Warnings:
 function(ceu_cm_get_abspath_from_linker_flag OUTPUT_VARIABLE LINKER_FLAG IS_STATIC)
     if(IS_STATIC)
         set(POSSIBLE_LIBRARY_FILENAMES
+        "${LINKER_FLAG}"
+        "${CMAKE_STATIC_LIBRARY_PREFIX}${LINKER_FLAG}"
             "${LINKER_FLAG}${CMAKE_STATIC_LIBRARY_SUFFIX}"
             "${CMAKE_STATIC_LIBRARY_PREFIX}${LINKER_FLAG}${CMAKE_STATIC_LIBRARY_SUFFIX}"
             "lib${LINKER_FLAG}${CMAKE_STATIC_LIBRARY_SUFFIX}"
@@ -39,12 +41,15 @@ function(ceu_cm_get_abspath_from_linker_flag OUTPUT_VARIABLE LINKER_FLAG IS_STAT
             "lib${LINKER_FLAG}.a")
     else()
         set(POSSIBLE_LIBRARY_FILENAMES
+            "${LINKER_FLAG}"
+            "${CMAKE_SHARED_LIBRARY_PREFIX}${LINKER_FLAG}"
             "${LINKER_FLAG}${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${CMAKE_SHARED_LIBRARY_PREFIX}${LINKER_FLAG}${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "lib${LINKER_FLAG}${CMAKE_SHARED_LIBRARY_SUFFIX}"
             "${LINKER_FLAG}.so"
             "${CMAKE_SHARED_LIBRARY_PREFIX}${LINKER_FLAG}.so"
             "lib${LINKER_FLAG}.so"
+            "lib${LINKER_FLAG}.dylib"
             "${LINKER_FLAG}.dll"
             "${CMAKE_SHARED_LIBRARY_PREFIX}${LINKER_FLAG}.dll"
             "lib${LINKER_FLAG}.dll"

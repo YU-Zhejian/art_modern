@@ -23,7 +23,7 @@ Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(const std::size_t batch_size, s
 }
 std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
 {
-    std::scoped_lock lock(mutex_);
+    const std::scoped_lock lock(mutex_);
     CoverageInfo::coverage_map coverage_positive;
     CoverageInfo::coverage_map coverage_negative;
     std::vector<std::string> seq_names;

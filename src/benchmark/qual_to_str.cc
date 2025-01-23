@@ -6,7 +6,7 @@
 #include <random>
 #include <vector>
 
-using namespace labw::art_modern;
+using namespace labw::art_modern; // NOLINT
 
 void bench(const int run_times, const int rlen)
 {

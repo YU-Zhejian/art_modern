@@ -6,7 +6,7 @@
 
 #include <boost/log/trivial.hpp>
 
-#ifdef USE_ASIO_PARALLEL
+#if !defined(USE_NOP_PARALLEL)
 #include <concurrentqueue.h>
 #endif
 
@@ -19,7 +19,7 @@
 
 namespace labw::art_modern {
 
-#ifdef USE_ASIO_PARALLEL
+#if !defined(USE_NOP_PARALLEL)
 template <typename T> class LockFreeIO {
 public:
     DELETE_MOVE(LockFreeIO)
@@ -86,7 +86,7 @@ private:
     }
 };
 
-#elif defined(USE_NOP_PARALLEL)
+#else
 template <typename T> class LockFreeIO {
 public:
     LockFreeIO() = default;

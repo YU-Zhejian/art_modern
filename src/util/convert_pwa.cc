@@ -1,18 +1,18 @@
-#include <boost/algorithm/string.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options.hpp>
 
 #include <fstream>
 #include <iostream>
 
-#include "ds/PairwiseAlignment.hh"
 #include "libam/Constants.hh"
-#include "out/OutputDispatcher.hh"
-#include "ref/batcher/Pbsim3TranscriptBatcher.hh"
-#include "ref/fetch/FaidxFetch.hh"
-#include "ref/fetch/InMemoryFastaFetch.hh"
-#include "utils/fs_utils.hh"
-#include "utils/mpi_utils.hh"
+#include "libam/ds/PairwiseAlignment.hh"
+#include "libam/out/OutputDispatcher.hh"
+#include "libam/ref/batcher/Pbsim3TranscriptBatcher.hh"
+#include "libam/ref/fetch/FaidxFetch.hh"
+#include "libam/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam/utils/fs_utils.hh"
+#include "libam/utils/mpi_utils.hh"
+#include "libam/utils/seq_utils.hh"
 
 namespace po = boost::program_options;
 using namespace labw::art_modern;
@@ -33,7 +33,7 @@ INPUT_FILE_TYPE get_input_file_type(const std::string& input_file_type_str, cons
         return INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS;
     } else if (input_file_type_str == INPUT_FILE_TYPE_AUTO) {
         for (const auto& fasta_file_end : std::vector<std::string> { "fna", "fsa", "fa", "fasta" }) {
-            if (boost::algorithm::ends_with(input_file_name, fasta_file_end)) {
+            if (ends_with(input_file_name, fasta_file_end)) {
                 return INPUT_FILE_TYPE::FASTA;
             }
         }
@@ -85,7 +85,7 @@ po::options_description get_po_desc(const OutputDispatcherFactory& factory)
         "the filename of input reference genome, reference "
         "transcriptome, or templates");
 
-    auto po_desc = boost::program_options::options_description("Options");
+    auto po_desc = po::options_description("Options");
     po_desc.add(required_opts);
     factory.patch_options(po_desc);
     return po_desc;

@@ -31,7 +31,16 @@ Changes in software implementation:
 
 ## 1.0.1
 
-Fixed miscelaneous bugs.
+Fixed miscellaneous bugs.
 
 - Further fixed issue #2.
 - More compiler versions tested; The software now supports Clang 10.0.0+, GCC 9.5.0+, and AOCC 3.2.0+.
+
+## 1.1.0
+
+- `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
+- [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
+- Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
+- Tested MacOS X Sequoia 15 with Command Line Tools for Xcode 16.2, CMake 3.31.4, and Boost 1.87.0. Fixed #3.
+- Bumped bundled HTSLib to 1.21.
+- Miscellaneous bug fixes.

@@ -21,8 +21,9 @@ std::string qual_to_str_for_loop(const am_qual_t* qual, size_t qlen);
 std::string qual_to_str_foreach(const am_qual_t* qual, size_t qlen);
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr);
 std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n);
+bool ends_with(const std::string& str, const std::string& suffix);
 
-/**
+/*!
  * Reverse an arbitrary sequence.
  *
  * @tparam T Sequence type.
