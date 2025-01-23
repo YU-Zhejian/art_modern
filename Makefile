@@ -1,6 +1,5 @@
 CMAKE_FLAGS ?= 
 
-
 .PHONY: build
 build:
 	mkdir -p opt/build_debug

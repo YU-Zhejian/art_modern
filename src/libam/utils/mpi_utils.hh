@@ -35,7 +35,7 @@ void init_mpi(int* argc, char*** argv);
  */
 void bye_mpi();
 
-/*£¡
+/*!
  * Get the current MPI rank in string.
  *
  * @return The current MPI rank in string.

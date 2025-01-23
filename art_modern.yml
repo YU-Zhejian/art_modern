@@ -27,6 +27,8 @@ dependencies:
   - pandas
   - scipy
   # Build tools
-  # - conda-forge::ninja
-  # - conda-forge::cmake
-  # - conda-forge::make
+  - conda-forge::ninja
+  - conda-forge::cmake
+  - conda-forge::make
+  - conda-forge::coreutils
+  - conda-forge::bash
