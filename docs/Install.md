@@ -228,11 +228,26 @@ xcode-select --install
 
 Alternatively, you may get the latest version [here](https://developer.apple.com/download/all). An Apple account is required.
 
-Download CMake from [here](https://cmake.org/download/). You should modify PATH in `~/.bashrc` or `~/.zshrc` to include the `bin` directory of the CMake installation. If you install the DMG image, it will commonly be XXX.
+Download CMake from [here](https://cmake.org/download/). You should modify PATH in `~/.bashrc` or `~/.zshrc` to include the `bin` directory of the CMake installation. If you install the DMG image, it will commonly be located in `/Applications/CMake.app/Contents/bin/cmake`.
 
-Download Boost source code from [here](https://www.boost.org/users/download/). Build it from source using:
+Download Boost source code from [here](https://www.boost.org/users/download/). Extract it. Build it from source using:
 
 ```shell
+# Assume you got Boost 1.87.0.
+# Assume you've extracted the source code in your Downloads version
+cd Downloads/boost_1_87_0
 ./bootstrap.sh
 ./b2
 ```
+
+And then you may use CMake to build this project through:
+
+```shell
+mkdir -p build
+cd build
+# Set -DBoost_DIR accordfingly.
+# Older CMake may have different bnehaviour.
+cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boost-1.87.0
+```
+
+You may also setup dependencies using [Conda](XXX) or [HomeBrew](XXX).

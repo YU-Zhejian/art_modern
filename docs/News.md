@@ -41,6 +41,6 @@ Fixed miscellaneous bugs.
 - `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
 - [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
 - Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
-- Tested MacOS X Sequoia 15 with Command Line Tools for Xcode 16.2, CMake 3.31.4, and Boost 1.87.0. Fixed #3.
+- Tested MacOS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
