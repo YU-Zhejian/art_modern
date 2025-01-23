@@ -4,6 +4,8 @@
 
 #include "libam/CExceptionsProxy.hh"
 
+#include <absl/base/casts.h>
+
 #include <htslib/sam.h>
 
 #include <cstddef>
@@ -17,7 +19,7 @@ void BamTags::patch(bam1_t* record) const
 {
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
         CExceptionsProxy::assert_numeric(bam_aux_append(record, tag_name.c_str(), tag_type, tag_len,
-                                             reinterpret_cast<const uint8_t*>(tag_data->c_str())),
+                                             absl::bit_cast<const uint8_t*>(tag_data->c_str())),
             USED_HTSLIB_NAME, "Failed to add tag to read", false, CExceptionsProxy::EXPECTATION::ZERO);
     }
 }

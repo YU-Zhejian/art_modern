@@ -27,6 +27,7 @@ public:
 
     DELETE_COPY(Rprob)
     DELETE_MOVE(Rprob)
+    ~Rprob();
 
     double r_prob();
     void r_probs(std::size_t n);
@@ -35,7 +36,6 @@ public:
     char rand_base();
     void rand_quality();
     int rand_quality_less_than_10();
-    ~Rprob();
     int rand_pos_on_read();
     int rand_pos_on_read_not_head_and_tail();
     int randint(int min, int max);
