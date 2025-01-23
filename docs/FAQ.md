@@ -43,6 +43,28 @@ Currently, it does not due to the extensive use of `test_run` in CMake scripts.
 
 Please submit a bug-report with instructions on how I may emulate your platform using free emulators like [QEMU](https://www.qemu.org/).
 
+## Community
+
+### I am new to GNU/Linux. How can I gather required information for a bug report?
+
+Followings are where you may find the required information:
+
+- Name and version of your current operating system in an human-readable way.
+
+  You may find that out by reading `/etc/lsb-release` or use [neofetch](https://github.com/dylanaraps/neofetch), [screenFetch](https://github.com/KittyKatt/screenFetch), [fastfetch](https://github.com/fastfetch-cli/fastfetch)
+
+- Version of the kernel.
+
+  Easy, just run `uname -a`, or `cat /proc/version`.
+
+- Version of the compiler.
+
+  - First of all, if your CMake correctly identifies your compiler, you may put the first several lines of CMake output to the bug report.
+  - If you use GCC, it will be `g++ --version`.
+  - If you use LLVM Clang, it will be `clang++ --version`.
+  - If you use Intel (R) oneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh`, before invoking this command.
+  - Consult your compiler's documentation for other compilers.
+
 ## My question is still unanswered
 
 Please feel free to open an issue on GitHub or E-mail the maintainer.
