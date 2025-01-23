@@ -13,10 +13,11 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
     endif()
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.0)
+    VERSION 1.1.1)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)

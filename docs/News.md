@@ -44,3 +44,7 @@ Fixed miscellaneous bugs.
 - Tested MacOS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
+
+## 1.1.1
+
+- Possible build acceleration using [ccache](https://ccache.dev/) supported.

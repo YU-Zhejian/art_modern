@@ -9,13 +9,14 @@
 #elif defined(USE_BOOST_RANDOM)
 #include <boost/random.hpp>
 #elif defined(USE_ONEMKL_RANDOM)
-#include <mkl.h>
+#include <mkl.h> // NOLINT
 #elif defined(USE_GSL_RANDOM)
 #include <gsl/gsl_rng.h>
 #else
 #error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM or USE_GSL_RANDOM for random generators!"
 #endif
 
+#include <cstddef>
 #include <cstdint>
 #include <vector>
 
