@@ -11,7 +11,7 @@
 namespace labw::art_modern {
 class BamTags {
 public:
-    using data_type = std::shared_ptr<uint8_t[]>;
+    using data_type = std::shared_ptr<std::string>;
     using tag_type = std::tuple<std::string, char, int, data_type>;
     void patch(bam1_t* record) const;
     [[nodiscard]] size_t size() const;
