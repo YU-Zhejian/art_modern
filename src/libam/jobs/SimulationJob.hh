@@ -2,23 +2,24 @@
 
 #include "libam/ds/CoverageInfo.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
+#include "libam/utils/class_macros_utils.hh"
+
+#include <memory>
 
 namespace labw::art_modern {
 
 class SimulationJob {
 public:
-    ~SimulationJob();
-    SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, int job_id,
-        bool free_fasta_fetch_after_execution);
+    SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
+        const std::shared_ptr<CoverageInfo>& coverage_info, int job_id, bool free_fasta_fetch_after_execution);
+    SimulationJob& operator=(SimulationJob&&) = delete;
 
     SimulationJob(SimulationJob&& other) noexcept;
+    DELETE_COPY(SimulationJob)
+    ~SimulationJob() = default;
 
-    SimulationJob(const SimulationJob&) = delete;
-    SimulationJob& operator=(SimulationJob&&) = delete;
-    SimulationJob& operator=(const SimulationJob&) = delete;
-
-    BaseFastaFetch* fasta_fetch;
-    const CoverageInfo coverage_info; // We own this
+    std::shared_ptr<BaseFastaFetch> fasta_fetch;
+    std::shared_ptr<CoverageInfo> coverage_info;
     const int job_id;
     const bool free_fasta_fetch_after_execution;
 };

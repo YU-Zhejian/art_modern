@@ -276,7 +276,6 @@ ArtRead::ArtRead(
     const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob)
     : art_params_(art_params)
     , contig_name_(contig_name)
-    , pos_on_contig_(0) // Defaults
     , read_name_(read_name)
     , rprob_(rprob)
 {

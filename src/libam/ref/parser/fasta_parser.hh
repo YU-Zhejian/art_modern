@@ -2,6 +2,8 @@
 
 #include "libam/utils/class_macros_utils.hh"
 
+#include <absl/base/attributes.h>
+
 #include <cstddef>
 #include <exception>
 #include <istream>
@@ -13,11 +15,12 @@ namespace labw::art_modern {
 
 using FastaRecord = std::pair<std::string, std::string>;
 
-struct EOFException : std::exception { };
+struct EOFException : std::exception {
+} ABSL_ATTRIBUTE_PACKED;
 struct MalformedFastaException : std::exception {
 public:
     [[nodiscard]] const char* what() const noexcept override;
-};
+} ABSL_ATTRIBUTE_PACKED;
 
 class FastaIterator {
 public:

@@ -3,6 +3,7 @@
  *  An exception proxy for C exceptions, with helper functions that asserts return value of C routines.
  */
 #pragma once
+#include "libam/utils/class_macros_utils.hh"
 #include "libam/utils/exception_utils.hh"
 
 #include <cerrno>
@@ -39,6 +40,9 @@ public:
      * @param details Details about the error.
      */
     CExceptionsProxy(std::string c_lib_name, std::string details);
+    DEFAULT_COPY(CExceptionsProxy)
+    DEFAULT_MOVE(CExceptionsProxy)
+
     /** Default destructor. */
     ~CExceptionsProxy() override = default;
 

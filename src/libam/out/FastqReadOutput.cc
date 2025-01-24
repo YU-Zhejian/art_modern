@@ -85,13 +85,13 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
         "Destination of output FASTQ file. Unset to disable the writer.");
     desc.add(fastq_desc);
 }
-BaseReadOutput* FastqReadOutputFactory::create(const boost::program_options::variables_map& vm,
+std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const boost::program_options::variables_map& vm,
     [[maybe_unused]] const BaseFastaFetch* /*fasta_fetch*/,
     [[maybe_unused]] const std::vector<std::string>& /*args*/) const
 {
     if (vm.count("o-fastq") != 0) {
-        return new FastqReadOutput(vm["o-fastq"].as<std::string>());
+        return std::make_shared<FastqReadOutput>(vm["o-fastq"].as<std::string>());
     }
-    return new DumbReadOutput();
+    return std::make_shared<DumbReadOutput>();
 }
 } // namespace labw::art_modern

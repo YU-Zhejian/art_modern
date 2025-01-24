@@ -190,7 +190,7 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
         "compression.");
     desc.add(bam_desc);
 }
-BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
+std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
     const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
     if (vm.count("o-sam") != 0U) {
@@ -210,9 +210,9 @@ BaseReadOutput* BamReadOutputFactory::create(const boost::program_options::varia
                                      << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
-        return new BamReadOutput(vm["o-sam"].as<std::string>(), fasta_fetch, so);
+        return std::make_shared<BamReadOutput>(vm["o-sam"].as<std::string>(), fasta_fetch, so);
     }
-    return new DumbReadOutput();
+    return std::make_shared<DumbReadOutput>();
 }
 const std::string BamReadOutputFactory::name() const { return "BAM"; }
 

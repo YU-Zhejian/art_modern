@@ -191,7 +191,7 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
     desc.add(bam_desc);
 }
 
-BaseReadOutput* HeadlessBamReadOutputFactory::create(const boost::program_options::variables_map& vm,
+std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const boost::program_options::variables_map& vm,
     const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
     if (vm.count("o-hl_sam") != 0U) {
@@ -210,9 +210,9 @@ BaseReadOutput* HeadlessBamReadOutputFactory::create(const boost::program_option
                                      << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
-        return new HeadlessBamReadOutput(vm["o-hl_sam"].as<std::string>(), so);
+        return std::make_shared<HeadlessBamReadOutput>(vm["o-hl_sam"].as<std::string>(), so);
     }
-    return new DumbReadOutput();
+    return std::make_shared<DumbReadOutput>();
 }
 
 HeadlessBamReadOutputFactory::~HeadlessBamReadOutputFactory() = default;

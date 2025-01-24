@@ -3,11 +3,11 @@
 #include "libam/utils/seq_utils.hh"
 #include "libam/ds/PairwiseAlignment.hh"
 
-#include <boost/test/unit_test.hpp> // NOLINT
+#include <boost/test/unit_test.hpp>
 
 #include <string>
 
-using namespace labw::art_modern; // NOLINT
+using namespace labw::art_modern;
 
 BOOST_AUTO_TEST_CASE(test_seq_utils_1)
 {

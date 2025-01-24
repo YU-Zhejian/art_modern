@@ -2,12 +2,14 @@
 #include "libam/utils/seq_utils.hh"
 
 #include <chrono>
+#include <cstdlib>
 #include <iostream>
 #include <random>
 #include <vector>
 
 using namespace labw::art_modern; // NOLINT
 
+namespace {
 void bench(const int run_times, const int rlen)
 {
     std::cout << "run_times: " << run_times << " rlen: " << rlen << std::endl;
@@ -19,25 +21,26 @@ void bench(const int run_times, const int rlen)
     for (int i = 0; i < rlen; i++) {
         q.emplace_back(dis(gen));
     }
-    std::chrono::high_resolution_clock::time_point start, end;
+    std::chrono::high_resolution_clock::time_point start;
+    std::chrono::high_resolution_clock::time_point end;
 
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
-        volatile auto s = qual_to_str_avx2(q.data(), rlen);
+        volatile auto s = qual_to_str_avx2(q.data(), rlen); // NOLINT
     }
     end = std::chrono::high_resolution_clock::now();
     std::cout << "AVX2: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
-        volatile auto s = qual_to_str_sse2(q.data(), rlen);
+        volatile auto s = qual_to_str_sse2(q.data(), rlen); // NOLINT
     }
     end = std::chrono::high_resolution_clock::now();
     std::cout << "SSE2: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
-        volatile auto s = qual_to_str_mmx(q.data(), rlen);
+        volatile auto s = qual_to_str_mmx(q.data(), rlen); // NOLINT
     }
 
     end = std::chrono::high_resolution_clock::now();
@@ -45,7 +48,7 @@ void bench(const int run_times, const int rlen)
 
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
-        volatile auto s = qual_to_str(q.data(), rlen);
+        volatile auto s = qual_to_str(q.data(), rlen); // NOLINT
     }
     end = std::chrono::high_resolution_clock::now();
     std::cout << "Scala (for loop): " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
@@ -53,29 +56,30 @@ void bench(const int run_times, const int rlen)
 
     start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
-        volatile auto s = qual_to_str_foreach(q.data(), rlen);
+        volatile auto s = qual_to_str_foreach(q.data(), rlen); // NOLINT
     }
     end = std::chrono::high_resolution_clock::now();
     std::cout << "Scala (std::for_each): " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()
               << std::endl;
 
     if (qual_to_str_sse2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        throw std::exception();
+        std::abort();
     }
 
     if (qual_to_str_mmx(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        throw std::exception();
+        std::abort();
     }
 
     if (qual_to_str_for_loop(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        throw std::exception();
+        std::abort();
     }
 
     if (qual_to_str_avx2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        throw std::exception();
+        std::abort();
     }
 }
 
+} // namespace
 int main()
 {
     bench(1000000, 36);

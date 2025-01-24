@@ -9,6 +9,7 @@
 #include <cstddef>
 #include <iostream>
 #include <limits>
+#include <memory>
 #include <mutex>
 #include <stdexcept>
 #include <string>
@@ -21,7 +22,7 @@ Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(const std::size_t batch_size, s
     , istream_(istream)
 {
 }
-std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
+std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pbsim3TranscriptBatcher::fetch()
 {
     const std::scoped_lock lock(mutex_);
     CoverageInfo::coverage_map coverage_positive;
@@ -51,6 +52,7 @@ std::pair<InMemoryFastaFetch, CoverageInfo> Pbsim3TranscriptBatcher::fetch()
             throw std::invalid_argument("Cannot parse PBSIM3 transcript " + line);
         }
     }
-    return { InMemoryFastaFetch(seq_names, seqs), CoverageInfo(coverage_positive, coverage_negative) };
+    return { std::make_shared<InMemoryFastaFetch>(std::move(seq_names), std::move(seqs)),
+        std::make_shared<CoverageInfo>(std::move(coverage_positive), std::move(coverage_negative)) };
 }
 } // namespace labw::art_modern

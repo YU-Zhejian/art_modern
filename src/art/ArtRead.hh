@@ -7,6 +7,8 @@
 #include "libam/ds/PairwiseAlignment.hh"
 #include "libam/utils/class_macros_utils.hh"
 
+#include <absl/base/attributes.h>
+
 #include <htslib/hts.h>
 
 #include <functional>
@@ -19,7 +21,7 @@ namespace labw::art_modern {
 
 struct ReadGenerationException : public std::runtime_error {
     using runtime_error::runtime_error;
-};
+} ABSL_ATTRIBUTE_PACKED;
 
 class ArtRead {
 public:
@@ -60,7 +62,7 @@ private:
     std::string contig_name_;
     std::map<int, char, std::less<>> indel_;
     bool is_plus_strand_ = false;
-    hts_pos_t pos_on_contig_;
+    hts_pos_t pos_on_contig_ = 0;
     std::vector<am_qual_t> qual_;
     std::string read_name_;
     Rprob& rprob_;

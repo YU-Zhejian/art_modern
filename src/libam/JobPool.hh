@@ -68,7 +68,7 @@ public:
      */
     void add(const std::shared_ptr<T>& aje)
     {
-        std::scoped_lock lock(mutex_);
+        const std::scoped_lock lock(mutex_);
         // Spin until there's a slot
         while (n_running_ajes() >= pool_size_) {
             std::this_thread::sleep_for(std::chrono::milliseconds(10));

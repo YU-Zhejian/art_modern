@@ -10,22 +10,23 @@
 
 #include <atomic>
 #include <cstddef>
+#include <memory>
 #include <string>
 
 namespace labw::art_modern {
 
 class ArtJobExecutor {
 public:
-    ArtJobExecutor(ArtJobExecutor&& other) noexcept;
-
-    DELETE_COPY(ArtJobExecutor)
-    ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
-
-    ArtJobExecutor(SimulationJob job, const ArtParams& art_params, BaseReadOutput* output_dispatcher);
-
+    ArtJobExecutor(
+        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<BaseReadOutput>& output_dispatcher);
     ~ArtJobExecutor() = default;
+
+    ArtJobExecutor(ArtJobExecutor&& other) noexcept;
+    ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
+    DELETE_COPY(ArtJobExecutor)
+
     void operator()();
-    std::string thread_info() const;
+    [[nodiscard]] std::string thread_info() const;
     std::atomic<bool> is_running = false;
 
 private:
@@ -37,7 +38,7 @@ private:
     SimulationJob job_;
     const std::string mpi_rank_;
     std::atomic<std::size_t> num_reads;
-    BaseReadOutput* output_dispatcher_;
+    std::shared_ptr<BaseReadOutput> output_dispatcher_;
     Rprob rprob_;
     const int num_reads_to_reduce_;
 };

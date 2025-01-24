@@ -13,6 +13,7 @@
 
 #include <htslib/sam.h>
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -20,10 +21,8 @@ namespace labw::art_modern {
 
 class HeadlessBamReadOutput : public BaseFileReadOutput {
 public:
-    HeadlessBamReadOutput(HeadlessBamReadOutput&& other) = delete;
-    HeadlessBamReadOutput(const HeadlessBamReadOutput&) = delete;
-    HeadlessBamReadOutput& operator=(HeadlessBamReadOutput&&) = delete;
-    HeadlessBamReadOutput& operator=(const HeadlessBamReadOutput&) = delete;
+    DELETE_MOVE(HeadlessBamReadOutput)
+    DELETE_COPY(HeadlessBamReadOutput)
 
     HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options);
     void writeSE(const PairwiseAlignment& pwa) override;
@@ -46,8 +45,8 @@ public:
 
     [[nodiscard]] const std::string name() const override { return "HeadlessBam"; }
     void patch_options(boost::program_options::options_description& desc) const override;
-    BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
-        const std::vector<std::string>& args) const override;
+    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
+        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
     ~HeadlessBamReadOutputFactory() override;
 
 private:

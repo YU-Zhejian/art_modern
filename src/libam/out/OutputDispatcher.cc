@@ -40,16 +40,9 @@ void OutputDispatcher::close()
     }
 }
 
-OutputDispatcher::~OutputDispatcher()
-{
-    OutputDispatcher::close();
+OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
 
-    for (const auto& output : outputs_) {
-        delete output;
-    }
-}
-
-void OutputDispatcher::add(BaseReadOutput* output) { outputs_.emplace_back(output); }
+void OutputDispatcher::add(std::shared_ptr<BaseReadOutput>&& output) { outputs_.emplace_back(std::move(output)); }
 
 void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc) const
 {
@@ -57,10 +50,10 @@ void OutputDispatcherFactory::patch_options(boost::program_options::options_desc
         factory->patch_options(desc);
     }
 }
-BaseReadOutput* OutputDispatcherFactory::create(const boost::program_options::variables_map& vm,
+std::shared_ptr<BaseReadOutput> OutputDispatcherFactory::create(const boost::program_options::variables_map& vm,
     const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
 {
-    auto* const output_dispatcher = new OutputDispatcher();
+    auto output_dispatcher = std::make_shared<OutputDispatcher>();
     for (auto const& factory : factories_) {
         output_dispatcher->add(factory->create(vm, fasta_fetch, args));
     }

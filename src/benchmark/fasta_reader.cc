@@ -7,14 +7,16 @@
 #include <algorithm>
 #include <cstddef>
 #include <iostream>
+#include <memory>
 #include <random>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 using namespace labw::art_modern; // NOLINT
-
-void bench_ff(BaseFastaFetch* ff, const std::string& name)
+namespace {
+void bench_ff(std::unique_ptr<BaseFastaFetch> ff, const std::string& name)
 {
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -40,22 +42,19 @@ void bench_ff(BaseFastaFetch* ff, const std::string& name)
     }
     std::cout << name << " fetched_size: " << fetched_size << std::endl;
 }
-
+} // namespace
 int main()
 {
-    std::vector<std::string> data { "ce11.mRNA_head", "ce11_chr1" };
+    const std::vector<std::string> data { "ce11.mRNA_head", "ce11_chr1" };
 
     for (const auto& datum : data) {
-        BaseFastaFetch* ff = new FaidxFetch(datum + ".fa");
-        bench_ff(ff, datum + "-faidx-fa");
-        delete ff;
+        std::unique_ptr<BaseFastaFetch> ff = std::make_unique<FaidxFetch>(datum + ".fa");
+        bench_ff(std::move(ff), datum + "-faidx-fa");
 
-        ff = new FaidxFetch(datum + ".fa.gz");
-        bench_ff(ff, datum + "-faidx-fa.gz");
-        delete ff;
+        ff = std::make_unique<FaidxFetch>(datum + ".fa.gz");
+        bench_ff(std::move(ff), datum + "-faidx-fa.gz");
 
-        ff = new InMemoryFastaFetch(datum + ".fa");
-        bench_ff(ff, datum + "-memory-fa");
-        delete ff;
+        ff = std::make_unique<InMemoryFastaFetch>(datum + ".fa");
+        bench_ff(std::move(ff), datum + "-memory-fa");
     }
 }

@@ -20,10 +20,8 @@ namespace labw::art_modern {
 
 class BamReadOutput : public BaseFileReadOutput {
 public:
-    BamReadOutput(BamReadOutput&& other) = delete;
-    BamReadOutput(const BamReadOutput&) = delete;
-    BamReadOutput& operator=(BamReadOutput&&) = delete;
-    BamReadOutput& operator=(const BamReadOutput&) = delete;
+    DELETE_MOVE(BamReadOutput)
+    DELETE_COPY(BamReadOutput)
 
     BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, const BamOptions& sam_options);
     void writeSE(const PairwiseAlignment& pwa) override;
@@ -46,8 +44,8 @@ public:
 
     [[nodiscard]] const std::string name() const override;
     void patch_options(boost::program_options::options_description& desc) const override;
-    BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
-        const std::vector<std::string>& args) const override;
+    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
+        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
     ~BamReadOutputFactory() override;
 
 private:

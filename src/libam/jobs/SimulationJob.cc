@@ -3,11 +3,13 @@
 #include "libam/ds/CoverageInfo.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
 
-namespace labw::art_modern {
-SimulationJob::~SimulationJob() = default;
+#include <memory>
+#include <utility>
 
-SimulationJob::SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& coverage_info, const int job_id,
-    const bool free_fasta_fetch_after_execution)
+namespace labw::art_modern {
+
+SimulationJob::SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
+    const std::shared_ptr<CoverageInfo>& coverage_info, const int job_id, const bool free_fasta_fetch_after_execution)
     : fasta_fetch(fasta_fetch)
     , coverage_info(coverage_info)
     , job_id(job_id)
@@ -15,8 +17,8 @@ SimulationJob::SimulationJob(BaseFastaFetch* fasta_fetch, const CoverageInfo& co
 {
 }
 SimulationJob::SimulationJob(SimulationJob&& other) noexcept
-    : fasta_fetch(other.fasta_fetch)
-    , coverage_info(other.coverage_info)
+    : fasta_fetch(std::move(other.fasta_fetch))
+    , coverage_info(std::move(other.coverage_info))
     , job_id(other.job_id)
     , free_fasta_fetch_after_execution(other.free_fasta_fetch_after_execution)
 {

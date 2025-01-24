@@ -68,12 +68,12 @@ void PwaReadOutputFactory::patch_options(boost::program_options::options_descrip
         "Destination of output pwa file. Unset to disable the writer.");
     desc.add(pwa_desc);
 }
-BaseReadOutput* PwaReadOutputFactory::create(const boost::program_options::variables_map& vm,
+std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const boost::program_options::variables_map& vm,
     const BaseFastaFetch* /*fasta_fetch*/, const std::vector<std::string>& args) const
 {
     if (vm.count("o-pwa") != 0U) {
-        return new PwaReadOutput(vm["o-pwa"].as<std::string>(), args);
+        return std::make_shared<PwaReadOutput>(vm["o-pwa"].as<std::string>(), args);
     }
-    return new DumbReadOutput();
+    return std::make_shared<DumbReadOutput>();
 }
 } // namespace labw::art_modern

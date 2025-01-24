@@ -6,6 +6,7 @@
 
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
+#include "libam/out/BaseReadOutput.hh"
 #include "libam/utils/arithmetic_utils.hh"
 #include "libam/utils/mpi_utils.hh"
 
@@ -13,9 +14,9 @@
 
 #include <htslib/hts.h>
 
-#include <algorithm>
 #include <atomic>
 #include <cstddef>
+#include <memory>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -101,7 +102,8 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-ArtJobExecutor::ArtJobExecutor(SimulationJob job, const ArtParams& art_params, BaseReadOutput* output_dispatcher)
+ArtJobExecutor::ArtJobExecutor(
+    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank())
@@ -138,8 +140,8 @@ void ArtJobExecutor::operator()()
         const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
             ? 1
             : static_cast<double>(contig_size) / art_params_.read_len;
-        const auto cov_pos = job_.coverage_info.coverage_positive(contig_name);
-        const auto cov_neg = job_.coverage_info.coverage_negative(contig_name);
+        const auto cov_pos = job_.coverage_info->coverage_positive(contig_name);
+        const auto cov_neg = job_.coverage_info->coverage_negative(contig_name);
 
         const auto num_pos_reads = static_cast<am_readnum_t>(cov_pos * cov_ratio);
         const auto num_neg_reads = static_cast<am_readnum_t>(cov_neg * cov_ratio);
@@ -158,9 +160,7 @@ void ArtJobExecutor::operator()()
                             << static_cast<double>(num_reads) * art_params_.read_len
             / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
-    if (job_.free_fasta_fetch_after_execution) {
-        delete job_.fasta_fetch;
-    }
+    if (job_.free_fasta_fetch_after_execution) { }
     is_running = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
@@ -168,7 +168,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , job_(std::move(other.job_))
     , mpi_rank_(other.mpi_rank_)
     , num_reads(other.num_reads.load())
-    , output_dispatcher_(other.output_dispatcher_)
+    , output_dispatcher_(std::move(other.output_dispatcher_))
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
 {
