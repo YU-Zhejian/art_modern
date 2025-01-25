@@ -67,6 +67,10 @@ For C library, this project works on [GNU C Library](https://www.gnu.org/softwar
 
 For Apple Mac OS X, FreeBSD, and Alpine Linux users: Please install [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [GNU Bash](https://www.gnu.org/software/bash/) and [GNU Make](https://www.gnu.org/software/make) as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
+The project may take advantage of [pkgconf](https://github.com/pkgconf/pkgconf) or [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) to locate the dependencies.
+
+The project may use [ccache](https://ccache.dev/) to speed up the compilation process.
+
 ## Dependencies
 
 Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), YUM/DNF, PacMan, etc. Otherwise, contact your system administrator for where to find them or build them from source.
@@ -104,8 +108,11 @@ To use external HTSLib, consult your system administrator. Those libraries usual
 ### Other Optional Libraries
 
 - Various libraries for accelerating random number generation. Including:
-  - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+  - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). Highly recommended if you are using Intel CPUs.
   - **OPTIONAL** [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
+- Alternate `malloc`/`free` implementations. Including:
+  - **OPTIONAL** [mi-malloc](https://github.com/microsoft/mimalloc).
+  - **OPTIONAL** [jemalloc](https://github.com/jemalloc/jemalloc).
 
 ## Using CMake Building System
 
@@ -201,12 +208,19 @@ Whether to use `btree::map` instead of `std::map`. The former is faster than the
 
 ## `USE_MALLOC`
 
-Whether to use alternative high-performance `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) or [mi-malloc](https://github.com/microsoft/mimalloc). Using those implementations can improve the performance of the program but slightly increase memory consumptions.
+Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumptions.
 
 - **`AUTO` (DEFAULT): Will use mi-malloc and then jemalloc if possible.**
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
-- `OFF`: Will not use alternative `malloc`/`free` implementations.
+- `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
+
+## `USE_CCACHE`
+
+Whether to use [ccache](https://ccache.dev/) to speed up the compilation process. Howevwer, it may not work on some systems.
+
+- **`OFF` (DEFAULT): Will not use ccache.**
+- `ON`: Will use ccache if available.
 
 ## Platform-Specific Building Instructions
 

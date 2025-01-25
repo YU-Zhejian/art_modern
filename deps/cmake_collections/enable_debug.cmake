@@ -22,6 +22,7 @@ Function:
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/detect_c_preprocessor_macros.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/check_compiler_flag.cmake")
 
 #[=======================================================================[
 ceu_cm_set_static_target -- Mark a target as static.
@@ -69,32 +70,9 @@ Notice:
 Sets:
     - CMake variable `C_COMPILER_HAVE_${FLAG}`.
 #]=======================================================================]
-function(ceu_cm_global_enhanced_check_compiler_flag)
-    foreach(FLAG ${ARGN})
-        if(DEFINED CMAKE_C_COMPILER)
-            check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
-        else()
-            # If no C support is added, bypass the test.
-            set(C_COMPILER_HAVE_${FLAG} ON)
-        endif()
-        if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER)
-            check_cxx_compiler_flag(${FLAG} CXX_COMPILER_HAVE_${FLAG})
-        else()
-            set(CXX_COMPILER_HAVE_${FLAG} ON)
-        endif()
-        if(C_COMPILER_HAVE_${FLAG} AND CXX_COMPILER_HAVE_${FLAG})
-            add_compile_options(${FLAG})
-            set(CEU_CM_ADDITIONAL_COMPILER_FLAGS
-                ${FLAG} ${CEU_CM_ADDITIONAL_COMPILER_FLAGS}
-                PARENT_SCOPE)
-            return()
-        endif()
-    endforeach()
-endfunction()
 
 if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-    set(CEU_CM_ADDITIONAL_COMPILER_FLAGS "")
     set(CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED
         ON
         CACHE INTERNAL "Whether a description on environment was printed.")
@@ -122,61 +100,10 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
         set(CEU_CM_SHOULD_USE_NATIVE OFF)
     endif()
-    if(CEU_CM_SHOULD_USE_NATIVE)
-        ceu_cm_global_enhanced_check_compiler_flag(-march=native)
-        ceu_cm_global_enhanced_check_compiler_flag(-mtune=native -mtune)
-    endif()
-    if(CMAKE_VERSION GREATER_EQUAL 3.12)
-        add_compile_definitions(__STDC_WANT_LIB_EXT1__=1)
-    else()
-        add_compile_options("-D__STDC_WANT_LIB_EXT1__=1")
-    endif()
-    if(MSVC)
-        ceu_cm_global_enhanced_check_compiler_flag(-options:strict) # Error on unrecognized arguments
-        ceu_cm_global_enhanced_check_compiler_flag(/utf-8)
-        ceu_cm_global_enhanced_check_compiler_flag(/Qspectre) # Stop spectre memory issues
-        ceu_cm_global_enhanced_check_compiler_flag(/MP) # Multiprocessing
-        ceu_cm_global_enhanced_check_compiler_flag(/Zc:__STDC__) # Define __STDC__
-        ceu_cm_global_enhanced_check_compiler_flag(/Zc:__cplusplus) # Define __cplusplus
-    endif()
     # Detect build type.
     if(NOT DEFINED CMAKE_BUILD_TYPE)
         set(CMAKE_BUILD_TYPE "Debug")
     endif()
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "Release") # Release
-        ceu_cm_global_enhanced_check_compiler_flag(-W0 -w)
-        ceu_cm_global_enhanced_check_compiler_flag(-g0)
-        ceu_cm_global_enhanced_check_compiler_flag(-Ofast -O3 -O2)
-    elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Information
-        ceu_cm_global_enhanced_check_compiler_flag(-Ofast -O3 -O2)
-        ceu_cm_global_enhanced_check_compiler_flag(-g)
-    else() # Debug, the default.
-        # ceu_cm_global_enhanced_check_compiler_flag(-fsanitize=address)
-        ceu_cm_global_enhanced_check_compiler_flag(-Wall)
-        ceu_cm_global_enhanced_check_compiler_flag(-Wextra)
-        if(NOT MSVC)
-            ceu_cm_global_enhanced_check_compiler_flag(-pedantic -Wpedantic)
-            ceu_cm_global_enhanced_check_compiler_flag(-Og) # Add debug info
-            ceu_cm_global_enhanced_check_compiler_flag(-g3) # Add debug info
-            ceu_cm_global_enhanced_check_compiler_flag(-pg) # Add profiling info
-            ceu_cm_global_enhanced_check_compiler_flag(-O0) # Stop optimization
-        endif()
-
-        if(MSVC)
-            ceu_cm_global_enhanced_check_compiler_flag(/Wp64) # Visual Studio 64 bit compatibility
-            ceu_cm_global_enhanced_check_compiler_flag(/permissive) # Visual Studio
-            ceu_cm_global_enhanced_check_compiler_flag(/sdl) # Visual Studio
-            ceu_cm_global_enhanced_check_compiler_flag(/Z7) # Visual Studio
-        endif()
-
-        set(CEU_CM_IS_DEBUG
-            1
-            CACHE INTERNAL "") # Also set CMake variable
-    endif()
-
-    set(CEU_CM_ADDITIONAL_COMPILER_FLAGS
-        ${CEU_CM_ADDITIONAL_COMPILER_FLAGS}
-        CACHE INTERNAL "Additional compiler flags")
 endif()
 
 if(NOT DEFINED ENV{CEU_CM_DEBUG_BANNER_SHOWN})
@@ -233,7 +160,6 @@ if(NOT DEFINED ENV{CEU_CM_DEBUG_BANNER_SHOWN})
         STATUS
             "|CEU_CM_SHOULD_ENABLE_TEST=${CEU_CM_SHOULD_ENABLE_TEST}; CEU_CM_SHOULD_USE_NATIVE=${CEU_CM_SHOULD_USE_NATIVE}"
     )
-    message(STATUS "|CEU_CM_ADDITIONAL_COMPILER_FLAGS=${CEU_CM_ADDITIONAL_COMPILER_FLAGS}")
 
     message(STATUS "\\------------------- Basic Information -------------------/")
 endif()

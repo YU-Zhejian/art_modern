@@ -272,10 +272,9 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
 #endif
 }
 
-ArtRead::ArtRead(
-    const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob)
+ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, const std::string& read_name, Rprob& rprob)
     : art_params_(art_params)
-    , contig_name_(contig_name)
+    , contig_name_(std::move(contig_name))
     , read_name_(read_name)
     , rprob_(rprob)
 {

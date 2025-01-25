@@ -77,7 +77,7 @@ public:
 #if defined(USE_NOP_PARALLEL)
         aje->operator()();
 #elif defined(USE_BS_PARALLEL)
-        pool_.submit_task([this_aje = aje]() mutable { this_aje->operator()(); });
+        [[maybe_unused]] auto future = pool_.submit_task([this_aje = aje]() mutable { this_aje->operator()(); });
 #elif defined(USE_ASIO_PARALLEL)
         post(pool_, [this_aje = aje]() mutable { this_aje->operator()(); });
 #endif
