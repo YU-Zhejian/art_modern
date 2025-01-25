@@ -33,6 +33,7 @@
 
 // Malloc
 #cmakedefine WITH_MIMALLOC
+#cmakedefine WITH_JEMALLOC
 
 // OpenMP
 

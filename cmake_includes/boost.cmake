@@ -22,13 +22,8 @@ else()
 endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
-set(ART_MODERN_LINK_LIBS
-    ${ART_MODERN_LINK_LIBS}
-    Boost::filesystem
-    Boost::program_options
-    Boost::thread
-    Boost::log_setup
-    Boost::log)
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::filesystem Boost::program_options Boost::thread
+                         Boost::log_setup Boost::log)
 unset(WITH_BOOST_TIMER)
 if(Boost_timer_FOUND)
     set(WITH_BOOST_TIMER ON)

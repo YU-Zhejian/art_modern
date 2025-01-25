@@ -32,7 +32,7 @@ namespace labw::art_modern {
 struct Generator {
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    explicit Generator(const ArtParams &art_params)
+    explicit Generator(const ArtParams& art_params)
         : art_params_(art_params)
         , job_pool_(art_params.parallel)
     {
@@ -81,7 +81,7 @@ void generate_all(const ArtParams& art_params)
         const auto coverage_info = std::make_shared<CoverageInfo>(art_params.coverage_info.div(art_params.parallel));
         if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch
-                    = std::make_shared<InMemoryFastaFetch>(art_params.input_file_name);
+                = std::make_shared<InMemoryFastaFetch>(art_params.input_file_name);
             generator.init_dispatcher(fetch);
             for (int i = 0; i < art_params.parallel; ++i) {
                 generator.add(fetch, coverage_info);

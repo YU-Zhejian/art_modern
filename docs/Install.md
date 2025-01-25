@@ -203,7 +203,9 @@ Whether to use `btree::map` instead of `std::map`. The former is faster than the
 
 Whether to use alternative high-performance `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) or [mi-malloc](https://github.com/microsoft/mimalloc). Using those implementations can improve the performance of the program but slightly increase memory consumptions.
 
-- **`AUTO` (DEFAULT): Will use mi-malloc if possible.**
+- **`AUTO` (DEFAULT): Will use mi-malloc and then jemalloc if possible.**
+- `MIMALLOC`: Find and use mi-malloc, and fail if not found.
+- `JEMALLOC`: Find and use jemalloc, and fail if not found.
 - `OFF`: Will not use alternative `malloc`/`free` implementations.
 
 ## Platform-Specific Building Instructions

@@ -13,7 +13,8 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
     endif()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
+# FIXME: Some times ccache may fail.
+# include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
 project(
     art_modern
     LANGUAGES C CXX
@@ -55,7 +56,7 @@ endif()
 
 if(NOT DEFINED USE_MALLOC)
     set(USE_MALLOC AUTO)
-endif ()
+endif()
 
 set(WITH_MPI OFF) # TODO
 

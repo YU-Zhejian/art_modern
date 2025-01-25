@@ -69,13 +69,13 @@ for i in {1..3}; do
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
-#    run pirs-transcriptome-pe100 bin/pirs simulate -A dist -m 500 -l 100 -x 4 -v 20 -t 20 \
-#        -B data/e_coli_HiSeq2K_pirs_bcm.count.matrix \
-#        -I data/e_coli_HiSeq2K_pirs_indelstat.InDel.matrix \
-#        --no-gc-bias \
-#        -o "${OUT_DIR}"/Illumina \
-#        -c text \
-#        data/hg38_long_mrna.fa
+    #    run pirs-transcriptome-pe100 bin/pirs simulate -A dist -m 500 -l 100 -x 4 -v 20 -t 20 \
+    #        -B data/e_coli_HiSeq2K_pirs_bcm.count.matrix \
+    #        -I data/e_coli_HiSeq2K_pirs_indelstat.InDel.matrix \
+    #        --no-gc-bias \
+    #        -o "${OUT_DIR}"/Illumina \
+    #        -c text \
+    #        data/hg38_long_mrna.fa
 
     run dwgsim-transcriptome-pe100 bin/dwgsim \
         -1 100 -2 100 -C 4 -d 500 -s 20 -o 2 -r 0 -y 0 \
@@ -170,13 +170,13 @@ for i in {1..3}; do
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
-#    run pirs-transcriptome-pe300 bin/pirs simulate -A dist -m 500 -l 300 -x 4 -v 20 -t 20 \
-#        -B data/soybean_HiSeq2500_pirs_bcm.count.matrix \
-#        -I data/soybean_HiSeq2500_pirs_indelstat.InDel.matrix \
-#        --no-gc-bias \
-#        -o "${OUT_DIR}"/Illumina \
-#        -c text \
-#        data/hg38_long_mrna.fa
+    #    run pirs-transcriptome-pe300 bin/pirs simulate -A dist -m 500 -l 300 -x 4 -v 20 -t 20 \
+    #        -B data/soybean_HiSeq2500_pirs_bcm.count.matrix \
+    #        -I data/soybean_HiSeq2500_pirs_indelstat.InDel.matrix \
+    #        --no-gc-bias \
+    #        -o "${OUT_DIR}"/Illumina \
+    #        -c text \
+    #        data/hg38_long_mrna.fa
 
     run dwgsim-transcriptome-pe300 bin/dwgsim \
         -1 300 -2 300 -C 4 -d 500 -s 20 -o 2 -r 0 -y 0 \

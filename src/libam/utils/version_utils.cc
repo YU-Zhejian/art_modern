@@ -46,8 +46,10 @@
 #endif
 
 // malloc
-#ifdef WITH_MIMALLOC
+#if defined(WITH_MIMALLOC)
 #include <mimalloc.h>
+#elif defined(WITH_JEMALLOC)
+#include <jemalloc/jemalloc.h>
 #endif
 
 // CPPSTDLIB
@@ -238,9 +240,17 @@ namespace {
 #endif
     }
 
-    void print_malloc_version(){
+    void print_malloc_version()
+    {
 #if defined(WITH_MIMALLOC)
         std::cout << "mimalloc: " << MI_MALLOC_VERSION / 100 << "." << MI_MALLOC_VERSION % 100 << std::endl;
+#elif defined(WITH_JEMALLOC)
+#ifdef JEMALLOC_VERSION
+        std::cout << "jemalloc: " << JEMALLOC_VERSION << std::endl;
+#else
+        std::cout << "jemalloc: " << JEMALLOC_VERSION_MAJOR << "." << JEMALLOC_VERSION_MINOR << "."
+                  << JEMALLOC_VERSION_BUGFIX << std::endl;
+#endif
 #else
         std::cout << "*malloc: not used" << std::endl;
 #endif
