@@ -1,0 +1,12 @@
+if (USE_MALLOC STREQUAL AUTO)
+    find_package(mimalloc 2.1)
+    if(mimalloc_FOUND)
+        set(WITH_MIMALLOC ON)
+        if(BUILD_SHARED_LIBS)
+            set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} mimalloc)
+        else()
+            set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} mimalloc-static)
+        endif()
+    endif ()
+endif()
+

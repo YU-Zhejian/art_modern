@@ -32,10 +32,9 @@ namespace labw::art_modern {
 struct Generator {
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    explicit Generator(const ArtParams& art_params, const bool free_fasta_fetch_after_execution)
+    explicit Generator(const ArtParams &art_params)
         : art_params_(art_params)
         , job_pool_(art_params.parallel)
-        , free_fasta_fetch_after_execution_(free_fasta_fetch_after_execution)
     {
     }
     void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
@@ -45,7 +44,7 @@ struct Generator {
 
     void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
     {
-        SimulationJob sj { fetch, coverage_info, ++job_id_, free_fasta_fetch_after_execution_ };
+        SimulationJob sj { fetch, coverage_info, ++job_id_ };
         auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_);
         job_pool_.add(aje);
     }
@@ -61,33 +60,8 @@ private:
     int job_id_ = 0;
     ArtParams art_params_;
     JobPool<ArtJobExecutor> job_pool_;
-    const bool free_fasta_fetch_after_execution_;
     std::shared_ptr<BaseReadOutput> out_dispatcher_;
 };
-
-namespace {
-    void generate_wgs(const ArtParams& art_params)
-    {
-        Generator generator(art_params, art_params.art_input_file_parser != INPUT_FILE_PARSER::MEMORY);
-
-        const auto coverage_info = std::make_shared<CoverageInfo>(art_params.coverage_info.div(art_params.parallel));
-        if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-            std::shared_ptr<BaseFastaFetch> const fetch
-                = std::make_shared<InMemoryFastaFetch>(art_params.input_file_name);
-            generator.init_dispatcher(fetch);
-            for (int i = 0; i < art_params.parallel; ++i) {
-                generator.add(fetch, coverage_info);
-            }
-        } else {
-            generator.init_dispatcher(std::make_shared<FaidxFetch>(art_params.input_file_name));
-            for (int i = 0; i < art_params.parallel; ++i) {
-                generator.add(std::make_shared<FaidxFetch>(art_params.input_file_name), coverage_info);
-            }
-        }
-        generator.wait();
-    }
-
-} // namespace
 
 void print_banner()
 {
@@ -102,12 +76,25 @@ void print_banner()
 
 void generate_all(const ArtParams& art_params)
 {
+    Generator generator(art_params);
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        generate_wgs(art_params);
+        const auto coverage_info = std::make_shared<CoverageInfo>(art_params.coverage_info.div(art_params.parallel));
+        if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
+            std::shared_ptr<BaseFastaFetch> const fetch
+                    = std::make_shared<InMemoryFastaFetch>(art_params.input_file_name);
+            generator.init_dispatcher(fetch);
+            for (int i = 0; i < art_params.parallel; ++i) {
+                generator.add(fetch, coverage_info);
+            }
+        } else {
+            generator.init_dispatcher(std::make_shared<FaidxFetch>(art_params.input_file_name));
+            for (int i = 0; i < art_params.parallel; ++i) {
+                generator.add(std::make_shared<FaidxFetch>(art_params.input_file_name), coverage_info);
+            }
+        }
     } else {
         // Batch-based parallelism
         if (art_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
-            Generator generator(art_params, true);
 
             const auto coverage_info = std::make_shared<CoverageInfo>(art_params.coverage_info);
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
@@ -135,9 +122,7 @@ void generate_all(const ArtParams& art_params)
                 }
                 fasta_stream.close();
             }
-            generator.wait();
         } else if (art_params.art_input_file_type == INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS) {
-            Generator generator(art_params, true);
             if (art_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 std::ifstream input_file_stream(art_params.input_file_name);
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
@@ -167,10 +152,11 @@ void generate_all(const ArtParams& art_params)
                 }
                 pbsim3_transcript_stream.close();
             }
-            generator.wait();
         } else {
             throw std::runtime_error("Unsupported input file type");
         }
     }
+
+    generator.wait();
 }
 } // namespace labw::art_modern

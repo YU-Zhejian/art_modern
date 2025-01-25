@@ -16,7 +16,6 @@
 #include <functional>
 #include <istream>
 #include <limits>
-#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -138,7 +137,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     std::string line;
     int t_int = 0;
     std::vector<int> qual;
-    std::map<int, int, std::less<>> dist;
+    dist_map_type dist;
     std::vector<am_qual_dist_t> count;
     int qmin = std::numeric_limits<int>::max();
     int qmax = std::numeric_limits<int>::min();

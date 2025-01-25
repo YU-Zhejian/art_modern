@@ -2,7 +2,7 @@
 
 ## IMPORTANT
 
-None now.
+- Add jemalloc and mimalloc to INSTALL.md.
 
 ## Performance
 

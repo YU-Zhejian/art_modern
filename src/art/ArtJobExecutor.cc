@@ -160,7 +160,6 @@ void ArtJobExecutor::operator()()
                             << static_cast<double>(num_reads) * art_params_.read_len
             / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
-    if (job_.free_fasta_fetch_after_execution) { }
     is_running = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept

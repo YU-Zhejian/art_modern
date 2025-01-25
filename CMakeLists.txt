@@ -45,9 +45,17 @@ if(NOT DEFINED USE_THREAD_PARALLEL)
     set(USE_THREAD_PARALLEL ASIO)
 endif()
 
+if(NOT DEFINED USE_BTREE_MAP)
+    set(USE_BTREE_MAP ON)
+endif()
+
 if(NOT DEFINED USE_RANDOM_GENERATOR)
     set(USE_RANDOM_GENERATOR STL)
 endif()
+
+if(NOT DEFINED USE_MALLOC)
+    set(USE_MALLOC AUTO)
+endif ()
 
 set(WITH_MPI OFF) # TODO
 
@@ -66,6 +74,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # OpenMP temporarily disabled.
 # include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 

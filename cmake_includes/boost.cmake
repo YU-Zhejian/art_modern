@@ -18,14 +18,13 @@ if(NOT ${CMAKE_VERSION} VERSION_LESS "3.11.0")
 else()
     # Only required modules are searched stacktrace_basic may have bug with low versions of Boost & CMake, so not
     # included.
-    find_package(Boost REQUIRED COMPONENTS filesystem regex program_options thread log_setup log)
+    find_package(Boost REQUIRED COMPONENTS filesystem program_options thread log_setup log)
 endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
 set(ART_MODERN_LINK_LIBS
     ${ART_MODERN_LINK_LIBS}
     Boost::filesystem
-    Boost::regex
     Boost::program_options
     Boost::thread
     Boost::log_setup

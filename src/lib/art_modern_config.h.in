@@ -28,6 +28,12 @@
 #cmakedefine USE_BS_PARALLEL
 #cmakedefine USE_NOP_PARALLEL
 
+// std::map alternatives
+#cmakedefine USE_BTREE_MAP
+
+// Malloc
+#cmakedefine WITH_MIMALLOC
+
 // OpenMP
 
 #cmakedefine WITH_OPENMP

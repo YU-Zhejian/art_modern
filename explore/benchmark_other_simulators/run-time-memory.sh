@@ -53,13 +53,29 @@ for i in {1..3}; do
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
-    run pirs-transcriptome-pe100 bin/pirs simulate -A dist -m 500 -l 100 -x 4 -v 20 -t 20 \
-        -B data/e_coli_HiSeq2K_pirs_bcm.count.matrix \
-        -I data/e_coli_HiSeq2K_pirs_indelstat.InDel.matrix \
-        --no-gc-bias \
-        -o "${OUT_DIR}"/Illumina \
-        -c text \
-        data/hg38_long_mrna.fa
+    run art_modern_gcc-genome-pe100 opt/art_modern_gcc_build/art_modern \
+        --mode wgs --lc pe \
+        --i-file data/ce11.fa --i-fcov 10 --read_len 100 \
+        --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
+        --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
+
+    run art_modern_prev-genome-pe100 opt/art_modern_prev_ver_build/art_modern \
+        --mode wgs --lc pe \
+        --i-file data/ce11.fa --i-fcov 10 --read_len 100 \
+        --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
+        --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
+
+#    run pirs-transcriptome-pe100 bin/pirs simulate -A dist -m 500 -l 100 -x 4 -v 20 -t 20 \
+#        -B data/e_coli_HiSeq2K_pirs_bcm.count.matrix \
+#        -I data/e_coli_HiSeq2K_pirs_indelstat.InDel.matrix \
+#        --no-gc-bias \
+#        -o "${OUT_DIR}"/Illumina \
+#        -c text \
+#        data/hg38_long_mrna.fa
 
     run dwgsim-transcriptome-pe100 bin/dwgsim \
         -1 100 -2 100 -C 4 -d 500 -s 20 -o 2 -r 0 -y 0 \
@@ -78,6 +94,24 @@ for i in {1..3}; do
         -f 4 --len 100 --mflen 500 --sdev 20 --noALN --paired
 
     run art_modern-transcriptome-pe100 opt/art_modern_build/art_modern \
+        --mode trans --lc pe \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 100 --i-parser stream \
+        --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
+        --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
+        --i-batch_size 1024
+
+    run art_modern_gcc-transcriptome-pe100 opt/art_modern_gcc_build/art_modern \
+        --mode trans --lc pe \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 100 --i-parser stream \
+        --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
+        --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
+        --i-batch_size 1024
+
+    run art_modern_prev-transcriptome-pe100 opt/art_modern_prev_ver_build/art_modern \
         --mode trans --lc pe \
         --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 100 --i-parser stream \
         --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
@@ -120,13 +154,29 @@ for i in {1..3}; do
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
-    run pirs-transcriptome-pe300 bin/pirs simulate -A dist -m 500 -l 300 -x 4 -v 20 -t 20 \
-        -B data/soybean_HiSeq2500_pirs_bcm.count.matrix \
-        -I data/soybean_HiSeq2500_pirs_indelstat.InDel.matrix \
-        --no-gc-bias \
-        -o "${OUT_DIR}"/Illumina \
-        -c text \
-        data/hg38_long_mrna.fa
+    run art_modern_gcc-genome-pe300 opt/art_modern_gcc_build/art_modern \
+        --mode wgs --lc pe \
+        --i-file data/ce11.fa --i-fcov 10 --read_len 300 \
+        --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
+        --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
+
+    run art_modern_prev-genome-pe300 opt/art_modern_prev_ver_build/art_modern \
+        --mode wgs --lc pe \
+        --i-file data/ce11.fa --i-fcov 10 --read_len 300 \
+        --o-fastq "${OUT_DIR}"/ce11_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
+        --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
+
+#    run pirs-transcriptome-pe300 bin/pirs simulate -A dist -m 500 -l 300 -x 4 -v 20 -t 20 \
+#        -B data/soybean_HiSeq2500_pirs_bcm.count.matrix \
+#        -I data/soybean_HiSeq2500_pirs_indelstat.InDel.matrix \
+#        --no-gc-bias \
+#        -o "${OUT_DIR}"/Illumina \
+#        -c text \
+#        data/hg38_long_mrna.fa
 
     run dwgsim-transcriptome-pe300 bin/dwgsim \
         -1 300 -2 300 -C 4 -d 500 -s 20 -o 2 -r 0 -y 0 \
@@ -145,6 +195,24 @@ for i in {1..3}; do
         -f 4 --len 300 --mflen 500 --sdev 20 --noALN --paired
 
     run art_modern-transcriptome-pe300 opt/art_modern_build/art_modern \
+        --mode trans --lc pe \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 300 --i-parser stream \
+        --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
+        --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
+        --i-batch_size 1024
+
+    run art_modern_gcc-transcriptome-pe300 opt/art_modern_gcc_build/art_modern \
+        --mode trans --lc pe \
+        --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 300 --i-parser stream \
+        --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \
+        --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
+        --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
+        --i-batch_size 1024
+
+    run art_modern_prev-transcriptome-pe300 opt/art_modern_prev_ver_build/art_modern \
         --mode trans --lc pe \
         --i-file data/hg38_long_mrna.fa --i-fcov 4 --read_len 300 --i-parser stream \
         --o-fastq "${OUT_DIR}"/hg38_long_mrna_art_modern_wgs_memory.fastq \

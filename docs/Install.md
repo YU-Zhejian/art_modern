@@ -192,6 +192,20 @@ Configures the behaviour of CMake policy [`CMP0167`](https://cmake.org/cmake/hel
 
 There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
 
+## `USE_BTREE_MAP`
+
+Whether to use `btree::map` instead of `std::map`. The former is faster than the latter.
+
+- **`ON` (DEFAULT)**
+- `OFF`.
+
+## `USE_MALLOC`
+
+Whether to use alternative high-performance `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) or [mi-malloc](https://github.com/microsoft/mimalloc). Using those implementations can improve the performance of the program but slightly increase memory consumptions.
+
+- **`AUTO` (DEFAULT): Will use mi-malloc if possible.**
+- `OFF`: Will not use alternative `malloc`/`free` implementations.
+
 ## Platform-Specific Building Instructions
 
 ### Debian, Ubuntu, Linux Mint, or Other Debian-Based Distributions
@@ -250,4 +264,4 @@ cd build
 cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boost-1.87.0
 ```
 
-You may also setup dependencies using [Conda](XXX) or [HomeBrew](XXX).
+You may also setup dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).

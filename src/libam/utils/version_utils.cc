@@ -45,6 +45,11 @@
 #include <google/protobuf/stubs/common.h>
 #endif
 
+// malloc
+#ifdef WITH_MIMALLOC
+#include <mimalloc.h>
+#endif
+
 // CPPSTDLIB
 #include <iostream>
 #include <string>
@@ -233,6 +238,14 @@ namespace {
 #endif
     }
 
+    void print_malloc_version(){
+#if defined(WITH_MIMALLOC)
+        std::cout << "mimalloc: " << MI_MALLOC_VERSION / 100 << "." << MI_MALLOC_VERSION % 100 << std::endl;
+#else
+        std::cout << "*malloc: not used" << std::endl;
+#endif
+    }
+
 } // namespace
 
 void print_version()
@@ -248,6 +261,7 @@ void print_version()
     print_openmp_version();
     print_simde_version();
     print_bs_version();
+    print_malloc_version();
     std::cout << ceu_interpret_c_std_version();
     std::cout << ceu_interpret_cxx_std_version();
     std::cout << ceu_check_get_compiler_info();
