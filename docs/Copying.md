@@ -68,3 +68,13 @@ Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
 Affected files:
 
 - `/deps/slim_abseil/**`
+
+## Google Inc. and German Mendez Bravo C++ B-tree Project
+
+Available from <https://github.com/Kronuz/cpp-btree>, commit `3e9f417`.
+
+Affected files:
+
+- `/deps/cpp-btree/**`
+
+Under the Apache License, Version 2.0.

@@ -74,6 +74,7 @@ include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 # include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/simde")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
+include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
 
@@ -97,7 +98,7 @@ endif()
 configure_file("${CMAKE_CURRENT_LIST_DIR}/src/lib/art_modern_config.h.in"
                "${CMAKE_BINARY_DIR}/include/art_modern_config.h")
 
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/src")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/src/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/include/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/gen/src/")
 
