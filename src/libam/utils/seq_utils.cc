@@ -2,6 +2,7 @@
 
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
+#include <cstdio>
 
 // NOLINTBEGIN
 #if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)

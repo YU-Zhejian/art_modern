@@ -27,7 +27,8 @@ namespace {
 
     std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
-        return std::make_unique<std::string>(fmt::format("@{}\n{}\n+\n{}\n@{}\n{}\n+\n{}\n", pwa1.read_name, pwa1.query, pwa1.qual, pwa2.read_name, pwa2.query, pwa2.qual));
+        return std::make_unique<std::string>(fmt::format("@{}\n{}\n+\n{}\n@{}\n{}\n+\n{}\n", pwa1.read_name, pwa1.query,
+            pwa1.qual, pwa2.read_name, pwa2.query, pwa2.qual));
     }
 
 } // namespace
@@ -67,6 +68,9 @@ void FastqReadOutput::close()
     file_.close();
     BaseFileReadOutput::close();
 }
+
+bool FastqReadOutput::require_alignment() const { return false; }
+
 void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fastq_desc("FASTQ Output");

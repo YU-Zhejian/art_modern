@@ -61,6 +61,9 @@ void PwaReadOutput::close()
     file_.flush();
     BaseFileReadOutput::close();
 }
+
+bool PwaReadOutput::require_alignment() const { return true; }
+
 void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description pwa_desc("PWA Output");

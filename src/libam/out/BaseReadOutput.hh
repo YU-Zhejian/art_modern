@@ -21,6 +21,7 @@ public:
     virtual void writeSE(const PairwiseAlignment& pwa) = 0;
     virtual void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
     virtual void close() = 0;
+    virtual bool require_alignment() const = 0;
     virtual ~BaseReadOutput() = default;
 };
 

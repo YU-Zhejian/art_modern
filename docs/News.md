@@ -50,3 +50,5 @@ Fixed miscellaneous bugs.
 - Possible build acceleration using [ccache](https://ccache.dev/) supported.
 - Alternate `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) and [mi-malloc](https://github.com/microsoft/mimalloc) supported.
 - Formatting engine changed to [`{fmt}`](https://github.com/fmtlib/fmt).
+- Supporting FASTA output format.
+- If the output consists only FASTA or FASTQ, pairwise alignment will not be computed.

@@ -176,6 +176,9 @@ void BamReadOutput::close()
     sam_hdr_destroy(sam_header_);
     BaseFileReadOutput::close();
 }
+
+bool BamReadOutput::require_alignment() const { return true; }
+
 void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     po::options_description bam_desc("SAM/BAM Output");

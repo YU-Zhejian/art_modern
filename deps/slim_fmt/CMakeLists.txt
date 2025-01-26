@@ -10,9 +10,9 @@ unset(CEU_CM_SILENT)
 
 file(GLOB SLIM_LIBFMT_SOURCES ${CMAKE_CURRENT_LIST_DIR}/*/*.cc)
 if(BUILD_SHARED_LIBS)
-  add_library(slim_libfmt SHARED ${SLIM_LIBFMT_SOURCES})
+    add_library(slim_libfmt SHARED ${SLIM_LIBFMT_SOURCES})
 else()
-  add_library(slim_libfmt STATIC ${SLIM_LIBFMT_SOURCES})
+    add_library(slim_libfmt STATIC ${SLIM_LIBFMT_SOURCES})
 endif()
 
 message(STATUS "slim_libfmt compiler flags: ${SLIM_LIBFMT_CC_FLAGS}")

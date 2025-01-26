@@ -41,6 +41,7 @@ private:
     std::shared_ptr<BaseReadOutput> output_dispatcher_;
     Rprob rprob_;
     const int num_reads_to_reduce_;
+    const bool require_alignment_;
 };
 
 } // namespace labw::art_modern

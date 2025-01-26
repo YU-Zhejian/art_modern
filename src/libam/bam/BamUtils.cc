@@ -11,6 +11,7 @@
 #include "libam/utils/mpi_utils.hh" // NOLINT
 #include "libam/utils/seq_utils.hh"
 
+#include <algorithm>
 #include <fmt/core.h>
 
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
@@ -33,7 +34,8 @@ namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const int32_t nm_tag)
 {
-    return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-', cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
+    return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-',
+        cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
 }
 std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar)
@@ -154,8 +156,22 @@ void BamUtils::assert_correct_cigar(
     const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());
     const auto qual_len = static_cast<hts_pos_t>(pwa.qual.length());
 
+    auto reconst_ref = pwa.aligned_ref;
+    auto reconst_query = pwa.aligned_query;
+
+    reconst_ref.erase(std::remove(reconst_ref.begin(), reconst_ref.end(), ALN_GAP), reconst_ref.end());
+    reconst_query.erase(std::remove(reconst_query.begin(), reconst_query.end(), ALN_GAP), reconst_query.end());
+
     if (cigar_qlen != qlen) {
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << qlen;
+        goto err;
+    }
+    if (reconst_ref != pwa.ref) {
+        BOOST_LOG_TRIVIAL(error) << "Reconstructed reference != reference: " << reconst_ref << " != " << pwa.ref;
+        goto err;
+    }
+    if (reconst_query != pwa.query) {
+        BOOST_LOG_TRIVIAL(error) << "Reconstructed query != query: " << reconst_query << " != " << pwa.query;
         goto err;
     }
     if (cigar_rlen != rlen) {

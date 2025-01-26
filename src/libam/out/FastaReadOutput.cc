@@ -27,7 +27,8 @@ namespace {
 
     std::unique_ptr<std::string> format_fasta(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
-        return std::make_unique<std::string>(fmt::format(">{}\n{}\n>{}\n{}\n", pwa1.read_name, pwa1.query, pwa2.read_name, pwa2.query));
+        return std::make_unique<std::string>(
+            fmt::format(">{}\n{}\n>{}\n{}\n", pwa1.read_name, pwa1.query, pwa2.read_name, pwa2.query));
     }
 
 } // namespace
@@ -67,6 +68,9 @@ void FastaReadOutput::close()
     file_.close();
     BaseFileReadOutput::close();
 }
+
+bool FastaReadOutput::require_alignment() const { return false; }
+
 void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fasta_desc("FASTA Output");

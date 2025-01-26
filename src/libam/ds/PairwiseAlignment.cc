@@ -77,8 +77,8 @@ std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m
 
 std::string PairwiseAlignment::serialize() const
 {
-    return fmt::format(">{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, contig_name,
-                        pos_on_contig, is_plus_strand ? '+' : '-', aligned_query, aligned_ref, qual);
+    return fmt::format(">{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, contig_name, pos_on_contig, is_plus_strand ? '+' : '-',
+        aligned_query, aligned_ref, qual);
 }
 
 [[maybe_unused]] PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)

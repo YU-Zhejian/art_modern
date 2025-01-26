@@ -20,6 +20,8 @@ public:
     DELETE_MOVE(OutputDispatcher)
     DELETE_COPY(OutputDispatcher)
 
+    bool require_alignment() const override;
+
     OutputDispatcher() = default;
     ~OutputDispatcher() override;
 

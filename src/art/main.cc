@@ -17,6 +17,9 @@
 // MPI
 #ifdef WITH_MPI
 #include <mpi.h>
+
+#include <chrono>
+#include <thread>
 #endif
 
 #include <cstdlib>
@@ -42,11 +45,11 @@ int main_mpi_child()
                 return EXIT_SUCCESS;
             } else {
                 BOOST_LOG_TRIVIAL(info) << "Received wrong signal.";
-                // sleep(1); FIXME: Not found under MS Windows
+                std::current_thread::sleep_for(std::chrono::seconds(1));
             }
         } else {
             BOOST_LOG_TRIVIAL(info) << "Received no signal.";
-            // sleep(1); FIXME: Not found under MS Windows
+            std::current_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }

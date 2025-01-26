@@ -13,6 +13,7 @@
     --ins_rate_1 "${IDRATE}" \
     --del_rate_1 "${IDRATE}" \
     --o-fastq "${OUT_DIR}"/test_small_se_template_memory_sep.fastq \
+    --o-fasta "${OUT_DIR}"/test_small_se_template_memory_sep.fasta \
     --o-pwa "${OUT_DIR}"/test_small_se_template_memory_sep.pwa \
     --o-sam "${OUT_DIR}"/test_small_se_template_memory_sep.sam \
     --o-hl_sam "${OUT_DIR}"/test_small_se_template_memory_sep.hl.bam \

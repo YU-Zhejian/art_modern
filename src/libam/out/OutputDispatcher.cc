@@ -3,6 +3,7 @@
 #include "BaseReadOutput.hh"
 #include "libam/ds/PairwiseAlignment.hh"
 #include "libam/out/BamReadOutput.hh"
+#include "libam/out/FastaReadOutput.hh"
 #include "libam/out/FastqReadOutput.hh"
 #include "libam/out/HeadlessBamReadOutput.hh"
 #include "libam/out/PwaReadOutput.hh"
@@ -44,6 +45,16 @@ OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
 
 void OutputDispatcher::add(std::shared_ptr<BaseReadOutput>&& output) { outputs_.emplace_back(std::move(output)); }
 
+bool OutputDispatcher::require_alignment() const
+{
+    bool retv = false;
+
+    for (const auto& output : outputs_) {
+        retv |= output->require_alignment();
+    }
+    return retv;
+}
+
 void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc) const
 {
     for (auto const& factory : factories_) {
@@ -68,6 +79,7 @@ void OutputDispatcherFactory::add(std::shared_ptr<BaseReadOutputFactory> factory
 OutputDispatcherFactory::OutputDispatcherFactory()
 {
     add(std::make_shared<PwaReadOutputFactory>());
+    add(std::make_shared<FastaReadOutputFactory>());
     add(std::make_shared<FastqReadOutputFactory>());
     add(std::make_shared<BamReadOutputFactory>());
     add(std::make_shared<HeadlessBamReadOutputFactory>());

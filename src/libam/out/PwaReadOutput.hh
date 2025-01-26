@@ -26,6 +26,8 @@ public:
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
 
+    bool require_alignment() const override;
+
     void close() override;
 
     ~PwaReadOutput() override;

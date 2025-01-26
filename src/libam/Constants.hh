@@ -37,7 +37,6 @@ constexpr int G_SIZE = 1U << 30U;
 
 /**
  * Version of ART this program is based on.
- * TODO: Move this to art/ArtConstants.hh.
  */
 constexpr char ART_VERSION[] = "2.5.8";
 

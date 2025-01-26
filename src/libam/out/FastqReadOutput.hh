@@ -27,6 +27,8 @@ public:
     void close() override;
     ~FastqReadOutput() override;
 
+    bool require_alignment() const override;
+
 private:
     std::ofstream file_;
     SimpleLFIO lfio_;

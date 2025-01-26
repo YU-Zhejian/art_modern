@@ -56,7 +56,8 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
 
 bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
-    const std::string read_name = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
+    const std::string read_name
+        = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
@@ -70,8 +71,10 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
     read_1.generate_snv_on_qual(true);
     read_2.generate_snv_on_qual(false);
-    read_1.generate_pairwise_aln();
-    read_2.generate_pairwise_aln();
+    if (require_alignment_) {
+        read_1.generate_pairwise_aln();
+        read_2.generate_pairwise_aln();
+    }
     if (!(read_1.is_good() && read_2.is_good())) {
         return false;
     }
@@ -83,14 +86,18 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
 bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
-    ArtRead art_read(art_params_, art_contig.seq_name, fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads), rprob_);
+    ArtRead art_read(art_params_, art_contig.seq_name,
+        fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads),
+        rprob_);
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
     } catch (ReadGenerationException&) {
         return false;
     }
     art_read.generate_snv_on_qual(true);
-    art_read.generate_pairwise_aln();
+    if (require_alignment_) {
+        art_read.generate_pairwise_aln();
+    }
     if (!art_read.is_good()) {
         return false;
     }
@@ -107,6 +114,7 @@ ArtJobExecutor::ArtJobExecutor(
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
+    , require_alignment_(output_dispatcher->require_alignment())
 {
 }
 
@@ -166,6 +174,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , output_dispatcher_(std::move(other.output_dispatcher_))
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
+    , require_alignment_(other.require_alignment_)
 {
 }
 std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }

@@ -272,10 +272,10 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
 #endif
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, const std::string& read_name, Rprob& rprob)
+ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob)
     : art_params_(art_params)
     , contig_name_(std::move(contig_name))
-    , read_name_(read_name)
+    , read_name_(std::move(read_name))
     , rprob_(rprob)
 {
     seq_read_.resize(art_params_.read_len);
@@ -293,15 +293,7 @@ bool ArtRead::is_good() const
     if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > art_params_.max_n) {
         return false;
     }
-    if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
-        goto error;
-    }
-    if (static_cast<int>(qual_.size()) != art_params_.read_len) {
-        goto error;
-    }
     return true;
-error:
-    return false; // FIXME: No idea why this occurs.
 }
 
 } // namespace labw::art_modern

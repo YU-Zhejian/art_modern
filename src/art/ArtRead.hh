@@ -30,7 +30,7 @@ public:
     DELETE_COPY(ArtRead)
     ~ArtRead() = default;
 
-    ArtRead(const ArtParams& art_params, std::string contig_name, const std::string& read_name, Rprob& rprob);
+    ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
     int generate_indels(bool is_read_1);
@@ -44,8 +44,6 @@ public:
 
     /*!
      * Populate aln_read_ and aln_ref_
-     *
-     * TODO: This stuff is not needed for FASTQ. Need to modify the control flow.
      */
     void generate_pairwise_aln();
 

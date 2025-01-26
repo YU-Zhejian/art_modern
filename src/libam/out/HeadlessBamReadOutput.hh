@@ -24,6 +24,8 @@ public:
     DELETE_MOVE(HeadlessBamReadOutput)
     DELETE_COPY(HeadlessBamReadOutput)
 
+    bool require_alignment() const override;
+
     HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;

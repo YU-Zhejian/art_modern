@@ -29,6 +29,8 @@ public:
     void close() override;
     ~BamReadOutput() override;
 
+    bool require_alignment() const override;
+
 private:
     samFile* sam_file_;
     sam_hdr_t* sam_header_;

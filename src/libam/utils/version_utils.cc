@@ -260,7 +260,8 @@ namespace {
 
     void print_fmt_version()
     {
-        std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100 << std::endl;
+        std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100
+                  << std::endl;
     }
 
 } // namespace

@@ -24,6 +24,7 @@
 #include <htslib/sam.h>
 
 #include <algorithm>
+#include <memory>
 #include <string>
 #include <utility>
 #include <vector>
@@ -175,6 +176,8 @@ void HeadlessBamReadOutput::close()
     BaseFileReadOutput::close();
 }
 HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close(); }
+
+bool HeadlessBamReadOutput::require_alignment() const { return true; }
 
 void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

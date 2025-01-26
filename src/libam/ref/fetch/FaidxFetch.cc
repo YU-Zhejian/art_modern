@@ -62,7 +62,7 @@ namespace {
 
 char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
 {
-    const auto reg = fmt::format("{}:{}-{}",  seq_name, start + 1, end);
+    const auto reg = fmt::format("{}:{}-{}", seq_name, start + 1, end);
     hts_pos_t pos = 0;
     auto* const rets = fai_fetch64(faidx_, reg.c_str(), &pos);
     if (rets == nullptr) {
