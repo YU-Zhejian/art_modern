@@ -67,6 +67,11 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
+unset(WITH_GIT)
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/git_adapter.cmake")
+if(GIT_FOUND)
+    set(WITH_GIT ON)
+endif ()
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 set(ART_MODERN_LINK_LIBS "")

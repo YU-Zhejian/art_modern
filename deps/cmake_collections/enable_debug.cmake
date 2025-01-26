@@ -45,10 +45,9 @@ macro(ceu_cm_set_static_target name)
     set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
     set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
     set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
-    if(CMAKE_VERSION GREATER_EQUAL 3.13
-       AND NOT BORLAND
+    if(NOT BORLAND
        AND NOT MSVC)
-        target_link_options(
+        target_compile_options(
             "${name}" PRIVATE -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
             $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> $<$<COMPILE_LANGUAGE:Fortran>:-static-libgfortran>)
     endif()

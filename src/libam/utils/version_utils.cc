@@ -261,6 +261,14 @@ namespace {
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
+#ifdef WITH_GIT
+    std::cout << "On git commit: '" <<
+    CEU_CM_GIT_COMMIT_MESSAGE <<
+    "' (" << CEU_CM_GIT_COMMIT_HASH << ") "<< CEU_CM_GIT_COMMIT_DATE
+    << std::endl;
+#else
+    std::cout << "Git: N/A" << std::endl;
+#endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
     print_boost_version();
