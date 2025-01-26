@@ -3,36 +3,43 @@ include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_c_helloworld.cmake")
 
-if(NOT DEFINED CEU_CM_LIBBZ2_LIBRARY_SHARED)
-    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE CEU_CM_LIBBZ2_LIBRARY_SHARED LINKER_FLAG bz2)
+if(NOT TARGET CEU_CM_EFL::libbz2_shared)
+    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libbz2_shared PKGCONF_NAME bzip2 LINKER_FLAG bz2)
 endif()
-
-if(NOT DEFINED CEU_CM_LIBBZ2_LIBRARY_STATIC)
-    ceu_cm_enhanced_find_library(STATIC OUTPUT_VARIABLE CEU_CM_LIBBZ2_LIBRARY_STATIC LINKER_FLAG bz2)
+if(NOT TARGET CEU_CM_EFL::libbz2_static)
+    ceu_cm_enhanced_find_library(
+        STATIC
+        OUTPUT_VARIABLE
+        libbz2_static
+        PKGCONF_NAME
+        bzip2
+        LINKER_FLAG
+        bz2)
 endif()
-
-ceu_cm_enhanced_try_run(
-    VARNAME
-    LIBBZ2
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_libbz2.c"
-    LINK_LIBRARIES
-    "${CEU_CM_LIBBZ2_LIBRARY_SHARED}"
-    DEPENDS
-    C_HELLOWORLD)
-ceu_cm_enhanced_try_run(
-    STATIC
-    VARNAME
-    LIBBZ2
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_libbz2.c"
-    LINK_LIBRARIES
-    "${CEU_CM_LIBBZ2_LIBRARY_STATIC}"
-    DEPENDS
-    C_HELLOWORLD)
+if(TARGET CEU_CM_EFL::libbz2_shared)
+    ceu_cm_enhanced_try_run(
+        VARNAME
+        LIBBZ2
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_libbz2.c"
+        LINK_LIBRARIES
+        CEU_CM_EFL::libbz2_shared
+        DEPENDS
+        C_HELLOWORLD)
+endif()
+if(TARGET CEU_CM_EFL::libbz2_static)
+    ceu_cm_enhanced_try_run(
+        STATIC
+        VARNAME
+        LIBBZ2
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_libbz2.c"
+        LINK_LIBRARIES
+        CEU_CM_EFL::libbz2_static
+        DEPENDS
+        C_HELLOWORLD)
+endif()
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
-    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        ON
-        CACHE INTERNAL "This file was included")
+    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)
     ceu_cm_print_test_status("libbz2" LIBBZ2)
 endif()

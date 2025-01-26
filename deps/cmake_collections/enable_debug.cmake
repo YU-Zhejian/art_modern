@@ -1,5 +1,5 @@
 #[=======================================================================[
-enable_debug.cmake -- C/C++/Fortran set up utilities
+enable_debug.cmake -- C/C++ set up utilities
 
 Requires:
     - `CMAKE_BUILD_TYPE`
@@ -22,37 +22,8 @@ Function:
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/detect_c_preprocessor_macros.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/check_compiler_flag.cmake")
-
-#[=======================================================================[
-ceu_cm_set_static_target -- Mark a target as static.
-
-Synopsis: ceu_cm_set_static_target(name)
-
-Params:
-    - `name`: the name of the target that would be sattis
-
-Notice:
-    This function works by adding following lines to link options:
-    - `-static`
-    - `-static-libgcc`
-    - `-static-libstdc++`
-    - `-static-libgfortran`
-
-Warnings:
-    - For those who uses pthreads & openMP on GLibC platforms (i.e., common GNU/Linux EXCLUDING Alpine Linux), this option would lead to segfaults.
-#]=======================================================================]
-macro(ceu_cm_set_static_target name)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
-    set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
-    if(NOT BORLAND
-       AND NOT MSVC)
-        target_compile_options(
-            "${name}" PRIVATE -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
-            $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> $<$<COMPILE_LANGUAGE:Fortran>:-static-libgfortran>)
-    endif()
-endmacro()
+include("${CMAKE_CURRENT_LIST_DIR}/libcmake/set_static_target.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/libcmake/check_compiler_flag.cmake")
 
 #[=======================================================================[
 ceu_cm_global_enhanced_check_compiler_flag -- Check whether one of the flags in a group of flags is available.
@@ -71,6 +42,7 @@ Sets:
 #]=======================================================================]
 
 if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
+    # For debugging purposes, export compile commands.
     set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
     set(CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED
         ON
@@ -80,16 +52,21 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
         ceu_cm_detect_c_preprocessor_macros()
     endif()
 
+    # Detect build type.
+    if(NOT DEFINED CMAKE_BUILD_TYPE)
+        set(CMAKE_BUILD_TYPE "Debug")
+    endif()
+
     # Detect Test.
     if(NOT DEFINED CEU_CM_SHOULD_ENABLE_TEST)
-        if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-            set(CEU_CM_SHOULD_ENABLE_TEST
-                OFF
-                CACHE INTERNAL "Test automatically disabled")
-        else()
+        if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
             set(CEU_CM_SHOULD_ENABLE_TEST
                 ON
                 CACHE INTERNAL "Test automatically enabled")
+        else()
+            set(CEU_CM_SHOULD_ENABLE_TEST
+                OFF
+                CACHE INTERNAL "Test automatically disabled")
         endif()
     endif()
     if(CEU_CM_SHOULD_ENABLE_TEST)
@@ -98,10 +75,6 @@ if(NOT DEFINED CEU_CM_ENABLE_DEBUG_CMAKE_WAS_ALREADY_INCLUDED)
     # Detect native.
     if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
         set(CEU_CM_SHOULD_USE_NATIVE OFF)
-    endif()
-    # Detect build type.
-    if(NOT DEFINED CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE "Debug")
     endif()
 endif()
 
@@ -138,23 +111,13 @@ if(NOT DEFINED ENV{CEU_CM_DEBUG_BANNER_SHOWN})
         )
         message(STATUS "|CMAKE_CXX_LINK_EXECUTABLE=${CMAKE_CXX_LINK_EXECUTABLE}")
     endif()
-    if(DEFINED CMAKE_Fortran_COMPILER)
-        message(
-            STATUS
-                "|CMAKE_Fortran_COMPILER=${CMAKE_Fortran_COMPILER} (${CMAKE_Fortran_COMPILER_ABI}) ver. ${CMAKE_Fortran_COMPILER_VERSION}"
-        )
-        message(STATUS "|CMAKE_Fortran_LINK_EXECUTABLE=${CMAKE_Fortran_LINK_EXECUTABLE}")
-    endif()
+
     message(STATUS "|CMAKE_SYSTEM_LIBRARY_PATH=${CMAKE_SYSTEM_LIBRARY_PATH}")
     message(STATUS "|CMAKE_SYSTEM_INCLUDE_PATH=${CMAKE_SYSTEM_INCLUDE_PATH}")
     message(STATUS "|CMAKE_SYSTEM_PREFIX_PATH=${CMAKE_SYSTEM_PREFIX_PATH}")
     message(STATUS "|CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
+    message(STATUS "|CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 
-    if("${CMAKE_BUILD_TYPE}" STREQUAL "Release")
-        message(STATUS "|CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -> Release mode was on")
-    else()
-        message(STATUS "|CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE} -> Debug mode was on")
-    endif()
     message(
         STATUS
             "|CEU_CM_SHOULD_ENABLE_TEST=${CEU_CM_SHOULD_ENABLE_TEST}; CEU_CM_SHOULD_USE_NATIVE=${CEU_CM_SHOULD_USE_NATIVE}"

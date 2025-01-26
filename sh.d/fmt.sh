@@ -50,8 +50,7 @@ wait
 
 which cmake-format &>/dev/null &&
     git ls-files |
-    grep -v 'deps' |
-        grep -v '.idea/' |
+    grep -v '.idea/' |
         grep -v 'art_original' |
         grep -v 'dwgsim' |
         grep -v 'htslib-1.21' |

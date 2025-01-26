@@ -14,12 +14,11 @@ ceu_cm_enhanced_try_run(
     DEPENDS
     C_HELLOWORLD)
 
-if(NOT DEFINED LIBM_LIBRARY_SHARED)
-    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE LIBM_LIBRARY_SHARED LINKER_FLAG m)
+if(NOT TARGET CEU_CM_EFL::libm_shared)
+    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libm_shared LINKER_FLAG m)
 endif()
-
-if(NOT DEFINED LIBM_LIBRARY_STATIC)
-    ceu_cm_enhanced_find_library(STATIC OUTPUT_VARIABLE LIBM_LIBRARY_STATIC LINKER_FLAG m)
+if(NOT TARGET CEU_CM_EFL::libm_static)
+    ceu_cm_enhanced_find_library(STATIC OUTPUT_VARIABLE libm_static LINKER_FLAG m)
 endif()
 
 ceu_cm_enhanced_try_run(
@@ -30,7 +29,7 @@ ceu_cm_enhanced_try_run(
     DEPENDS
     C_HELLOWORLD
     LINK_LIBRARIES
-    ${LIBM_LIBRARY_SHARED})
+    CEU_CM_EFL::libm_shared)
 ceu_cm_enhanced_try_run(
     STATIC
     VARNAME
@@ -40,11 +39,8 @@ ceu_cm_enhanced_try_run(
     DEPENDS
     C_HELLOWORLD
     LINK_LIBRARIES
-    ${LIBM_LIBRARY_STATIC})
+    CEU_CM_EFL::libm_static)
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
-    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        ON
-        CACHE INTERNAL "This file was included")
     ceu_cm_print_test_status("libm: without -lm (c)" C_NO_LIBM)
     ceu_cm_print_test_status("libm: with -lm (c)" C_WITH_LIBM)
 endif()
@@ -54,7 +50,7 @@ if(CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_SHARED EQUAL 0 AND NOT CEU_CM_HAVE_WORKING_
         CACHE INTERNAL "mathematical functions work without libm")
 elseif(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_SHARED EQUAL 0)
     set(CEU_CM_LIBM_SHARED
-        "${LIBM_LIBRARY_SHARED}"
+        "CEU_CM_EFL::libm_shared"
         CACHE INTERNAL "mathematical functions work with libm")
 else()
     set(CEU_CM_LIBM_SHARED
@@ -68,7 +64,7 @@ if(CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_STATIC EQUAL 0 AND NOT CEU_CM_HAVE_WORKING_
         CACHE INTERNAL "mathematical functions work without libm")
 elseif(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_STATIC EQUAL 0)
     set(CEU_CM_LIBM_STATIC
-        "${LIBM_LIBRARY_STATIC}"
+        "CEU_CM_EFL::libm_static"
         CACHE INTERNAL "mathematical functions work with libm")
 else()
     set(CEU_CM_LIBM_STATIC

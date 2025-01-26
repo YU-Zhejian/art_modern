@@ -1,4 +1,3 @@
-
 #[=======================================================================[
 ceu_cm_global_enhanced_check_compiler_flag -- Check whether one of the flags in a group of flags is available.
 
@@ -15,10 +14,7 @@ function(ceu_cm_enhanced_check_compiler_flag)
     set(options "")
     set(oneValueArgs OUT_NAME)
     set(multiValueArgs FLAGS)
-    cmake_parse_arguments(CEU_CM_ECCF
-            "${options}" "${oneValueArgs}" "${multiValueArgs}"
-            ${ARGN}
-    )
+    cmake_parse_arguments(CEU_CM_ECCF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     foreach(FLAG ${CEU_CM_ECCF_FLAGS})
         if(DEFINED CMAKE_C_COMPILER)
             check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
@@ -34,8 +30,8 @@ function(ceu_cm_enhanced_check_compiler_flag)
         if(C_COMPILER_HAVE_${FLAG} AND CXX_COMPILER_HAVE_${FLAG})
             add_compile_options(${FLAG})
             set(${CEU_CM_ECCF_OUT_NAME}
-                    ${FLAG} ${${CEU_CM_ECCF_OUT_NAME}}
-                    PARENT_SCOPE)
+                ${FLAG} ${${CEU_CM_ECCF_OUT_NAME}}
+                PARENT_SCOPE)
             return()
         endif()
         unset(C_COMPILER_HAVE_${FLAG})
