@@ -52,6 +52,8 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
+#include <fmt/core.h>
+
 // CPPSTDLIB
 #include <iostream>
 #include <string>
@@ -256,6 +258,11 @@ namespace {
 #endif
     }
 
+    void print_fmt_version()
+    {
+        std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100 << std::endl;
+    }
+
 } // namespace
 
 void print_version()
@@ -269,6 +276,7 @@ void print_version()
 #endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
+    print_fmt_version();
     print_boost_version();
     print_gsl_version();
     print_onemkl_version();

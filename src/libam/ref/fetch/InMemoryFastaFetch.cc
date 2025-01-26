@@ -7,6 +7,8 @@
 
 #include <cstddef>
 #include <fstream>
+#include <istream>
+#include <sstream>
 #include <string>
 #include <tuple>
 #include <utility>
@@ -24,13 +26,11 @@ namespace {
         return retv;
     }
 
-    std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
+    std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map_ss(std::istream& iss)
     {
         std::vector<std::string> seq_names;
         std::vector<std::string> seqs;
-
-        auto file_reader = std::ifstream(file_name);
-        FastaIterator fai(file_reader);
+        FastaIterator fai(iss);
         while (true) {
             try {
                 auto [id, sequence] = fai.next();
@@ -40,13 +40,25 @@ namespace {
                 break;
             }
         }
-        file_reader.close();
         return { std::move(seq_names), std::move(seqs) };
+    }
+
+    std::tuple<std::vector<std::string>, std::vector<std::string>> get_seq_map(const std::string& file_name)
+    {
+        auto file_reader = std::ifstream(file_name);
+        const auto retv = get_seq_map_ss(file_reader);
+        file_reader.close();
+        return retv;
     }
 } // namespace
 
 InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
     : InMemoryFastaFetch(get_seq_map(file_name))
+{
+}
+
+InMemoryFastaFetch::InMemoryFastaFetch(std::istream& iss)
+    : InMemoryFastaFetch(get_seq_map_ss(iss))
 {
 }
 

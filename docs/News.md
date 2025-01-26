@@ -48,3 +48,5 @@ Fixed miscellaneous bugs.
 ## 1.1.1
 
 - Possible build acceleration using [ccache](https://ccache.dev/) supported.
+- Alternate `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) and [mi-malloc](https://github.com/microsoft/mimalloc) supported.
+- Formatting engine changed to [`{fmt}`](https://github.com/fmtlib/fmt).

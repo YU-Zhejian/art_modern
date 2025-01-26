@@ -78,3 +78,15 @@ Affected files:
 - `/deps/cpp-btree/**`
 
 Under the Apache License, Version 2.0.
+
+## Victor Zverovich's `{fmt}` Project
+
+Available from <https://github.com/fmtlib/fmt>, commit `a3d05d70` (tag `7.1.3`).
+
+Affected files:
+
+- `/deps/slim_libfmt/**`
+
+Under an MIT-like License.
+
+**NOTE** This is the last version that does not come with C++20 modules.

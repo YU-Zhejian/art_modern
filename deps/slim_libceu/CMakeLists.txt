@@ -15,7 +15,7 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/libceu_stddef.h.in" "${CMAKE_BINARY_DI
 
 file(GLOB CEU_LIBRARY_SOURCES ${CMAKE_CURRENT_LIST_DIR}/*/*.cc)
 if(BUILD_SHARED_LIBS)
-    add_library(libceu SHARED ${CEU_LIBRARY_SOURCES})
+    add_library(slim_libceu SHARED ${CEU_LIBRARY_SOURCES})
 else()
-    add_library(libceu STATIC ${CEU_LIBRARY_SOURCES})
+    add_library(slim_libceu STATIC ${CEU_LIBRARY_SOURCES})
 endif()

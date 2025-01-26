@@ -7,7 +7,7 @@
 ## Performance
 
 - The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost.ASIO.
-- The massive use of `std::stringstream` should be replaced by `std::snprintf`, which is considerably faster and makes advantages of pre-allocated memory.
+- The massive use of `std::stringstream` should be replaced by `{fmt}`, which is considerably faster and makes advantages of pre-allocated memory.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -28,6 +28,7 @@
   - Compress builtin profiles using XZ, etc., and then encode it using base64.
     - May depend on Boost.IO or use ZLib/libLZMA/libzstd directly.
     - Only a decoder is needed in the executable.
+  - See also: [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings)
 
 ## I/O Formats
 

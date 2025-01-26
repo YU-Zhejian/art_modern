@@ -11,6 +11,8 @@
 #include "libam/utils/mpi_utils.hh" // NOLINT
 #include "libam/utils/seq_utils.hh"
 
+#include <fmt/core.h>
+
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 
 #include <htslib/hts.h>
@@ -31,14 +33,7 @@ namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const int32_t nm_tag)
 {
-    const auto pos = std::to_string(pwa.pos_on_contig + 1); // SAM is 1-based
-    const auto strand = pwa.is_plus_strand ? '+' : '-';
-    const auto cigar_str = cigar_arr_to_str(cigar);
-    // TODO: Refactor this using std::snprintf
-    std::ostringstream oss;
-    oss << pwa.contig_name << ',' << pos << ',' << strand << ',' << cigar_str << ',' << MAPQ_MAX_STR << ','
-        << std::to_string(nm_tag) << ';';
-    return oss.str();
+    return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-', cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
 }
 std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar)

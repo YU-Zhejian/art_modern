@@ -10,6 +10,8 @@
 #include "libam/utils/arithmetic_utils.hh"
 #include "libam/utils/mpi_utils.hh"
 
+#include <fmt/core.h>
+
 #include <boost/log/trivial.hpp>
 
 #include <htslib/hts.h>
@@ -54,10 +56,7 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
 
 bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
-    std::ostringstream osID;
-    osID << art_contig.seq_name << ':' << art_params_.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
-         << current_num_reads;
-    const std::string read_name = osID.str();
+    const std::string read_name = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
@@ -84,10 +83,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
 bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
 {
-    std::ostringstream osID;
-    osID << art_contig.seq_name << ':' << art_params_.id << ":" << job_.job_id << ":" << mpi_rank_ << ":"
-         << current_num_reads;
-    ArtRead art_read(art_params_, art_contig.seq_name, osID.str(), rprob_);
+    ArtRead art_read(art_params_, art_contig.seq_name, fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads), rprob_);
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
     } catch (ReadGenerationException&) {

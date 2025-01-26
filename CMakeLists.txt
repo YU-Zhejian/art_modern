@@ -83,7 +83,6 @@ unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
-message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
@@ -98,16 +97,19 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
+add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 # include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/simde")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
+include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
 
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} libceu)
-message(NOTICE "ART_MODERN_LINK_LIBS=${ART_MODERN_LINK_LIBS}")
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt)
+message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
+message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
     execute_process(

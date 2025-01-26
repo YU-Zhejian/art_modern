@@ -43,7 +43,6 @@ constexpr char ART_VERSION[] = "2.5.8";
 
 /** Maximum mapping quality */
 constexpr int MAPQ_MAX = ((1 << 8) - 1); // 255
-constexpr char MAPQ_MAX_STR[] = "255"; // 255
 
 constexpr int PHRED_OFFSET = 33;
 

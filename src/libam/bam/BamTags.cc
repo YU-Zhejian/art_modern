@@ -15,6 +15,7 @@
 #include <string>
 
 namespace labw::art_modern {
+BamTags::BamTags(int est_num_tags) { tags_.reserve(est_num_tags); }
 void BamTags::patch(bam1_t* record) const
 {
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
