@@ -2,7 +2,7 @@
 
 ## IMPORTANT
 
-- Add jemalloc and mimalloc to INSTALL.md.
+- Support jemalloc through pkg-config.
 
 ## Performance
 

@@ -13,7 +13,6 @@
 #include <cmath>
 #include <cstddef>
 #include <fstream>
-#include <functional>
 #include <istream>
 #include <limits>
 #include <sstream>

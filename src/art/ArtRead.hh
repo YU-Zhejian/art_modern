@@ -30,7 +30,7 @@ public:
     DELETE_COPY(ArtRead)
     ~ArtRead() = default;
 
-    ArtRead(const ArtParams& art_params, const std::string& contig_name, const std::string& read_name, Rprob& rprob);
+    ArtRead(const ArtParams& art_params, std::string contig_name, const std::string& read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
     int generate_indels(bool is_read_1);

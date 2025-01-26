@@ -1,7 +1,7 @@
 unset(WITH_MIMALLOC)
 unset(WITH_JEMALLOC)
 
-if(USE_MALLOC STREQUAL AUTO)
+if("${USE_MALLOC}" STREQUAL AUTO)
     find_package(mimalloc)
     if(mimalloc_FOUND)
         set(WITH_MIMALLOC ON)
@@ -13,8 +13,7 @@ if(USE_MALLOC STREQUAL AUTO)
     else()
         # Find jemalloc TODO
     endif()
-
-elseif(USE_MALLOC STREQUAL MIMALLOC)
+elseif("${USE_MALLOC}" STREQUAL MIMALLOC)
     find_package(mimalloc REQUIRED)
     set(WITH_MIMALLOC ON)
     if(BUILD_SHARED_LIBS)
@@ -22,6 +21,10 @@ elseif(USE_MALLOC STREQUAL MIMALLOC)
     else()
         set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} mimalloc-static)
     endif()
-elseif(USE_MALLOC STREQUAL JEMALLOC)
+elseif("${USE_MALLOC}" STREQUAL JEMALLOC)
     # Find jemalloc TODO
+elseif("${USE_MALLOC}" STREQUAL NOP)
+    # Do nothing!
+else()
+    message(FATAL_ERROR "Unknown USE_MALLOC: ${USE_MALLOC}. Sgould be one of AUTO, MIMALLOC, JEMALLOC, and NOP")
 endif()

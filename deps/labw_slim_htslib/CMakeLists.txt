@@ -11,6 +11,14 @@ endif()
 find_package(Threads REQUIRED)
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
+
+set(CEU_CM_SILENT ON)
+set(CEU_CM_CC_FLAGS "")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
+set(HTSLIB_CC_FLAGS ${CEU_CM_CC_FLAGS})
+message(STATUS "HTSLib compiler flags: ${HTSLIB_CC_FLAGS}")
+unset(CEU_CM_SILENT)
+
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_c_helloworld.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libm.cmake")
 # FIXME include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libpthread.cmake")
@@ -142,6 +150,7 @@ else()
     add_library(labw_slim_htslib STATIC ${HTSLIB_SOURCES})
     ceu_cm_set_static_target(labw_slim_htslib)
 endif()
+target_compile_options(labw_slim_htslib BEFORE PUBLIC ${HTSLIB_CC_FLAGS})
 
 target_link_libraries(
         labw_slim_htslib

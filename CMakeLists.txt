@@ -13,8 +13,13 @@ if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
     endif()
 endif()
 
-# FIXME: Some times ccache may fail.
-# include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
+if(NOT DEFINED USE_CCACHE)
+    set(USE_CCACHE OFF)
+endif()
+if(USE_CCACHE)
+    include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
+endif()
+
 project(
     art_modern
     LANGUAGES C CXX
@@ -72,6 +77,14 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/git_adapter.cmake")
 if(GIT_FOUND)
     set(WITH_GIT ON)
 endif ()
+
+
+unset(CEU_CM_SILENT)
+set(CEU_CM_CC_FLAGS "")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
+set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
+message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
+
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 set(ART_MODERN_LINK_LIBS "")
@@ -127,9 +140,11 @@ endif()
 file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/libam/*.cc"
      "${CMAKE_CURRENT_LIST_DIR}/src/libam/*/*/*.cc" "${CMAKE_CURRENT_LIST_DIR}/src/libam/*/*.cc")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
+target_compile_options(art_modern_lib BEFORE PUBLIC ${AM_CC_FLAGS})
 
 file(GLOB ART_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.cc")
 add_executable(art_modern ${ART_SOURCE})
+target_compile_options(art_modern BEFORE PUBLIC ${AM_CC_FLAGS})
 
 target_link_libraries(art_modern_lib PUBLIC ${ART_MODERN_LINK_LIBS})
 target_link_libraries(art_modern PUBLIC art_modern_lib)
@@ -152,6 +167,7 @@ elseif(Boost_unit_test_framework_FOUND)
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
         target_link_libraries("${ART_MODERN_TEST_EXEC}" art_modern_lib Boost::unit_test_framework)
         add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
+        target_compile_options("${ART_MODERN_TEST_EXEC}" BEFORE PUBLIC ${AM_CC_FLAGS})
     endforeach()
 else()
     message(NOTICE "Testing disabled since Boost::unit_test_framework was not found")
@@ -165,6 +181,7 @@ if(CEU_CM_SHOULD_ENABLE_TEST)
         set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
         add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" art_modern_lib)
+        target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PUBLIC ${AM_CC_FLAGS})
     endforeach()
 endif()
 

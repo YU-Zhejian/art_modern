@@ -5,8 +5,6 @@
 #include "libam/Constants.hh"
 #include "libam/ds/CoverageInfo.hh"
 
-#include <absl/base/attributes.h>
-
 #include <boost/program_options/variables_map.hpp>
 
 #include <htslib/hts.h>
@@ -41,6 +39,6 @@ struct ArtParams {
     const int batch_size;
     const boost::program_options::variables_map vm;
     const std::vector<std::string> args;
-} ABSL_ATTRIBUTE_PACKED;
+};
 
 } // namespace labw::art_modern
