@@ -61,14 +61,8 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
-
-    try {
-        art_contig.generate_read_pe(
-            is_plus_strand, art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP, read_1, read_2);
-    } catch (ReadGenerationException&) {
-        return false;
-    }
-
+    art_contig.generate_read_pe(
+        is_plus_strand, art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP, read_1, read_2);
     read_1.generate_snv_on_qual(true);
     read_2.generate_snv_on_qual(false);
     if (require_alignment_) {
@@ -89,11 +83,7 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     ArtRead art_read(art_params_, art_contig.seq_name,
         fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads),
         rprob_);
-    try {
-        art_contig.generate_read_se(is_plus_strand, art_read);
-    } catch (ReadGenerationException&) {
-        return false;
-    }
+    art_contig.generate_read_se(is_plus_strand, art_read);
     art_read.generate_snv_on_qual(true);
     if (require_alignment_) {
         art_read.generate_pairwise_aln();

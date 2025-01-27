@@ -7,21 +7,14 @@
 #include "libam/ds/PairwiseAlignment.hh"
 #include "libam/utils/class_macros_utils.hh"
 
-#include <absl/base/attributes.h>
-
 #include <htslib/hts.h>
 
 #include <functional>
 #include <map>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
-
-struct ReadGenerationException : public std::runtime_error {
-    using runtime_error::runtime_error;
-} ABSL_ATTRIBUTE_PACKED;
 
 class ArtRead {
 public:
@@ -54,7 +47,7 @@ public:
     [[nodiscard]] bool is_good() const;
 
 private:
-    std::string aln_read_;
+    std::string aln_query_;
     std::string aln_ref_;
     const ArtParams& art_params_;
     std::string contig_name_;
@@ -64,8 +57,8 @@ private:
     std::vector<am_qual_t> qual_;
     std::string read_name_;
     Rprob& rprob_;
-    std::string seq_read_;
-    std::string seq_ref_;
+    std::string query_;
+    std::string ref_;
     [[maybe_unused]] void except_() const;
 };
 

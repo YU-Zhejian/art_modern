@@ -50,11 +50,11 @@ public:
     /*!
      * Query sequence with gap inserted using -
      */
-    const std::string aligned_query;
+    const std::string aln_query;
     /*!
      * Reference sequence with gap inserted using -
      */
-    const std::string aligned_ref;
+    const std::string aln_ref;
     /*!
      * Query sequence without gap.
      */

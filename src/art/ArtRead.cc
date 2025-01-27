@@ -5,8 +5,8 @@
 #include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 #include "libam/Constants.hh"
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/utils/seq_utils.hh"
 #include "libam/utils/mpi_utils.hh"
+#include "libam/utils/seq_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <sstream>
 #include <utility>
 
 namespace labw::art_modern {
@@ -22,34 +23,34 @@ namespace labw::art_modern {
 void ArtRead::generate_pairwise_aln()
 {
     std::size_t pos_on_aln_str = 0;
-    std::size_t pos_on_read = 0;
+    std::size_t pos_on_query = 0;
     std::size_t pos_on_ref = 0;
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
-    aln_read_.resize(maxk);
+    aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
 #if (1)
     std::size_t num_match = 0;
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
-        std::memcpy(aln_read_.data() + pos_on_aln_str, seq_read_.data() + pos_on_read, num_match);
-        std::memcpy(aln_ref_.data() + pos_on_aln_str, seq_ref_.data() + pos_on_ref, num_match);
-        pos_on_read += num_match;
+        std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
+        std::memcpy(aln_ref_.data() + pos_on_aln_str, ref_.data() + pos_on_ref, num_match);
+        pos_on_query += num_match;
         pos_on_ref += num_match;
         pos_on_aln_str = this_pos_on_aln_str;
         if (indel == ALN_GAP) {
-            aln_read_[pos_on_aln_str] = ALN_GAP;
-            aln_ref_[pos_on_aln_str] = seq_ref_[pos_on_ref];
+            aln_query_[pos_on_aln_str] = ALN_GAP;
+            aln_ref_[pos_on_aln_str] = ref_[pos_on_ref];
             pos_on_ref++;
         } else {
-            aln_read_[pos_on_aln_str] = indel;
+            aln_query_[pos_on_aln_str] = query_[pos_on_query];
             aln_ref_[pos_on_aln_str] = ALN_GAP;
-            pos_on_read++;
+            pos_on_query++;
         }
         pos_on_aln_str++;
     }
-    num_match = seq_ref_.size() - pos_on_ref;
-    std::memcpy(aln_read_.data() + pos_on_aln_str, seq_read_.data() + pos_on_read, num_match);
-    std::memcpy(aln_ref_.data() + pos_on_aln_str, seq_ref_.data() + pos_on_ref, num_match);
+    num_match = ref_.size() - pos_on_ref;
+    std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
+    std::memcpy(aln_ref_.data() + pos_on_aln_str, ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
 #else // Old version for historical purposes
     while (pos_on_ref < seq_ref_.size()) {
@@ -80,12 +81,26 @@ void ArtRead::generate_pairwise_aln()
         pos_on_aln_str++;
     }
 #endif
-    aln_read_.resize(pos_on_aln_str);
+    aln_query_.resize(pos_on_aln_str);
     aln_ref_.resize(pos_on_aln_str);
 
 #ifdef CEU_CM_IS_DEBUG
-    if (aln_read_.size() != aln_ref_.size()) {
-        BOOST_LOG_TRIVIAL(fatal) << "aln_read_.size() != aln_ref_.size()";
+    if (aln_query_.size() != aln_ref_.size()) {
+        BOOST_LOG_TRIVIAL(fatal) << "Aligned read size (" << aln_query_.size() << ") != aligned ref size ("
+                                 << aln_ref_.size() << ")";
+        except_();
+    }
+    auto reconst_ref = aln_ref_;
+    auto reconst_query = aln_query_;
+    reconst_ref.erase(std::remove(reconst_ref.begin(), reconst_ref.end(), ALN_GAP), reconst_ref.end());
+    reconst_query.erase(std::remove(reconst_query.begin(), reconst_query.end(), ALN_GAP), reconst_query.end());
+
+    if (reconst_ref != ref_) {
+        BOOST_LOG_TRIVIAL(error) << "Reconstructed reference != reference:";
+        except_();
+    }
+    if (reconst_query != query_) {
+        BOOST_LOG_TRIVIAL(error) << "Reconstructed query != query:";
         except_();
     }
 #endif
@@ -96,23 +111,23 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read)
     if (!art_params_.sep_flag) {
         art_params_.qdist.get_read_qual(qual_, art_params_.read_len, rprob_, is_first_read);
     } else if (is_first_read) {
-        art_params_.qdist.get_read_qual_sep_1(qual_, seq_read_, rprob_);
+        art_params_.qdist.get_read_qual_sep_1(qual_, query_, rprob_);
     } else {
-        art_params_.qdist.get_read_qual_sep_2(qual_, seq_read_, rprob_);
+        art_params_.qdist.get_read_qual_sep_2(qual_, query_, rprob_);
     }
     char achar = 0;
     rprob_.r_probs();
     for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
-        if (seq_read_[i] == 'N') {
+        if (query_[i] == 'N') {
             qual_[i] = MIN_QUAL;
             continue;
         }
         if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
-            achar = seq_read_[i];
-            while (seq_read_[i] == achar) {
+            achar = query_[i];
+            while (query_[i] == achar) {
                 achar = rprob_.rand_base();
             }
-            seq_read_[i] = achar;
+            query_[i] = achar;
         }
     }
 }
@@ -221,36 +236,36 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
 {
     pos_on_contig_ = pos_on_contig;
     is_plus_strand_ = is_plus_strand;
-    seq_ref_ = std::move(seq_ref);
-    normalize_inplace(seq_ref_);
+    ref_ = std::move(seq_ref);
+    normalize_inplace(ref_);
     if (!is_plus_strand) {
-        revcomp_inplace(seq_ref_);
+        revcomp_inplace(ref_);
     }
     std::size_t pos_on_aln_str = 0;
     std::size_t pos_on_read = 0;
     std::size_t pos_on_ref = 0;
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
-    aln_read_.resize(maxk);
+    aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
 #if (1)
     std::size_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
-        std::memcpy(seq_read_.data() + pos_on_read, seq_ref_.data() + pos_on_ref, num_match);
+        std::memcpy(query_.data() + pos_on_read, ref_.data() + pos_on_ref, num_match);
         pos_on_read += num_match;
         pos_on_ref += num_match;
         pos_on_aln_str = this_pos_on_aln_str;
         if (indel == ALN_GAP) {
             pos_on_ref++;
         } else {
-            seq_read_[pos_on_read] = indel;
+            query_[pos_on_read] = indel;
             pos_on_read++;
         }
         pos_on_aln_str++;
     }
-    num_match = seq_ref_.size() - pos_on_ref;
-    std::memcpy(seq_read_.data() + pos_on_read, seq_ref_.data() + pos_on_ref, num_match);
+    num_match = ref_.size() - pos_on_ref;
+    std::memcpy(query_.data() + pos_on_read, ref_.data() + pos_on_ref, num_match);
 #else // Old code for historical purposes
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
         const auto find = indel_.find(k);
@@ -277,21 +292,31 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     }
 #endif
 #ifdef CEU_CM_IS_DEBUG
-    if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
+    if (static_cast<int>(query_.size()) != art_params_.read_len) {
+        BOOST_LOG_TRIVIAL(error) << "Generated read length (" << query_.size()
+                                 << ") is not equal to designed read length (" << art_params_.read_len << ")";
         except_();
     }
 #endif
 }
 
-void ArtRead::except_() const{
+void ArtRead::except_() const
+{
     BOOST_LOG_TRIVIAL(error) << "Read   : " << read_name_;
     BOOST_LOG_TRIVIAL(error) << "Contig : " << contig_name_ << ":" << pos_on_contig_ << ":"
                              << (is_plus_strand_ ? "+" : "-");
-    BOOST_LOG_TRIVIAL(error) << "Query  : " << seq_read_;
-    BOOST_LOG_TRIVIAL(error) << "Ref    : " << seq_ref_;
+    BOOST_LOG_TRIVIAL(error) << "Query  : " << query_;
+    BOOST_LOG_TRIVIAL(error) << "Ref    : " << ref_;
     BOOST_LOG_TRIVIAL(error) << "Qual   : " << qual_to_str(qual_);
-    BOOST_LOG_TRIVIAL(error) << "AQuery : " << aln_read_;
+    BOOST_LOG_TRIVIAL(error) << "AQuery : " << aln_query_;
     BOOST_LOG_TRIVIAL(error) << "ARef   : " << aln_ref_;
+    std::ostringstream indel_oss;
+    indel_oss << "{";
+    for (const auto& [pos, indel] : indel_) {
+        indel_oss << pos << ":" << indel << ", ";
+    }
+    indel_oss << "}";
+    BOOST_LOG_TRIVIAL(error) << "Indel  : " << indel_oss.str();
     abort_mpi();
 }
 
@@ -301,19 +326,18 @@ ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::stri
     , read_name_(std::move(read_name))
     , rprob_(rprob)
 {
-    seq_read_.resize(art_params_.read_len);
+    query_.resize(art_params_.read_len);
     qual_.resize(art_params_.read_len);
 }
 
 PairwiseAlignment ArtRead::to_pwa()
 {
-    std::string qual_str = qual_to_str(qual_);
-    return { std::move(read_name_), std::move(contig_name_), std::move(seq_read_), std::move(seq_ref_),
-        std::move(qual_str), std::move(aln_read_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
+    return { std::move(read_name_), std::move(contig_name_), std::move(query_), std::move(ref_), qual_to_str(qual_),
+        std::move(aln_query_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
 }
 bool ArtRead::is_good() const
 {
-    if (std::count(seq_read_.begin(), seq_read_.end(), 'N') > art_params_.max_n) {
+    if (std::count(query_.begin(), query_.end(), 'N') > art_params_.max_n) {
         return false;
     }
     return true;

@@ -5,7 +5,7 @@ set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
 
-export OUT_DIR=/tmp/data_out
+export OUT_DIR=data_out_am_impl
 export ART_MODERN_THREADS=20
 
 mkdir -p "${OUT_DIR}"
@@ -26,6 +26,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 100 \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern_gcc-genome-pe100 opt/art_modern_gcc_build/art_modern \
@@ -33,6 +34,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 100 \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern_prev-genome-pe100 opt/art_modern_prev_ver_build/art_modern \
@@ -40,6 +42,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 100 \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern-transcriptome-pe100 opt/art_modern_build/art_modern \
@@ -47,6 +50,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 100 --i-parser stream \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 
@@ -55,6 +59,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 100 --i-parser stream \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 
@@ -63,6 +68,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 100 --i-parser stream \
         --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
         --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 
@@ -73,6 +79,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 300 \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern_gcc-genome-pe300 opt/art_modern_gcc_build/art_modern \
@@ -80,6 +87,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 300 \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern_prev-genome-pe300 opt/art_modern_prev_ver_build/art_modern \
@@ -87,6 +95,7 @@ for i in {1..3}; do
         --i-file data/ce11.fa --i-fcov 100 --read_len 300 \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}"
 
     run art_modern-transcriptome-pe300 opt/art_modern_build/art_modern \
@@ -94,6 +103,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 300 --i-parser stream \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 
@@ -102,6 +112,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 300 --i-parser stream \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 
@@ -110,6 +121,7 @@ for i in {1..3}; do
         --i-file data/hg38_long_mrna.fa --i-fcov 40 --read_len 300 --i-parser stream \
         --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
         --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
+        --o-fastq "${OUT_DIR}"/out.fq \
         --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 --parallel "${ART_MODERN_THREADS}" \
         --i-batch_size 1024
 done

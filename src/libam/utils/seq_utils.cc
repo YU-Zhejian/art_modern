@@ -145,7 +145,6 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
         return qual_to_str_sse2(qual, qlen);
     }
     return qual_to_str_avx2(qual, qlen);
-
 #else
     return qual_to_str_foreach(qual, qlen);
 #endif

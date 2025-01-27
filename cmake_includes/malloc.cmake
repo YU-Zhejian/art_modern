@@ -11,7 +11,22 @@ if("${USE_MALLOC}" STREQUAL AUTO)
             set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} mimalloc-static)
         endif()
     else()
-        # Find jemalloc TODO
+        if(BUILD_SHARED_LIBS)
+            ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libjemalloc LINKER_FLAG jemalloc PKGCONF_NAME jemalloc)
+        else()
+            ceu_cm_enhanced_find_library(
+                OUTPUT_VARIABLE
+                libjemalloc
+                STATIC
+                LINKER_FLAG
+                jemalloc
+                PKGCONF_NAME
+                jemalloc)
+        endif()
+        if(TARGET CEU_CM_EFL::libjemalloc)
+            set(WITH_JEMALLOC ON)
+            set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} "CEU_CM_EFL::libjemalloc")
+        endif()
     endif()
 elseif("${USE_MALLOC}" STREQUAL MIMALLOC)
     find_package(mimalloc REQUIRED)
@@ -22,7 +37,24 @@ elseif("${USE_MALLOC}" STREQUAL MIMALLOC)
         set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} mimalloc-static)
     endif()
 elseif("${USE_MALLOC}" STREQUAL JEMALLOC)
-    # Find jemalloc TODO
+    if(BUILD_SHARED_LIBS)
+        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libjemalloc LINKER_FLAG jemalloc PKGCONF_NAME jemalloc)
+    else()
+        ceu_cm_enhanced_find_library(
+            OUTPUT_VARIABLE
+            libjemalloc
+            STATIC
+            LINKER_FLAG
+            jemalloc
+            PKGCONF_NAME
+            jemalloc)
+    endif()
+    if(TARGET CEU_CM_EFL::libjemalloc)
+        set(WITH_JEMALLOC ON)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} "CEU_CM_EFL::libjemalloc")
+    else()
+        message(FATAL_ERROR "Required jemalloc not found!")
+    endif()
 elseif("${USE_MALLOC}" STREQUAL NOP)
     # Do nothing!
 else()

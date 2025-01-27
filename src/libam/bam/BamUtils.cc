@@ -156,8 +156,8 @@ void BamUtils::assert_correct_cigar(
     const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());
     const auto qual_len = static_cast<hts_pos_t>(pwa.qual.length());
 
-    auto reconst_ref = pwa.aligned_ref;
-    auto reconst_query = pwa.aligned_query;
+    auto reconst_ref = pwa.aln_ref;
+    auto reconst_query = pwa.aln_query;
     reconst_ref.erase(std::remove(reconst_ref.begin(), reconst_ref.end(), ALN_GAP), reconst_ref.end());
     reconst_query.erase(std::remove(reconst_query.begin(), reconst_query.end(), ALN_GAP), reconst_query.end());
 
@@ -178,7 +178,7 @@ void BamUtils::assert_correct_cigar(
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << rlen;
         goto err;
     }
-    
+
     if (qlen != qual_len) {
         BOOST_LOG_TRIVIAL(error) << "Qual length mismatch with query: " << qual_len << " != " << qual_len;
         goto err;
@@ -231,8 +231,8 @@ err:
     BOOST_LOG_TRIVIAL(error) << "Query  : " << pwa.query;
     BOOST_LOG_TRIVIAL(error) << "Ref    : " << pwa.ref;
     BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
-    BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aligned_query;
-    BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aligned_ref;
+    BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aln_query;
+    BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aln_ref;
     abort_mpi();
 #endif
 }
