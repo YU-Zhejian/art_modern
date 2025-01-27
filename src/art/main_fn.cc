@@ -7,8 +7,8 @@
 #include "art/ArtParams.hh"
 
 #include "libam/Constants.hh"
-#include "libam/JobPool.hh"
 #include "libam/ds/CoverageInfo.hh"
+#include "libam/jobs/JobPool.hh"
 #include "libam/jobs/SimulationJob.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/OutputDispatcher.hh"
@@ -19,23 +19,59 @@
 #include "libam/ref/fetch/FaidxFetch.hh"
 #include "libam/ref/fetch/InMemoryFastaFetch.hh"
 
+#include <atomic>
 #include <boost/log/trivial.hpp>
 
+#include <chrono>
+#include <cstddef>
 #include <fstream>
 #include <limits>
 #include <memory>
 #include <stdexcept>
+#include <thread>
 #include <utility>
 
 namespace labw::art_modern {
 
-struct Generator {
+    class JobPoolReporter {
+    public:
+        explicit JobPoolReporter(const JobPool& jp)
+                : jp_(jp)
+        {
+        }
+        void stop()
+        {
+            should_stop_ = true;
+            thread_.join();
+        }
+        void start() { thread_ = std::thread(&JobPoolReporter::job_, this); }
+
+    private:
+        void job_()
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            while (!should_stop_) {
+                BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+
+        const JobPool& jp_;
+        std::atomic<bool> should_stop_ { false };
+        std::thread thread_;
+    };
+
+
+    class Generator {
+public:
     const OutputDispatcherFactory out_dispatcher_factory;
 
     explicit Generator(const ArtParams& art_params)
         : art_params_(art_params)
         , job_pool_(art_params.parallel)
+        , reporter_(job_pool_)
     {
+        reporter_.start();
     }
     void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
     {
@@ -51,15 +87,19 @@ struct Generator {
 
     void wait()
     {
+        BOOST_LOG_TRIVIAL(info) << "All jobs submitted. Waiting for job pool to stop...";
         job_pool_.stop();
+        reporter_.stop();
         BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
         out_dispatcher_->close();
+        BOOST_LOG_TRIVIAL(info) << "Output dispatchers cleared";
     }
 
 private:
     int job_id_ = 0;
     ArtParams art_params_;
-    JobPool<ArtJobExecutor> job_pool_;
+    JobPool job_pool_;
+    JobPoolReporter reporter_;
     std::shared_ptr<BaseReadOutput> out_dispatcher_;
 };
 

@@ -17,14 +17,49 @@
 #include <htslib/hts.h>
 
 #include <atomic>
-#include <cstddef>
+#include <chrono>
 #include <memory>
-#include <sstream>
 #include <string>
+#include <thread>
 #include <utility>
 
 namespace labw::art_modern {
+namespace {
 
+    class AJEReporter {
+    public:
+        explicit AJEReporter(const ArtJobExecutor& aje)
+            : aje_(aje)
+        {
+        }
+        void stop()
+        {
+            should_stop_ = true;
+            thread_.join();
+        }
+        void start() { thread_ = std::thread(&AJEReporter::job_, this); }
+
+    private:
+        void job_()
+        {
+            am_readnum_t num_reads_now = 0;
+            am_readnum_t num_reads_prev = 0;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            while (!should_stop_) {
+                num_reads_now = aje_.num_reads();
+                BOOST_LOG_TRIVIAL(info)
+                    << "AJEReporter: Job " << aje_.thread_info() << ": " << num_reads_now << " reads generated. Speed: " << (num_reads_now - num_reads_prev) / 1 << "reads/s";
+                num_reads_prev = num_reads_now;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }
+
+        const ArtJobExecutor& aje_;
+        std::atomic<bool> should_stop_ { false };
+        std::thread thread_;
+    };
+
+} // namespace
 void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig)
 {
     int num_cont_fail = 0;
@@ -41,7 +76,7 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
         }
         if (retv) {
             remaining_num_reads -= num_reads_to_reduce_;
-            num_reads += num_reads_to_reduce_;
+            num_reads_ += num_reads_to_reduce_;
             current_num_reads++;
         } else {
             num_cont_fail++;
@@ -54,7 +89,7 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
     }
 }
 
-bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
+bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     const std::string read_name
         = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
@@ -78,7 +113,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const std::size_t current_num_reads)
+bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     ArtRead art_read(art_params_, art_contig.seq_name,
         fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads),
@@ -100,7 +135,7 @@ ArtJobExecutor::ArtJobExecutor(
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank())
-    , num_reads(0)
+    , num_reads_(0)
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
@@ -108,9 +143,16 @@ ArtJobExecutor::ArtJobExecutor(
 {
 }
 
+bool ArtJobExecutor::is_running() const { return is_running_; }
+
+am_readnum_t ArtJobExecutor::num_reads() const { return num_reads_; }
+
 void ArtJobExecutor::operator()()
 {
-    is_running = true;
+    is_running_ = true;
+    AJEReporter reporter(*this);
+    reporter.start();
+
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
         return;
@@ -149,18 +191,19 @@ void ArtJobExecutor::operator()()
         generate(num_neg_reads, false, art_contig);
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads
+    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads_
                             << " reads (mean depth="
-                            << static_cast<double>(num_reads) * art_params_.read_len
+                            << static_cast<double>(num_reads_) * art_params_.read_len
             / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
-    is_running = false;
+    reporter.stop();
+    is_running_ = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     : art_params_(other.art_params_)
     , job_(std::move(other.job_))
     , mpi_rank_(other.mpi_rank_)
-    , num_reads(other.num_reads.load())
+    , num_reads_(other.num_reads_.load())
     , output_dispatcher_(std::move(other.output_dispatcher_))
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)

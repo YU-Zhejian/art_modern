@@ -2,7 +2,6 @@
 
 ## IMPORTANT
 
-- Support jemalloc through pkg-config.
 - Extensive testing needed.
 
 ## Performance
