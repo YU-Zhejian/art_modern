@@ -16,7 +16,6 @@ public:
     virtual void operator()() = 0;
     [[nodiscard]] virtual bool is_running() const = 0;
     [[nodiscard]] virtual std::string thread_info() const = 0;
-    [[nodiscard]] virtual am_readnum_t num_reads() const = 0;
 };
 
 } // namespace labw::art_modern

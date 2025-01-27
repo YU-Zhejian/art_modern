@@ -42,14 +42,9 @@ namespace {
     private:
         void job_()
         {
-            am_readnum_t num_reads_now = 0;
-            am_readnum_t num_reads_prev = 0;
             std::this_thread::sleep_for(std::chrono::seconds(1));
             while (!should_stop_) {
-                num_reads_now = aje_.num_reads();
-                BOOST_LOG_TRIVIAL(info)
-                    << "AJEReporter: Job " << aje_.thread_info() << ": " << num_reads_now << " reads generated. Speed: " << (num_reads_now - num_reads_prev) / 1 << "reads/s";
-                num_reads_prev = num_reads_now;
+                BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
                 std::this_thread::sleep_for(std::chrono::seconds(1));
             }
         }
@@ -62,28 +57,31 @@ namespace {
 } // namespace
 void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig)
 {
-    int num_cont_fail = 0;
-    const auto max_tolerance = am_max(static_cast<am_readnum_t>(5),
+    current_contig_ = art_contig.seq_name;
+    current_n_fails_ = 0;
+    current_n_reads_generated_ = 0;
+    current_max_tolerence_ = am_max(static_cast<am_readnum_t>(5),
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     bool retv = false;
-    am_readnum_t remaining_num_reads = targeted_num_reads;
+    current_n_reads_left_ = targeted_num_reads;
     am_readnum_t current_num_reads = 0;
-    while (remaining_num_reads > 0) {
+    while (current_n_reads_left_ > 0) {
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             retv = generate_se(art_contig, is_positive, current_num_reads);
         } else {
             retv = generate_pe(art_contig, is_positive, current_num_reads);
         }
         if (retv) {
-            remaining_num_reads -= num_reads_to_reduce_;
-            num_reads_ += num_reads_to_reduce_;
+            current_n_reads_left_ -= num_reads_to_reduce_;
+            total_num_reads_generated_ += num_reads_to_reduce_;
+            current_n_reads_generated_ += num_reads_to_reduce_;
             current_num_reads++;
         } else {
-            num_cont_fail++;
+            current_n_fails_++;
         }
-        if (num_cont_fail >= max_tolerance) {
+        if (current_n_fails_ >= current_max_tolerence_) {
             BOOST_LOG_TRIVIAL(debug) << "Failed to generate reads for " << art_contig.seq_name << " sized "
-                                     << art_contig.seq_size << " after " << max_tolerance << " attempts.";
+                                     << art_contig.seq_size << " after " << current_max_tolerence_ << " attempts.";
             break;
         }
     }
@@ -135,7 +133,6 @@ ArtJobExecutor::ArtJobExecutor(
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank())
-    , num_reads_(0)
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
@@ -144,8 +141,6 @@ ArtJobExecutor::ArtJobExecutor(
 }
 
 bool ArtJobExecutor::is_running() const { return is_running_; }
-
-am_readnum_t ArtJobExecutor::num_reads() const { return num_reads_; }
 
 void ArtJobExecutor::operator()()
 {
@@ -191,9 +186,9 @@ void ArtJobExecutor::operator()()
         generate(num_neg_reads, false, art_contig);
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << num_reads_
+    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << total_num_reads_generated_
                             << " reads (mean depth="
-                            << static_cast<double>(num_reads_) * art_params_.read_len
+                            << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
             / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
     reporter.stop();
@@ -203,13 +198,17 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     : art_params_(other.art_params_)
     , job_(std::move(other.job_))
     , mpi_rank_(other.mpi_rank_)
-    , num_reads_(other.num_reads_.load())
     , output_dispatcher_(std::move(other.output_dispatcher_))
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(other.require_alignment_)
 {
 }
-std::string ArtJobExecutor::thread_info() const { return std::to_string(job_.job_id) + ":" + mpi_rank_; }
+std::string ArtJobExecutor::thread_info() const
+{
+    return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",
+        job_.job_id, mpi_rank_, current_contig_, current_n_reads_generated_, current_n_reads_left_, current_n_fails_,
+        current_max_tolerence_, total_num_reads_generated_);
+}
 
 } // namespace labw::art_modern

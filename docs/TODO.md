@@ -2,7 +2,8 @@
 
 ## IMPORTANT
 
-- Extensive testing needed.
+- ART may stuck at one read. Why?
+- Preferr jemalloc than mi-malloc in CMake logic.
 
 ## Performance
 

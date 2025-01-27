@@ -28,7 +28,6 @@ public:
 
     void operator()() override;
     [[nodiscard]] std::string thread_info() const override;
-    [[nodiscard]] am_readnum_t num_reads() const override;
 
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
@@ -38,12 +37,17 @@ private:
     const ArtParams& art_params_;
     SimulationJob job_;
     const std::string mpi_rank_;
-    std::atomic<am_readnum_t> num_reads_;
+    am_readnum_t total_num_reads_generated_ = 0;
     std::shared_ptr<BaseReadOutput> output_dispatcher_;
     Rprob rprob_;
     const int num_reads_to_reduce_;
     const bool require_alignment_;
     std::atomic<bool> is_running_ = false;
+    std::string current_contig_;
+    am_readnum_t current_n_reads_left_ = 0;
+    am_readnum_t current_n_fails_ = 0;
+    am_readnum_t current_max_tolerence_ = 0;
+    am_readnum_t current_n_reads_generated_ = 0;
 };
 
 } // namespace labw::art_modern

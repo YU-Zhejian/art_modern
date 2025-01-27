@@ -23,7 +23,6 @@
 #include <boost/log/trivial.hpp>
 
 #include <chrono>
-#include <cstddef>
 #include <fstream>
 #include <limits>
 #include <memory>
@@ -33,36 +32,35 @@
 
 namespace labw::art_modern {
 
-    class JobPoolReporter {
-    public:
-        explicit JobPoolReporter(const JobPool& jp)
-                : jp_(jp)
-        {
-        }
-        void stop()
-        {
-            should_stop_ = true;
-            thread_.join();
-        }
-        void start() { thread_ = std::thread(&JobPoolReporter::job_, this); }
+class JobPoolReporter {
+public:
+    explicit JobPoolReporter(const JobPool& jp)
+        : jp_(jp)
+    {
+    }
+    void stop()
+    {
+        should_stop_ = true;
+        thread_.join();
+    }
+    void start() { thread_ = std::thread(&JobPoolReporter::job_, this); }
 
-    private:
-        void job_()
-        {
+private:
+    void job_()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        while (!should_stop_) {
+            BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
             std::this_thread::sleep_for(std::chrono::seconds(1));
-            while (!should_stop_) {
-                BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
         }
+    }
 
-        const JobPool& jp_;
-        std::atomic<bool> should_stop_ { false };
-        std::thread thread_;
-    };
+    const JobPool& jp_;
+    std::atomic<bool> should_stop_ { false };
+    std::thread thread_;
+};
 
-
-    class Generator {
+class Generator {
 public:
     const OutputDispatcherFactory out_dispatcher_factory;
 

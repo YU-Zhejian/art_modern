@@ -31,11 +31,13 @@ replacement_list <- list(
   "wgsim" = "wgsim",
   "art_original" = "Original ART",
   "art_modern" = "art_modern (HEAD)",
-  "art_modern_prev" = "art_modern (master)",
-  "art_modern_gcc" = "art_modern (GCC)"
+  "art_modern_prev_ver" = "art_modern (master)",
+  "art_modern_gcc" = "art_modern (GCC)",
+  "art_modern_jemalloc" = "art_modern (HEAD/jemalloc)",
+  "art_modern_asio" = "art_modern (HEAD/ASIO)",
+  "art_modern_mimalloc" = "art_modern (HEAD/mi-malloc)"
 )
-levels <- c("wgsim", "DWGSIM", "pIRS", "art_modern (HEAD)", "art_modern (master)", "art_modern (GCC)", "Original ART")
-
+levels <- c("wgsim", "DWGSIM", "pIRS", "art_modern (HEAD)", "art_modern (master)", "art_modern (GCC)", "art_modern (HEAD/jemalloc)","art_modern (HEAD/mi-malloc)","art_modern (HEAD/ASIO)",  "Original ART")
 p <- df %>%
   dplyr::select(CPU_TIME, WALL_CLOCK, RSS, DATA, SOFTWARE, RLEN) %>%
   dplyr::mutate(RSS = RSS / 1024) %>%
