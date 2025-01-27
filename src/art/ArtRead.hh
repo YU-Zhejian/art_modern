@@ -66,6 +66,7 @@ private:
     Rprob& rprob_;
     std::string seq_read_;
     std::string seq_ref_;
+    [[maybe_unused]] void except_() const;
 };
 
 } // namespace labw::art_modern

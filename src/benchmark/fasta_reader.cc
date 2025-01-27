@@ -24,7 +24,7 @@ void bench_ff(std::unique_ptr<BaseFastaFetch> ff, const std::string& name)
     hts_pos_t gen_start = 0;
     hts_pos_t gen_end = 0;
 
-    for (int i = 0; i < ff->num_seqs(); i++) {
+    for (std::size_t i = 0; i < ff->num_seqs(); i++) {
         std::uniform_int_distribution<hts_pos_t> coord_dist(0, ff->seq_len(i));
         for (int j = 0; j < 1000; j++) {
             gen_start = coord_dist(gen);

@@ -2,10 +2,13 @@
 
 #include "art/random_generator.hh"
 
-#include "art_modern_config.h" // NOLINT: For CEU_IS_DEBUG
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 #include "libam/Constants.hh"
 #include "libam/ds/PairwiseAlignment.hh"
 #include "libam/utils/seq_utils.hh"
+#include "libam/utils/mpi_utils.hh"
+
+#include <boost/log/trivial.hpp>
 
 #include <htslib/hts.h>
 
@@ -24,8 +27,8 @@ void ArtRead::generate_pairwise_aln()
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
+#if (1)
     std::size_t num_match = 0;
-
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
         std::memcpy(aln_read_.data() + pos_on_aln_str, seq_read_.data() + pos_on_read, num_match);
@@ -48,7 +51,7 @@ void ArtRead::generate_pairwise_aln()
     std::memcpy(aln_read_.data() + pos_on_aln_str, seq_read_.data() + pos_on_read, num_match);
     std::memcpy(aln_ref_.data() + pos_on_aln_str, seq_ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
-#if (0) // Old version for historical purposes
+#else // Old version for historical purposes
     while (pos_on_ref < seq_ref_.size()) {
         const auto find = indel_.find(pos_on_aln_str);
         if (find == indel_.end()) { // No indel
@@ -79,6 +82,13 @@ void ArtRead::generate_pairwise_aln()
 #endif
     aln_read_.resize(pos_on_aln_str);
     aln_ref_.resize(pos_on_aln_str);
+
+#ifdef CEU_CM_IS_DEBUG
+    if (aln_read_.size() != aln_ref_.size()) {
+        BOOST_LOG_TRIVIAL(fatal) << "aln_read_.size() != aln_ref_.size()";
+        except_();
+    }
+#endif
 }
 
 void ArtRead::generate_snv_on_qual(const bool is_first_read)
@@ -222,6 +232,7 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_read_.resize(maxk);
     aln_ref_.resize(maxk);
+#if (1)
     std::size_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
@@ -240,7 +251,7 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     }
     num_match = seq_ref_.size() - pos_on_ref;
     std::memcpy(seq_read_.data() + pos_on_read, seq_ref_.data() + pos_on_ref, num_match);
-#if (0) // Old code for historical purposes
+#else // Old code for historical purposes
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
         const auto find = indel_.find(k);
         if (find == indel_.end()) { // No indel
@@ -265,11 +276,23 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
         k++;
     }
 #endif
-#ifdef CEU_IS_DEBUG
+#ifdef CEU_CM_IS_DEBUG
     if (static_cast<int>(seq_read_.size()) != art_params_.read_len) {
-        throw ReadGenerationException("Generated seq_read_ with unequal sizes");
+        except_();
     }
 #endif
+}
+
+void ArtRead::except_() const{
+    BOOST_LOG_TRIVIAL(error) << "Read   : " << read_name_;
+    BOOST_LOG_TRIVIAL(error) << "Contig : " << contig_name_ << ":" << pos_on_contig_ << ":"
+                             << (is_plus_strand_ ? "+" : "-");
+    BOOST_LOG_TRIVIAL(error) << "Query  : " << seq_read_;
+    BOOST_LOG_TRIVIAL(error) << "Ref    : " << seq_ref_;
+    BOOST_LOG_TRIVIAL(error) << "Qual   : " << qual_to_str(qual_);
+    BOOST_LOG_TRIVIAL(error) << "AQuery : " << aln_read_;
+    BOOST_LOG_TRIVIAL(error) << "ARef   : " << aln_ref_;
+    abort_mpi();
 }
 
 ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob)

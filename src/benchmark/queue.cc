@@ -39,7 +39,7 @@ std::string randstr([[maybe_unused]] randgen_t& gen)
     char* cstr = static_cast<char*>(std::malloc(sizeof(char) * data_len));
     std::string rets { cstr, data_len };
     std::free(cstr);
-    return std::move(rets);
+    return rets;
 #else
     std::uniform_int_distribution<char> dist(CHAR_MIN, CHAR_MAX);
     std::string rets;

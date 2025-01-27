@@ -158,14 +158,9 @@ void BamUtils::assert_correct_cigar(
 
     auto reconst_ref = pwa.aligned_ref;
     auto reconst_query = pwa.aligned_query;
-
     reconst_ref.erase(std::remove(reconst_ref.begin(), reconst_ref.end(), ALN_GAP), reconst_ref.end());
     reconst_query.erase(std::remove(reconst_query.begin(), reconst_query.end(), ALN_GAP), reconst_query.end());
 
-    if (cigar_qlen != qlen) {
-        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << qlen;
-        goto err;
-    }
     if (reconst_ref != pwa.ref) {
         BOOST_LOG_TRIVIAL(error) << "Reconstructed reference != reference: " << reconst_ref << " != " << pwa.ref;
         goto err;
@@ -174,10 +169,16 @@ void BamUtils::assert_correct_cigar(
         BOOST_LOG_TRIVIAL(error) << "Reconstructed query != query: " << reconst_query << " != " << pwa.query;
         goto err;
     }
+
+    if (cigar_qlen != qlen) {
+        BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with query: " << cigar_qlen << " != " << qlen;
+        goto err;
+    }
     if (cigar_rlen != rlen) {
         BOOST_LOG_TRIVIAL(error) << "Cigar length mismatch with ref: " << cigar_rlen << " != " << rlen;
         goto err;
     }
+    
     if (qlen != qual_len) {
         BOOST_LOG_TRIVIAL(error) << "Qual length mismatch with query: " << qual_len << " != " << qual_len;
         goto err;
