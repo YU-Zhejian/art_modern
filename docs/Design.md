@@ -27,3 +27,9 @@ The current version does not support the specification of seed since it will res
 The generated read data, which is represented as `PairwiseAlignment` class (`src/lib/PairwiseAlignment.hh`), will be passed to an output dispatcher which dispatches the data to all output writers registered to it.
 
 Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted by each thread (since setting of `bam1_t*` is time-consuming) and then passed to a multi-producer single-consumer lock-free queue, which is then consumed by the file appender in a separate thread.
+
+## Building System
+
+### Static Linking
+
+The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software.

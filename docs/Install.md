@@ -118,7 +118,7 @@ To use external HTSLib, consult your system administrator. Those libraries usual
 
 [CMake](https://cmake.org/) 3.17 or above is recommended to build this project, although this project **MAY** work with CMake >= 3.10. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
-The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compiliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
 This project relies on diverse CMake variables that control the build behavior. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
 
@@ -210,14 +210,14 @@ Whether to use `btree::map` instead of `std::map`. The former is faster than the
 
 Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumptions.
 
-- **`AUTO` (DEFAULT): Will use mi-malloc and then jemalloc if possible.**
-- `MIMALLOC`: Find and use mi-malloc, and fail if not found.
+- **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc if possible.**
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
+- `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
 ## `USE_CCACHE`
 
-Whether to use [ccache](https://ccache.dev/) to speed up the compilation process. Howevwer, it may not work on some systems.
+Whether to use [ccache](https://ccache.dev/) to speed up the compilation process. However, it may not work on some systems.
 
 - **`OFF` (DEFAULT): Will not use ccache.**
 - `ON`: Will use ccache if available.
@@ -275,8 +275,8 @@ And then you may use CMake to build this project through:
 ```shell
 mkdir -p build
 cd build
-# Set -DBoost_DIR accordfingly.
-# Older CMake may have different bnehaviour.
+# Set -DBoost_DIR accordingly.
+# Older CMake may have different behaviour.
 cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boost-1.87.0
 ```
 

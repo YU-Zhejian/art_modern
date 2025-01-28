@@ -2,8 +2,7 @@
 
 ## IMPORTANT
 
-- ART may stuck at one read. Why?
-- Preferr jemalloc than mi-malloc in CMake logic.
+- ART stuck at one read. Why?
 
 ## Performance
 
@@ -21,7 +20,6 @@
         - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
-- Surveillance of each thread needs improving. We may implement a data structure that allows each thread to update its status to a locked `std::map` and ask a thread to display the status every few seconds.
 - Builtin profiles takes too much space on the executable. May consider:
   - Use an CMake option that disables embedding of builtin profiles.
   - Compress builtin profiles using XZ, etc., and then encode it using base64.

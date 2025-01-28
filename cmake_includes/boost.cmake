@@ -13,7 +13,7 @@ endif()
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.11.0")
     find_package(
         Boost REQUIRED
-        COMPONENTS filesystem regex program_options thread log_setup log
+        COMPONENTS filesystem program_options thread log_setup log
         OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
 else()
     # Only required modules are searched stacktrace_basic may have bug with low versions of Boost & CMake, so not

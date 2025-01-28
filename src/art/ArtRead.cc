@@ -22,14 +22,14 @@ namespace labw::art_modern {
 
 void ArtRead::generate_pairwise_aln()
 {
-    std::size_t pos_on_aln_str = 0;
-    std::size_t pos_on_query = 0;
-    std::size_t pos_on_ref = 0;
+    hts_pos_t pos_on_aln_str = 0;
+    hts_pos_t pos_on_query = 0;
+    hts_pos_t pos_on_ref = 0;
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
 #if (1)
-    std::size_t num_match = 0;
+    hts_pos_t num_match = 0;
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
         std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
@@ -123,10 +123,9 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read)
             continue;
         }
         if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
-            achar = query_[i];
-            while (query_[i] == achar) {
+            do {
                 achar = rprob_.rand_base();
-            }
+            } while (query_[i] == achar);
             query_[i] = achar;
         }
     }
@@ -241,14 +240,14 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     if (!is_plus_strand) {
         revcomp_inplace(ref_);
     }
-    std::size_t pos_on_aln_str = 0;
-    std::size_t pos_on_read = 0;
-    std::size_t pos_on_ref = 0;
+    hts_pos_t pos_on_aln_str = 0;
+    hts_pos_t pos_on_read = 0;
+    hts_pos_t pos_on_ref = 0;
     const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
 #if (1)
-    std::size_t num_match = 0;
+    hts_pos_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;

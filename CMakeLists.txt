@@ -107,7 +107,11 @@ include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/inclu
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
 
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt)
+# Threads is now required since lots of
+# surveillance and reporting routines are implemented using threads.
+find_package(Threads REQUIRED)
+
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt Threads::Threads)
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
 message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 

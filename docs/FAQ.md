@@ -35,6 +35,10 @@ The `std::filesystem` implementation in different compilers is not consistent. S
 
 See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem) and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
 
+### Why don't you use Intel Thread-Building Blocks (TBB)?
+
+Intel TBB is an excellent library that supports diverse parallel programming models and data structures. However, this library loads into the memory in run-time, which would consume a lot of time in short-running applications. This also makes the project incapable of being distributed in a fully static form (See [Design.md](Design.md)).
+
 ### Does this program support cross-compilation?
 
 Currently, it does not due to the extensive use of `test_run` in CMake scripts.

@@ -64,18 +64,18 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     bool retv = false;
     current_n_reads_left_ = targeted_num_reads;
-    am_readnum_t current_num_reads = 0;
+    am_readnum_t read_id = 0;
     while (current_n_reads_left_ > 0) {
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            retv = generate_se(art_contig, is_positive, current_num_reads);
+            retv = generate_se(art_contig, is_positive, read_id);
         } else {
-            retv = generate_pe(art_contig, is_positive, current_num_reads);
+            retv = generate_pe(art_contig, is_positive, read_id);
         }
         if (retv) {
             current_n_reads_left_ -= num_reads_to_reduce_;
             total_num_reads_generated_ += num_reads_to_reduce_;
             current_n_reads_generated_ += num_reads_to_reduce_;
-            current_num_reads++;
+            read_id++;
         } else {
             current_n_fails_++;
         }
