@@ -250,7 +250,7 @@ apk add g++ binutils boost-dev zlib-dev make python3 cmake zlib-static icu-stati
 
 ### Apple Mac OS X
 
-Install XCode commandline tools using:
+Install Xcode command-line tools using:
 
 ```shell
 xcode-select --install
@@ -280,4 +280,4 @@ cd build
 cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boost-1.87.0
 ```
 
-You may also setup dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).
+You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).

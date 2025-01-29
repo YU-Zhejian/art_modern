@@ -53,7 +53,7 @@ FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
 FastaReadOutput::FastaReadOutput(const std::string& filename)
     : BaseFileReadOutput(filename)
     , file_(filename)
-    , lfio_(file_)
+    , lfio_("FASTA", file_)
 {
     lfio_.start();
 }

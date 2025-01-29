@@ -15,14 +15,14 @@ So, we developed `art_modern` with the following ideas:
 - Parallelization is implemented using another layer of abstraction, simulation job, which can be taken as a unit of work in one thread, etc.
 - Writer for SAM output format was re-implemented using [HTSLib](https://www.htslib.org/), which allows supporting BAM and headless SAM/BAM output format with minimal modifications of code.
 - Multiple FASTA parsers were added. For example, the `htslib` parser allows on-disk random access of enormous genomes without reading them into memory, while the `stream` parser allows streaming of FASTA files. All coordinates are now int64-based.
-- The low-level I/O routines are made asynchronize to improve performance.
+- The low-level I/O routines are made asynchronized to improve performance.
 - Support other random number generators like Intel OneAPI Math Kernel Library (OneMKL).
 
 ## Common Development-Oriented Tasks
 
 ### Create Development Environment
 
-Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also requires other dependencies. Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
+Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also require other dependencies. Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
 
 ```shell
 conda env create -f art_modern.yml
@@ -30,7 +30,7 @@ conda env create -f art_modern.yml
 
 ### Testing
 
-Some of the individual modules can be tested using CMake CTest system. Execute `ctest` in your building directory to test them.
+Some individual modules can be tested using CMake CTest system. Execute `ctest` in your building directory to test them.
 
 Run `make testsmall` or `make testsmall-release` to run the integration tests using executables produced in `make build` and `make release`.
 
@@ -40,7 +40,7 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 
 - `intel-advisor` for Intel Advisor. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `intel-vtune` for Intel VTune Profiler. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
-- `nsys` for NVIDIA Nsight Systems. NVidia compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
+- `nsys` for NVIDIA Nsight Systems. Nvidia compiler with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `valgrind` for Valgrind Callgrind. GCC with `Debug` mode will be used since optimization may produce instructions that are not supported by Valgrind.
 - `amd-uprof` for AMD uProf. AMD compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 

@@ -7,6 +7,8 @@
 
 #include <htslib/sam.h>
 
+#include <utility>
+
 namespace labw::art_modern {
 class BamLFIO : public LockFreeIO<bam1_t_uptr> {
 public:
@@ -18,8 +20,9 @@ public:
         CExceptionsProxy::assert_numeric(sam_write1(fp_, h_, ss.get()), USED_HTSLIB_NAME,
             "Failed to write SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     }
-    BamLFIO(samFile* fp, const sam_hdr_t* h)
-        : fp_(fp)
+    BamLFIO(std::string name, samFile* fp, const sam_hdr_t* h)
+        : LockFreeIO<bam1_t_uptr>(std::move(name))
+        , fp_(fp)
         , h_(h)
     {
     }

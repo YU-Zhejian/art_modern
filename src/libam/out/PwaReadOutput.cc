@@ -43,7 +43,7 @@ PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
 PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args)
     : BaseFileReadOutput(filename)
     , file_(filename)
-    , lfio_(file_)
+    , lfio_("PWA", file_)
 {
     file_ << "#PWA\n";
     file_ << "#ARGS: " << boost::algorithm::join(args, " ") << "\n";

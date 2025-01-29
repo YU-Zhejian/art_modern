@@ -43,7 +43,7 @@ Intel TBB is an excellent library that supports diverse parallel programming mod
 
 Currently, it does not due to the extensive use of `test_run` in CMake scripts.
 
-### I am using platforms other than x86\_64 (e.g., ARM, RISC-V, LoongArch, etc.), and spotted a bug!
+### I am using platforms other than x86\_64 (e.g., ARM, RISC-V, LoongArch, etc.), and spotted a bug
 
 Please submit a bug-report with instructions on how I may emulate your platform using free emulators like [QEMU](https://www.qemu.org/).
 
@@ -53,7 +53,7 @@ Please submit a bug-report with instructions on how I may emulate your platform 
 
 Followings are where you may find the required information:
 
-- Name and version of your current operating system in an human-readable way.
+- Name and version of your current operating system in a human-readable way.
 
   You may find that out by reading `/etc/lsb-release` or use [neofetch](https://github.com/dylanaraps/neofetch), [screenFetch](https://github.com/KittyKatt/screenFetch), [fastfetch](https://github.com/fastfetch-cli/fastfetch)
 
@@ -63,7 +63,7 @@ Followings are where you may find the required information:
 
 - Version of the compiler.
 
-  - First of all, if your CMake correctly identifies your compiler, you may put the first several lines of CMake output to the bug report.
+  - If your CMake correctly identifies your compiler, you may put the first several lines of CMake output to the bug report.
   - If you use GCC, it will be `g++ --version`.
   - If you use LLVM Clang, it will be `clang++ --version`.
   - If you use Intel (R) oneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh`, before invoking this command.

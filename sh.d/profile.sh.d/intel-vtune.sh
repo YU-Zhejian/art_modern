@@ -28,19 +28,19 @@ for collect in hotspots threading memory-consumption; do # hpc-performance memor
         -result-dir="${PROFILE_DIR}"/vtune-"${collect}" -- \
         "${PROFILE_DIR}"/art_modern \
         --builtin_qual_file HiSeq2500_125bp \
-        --i-file data/raw_data/ce11.mRNA.fa \
+        --i-file data/raw_data/ce11_chr1.fa \
         --read_len 125 \
-        --mode trans \
+        --mode wgs \
         --lc pe \
         --i-parser memory \
-        --i-fcov 4 \
+        --i-fcov 20 \
         --parallel 0 \
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500 \
-        --o-sam "${PROFILE_DIR}"/test_small_se_wgs_memory.bam \
+        --o-sam /dev/null \
         --o-sam-write_bam \
-        --o-hl_sam "${PROFILE_DIR}"/test_small_se_wgs_memory.hl.sam \
-        --o-fastq "${PROFILE_DIR}"/test_small_se_wgs_memory.fastq \
-        --o-pwa "${PROFILE_DIR}"/test_small_se_wgs_memory.pwa
+        --o-hl_sam /dev/null \
+        --o-fastq /dev/null \
+        --o-pwa /dev/null
     vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
 done

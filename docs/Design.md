@@ -18,7 +18,7 @@ Here, "coverage" means that all contigs are passed to all threads with coverage 
 
 The current random number generation function in each library is [MT19937](https://doi.org/10.1145/272991.272995), which may not be the best choice for performance-critical applications. However, it is the most widely used, well-known, be of moderate performance and cycle, and is implemented in all random number generator libraries (namely, Boost, GSL, STL, and Intel OneAPI MKL).
 
-We may further introduce faster RNGs with shorter cycle (e.g., Taus) in the future for scientists that requires massive amount of data with less quality, and true rRNGs (e.g., `/dev/random`) for the contrary purpose. We may also further introduce cuRAND, which is said to be faster when generating a large amount of data. However, due to the fact that the current application is limited by IO, this is not a priority.
+We may further introduce faster RNGs with shorter cycle (e.g., Taus) in the future for scientists that requires massive amount of data with less quality. However, due to the fact that the current application is limited by IO, this is not a priority.
 
 The current version does not support the specification of seed since it will result in reads with identical position and error profile in each thread. The current seed is set by the product of nanoseconds since epoch and hash of the current thread ID to allow each thread to generate different data.
 
@@ -27,6 +27,10 @@ The current version does not support the specification of seed since it will res
 The generated read data, which is represented as `PairwiseAlignment` class (`src/lib/PairwiseAlignment.hh`), will be passed to an output dispatcher which dispatches the data to all output writers registered to it.
 
 Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted by each thread (since setting of `bam1_t*` is time-consuming) and then passed to a multi-producer single-consumer lock-free queue, which is then consumed by the file appender in a separate thread.
+
+## Other Performance Bottlenecks
+
+A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be hold in one node, which improves performance when being compared red-black tree used in  most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
 
 ## Building System
 

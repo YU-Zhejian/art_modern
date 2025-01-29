@@ -27,13 +27,13 @@ Parameters `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev` are needed to spec
 
 ## Parallelism (`--parallel`)
 
-TODO
+Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to use all available cores.
 
 ## Input (`--i-*`)
 
 Currently, we support input in FASTA and PBSIM3 Transcripts format. They are controlled by the following major parameters:
 
-- `--i-file`: The input reference file path. It must exist in the filesystem.
+- `--i-file`: The input reference file path. It must exist in the filesystem. Device paths like `/dev/stdin` is supported.
 - `--i-type`: The file type of input reference sequences. Currently, FASTA and PBSIM3 Transcripts format are supported.
   - **`auto` (DEFAULT) for extension-based decision.**
     - If the file ends with `.fna`, `.fsa`, `.fa`, `.fasta`, resolve to `fasta`.
@@ -44,7 +44,7 @@ Currently, we support input in FASTA and PBSIM3 Transcripts format. They are con
 ### Input Parser (`--i-parser`)
 
 - **`auto` (DEFAULT) for size-based determination.**
-  - If the file size larger than 1GiB or can not be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode).
+  - If the file size larger than 1 GiB or can not be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode).
   - Otherwise, use `memory`.
 - `memory`: The entire file will be read into the memory.
   - Fast for small reference files.
@@ -130,7 +130,7 @@ Compatibility matrix of file type, simulation mode, and parser:
 
 Compatibility matrix of coverage mode, simulation mode, and file type:
 
-| Simulation Mode \ File Type | `fasta`                        | `pbsim3_transcripts` | 
+| Simulation Mode \ File Type | `fasta`                        | `pbsim3_transcripts` |
 |-----------------------------|--------------------------------|----------------------|
 | `wgs`                       | Unified                        | **ERROR**            |
 | `trans`                     | Unified / Unstraded / Stranded | **IGNORED**          |

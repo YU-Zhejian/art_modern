@@ -37,7 +37,7 @@ HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const 
     , sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
-    , lfio_(sam_file_, sam_header_)
+    , lfio_("HeadlessBAM", sam_file_, sam_header_)
 {
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");

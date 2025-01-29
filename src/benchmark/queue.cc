@@ -11,12 +11,9 @@
 #include <cstddef>
 #include <cstdlib>
 #include <functional>
-#include <iostream>
-#include <mutex>
 #include <random>
 #include <string>
 #include <thread>
-#include <utility>
 #include <vector>
 
 #define VERBOSE_IO 0 // NOLINT
@@ -97,7 +94,6 @@ void mcqueue_producer(moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_u
 {
 #if VERBOSE_IO
     BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
-
 #endif
     moodycamel::ProducerToken const token(queue);
     randgen_t gen { std::random_device()() };
@@ -110,7 +106,6 @@ void mcqueue_producer(moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_u
     }
 #if VERBOSE_IO
     BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
-
 #endif
 }
 
@@ -121,7 +116,7 @@ void mcqueue_consumer_single(moodycamel::ConcurrentQueue<std::string>& queue)
 #endif
     std::string item;
     std::size_t i = 0;
-    bool pop_ret_cnt = 0;
+    bool pop_ret_cnt = false;
     while (i < nitems * nthreads) {
         pop_ret_cnt = queue.try_dequeue(item);
 #if VERBOSE_IO

@@ -158,7 +158,7 @@ BamReadOutput::BamReadOutput(
     , sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
-    , lfio_(sam_file_, sam_header_)
+    , lfio_("BAM", sam_file_, sam_header_)
 {
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(

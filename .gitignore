@@ -123,3 +123,5 @@ CMakeLists.txt.user
 *.tar.[gx]z
 *.tar.bz2
 *.t[gxb]z
+!/.vscode/ltex.dictionary.en-US.txt
+!/.vscode/ltex.disabledRules.en-US.txt

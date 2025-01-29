@@ -53,7 +53,7 @@ FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
     : BaseFileReadOutput(filename)
     , file_(filename)
-    , lfio_(file_)
+    , lfio_("FASTQ", file_)
 {
     lfio_.start();
 }
@@ -87,4 +87,5 @@ std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const boost::prog
     }
     return std::make_shared<DumbReadOutput>();
 }
+
 } // namespace labw::art_modern

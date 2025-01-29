@@ -67,12 +67,22 @@ int main()
 {
     auto iss = std::istringstream { fasta };
     const auto ff = InMemoryFastaFetch(iss);
-    const BamOptions bo;
+    BamOptions bo9;
+    BamOptions bo1;
+    BamOptions bou;
+    BamOptions so;
+    so.write_bam = false;
+    bo9.compress_level = '9';
+    bo1.compress_level = '1';
+    bou.compress_level = 'u';
     // Temporarily disable logging
     logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::fatal);
 
-    bench(std::make_unique<BamReadOutput>(DEVNULL, &ff, bo), "BamReadOutput");
-    bench(std::make_unique<HeadlessBamReadOutput>(DEVNULL, bo), "HeadlessBamReadOutput");
+    bench(std::make_unique<BamReadOutput>(DEVNULL, &ff, bo1), "BamReadOutput (l=1)");
+    bench(std::make_unique<BamReadOutput>(DEVNULL, &ff, bo9), "BamReadOutput (l=9)");
+    bench(std::make_unique<BamReadOutput>(DEVNULL, &ff, bou), "BamReadOutput (l=u)");
+    bench(std::make_unique<HeadlessBamReadOutput>(DEVNULL, bo1), "HeadlessBamReadOutput (l=1)");
+    bench(std::make_unique<BamReadOutput>(DEVNULL, &ff, so), "SamReadOutput");
     bench(std::make_unique<FastqReadOutput>(DEVNULL), "FastqReadOutput");
     bench(std::make_unique<FastaReadOutput>(DEVNULL), "FastaReadOutput");
     bench(std::make_unique<DumbReadOutput>(), "DumbReadOutput");

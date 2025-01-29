@@ -6,7 +6,7 @@
 
 ## Performance
 
-- The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost.ASIO.
+- The home-made "asynchronous IO" may be inefficient in SSDs. ~~May consider refactor into Boost.ASIO.~~
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.

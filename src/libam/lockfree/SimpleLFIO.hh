@@ -5,6 +5,7 @@
 #include <memory>
 #include <ostream>
 #include <string>
+#include <utility>
 
 namespace labw::art_modern {
 
@@ -13,15 +14,16 @@ public:
     DELETE_MOVE(SimpleLFIO)
     DELETE_COPY(SimpleLFIO)
     void write(std::unique_ptr<std::string> value) override { out_ << *value; }
-    explicit SimpleLFIO(std::ostream& out)
-        : out_(out)
+    explicit SimpleLFIO(std::string name, std::ostream& out)
+        : LockFreeIO(std::move(name))
+        , out_(out)
     {
     }
-    ~SimpleLFIO() override
+    void stop() override
     {
-        stop();
         std::flush(out_);
-    };
+        LockFreeIO::stop();
+    }
 
 private:
     std::ostream& out_;
