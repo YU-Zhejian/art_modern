@@ -178,9 +178,14 @@ Use which HTSLib implementation.
 The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
+- `PCG`: [PCG](https://www.pcg-random.org/) random generators.
+  - **NOTE** Experimental.
 - `BOOST`: Use Boost random generators.
-- `GSL`: Use GSL random generators. This is used in the original ART.
-- `ONEMKL`: Use Intel OneAPI MKL random generators. Highly recommended on Intel CPUs.
+- `GSL`: Use GSL random generators.
+  - This is used in the original ART.
+  - **NOTE** Slow on Intel CPUs.
+- `ONEMKL`: Use Intel OneAPI MKL random generators.
+  - **NOTE** Highly recommended on Intel CPUs.
 
 On my system for generating 1M random bits for 20K times:
 

@@ -174,7 +174,7 @@ function(ceu_cm_get_library_abspath_from_pkg_config OUTPUT_VARIABLE PKGCONF_NAME
             list(APPEND THIS_LIBRARY_ABSPATHS ${${LINKER_FLAG}_LIBRARY_ABSPATH})
         else()
             message(
-                WARNING
+                STATUS
                     "CEU_CM_EFL: Searching pkgconf ${PKGCONF_NAME} (STATIC=${IS_STATIC}): -l${LINKER_FLAG} -> NOTFOUND")
             set(${OUTPUT_VARIABLE}
                 ${OUTPUT_VARIABLE}-NOTFOUND
@@ -262,6 +262,13 @@ function(ceu_cm_enhanced_find_library)
     endif()
     if(NOT ${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS)
         set(${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS ${CEU_CM_EFL_OUTPUT_VARIABLE}-NOTFOUND)
+
+        unset(CEU_CM_EFL_OUTPUT_TYPE)
+        unset(CEU_CM_EFL_STATIC)
+        unset(CEU_CM_EFL_OUTPUT_VARIABLE)
+        unset(CEU_CM_EFL_PKGCONF_NAME)
+        unset(CEU_CM_EFL_LINKER_FLAG)
+        return()
     endif()
     add_library(CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE} ${CEU_CM_EFL_OUTPUT_TYPE} IMPORTED)
     set_target_properties(CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
