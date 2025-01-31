@@ -14,8 +14,57 @@
 #include <boost/random.hpp>
 
 #include <absl/random/random.h>
+#include <fstream>
+
+#include "pcg-cpp-0.98/include/pcg_random.hpp"
 
 #include "rprobs.hh"
+
+class CustomRandomDevice {
+public:
+    using result_type = unsigned int;
+
+    CustomRandomDevice()
+        : rand_stream("/dev/random", std::ios::binary)
+    {
+        if (!rand_stream.is_open()) {
+            throw std::system_error(errno, std::generic_category(), "Failed to open /dev/random");
+        }
+    }
+    ~CustomRandomDevice() { rand_stream.close(); }
+
+    static constexpr result_type min() { return 0; }
+
+    static constexpr result_type max() { return UINT_MAX; }
+
+    result_type operator()()
+    {
+        result_type randomNumber;
+        rand_stream.read(reinterpret_cast<char*>(&randomNumber), sizeof(randomNumber));
+        if (rand_stream.fail()) {
+            throw std::system_error(errno, std::generic_category(), "Failed to read from /dev/random");
+        }
+
+        return randomNumber;
+    }
+
+private:
+    std::ifstream rand_stream;
+};
+
+class GslRandWrapper {
+public:
+    using result_type = unsigned long;
+    GslRandWrapper(const gsl_rng_type* t) { r = gsl_rng_alloc(t); }
+    ~GslRandWrapper() { gsl_rng_free(r); }
+    result_type operator()() { return gsl_rng_get(r); }
+    result_type min() { return gsl_rng_min(r); }
+    result_type max() { return gsl_rng_max(r); }
+    std::string name() const { return gsl_rng_name(r); }
+
+private:
+    gsl_rng* r;
+};
 
 namespace {
 std::string formatWithCommas(std::size_t number)
@@ -31,10 +80,12 @@ std::string formatWithCommas(std::size_t number)
     return numStr;
 }
 
-template <typename T, typename R> void bench_bits_stl(T& rng, std::vector<R>& gen_bits, const std::string& name)
+template <typename T> void bench_bits_stl(T& rng, const std::string& name)
 {
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
+
+    std::vector<std::result_of_t<T()>> gen_bits(N_BASES);
 
     start = std::chrono::system_clock::now();
     for (int i = 0; i < N_TIMES; i++) {
@@ -42,15 +93,17 @@ template <typename T, typename R> void bench_bits_stl(T& rng, std::vector<R>& ge
     }
     end = std::chrono::system_clock::now();
 
-    std::cout << name << ": "
-              << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) << " us"
-              << std::endl;
+    std::cout << name << "(" << std::to_string(rng.min()) << ", " << std::to_string(rng.max())
+              << "): " << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())
+              << " us" << std::endl;
 }
 
 void bench_bits_mkl(const MKL_INT type, const std::string& name)
 {
     VSLStreamStatePtr stream = nullptr;
     vslNewStream(&stream, type, seed());
+    VSLBRngProperties brng;
+    vslGetBrngProperties(type, &brng);
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
     std::vector<std::uint32_t> gen_bits {};
@@ -63,72 +116,48 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
     end = std::chrono::system_clock::now();
 
     vslDeleteStream(&stream);
-    std::cout << name << ": "
+    std::cout << name << " (" << brng.NBits << " bits): "
               << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) << " us"
               << std::endl;
 }
 
 void bench_gsl(const gsl_rng_type* t)
 {
-    gsl_rng* r = gsl_rng_alloc(t);
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
-    std::vector<unsigned long int> gen_bits {};
-
-    start = std::chrono::system_clock::now();
-    for (int i = 0; i < N_TIMES; i++) {
-        std::generate_n(gen_bits.begin(), N_BASES, [&r]() { return gsl_rng_get(r); });
-    }
-    end = std::chrono::system_clock::now();
-
-    std::cout << "GSL::" << gsl_rng_name(r) << ": "
-              << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) << " us"
-              << std::endl;
-    gsl_rng_free(r);
+    GslRandWrapper gsl_rand_wrapper { t };
+    bench_bits_stl<GslRandWrapper>(gsl_rand_wrapper, "GSL::" + gsl_rand_wrapper.name());
 }
 
 void stl_main()
 {
+    CustomRandomDevice rng_custom_random_device;
+    bench_bits_stl<CustomRandomDevice>(rng_custom_random_device, "CustomRandomDevice");
+
     std::mt19937 rng_mt19937 { seed() };
-    std::vector<std::mt19937::result_type> gen_bits_mt19937(N_BASES);
-    bench_bits_stl<std::mt19937, std::mt19937::result_type>(rng_mt19937, gen_bits_mt19937, "std::mt19937");
+    bench_bits_stl<std::mt19937>(rng_mt19937, "std::mt19937");
 
     std::mt19937_64 rng_mt19937_64 { seed() };
-    std::vector<std::mt19937_64::result_type> gen_bits_mt19937_64(N_BASES);
-    bench_bits_stl<std::mt19937_64, std::mt19937_64::result_type>(
-        rng_mt19937_64, gen_bits_mt19937_64, "std::mt19937_64");
+    bench_bits_stl<std::mt19937_64>(rng_mt19937_64, "std::mt19937_64");
 
     std::ranlux48 rng_ranlux48 { seed() };
-    std::vector<std::ranlux48::result_type> gen_bits_ranlux48(N_BASES);
-    bench_bits_stl<std::ranlux48, std::ranlux48::result_type>(rng_ranlux48, gen_bits_ranlux48, "std::ranlux48");
+    bench_bits_stl<std::ranlux48>(rng_ranlux48, "std::ranlux48");
 
     std::ranlux24 rng_ranlux24 { seed() };
-    std::vector<std::ranlux24::result_type> gen_bits_ranlux24(N_BASES);
-    bench_bits_stl<std::ranlux24, std::ranlux24::result_type>(rng_ranlux24, gen_bits_ranlux24, "std::ranlux24");
+    bench_bits_stl<std::ranlux24>(rng_ranlux24, "std::ranlux24");
 
     std::ranlux48_base rng_ranlux48_base { seed() };
-    std::vector<std::ranlux48_base::result_type> gen_bits_ranlux48_base(N_BASES);
-    bench_bits_stl<std::ranlux48_base, std::ranlux48_base::result_type>(
-        rng_ranlux48_base, gen_bits_ranlux48_base, "std::ranlux48_base");
+    bench_bits_stl<std::ranlux48_base>(rng_ranlux48_base, "std::ranlux48_base");
 
     std::ranlux24_base rng_ranlux24_base { seed() };
-    std::vector<std::ranlux24_base::result_type> gen_bits_ranlux24_base(N_BASES);
-    bench_bits_stl<std::ranlux24_base, std::ranlux24_base::result_type>(
-        rng_ranlux24_base, gen_bits_ranlux24_base, "std::ranlux24_base");
+    bench_bits_stl<std::ranlux24_base>(rng_ranlux24_base, "std::ranlux24_base");
 
     std::knuth_b rng_knuth_b { seed() };
-    std::vector<std::knuth_b::result_type> gen_bits_knuth_b(N_BASES);
-    bench_bits_stl<std::knuth_b, std::knuth_b::result_type>(rng_knuth_b, gen_bits_knuth_b, "std::knuth_b");
+    bench_bits_stl<std::knuth_b>(rng_knuth_b, "std::knuth_b");
 
     std::minstd_rand0 rng_minstd_rand0 { seed() };
-    std::vector<std::minstd_rand0::result_type> gen_bits_minstd_rand0(N_BASES);
-    bench_bits_stl<std::minstd_rand0, std::minstd_rand0::result_type>(
-        rng_minstd_rand0, gen_bits_minstd_rand0, "std::minstd_rand0");
+    bench_bits_stl<std::minstd_rand0>(rng_minstd_rand0, "std::minstd_rand0");
 
     std::minstd_rand rng_minstd_rand { seed() };
-    std::vector<std::minstd_rand::result_type> gen_bits_minstd_rand(N_BASES);
-    bench_bits_stl<std::minstd_rand, std::minstd_rand::result_type>(
-        rng_minstd_rand, gen_bits_minstd_rand, "std::minstd_rand");
+    bench_bits_stl<std::minstd_rand>(rng_minstd_rand, "std::minstd_rand");
     /**
      Very very slow
       std::random_device rng_random_device;
@@ -141,159 +170,104 @@ void stl_main()
 void boost_main()
 {
     boost::random::mt19937 rng_mt19937 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::mt19937::result_type> gen_bits_mt19937(N_BASES);
-    bench_bits_stl<boost::random::mt19937, boost::random::mt19937::result_type>(
-        rng_mt19937, gen_bits_mt19937, "boost::random::mt19937");
+    bench_bits_stl<boost::random::mt19937>(rng_mt19937, "boost::random::mt19937");
 
     boost::random::mt19937_64 rng_mt19937_64 { seed() };
-    std::vector<boost::random::mt19937_64::result_type> gen_bits_mt19937_64(N_BASES);
-    bench_bits_stl<boost::random::mt19937_64, boost::random::mt19937_64::result_type>(
-        rng_mt19937_64, gen_bits_mt19937_64, "boost::random::mt19937_64");
+    bench_bits_stl<boost::random::mt19937_64>(rng_mt19937_64, "boost::random::mt19937_64");
 
     boost::random::ranlux48 rng_ranlux48 { seed() };
-    std::vector<boost::random::ranlux48::result_type> gen_bits_ranlux48(N_BASES);
-    bench_bits_stl<boost::random::ranlux48, boost::random::ranlux48::result_type>(
-        rng_ranlux48, gen_bits_ranlux48, "boost::random::ranlux48");
+    bench_bits_stl<boost::random::ranlux48>(rng_ranlux48, "boost::random::ranlux48");
 
     boost::random::ranlux24 rng_ranlux24 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux24::result_type> gen_bits_ranlux24(N_BASES);
-    bench_bits_stl<boost::random::ranlux24, boost::random::ranlux24::result_type>(
-        rng_ranlux24, gen_bits_ranlux24, "boost::random::ranlux24");
+    bench_bits_stl<boost::random::ranlux24>(rng_ranlux24, "boost::random::ranlux24");
 
     boost::random::knuth_b rng_knuth_b { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::knuth_b::result_type> gen_bits_knuth_b(N_BASES);
-    bench_bits_stl<boost::random::knuth_b, boost::random::knuth_b::result_type>(
-        rng_knuth_b, gen_bits_knuth_b, "boost::random::knuth_b");
+    bench_bits_stl<boost::random::knuth_b>(rng_knuth_b, "boost::random::knuth_b");
 
     boost::random::minstd_rand0 rng_minstd_rand0 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::minstd_rand0::result_type> gen_bits_minstd_rand0(N_BASES);
-    bench_bits_stl<boost::random::minstd_rand0, boost::random::minstd_rand0::result_type>(
-        rng_minstd_rand0, gen_bits_minstd_rand0, "boost::random::minstd_rand0");
+    bench_bits_stl<boost::random::minstd_rand0>(rng_minstd_rand0, "boost::random::minstd_rand0");
 
     boost::random::minstd_rand rng_minstd_rand { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::minstd_rand::result_type> gen_bits_minstd_rand(N_BASES);
-    bench_bits_stl<boost::random::minstd_rand, boost::random::minstd_rand::result_type>(
-        rng_minstd_rand, gen_bits_minstd_rand, "boost::random::minstd_rand");
+    bench_bits_stl<boost::random::minstd_rand>(rng_minstd_rand, "boost::random::minstd_rand");
 
     boost::random::ranlux48_base rng_ranlux48_base { seed() };
-    std::vector<boost::random::ranlux48_base::result_type> gen_bits_ranlux48_base(N_BASES);
-    bench_bits_stl<boost::random::ranlux48_base, boost::random::ranlux48_base::result_type>(
-        rng_ranlux48_base, gen_bits_ranlux48_base, "boost::random::ranlux48_base");
+    bench_bits_stl<boost::random::ranlux48_base>(rng_ranlux48_base, "boost::random::ranlux48_base");
 
     boost::random::ranlux24_base rng_ranlux24_base { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux24_base::result_type> gen_bits_ranlux24_base(N_BASES);
-    bench_bits_stl<boost::random::ranlux24_base, boost::random::ranlux24_base::result_type>(
-        rng_ranlux24_base, gen_bits_ranlux24_base, "boost::random::ranlux24_base");
+    bench_bits_stl<boost::random::ranlux24_base>(rng_ranlux24_base, "boost::random::ranlux24_base");
 
     boost::random::rand48 rng_rand48 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::rand48::result_type> gen_bits_rand48(N_BASES);
-    bench_bits_stl<boost::random::rand48, boost::random::rand48::result_type>(
-        rng_rand48, gen_bits_rand48, "boost::random::rand48");
+    bench_bits_stl<boost::random::rand48>(rng_rand48, "boost::random::rand48");
 
     boost::random::ecuyer1988 rng_ecuyer1988 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ecuyer1988::result_type> gen_bits_ecuyer1988(N_BASES);
-    bench_bits_stl<boost::random::ecuyer1988, boost::random::ecuyer1988::result_type>(
-        rng_ecuyer1988, gen_bits_ecuyer1988, "boost::random::ecuyer1988");
+    bench_bits_stl<boost::random::ecuyer1988>(rng_ecuyer1988, "boost::random::ecuyer1988");
 
     boost::random::kreutzer1986 rng_kreutzer1986 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::kreutzer1986::result_type> gen_bits_kreutzer1986(N_BASES);
-    bench_bits_stl<boost::random::kreutzer1986, boost::random::kreutzer1986::result_type>(
-        rng_kreutzer1986, gen_bits_kreutzer1986, "boost::random::kreutzer1986");
+    bench_bits_stl<boost::random::kreutzer1986>(rng_kreutzer1986, "boost::random::kreutzer1986");
 
     boost::random::taus88 rng_taus88 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::taus88::result_type> gen_bits_taus88(N_BASES);
-    bench_bits_stl<boost::random::taus88, boost::random::taus88::result_type>(
-        rng_taus88, gen_bits_taus88, "boost::random::taus88");
+    bench_bits_stl<boost::random::taus88>(rng_taus88, "boost::random::taus88");
 
     boost::random::hellekalek1995 rng_hellekalek1995 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::hellekalek1995::result_type> gen_bits_hellekalek1995(N_BASES);
-    bench_bits_stl<boost::random::hellekalek1995, boost::random::hellekalek1995::result_type>(
-        rng_hellekalek1995, gen_bits_hellekalek1995, "boost::random::hellekalek1995");
+    bench_bits_stl<boost::random::hellekalek1995>(rng_hellekalek1995, "boost::random::hellekalek1995");
 
     boost::random::mt11213b rng_mt11213b { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::mt11213b::result_type> gen_bits_mt11213b(N_BASES);
-    bench_bits_stl<boost::random::mt11213b, boost::random::mt11213b::result_type>(
-        rng_mt11213b, gen_bits_mt11213b, "boost::random::mt11213b");
+    bench_bits_stl<boost::random::mt11213b>(rng_mt11213b, "boost::random::mt11213b");
 
     boost::random::lagged_fibonacci607 rng_lagged_fibonacci607 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci607::result_type> gen_bits_lagged_fibonacci607(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci607, boost::random::lagged_fibonacci607::result_type>(
-        rng_lagged_fibonacci607, gen_bits_lagged_fibonacci607, "boost::random::lagged_fibonacci607");
+    bench_bits_stl<boost::random::lagged_fibonacci607>(rng_lagged_fibonacci607, "boost::random::lagged_fibonacci607");
 
     boost::random::lagged_fibonacci19937 rng_lagged_fibonacci19937 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci19937::result_type> gen_bits_lagged_fibonacci19937(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci19937, boost::random::lagged_fibonacci19937::result_type>(
-        rng_lagged_fibonacci19937, gen_bits_lagged_fibonacci19937, "boost::random::lagged_fibonacci19937");
+    bench_bits_stl<boost::random::lagged_fibonacci19937>(
+        rng_lagged_fibonacci19937, "boost::random::lagged_fibonacci19937");
 
     boost::random::lagged_fibonacci9689 rng_lagged_fibonacci9689 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci9689::result_type> gen_bits_lagged_fibonacci9689(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci9689, boost::random::lagged_fibonacci9689::result_type>(
-        rng_lagged_fibonacci9689, gen_bits_lagged_fibonacci9689, "boost::random::lagged_fibonacci9689");
+    bench_bits_stl<boost::random::lagged_fibonacci9689>(
+        rng_lagged_fibonacci9689, "boost::random::lagged_fibonacci9689");
 
     boost::random::lagged_fibonacci23209 rng_lagged_fibonacci23209 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci23209::result_type> gen_bits_lagged_fibonacci23209(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci23209, boost::random::lagged_fibonacci23209::result_type>(
-        rng_lagged_fibonacci23209, gen_bits_lagged_fibonacci23209, "boost::random::lagged_fibonacci23209");
+    bench_bits_stl<boost::random::lagged_fibonacci23209>(
+        rng_lagged_fibonacci23209, "boost::random::lagged_fibonacci23209");
 
     boost::random::lagged_fibonacci1279 rng_lagged_fibonacci1279 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci1279::result_type> gen_bits_lagged_fibonacci1279(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci1279, boost::random::lagged_fibonacci1279::result_type>(
-        rng_lagged_fibonacci1279, gen_bits_lagged_fibonacci1279, "boost::random::lagged_fibonacci1279");
+    bench_bits_stl<boost::random::lagged_fibonacci1279>(
+        rng_lagged_fibonacci1279, "boost::random::lagged_fibonacci1279");
 
     boost::random::lagged_fibonacci3217 rng_lagged_fibonacci3217 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci3217::result_type> gen_bits_lagged_fibonacci3217(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci3217, boost::random::lagged_fibonacci3217::result_type>(
-        rng_lagged_fibonacci3217, gen_bits_lagged_fibonacci3217, "boost::random::lagged_fibonacci3217");
+    bench_bits_stl<boost::random::lagged_fibonacci3217>(
+        rng_lagged_fibonacci3217, "boost::random::lagged_fibonacci3217");
 
     boost::random::lagged_fibonacci4423 rng_lagged_fibonacci4423 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci4423::result_type> gen_bits_lagged_fibonacci4423(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci4423, boost::random::lagged_fibonacci4423::result_type>(
-        rng_lagged_fibonacci4423, gen_bits_lagged_fibonacci4423, "boost::random::lagged_fibonacci4423");
+    bench_bits_stl<boost::random::lagged_fibonacci4423>(
+        rng_lagged_fibonacci4423, "boost::random::lagged_fibonacci4423");
 
     boost::random::lagged_fibonacci44497 rng_lagged_fibonacci44497 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::lagged_fibonacci44497::result_type> gen_bits_lagged_fibonacci44497(N_BASES);
-    bench_bits_stl<boost::random::lagged_fibonacci44497, boost::random::lagged_fibonacci44497::result_type>(
-        rng_lagged_fibonacci44497, gen_bits_lagged_fibonacci44497, "boost::random::lagged_fibonacci44497");
+    bench_bits_stl<boost::random::lagged_fibonacci44497>(
+        rng_lagged_fibonacci44497, "boost::random::lagged_fibonacci44497");
 
     boost::random::ranlux3 rng_ranlux3 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux3::result_type> gen_bits_ranlux3(N_BASES);
-    bench_bits_stl<boost::random::ranlux3, boost::random::ranlux3::result_type>(
-        rng_ranlux3, gen_bits_ranlux3, "boost::random::ranlux3");
+    bench_bits_stl<boost::random::ranlux3>(rng_ranlux3, "boost::random::ranlux3");
 
     boost::random::ranlux4 rng_ranlux4 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux4::result_type> gen_bits_ranlux4(N_BASES);
-    bench_bits_stl<boost::random::ranlux4, boost::random::ranlux4::result_type>(
-        rng_ranlux4, gen_bits_ranlux4, "boost::random::ranlux4");
+    bench_bits_stl<boost::random::ranlux4>(rng_ranlux4, "boost::random::ranlux4");
 
     boost::random::ranlux64_3 rng_ranlux64_3 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux64_3::result_type> gen_bits_ranlux64_3(N_BASES);
-    bench_bits_stl<boost::random::ranlux64_3, boost::random::ranlux64_3::result_type>(
-        rng_ranlux64_3, gen_bits_ranlux64_3, "boost::random::ranlux64_3");
+    bench_bits_stl<boost::random::ranlux64_3>(rng_ranlux64_3, "boost::random::ranlux64_3");
 
     boost::random::ranlux64_4 rng_ranlux64_4 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux64_4::result_type> gen_bits_ranlux64_4(N_BASES);
-    bench_bits_stl<boost::random::ranlux64_4, boost::random::ranlux64_4::result_type>(
-        rng_ranlux64_4, gen_bits_ranlux64_4, "boost::random::ranlux64_4");
+    bench_bits_stl<boost::random::ranlux64_4>(rng_ranlux64_4, "boost::random::ranlux64_4");
 
     boost::random::ranlux3_01 rng_ranlux3_01 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux3_01::result_type> gen_bits_ranlux3_01(N_BASES);
-    bench_bits_stl<boost::random::ranlux3_01, boost::random::ranlux3_01::result_type>(
-        rng_ranlux3_01, gen_bits_ranlux3_01, "boost::random::ranlux3_01");
+    bench_bits_stl<boost::random::ranlux3_01>(rng_ranlux3_01, "boost::random::ranlux3_01");
 
     boost::random::ranlux4_01 rng_ranlux4_01 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux4_01::result_type> gen_bits_ranlux4_01(N_BASES);
-    bench_bits_stl<boost::random::ranlux4_01, boost::random::ranlux4_01::result_type>(
-        rng_ranlux4_01, gen_bits_ranlux4_01, "boost::random::ranlux4_01");
+    bench_bits_stl<boost::random::ranlux4_01>(rng_ranlux4_01, "boost::random::ranlux4_01");
 
     boost::random::ranlux64_3_01 rng_ranlux64_3_01 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux64_3_01::result_type> gen_bits_ranlux64_3_01(N_BASES);
-    bench_bits_stl<boost::random::ranlux64_3_01, boost::random::ranlux64_3_01::result_type>(
-        rng_ranlux64_3_01, gen_bits_ranlux64_3_01, "boost::random::ranlux64_3_01");
+    bench_bits_stl<boost::random::ranlux64_3_01>(rng_ranlux64_3_01, "boost::random::ranlux64_3_01");
 
     boost::random::ranlux64_4_01 rng_ranlux64_4_01 { static_cast<unsigned int>(seed()) };
-    std::vector<boost::random::ranlux64_4_01::result_type> gen_bits_ranlux64_4_01(N_BASES);
-    bench_bits_stl<boost::random::ranlux64_4_01, boost::random::ranlux64_4_01::result_type>(
-        rng_ranlux64_4_01, gen_bits_ranlux64_4_01, "boost::random::ranlux64_4_01");
+    bench_bits_stl<boost::random::ranlux64_4_01>(rng_ranlux64_4_01, "boost::random::ranlux64_4_01");
 }
 
 void mkl_main()
@@ -322,13 +296,31 @@ void mkl_main()
 void absl_main()
 {
     absl::BitGen rng_bitgen {};
-    std::vector<absl::BitGen::result_type> gen_bits_bitgen(N_BASES);
-    bench_bits_stl<absl::BitGen, absl::BitGen::result_type>(rng_bitgen, gen_bits_bitgen, "absl::BitGen");
+    bench_bits_stl<absl::BitGen>(rng_bitgen, "absl::BitGen");
 
     absl::InsecureBitGen rng_insecure_bitgen {};
-    std::vector<absl::InsecureBitGen::result_type> gen_bits_insecure_bitgen(N_BASES);
-    bench_bits_stl<absl::InsecureBitGen, absl::InsecureBitGen::result_type>(
-        rng_insecure_bitgen, gen_bits_insecure_bitgen, "absl::InsecureBitGen");
+    bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
+}
+
+void pcg_main()
+{
+    pcg32 rng_pcg32 { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg32>(rng_pcg32, "PCG::pcg32");
+
+    pcg64 rng_pcg64 { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg64>(rng_pcg64, "PCG::pcg64");
+
+    pcg32_fast rng_pcg32_fast { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg32_fast>(rng_pcg32_fast, "PCG::pcg32_fast");
+
+    pcg64_fast rng_pcg64_fast { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg64_fast>(rng_pcg64_fast, "PCG::pcg64_fast");
+
+    pcg32_oneseq_once_insecure rng_pcg32_oneseq_once_insecure { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg32_oneseq_once_insecure>(rng_pcg32_oneseq_once_insecure, "PCG::pcg32_oneseq_once_insecure");
+
+    pcg64_oneseq_once_insecure rng_pcg64_oneseq_once_insecure { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg64_oneseq_once_insecure>(rng_pcg64_oneseq_once_insecure, "PCG::pcg64_oneseq_once_insecure");
 }
 
 void gsl_main()
@@ -381,9 +373,10 @@ void gsl_main()
 int main()
 {
     stl_main();
-    // boost_main();
-    // mkl_main();
-    // absl_main();
+    boost_main();
+    mkl_main();
+    absl_main();
     gsl_main();
+    pcg_main();
     return EXIT_SUCCESS;
 }
