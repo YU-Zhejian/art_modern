@@ -10,6 +10,7 @@
 // Random Generators
 
 #cmakedefine USE_STL_RANDOM
+#cmakedefine USE_PCG_RANDOM
 #cmakedefine USE_GSL_RANDOM
 #cmakedefine USE_BOOST_RANDOM
 #cmakedefine USE_ONEMKL_RANDOM

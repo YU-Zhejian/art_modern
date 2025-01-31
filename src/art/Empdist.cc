@@ -69,7 +69,7 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& rprob, const bool first) const
 {
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
-    rprob.rand_quality();
+    rprob.rand_quality_dist();
     for (auto i = 0; i < len; i++) {
         qual[i] = qual_dist[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
     }
@@ -79,7 +79,7 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
 {
     const auto len = seq.size();
 
-    rprob.rand_quality();
+    rprob.rand_quality_dist();
 
     for (decltype(seq.size()) i = 0; i < len; i++) {
         switch (seq[i]) {
@@ -105,7 +105,7 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
 {
     const auto len = seq.size();
 
-    rprob.rand_quality();
+    rprob.rand_quality_dist();
     for (size_t i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':

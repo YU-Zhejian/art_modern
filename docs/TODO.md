@@ -3,6 +3,7 @@
 ## IMPORTANT
 
 - ART stuck at one read. Why?
+- Revise the docs to support PCG::pcg32.
 
 ## Performance
 

@@ -16,11 +16,23 @@ Here, "coverage" means that all contigs are passed to all threads with coverage 
 
 ## Random Generators
 
+### Bit Generation
+
 The current random number generation function in each library is [MT19937](https://doi.org/10.1145/272991.272995), which may not be the best choice for performance-critical applications. However, it is the most widely used, well-known, be of moderate performance and cycle, and is implemented in all random number generator libraries (namely, Boost, GSL, STL, and Intel OneAPI MKL).
 
-We may further introduce faster RNGs with shorter cycle (e.g., Taus) in the future for scientists that requires massive amount of data with less quality. However, due to the fact that the current application is limited by IO, this is not a priority.
+We choose not to use [Abseil Random](https://abseil.io/docs/cpp/guides/random) since (1) It is hard to bundle the entire Abseil random library with the project and (2) Its performance is not satisfying. Using Intel compiler, even absl::InsecureBitGen is slower than either boost::random::mt19937 or std::mt19937.
+
+We choose not to use [cuRAND](https://docs.nvidia.com/cuda/curand/index.html) since it is hard to configure and its performance is not satisfying which may due to the time spent on copying data from GPU as the majority of our computation happens on CPU.
+
+We may further introduce faster RNGs (e.g., PCG::pcg32) in the future. However, due to the fact that the current application is limited by IO, this is not a priority.
 
 The current version does not support the specification of seed since it will result in reads with identical position and error profile in each thread. The current seed is set by the product of nanoseconds since epoch and hash of the current thread ID to allow each thread to generate different data.
+
+### Distribution Sampling
+
+The distribution sampling was currently implemented using each library's own implementation. For example; `boost::random::uniform_int_distribution` for Boost random generators, `std::uniform_int_distribution` for STL, `viRngUniform` for Intel MKL, and `gsl_rng_uniform_int` for GSL.
+
+Further decoupling may be needed.
 
 ## I/O
 
@@ -30,7 +42,7 @@ Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted 
 
 ## Other Performance Bottlenecks
 
-A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be hold in one node, which improves performance when being compared red-black tree used in  most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
+A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be hold in one node, which improves performance when being compared red-black tree used in most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
 
 ## Building System
 

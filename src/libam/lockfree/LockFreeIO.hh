@@ -28,6 +28,8 @@ public:
     static const int QUEUE_SIZE = M_SIZE;
     static const int BULK_SIZE = K_SIZE;
 
+    constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
+
     LockFreeIO(std::string name)
         : name_(std::move(name))
         ,
@@ -49,7 +51,7 @@ public:
 #if !defined(USE_NOP_PARALLEL)
         while (!queue_.try_enqueue(std::move(value))) {
             num_wait_in_++;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            std::this_thread::sleep_for(sleep_time);
         }
         num_reads_in_++;
 #else
@@ -87,7 +89,8 @@ private:
     std::atomic<std::size_t> num_reads_in_ = 0;
     std::atomic<std::size_t> num_reads_out_ = 0;
     std::atomic<std::size_t> num_wait_in_ = 0;
-    std::atomic<std::size_t> num_wait_out_ = 0;
+    std::atomic<std::size_t> num_wait_out_not_full_ = 0;
+    std::atomic<std::size_t> num_wait_out_empty_ = 0;
     std::atomic<bool> had_logged_ = false;
 #if !defined(USE_NOP_PARALLEL)
     moodycamel::ConcurrentQueue<T> queue_;
@@ -105,7 +108,12 @@ private:
         while (!should_stop_) {
             pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), BULK_SIZE);
             if (pop_ret_cnt == 0) {
-                num_wait_out_++;
+                num_wait_out_empty_++;
+                std::this_thread::sleep_for(sleep_time);
+                continue;
+            }
+            if (pop_ret_cnt < BULK_SIZE) {
+                num_wait_out_not_full_++;
             }
 
             num_reads_out_ += pop_ret_cnt;
@@ -124,14 +132,17 @@ private:
             }
             pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), BULK_SIZE);
         }
-        log_();
+        if (!had_logged_) {
+            log_();
+        }
+        had_logged_ = true;
 #endif
     }
     void log_() const
     {
         BOOST_LOG_TRIVIAL(info) << name_ << " finished, consuming " << num_reads_in_ << " reads and writes "
-                                << num_reads_out_ << " reads. N. Waitings (I/O): " << num_wait_in_ << "/"
-                                << num_wait_out_;
+                                << num_reads_out_ << " reads. N. Waitings (I/ONotFull/OEmpty): " << num_wait_in_ << "/"
+                                << num_wait_out_not_full_ << "/" << num_wait_out_empty_;
     }
 };
 

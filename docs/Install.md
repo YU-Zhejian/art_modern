@@ -142,6 +142,7 @@ This instructs CMake whether to build shared libraries. It will also affect beha
 This instructs CMake to build executables/libraries with different optimization and debugging levels.
 
 - **`Debug` (DEFAULT): For developers with debugging needs.**
+  - **NOTE** Very, very slow with tons of extra checks.
 - `Release`: Optimized executables/libraries without debug symbols. Used for daily use.
 - `RelWithDebInfo`: Optimized executables/libraries with debug symbols. Used for profiling.
 
@@ -180,6 +181,18 @@ The random number generator used.
 - `BOOST`: Use Boost random generators.
 - `GSL`: Use GSL random generators. This is used in the original ART.
 - `ONEMKL`: Use Intel OneAPI MKL random generators. Highly recommended on Intel CPUs.
+
+On my system for generating 1M random bits for 20K times:
+
+```text
+PCG::pcg32(0, 4294967295): 2,840 us
+MKL::VSL_BRNG_SFMT19937 (32 bits): 6,472 us
+MKL::VSL_BRNG_MT19937 (32 bits): 8,672 us
+boost::random::mt19937(0, 4294967295): 12,669 us
+std::mt19937(0, 4294967295): 19,837 us
+absl::InsecureBitGen(0, 18446744073709551615): 30,928 us
+GSL::mt19937(0, 4294967295): 48,060 us
+```
 
 ### `USE_THREAD_PARALLEL`
 

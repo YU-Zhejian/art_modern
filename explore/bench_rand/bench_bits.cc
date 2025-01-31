@@ -1,11 +1,5 @@
-#include <algorithm>
-#include <chrono>
-#include <cstddef>
-#include <cstdint>
-#include <memory>
-#include <random>
-#include <utility>
-#include <vector>
+#include "gsl_rng_wrapper.hh"
+#include "rprobs.hh"
 
 #include <mkl.h>
 
@@ -14,72 +8,20 @@
 #include <boost/random.hpp>
 
 #include <absl/random/random.h>
+
+#include <pcg_random.hpp>
+
+#include <algorithm>
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
 #include <fstream>
-
-#include "pcg-cpp-0.98/include/pcg_random.hpp"
-
-#include "rprobs.hh"
-
-class CustomRandomDevice {
-public:
-    using result_type = unsigned int;
-
-    CustomRandomDevice()
-        : rand_stream("/dev/random", std::ios::binary)
-    {
-        if (!rand_stream.is_open()) {
-            throw std::system_error(errno, std::generic_category(), "Failed to open /dev/random");
-        }
-    }
-    ~CustomRandomDevice() { rand_stream.close(); }
-
-    static constexpr result_type min() { return 0; }
-
-    static constexpr result_type max() { return UINT_MAX; }
-
-    result_type operator()()
-    {
-        result_type randomNumber;
-        rand_stream.read(reinterpret_cast<char*>(&randomNumber), sizeof(randomNumber));
-        if (rand_stream.fail()) {
-            throw std::system_error(errno, std::generic_category(), "Failed to read from /dev/random");
-        }
-
-        return randomNumber;
-    }
-
-private:
-    std::ifstream rand_stream;
-};
-
-class GslRandWrapper {
-public:
-    using result_type = unsigned long;
-    GslRandWrapper(const gsl_rng_type* t) { r = gsl_rng_alloc(t); }
-    ~GslRandWrapper() { gsl_rng_free(r); }
-    result_type operator()() { return gsl_rng_get(r); }
-    result_type min() { return gsl_rng_min(r); }
-    result_type max() { return gsl_rng_max(r); }
-    std::string name() const { return gsl_rng_name(r); }
-
-private:
-    gsl_rng* r;
-};
+#include <memory>
+#include <random>
+#include <utility>
+#include <vector>
 
 namespace {
-std::string formatWithCommas(std::size_t number)
-{
-    std::string numStr = std::to_string(number);
-    int insertPosition = static_cast<int>(numStr.length()) - 3;
-
-    while (insertPosition > 0) {
-        numStr.insert(insertPosition, ",");
-        insertPosition -= 3;
-    }
-
-    return numStr;
-}
-
 template <typename T> void bench_bits_stl(T& rng, const std::string& name)
 {
     std::chrono::time_point<std::chrono::system_clock> start;
@@ -123,14 +65,17 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
 
 void bench_gsl(const gsl_rng_type* t)
 {
-    GslRandWrapper gsl_rand_wrapper { t };
-    bench_bits_stl<GslRandWrapper>(gsl_rand_wrapper, "GSL::" + gsl_rand_wrapper.name());
+    GslRngWrapper gsl_rand_wrapper { t };
+    bench_bits_stl<GslRngWrapper>(gsl_rand_wrapper, "GSL::" + gsl_rand_wrapper.name());
 }
 
 void stl_main()
 {
     CustomRandomDevice rng_custom_random_device;
     bench_bits_stl<CustomRandomDevice>(rng_custom_random_device, "CustomRandomDevice");
+
+    DumbRandomDevice rng_dumb_random_device;
+    bench_bits_stl<DumbRandomDevice>(rng_dumb_random_device, "DumbRandomDevice");
 
     std::mt19937 rng_mt19937 { seed() };
     bench_bits_stl<std::mt19937>(rng_mt19937, "std::mt19937");
@@ -368,15 +313,36 @@ void gsl_main()
     bench_gsl(gsl_rng_fishman2x);
     bench_gsl(gsl_rng_coveyou);
 }
+
+void mt19937_main()
+{
+    std::mt19937 rng_stl_mt19937 { seed() };
+    bench_bits_stl<std::mt19937>(rng_stl_mt19937, "std::mt19937");
+
+    absl::InsecureBitGen rng_insecure_bitgen {};
+    bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
+
+    pcg32 rng_pcg32 { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<pcg32>(rng_pcg32, "PCG::pcg32");
+
+    boost::random::mt19937 rng_boost_mt19937 { static_cast<unsigned int>(seed()) };
+    bench_bits_stl<boost::random::mt19937>(rng_boost_mt19937, "boost::random::mt19937");
+
+    bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
+    bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
+    bench_gsl(gsl_rng_mt19937);
+}
+
 } // namespace
 
 int main()
 {
-    stl_main();
-    boost_main();
-    mkl_main();
-    absl_main();
-    gsl_main();
-    pcg_main();
+    mt19937_main();
+    //    stl_main();
+    //    boost_main();
+    //    mkl_main();
+    //    absl_main();
+    //    gsl_main();
+    //    pcg_main();
     return EXIT_SUCCESS;
 }

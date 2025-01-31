@@ -52,3 +52,4 @@ Fixed miscellaneous bugs.
 - Formatting engine changed to [`{fmt}`](https://github.com/fmtlib/fmt).
 - Supporting FASTA output format.
 - If the output consists only FASTA or FASTQ, pairwise alignment will not be computed.
+- The default random generator for Intel MKL library changed from `VSL_BRNG_MT19937` to `VSL_BRNG_SFMT19937`, which is slightly faster.

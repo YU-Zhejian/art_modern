@@ -20,7 +20,7 @@ function run() {
 printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\n' >time.tsv
 for i in {1..3}; do
     echo "Run ${i}"
-    for name in art_modern art_modern_gcc art_modern_prev_ver art_modern_jemalloc art_modern_asio art_modern_mimalloc; do
+    for name in art_modern_pcg art_modern art_modern_gcc art_modern_prev_ver; do
 
         run "${name}"-genome-pe100 opt/"${name}"_build/art_modern \
             --mode wgs --lc pe \
