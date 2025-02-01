@@ -1,7 +1,6 @@
 #include "libam/out/FastqReadOutput.hh"
 
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/DumbReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
@@ -35,7 +34,7 @@ namespace {
 
 void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.push(format_fastq(pwa));
@@ -43,7 +42,7 @@ void FastqReadOutput::writeSE(const PairwiseAlignment& pwa)
 
 void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.push(format_fastq(pwa1, pwa2));
@@ -51,22 +50,18 @@ void FastqReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
 FastqReadOutput::FastqReadOutput(const std::string& filename)
-    : BaseFileReadOutput(filename)
-    , file_(filename)
-    , lfio_("FASTQ", file_)
+    : lfio_("FASTQ", filename)
 {
     lfio_.start();
 }
 
 void FastqReadOutput::close()
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.stop();
-    file_.flush();
-    file_.close();
-    BaseFileReadOutput::close();
+    closed_ = true;
 }
 
 bool FastqReadOutput::require_alignment() const { return false; }

@@ -4,6 +4,7 @@
 #include "art/BuiltinProfile.hh"
 #include "art/random_generator.hh"
 
+#include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
 #include "libam/utils/mpi_utils.hh"
 
@@ -71,6 +72,7 @@ void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& 
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
     rprob.rand_quality_dist();
     for (auto i = 0; i < len; i++) {
+        // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
     }
 }

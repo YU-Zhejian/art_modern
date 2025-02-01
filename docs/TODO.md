@@ -3,11 +3,10 @@
 ## IMPORTANT
 
 - ART stuck at one read. Why?
-- Revise the docs to support PCG::pcg32.
 
 ## Performance
 
-- The home-made "asynchronous IO" may be inefficient in SSDs. ~~May consider refactor into Boost.ASIO.~~
+- The home-made "asynchronous IO" may be inefficient in SSDs.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -26,7 +25,7 @@
   - Compress builtin profiles using XZ, etc., and then encode it using base64.
     - May depend on Boost.IO or use ZLib/libLZMA/libzstd directly.
     - Only a decoder is needed in the executable.
-  - See also: [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings)
+  - See also: [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings).
 
 ## I/O Formats
 

@@ -1,7 +1,6 @@
 #include "libam/out/PwaReadOutput.hh"
 
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/DumbReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
@@ -11,17 +10,26 @@
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include <fstream>
 #include <memory>
+#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace labw::art_modern {
+namespace {
+    std::string preamble(const std::vector<std::string>& args)
+    {
+        std::ostringstream oss;
+        oss << "#PWA\n";
+        oss << "#ARGS: " << boost::algorithm::join(args, " ") << "\n";
+        return oss.str();
+    }
+} // namespace
 
 void PwaReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     auto os = std::make_unique<std::string>(pwa.serialize());
@@ -30,7 +38,7 @@ void PwaReadOutput::writeSE(const PairwiseAlignment& pwa)
 
 void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     auto os1 = std::make_unique<std::string>(pwa1.serialize());
@@ -41,25 +49,18 @@ void PwaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
 PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args)
-    : BaseFileReadOutput(filename)
-    , file_(filename)
-    , lfio_("PWA", file_)
+    : lfio_("PWA", filename, preamble(args))
 {
-    file_ << "#PWA\n";
-    file_ << "#ARGS: " << boost::algorithm::join(args, " ") << "\n";
-    file_.flush();
-
     lfio_.start();
 }
 
 void PwaReadOutput::close()
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.stop();
-    file_.flush();
-    BaseFileReadOutput::close();
+    closed_ = true;
 }
 
 bool PwaReadOutput::require_alignment() const { return true; }

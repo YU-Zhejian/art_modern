@@ -2,7 +2,6 @@
 
 #include "libam/ds/PairwiseAlignment.hh"
 #include "libam/lockfree/SimpleLFIO.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
 #include "libam/utils/class_macros_utils.hh"
@@ -10,14 +9,13 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include <fstream>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
 
-class FastaReadOutput : public BaseFileReadOutput {
+class FastaReadOutput : public BaseReadOutput {
 public:
     DELETE_MOVE(FastaReadOutput)
     DELETE_COPY(FastaReadOutput)
@@ -31,7 +29,6 @@ public:
     ~FastaReadOutput() override;
 
 private:
-    std::ofstream file_;
     SimpleLFIO lfio_;
 };
 

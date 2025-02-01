@@ -14,7 +14,7 @@
 
 namespace labw::art_modern {
 
-/*!
+/**
  * SE:@code
                 |----------->
              ------------------------------------
@@ -39,7 +39,7 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
     read_1.ref2read(std::move(seq_ref), is_plus_strand, pos_1);
 }
 
-/*!
+/**
  * PE: @code
                 |----------->
              ------------------------------------

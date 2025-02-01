@@ -30,17 +30,17 @@ public:
     // number of deletions <= number of insertions
     int generate_indels_2(bool is_read_1);
 
-    /*!
+    /**
      * Populate the read while adding insertions and deletions.
      */
     void ref2read(std::string seq_ref, bool is_plus_strand, hts_pos_t pos_on_contig);
 
-    /*!
+    /**
      * Populate aln_read_ and aln_ref_
      */
     void generate_pairwise_aln();
 
-    /*!
+    /**
      * Add point mutations to random bases based on empirical dist of quali scores
      */
     void generate_snv_on_qual(bool is_first_read);

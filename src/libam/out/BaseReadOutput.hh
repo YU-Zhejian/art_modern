@@ -6,6 +6,7 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -21,8 +22,11 @@ public:
     virtual void writeSE(const PairwiseAlignment& pwa) = 0;
     virtual void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
     virtual void close() = 0;
-    virtual bool require_alignment() const = 0;
+    [[nodiscard]] virtual bool require_alignment() const = 0;
     virtual ~BaseReadOutput() = default;
+
+protected:
+    std::atomic<bool> closed_ = false;
 };
 
 class BaseReadOutputFactory {

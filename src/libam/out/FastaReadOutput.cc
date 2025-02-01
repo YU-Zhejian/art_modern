@@ -1,7 +1,6 @@
 #include "libam/out/FastaReadOutput.hh"
 
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/DumbReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
@@ -12,10 +11,8 @@
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
 
-#include <cstdio>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace labw::art_modern {
 
@@ -35,7 +32,7 @@ namespace {
 
 void FastaReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.push(format_fasta(pwa));
@@ -43,7 +40,7 @@ void FastaReadOutput::writeSE(const PairwiseAlignment& pwa)
 
 void FastaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.push(format_fasta(pwa1, pwa2));
@@ -51,22 +48,18 @@ void FastaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlign
 
 FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
 FastaReadOutput::FastaReadOutput(const std::string& filename)
-    : BaseFileReadOutput(filename)
-    , file_(filename)
-    , lfio_("FASTA", file_)
+    : lfio_("FASTA", filename)
 {
     lfio_.start();
 }
 
 void FastaReadOutput::close()
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.stop();
-    file_.flush();
-    file_.close();
-    BaseFileReadOutput::close();
+    closed_ = true;
 }
 
 bool FastaReadOutput::require_alignment() const { return false; }

@@ -2,6 +2,8 @@
 
 #include "art/ArtConstants.hh"
 
+#include "libam/Constants.hh"
+
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
 #endif

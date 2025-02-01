@@ -1,4 +1,4 @@
-/*!
+/**
  *  @brief  C exceptions proxy.
  *  An exception proxy for C exceptions, with helper functions that asserts return value of C routines.
  */
@@ -16,24 +16,23 @@
 namespace labw::art_modern {
 static const std::string UNKNOWN_C_EXCEPTION = "UNKNOWN";
 
-/*!
+/**
  * An exception proxy for C exceptions.
- * TODO: Have it refactored somehow.
  * The current implementation is stupid. It generates horrific logs.
  */
 class CExceptionsProxy : public std::exception {
 public:
-    /*! Expected type of return value of C routines **/
+    /** Expected type of return value of C routines **/
     enum class EXPECTATION : std::uint8_t {
-        /*! Return value should be zero **/
+        /** Return value should be zero **/
         ZERO,
-        /*! Return value should be non-negative **/
+        /** Return value should be non-negative **/
         NON_NEGATIVE,
-        /*! Return value should be positive **/
+        /** Return value should be positive **/
         POSITIVE
     };
 
-    /*!
+    /**
      * Constructor.
      *
      * @param c_lib_name Name of the C library.
@@ -50,7 +49,7 @@ public:
     /** Log the exception. */
     void log() const;
 
-    /*!
+    /**
      * Assert a C routine return value.
      *
      * @tparam t Some type that can be converted to int.
@@ -86,7 +85,7 @@ public:
         return c_value;
     }
 
-    /*!
+    /**
      * Assert a C routine return value.
      *
      * @tparam t Some type that can should not be `null`.

@@ -3,7 +3,6 @@
 #include "libam/bam/BamLFIO.hh"
 #include "libam/bam/BamOptions.hh"
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
 #include "libam/utils/class_macros_utils.hh"
@@ -18,7 +17,7 @@
 
 namespace labw::art_modern {
 
-class BamReadOutput : public BaseFileReadOutput {
+class BamReadOutput : public BaseReadOutput {
 public:
     DELETE_MOVE(BamReadOutput)
     DELETE_COPY(BamReadOutput)

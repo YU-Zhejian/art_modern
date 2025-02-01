@@ -8,7 +8,6 @@
 #include "libam/bam/BamTags.hh"
 #include "libam/bam/BamUtils.hh"
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/DumbReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
@@ -26,9 +25,9 @@
 #include <htslib/sam.h>
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <utility>
-#include <vector>
 
 namespace po = boost::program_options;
 
@@ -36,10 +35,9 @@ namespace labw::art_modern {
 
 void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
-
     const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
@@ -78,10 +76,9 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
 
 void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
-
     const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
@@ -154,8 +151,7 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(
     const std::string& filename, const BaseFastaFetch* fasta_fetch, const BamOptions& sam_options)
-    : BaseFileReadOutput(filename)
-    , sam_file_(BamUtils::open_file(filename, sam_options))
+    : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
     , lfio_("BAM", sam_file_, sam_header_)
@@ -168,13 +164,12 @@ BamReadOutput::BamReadOutput(
 
 void BamReadOutput::close()
 {
-    if (is_closed_) {
+    if (closed_) {
         return;
     }
     lfio_.stop();
-    sam_close(sam_file_);
     sam_hdr_destroy(sam_header_);
-    BaseFileReadOutput::close();
+    closed_ = true;
 }
 
 bool BamReadOutput::require_alignment() const { return true; }

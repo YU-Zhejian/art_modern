@@ -98,6 +98,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
     generate_all(art_params);
+    BOOST_LOG_TRIVIAL(info) << "All reads generated.";
 #ifdef WITH_BOOST_TIMER
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");

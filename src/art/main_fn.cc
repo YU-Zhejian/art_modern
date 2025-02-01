@@ -88,9 +88,9 @@ public:
         BOOST_LOG_TRIVIAL(info) << "All jobs submitted. Waiting for job pool to stop...";
         job_pool_.stop();
         reporter_.stop();
-        BOOST_LOG_TRIVIAL(info) << "Job pool stopped";
+        BOOST_LOG_TRIVIAL(info) << "Job pool stopped.";
         out_dispatcher_->close();
-        BOOST_LOG_TRIVIAL(info) << "Output dispatchers cleared";
+        BOOST_LOG_TRIVIAL(info) << "Output dispatchers cleared.";
     }
 
 private:
@@ -196,5 +196,6 @@ void generate_all(const ArtParams& art_params)
     }
 
     generator.wait();
+    BOOST_LOG_TRIVIAL(info) << "Generator finished.";
 }
 } // namespace labw::art_modern

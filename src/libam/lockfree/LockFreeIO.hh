@@ -3,8 +3,10 @@
 
 #include "libam/Constants.hh" // For USE_ASIO_PARALLEL
 #include "libam/utils/class_macros_utils.hh"
+#include "libam/utils/si_utils.hh"
 
 #include <boost/log/trivial.hpp>
+#include <utility>
 
 #if !defined(USE_NOP_PARALLEL)
 #include <concurrentqueue.h>
@@ -30,7 +32,7 @@ public:
 
     constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
 
-    LockFreeIO(std::string name)
+    explicit LockFreeIO(std::string name)
         : name_(std::move(name))
         ,
 #if !defined(USE_NOP_PARALLEL)
@@ -40,11 +42,7 @@ public:
 #endif
 
         virtual ~LockFreeIO()
-    {
-#if !defined(USE_NOP_PARALLEL)
-        stop();
-#endif
-    };
+        = default;
 
     void push(T&& value)
     {
@@ -63,12 +61,14 @@ public:
     }
     void start()
     {
+        start_time_ = std::chrono::high_resolution_clock::now();
 #if !defined(USE_NOP_PARALLEL)
         thread_ = std::thread(&LockFreeIO::run, this);
 #endif
     }
+    virtual void flush_and_close() { };
 
-    virtual void stop()
+    void stop()
     {
 #if !defined(USE_NOP_PARALLEL)
         should_stop_ = true;
@@ -76,6 +76,8 @@ public:
             thread_.join();
         }
 #endif
+        flush_and_close();
+        end_time_ = std::chrono::high_resolution_clock::now();
         if (!had_logged_) {
             log_();
         }
@@ -84,13 +86,19 @@ public:
 
     virtual void write(T value) = 0;
 
-private:
+protected:
+    std::atomic<std::size_t> num_bytes_out_ = 0;
     const std::string name_;
+
+private:
+    std::chrono::high_resolution_clock::time_point start_time_;
+    std::chrono::high_resolution_clock::time_point end_time_;
     std::atomic<std::size_t> num_reads_in_ = 0;
     std::atomic<std::size_t> num_reads_out_ = 0;
     std::atomic<std::size_t> num_wait_in_ = 0;
     std::atomic<std::size_t> num_wait_out_not_full_ = 0;
     std::atomic<std::size_t> num_wait_out_empty_ = 0;
+    std::atomic<std::size_t> num_nowait_out_ = 0;
     std::atomic<bool> had_logged_ = false;
 #if !defined(USE_NOP_PARALLEL)
     moodycamel::ConcurrentQueue<T> queue_;
@@ -114,6 +122,8 @@ private:
             }
             if (pop_ret_cnt < BULK_SIZE) {
                 num_wait_out_not_full_++;
+            } else {
+                num_nowait_out_++;
             }
 
             num_reads_out_ += pop_ret_cnt;
@@ -132,17 +142,23 @@ private:
             }
             pop_ret_cnt = queue_.try_dequeue_bulk(retp_a.data(), BULK_SIZE);
         }
-        if (!had_logged_) {
-            log_();
-        }
-        had_logged_ = true;
 #endif
     }
     void log_() const
     {
-        BOOST_LOG_TRIVIAL(info) << name_ << " finished, consuming " << num_reads_in_ << " reads and writes "
-                                << num_reads_out_ << " reads. N. Waitings (I/ONotFull/OEmpty): " << num_wait_in_ << "/"
-                                << num_wait_out_not_full_ << "/" << num_wait_out_empty_;
+        const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_ - start_time_).count();
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << num_reads_in_ << " reads and writes "
+                                << num_reads_out_ << " reads.";
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. Waitings (I/ONotFull/OEmpty): " << num_wait_in_ << " / "
+                                << num_wait_out_not_full_ << "("
+                                << (100.0 * num_wait_out_not_full_
+                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
+                                << "%) / " << num_wait_out_empty_ << "("
+                                << (100.0 * num_wait_out_empty_
+                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
+                                << "%).";
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: " << to_si(num_bytes_out_) << "B written in " << time / 1000.0
+                                << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
     }
 };
 

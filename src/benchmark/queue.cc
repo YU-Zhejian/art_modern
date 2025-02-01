@@ -109,7 +109,7 @@ void mcqueue_producer(moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_u
 #endif
 }
 
-void mcqueue_consumer_single(moodycamel::ConcurrentQueue<std::string>& queue)
+[[maybe_unused]] void mcqueue_consumer_single(moodycamel::ConcurrentQueue<std::string>& queue)
 {
 #if VERBOSE_IO
     BOOST_LOG_TRIVIAL(info) << "consumer thread started";

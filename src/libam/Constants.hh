@@ -4,6 +4,7 @@
 #pragma once
 #include "libam/Dtypes.hh"
 
+#include <cstddef>
 #include <cstdint>
 #include <string>
 
@@ -15,12 +16,12 @@ constexpr int PARALLEL_DISABLE = -1;
 /** Parallelization with all cores. */
 constexpr int PARALLEL_ALL = 0;
 
-/*!
+/**
  * Alignment gap character.
  */
 constexpr char ALN_GAP = '-';
 
-/*!
+/**
  * Maximum phred-based quality score.
  * 10^{-40} error rate, which is quite low.
  */
@@ -77,23 +78,34 @@ constexpr int MPI_UNAVAILABLE_RANK = -1;
 
 constexpr int TID_FOR_UNMAPPED = -1;
 
-/*!
+/**
  * BAM_CMATCH, BAM_CEQUAL, BAM_CDIFF; Consume both
  */
 constexpr am_cigar_type_t CONSUME_QUERY_AND_REFERENCE = 0b11;
 
-/*!
+/**
  * BAM_CHARD_CLIP, BAM_CPAD, BAM_CBACK; Consume neither
  */
 constexpr am_cigar_type_t CONSUME_NEITHER_QUERY_NOR_REFERENCE = 0b00;
 
-/*!
+/**
  *  BAM_CINS, BAM_CSOFT_CLIP; Consume query
  */
 constexpr am_cigar_type_t CONSUME_QUERY = 0b01;
 
-/*!
+/**
  *  BAM_CDEL, BAM_CREF_SKIP; Consume reference
  */
 constexpr am_cigar_type_t CONSUME_REFERENCE = 0b10;
+
+/**
+ * SI units for printing
+ */
+constexpr const char* SI_UNITS[] = { "", "K", "M", "G", "T", "P", "E", "Z", "Y" };
+constexpr std::size_t SI_UNITS_LENGTH = 8;
+
+/** ART nucleotides */
+constexpr char ART_ACGT[] = "ACGT";
+/** ART nucleotides as string */
+const std::string ART_ACGT_STR = "ACGT";
 } // namespace labw::art_modern

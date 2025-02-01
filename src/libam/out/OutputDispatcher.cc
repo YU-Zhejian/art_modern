@@ -22,6 +22,9 @@ namespace labw::art_modern {
 
 void OutputDispatcher::writeSE(const PairwiseAlignment& pwa)
 {
+    if (closed_) {
+        return;
+    }
     for (const auto& output : outputs_) {
         output->writeSE(pwa);
     }
@@ -29,6 +32,9 @@ void OutputDispatcher::writeSE(const PairwiseAlignment& pwa)
 
 void OutputDispatcher::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
+    if (closed_) {
+        return;
+    }
     for (const auto& output : outputs_) {
         output->writePE(pwa1, pwa2);
     }
@@ -36,9 +42,13 @@ void OutputDispatcher::writePE(const PairwiseAlignment& pwa1, const PairwiseAlig
 
 void OutputDispatcher::close()
 {
+    if (closed_) {
+        return;
+    }
     for (const auto& output : outputs_) {
         output->close();
     }
+    closed_ = true;
 }
 
 OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
