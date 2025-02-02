@@ -180,6 +180,7 @@ The random number generator used.
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: [PCG](https://www.pcg-random.org/) random generators.
   - **NOTE** Experimental.
+  - **NOTE** This generator would fail on Mac OS X due to the lack of `cxxabi.h`.
 - `BOOST`: Use Boost random generators.
 - `GSL`: Use GSL random generators.
   - This is used in the original ART.

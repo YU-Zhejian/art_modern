@@ -90,3 +90,15 @@ Affected files:
 Under an MIT-like License.
 
 **NOTE** This is the last version that does not come with C++20 modules.
+
+## Melissa O'Neill and PCG Project Contributors' PCG Project
+
+Available from <https://github.com/imneme/pcg-cpp>.
+
+Affected files:
+
+- `/deps/pcg-cpp-0.98/**`
+
+Dual licensed under the MIT License and Apache 2.0 License.
+
+**NOTE** This project used the version retrived [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.

@@ -4,6 +4,31 @@ all: test-build-ubuntu-1804-gcc test-build-ubuntu-1804-clang alpine-latest-build
 cmake-3.31.4-linux-x86_64.tar.gz:
 	wget https://github.com/Kitware/CMake/releases/download/v3.31.4/cmake-3.31.4-linux-x86_64.tar.gz
 
+
+debian-oldoldstable: cmake-3.31.4-linux-x86_64.tar.gz
+	sudo debootstrap \
+		--variant=buildd \
+		--arch=amd64 \
+		oldoldstable $(CURDIR)/debian-oldoldstable https://mirrors.ustc.edu.cn/debian/
+	sudo cp cmake-3.31.4-linux-x86_64.tar.gz ubuntu-1804/opt
+	sudo cp debian-oldoldstable-etc-apt-source.list $(CURDIR)/debian-oldoldstable/etc/apt/sources.list
+	sudo chroot $(CURDIR)/debian-oldoldstable tar -zxvf /opt/cmake-3.31.4-linux-x86_64.tar.gz -C /opt
+	sudo chroot $(CURDIR)/debian-oldoldstable apt update
+	sudo chroot $(CURDIR)/debian-oldoldstable apt upgrade -y
+	sudo chroot $(CURDIR)/debian-oldoldstable apt install -y \
+		build-essential \
+		g++ \
+		binutils \
+		libboost-all-dev \
+		libz-dev \
+		make \
+		apt-file \
+		python3 \
+		clang++
+	sudo chroot $(CURDIR)/debian-oldoldstable apt-file update
+	sudo chroot $(CURDIR)/debian-oldoldstable apt clean
+
+
 ubuntu-1804: cmake-3.31.4-linux-x86_64.tar.gz
 	sudo debootstrap \
 		--variant=buildd \
@@ -22,7 +47,8 @@ ubuntu-1804: cmake-3.31.4-linux-x86_64.tar.gz
 		libz-dev \
 		make \
 		apt-file \
-		python3
+		python3 \
+		clang++-5
 	sudo chroot ubuntu-1804 apt-file update
 	sudo chroot ubuntu-1804 apt clean
 
