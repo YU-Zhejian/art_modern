@@ -37,7 +37,7 @@ Affected files:
 
 Dual-licensed under Simplified BSD License and Boost Software License.
 
-## William Sherif's Nibble And A Half Project
+## William Sherif's "Nibble And A Half" Project
 
 Originally from <https://github.com/superwills/NibbleAndAHalf>.
 
@@ -99,6 +99,6 @@ Affected files:
 
 - `/deps/pcg-cpp-0.98/**`
 
-Dual licensed under the MIT License and Apache 2.0 License.
+Licensed under the MIT License and Apache 2.0 License.
 
-**NOTE** This project used the version retrived [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.
+**NOTE** This project used the version retried [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.

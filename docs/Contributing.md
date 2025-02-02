@@ -57,11 +57,11 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 
 ### Issues
 
-You're welcome to submit issues on GitHub if you've encountered any problems while using this software. You're recommended to take advantage of the bug report templates, which will help us to understand your problem better. You may also submit issues if you're unclear about the docs or have some ideas improving the software itself.
+You're welcome to submit issues on GitHub if you've encountered any problems while using this software. You're recommended to take advantage of the bug report templates, which will help us to understand your problem better. You may also submit issues if you're unclear about the docs or have some ideas for improving the software itself.
 
 ### Pull Requests (PRs)
 
-You're welcomed to send pull requests (PRs) to this project using the standard fork-and-pull-request workflow. However, please send an issue first to discuss the changes you're going to make (except spelling \& punctuation \& grammar issues), otherwise we may not be able to accept your PR.
+You're welcomed to send pull requests (PRs) to this project using the standard fork-and-pull-request workflow. However, please send an issue first to discuss the changes you're going to make (except spelling \& punctuation \& grammar issues). Otherwise, we may not be able to accept your PR.
 
 Before you send a PR, please make sure that:
 

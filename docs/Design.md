@@ -16,7 +16,7 @@ Here, "coverage" means that all contigs are passed to all threads with coverage 
 
 ## Random Generators
 
-### Bit Generation
+### Bits Generation
 
 The current random number generation function in each library is [MT19937](https://doi.org/10.1145/272991.272995), which may not be the best choice for performance-critical applications. However, it is the most widely used, well-known, of moderate performance and cycle, and is implemented in all random number generator libraries (namely, Boost, GSL, STL, and Intel OneAPI MKL).
 
@@ -40,10 +40,10 @@ Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted 
 
 ## Other Performance Bottlenecks
 
-A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be hold in one node, which improves performance when being compared red-black tree used in most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
+A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be held in one node, which improves performance when being compared red-black tree used in most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
 
 ## Building System
 
 ### Static Linking
 
-The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software.
+The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software.

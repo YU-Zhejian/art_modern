@@ -14,7 +14,7 @@ This project depends on [Google Abseil](https://abseil.io/), whose requirements 
 
 This project requires a working C++ compiler that supports C++17 (due to the introduction of Google ProtoBuff library) and a working C compiler that supports C11 (for bundled HTSLib).
 
-See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC for example) supports C++17 using:
+See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC, for example) supports C++17 using:
 
 ```shell
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
@@ -38,7 +38,7 @@ Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolc
 
 - **NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
 - The minimal version of Clang tested is Clang 5.0.1.
-- However, earlier Clang versions may be supported with earlier operating systems, GCC, and Boost library.
+- However, earlier Clang versions may be supported with earlier operating systems, GCC, and Boost libraries.
 - Reference:
   - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
   - Libc++ support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of libstdc++ (GNU C++ Standard Library).
@@ -227,7 +227,7 @@ Whether to use `btree::map` instead of `std::map`. The former is faster than the
 
 ## `USE_MALLOC`
 
-Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumptions.
+Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumption.
 
 - **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc if possible.**
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.

@@ -51,7 +51,7 @@ Please submit a bug-report with instructions on how I may emulate your platform 
 
 ### I am new to GNU/Linux. How can I gather required information for a bug report?
 
-Followings are where you may find the required information:
+Where you may find the required information:
 
 - Name and version of your current operating system in a human-readable way.
 

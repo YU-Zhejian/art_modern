@@ -20,8 +20,8 @@
         - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
-- Builtin profiles takes too much space on the executable. May consider:
-  - Use an CMake option that disables embedding of builtin profiles.
+- Builtin profiles take too much space on the executable. May consider:
+  - Use a CMake option that disables embedding of builtin profiles.
   - Compress builtin profiles using XZ, etc., and then encode it using base64.
     - May depend on Boost.IO or use ZLib/libLZMA/libzstd directly.
     - Only a decoder is needed in the executable.
