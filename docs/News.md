@@ -57,4 +57,6 @@ Fixed miscellaneous bugs.
 
 Bundled files:
 
-- XXX: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
+- `art_modern_alpine`: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
+
+## 1.1.2 (On-going)
