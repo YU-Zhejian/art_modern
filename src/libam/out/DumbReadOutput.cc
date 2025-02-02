@@ -17,6 +17,9 @@ void DumbReadOutput::writeSE([[maybe_unused]] const PairwiseAlignment& /*pwa*/)
 {
     // Do nothing!
 }
+
+bool DumbReadOutput::require_alignment() const { return false; }
+
 DumbReadOutput::DumbReadOutput() = default;
 
 } // namespace labw::art_modern

@@ -13,6 +13,7 @@
     --ins_rate_1 "${IDRATE}" \
     --del_rate_1 "${IDRATE}" \
     --o-fastq "${OUT_DIR}"/test_small_se_template_memory_sep.fastq \
+    --o-fasta "${OUT_DIR}"/test_small_se_template_memory_sep.fasta \
     --o-pwa "${OUT_DIR}"/test_small_se_template_memory_sep.pwa \
     --o-sam "${OUT_DIR}"/test_small_se_template_memory_sep.sam \
     --o-hl_sam "${OUT_DIR}"/test_small_se_template_memory_sep.hl.bam \
@@ -23,5 +24,8 @@ fastqc "${OUT_DIR}"/test_small_se_template_memory_sep.fastq
 if which x-www-browser &>/dev/null; then
     # x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
     sleep 3
+fi
+if [ "${FORMAT_ONLY:-}" = "1" ]; then
+    exit 0
 fi
 rm -fr "${OUT_DIR}"/test_small_se_template_memory_sep.* "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.*

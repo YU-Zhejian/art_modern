@@ -67,9 +67,8 @@ function(ceu_cm_enhanced_try_run)
     endif()
 
     # Start processing
-    if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX} OR
-            NOT CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX} EQUAL 0)
-        message(STATUS "CEU_CM: Finding and assessing ${TARGET_POSTFIX} ${CEU_CM_ENHANCED_TRY_RUN_VARNAME}")
+    if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
+       OR NOT CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX} EQUAL 0)
 
         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
             OFF
@@ -86,12 +85,16 @@ function(ceu_cm_enhanced_try_run)
                 if(DEFINED CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX})
                     if(NOT ${CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX}})
                         set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                                OFF
-                                CACHE INTERNAL
+                            OFF
+                            CACHE
+                                INTERNAL
                                 "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX} failed.")
                     endif()
                 else()
-                    message(FATAL_ERROR "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX} is not undefined")
+                    message(
+                        FATAL_ERROR
+                            "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_COMPILE_${TARGET_POSTFIX} is not undefined"
+                    )
                 endif()
 
                 # Assess running result.
@@ -108,7 +111,10 @@ function(ceu_cm_enhanced_try_run)
                         OFF
                         CACHE INTERNAL
                               "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_RUN_${TARGET_POSTFIX} undefined.")
-                    message(FATAL_ERROR "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_RUN_${TARGET_POSTFIX} is not undefined")
+                    message(
+                        FATAL_ERROR
+                            "Dependency CEU_CM_HAVE_WORKING_${DEPENDENT_VARNAME}_RUN_${TARGET_POSTFIX} is not undefined"
+                    )
                 endif()
             endforeach()
         endif()
@@ -135,15 +141,13 @@ function(ceu_cm_enhanced_try_run)
 
         if(DEFINED CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS)
             foreach(FLAG ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS})
-                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS}
-                                                                 -D${FLAG})
+                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS} -D${FLAG})
             endforeach()
         endif()
 
         if(DEFINED CEU_CM_ADDITIONAL_COMPILER_FLAGS)
             foreach(FLAG ${CEU_CM_ADDITIONAL_COMPILER_FLAGS})
-                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS}
-                                                                 ${FLAG})
+                set(THIS_COMPILE_DEFS ${THIS_COMPILE_DEFS} ${FLAG})
             endforeach()
         endif()
 
@@ -155,22 +159,19 @@ function(ceu_cm_enhanced_try_run)
 
         if(DEFINED CEU_CM_ENHANCED_TRY_RUN_LINK_FLAGS)
             foreach(FLAG ${CEU_CM_ENHANCED_TRY_RUN_LINK_FLAGS})
-                set(THIS_LINK_FLAGS ${THIS_LINK_FLAGS}
-                        ${FLAG})
+                set(THIS_LINK_FLAGS ${THIS_LINK_FLAGS} ${FLAG})
             endforeach()
         endif()
 
         try_run(
-                CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
-                CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                "${CMAKE_BINARY_DIR}/CEU_TRC" "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}"
-                CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES} -DLINK_FLAGS=${THIS_LINK_FLAGS}"
-                            LINK_LIBRARIES ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES}
-                COMPILE_DEFINITIONS ${THIS_COMPILE_DEFS}
-                COMPILE_OUTPUT_VARIABLE
-                    CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}_VAR
-                RUN_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
-
+            CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
+            CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
+            "${CMAKE_BINARY_DIR}/CEU_TRC" "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}"
+            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES} -DLINK_FLAGS=${THIS_LINK_FLAGS}"
+                        LINK_LIBRARIES ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES}
+            COMPILE_DEFINITIONS ${THIS_COMPILE_DEFS}
+            COMPILE_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}_VAR
+            RUN_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
 
         if(NOT DEFINED CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR)
             set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}_VAR "")

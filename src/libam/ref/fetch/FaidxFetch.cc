@@ -3,6 +3,8 @@
 #include "libam/ref/fetch/BaseFastaFetch.hh"
 #include "libam/utils/mpi_utils.hh"
 
+#include <fmt/core.h>
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/log/trivial.hpp>
@@ -60,16 +62,9 @@ namespace {
 
 char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
 {
-    std::size_t const reg_len = std::strlen(seq_name) + 42;
-    auto* reg = static_cast<char*>(std::calloc(reg_len, sizeof(char)));
-    if (reg == nullptr) {
-        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
-        abort_mpi();
-    }
-    std::snprintf(reg, reg_len, "%s:%ld-%ld", seq_name, start + 1, end);
+    const auto reg = fmt::format("{}:{}-{}", seq_name, start + 1, end);
     hts_pos_t pos = 0;
-    auto* const rets = fai_fetch64(faidx_, reg, &pos);
-    std::free(reg);
+    auto* const rets = fai_fetch64(faidx_, reg.c_str(), &pos);
     if (rets == nullptr) {
         BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
         abort_mpi();

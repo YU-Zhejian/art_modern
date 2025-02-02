@@ -4,19 +4,7 @@ project(
     VERSION 0.1
     LANGUAGES C)
 
-macro(ceu_cm_set_static_target name)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
-    set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
-    if(CMAKE_VERSION GREATER_EQUAL 3.13
-       AND NOT BORLAND
-       AND NOT MSVC)
-        target_link_options(
-            "${name}" PRIVATE -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
-            $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++> $<$<COMPILE_LANGUAGE:Fortran>:-static-libgfortran>)
-    endif()
-endmacro()
-add_compile_options(${CEU_CM_ADDITIONAL_COMPILER_FLAGS})
+include("${CMAKE_CURRENT_LIST_DIR}/../libcmake/set_static_target.cmake")
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/../test_link_proj_source")
 add_library(main_lib STATIC "${CMAKE_CURRENT_LIST_DIR}/../test_link_proj_source/lib.c")

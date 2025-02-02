@@ -2,12 +2,12 @@
 
 ## IMPORTANT
 
-None now.
+- ART stuck at one read. Why?
+- Separation of compile and link options required.
 
 ## Performance
 
-- The home-made "asynchronous IO" may be inefficient in SSDs. May consider refactor into Boost.ASIO.
-- The massive use of `std::stringstream` should be replaced by `std::snprintf`, which is considerably faster and makes advantages of pre-allocated memory.
+- The home-made "asynchronous IO" may be inefficient in SSDs.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -21,13 +21,12 @@ None now.
         - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
-- Surveillance of each thread needs improving. We may implement a data structure that allows each thread to update its status to a locked `std::map` and ask a thread to display the status every few seconds.
-- Add `--no_alignment` parameter to stop synthesizing alignments for FASTQ and headless SAM/BAM output.
-- Builtin profiles takes too much space on the executable. May consider:
-  - Use an CMake option that disables embedding of builtin profiles.
+- Builtin profiles take too much space on the executable. May consider:
+  - Use a CMake option that disables embedding of builtin profiles.
   - Compress builtin profiles using XZ, etc., and then encode it using base64.
     - May depend on Boost.IO or use ZLib/libLZMA/libzstd directly.
     - Only a decoder is needed in the executable.
+  - See also: [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings).
 
 ## I/O Formats
 
@@ -35,3 +34,4 @@ None now.
 - Support UCSC MAF output format?
 - Working with >65535 CIGAR operations (very unlikely)? See [here](https://github.com/lh3/minimap2?tab=readme-ov-file#working-with-65535-cigar-operations).
 - Support UCSC 2bit input format for fast on-disk random access of reference genome? Also use such formats for internal representation of DNA sequences?
+- Add flags to disable/enable diverse BAM tags.

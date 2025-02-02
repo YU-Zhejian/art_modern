@@ -2,6 +2,7 @@
 
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
+#include <cstdio>
 
 // NOLINTBEGIN
 #if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
@@ -23,7 +24,7 @@ constexpr char rev_comp_trans_2[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
     52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 84, 66, 71, 68, 69, 70, 67, 72, 73, 74, 75, 76, 77, 78, 79, 80,
     81, 82, 83, 65, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 116, 98, 103, 100, 101, 102, 99, 104, 105, 106, 107,
     108, 109, 110, 111, 112, 113, 114, 115, 97, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127 };
-/*!
+/**
  *
  * Generated using:
  *
@@ -144,7 +145,6 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
         return qual_to_str_sse2(qual, qlen);
     }
     return qual_to_str_avx2(qual, qlen);
-
 #else
     return qual_to_str_foreach(qual, qlen);
 #endif

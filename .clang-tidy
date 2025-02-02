@@ -95,9 +95,16 @@ Checks:
   # Memory management by hand of temporary objects are needed
   # to interact with third-party C libraries.
   - -*-no-malloc
+
+  # Commonly used in tests and entry points
+  - -google-build-using-namespace
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit
+
+CheckOptions:
+  - key: misc-include-cleaner.IgnoreHeaders
+    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*'
 
 HeaderFileExtensions:
   - h

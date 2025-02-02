@@ -1,4 +1,4 @@
-/*!
+/**
  * @brief Constants specific to ART.
  */
 
@@ -49,12 +49,6 @@ constexpr char const* ART_LIB_CONST_MODE_STR[]
 
 /** Program name */
 constexpr char ART_PROGRAM_NAME[] = "art_modern";
-
-/** TODO: Move this to libam. */
-constexpr char ART_ACGT[] = "ACGT";
-
-/** TODO: Move this to libam. */
-const std::string ART_ACGT_STR = "ACGT";
 
 /**
  * Stop generating reads on a contig if 20% attempts failed.

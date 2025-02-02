@@ -7,26 +7,24 @@ add_compile_options("-pthread")
 add_link_options("-pthread")
 
 ceu_cm_enhanced_try_run(
-        VARNAME
-        C_NO_LIBPTHREAD
-        SRC_PATH
-        "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-        LINK_FLAGS
-        "-pthread"
-        DEPENDS
-        C_HELLOWORLD
-)
+    VARNAME
+    C_NO_LIBPTHREAD
+    SRC_PATH
+    "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+    LINK_FLAGS
+    "-pthread"
+    DEPENDS
+    C_HELLOWORLD)
 ceu_cm_enhanced_try_run(
     STATIC
     VARNAME
-        C_NO_LIBPTHREAD
+    C_NO_LIBPTHREAD
     SRC_PATH
     "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-        LINK_FLAGS
-        "-pthread"
+    LINK_FLAGS
+    "-pthread"
     DEPENDS
-    C_HELLOWORLD
-)
+    C_HELLOWORLD)
 
 if(NOT DEFINED LIBPTHREAD_LIBRARY_SHARED)
     ceu_cm_enhanced_find_library(OUTPUT_VARIABLE LIBPTHREAD_LIBRARY_SHARED LINKER_FLAG pthread)
@@ -45,9 +43,8 @@ ceu_cm_enhanced_try_run(
     C_HELLOWORLD
     LINK_LIBRARIES
     "${LIBPTHREAD_LIBRARY_SHARED}"
-        LINK_FLAGS
-        "-pthread"
-)
+    LINK_FLAGS
+    "-pthread")
 ceu_cm_enhanced_try_run(
     STATIC
     VARNAME
@@ -58,9 +55,8 @@ ceu_cm_enhanced_try_run(
     C_HELLOWORLD
     LINK_LIBRARIES
     "${LIBPTHREAD_LIBRARY_STATIC}"
-        LINK_FLAGS
-        "-pthread"
-)
+    LINK_FLAGS
+    "-pthread")
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
         ON

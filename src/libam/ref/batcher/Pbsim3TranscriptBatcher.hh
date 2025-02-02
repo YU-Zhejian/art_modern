@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include <istream>
+#include <memory>
 #include <mutex>
 #include <utility>
 
@@ -18,7 +19,7 @@ public:
     ~Pbsim3TranscriptBatcher() = default;
 
     explicit Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream);
-    std::pair<InMemoryFastaFetch, CoverageInfo> fetch();
+    std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> fetch();
 
 private:
     std::size_t batch_size_;

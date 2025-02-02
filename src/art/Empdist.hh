@@ -1,14 +1,19 @@
 #pragma once
 
+#include "art_modern_config.h" // NOLINT
+
 #include "art/BuiltinProfile.hh"
 #include "art/random_generator.hh"
 
 #include "libam/Dtypes.hh"
 
+#ifdef USE_BTREE_MAP
+#include <btree/map.h>
+#endif
+
 #include <cstddef>
 #include <functional>
 #include <istream>
-#include <map>
 #include <string>
 #include <vector>
 
@@ -16,7 +21,12 @@ namespace labw::art_modern {
 
 class Empdist {
 public:
-    using dist_type = std::vector<std::map<int, int, std::less<>>>;
+#ifdef USE_BTREE_MAP
+    using dist_map_type = btree::map<int, int, std::less<>>;
+#else
+    using dist_map_type = std::map<int, int, std::less<>>;
+#endif
+    using dist_type = std::vector<dist_map_type>;
     dist_type qual_dist_first;
     dist_type qual_dist_second;
 

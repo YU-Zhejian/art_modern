@@ -4,15 +4,15 @@ if(NOT DEFINED CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED)
         CACHE INTERNAL "Whether the CEU CM Git adapter was already included.")
     set(CEU_CM_GIT_COMMIT_HASH
         "Do not have Git VCS"
-        CACHE STRING "Default to unfound")
+        CACHE STRING "Default if Git was not found")
     set(CEU_CM_GIT_COMMIT_DATE
         "Do not have Git VCS"
-        CACHE STRING "Default to unfound")
-    set(CEU_CM_GIT_GIT_COMMIT_MESSAGE
+        CACHE STRING "Default if Git was not found")
+    set(CEU_CM_GIT_COMMIT_MESSAGE
         "Do not have Git VCS"
-        CACHE STRING "Default to unfound")
+        CACHE STRING "Default if Git was not found")
 
-    find_package(Git)
+    find_package(Git QUIET)
     if(GIT_FOUND)
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" log -1 --pretty=format:%H
@@ -26,7 +26,7 @@ if(NOT DEFINED CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED)
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" log -1 --pretty=format:%s
-            OUTPUT_VARIABLE CEU_CM_GIT_GIT_COMMIT_MESSAGE
+            OUTPUT_VARIABLE CEU_CM_GIT_COMMIT_MESSAGE
             OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET
             WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
     else()
@@ -35,7 +35,6 @@ if(NOT DEFINED CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED)
     message(STATUS "/------------------- Finding and assessing git -------------------\\")
     message(STATUS "|git executable found at ${GIT_EXECUTABLE}")
     message(
-        STATUS
-            "|On Git commit ${CEU_CM_GIT_GIT_COMMIT_MESSAGE} (${CEU_CM_GIT_COMMIT_HASH}) at ${CEU_CM_GIT_COMMIT_DATE}")
+        STATUS "|On Git commit ${CEU_CM_GIT_COMMIT_MESSAGE} (${CEU_CM_GIT_COMMIT_HASH}) at ${CEU_CM_GIT_COMMIT_DATE}")
     message(STATUS "\\------------------- Finding and assessing git -------------------/")
 endif()

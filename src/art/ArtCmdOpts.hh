@@ -1,4 +1,4 @@
-/*!
+/**
  * @brief Argument parser
  */
 
@@ -7,7 +7,7 @@
 
 namespace labw::art_modern {
 
-/*!
+/**
  * @brief Parse command line arguments and return the parsed parameters.
  * @param argc Number of arguments.
  * @param argv Array of arguments.

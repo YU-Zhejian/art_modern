@@ -70,7 +70,7 @@ int pairnames(int, char**, int* (*)(struct buf*, struct stat*, int),
 
 int c89main(int argc, char** argv)
 {
-    int ok;
+    int ok = 0;
     ok |= (argc == 0 || f(e, argv, 0) != argv[0] || f(e, argv, 1) != argv[1]);
     return ok;
 }

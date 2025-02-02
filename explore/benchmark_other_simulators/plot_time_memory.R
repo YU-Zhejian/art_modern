@@ -15,8 +15,7 @@ df <- readr::read_tsv("time.tsv") %>%
 df_2 <- df %>%
   dplyr::filter(SOFTWARE %in% c("art_original", "art_modern")) %>%
   dplyr::select(WALL_CLOCK, SOFTWARE, RLEN, DATA) %>%
-  tidyr::pivot_wider(names_from=SOFTWARE, values_from=WALL_CLOCK, values_fn =mean) %>%
-  dplyr::mutate(rario=art_original/art_modern)
+  tidyr::pivot_wider(names_from=SOFTWARE, values_from=WALL_CLOCK, values_fn =mean)
 
 
 replacement_list <- list(
@@ -31,9 +30,14 @@ replacement_list <- list(
   "dwgsim" = "DWGSIM",
   "wgsim" = "wgsim",
   "art_original" = "Original ART",
-  "art_modern" = "art_modern"
+  "art_modern" = "art_modern (HEAD)",
+  "art_modern_prev_ver" = "art_modern (master)",
+  "art_modern_gcc" = "art_modern (GCC)",
+  "art_modern_jemalloc" = "art_modern (HEAD/jemalloc)",
+  "art_modern_asio" = "art_modern (HEAD/ASIO)",
+  "art_modern_mimalloc" = "art_modern (HEAD/mi-malloc)"
 )
-
+levels <- c("wgsim", "DWGSIM", "pIRS", "art_modern (HEAD)", "art_modern (master)", "art_modern (GCC)", "art_modern (HEAD/jemalloc)","art_modern (HEAD/mi-malloc)","art_modern (HEAD/ASIO)",  "Original ART")
 p <- df %>%
   dplyr::select(CPU_TIME, WALL_CLOCK, RSS, DATA, SOFTWARE, RLEN) %>%
   dplyr::mutate(RSS = RSS / 1024) %>%
@@ -53,7 +57,7 @@ p <- df %>%
   geom_boxplot(aes(
     y = factor(
       SOFTWARE,
-      levels = c("wgsim", "DWGSIM", "pIRS", "art_modern", "Original ART")
+      levels = levels
     ),
     x = VALUES,
     fill = RLEN,
@@ -91,7 +95,7 @@ p <- df %>%
   geom_boxplot(aes(
     y = factor(
       SOFTWARE,
-      levels = c("wgsim", "DWGSIM", "pIRS", "art_modern", "Original ART")
+      levels = levels
     ),
     x = PFCS,
     fill = RLEN,

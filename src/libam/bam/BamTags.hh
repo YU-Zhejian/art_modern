@@ -12,6 +12,7 @@
 namespace labw::art_modern {
 class BamTags {
 public:
+    explicit BamTags(int est_num_tags = 16);
     /**
      * The type of the data stored in the tag.
      *

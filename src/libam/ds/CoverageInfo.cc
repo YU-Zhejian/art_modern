@@ -42,7 +42,7 @@ CoverageInfo::CoverageInfo(const double static_coverage)
 {
 }
 
-CoverageInfo::CoverageInfo(coverage_map coverage_positive, coverage_map coverage_negative)
+CoverageInfo::CoverageInfo(coverage_map&& coverage_positive, coverage_map&& coverage_negative)
     : static_coverage_positive_(0)
     , static_coverage_negative_(0)
     , coverage_positive_(std::move(coverage_positive))

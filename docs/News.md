@@ -8,26 +8,26 @@ The first release of `art_modern`.
 
 Changes on software function:
 
-- [X] Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
-- [X] Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
-- [X] Supports 3 library construction methods: `se`, `pe` and `mp`.
-- [X] Except FASTQ, support output in SAM and BAM format through HTSLib.
-- [X] Support for masking detection was temporarily suspended.
-- [X] Support for sequencers except Illumina dropped.
-- [X] Support for the `aln` output format was dropped.
-- [X] Built-in profiles are no longer supported. Users must specify the path to the existing profile they want to use.
-- [X] Parallelization using Boost ASIO.
+- Supports 3 modes: `wgs`, `trans` and `templ`, similar to `pbsim3`.
+- Supports 3 FASTA parsers: `memory`, `htslib` and `stream`.
+- Supports 3 library construction methods: `se`, `pe` and `mp`.
+- Except FASTQ, support output in SAM and BAM format through HTSLib.
+- Support for masking detection was temporarily suspended.
+- Support for sequencers except Illumina dropped.
+- Support for the `aln` output format was dropped.
+- Built-in profiles are no longer supported. Users must specify the path to the existing profile they want to use.
+- Parallelization using Boost ASIO.
 
 Changes in software implementation:
 
-- [X] Build systems changed to CMake.
-- [X] All C++ code was re-implemented in C++17 with radical removal of duplicated or unused code.
-- [X] More random number generation libraries were supported.
-- [X] Logging re-implemented using Boost.
-- [X] Multithreading support implemented using Boost.
-- [X] Largely eliminated POSIX-only routines by Boost.
-- [X] Argument parser implemented in Boost.
-- [X] Output writers were made asynchronous using `moodycamel::ConcurrentQueue<T>`.
+- Build systems changed to CMake.
+- All C++ code was re-implemented in C++17 with radical removal of duplicated or unused code.
+- More random number generation libraries were supported.
+- Logging re-implemented using Boost.
+- Multithreading support implemented using Boost.
+- Largely eliminated POSIX-only routines by Boost.
+- Argument parser implemented in Boost.
+- Output writers were made asynchronous using `moodycamel::ConcurrentQueue<T>`.
 
 ## 1.0.1
 
@@ -41,6 +41,20 @@ Fixed miscellaneous bugs.
 - `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
 - [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
 - Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
-- Tested MacOS X Sequoia 15 with Command Line Tools for Xcode 16.2, CMake 3.31.4, and Boost 1.87.0. Fixed #3.
+- Tested MacOS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
+
+## 1.1.1
+
+- Possible build acceleration using [ccache](https://ccache.dev/) supported.
+- Alternate `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) and [mi-malloc](https://github.com/microsoft/mimalloc) supported.
+- Formatting engine of FASTQ changed to [`{fmt}`](https://github.com/fmtlib/fmt), which is slightly faster.
+- FASTA output format supported.
+- If the output consists only FASTA or FASTQ, pairwise alignment will not be computed.
+- The default random generator for the Intel MKL library changed from `VSL_BRNG_MT19937` to `VSL_BRNG_SFMT19937`, which is slightly faster.
+- [PCG](https://www.pcg-random.org/) added as an alternative random number generator. **THIS GENERATOR MAY NOT WORK UNDER MAC OS X.**
+
+Bundled files:
+
+- XXX: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.

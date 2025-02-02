@@ -27,7 +27,7 @@ public:
 
     static const int NUM_LINES = 4;
 
-    /*!
+    /**
      *
      * @param read_name Number of read. Will be moved inside.
      * @param contig_name Name of the contig. Will be moved inside.
@@ -47,23 +47,23 @@ public:
     [[nodiscard]] std::string serialize() const;
     [[maybe_unused]] void serialize(std::ostream& os) const;
 
-    /*!
+    /**
      * Query sequence with gap inserted using -
      */
-    const std::string aligned_query;
-    /*!
+    const std::string aln_query;
+    /**
      * Reference sequence with gap inserted using -
      */
-    const std::string aligned_ref;
-    /*!
+    const std::string aln_ref;
+    /**
      * Query sequence without gap.
      */
     const std::string query;
-    /*!
+    /**
      * Reference sequence without gap.
      */
     const std::string ref;
-    /*!
+    /**
      * Quality sequence whose elngth should be the same as query.
      */
     const std::string qual;

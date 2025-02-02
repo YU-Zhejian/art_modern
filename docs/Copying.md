@@ -37,7 +37,7 @@ Affected files:
 
 Dual-licensed under Simplified BSD License and Boost Software License.
 
-## William Sherif's Nibble And A Half Project
+## William Sherif's "Nibble And A Half" Project
 
 Originally from <https://github.com/superwills/NibbleAndAHalf>.
 
@@ -68,3 +68,37 @@ Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
 Affected files:
 
 - `/deps/slim_abseil/**`
+
+## Google Inc. and German Mendez Bravo C++ B-tree Project
+
+Available from <https://github.com/Kronuz/cpp-btree>, commit `3e9f417`.
+
+Affected files:
+
+- `/deps/cpp-btree/**`
+
+Under the Apache License, Version 2.0.
+
+## Victor Zverovich's `{fmt}` Project
+
+Available from <https://github.com/fmtlib/fmt>, commit `a3d05d70` (tag `7.1.3`).
+
+Affected files:
+
+- `/deps/slim_libfmt/**`
+
+Under an MIT-like License.
+
+**NOTE** This is the last version that does not come with C++20 modules.
+
+## Melissa O'Neill and PCG Project Contributors' PCG Project
+
+Available from <https://github.com/imneme/pcg-cpp>.
+
+Affected files:
+
+- `/deps/pcg-cpp-0.98/**`
+
+Licensed under the MIT License and Apache 2.0 License.
+
+**NOTE** This project used the version retried [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.

@@ -1,3 +1,3 @@
 # Readme
 
-Miscelaneous explorations for optimization purposes.
+Miscellaneous explorations for optimization purposes.

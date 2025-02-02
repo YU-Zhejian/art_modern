@@ -13,7 +13,12 @@ using am_cigar_type_t = uint8_t;
 using am_cigar_t = uint32_t;
 /** ART quality distribution. */
 using am_qual_dist_t = int;
-/** Number of reads. */
+/**
+ * Number of reads.
+ *
+ * This MUST be a signed integer.
+ * Otherwise -1 will be reverted to an extraordinarily large number.
+ */
 using am_readnum_t = int64_t;
 /** Length of files. */
 using am_filelen_t = int64_t;

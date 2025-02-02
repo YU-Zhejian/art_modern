@@ -17,6 +17,9 @@
 // MPI
 #ifdef WITH_MPI
 #include <mpi.h>
+
+#include <chrono>
+#include <thread>
 #endif
 
 #include <cstdlib>
@@ -42,11 +45,11 @@ int main_mpi_child()
                 return EXIT_SUCCESS;
             } else {
                 BOOST_LOG_TRIVIAL(info) << "Received wrong signal.";
-                // sleep(1); FIXME: Not found under MS Windows
+                std::current_thread::sleep_for(std::chrono::seconds(1));
             }
         } else {
             BOOST_LOG_TRIVIAL(info) << "Received no signal.";
-            // sleep(1); FIXME: Not found under MS Windows
+            std::current_thread::sleep_for(std::chrono::seconds(1));
         }
     }
 }
@@ -95,6 +98,7 @@ int main(int argc, char* argv[])
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
     generate_all(art_params);
+    BOOST_LOG_TRIVIAL(info) << "All reads generated.";
 #ifdef WITH_BOOST_TIMER
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");

@@ -5,14 +5,13 @@
 #include "libam/Constants.hh"
 #include "libam/Dtypes.hh"
 
-#include <algorithm>
-#include <boost/algorithm/string/erase.hpp>
+#include <fmt/core.h>
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
+#include <algorithm>
 #include <array>
-#include <cstddef>
 #include <cstdio>
 #include <ostream>
 #include <sstream>
@@ -23,8 +22,8 @@
 namespace labw::art_modern {
 PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
     std::string qual, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig, bool is_plus_strand)
-    : aligned_query(std::move(aligned_query))
-    , aligned_ref(std::move(aligned_ref))
+    : aln_query(std::move(aligned_query))
+    , aln_ref(std::move(aligned_ref))
     , query(std::move(query))
     , ref(std::move(ref))
     , qual(std::move(qual))
@@ -34,7 +33,7 @@ PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_n
     , is_plus_strand(is_plus_strand)
 {
 #ifdef CEU_CM_IS_DEBUG
-    if (this->aligned_ref.length() != this->aligned_query.length()) {
+    if (this->aln_ref.length() != this->aln_query.length()) {
         throw PWAException("Length of aligned query and ref inequal!");
     }
     if (this->qual.length() != this->query.length()) {
@@ -52,13 +51,13 @@ std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m
     am_cigar_t current_cigar = 0;
     am_cigar_t prev_cigar = bam_eq;
     am_cigar_t cigar_len = 0;
-    const auto ref_len = aligned_ref.length();
-    for (decltype(aligned_ref.length()) i = 0; i < ref_len; i++) {
-        if (aligned_ref[i] == aligned_query[i]) {
+    const auto ref_len = aln_ref.length();
+    for (decltype(aln_ref.length()) i = 0; i < ref_len; i++) {
+        if (aln_ref[i] == aln_query[i]) {
             current_cigar = bam_eq;
-        } else if (aligned_ref[i] == ALN_GAP) {
+        } else if (aln_ref[i] == ALN_GAP) {
             current_cigar = BAM_CINS;
-        } else if (aligned_query[i] == ALN_GAP) {
+        } else if (aln_query[i] == ALN_GAP) {
             current_cigar = BAM_CDEL;
         } else {
             current_cigar = bam_diff;
@@ -78,16 +77,8 @@ std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m
 
 std::string PairwiseAlignment::serialize() const
 {
-    const auto pos_on_contig_s = std::to_string(pos_on_contig);
-    const std::size_t buff_len = read_name.length() + contig_name.length() + pos_on_contig_s.length()
-        + aligned_query.length() + aligned_ref.length() + qual.length() + 9;
-    std::string buff;
-    buff.resize(buff_len);
-    buff[0] = 0;
-    std::snprintf(buff.data(), buff_len + 1, ">%s\t%s:%s:%c\n%s\n%s\n%s\n", read_name.c_str(), contig_name.c_str(),
-        pos_on_contig_s.c_str(), is_plus_strand ? '+' : '-', aligned_query.c_str(), aligned_ref.c_str(), qual.c_str());
-
-    return buff;
+    return fmt::format(">{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, contig_name, pos_on_contig, is_plus_strand ? '+' : '-',
+        aln_query, aln_ref, qual);
 }
 
 [[maybe_unused]] PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)
@@ -119,8 +110,8 @@ std::string PairwiseAlignment::serialize() const
 {
     os << ">" << read_name << "\t" << contig_name << ":" << std::to_string(pos_on_contig) << ":"
        << (is_plus_strand ? '+' : '-') << "\n";
-    os << aligned_query << "\n";
-    os << aligned_ref << "\n";
+    os << aln_query << "\n";
+    os << aln_ref << "\n";
     os << qual << "\n";
 }
 

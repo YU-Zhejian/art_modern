@@ -3,7 +3,6 @@
 #include "libam/bam/BamLFIO.hh"
 #include "libam/bam/BamOptions.hh"
 #include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/BaseFileReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/ref/fetch/BaseFastaFetch.hh"
 #include "libam/utils/class_macros_utils.hh"
@@ -18,18 +17,18 @@
 
 namespace labw::art_modern {
 
-class BamReadOutput : public BaseFileReadOutput {
+class BamReadOutput : public BaseReadOutput {
 public:
-    BamReadOutput(BamReadOutput&& other) = delete;
-    BamReadOutput(const BamReadOutput&) = delete;
-    BamReadOutput& operator=(BamReadOutput&&) = delete;
-    BamReadOutput& operator=(const BamReadOutput&) = delete;
+    DELETE_MOVE(BamReadOutput)
+    DELETE_COPY(BamReadOutput)
 
     BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, const BamOptions& sam_options);
     void writeSE(const PairwiseAlignment& pwa) override;
     void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;
     ~BamReadOutput() override;
+
+    bool require_alignment() const override;
 
 private:
     samFile* sam_file_;
@@ -46,8 +45,8 @@ public:
 
     [[nodiscard]] const std::string name() const override;
     void patch_options(boost::program_options::options_description& desc) const override;
-    BaseReadOutput* create(const boost::program_options::variables_map& vm, const BaseFastaFetch* fasta_fetch,
-        const std::vector<std::string>& args) const override;
+    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
+        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
     ~BamReadOutputFactory() override;
 
 private:

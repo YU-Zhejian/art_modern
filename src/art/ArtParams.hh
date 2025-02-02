@@ -5,7 +5,7 @@
 #include "libam/Constants.hh"
 #include "libam/ds/CoverageInfo.hh"
 
-#include <boost/program_options.hpp>
+#include <boost/program_options/variables_map.hpp>
 
 #include <htslib/hts.h>
 

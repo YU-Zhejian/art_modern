@@ -1,6 +1,6 @@
 # Build Logs
 
-Here contains some build logs for unsupported platforms. If you insist to build `art_modern` on those platforms, they may be of help.
+Here contains some build logs for unsupported platforms. If you insist on building `art_modern` on those platforms, they may be of help.
 
 ## Ubuntu 18.04 chroot
 

@@ -33,9 +33,9 @@ rel_with_dbg_alpine:
 		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
 		-DBUILD_SHARED_LIBS=OFF \
-		-G Ninja $(CURDIR) \
-		-DCMAKE_C_COMPILER=$(CC) \
-		-DCMAKE_CXX_COMPILER=$(CXX)
+		-DUSE_RANDOM_GENERATOR=BOOST \
+        $(CMAKE_FLAGS) \
+		$(CURDIR)
 	cmake --build opt/build_rel_with_dbg_alpine -j40
 
 .PHONY: fmt

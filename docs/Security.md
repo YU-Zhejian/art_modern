@@ -2,7 +2,11 @@
 
 ## Supported Versions
 
-Will be updated after the first release.
+Only the latest version is supported. Please update your installation to the latest version.
+
+## Known Vulnerabilities
+
+No known vulnerability.
 
 ## Reporting a Vulnerability
 

@@ -9,9 +9,9 @@ assignees: ''
 
 ## Session Information
 
-Please provide the following information about your system by replacing the placeholders. Avoid any blanks that may expose your personal information by deleting the placeholder while unticking the box. You may use `/workbench` as a placeholder to your working directory.
+Please provide the following information about your system by replacing the placeholders. Avoid any blanks that may expose your personal information by deleting the placeholder while unchecking the box. You may use `/workbench` as a placeholder to your working directory.
 
-- [ ] Name and version of your current operating system in an human-readable way.
+- [ ] Name and version of your current operating system in a human-readable way.
 
   `Linux Mint 22 Wilma`
 
@@ -50,7 +50,7 @@ Please provide the following information about your system by replacing the plac
   [2024-12-02 00:16:21.360571] info: EXIT
   ```
 
-- [ ] The CMake commandline you used to build the code.
+- [ ] The CMake command-line you used to build the code.
 
   ```shell
   env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release -G Ninja "$(pwd)"
@@ -110,7 +110,7 @@ Please provide the following information about your system by replacing the plac
 
 **NOTE: IF YOU'RE IN A CONTROLLED ACCESS ENVIRONMENT PLEASE MAKE SURE THE INFORMATION YOU SEND DOES NOT CONTAIN ANYTHING THAT MAY BE CONSIDERED CONFIDENTIAL!**
 
-**NOTE: DO NOT SEND THE CMAKE BUILD FORDER AS IT MAY CONTAIN SENSITIVE INFORMATION!**
+**NOTE: DO NOT SEND THE CMAKE BUILD FOLDER AS IT MAY CONTAIN SENSITIVE INFORMATION!**
 
 ## Optional Questions
 

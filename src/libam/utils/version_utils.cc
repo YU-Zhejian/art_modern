@@ -45,6 +45,15 @@
 #include <google/protobuf/stubs/common.h>
 #endif
 
+// malloc
+#if defined(WITH_MIMALLOC)
+#include <mimalloc.h>
+#elif defined(WITH_JEMALLOC)
+#include <jemalloc/jemalloc.h>
+#endif
+
+#include <fmt/core.h>
+
 // CPPSTDLIB
 #include <iostream>
 #include <string>
@@ -233,13 +242,42 @@ namespace {
 #endif
     }
 
+    void print_malloc_version()
+    {
+#if defined(WITH_MIMALLOC)
+        std::cout << "mimalloc: " << MI_MALLOC_VERSION / 100 << "." << MI_MALLOC_VERSION % 100 << std::endl;
+#elif defined(WITH_JEMALLOC)
+#ifdef JEMALLOC_VERSION
+        std::cout << "jemalloc: " << JEMALLOC_VERSION << std::endl;
+#else
+        std::cout << "jemalloc: " << JEMALLOC_VERSION_MAJOR << "." << JEMALLOC_VERSION_MINOR << "."
+                  << JEMALLOC_VERSION_BUGFIX << std::endl;
+#endif
+#else
+        std::cout << "*malloc: not used" << std::endl;
+#endif
+    }
+
+    void print_fmt_version()
+    {
+        std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100
+                  << std::endl;
+    }
+
 } // namespace
 
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
+#ifdef WITH_GIT
+    std::cout << "On git commit: (" << CEU_CM_GIT_COMMIT_HASH << ") "
+              << CEU_CM_GIT_COMMIT_DATE << std::endl;
+#else
+    std::cout << "Git: N/A" << std::endl;
+#endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
+    print_fmt_version();
     print_boost_version();
     print_gsl_version();
     print_onemkl_version();
@@ -248,6 +286,7 @@ void print_version()
     print_openmp_version();
     print_simde_version();
     print_bs_version();
+    print_malloc_version();
     std::cout << ceu_interpret_c_std_version();
     std::cout << ceu_interpret_cxx_std_version();
     std::cout << ceu_check_get_compiler_info();
