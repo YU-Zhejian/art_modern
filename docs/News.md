@@ -54,3 +54,7 @@ Fixed miscellaneous bugs.
 - If the output consists only FASTA or FASTQ, pairwise alignment will not be computed.
 - The default random generator for the Intel MKL library changed from `VSL_BRNG_MT19937` to `VSL_BRNG_SFMT19937`, which is slightly faster.
 - [PCG](https://www.pcg-random.org/) added as an alternative random number generator. **THIS GENERATOR MAY NOT WORK UNDER MAC OS X.**
+
+Bundled files:
+
+- XXX: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.

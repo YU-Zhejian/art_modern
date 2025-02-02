@@ -25,7 +25,7 @@ if which x-www-browser &>/dev/null; then
     # x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
     sleep 3
 fi
-if [ "${FORMAT_ONLY}" = "1" ]; then
+if [ "${FORMAT_ONLY:-}" = "1" ]; then
     exit 0
 fi
 rm -fr "${OUT_DIR}"/test_small_se_template_memory_sep.* "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.*

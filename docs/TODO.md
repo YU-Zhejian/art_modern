@@ -3,6 +3,7 @@
 ## IMPORTANT
 
 - ART stuck at one read. Why?
+- Separation of compile and link options required.
 
 ## Performance
 

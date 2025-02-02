@@ -12,7 +12,7 @@ if(NOT DEFINED CEU_CM_GIT_ADAPTER_WAS_ALREADY_INCLUDED)
         "Do not have Git VCS"
         CACHE STRING "Default if Git was not found")
 
-    find_package(Git)
+    find_package(Git QUIET)
     if(GIT_FOUND)
         execute_process(
             COMMAND "${GIT_EXECUTABLE}" log -1 --pretty=format:%H
