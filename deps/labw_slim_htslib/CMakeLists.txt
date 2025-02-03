@@ -153,4 +153,4 @@ target_compile_options(labw_slim_htslib BEFORE PRIVATE "${HTSLIB_CC_FLAGS}")
 message(STATUS "HTSLib compiler flags: ${HTSLIB_CC_FLAGS}")
 message(STATUS "HTSLib link libs: ${LABW_SLIM_HTSLIB_LINK_LIBRARIES}")
 
-target_link_libraries(labw_slim_htslib ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} Threads::Threads)
+target_link_libraries(labw_slim_htslib PUBLIC ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} Threads::Threads)
