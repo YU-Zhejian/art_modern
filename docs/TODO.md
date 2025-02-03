@@ -4,6 +4,7 @@
 
 - ART stuck at one read. Why?
 - Separation of compile and link options required.
+- `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 
 ## Performance
 
@@ -35,3 +36,8 @@
 - Working with >65535 CIGAR operations (very unlikely)? See [here](https://github.com/lh3/minimap2?tab=readme-ov-file#working-with-65535-cigar-operations).
 - Support UCSC 2bit input format for fast on-disk random access of reference genome? Also use such formats for internal representation of DNA sequences?
 - Add flags to disable/enable diverse BAM tags.
+
+## Known Incompatibilities
+
+- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
+- GCC would fail on Debian GNU/Hurd.
