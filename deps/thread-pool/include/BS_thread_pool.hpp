@@ -115,6 +115,7 @@ namespace BS {
 #define BS_THREAD_POOL_VERSION_MINOR 0
 #define BS_THREAD_POOL_VERSION_PATCH 0
 
+#if (0) // YU Zhejian: Following code causes bugs in FreeBSD, so removed.
 /**
  * @brief A struct used to store a version number, which can be checked and compared at compilation time.
  */
@@ -189,6 +190,10 @@ inline constexpr bool thread_pool_module = true;
 /**
  * @brief A flag indicating whether the thread pool library was compiled as a C++20 module.
  */
+inline constexpr bool thread_pool_module = false;
+#endif
+#else
+#undef BS_THREAD_POOL_MODULE
 inline constexpr bool thread_pool_module = false;
 #endif
 
