@@ -1,6 +1,7 @@
 #include "libam/Constants.hh"
 #include "libam/bam/BamOptions.hh"
 #include "libam/ds/PairwiseAlignment.hh"
+#include "libam/lockfree/LockFreeIO.hh"
 #include "libam/out/BamReadOutput.hh"
 #include "libam/out/BaseReadOutput.hh"
 #include "libam/out/DumbReadOutput.hh"
@@ -24,6 +25,48 @@
 
 namespace logging = boost::log;
 using namespace labw::art_modern;
+
+
+class EmptyLFIOReadOutput final : public BaseReadOutput {
+public:
+    DELETE_COPY(EmptyLFIOReadOutput)
+    DELETE_MOVE(EmptyLFIOReadOutput)
+
+    EmptyLFIOReadOutput() {
+        lfio_.start();
+    }
+    void writeSE( [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override{
+        lfio_.push(std::make_unique<nullptr_t>());
+    }
+    void writePE([[maybe_unused]] const PairwiseAlignment& ,[[maybe_unused]]  const PairwiseAlignment& ) override{
+        lfio_.push(std::make_unique<nullptr_t>());
+        lfio_.push(std::make_unique<nullptr_t>());
+    }
+    void close() override{
+        lfio_.flush_and_close();
+        lfio_.stop();
+    }
+
+    bool require_alignment() const override{
+        return false;
+    }
+
+    ~EmptyLFIOReadOutput() override{
+        close();
+    }
+private:
+    class EmptyLFIO: public LockFreeIO<std::unique_ptr<nullptr_t> >{
+    public:
+        DELETE_COPY(EmptyLFIO)
+        DELETE_MOVE(EmptyLFIO)
+        EmptyLFIO() : LockFreeIO<std::unique_ptr<nullptr_t>>("Empty") {}
+        void write(std::unique_ptr<nullptr_t> value) override {
+            // Do nothing!
+        }
+    };
+    EmptyLFIO lfio_;
+};
+
 
 namespace {
 const std::string DEVNULL = "/dev/null";
@@ -86,6 +129,7 @@ int main()
     bench(std::make_unique<FastqReadOutput>(DEVNULL), "FastqReadOutput");
     bench(std::make_unique<FastaReadOutput>(DEVNULL), "FastaReadOutput");
     bench(std::make_unique<DumbReadOutput>(), "DumbReadOutput");
+    bench(std::make_unique<EmptyLFIOReadOutput>(), "EmptyLFIOReadOutput");
     bench(std::make_unique<PwaReadOutput>(DEVNULL, std::vector<std::string> {}), "PwaReadOutput");
 
     logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);

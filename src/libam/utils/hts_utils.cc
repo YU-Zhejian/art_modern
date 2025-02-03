@@ -1,9 +1,10 @@
 #include "libam/utils/hts_utils.hh"
 
-#include <htslib/bgzf.h>
+#include <htslib/bgzf.h> // NOLINT
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
-#include <htslib/sam.h>
+
+#include <cstddef>
 
 namespace labw::art_modern {
 
