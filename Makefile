@@ -18,6 +18,7 @@ build:
 release:
 	mkdir -p opt/build_release
 	env -C opt/build_release cmake \
+		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		$(CMAKE_FLAGS) \
