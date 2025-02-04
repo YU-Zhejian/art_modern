@@ -3,7 +3,6 @@
 ## IMPORTANT
 
 - ART stuck at one read. Why?
-- Separation of compile and link options required.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 
 ## Performance

@@ -21,34 +21,42 @@ if(NOT TARGET CEU_CM_EFL::libm_static)
     ceu_cm_enhanced_find_library(STATIC OUTPUT_VARIABLE libm_static LINKER_FLAG m)
 endif()
 if(TARGET CEU_CM_EFL::libm_shared)
-ceu_cm_enhanced_try_run(
-    VARNAME
-    C_WITH_LIBM
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_libm.c"
-    DEPENDS
-    C_HELLOWORLD
-    LINK_LIBRARIES
-    CEU_CM_EFL::libm_shared)
-    else()
-    
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_COMPILE_SHARED OFF CACHE BOOL "libm not found")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_SHARED 255 CACHE INTERNAL "libm not found")
+    ceu_cm_enhanced_try_run(
+        VARNAME
+        C_WITH_LIBM
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_libm.c"
+        DEPENDS
+        C_HELLOWORLD
+        LINK_LIBRARIES
+        CEU_CM_EFL::libm_shared)
+else()
+
+    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_COMPILE_SHARED
+        OFF
+        CACHE BOOL "libm not found")
+    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_SHARED
+        255
+        CACHE INTERNAL "libm not found")
 endif()
 if(TARGET CEU_CM_EFL::libm_static)
-ceu_cm_enhanced_try_run(
-    STATIC
-    VARNAME
-    C_WITH_LIBM
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_libm.c"
-    DEPENDS
-    C_HELLOWORLD
-    LINK_LIBRARIES
-    CEU_CM_EFL::libm_static)
-    else()
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_COMPILE_STATIC OFF CACHE BOOL "libm not found")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_STATIC 255 CACHE INTERNAL "libm not found")
+    ceu_cm_enhanced_try_run(
+        STATIC
+        VARNAME
+        C_WITH_LIBM
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_libm.c"
+        DEPENDS
+        C_HELLOWORLD
+        LINK_LIBRARIES
+        CEU_CM_EFL::libm_static)
+else()
+    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_COMPILE_STATIC
+        OFF
+        CACHE BOOL "libm not found")
+    set(CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_STATIC
+        255
+        CACHE INTERNAL "libm not found")
 endif()
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     ceu_cm_print_test_status("libm: without -lm (c)" C_NO_LIBM)

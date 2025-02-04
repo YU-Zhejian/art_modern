@@ -21,6 +21,6 @@ macro(ceu_cm_set_static_target name)
     set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
     if(NOT (BORLAND OR MSVC))
         set_target_properties("${name}" PROPERTIES LINK_FLAGS -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
-                                                 $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
+                                                                      $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
     endif()
 endmacro()

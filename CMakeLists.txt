@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
 
 if(NOT DEFINED BOOST_CONFIG_PROVIDED_BY_BOOST)
     set(BOOST_CONFIG_PROVIDED_BY_BOOST ON)

@@ -34,15 +34,16 @@ public:
 
     explicit LockFreeIO(std::string name)
         : name_(std::move(name))
-        ,
 #if !defined(USE_NOP_PARALLEL)
-        queue_(QUEUE_SIZE) {}
+        , queue_(QUEUE_SIZE)
+    {
+    }
 #else
-        = default;
+    {
+    }
 #endif
 
-        virtual ~LockFreeIO()
-        = default;
+    virtual ~LockFreeIO() = default;
 
     void push(T&& value)
     {
