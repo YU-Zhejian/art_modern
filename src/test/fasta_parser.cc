@@ -2,10 +2,10 @@
 
 #define BOOST_TEST_MODULE test_fasta_parser // NOLINT
 
-#include "libam/ref/fetch/BaseFastaFetch.hh"
-#include "libam/ref/fetch/FaidxFetch.hh"
-#include "libam/ref/fetch/InMemoryFastaFetch.hh"
-#include "libam/ref/parser/fasta_parser.hh"
+#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/ref/fetch/FaidxFetch.hh"
+#include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/ref/parser/fasta_parser.hh"
 
 #include <boost/test/unit_test.hpp>
 

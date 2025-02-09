@@ -1,4 +1,4 @@
-#include "libam/ds/PyQueue.hh"
+#include "libam_support/ds/PyQueue.hh"
 
 #include <boost/lockfree/queue.hpp> // NOLINT
 #include <boost/log/trivial.hpp> // NOLINT

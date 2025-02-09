@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE test_seq_utils // NOLINT
 
-#include "libam/utils/seq_utils.hh"
-#include "libam/ds/PairwiseAlignment.hh"
+#include "libam_support/utils/seq_utils.hh"
+#include "libam_support/ds/PairwiseAlignment.hh"
 
 #include <boost/test/unit_test.hpp>
 

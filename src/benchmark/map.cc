@@ -1,6 +1,6 @@
-#include "libam/Constants.hh"
-#include "libam/Dtypes.hh"
-#include "libam/utils/class_macros_utils.hh"
+#include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <btree/map.h>
 
