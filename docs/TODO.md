@@ -4,6 +4,7 @@
 
 - ART stuck at one read. Why?
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
+- Update `-DUSE_QUAL_GEN` to docs. Ready for release.
 
 ## Performance
 

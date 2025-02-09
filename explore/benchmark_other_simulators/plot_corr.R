@@ -38,6 +38,7 @@ p <- ggplot(df) +
       levels = c("wgsim", "DWGSIM", "pIRS", "art_modern", "Original ART")
     ))) +
     facet_grid(profile_1~rlen, scales="free_x") +
+  scale_color_discrete("Software") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
 ggsave("fig/correlation.pdf", p, width=8, height=4)

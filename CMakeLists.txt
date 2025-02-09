@@ -47,22 +47,6 @@ if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
     set(CEU_CM_SHOULD_USE_NATIVE OFF)
 endif()
 
-if(NOT DEFINED USE_THREAD_PARALLEL)
-    set(USE_THREAD_PARALLEL ASIO)
-endif()
-
-if(NOT DEFINED USE_BTREE_MAP)
-    set(USE_BTREE_MAP ON)
-endif()
-
-if(NOT DEFINED USE_RANDOM_GENERATOR)
-    set(USE_RANDOM_GENERATOR STL)
-endif()
-
-if(NOT DEFINED USE_MALLOC)
-    set(USE_MALLOC AUTO)
-endif()
-
 set(WITH_MPI OFF) # TODO
 set(ART_MODERN_LINK_LIBS "")
 
@@ -93,6 +77,7 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")

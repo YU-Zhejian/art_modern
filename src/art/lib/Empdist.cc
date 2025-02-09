@@ -6,6 +6,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
+#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -23,12 +24,12 @@
 namespace labw::art_modern {
 
 namespace {
-    void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const int min_qual, const int max_qual)
+    void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const am_qual_t min_qual, const am_qual_t max_qual)
     {
         for (auto& i : map_to_process) {
             for (auto& [fst, snd] : i) {
                 snd += q_shift;
-                snd = std::min(std::max(snd, min_qual), max_qual);
+                snd = am_min(am_max(snd, min_qual), max_qual);
             }
         }
     }
@@ -47,7 +48,7 @@ Empdist::Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_p
     }
     validate_();
     BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
-    print_();
+    log();
 }
 
 Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
@@ -62,40 +63,68 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
     }
     validate_();
     BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
-    print_();
+    log();
 }
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<am_qual_t>& qual, const int len, Rprob& rprob, const bool first) const
+    void Empdist::get_read_qual(std::vector<am_qual_t> &qual, Rprob &rprob, bool first) const
 {
+#ifdef USE_WALKER_QUALGEN
+        const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
+        rprob.r_probs();
+        for (std::size_t i = 0; i < read_len_; i++) {
+            // TODO: This line of code have catastrophic locality.
+            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
+        }
+#else
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
     rprob.rand_quality_dist();
-    for (auto i = 0; i < len; i++) {
+    for (std::size_t i = 0; i < read_len_; i++) {
         // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
     }
+#endif
 }
 
 void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
 
+#ifdef USE_WALKER_QUALGEN
+    rprob.r_probs();
+#else
     rprob.rand_quality_dist();
-
+#endif
     for (decltype(seq.size()) i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
+#ifdef USE_WALKER_QUALGEN
+            qual[i] = a_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
             qual[i] = a_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'C':
-            qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = c_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'G':
-            qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = g_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'T':
-            qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = t_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         default:
             qual[i] = rprob.rand_quality_less_than_10();
@@ -111,16 +140,32 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
     for (size_t i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
-            qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = a_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'C':
-            qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = c_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] =c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'G':
-            qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = g_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         case 'T':
-            qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#ifdef USE_WALKER_QUALGEN
+                qual[i] = t_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+#else
+                qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+#endif
             break;
         default:
             qual[i] = rprob.rand_quality_less_than_10();
@@ -262,14 +307,14 @@ void Empdist::validate_() const
         if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size()
             || c_qual_dist_first.size() != t_qual_dist_first.size()) {
             BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: The length of 1st read in each qual dist is not equal!";
-            print_();
+            log();
             abort_mpi();
         }
         if (a_qual_dist_second.size() != g_qual_dist_second.size()
             || g_qual_dist_second.size() != c_qual_dist_second.size()
             || c_qual_dist_second.size() != t_qual_dist_second.size()) {
             BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: The length of 2nd read in each qual dist is not equal!";
-            print_();
+            log();
             abort_mpi();
         }
     }
@@ -278,7 +323,7 @@ void Empdist::validate_() const
             BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_
                                      << ") exceeds the "
                                         "length of the read quality profile.";
-            print_();
+            log();
             abort_mpi();
         }
         if (is_pe_) {
@@ -286,7 +331,7 @@ void Empdist::validate_() const
                 BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_
                                          << ") exceeds the "
                                             "length of the read quality profile.";
-                print_();
+                log();
                 abort_mpi();
             }
         }
@@ -295,7 +340,7 @@ void Empdist::validate_() const
             BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_
                                      << ") exceeds the "
                                         "length of the read quality profile.";
-            print_();
+            log();
             abort_mpi();
         }
         if (is_pe_) {
@@ -304,14 +349,14 @@ void Empdist::validate_() const
                                          << ") exceeds the "
                                             "length of the read quality profile ("
                                          << qual_dist_second.size() << ")";
-                print_();
+                log();
                 abort_mpi();
             }
         }
     }
 }
 
-void Empdist::print_() const
+void Empdist::log() const
 {
     if (sep_qual_) {
         BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first.size()
@@ -325,5 +370,45 @@ void Empdist::print_() const
         BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second.size();
     }
 }
+
+    void Empdist::index() {
+#ifdef USE_WALKER_QUALGEN
+    if (sep_qual_) {
+        for (const auto& dist : a_qual_dist_first) {
+            a_qual_dist_first_idx.emplace_back(dist);
+        }
+        for (const auto& dist : a_qual_dist_second) {
+            a_qual_dist_second_idx.emplace_back(dist);
+        }
+        for (const auto& dist : c_qual_dist_first) {
+            c_qual_dist_first_idx.emplace_back(dist);
+        }
+        for (const auto& dist : c_qual_dist_second) {
+            c_qual_dist_second_idx.emplace_back(dist);
+        }
+        for (const auto& dist : g_qual_dist_first) {
+            g_qual_dist_first_idx.emplace_back(dist);
+        }
+        for (const auto& dist : g_qual_dist_second) {
+            g_qual_dist_second_idx.emplace_back(dist);
+        }
+        for (const auto& dist : t_qual_dist_first) {
+            t_qual_dist_first_idx.emplace_back(dist);
+        }
+        for (const auto& dist : t_qual_dist_second) {
+            t_qual_dist_second_idx.emplace_back(dist);
+        }
+    }else{
+
+        for (const auto& dist : qual_dist_first) {
+            qual_dist_first_idx.emplace_back(dist);
+        }
+        for (const auto& dist : qual_dist_second) {
+            qual_dist_second_idx.emplace_back(dist);
+        }
+    }
+
+#endif
+    }
 
 } // namespace labw::art_modern

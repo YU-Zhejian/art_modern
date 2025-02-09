@@ -1,8 +1,8 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
+#include "libam_support/ds/GslDiscreteDistribution.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/si_utils.hh"
-#include "libam_support/ds/GslDiscreteDistribution.hh"
 
 #include <boost/accumulators/accumulators_fwd.hpp>
 #include <boost/accumulators/framework/accumulator_set.hpp>
@@ -174,7 +174,7 @@ public:
         }
         rd_ = GslDiscreteDistribution<double>(init_list);
     }
-    ~SlimEmpDistGslDiscrete() override  = default;
+    ~SlimEmpDistGslDiscrete() override = default;
 
     void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
     {
@@ -326,13 +326,12 @@ int main()
 {
     bench(std::make_unique<SlimEmpDistNop>(), "nop");
     bench(std::make_unique<SlimEmpDistOld>(empdist_quals, empdist_counts), "old");
-    //    bench(std::make_unique<SlimEmpDistUsingStdMap>(empdist_quals, empdist_counts), "std::map");
-    //    bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::container::map");
-    //    bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts),
-    //    "boost::container::flat_map"); bench(std::make_unique<SlimEmpDistUsingBTreeMap>(empdist_quals,
-    //    empdist_counts), "btree::map"); bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts),
-    //    "std::discrete_distribution"); bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals,
-    //    empdist_counts), "boost::discrete_distribution");
+    bench(std::make_unique<SlimEmpDistUsingStdMap>(empdist_quals, empdist_counts), "std::map");
+    bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::container::map");
+    bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::container::flat_map");
+    bench(std::make_unique<SlimEmpDistUsingBTreeMap>(empdist_quals, empdist_counts), "btree::map");
+    bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::discrete_distribution");
+    bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::discrete_distribution");
     bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::gsl_ran_discrete");
     return EXIT_SUCCESS;
 }

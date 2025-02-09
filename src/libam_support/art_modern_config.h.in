@@ -30,7 +30,9 @@
 #cmakedefine USE_NOP_PARALLEL
 
 // std::map alternatives
-#cmakedefine USE_BTREE_MAP
+#cmakedefine USE_WALKER_QUALGEN
+#cmakedefine USE_BTREE_MAP_QUALGEN
+#cmakedefine USE_STL_QUALGEN
 
 // Malloc
 #cmakedefine WITH_MIMALLOC

@@ -158,9 +158,9 @@ namespace {
         art_opts.add_options()(ARG_Q_SHIFT_2, po::value<int>()->default_value(0),
             "the amount to shift every second-read quality score by");
         art_opts.add_options()(
-            ARG_MIN_QUAL, po::value<int>()->default_value(MIN_QUAL), "the minimum base quality score");
+            ARG_MIN_QUAL, po::value<am_qual_t>()->default_value(MIN_QUAL), "the minimum base quality score");
         art_opts.add_options()(
-            ARG_MAX_QUAL, po::value<int>()->default_value(MAX_QUAL), "the maximum base quality score");
+            ARG_MAX_QUAL, po::value<am_qual_t>()->default_value(MAX_QUAL), "the maximum base quality score");
 
         po::options_description parallel_opts("Parallelism-related options");
         parallel_opts.add_options()(ARG_PARALLEL, po::value<int>()->default_value(PARALLEL_ALL),
@@ -318,7 +318,7 @@ namespace {
         }
     }
 
-    void validate_min_max_qual(const int min_qual, const int max_qual)
+    void validate_min_max_qual(const am_qual_t min_qual, const am_qual_t max_qual)
     {
         if (min_qual < 0 || min_qual > MAX_QUAL) {
             BOOST_LOG_TRIVIAL(fatal) << "Input Error: The minimum quality score must be an integer in [0," << MAX_QUAL
@@ -341,36 +341,9 @@ namespace {
         }
     }
 
-    void validate_and_shift_emp(Empdist& qdist, const size_t read_len, const ART_LIB_CONST_MODE art_lib_const_mode,
-        const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
-    {
-
-        size_t r1_profile_size = 0;
-        size_t r2_profile_size = 0;
-        if (sep_flag) {
-            r1_profile_size = qdist.a_qual_dist_first.size();
-            r2_profile_size = qdist.a_qual_dist_second.size();
-        } else {
-            r1_profile_size = qdist.qual_dist_first.size();
-            r2_profile_size = qdist.qual_dist_second.size();
-        }
-
-        if (read_len > r1_profile_size) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
-                                     << ", exceeds the maximum first read profile length, " << r1_profile_size << ".";
-            abort_mpi();
-        }
-        if (read_len > r2_profile_size && art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length, " << read_len
-                                     << ", exceeds the maximum second read profile length, " << r2_profile_size << ".";
-            abort_mpi();
-        }
-        qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
-    }
-
     Empdist read_emp(const std::string& builtin_profile_name, const std::string& qual_file_1,
         const std::string& qual_file_2, const size_t read_len, const ART_LIB_CONST_MODE art_lib_const_mode,
-        const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
+        const bool sep_flag, const int q_shift_1, const int q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
     {
         validate_min_max_qual(min_qual, max_qual);
 
@@ -383,8 +356,8 @@ namespace {
                     }
                     auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], ENCODED_BUILTIN_PROFILES[i][1]),
                         sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
-                    validate_and_shift_emp(
-                        qdist, read_len, art_lib_const_mode, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+                    qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+                    qdist.index();
                     return qdist;
                 }
             }
@@ -394,8 +367,8 @@ namespace {
             validate_qual_files(qual_file_1, qual_file_2, art_lib_const_mode);
             auto qdist
                 = Empdist(qual_file_1, qual_file_2, sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
-            validate_and_shift_emp(
-                qdist, read_len, art_lib_const_mode, sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+            qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
+            qdist.index();
             return qdist;
         }
     }
@@ -575,7 +548,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
         get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
         art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
-        get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
+        get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
@@ -635,9 +608,9 @@ ArtParams parse_args2(const int argc, char** argv)
     auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
         get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
         art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
-        get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
+        get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
-    for (int i = 0; i < HIGHEST_QUAL; i++) {
+    for (am_qual_t i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
     }
     return {

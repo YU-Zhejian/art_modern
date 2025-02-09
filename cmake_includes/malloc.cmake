@@ -1,6 +1,10 @@
 unset(WITH_MIMALLOC)
 unset(WITH_JEMALLOC)
 
+if(NOT DEFINED USE_MALLOC)
+    set(USE_MALLOC AUTO)
+endif()
+
 if("${USE_MALLOC}" STREQUAL AUTO)
     if(BUILD_SHARED_LIBS)
         ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libjemalloc LINKER_FLAG jemalloc PKGCONF_NAME jemalloc)
@@ -58,5 +62,5 @@ elseif("${USE_MALLOC}" STREQUAL JEMALLOC)
 elseif("${USE_MALLOC}" STREQUAL NOP)
     # Do nothing!
 else()
-    message(FATAL_ERROR "Unknown USE_MALLOC: ${USE_MALLOC}. Sgould be one of AUTO, MIMALLOC, JEMALLOC, and NOP")
+    message(FATAL_ERROR "Unknown USE_MALLOC: ${USE_MALLOC}. Should be one of AUTO, MIMALLOC, JEMALLOC, and NOP")
 endif()

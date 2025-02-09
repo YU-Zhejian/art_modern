@@ -109,7 +109,7 @@ void ArtRead::generate_pairwise_aln()
 void ArtRead::generate_snv_on_qual(const bool is_first_read)
 {
     if (!art_params_.sep_flag) {
-        art_params_.qdist.get_read_qual(qual_, art_params_.read_len, rprob_, is_first_read);
+        art_params_.qdist.get_read_qual(qual_, rprob_, is_first_read);
     } else if (is_first_read) {
         art_params_.qdist.get_read_qual_sep_1(qual_, query_, rprob_);
     } else {
