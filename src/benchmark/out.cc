@@ -44,7 +44,7 @@ public:
     constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
 
     explicit LockedIO(std::string name)
-        : name_(std::move(name)) { };
+        : name_(std::move(name)) {};
 
     virtual ~LockedIO() = default;
 
@@ -56,7 +56,7 @@ public:
         num_reads_out_++;
     }
     void start() { start_time_ = std::chrono::high_resolution_clock::now(); }
-    virtual void flush_and_close() { };
+    virtual void flush_and_close() {};
 
     void stop()
     {

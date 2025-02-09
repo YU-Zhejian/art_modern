@@ -54,9 +54,9 @@ private:
     void read_emp_dist_(std::istream& input, bool is_first);
     void validate_() const;
     void print_() const;
-    bool sep_qual_;
-    bool is_pe_;
-    std::size_t read_len_;
+    const bool sep_qual_;
+    const bool is_pe_;
+    const std::size_t read_len_;
 };
 
 } // namespace labw::art_modern

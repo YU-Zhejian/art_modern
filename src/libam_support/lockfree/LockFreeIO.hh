@@ -67,7 +67,7 @@ public:
         thread_ = std::thread(&LockFreeIO::run, this);
 #endif
     }
-    virtual void flush_and_close() { };
+    virtual void flush_and_close() {};
 
     void stop()
     {

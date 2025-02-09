@@ -64,6 +64,7 @@ if(NOT DEFINED USE_MALLOC)
 endif()
 
 set(WITH_MPI OFF) # TODO
+set(ART_MODERN_LINK_LIBS "")
 
 # Installation
 include(GNUInstallDirs)
@@ -87,7 +88,8 @@ set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
-set(ART_MODERN_LINK_LIBS "")
+# -----------------------------------------------------------------------------
+# Dealing with depencency scripts.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
@@ -97,11 +99,15 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # OpenMP temporarily disabled.
 # include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
+# -----------------------------------------------------------------------------
+# Dealing with depencency libs as subdirs.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
+
+# -----------------------------------------------------------------------------
+# Dealing with depencency includes.
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
-# include_directories("${CMAKE_CURRENT_LIST_DIR}/deps/simde")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
@@ -116,6 +122,9 @@ set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt Threads
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
 message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
+# -----------------------------------------------------------------------------
+# Dealing with config files.
+
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
     execute_process(
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/sh.d/gen_builtin_profiles.py"
@@ -126,9 +135,6 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
         message(FATAL_ERROR "Generation of builtin profiles failed!")
     endif()
 endif()
-
-# -----------------------------------------------------------------------------
-# Dealing with config files.
 
 if(CEU_CM_SHOULD_ENABLE_TEST)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")

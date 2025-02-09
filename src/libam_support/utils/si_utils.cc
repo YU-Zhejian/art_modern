@@ -4,13 +4,15 @@
 
 #include <fmt/core.h>
 
+#include <cstddef>
+#include <cstdint>
 #include <string>
 
 namespace labw::art_modern {
 std::string format_with_commas(const std::size_t number)
 {
     std::string num_str = std::to_string(number);
-    uint64_t insertPosition = static_cast<uint64_t>(num_str.length()) - 3;
+    int64_t insertPosition = static_cast<int64_t>(num_str.length()) - 3;
 
     while (insertPosition > 0) {
         num_str.insert(insertPosition, ",");
