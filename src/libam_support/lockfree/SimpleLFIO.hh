@@ -38,11 +38,13 @@ public:
         out_ = std::ofstream(out_path_, std::ios::out | std::ios::binary);
     }
 
-    SimpleLFIO(std::string name, std::string out_path, std::string preamble)
+    SimpleLFIO(std::string name, std::string out_path, const std::string& preamble)
         : SimpleLFIO(std::move(name), std::move(out_path))
     {
         out_ << preamble;
     }
+
+
 
     void flush_and_close() override
     {

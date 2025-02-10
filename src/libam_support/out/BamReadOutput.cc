@@ -9,7 +9,7 @@
 #include "libam_support/bam/BamUtils.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/out/DumbReadOutput.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
@@ -19,7 +19,8 @@
 #include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
-#include <boost/program_options/variables_map.hpp>
+
+#include <concurrentqueue.h>
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>
@@ -33,7 +34,7 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 
-void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
+void BamReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
@@ -71,10 +72,10 @@ void BamReadOutput::writeSE(const PairwiseAlignment& pwa)
     }
     tags.patch(sam_record.get());
 
-    lfio_.push(std::move(sam_record));
+    lfio_.push(std::move(sam_record), token);
 }
 
-void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void BamReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -145,12 +146,12 @@ void BamReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignme
 
     tags1.patch(sam_record1.get());
     tags2.patch(sam_record2.get());
-    lfio_.push(std::move(sam_record1));
-    lfio_.push(std::move(sam_record2));
+    lfio_.push(std::move(sam_record1), token);
+    lfio_.push(std::move(sam_record2), token);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(
-    const std::string& filename, const BaseFastaFetch* fasta_fetch, const BamOptions& sam_options)
+    const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const BamOptions& sam_options,const int n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -159,6 +160,7 @@ BamReadOutput::BamReadOutput(
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
+    lfio_.init_queue(n_threads, 0);
     lfio_.start();
 }
 
@@ -174,7 +176,11 @@ void BamReadOutput::close()
 
 bool BamReadOutput::require_alignment() const { return true; }
 
-void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+    moodycamel::ProducerToken BamReadOutput::get_producer_token() {
+        return lfio_.get_producer_token();
+    }
+
+    void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     po::options_description bam_desc("SAM/BAM Output");
     bam_desc.add_options()(
@@ -188,29 +194,28 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
         "compression.");
     desc.add(bam_desc);
 }
-std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const boost::program_options::variables_map& vm,
-    const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const
+std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& params) const
 {
-    if (vm.count("o-sam") != 0U) {
-        if (fasta_fetch->num_seqs() == 0) {
+    if (params.vm.count("o-sam") != 0U) {
+        if (params.fasta_fetch->num_seqs() == 0) {
             BOOST_LOG_TRIVIAL(error) << "No sequences in the reference file. If you used " << INPUT_FILE_PARSER_STREAM
                                      << " input parser, you should use headless SAM/BAM instead of this one.";
             abort_mpi();
         }
         auto so = BamOptions();
-        so.use_m = vm.count("o-sam-use_m") > 0;
-        so.write_bam = vm.count("o-sam-write_bam") > 0;
-        so.PG_CL = boost::algorithm::join(args, " ");
-        so.hts_io_threads = vm["o-sam-num_threads"].as<int>();
-        so.compress_level = vm["o-sam-compress_level"].as<char>();
+        so.use_m = params.vm.count("o-sam-use_m") > 0;
+        so.write_bam = params.vm.count("o-sam-write_bam") > 0;
+        so.PG_CL = boost::algorithm::join(params.args, " ");
+        so.hts_io_threads = params.vm["o-sam-num_threads"].as<int>();
+        so.compress_level = params.vm["o-sam-compress_level"].as<char>();
         if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {
             BOOST_LOG_TRIVIAL(fatal) << "Invalid compression level: " << so.compress_level
                                      << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
-        return std::make_shared<BamReadOutput>(vm["o-sam"].as<std::string>(), fasta_fetch, so);
+        return std::make_shared<BamReadOutput>(params.vm["o-sam"].as<std::string>(), params.fasta_fetch, so, params.n_threads);
     }
-    return std::make_shared<DumbReadOutput>();
+    throw OutputNotSpecifiedException{};
 }
 const std::string BamReadOutputFactory::name() const { return "BAM"; }
 

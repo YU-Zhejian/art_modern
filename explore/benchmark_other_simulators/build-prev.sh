@@ -6,14 +6,14 @@ set -ue
 # Build previous version of ART_MODERN
 rm -fr src/am_prev_ver
 git clone "$(git remote get-url origin)" src/am_prev_ver
-env -C src/am_prev_ver git checkout 1.1.0
+env -C src/am_prev_ver git checkout 1.1.1
 mkdir -p opt/art_modern_prev_ver_build/
 env -C opt/art_modern_prev_ver_build/ cmake \
     -DCMAKE_C_COMPILER=icx \
     -DCMAKE_CXX_COMPILER=icpx \
     -DCEU_CM_SHOULD_USE_NATIVE=ON \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
-    -DUSE_THREAD_PARALLEL=ASIO \
+    -DUSE_THREAD_PARALLEL=BS \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DUSE_RANDOM_GENERATOR=ONEMKL \
     -DUSE_HTSLIB=hts \

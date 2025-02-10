@@ -5,14 +5,23 @@
 #include <cstdint>
 
 namespace labw::art_modern {
-/** Phred quality score. */
-using am_qual_t = uint8_t;
+/**
+ * Phred quality score.
+ *
+ * This score will be involved in +/- operations so it must be signed.
+ */
+using am_qual_t = int8_t;
 /** Cigar type. Should be 0b00 to 0b11. */
 using am_cigar_type_t = uint8_t;
-/** Cigar operation, length, or combined. */
+/**
+ * Cigar operation, length, or combined.
+ *
+ * FIXME: This would cause error when doing +/- operations on cigar length
+ * as they may create negative values.
+ */
 using am_cigar_t = uint32_t;
 /** ART quality distribution. */
-using am_qual_dist_t = int;
+using am_qual_count_t = int;
 /**
  * Number of reads.
  *

@@ -4,16 +4,18 @@
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
+#include <concurrentqueue.h>
+
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <htslib/sam.h>
 
+#include <memory>
 #include <string>
-#include <vector>
 
 namespace labw::art_modern {
 
@@ -22,13 +24,14 @@ public:
     DELETE_MOVE(BamReadOutput)
     DELETE_COPY(BamReadOutput)
 
-    BamReadOutput(const std::string& filename, const BaseFastaFetch* fasta_fetch, const BamOptions& sam_options);
-    void writeSE(const PairwiseAlignment& pwa) override;
-    void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const BamOptions& sam_options, int n_threads);
+    void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
+    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;
     ~BamReadOutput() override;
 
-    bool require_alignment() const override;
+    [[nodiscard]] bool require_alignment() const override;
+    moodycamel::ProducerToken get_producer_token() override;
 
 private:
     samFile* sam_file_;
@@ -45,8 +48,7 @@ public:
 
     [[nodiscard]] const std::string name() const override;
     void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
+    [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
     ~BamReadOutputFactory() override;
 
 private:

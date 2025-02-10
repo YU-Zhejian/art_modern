@@ -22,7 +22,10 @@
     --o-hl_sam-write_bam
 fastqc "${OUT_DIR}"/test_small_se_template_memory_sep.fastq
 if which x-www-browser &>/dev/null; then
-    # x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html
+    # Open the browser and ignore what's happening afterwards
+    {
+        x-www-browser "${OUT_DIR}"/test_small_se_template_memory_sep_fastqc.html || true
+    } &
     sleep 3
 fi
 if [ "${FORMAT_ONLY:-}" = "1" ]; then

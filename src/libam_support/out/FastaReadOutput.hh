@@ -9,9 +9,10 @@
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/variables_map.hpp>
 
+#include <concurrentqueue.h>
+
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace labw::art_modern {
 
@@ -19,13 +20,12 @@ class FastaReadOutput : public BaseReadOutput {
 public:
     DELETE_MOVE(FastaReadOutput)
     DELETE_COPY(FastaReadOutput)
-    explicit FastaReadOutput(const std::string& filename);
-    void writeSE(const PairwiseAlignment& pwa) override;
-    void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    explicit FastaReadOutput(const std::string& filename, int n_threads);
+    void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
+    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;
-
     bool require_alignment() const override;
-
+    moodycamel::ProducerToken get_producer_token() override;
     ~FastaReadOutput() override;
 
 private:
@@ -41,7 +41,6 @@ public:
 
     [[nodiscard]] const std::string name() const override { return "FASTA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
+    std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };
 } // namespace labw::art_modern

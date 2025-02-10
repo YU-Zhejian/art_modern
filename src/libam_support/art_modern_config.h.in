@@ -31,7 +31,6 @@
 
 // std::map alternatives
 #cmakedefine USE_WALKER_QUALGEN
-#cmakedefine USE_BTREE_MAP_QUALGEN
 #cmakedefine USE_STL_QUALGEN
 
 // Malloc

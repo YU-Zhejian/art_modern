@@ -2,51 +2,54 @@
 
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
+#include <concurrentqueue.h>
+
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
 
-class OutputDispatcher : public BaseReadOutput {
+class OutputDispatcher {
 
 public:
     DELETE_MOVE(OutputDispatcher)
     DELETE_COPY(OutputDispatcher)
+    using TokenRing =std::vector<moodycamel::ProducerToken>;
 
-    bool require_alignment() const override;
+    [[nodiscard]] bool require_alignment() const ;
 
     OutputDispatcher() = default;
-    ~OutputDispatcher() override;
+    ~OutputDispatcher();
 
     void add(std::shared_ptr<BaseReadOutput>&& output);
-    void writeSE(const PairwiseAlignment& pwa) override;
-    void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
-    void close() override;
+    void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa) ;
+    void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) ;
+    void close();
+    TokenRing get_producer_tokens();
 
 private:
     std::vector<std::shared_ptr<BaseReadOutput>> outputs_;
+    std::atomic<bool> closed_ = false;
 };
 
-class OutputDispatcherFactory : public BaseReadOutputFactory {
+class OutputDispatcherFactory {
 public:
     DELETE_MOVE(OutputDispatcherFactory)
     DELETE_COPY(OutputDispatcherFactory)
 
     OutputDispatcherFactory();
 
-    [[nodiscard]] const std::string name() const override { return "OD"; }
-    void add(std::shared_ptr<BaseReadOutputFactory> factory);
-    void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
-    ~OutputDispatcherFactory() override;
+    [[nodiscard]] const std::string name() const { return "OD"; }
+    void patch_options(boost::program_options::options_description& desc) const;
+    [[nodiscard]] std::shared_ptr<OutputDispatcher> create(const OutParams& params) const;
+    ~OutputDispatcherFactory();
 
 private:
     std::vector<std::shared_ptr<BaseReadOutputFactory>> factories_;

@@ -11,7 +11,7 @@
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/jobs/JobPool.hh"
 #include "libam_support/jobs/SimulationJob.hh"
-#include "libam_support/out/BaseReadOutput.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/ref/batcher/FastaStreamBatcher.hh"
 #include "libam_support/ref/batcher/InMemoryFastaBatcher.hh"
@@ -75,7 +75,8 @@ public:
     }
     void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
     {
-        out_dispatcher_ = out_dispatcher_factory.create(art_io_params_.vm, fetch.get(), art_io_params_.args);
+        OutParams params{art_io_params_.parallel, art_io_params_.vm,  art_io_params_.args, fetch};
+        out_dispatcher_ = out_dispatcher_factory.create(params);
     }
 
     void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
@@ -101,7 +102,7 @@ private:
     ArtIOParams art_io_params_;
     JobPool job_pool_;
     JobPoolReporter reporter_;
-    std::shared_ptr<BaseReadOutput> out_dispatcher_;
+    std::shared_ptr<OutputDispatcher> out_dispatcher_;
 };
 
 void print_banner()

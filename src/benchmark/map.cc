@@ -27,7 +27,6 @@
 #include <map>
 #include <memory>
 #include <random>
-#include <stack>
 #include <string>
 #include <utility>
 #include <vector>
@@ -40,18 +39,18 @@ namespace {
  */
 const std::vector<am_qual_t> empdist_quals { 2, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25,
     26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38 };
-const std::vector<am_qual_dist_t> empdist_counts { 1'005'307, 1'005'331, 1'052'941, 1'212'250, 1'280'823, 1'319'284,
+const std::vector<am_qual_count_t> empdist_counts { 1'005'307, 1'005'331, 1'052'941, 1'212'250, 1'280'823, 1'319'284,
     1'319'306, 1'322'792, 1'348'204, 1'378'493, 1'402'848, 1'437'193, 1'470'236, 1'493'447, 1'558'624, 1'588'409,
     1'687'992, 1'729'588, 1'809'750, 1'898'693, 1'926'134, 2'010'366, 2'050'530, 2'111'370, 2'160'093, 2'209'413,
     2'245'481, 2'271'272, 2'618'106, 2'797'257, 2'970'924, 3'577'430, 6'455'505 };
 const auto DIST_END = empdist_counts.back();
-constexpr am_qual_dist_t MAX_DIST_NUMBER = 1'000'000;
+constexpr am_qual_count_t MAX_DIST_NUMBER = 1'000'000;
 
 constexpr am_readnum_t NUM_TRIALS = K_SIZE << 8;
 constexpr am_readnum_t READ_LEN = K_SIZE;
 pcg32_fast gen { 0 };
-std::uniform_int_distribution<am_qual_dist_t> one_to_dist_end(1, DIST_END);
-std::uniform_int_distribution<am_qual_dist_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
+std::uniform_int_distribution<am_qual_count_t> one_to_dist_end(1, DIST_END);
+std::uniform_int_distribution<am_qual_count_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
 } // namespace
 
 class SlimEmpDist {
@@ -81,7 +80,7 @@ class SlimEmpDistOld : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistOld)
     DELETE_COPY(SlimEmpDistOld)
-    SlimEmpDistOld(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistOld(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
     {
         const auto denom = static_cast<double>(count.back()) / MAX_DIST_NUMBER;
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
@@ -92,7 +91,7 @@ public:
 
     void gen_qualities(std::vector<am_qual_t>& qual) override
     {
-        std::vector<am_qual_dist_t> count;
+        std::vector<am_qual_count_t> count;
         count.resize(READ_LEN);
         std::generate(count.begin(), count.end(), [] { return one_to_max_dist_number(gen); });
         for (std::size_t i = 0; i < qual.size(); i++) {
@@ -101,13 +100,13 @@ public:
     }
 
 private:
-    std::map<am_qual_dist_t, am_qual_t, std::less<>> dist_;
+    std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 class SlimEmpDistStdDiscrete : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistStdDiscrete)
     DELETE_COPY(SlimEmpDistStdDiscrete)
-    SlimEmpDistStdDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistStdDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
         : qual_(qual)
     {
         std::vector<double> init_list;
@@ -122,7 +121,7 @@ public:
 
     void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
     {
-        for (unsigned char& i : qual) {
+        for (auto& i : qual) {
             i = qual_[rd_(gen)];
         }
     }
@@ -135,7 +134,7 @@ class SlimEmpDistBoostDiscrete : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistBoostDiscrete)
     DELETE_COPY(SlimEmpDistBoostDiscrete)
-    SlimEmpDistBoostDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistBoostDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
         : qual_(qual)
     {
         std::vector<double> init_list;
@@ -150,7 +149,7 @@ public:
 
     void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
     {
-        for (unsigned char& i : qual) {
+        for (auto& i : qual) {
             i = qual_[rd_(gen)];
         }
     }
@@ -163,7 +162,7 @@ class SlimEmpDistGslDiscrete : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscrete)
     DELETE_COPY(SlimEmpDistGslDiscrete)
-    SlimEmpDistGslDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistGslDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
         : qual_(qual)
     {
         std::vector<double> init_list;
@@ -188,11 +187,48 @@ private:
     GslDiscreteDistribution<double> rd_;
     boost::uniform_01<double> rnd_01_;
 };
+class SlimEmpDistGslDiscreteInterpolated : public SlimEmpDist {
+public:
+    DELETE_MOVE(SlimEmpDistGslDiscreteInterpolated)
+    DELETE_COPY(SlimEmpDistGslDiscreteInterpolated)
+    SlimEmpDistGslDiscreteInterpolated(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
+        : qual_offset_(qual.front())
+    {
+        am_qual_t prev_qual = qual_offset_;
+        std::vector<double> init_list;
+        double prev = 0;
+        for (std::size_t i = 0; i < count.size(); i++) {
+            if (i != 0) {
+                prev_qual++;
+            }
+            while (prev_qual != qual[i]) {
+                init_list.emplace_back(0);
+                prev_qual++;
+            }
+            init_list.emplace_back(count[i] - prev);
+            prev = count[i];
+        }
+        rd_ = GslDiscreteDistribution<double>(init_list);
+    }
+    ~SlimEmpDistGslDiscreteInterpolated() override = default;
+
+    void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
+    {
+        for (auto& i : qual) {
+            i = rd_(rnd_01_(gen)) + qual_offset_;
+        }
+    }
+
+private:
+    am_qual_t qual_offset_;
+    GslDiscreteDistribution<double> rd_;
+    boost::uniform_01<double> rnd_01_;
+};
 class SlimEmpDistUsingBoostMap : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostMap)
     DELETE_COPY(SlimEmpDistUsingBoostMap)
-    SlimEmpDistUsingBoostMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistUsingBoostMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
     {
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
             dist_[count[i]] = qual[i];
@@ -202,7 +238,7 @@ public:
 
     void gen_qualities(std::vector<am_qual_t>& qual) override
     {
-        std::vector<am_qual_dist_t> count;
+        std::vector<am_qual_count_t> count;
         count.resize(READ_LEN);
         std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
         for (std::size_t i = 0; i < qual.size(); i++) {
@@ -211,14 +247,14 @@ public:
     }
 
 private:
-    boost::container::map<am_qual_dist_t, am_qual_t, std::less<>> dist_;
+    boost::container::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
 class SlimEmpDistUsingBoostFlatMap : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostFlatMap)
     DELETE_COPY(SlimEmpDistUsingBoostFlatMap)
-    SlimEmpDistUsingBoostFlatMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistUsingBoostFlatMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
     {
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
             dist_[count[i]] = qual[i];
@@ -228,7 +264,7 @@ public:
 
     void gen_qualities(std::vector<am_qual_t>& qual) override
     {
-        std::vector<am_qual_dist_t> count;
+        std::vector<am_qual_count_t> count;
         count.resize(READ_LEN);
         std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
         for (std::size_t i = 0; i < qual.size(); i++) {
@@ -237,14 +273,14 @@ public:
     }
 
 private:
-    boost::container::flat_map<am_qual_dist_t, am_qual_t, std::less<>> dist_;
+    boost::container::flat_map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
 class SlimEmpDistUsingStdMap : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingStdMap)
     DELETE_COPY(SlimEmpDistUsingStdMap)
-    SlimEmpDistUsingStdMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistUsingStdMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
     {
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
             dist_[count[i]] = qual[i];
@@ -254,7 +290,7 @@ public:
 
     void gen_qualities(std::vector<am_qual_t>& qual) override
     {
-        std::vector<am_qual_dist_t> count;
+        std::vector<am_qual_count_t> count;
         count.resize(READ_LEN);
         std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
         for (std::size_t i = 0; i < qual.size(); i++) {
@@ -263,14 +299,14 @@ public:
     }
 
 private:
-    std::map<am_qual_dist_t, am_qual_t, std::less<>> dist_;
+    std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
 class SlimEmpDistUsingBTreeMap : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBTreeMap)
     DELETE_COPY(SlimEmpDistUsingBTreeMap)
-    SlimEmpDistUsingBTreeMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_dist_t>& count)
+    SlimEmpDistUsingBTreeMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
     {
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
             dist_[count[i]] = qual[i];
@@ -280,7 +316,7 @@ public:
 
     void gen_qualities(std::vector<am_qual_t>& qual) override
     {
-        std::vector<am_qual_dist_t> count;
+        std::vector<am_qual_count_t> count;
         count.resize(READ_LEN);
         std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
         for (std::size_t i = 0; i < qual.size(); i++) {
@@ -289,7 +325,7 @@ public:
     }
 
 private:
-    btree::map<am_qual_dist_t, am_qual_t, std::less<>> dist_;
+    btree::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
 namespace {
@@ -327,11 +363,12 @@ int main()
     bench(std::make_unique<SlimEmpDistNop>(), "nop");
     bench(std::make_unique<SlimEmpDistOld>(empdist_quals, empdist_counts), "old");
     bench(std::make_unique<SlimEmpDistUsingStdMap>(empdist_quals, empdist_counts), "std::map");
-    bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::container::map");
-    bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::container::flat_map");
+    bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::map");
+    bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::flat_map");
     bench(std::make_unique<SlimEmpDistUsingBTreeMap>(empdist_quals, empdist_counts), "btree::map");
-    bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::discrete_distribution");
-    bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::discrete_distribution");
-    bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::gsl_ran_discrete");
+    bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::dd");
+    bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::dd");
+    bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::dd");
+    bench(std::make_unique<SlimEmpDistGslDiscreteInterpolated>(empdist_quals, empdist_counts), "GSL::dd (int)");
     return EXIT_SUCCESS;
 }

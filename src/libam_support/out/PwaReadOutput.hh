@@ -3,11 +3,12 @@
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/lockfree/SimpleLFIO.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
+#include <concurrentqueue.h>
+
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <memory>
 #include <string>
@@ -20,9 +21,10 @@ public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args);
-    void writeSE(const PairwiseAlignment& pwa) override;
-    void writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args,  int n_threads);
+    void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
+    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    moodycamel::ProducerToken get_producer_token() override;
 
     bool require_alignment() const override;
 
@@ -43,7 +45,6 @@ public:
 
     [[nodiscard]] const std::string name() const override { return "PWA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const boost::program_options::variables_map& vm,
-        const BaseFastaFetch* fasta_fetch, const std::vector<std::string>& args) const override;
+    std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };
 } // namespace labw::art_modern

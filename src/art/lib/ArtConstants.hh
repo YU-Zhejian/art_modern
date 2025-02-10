@@ -11,7 +11,7 @@
 namespace labw::art_modern {
 
 constexpr am_qual_t HIGHEST_QUAL = 80;
-constexpr am_qual_dist_t MAX_DIST_NUMBER = 1000000;
+constexpr am_qual_count_t MAX_DIST_NUMBER = 1000000;
 /**
  * Default insertion rate for read 1.
  */

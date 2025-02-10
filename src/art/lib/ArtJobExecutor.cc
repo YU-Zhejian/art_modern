@@ -6,7 +6,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
-#include "libam_support/out/BaseReadOutput.hh"
+#include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
@@ -106,7 +106,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
         return false;
     }
 
-    output_dispatcher_->writePE(read_1.to_pwa(), read_2.to_pwa());
+    output_dispatcher_->writePE(token_ring_, read_1.to_pwa(), read_2.to_pwa());
 
     return true;
 }
@@ -124,12 +124,12 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     if (!art_read.is_good()) {
         return false;
     }
-    output_dispatcher_->writeSE(art_read.to_pwa());
+    output_dispatcher_->writeSE(token_ring_, art_read.to_pwa());
     return true;
 }
 
 ArtJobExecutor::ArtJobExecutor(
-    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<BaseReadOutput>& output_dispatcher)
+    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank())
@@ -137,6 +137,7 @@ ArtJobExecutor::ArtJobExecutor(
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(output_dispatcher->require_alignment())
+    , token_ring_(output_dispatcher->get_producer_tokens())
 {
 }
 
@@ -202,6 +203,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , rprob_(Rprob(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len))
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(other.require_alignment_)
+    , token_ring_(std::move(other.token_ring_))
 {
 }
 std::string ArtJobExecutor::thread_info() const

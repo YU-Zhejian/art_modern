@@ -42,6 +42,7 @@
 #include <fstream>
 #include <iostream>
 #include <thread>
+#include <tuple>
 #include <utility>
 #include <vector>
 
@@ -154,8 +155,8 @@ namespace {
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
         art_opts.add_options()(
-            ARG_Q_SHIFT_1, po::value<int>()->default_value(0), "the amount to shift every first-read quality score by");
-        art_opts.add_options()(ARG_Q_SHIFT_2, po::value<int>()->default_value(0),
+            ARG_Q_SHIFT_1, po::value<am_qual_t>()->default_value(0), "the amount to shift every first-read quality score by");
+        art_opts.add_options()(ARG_Q_SHIFT_2, po::value<am_qual_t>()->default_value(0),
             "the amount to shift every second-read quality score by");
         art_opts.add_options()(
             ARG_MIN_QUAL, po::value<am_qual_t>()->default_value(MIN_QUAL), "the minimum base quality score");
@@ -343,7 +344,8 @@ namespace {
 
     Empdist read_emp(const std::string& builtin_profile_name, const std::string& qual_file_1,
         const std::string& qual_file_2, const size_t read_len, const ART_LIB_CONST_MODE art_lib_const_mode,
-        const bool sep_flag, const int q_shift_1, const int q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
+        const bool sep_flag, const am_qual_t q_shift_1, const am_qual_t q_shift_2, const am_qual_t min_qual,
+        const am_qual_t max_qual)
     {
         validate_min_max_qual(min_qual, max_qual);
 
@@ -547,7 +549,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
 
     auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
         get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
-        art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
+        art_lib_const_mode, sep_flag, get_param<am_qual_t>(vm_, ARG_Q_SHIFT_1), get_param<am_qual_t>(vm_, ARG_Q_SHIFT_2),
         get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
     for (int i = 0; i < HIGHEST_QUAL; i++) {
@@ -579,6 +581,9 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
             std::move(args) } };
 }
 
+/**
+ * For CAPI; Not finished; Do NOT use.
+ */
 ArtParams parse_args2(const int argc, char** argv)
 {
     const po::options_description po_desc_ = option_parser();
@@ -607,7 +612,7 @@ ArtParams parse_args2(const int argc, char** argv)
 
     auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
         get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
-        art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
+        art_lib_const_mode, sep_flag, get_param<am_qual_t>(vm_, ARG_Q_SHIFT_1), get_param<am_qual_t>(vm_, ARG_Q_SHIFT_2),
         get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
     for (am_qual_t i = 0; i < HIGHEST_QUAL; i++) {

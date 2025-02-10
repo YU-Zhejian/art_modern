@@ -2,14 +2,14 @@
 
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/out/DumbReadOutput.hh"
-#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/out/OutParams.hh"
+
+#include <concurrentqueue.h>
 
 #include <fmt/core.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <memory>
 #include <string>
@@ -30,26 +30,27 @@ namespace {
 
 } // namespace
 
-void FastaReadOutput::writeSE(const PairwiseAlignment& pwa)
+void FastaReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
     }
-    lfio_.push(format_fasta(pwa));
+    lfio_.push(format_fasta(pwa), token);
 }
 
-void FastaReadOutput::writePE(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void FastaReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
     }
-    lfio_.push(format_fasta(pwa1, pwa2));
+    lfio_.push(format_fasta(pwa1, pwa2), token);
 }
 
 FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
-FastaReadOutput::FastaReadOutput(const std::string& filename)
+FastaReadOutput::FastaReadOutput(const std::string& filename, const int n_threads)
     : lfio_("FASTA", filename)
 {
+    lfio_.init_queue(n_threads, 0);
     lfio_.start();
 }
 
@@ -64,20 +65,22 @@ void FastaReadOutput::close()
 
 bool FastaReadOutput::require_alignment() const { return false; }
 
-void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+    moodycamel::ProducerToken FastaReadOutput::get_producer_token() {
+        return lfio_.get_producer_token();
+    }
+
+    void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fasta_desc("FASTA Output");
     fasta_desc.add_options()("o-fasta", boost::program_options::value<std::string>(),
         "Destination of output FASTA file. Unset to disable the writer.");
     desc.add(fasta_desc);
 }
-std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const boost::program_options::variables_map& vm,
-    [[maybe_unused]] const BaseFastaFetch* /*fasta_fetch*/,
-    [[maybe_unused]] const std::vector<std::string>& /*args*/) const
+std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& params) const
 {
-    if (vm.count("o-fasta") != 0) {
-        return std::make_shared<FastaReadOutput>(vm["o-fasta"].as<std::string>());
+    if (params.vm.count("o-fasta") != 0) {
+        return std::make_shared<FastaReadOutput>(params.vm["o-fasta"].as<std::string>(), params.n_threads);
     }
-    return std::make_shared<DumbReadOutput>();
+    throw OutputNotSpecifiedException{};
 }
 } // namespace labw::art_modern

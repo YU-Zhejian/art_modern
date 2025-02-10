@@ -24,7 +24,8 @@
 namespace labw::art_modern {
 
 namespace {
-    void shift_emp(Empdist::dist_type& map_to_process, const int q_shift, const am_qual_t min_qual, const am_qual_t max_qual)
+    void shift_emp(
+        Empdist::dist_type& map_to_process, const am_qual_t q_shift, const am_qual_t min_qual, const am_qual_t max_qual)
     {
         for (auto& i : map_to_process) {
             for (auto& [fst, snd] : i) {
@@ -68,15 +69,15 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-    void Empdist::get_read_qual(std::vector<am_qual_t> &qual, Rprob &rprob, bool first) const
+void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, bool first) const
 {
 #ifdef USE_WALKER_QUALGEN
-        const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
-        rprob.r_probs();
-        for (std::size_t i = 0; i < read_len_; i++) {
-            // TODO: This line of code have catastrophic locality.
-            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
-        }
+    const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
+    rprob.r_probs();
+    for (std::size_t i = 0; i < read_len_; i++) {
+        // TODO: This line of code have catastrophic locality.
+        qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
+    }
 #else
     const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
     rprob.rand_quality_dist();
@@ -107,23 +108,23 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
             break;
         case 'C':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = c_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = c_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         case 'G':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = g_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = g_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         case 'T':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = t_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = t_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         default:
@@ -141,30 +142,30 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
         switch (seq[i]) {
         case 'A':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = a_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = a_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         case 'C':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = c_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = c_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] =c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         case 'G':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = g_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = g_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         case 'T':
 #ifdef USE_WALKER_QUALGEN
-                qual[i] = t_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = t_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
 #else
-                qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
+            qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
 #endif
             break;
         default:
@@ -179,12 +180,12 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     int read_pos = 0;
     char alt_read_pos = 0;
     char leading_base = 0;
-    am_qual_dist_t t_uint = 0;
+    am_qual_count_t t_uint = 0;
     std::string line;
     int t_int = 0;
     std::vector<int> qual;
     dist_map_type dist;
-    std::vector<am_qual_dist_t> count;
+    std::vector<am_qual_count_t> count;
     int qmin = std::numeric_limits<int>::max();
     int qmax = std::numeric_limits<int>::min();
 
@@ -284,7 +285,7 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
 }
 
 void Empdist::shift_all_emp(
-    const bool sep_flag, const int q_shift_1, const int q_shift_2, const int min_qual, const int max_qual)
+    const bool sep_flag, const am_qual_t q_shift_1, const am_qual_t q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
 {
     if (!sep_flag) {
         shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);
@@ -371,7 +372,8 @@ void Empdist::log() const
     }
 }
 
-    void Empdist::index() {
+void Empdist::index()
+{
 #ifdef USE_WALKER_QUALGEN
     if (sep_qual_) {
         for (const auto& dist : a_qual_dist_first) {
@@ -398,7 +400,7 @@ void Empdist::log() const
         for (const auto& dist : t_qual_dist_second) {
             t_qual_dist_second_idx.emplace_back(dist);
         }
-    }else{
+    } else {
 
         for (const auto& dist : qual_dist_first) {
             qual_dist_first_idx.emplace_back(dist);
@@ -409,6 +411,6 @@ void Empdist::log() const
     }
 
 #endif
-    }
+}
 
 } // namespace labw::art_modern

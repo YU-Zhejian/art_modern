@@ -9,9 +9,9 @@ set -ue
 export OUT_DIR="$(pwd)"/data_out/depth
 export FCOV=100
 export REF="$(pwd)/data/lambda_phage.fa"
- bwa index "${REF}"
+bwa index "${REF}"
 
- rm -fr "${OUT_DIR}"
+rm -fr "${OUT_DIR}"
 mkdir -p "${OUT_DIR}"
 
 bin/wgsim \

@@ -60,3 +60,7 @@ Bundled files:
 - `art_modern_alpine`: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
 
 ## 1.1.2 (On-going)
+
+- The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
+- Support over B-Tree was dropped. Its performance was found worse than STL map in corrected benchmarks.
+- The performance of MoodyCamel queue was improved using producer and consumer tokens.

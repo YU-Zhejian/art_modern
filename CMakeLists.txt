@@ -98,7 +98,7 @@ include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
-
+include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)

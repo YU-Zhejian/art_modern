@@ -6,8 +6,8 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/jobs/JobExecutor.hh"
 #include "libam_support/jobs/SimulationJob.hh"
-#include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/utils/class_macros_utils.hh"
+#include "libam_support/out/OutputDispatcher.hh"
 
 #include <atomic>
 #include <memory>
@@ -18,7 +18,7 @@ namespace labw::art_modern {
 class ArtJobExecutor : public JobExecutor {
 public:
     ArtJobExecutor(
-        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<BaseReadOutput>& output_dispatcher);
+        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher);
     ~ArtJobExecutor() override = default;
 
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
@@ -38,7 +38,7 @@ private:
     SimulationJob job_;
     const std::string mpi_rank_;
     am_readnum_t total_num_reads_generated_ = 0;
-    std::shared_ptr<BaseReadOutput> output_dispatcher_;
+    std::shared_ptr<OutputDispatcher> output_dispatcher_;
     Rprob rprob_;
     const int num_reads_to_reduce_;
     const bool require_alignment_;
@@ -48,6 +48,7 @@ private:
     am_readnum_t current_n_fails_ = 0;
     am_readnum_t current_max_tolerence_ = 0;
     am_readnum_t current_n_reads_generated_ = 0;
+    OutputDispatcher::TokenRing       token_ring_;
 };
 
 } // namespace labw::art_modern

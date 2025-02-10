@@ -20,9 +20,11 @@ template <typename FloatType> class GslDiscreteDistribution {
 
 public:
     GslDiscreteDistribution()
-        : K(0) {};
+        : K(0) { };
     explicit GslDiscreteDistribution(const std::vector<FloatType>& prob_array)
-        : K(prob_array.size()), F(std::vector<FloatType>(prob_array.size())), A(std::vector<size_t>(prob_array.size()))
+        : K(prob_array.size())
+        , F(std::vector<FloatType>(prob_array.size()))
+        , A(std::vector<size_t>(prob_array.size()))
     {
         std::stack<size_t> Bigs;
         std::stack<size_t> Smalls;

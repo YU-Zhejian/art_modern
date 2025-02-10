@@ -8,7 +8,6 @@
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/hts_utils.hh"
 
-#include <htslib/hts.h>
 #include <htslib/sam.h>
 
 #include <atomic>
@@ -35,6 +34,7 @@ public:
         , h_(h)
     {
     }
+
     void flush_and_close() override
     {
         if (closed_) {

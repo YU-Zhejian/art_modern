@@ -4,7 +4,6 @@
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/out/BamReadOutput.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/out/DumbReadOutput.hh"
 #include "libam_support/out/FastaReadOutput.hh"
 #include "libam_support/out/FastqReadOutput.hh"
 #include "libam_support/out/HeadlessBamReadOutput.hh"
@@ -44,7 +43,7 @@ public:
     constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
 
     explicit LockedIO(std::string name)
-        : name_(std::move(name)) {};
+        : name_(std::move(name)) { };
 
     virtual ~LockedIO() = default;
 
@@ -56,7 +55,7 @@ public:
         num_reads_out_++;
     }
     void start() { start_time_ = std::chrono::high_resolution_clock::now(); }
-    virtual void flush_and_close() {};
+    virtual void flush_and_close() { };
 
     void stop()
     {
@@ -138,6 +137,9 @@ public:
     bool require_alignment() const override { return false; }
 
     ~EmptyLFIOReadOutput() override { close(); }
+    moodycamel::ProducerToken get_producer_token(){
+        return lfio_.get_producer_token();
+    }
 
 private:
     class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
@@ -299,7 +301,6 @@ int main()
             bench(std::make_shared<BamReadOutput>(DEVNULL, &ff, so), get_bo_name("SamReadOutput", so), nthread, oss);
             bench(std::make_shared<FastqReadOutput>(DEVNULL), "FastqReadOutput", nthread, oss);
             bench(std::make_shared<FastaReadOutput>(DEVNULL), "FastaReadOutput", nthread, oss);
-            bench(std::make_shared<DumbReadOutput>(), "DumbReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLockedIOReadOutput>(), "EmptyLockedIOReadOutput", nthread, oss);
             bench(std::make_shared<PwaReadOutput>(DEVNULL, std::vector<std::string> {}), "PwaReadOutput", nthread, oss);

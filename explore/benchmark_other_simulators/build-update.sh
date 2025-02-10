@@ -35,7 +35,6 @@ env -C opt/art_modern_stlmap_build/ cmake \
     -G Ninja "$(pwd)"/../../
 env -C opt/art_modern_stlmap_build/ ninja
 
-
 rm -fr opt/art_modern_gcc_build/
 mkdir -p opt/art_modern_gcc_build/
 env -C opt/art_modern_gcc_build/ cmake \
