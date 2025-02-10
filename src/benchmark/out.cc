@@ -11,21 +11,18 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <atomic>
+#include <concurrentqueue.h>
+
 #include <fmt/core.h>
 
-#include <boost/log/core.hpp>
-#include <boost/log/expressions.hpp>
 #include <boost/log/trivial.hpp>
-#include <boost/log/utility/setup/common_attributes.hpp>
 
-#include <atomic>
 #include <chrono>
+#include <cstddef>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <mutex>
 #include <ostream>
 #include <string>
 #include <thread>
@@ -135,15 +132,17 @@ public:
     DELETE_COPY(EmptyLFIOReadOutput)
     DELETE_MOVE(EmptyLFIOReadOutput)
 
-    EmptyLFIOReadOutput(const int nthreads) {
-        lfio_.init_queue(nthreads, 0); lfio_.start();
+    explicit EmptyLFIOReadOutput(const int nthreads)
+    {
+        lfio_.init_queue(nthreads, 0);
+        lfio_.start();
     }
     void writeSE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
-    void writePE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment&,
-        [[maybe_unused]] const PairwiseAlignment&) override
+    void writePE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
+        [[maybe_unused]] const PairwiseAlignment& /** pwa2 **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
@@ -154,7 +153,7 @@ public:
         lfio_.stop();
     }
 
-    bool require_alignment() const override { return false; }
+    [[nodiscard]] bool require_alignment() const override { return false; }
 
     ~EmptyLFIOReadOutput() override { close(); }
     moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
@@ -167,15 +166,18 @@ public:
     DELETE_COPY(EmptyImplicitLFIOReadOutput)
     DELETE_MOVE(EmptyImplicitLFIOReadOutput)
 
-    EmptyImplicitLFIOReadOutput(const int nthreads) {
-        lfio_.init_queue(0, nthreads); lfio_.start();
+    explicit EmptyImplicitLFIOReadOutput(const int nthreads)
+    {
+        lfio_.init_queue(0, nthreads);
+        lfio_.start();
     }
-    void writeSE([[maybe_unused]] const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
+    void writeSE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/,
+        [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void writePE([[maybe_unused]] const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment&,
-                 [[maybe_unused]] const PairwiseAlignment&) override
+    void writePE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/, [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
+        [[maybe_unused]] const PairwiseAlignment& /** pwa2 **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
         lfio_.push(std::make_unique<std::nullptr_t>());
@@ -186,7 +188,7 @@ public:
         lfio_.stop();
     }
 
-    bool require_alignment() const override { return false; }
+    [[nodiscard]] bool require_alignment() const override { return false; }
 
     ~EmptyImplicitLFIOReadOutput() override { close(); }
     moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
@@ -194,7 +196,6 @@ public:
 private:
     EmptyLFIO lfio_;
 };
-
 
 namespace {
 const std::string DEVNULL = "/dev/null";
@@ -234,7 +235,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
-        std::thread t(working_thread, bro, (M_SIZE) / nthread);
+        std::thread t(working_thread, bro, M_SIZE / nthread);
         threads.emplace_back(std::move(t));
     }
     for (auto& t : threads) {
@@ -275,7 +276,6 @@ int main()
         bo_l.back().compress_level = t;
     }
     // Temporarily disable logging
-    logging::core::get()->set_filter(logging::trivial::severity > logging::trivial::fatal);
     for (int i = 0; i < 5; i++) {
         for (std::size_t const nthread : std::vector<std::size_t> { 1, 2, 4, 8, 16, 32, 64 }) {
             for (auto& bo : bo_l) {
@@ -298,7 +298,6 @@ int main()
                 nthread, oss);
         }
     }
-    logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);
 
     return EXIT_SUCCESS;
 }

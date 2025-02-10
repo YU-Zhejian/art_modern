@@ -80,7 +80,7 @@ Please note that we have additionally specified a quality file for read 2 with t
 
 ### Simulating RNA-Seq Data using _C. Elegans_ Transcriptome
 
-Simulating transcriptome is a little bit more complicated since each cDNA molecule has different counts. Strand-specific library technologies also generate RNA-Seq data on one strand only. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate expression for each cDNA molecule. You may also easily convert outputs from [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kallisto](https://pachterlab.github.io/kallisto/) or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
+Simulating transcriptome is a little more complicated since each cDNA molecule has different counts. Strand-specific library technologies also generate RNA-Seq data on one strand only. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate expression for each cDNA molecule. You may also easily convert outputs from [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kallisto](https://pachterlab.github.io/kallisto/) or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
 
 Please note that cDNAs with insufficient length will be ignored. We also do not support circular RNA simulation.
 

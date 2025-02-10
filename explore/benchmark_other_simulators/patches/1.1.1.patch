@@ -13,3 +13,16 @@ index 49c3f36..077e894 100644
  
  if(NOT BUILD_SHARED_LIBS)
      ceu_cm_set_static_target(art_modern_lib)
+diff --git a/src/art/Empdist.hh b/src/art/Empdist.hh
+index 4d1e47f..44958c4 100644
+--- a/src/art/Empdist.hh
++++ b/src/art/Empdist.hh
+@@ -9,6 +9,8 @@
+ 
+ #ifdef USE_BTREE_MAP
+ #include <btree/map.h>
++#else
++#include <map>
+ #endif
+ 
+ #include <cstddef>

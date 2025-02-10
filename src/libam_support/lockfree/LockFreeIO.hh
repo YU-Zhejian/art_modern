@@ -65,7 +65,7 @@ public:
         start_time_ = std::chrono::high_resolution_clock::now();
         thread_ = std::thread(&LockFreeIO::run, this);
     }
-    virtual void flush_and_close() { };
+    virtual void flush_and_close() {};
 
     void stop()
     {
@@ -85,18 +85,20 @@ public:
     moodycamel::ProducerToken get_producer_token() { return moodycamel::ProducerToken(queue_); }
 
 protected:
-    std::atomic<std::size_t> num_bytes_out_ = 0;
+    std::size_t num_bytes_out_ = 0;
     const std::string name_;
 
 private:
     std::chrono::high_resolution_clock::time_point start_time_;
     std::chrono::high_resolution_clock::time_point end_time_;
     std::atomic<std::size_t> num_reads_in_ = 0;
-    std::atomic<std::size_t> num_reads_out_ = 0;
     std::atomic<std::size_t> num_wait_in_ = 0;
-    std::atomic<std::size_t> num_wait_out_not_full_ = 0;
-    std::atomic<std::size_t> num_wait_out_empty_ = 0;
-    std::atomic<std::size_t> num_nowait_out_ = 0;
+
+    std::size_t num_reads_out_ = 0;
+    std::size_t num_wait_out_not_full_ = 0;
+    std::size_t num_wait_out_empty_ = 0;
+    std::size_t num_nowait_out_ = 0;
+
     std::atomic<bool> had_logged_ = false;
 
     moodycamel::ConcurrentQueue<T> queue_;
