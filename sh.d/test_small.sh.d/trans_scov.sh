@@ -1,4 +1,5 @@
-# shell=bash
+# shellcheck shell=bash
+
 # Trans mode with stranded/strandless coverage
 parser=memory
 for coverage in stranded strandless; do

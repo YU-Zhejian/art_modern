@@ -87,7 +87,7 @@ rm -fr \
     "${OUT_DIR}"/*.mutations.*
 
 for rlen in 100 300; do
-    for software in art_modern; do #  art pirs wgsim dwgsim
+    for software in art_modern art pirs wgsim dwgsim; do
         bwa mem -t 20 \
             "${REF}" \
             "${OUT_DIR}"/pe"${rlen}"_"${software}"_1.fq \

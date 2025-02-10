@@ -6,7 +6,7 @@ uniprot*
 *.out
 *.bed
 *.msgpack
-.vscode
+
 
 /.idea/*
 !/.idea/encodings.xml
@@ -123,5 +123,7 @@ CMakeLists.txt.user
 *.tar.[gx]z
 *.tar.bz2
 *.t[gxb]z
+
+/.vscode/*
 !/.vscode/ltex.dictionary.en-US.txt
 !/.vscode/ltex.disabledRules.en-US.txt

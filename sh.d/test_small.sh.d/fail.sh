@@ -1,4 +1,4 @@
-# shell=bash
+# shellcheck shell=bash
 FCOV=10
 parser=memory
 for lc in se pe mp; do

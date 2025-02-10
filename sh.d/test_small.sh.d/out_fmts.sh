@@ -1,4 +1,4 @@
-# shell=bash
+# shellcheck shell=bash
 
 "${ART}" \
     --qual_file_1 data/Illumina_profiles/HiSeq2500L150R1.txt \

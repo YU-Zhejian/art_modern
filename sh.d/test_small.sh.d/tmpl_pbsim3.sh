@@ -1,4 +1,4 @@
-# shell=bash
+# shellcheck shell=bash
 
 parser=memory
 coverage=pbsim3

@@ -1,4 +1,5 @@
-# shell=bash
+# shellcheck shell=bash
+
 FCOV=0.2
 for parser in memory htslib; do
     for lc in se pe mp; do

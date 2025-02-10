@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1091
+# shellcheck disable=SC2317
+
 set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
