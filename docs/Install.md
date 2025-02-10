@@ -4,49 +4,54 @@
 
 The project assumes x86\_64 (Intel, AMD, Zhaoxin, etc.) platforms. Other platform support is not guaranteed.
 
-The project assumes modern GNU/Linux. That is, GNU/Linux that is under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus).
+The project assumes modern GNU/Linux distributions that are still under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus).
 
-Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like Cygwin, MSYS2, and MinGW are neither supported nor tested.
+Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
 
 This project depends on [Google Abseil](https://abseil.io/), whose requirements are available [here](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md).
 
 ## Compiler Infrastructure
 
-This project requires a working C++ compiler that supports C++17 (due to the introduction of Google ProtoBuff library) and a working C compiler that supports C11 (for bundled HTSLib).
+This project requires a working C++ compiler that supports C++17 and a working C compiler that supports C11 (for bundled HTSLib). That also includes the C++ standard library, compiler runtime library, and miscellaneous tools like linker and assembler.
 
-See [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C++17. You may test whether your compiler (GCC, for example) supports C++17 using:
+### Checking C11 and C++17 Compatibility
+
+See [here](https://en.cppreference.com/w/c/11) and [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C11 and C++17. You may test whether your compiler (GCC, for example) using:
 
 ```shell
+echo 'int main(){}' | gcc --std=c11 -x c - -o /dev/null
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-If there's no error, the compiler is supported. You may also test your compiler using [`MericLuc/Cpp17-Features-tests`](https://github.com/MericLuc/Cpp17-Features-tests/) or other C++17 test suites.
+If there's no error, the compiler is supported. The CMake build scripts inside this project also contains a script that tests compiler compatibility using codes from [GNU AutoConf Archive](https://www.gnu.org/software/autoconf-archive/).
 
 ### [GCC](https://gcc.gnu.org/)
 
-The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
+The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance. The minimal version of GCC tested is GCC 7.4.0.
 
-- **NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library (libstdc++).
-- The minimal version of GCC tested is GCC 7.4.0.
-- Reference:
-  - GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
-  - libstdc++ support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
+**NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library ([`libstdc++`](https://gcc.gnu.org/onlinedocs/libstdc++/)).
+
+Reference:
+
+- GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
+- `libstdc++` support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
 
 ### [Clang](https://clang.llvm.org/)
 
-Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X.
+Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X. The minimal version of Clang tested is Clang 5.0.1.
 
-- **NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
-- The minimal version of Clang tested is Clang 5.0.1.
-- However, earlier Clang versions may be supported with earlier operating systems, GCC, and Boost libraries.
-- Reference:
-  - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
-  - Libc++ support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of libstdc++ (GNU C++ Standard Library).
-  - [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
+**NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
+
+Reference:
+
+- Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
+- `libc++ `support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of `libstdc++` (GNU C++ Standard Library).
+
+**NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
 
 ### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)
 
-For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`).
+For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`). Only the latest version is tested.
 
 ### Other Compilers
 
@@ -67,20 +72,19 @@ For C library, this project works on [GNU C Library](https://www.gnu.org/softwar
 
 For Apple Mac OS X, FreeBSD, and Alpine Linux users: Please install [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [GNU Bash](https://www.gnu.org/software/bash/) and [GNU Make](https://www.gnu.org/software/make) as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
-The project may take advantage of [pkgconf](https://github.com/pkgconf/pkgconf) or [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) to locate the dependencies.
+The project may take advantage of [pkgconf](https://github.com/pkgconf/pkgconf) or [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) to locate the dependencies. Installing such is **HIGHLY** recommended.
 
-The project may use [ccache](https://ccache.dev/) to speed up the compilation process.
+The project may use [ccache](https://ccache.dev/) to speed up the compilation process. However, this may cause bugs in some systems and is not enabled by default.
 
 ## Dependencies
 
-Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), YUM/DNF, PacMan, etc. Otherwise, contact your system administrator for where to find them or build them from source.
+Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
 ### [Boost C++ Library](https://www.boost.org/)
 
 This is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are namely:
 
 - **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
-- **REQUIRED** [Regex](https://www.boost.org/doc/libs/1_85_0/libs/regex/).
 - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
 - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
 - **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
@@ -88,8 +92,8 @@ This is an umbrella project of diverse small modules that can be used independen
 - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
 - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
 
-- **NOTE** Clang <= 9 with Boost >= 1.76 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
-- **NOTE** Boost <= 1.65 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` or `-DUSE_THREAD_PARALLEL=NOP` in CMake options (introduced below) to avoid using Boost.ASIO.
+- **NOTE** Clang < 10 with Boost > 1.77 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
+- **NOTE** Boost < 1.66 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
 
 ### [HTSLib](https://www.htslib.org/)
 
@@ -103,7 +107,7 @@ You may either use the one bundled with the project or an external one that had 
 
 See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
 
-To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so` with optional version suffixes.
+To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes.
 
 ### Other Optional Libraries
 
@@ -116,7 +120,7 @@ To use external HTSLib, consult your system administrator. Those libraries usual
 
 ## Using CMake Building System
 
-[CMake](https://cmake.org/) 3.17 or above is recommended to build this project, although this project **MAY** work with CMake >= 3.10. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+[CMake](https://cmake.org/) 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
 The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
@@ -150,6 +154,8 @@ This instructs CMake to build executables/libraries with different optimization 
 
 Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
 
+Available since 1.1.1.
+
 ### `CEU_CM_SHOULD_USE_NATIVE`
 
 Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable with impaired portability (i.e., do not run on other machines).
@@ -178,7 +184,7 @@ Use which HTSLib implementation.
 The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
-- `PCG`: [PCG](https://www.pcg-random.org/) random generators.
+- `PCG`: [PCG](https://www.pcg-random.org/) random generators. Available since 1.1.1.
   - **NOTE** Experimental.
   - **NOTE** This generator would fail on Mac OS X due to the lack of `cxxabi.h`.
 - `BOOST`: Use Boost random generators.
@@ -206,26 +212,30 @@ The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
   - **NOTE** This is only available in Boost >= 1.66.
-- `BS`: Will use [`BS::thread_pool`](https://github.com/bshoshany/thread-pool).
+- `BS`: Will use [`BS::thread_pool`](https://github.com/bshoshany/thread-pool). Available since 1.1.1.
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
 ### `BOOST_CONFIG_PROVIDED_BY_BOOST`
 
-Configures the behaviour of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html).
+Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html).
 
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
 
 There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
 
-## `USE_BTREE_MAP`
+### `USE_QUAL_GEN`
 
-Whether to use `btree::map` instead of `std::map`. The former is faster than the latter.
+Available since 1.1.2.
 
-- **`ON` (DEFAULT)**
-- `OFF`.
+The quality generation algorithm.
 
-## `USE_MALLOC`
+- **`WALKER` (DEFAULT): Use [Walker's Algorithm](https://doi.org/10.1145/355744.355749) to accelerate quality synthesis.**
+- `STL`: Use binary search algorithm implemented in `std::map`. This is identical to the original ART.
+
+### `USE_MALLOC`
+
+Available since 1.1.1.
 
 Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumption.
 
@@ -234,12 +244,18 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
-## `USE_CCACHE`
+### `USE_CCACHE`
+
+Available since 1.1.1.
 
 Whether to use [ccache](https://ccache.dev/) to speed up the compilation process. However, it may not work on some systems.
 
 - **`OFF` (DEFAULT): Will not use ccache.**
 - `ON`: Will use ccache if available.
+
+### Deprecated Options
+
+- `USE_BTREE_MAP` was deprecated in 1.1.2.
 
 ## Platform-Specific Building Instructions
 

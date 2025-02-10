@@ -25,7 +25,7 @@ We may develop a C interface in the future after the APIs and design of the core
 
 ### How to add adaptors \& primers to the reads?
 
-Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adapters to them, and use `templ` mode to introduce sequencing errors.
+Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
 
 ## Software Engineering
 
@@ -55,7 +55,7 @@ Where you may find the required information:
 
 - Name and version of your current operating system in a human-readable way.
 
-  You may find that out by reading `/etc/lsb-release` or use [neofetch](https://github.com/dylanaraps/neofetch), [screenFetch](https://github.com/KittyKatt/screenFetch), [fastfetch](https://github.com/fastfetch-cli/fastfetch)
+  You may find that out by reading `/etc/lsb-release` or use tools like [neofetch](https://github.com/dylanaraps/neofetch), [screenFetch](https://github.com/KittyKatt/screenFetch), or [fastfetch](https://github.com/fastfetch-cli/fastfetch).
 
 - Version of the kernel.
 

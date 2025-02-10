@@ -4,7 +4,6 @@
 
 - ART stuck at one read. Why?
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-- Update `-DUSE_QUAL_GEN` to docs. Ready for release.
 
 ## Performance
 
@@ -19,7 +18,6 @@
         - [MPICH](https://www.mpich.org/).
         - [OpenMPI](https://www.open-mpi.org/).
         - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-        - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
 - Builtin profiles take too much space on the executable. May consider:

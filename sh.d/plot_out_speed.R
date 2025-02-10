@@ -11,6 +11,7 @@ df_defaults <- df %>%
 ggplot(df_defaults) +
   geom_boxplot(aes(y=time_complexity, x=as.factor(threads))) +
   facet_wrap(~name, scales = "free_y")
+ggsave("boxplot_formats.pdf", width = 10, height = 10)
 
 df_bam_levels <- df %>%
   dplyr::filter(name %in% grep("BamReadOutput_l=._t=1", unique(name), value = TRUE))
@@ -18,6 +19,7 @@ df_bam_levels <- df %>%
 ggplot(df_bam_levels) +
   geom_boxplot(aes(y=time_complexity, x=as.factor(threads))) +
   facet_wrap(~name)
+ggsave("boxplot_bam_levels.pdf", width = 10, height = 10)
 
 df_bam_threads <- df %>%
   dplyr::filter(name %in% grep("BamReadOutput_l=4_t=.", unique(name), value = TRUE))
@@ -25,4 +27,5 @@ df_bam_threads <- df %>%
 ggplot(df_bam_threads) +
   geom_boxplot(aes(y=time_complexity, x=as.factor(threads))) +
   facet_wrap(~name)
+ggsave("boxplot_bam_threads.pdf", width = 10, height = 10)
 
