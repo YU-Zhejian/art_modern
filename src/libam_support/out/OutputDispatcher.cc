@@ -23,7 +23,7 @@ void OutputDispatcher::writeSE(const TokenRing& tokens, const PairwiseAlignment&
     if (closed_) {
         return;
     }
-    for (std::size_t i=0; i < outputs_.size(); i++) {
+    for (std::size_t i = 0; i < outputs_.size(); i++) {
         outputs_[i]->writeSE(tokens[i], pwa);
     }
 }
@@ -33,7 +33,7 @@ void OutputDispatcher::writePE(const TokenRing& tokens, const PairwiseAlignment&
     if (closed_) {
         return;
     }
-    for (std::size_t i=0; i < outputs_.size(); i++) {
+    for (std::size_t i = 0; i < outputs_.size(); i++) {
         outputs_[i]->writePE(tokens[i], pwa1, pwa2);
     }
 }
@@ -63,15 +63,16 @@ bool OutputDispatcher::require_alignment() const
     return retv;
 }
 
-    OutputDispatcher::TokenRing OutputDispatcher::get_producer_tokens() {
-        OutputDispatcher::TokenRing retv;
-        for (const auto& output : outputs_) {
-            retv.emplace_back(output->get_producer_token());
-        }
-        return retv;
+OutputDispatcher::TokenRing OutputDispatcher::get_producer_tokens()
+{
+    OutputDispatcher::TokenRing retv;
+    for (const auto& output : outputs_) {
+        retv.emplace_back(output->get_producer_token());
     }
+    return retv;
+}
 
-    void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc) const
+void OutputDispatcherFactory::patch_options(boost::program_options::options_description& desc) const
 {
     for (auto const& factory : factories_) {
         factory->patch_options(desc);
@@ -81,7 +82,7 @@ std::shared_ptr<OutputDispatcher> OutputDispatcherFactory::create(const OutParam
 {
     auto output_dispatcher = std::make_shared<OutputDispatcher>();
     for (auto const& factory : factories_) {
-        try{
+        try {
             output_dispatcher->add(factory->create(params));
         } catch (const OutputNotSpecifiedException& e) {
             // ignored

@@ -35,6 +35,7 @@
 namespace logging = boost::log;
 using namespace labw::art_modern;
 
+#if 0
 template <typename T> class LockedIO {
 public:
     DELETE_MOVE(LockedIO)
@@ -107,6 +108,22 @@ private:
                                 << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
     }
 };
+#endif
+
+class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
+public:
+    DELETE_COPY(EmptyLFIO)
+    DELETE_MOVE(EmptyLFIO)
+    EmptyLFIO()
+        : LockFreeIO<std::unique_ptr<std::nullptr_t>>("Empty")
+    {
+    }
+    ~EmptyLFIO() override { stop(); };
+    void write([[maybe_unused]] std::unique_ptr<std::nullptr_t> /** value **/) override
+    {
+        // Do nothing!
+    }
+};
 
 /**
  * @brief An output that passes `std::unique_ptr<std::nullptr_t>` to an LFIO.
@@ -118,15 +135,18 @@ public:
     DELETE_COPY(EmptyLFIOReadOutput)
     DELETE_MOVE(EmptyLFIOReadOutput)
 
-    EmptyLFIOReadOutput() { lfio_.start(); }
-    void writeSE([[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
-    {
-        lfio_.push(std::make_unique<std::nullptr_t>());
+    EmptyLFIOReadOutput(const int nthreads) {
+        lfio_.init_queue(nthreads, 0); lfio_.start();
     }
-    void writePE([[maybe_unused]] const PairwiseAlignment&, [[maybe_unused]] const PairwiseAlignment&) override
+    void writeSE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
-        lfio_.push(std::make_unique<std::nullptr_t>());
-        lfio_.push(std::make_unique<std::nullptr_t>());
+        lfio_.push(std::make_unique<std::nullptr_t>(), token);
+    }
+    void writePE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment&,
+        [[maybe_unused]] const PairwiseAlignment&) override
+    {
+        lfio_.push(std::make_unique<std::nullptr_t>(), token);
+        lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
     void close() override
     {
@@ -137,44 +157,25 @@ public:
     bool require_alignment() const override { return false; }
 
     ~EmptyLFIOReadOutput() override { close(); }
-    moodycamel::ProducerToken get_producer_token(){
-        return lfio_.get_producer_token();
-    }
+    moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
 
 private:
-    class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
-    public:
-        DELETE_COPY(EmptyLFIO)
-        DELETE_MOVE(EmptyLFIO)
-        EmptyLFIO()
-            : LockFreeIO<std::unique_ptr<std::nullptr_t>>("Empty")
-        {
-        }
-        ~EmptyLFIO() override { stop(); };
-        void write([[maybe_unused]] std::unique_ptr<std::nullptr_t> /** value **/) override
-        {
-            // Do nothing!
-        }
-    };
     EmptyLFIO lfio_;
 };
-
-/**
- * @brief An output that passes `std::unique_ptr<std::nullptr_t>` to an Locked IO.
- *
- * Designed to test the overhead caused by Mutex.
- */
-class EmptyLockedIOReadOutput final : public BaseReadOutput {
+class EmptyImplicitLFIOReadOutput final : public BaseReadOutput {
 public:
-    DELETE_COPY(EmptyLockedIOReadOutput)
-    DELETE_MOVE(EmptyLockedIOReadOutput)
+    DELETE_COPY(EmptyImplicitLFIOReadOutput)
+    DELETE_MOVE(EmptyImplicitLFIOReadOutput)
 
-    EmptyLockedIOReadOutput() { lfio_.start(); }
-    void writeSE([[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
+    EmptyImplicitLFIOReadOutput(const int nthreads) {
+        lfio_.init_queue(0, nthreads); lfio_.start();
+    }
+    void writeSE([[maybe_unused]] const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void writePE([[maybe_unused]] const PairwiseAlignment&, [[maybe_unused]] const PairwiseAlignment&) override
+    void writePE([[maybe_unused]] const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment&,
+                 [[maybe_unused]] const PairwiseAlignment&) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
         lfio_.push(std::make_unique<std::nullptr_t>());
@@ -187,25 +188,13 @@ public:
 
     bool require_alignment() const override { return false; }
 
-    ~EmptyLockedIOReadOutput() override { close(); }
+    ~EmptyImplicitLFIOReadOutput() override { close(); }
+    moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
 
 private:
-    class EmptyLockedIO : public LockedIO<std::unique_ptr<std::nullptr_t>> {
-    public:
-        DELETE_COPY(EmptyLockedIO)
-        DELETE_MOVE(EmptyLockedIO)
-        EmptyLockedIO()
-            : LockedIO<std::unique_ptr<std::nullptr_t>>("Empty")
-        {
-        }
-        ~EmptyLockedIO() override { stop(); };
-        void write([[maybe_unused]] std::unique_ptr<std::nullptr_t> /** value **/) override
-        {
-            // Do nothing!
-        }
-    };
-    EmptyLockedIO lfio_;
+    EmptyLFIO lfio_;
 };
+
 
 namespace {
 const std::string DEVNULL = "/dev/null";
@@ -231,8 +220,9 @@ const PairwiseAlignment pwa { "read_1", "chr1",
 
 void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_t num_records)
 {
+    const auto token = bro->get_producer_token();
     for (std::size_t i = 0; i < num_records; i++) {
-        bro->writeSE(pwa);
+        bro->writeSE(token, pwa);
     }
 }
 
@@ -269,7 +259,7 @@ int main()
     auto oss = std::ofstream { "time_complexity.tsv" };
     oss << "name\tthreads\ttime_complexity" << std::endl;
     auto iss = std::istringstream { fasta };
-    const auto ff = InMemoryFastaFetch(iss);
+    const auto ff = std::make_shared<InMemoryFastaFetch>(iss);
     BamOptions so;
     BamOptions const bo_defaults;
     so.write_bam = false;
@@ -289,21 +279,23 @@ int main()
     for (int i = 0; i < 5; i++) {
         for (std::size_t const nthread : std::vector<std::size_t> { 1, 2, 4, 8, 16, 32, 64 }) {
             for (auto& bo : bo_l) {
-                bench(
-                    std::make_shared<BamReadOutput>(DEVNULL, &ff, bo), get_bo_name("BamReadOutput", bo), nthread, oss);
+                bench(std::make_shared<BamReadOutput>(DEVNULL, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
+                    nthread, oss);
             }
             for (auto& bo : bo_t) {
-                bench(
-                    std::make_shared<BamReadOutput>(DEVNULL, &ff, bo), get_bo_name("BamReadOutput", bo), nthread, oss);
+                bench(std::make_shared<BamReadOutput>(DEVNULL, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
+                    nthread, oss);
             }
-            bench(std::make_shared<HeadlessBamReadOutput>(DEVNULL, bo_defaults),
+            bench(std::make_shared<HeadlessBamReadOutput>(DEVNULL, bo_defaults, nthread),
                 get_bo_name("HeadlessBamReadOutput", bo_defaults), nthread, oss);
-            bench(std::make_shared<BamReadOutput>(DEVNULL, &ff, so), get_bo_name("SamReadOutput", so), nthread, oss);
-            bench(std::make_shared<FastqReadOutput>(DEVNULL), "FastqReadOutput", nthread, oss);
-            bench(std::make_shared<FastaReadOutput>(DEVNULL), "FastaReadOutput", nthread, oss);
-            bench(std::make_shared<EmptyLFIOReadOutput>(), "EmptyLFIOReadOutput", nthread, oss);
-            bench(std::make_shared<EmptyLockedIOReadOutput>(), "EmptyLockedIOReadOutput", nthread, oss);
-            bench(std::make_shared<PwaReadOutput>(DEVNULL, std::vector<std::string> {}), "PwaReadOutput", nthread, oss);
+            bench(std::make_shared<BamReadOutput>(DEVNULL, ff, so, nthread), get_bo_name("SamReadOutput", so), nthread,
+                oss);
+            bench(std::make_shared<FastqReadOutput>(DEVNULL, nthread), "FastqReadOutput", nthread, oss);
+            bench(std::make_shared<FastaReadOutput>(DEVNULL, nthread), "FastaReadOutput", nthread, oss);
+            bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
+            bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
+            bench(std::make_shared<PwaReadOutput>(DEVNULL, std::vector<std::string> {}, nthread), "PwaReadOutput",
+                nthread, oss);
         }
     }
     logging::core::get()->set_filter(logging::trivial::severity >= logging::trivial::info);

@@ -6,7 +6,7 @@ library(tidyr)
 df <- readr::read_tsv("cmake-build-relwithdebinfo-llvm_intel/time_complexity.tsv")
 
 df_defaults <- df %>%
-  dplyr::filter(name %in% c("BamReadOutput_l=4_t=1", "HeadlessBamReadOutput_l=4_t=1", "SamReadOutput_l=4_t=1", "FastqReadOutput", "PwaReadOutput", "FastaReadOutput", "DumbReadOutput", "EmptyLockedIOReadOutput", "EmptyLFIOReadOutput"))
+  dplyr::filter(name %in% c("BamReadOutput_l=4_t=1", "HeadlessBamReadOutput_l=4_t=1", "SamReadOutput_l=4_t=1", "FastqReadOutput", "PwaReadOutput", "FastaReadOutput", "DumbReadOutput", "EmptyImplicitLFIOReadOutput", "EmptyLFIOReadOutput"))
 
 ggplot(df_defaults) +
   geom_boxplot(aes(y=time_complexity, x=as.factor(threads))) +

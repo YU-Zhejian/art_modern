@@ -24,9 +24,10 @@ public:
 
     [[nodiscard]] bool require_alignment() const override;
 
-    HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options,  int n_threads);
+    HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options, int n_threads);
     void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
-    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    void writePE(
+        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     moodycamel::ProducerToken get_producer_token() override;
     void close() override;
     ~HeadlessBamReadOutput() override;

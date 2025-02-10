@@ -21,9 +21,10 @@ public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args,  int n_threads);
+    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, int n_threads);
     void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
-    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    void writePE(
+        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     moodycamel::ProducerToken get_producer_token() override;
 
     bool require_alignment() const override;

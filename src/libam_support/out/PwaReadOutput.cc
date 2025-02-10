@@ -36,7 +36,8 @@ void PwaReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pairwi
     lfio_.push(std::move(os), token);
 }
 
-void PwaReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void PwaReadOutput::writePE(
+    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -66,11 +67,9 @@ void PwaReadOutput::close()
 
 bool PwaReadOutput::require_alignment() const { return true; }
 
-    moodycamel::ProducerToken PwaReadOutput::get_producer_token() {
-        return lfio_.get_producer_token();
-    }
+moodycamel::ProducerToken PwaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
-    void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description pwa_desc("PWA Output");
     pwa_desc.add_options()("o-pwa", boost::program_options::value<std::string>(),
@@ -82,6 +81,6 @@ std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const OutParams& pa
     if (params.vm.count("o-pwa") != 0U) {
         return std::make_shared<PwaReadOutput>(params.vm["o-pwa"].as<std::string>(), params.args, params.n_threads);
     }
-    throw OutputNotSpecifiedException{};
+    throw OutputNotSpecifiedException {};
 }
 } // namespace labw::art_modern

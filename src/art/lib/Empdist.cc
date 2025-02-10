@@ -284,8 +284,8 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
     read_emp_dist_(distss, is_first);
 }
 
-void Empdist::shift_all_emp(
-    const bool sep_flag, const am_qual_t q_shift_1, const am_qual_t q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
+void Empdist::shift_all_emp(const bool sep_flag, const am_qual_t q_shift_1, const am_qual_t q_shift_2,
+    const am_qual_t min_qual, const am_qual_t max_qual)
 {
     if (!sep_flag) {
         shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);

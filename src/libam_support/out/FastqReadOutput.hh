@@ -23,7 +23,8 @@ public:
     DELETE_COPY(FastqReadOutput)
     explicit FastqReadOutput(const std::string& filename, int n_threads);
     void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
-    void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    void writePE(
+        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     moodycamel::ProducerToken get_producer_token() override;
     void close() override;
     ~FastqReadOutput() override;

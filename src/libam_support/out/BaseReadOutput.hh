@@ -14,12 +14,10 @@
 
 namespace labw::art_modern {
 
-    class OutputNotSpecifiedException: public std::exception {
-    public:
-        [[nodiscard]] const char* what() const noexcept override {
-            return "Output file not specified";
-        }
-    };
+class OutputNotSpecifiedException : public std::exception {
+public:
+    [[nodiscard]] const char* what() const noexcept override { return "Output file not specified"; }
+};
 
 class BaseReadOutput {
 public:
@@ -28,7 +26,9 @@ public:
 
     BaseReadOutput() = default;
     virtual void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) = 0;
-    virtual void writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
+    virtual void writePE(
+        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+        = 0;
     virtual void close() = 0;
     [[nodiscard]] virtual bool require_alignment() const = 0;
     virtual ~BaseReadOutput() = default;
@@ -49,8 +49,7 @@ public:
     /**
      * @throw OutputNotSpecifiedException if output file is not specified.
      */
-    virtual std::shared_ptr<BaseReadOutput> create(const OutParams& params) const
-        = 0;
+    virtual std::shared_ptr<BaseReadOutput> create(const OutParams& params) const = 0;
     virtual ~BaseReadOutputFactory() = default;
 };
 

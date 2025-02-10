@@ -35,8 +35,9 @@ public:
     {
     }
 
-    void init_queue(const std::size_t num_explicit_producers, const std::size_t num_implicit_producers){
-        queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE,num_explicit_producers, num_implicit_producers);
+    void init_queue(const std::size_t num_explicit_producers, const std::size_t num_implicit_producers)
+    {
+        queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
     }
 
     virtual ~LockFreeIO() = default;
@@ -50,7 +51,7 @@ public:
         num_reads_in_++;
     }
 
-    void push(T&& value, const moodycamel::ProducerToken & token)
+    void push(T&& value, const moodycamel::ProducerToken& token)
     {
         while (!queue_.try_enqueue(token, std::move(value))) {
             num_wait_in_++;
@@ -81,10 +82,7 @@ public:
     }
 
     virtual void write(T value) = 0;
-    moodycamel::ProducerToken get_producer_token()
-    {
-        return moodycamel::ProducerToken(queue_);
-    }
+    moodycamel::ProducerToken get_producer_token() { return moodycamel::ProducerToken(queue_); }
 
 protected:
     std::atomic<std::size_t> num_bytes_out_ = 0;
@@ -143,16 +141,15 @@ private:
     void log_() const
     {
         const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_ - start_time_).count();
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << format_with_commas(num_reads_in_) << " reads and writes "
-                                << format_with_commas(num_reads_out_) << " reads.";
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. Waitings (I/ONotFull/OEmpty): " << format_with_commas(num_wait_in_) << " / "
-                                << format_with_commas(num_wait_out_not_full_) << "("
-                                << (100.0 * num_wait_out_not_full_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%) / " << format_with_commas(num_wait_out_empty_) << "("
-                                << (100.0 * num_wait_out_empty_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%).";
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << format_with_commas(num_reads_in_)
+                                << " reads and writes " << format_with_commas(num_reads_out_) << " reads.";
+        BOOST_LOG_TRIVIAL(info)
+            << name_ << " LockFreeIO: N. Waitings (I/ONotFull/OEmpty): " << format_with_commas(num_wait_in_) << " / "
+            << format_with_commas(num_wait_out_not_full_) << "("
+            << (100.0 * num_wait_out_not_full_ / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
+            << "%) / " << format_with_commas(num_wait_out_empty_) << "("
+            << (100.0 * num_wait_out_empty_ / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
+            << "%).";
         BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: " << to_si(num_bytes_out_) << "B written in " << time / 1000.0
                                 << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
     }

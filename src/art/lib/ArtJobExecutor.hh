@@ -6,8 +6,8 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/jobs/JobExecutor.hh"
 #include "libam_support/jobs/SimulationJob.hh"
-#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/out/OutputDispatcher.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <atomic>
 #include <memory>
@@ -48,7 +48,7 @@ private:
     am_readnum_t current_n_fails_ = 0;
     am_readnum_t current_max_tolerence_ = 0;
     am_readnum_t current_n_reads_generated_ = 0;
-    OutputDispatcher::TokenRing       token_ring_;
+    OutputDispatcher::TokenRing token_ring_;
 };
 
 } // namespace labw::art_modern

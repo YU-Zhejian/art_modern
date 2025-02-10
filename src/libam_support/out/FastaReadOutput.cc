@@ -38,7 +38,8 @@ void FastaReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pair
     lfio_.push(format_fasta(pwa), token);
 }
 
-void FastaReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void FastaReadOutput::writePE(
+    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -65,11 +66,9 @@ void FastaReadOutput::close()
 
 bool FastaReadOutput::require_alignment() const { return false; }
 
-    moodycamel::ProducerToken FastaReadOutput::get_producer_token() {
-        return lfio_.get_producer_token();
-    }
+moodycamel::ProducerToken FastaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
-    void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fasta_desc("FASTA Output");
     fasta_desc.add_options()("o-fasta", boost::program_options::value<std::string>(),
@@ -81,6 +80,6 @@ std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& 
     if (params.vm.count("o-fasta") != 0) {
         return std::make_shared<FastaReadOutput>(params.vm["o-fasta"].as<std::string>(), params.n_threads);
     }
-    throw OutputNotSpecifiedException{};
+    throw OutputNotSpecifiedException {};
 }
 } // namespace labw::art_modern

@@ -77,7 +77,7 @@ p <- df %>%
   facet_grid(DATA ~ ASPECTS, scales = "free") +
   theme_bw() +
   theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank())
-ggsave("fig/time_memory.pdf", p, width = 7, height = 4)
+ggsave("fig/time_memory.pdf", p, width = 20, height = 4)
 
 p <- df %>%
   dplyr::select(MAJ_PG_F, MIN_PG_F, VOL_CTX_S, IV_CTX_S, DATA, SOFTWARE, RLEN) %>%
@@ -105,6 +105,6 @@ p <- df %>%
   scale_x_continuous(trans = "log10", labels = scales::label_number()) +
   facet_grid(DATA ~ PFCS_TYPE, scales = "free") +
   theme_bw()
-ggsave("fig/page_faults.pdf", p, width = 12, height = 4)
+ggsave("fig/page_faults.pdf", p, width = 20, height = 4)
 
 sessionInfo()

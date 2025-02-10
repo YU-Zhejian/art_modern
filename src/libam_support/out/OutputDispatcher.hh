@@ -21,16 +21,16 @@ class OutputDispatcher {
 public:
     DELETE_MOVE(OutputDispatcher)
     DELETE_COPY(OutputDispatcher)
-    using TokenRing =std::vector<moodycamel::ProducerToken>;
+    using TokenRing = std::vector<moodycamel::ProducerToken>;
 
-    [[nodiscard]] bool require_alignment() const ;
+    [[nodiscard]] bool require_alignment() const;
 
     OutputDispatcher() = default;
     ~OutputDispatcher();
 
     void add(std::shared_ptr<BaseReadOutput>&& output);
-    void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa) ;
-    void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) ;
+    void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa);
+    void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2);
     void close();
     TokenRing get_producer_tokens();
 

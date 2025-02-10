@@ -30,7 +30,8 @@
 namespace po = boost::program_options;
 
 namespace labw::art_modern {
-HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options, const int n_threads)
+HeadlessBamReadOutput::HeadlessBamReadOutput(
+    const std::string& filename, const BamOptions& sam_options, const int n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -80,7 +81,8 @@ void HeadlessBamReadOutput::writeSE(const moodycamel::ProducerToken& token, cons
     tags.patch(sam_record.get());
     lfio_.push(std::move(sam_record), token);
 }
-void HeadlessBamReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void HeadlessBamReadOutput::writePE(
+    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -176,11 +178,9 @@ HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close()
 
 bool HeadlessBamReadOutput::require_alignment() const { return true; }
 
-    moodycamel::ProducerToken HeadlessBamReadOutput::get_producer_token() {
-        return lfio_.get_producer_token();
-    }
+moodycamel::ProducerToken HeadlessBamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
-    void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     po::options_description bam_desc("Headless SAM/BAM Output");
     bam_desc.add_options()("o-hl_sam", po::value<std::string>(),
@@ -215,7 +215,7 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
         }
         return std::make_shared<HeadlessBamReadOutput>(params.vm["o-hl_sam"].as<std::string>(), so, params.n_threads);
     }
-    throw OutputNotSpecifiedException{};
+    throw OutputNotSpecifiedException {};
 }
 
 HeadlessBamReadOutputFactory::~HeadlessBamReadOutputFactory() = default;

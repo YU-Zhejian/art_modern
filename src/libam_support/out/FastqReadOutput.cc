@@ -39,7 +39,8 @@ void FastqReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pair
     lfio_.push(format_fastq(pwa), token);
 }
 
-void FastqReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void FastqReadOutput::writePE(
+    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -66,11 +67,9 @@ void FastqReadOutput::close()
 
 bool FastqReadOutput::require_alignment() const { return false; }
 
-    moodycamel::ProducerToken FastqReadOutput::get_producer_token() {
-        return lfio_.get_producer_token();
-    }
+moodycamel::ProducerToken FastqReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
-    void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fastq_desc("FASTQ Output");
     fastq_desc.add_options()("o-fastq", boost::program_options::value<std::string>(),
@@ -82,7 +81,7 @@ std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& 
     if (params.vm.count("o-fastq") != 0) {
         return std::make_shared<FastqReadOutput>(params.vm["o-fastq"].as<std::string>(), params.n_threads);
     }
-    throw OutputNotSpecifiedException{};
+    throw OutputNotSpecifiedException {};
 }
 
 } // namespace labw::art_modern

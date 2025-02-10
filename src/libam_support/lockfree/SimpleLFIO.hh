@@ -44,8 +44,6 @@ public:
         out_ << preamble;
     }
 
-
-
     void flush_and_close() override
     {
         if (closed_) {

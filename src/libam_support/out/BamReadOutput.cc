@@ -75,7 +75,8 @@ void BamReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pairwi
     lfio_.push(std::move(sam_record), token);
 }
 
-void BamReadOutput::writePE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void BamReadOutput::writePE(
+    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -150,8 +151,8 @@ void BamReadOutput::writePE(const moodycamel::ProducerToken& token, const Pairwi
     lfio_.push(std::move(sam_record2), token);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
-BamReadOutput::BamReadOutput(
-    const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const BamOptions& sam_options,const int n_threads)
+BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
+    const BamOptions& sam_options, const int n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -176,11 +177,9 @@ void BamReadOutput::close()
 
 bool BamReadOutput::require_alignment() const { return true; }
 
-    moodycamel::ProducerToken BamReadOutput::get_producer_token() {
-        return lfio_.get_producer_token();
-    }
+moodycamel::ProducerToken BamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
-    void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
+void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     po::options_description bam_desc("SAM/BAM Output");
     bam_desc.add_options()(
@@ -213,9 +212,10 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
                                      << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
-        return std::make_shared<BamReadOutput>(params.vm["o-sam"].as<std::string>(), params.fasta_fetch, so, params.n_threads);
+        return std::make_shared<BamReadOutput>(
+            params.vm["o-sam"].as<std::string>(), params.fasta_fetch, so, params.n_threads);
     }
-    throw OutputNotSpecifiedException{};
+    throw OutputNotSpecifiedException {};
 }
 const std::string BamReadOutputFactory::name() const { return "BAM"; }
 

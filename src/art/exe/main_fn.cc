@@ -75,7 +75,7 @@ public:
     }
     void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
     {
-        OutParams params{art_io_params_.parallel, art_io_params_.vm,  art_io_params_.args, fetch};
+        OutParams params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
         out_dispatcher_ = out_dispatcher_factory.create(params);
     }
 

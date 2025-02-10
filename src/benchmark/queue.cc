@@ -90,7 +90,8 @@ void pyqueue_consumer(PyQueue<std::string>& queue)
 #endif
 }
 
-    [[maybe_unused]] void mcqueue_explicit_producer(moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_unused]] std::size_t id)
+[[maybe_unused]] void mcqueue_explicit_producer(
+    moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_unused]] std::size_t id)
 {
 #if VERBOSE_IO
     BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
@@ -108,23 +109,24 @@ void pyqueue_consumer(PyQueue<std::string>& queue)
     BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
 #endif
 }
-    [[maybe_unused]] void mcqueue_implicit_producer(moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_unused]] std::size_t id)
-    {
+[[maybe_unused]] void mcqueue_implicit_producer(
+    moodycamel::ConcurrentQueue<std::string>& queue, [[maybe_unused]] std::size_t id)
+{
 #if VERBOSE_IO
-        BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
+    BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
 #endif
-        randgen_t gen { std::random_device()() };
-        std::size_t i = 0;
-        while (i < nitems) {
-            while (!queue.try_enqueue(randstr(gen))) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
-            i++;
+    randgen_t gen { std::random_device()() };
+    std::size_t i = 0;
+    while (i < nitems) {
+        while (!queue.try_enqueue(randstr(gen))) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
         }
-#if VERBOSE_IO
-        BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
-#endif
+        i++;
     }
+#if VERBOSE_IO
+    BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
+#endif
+}
 
 [[maybe_unused]] void mcqueue_consumer_single(moodycamel::ConcurrentQueue<std::string>& queue)
 {
@@ -175,30 +177,29 @@ void mcqueue_consumer_bulk_implicit(moodycamel::ConcurrentQueue<std::string>& qu
 #endif
 }
 
-    void mcqueue_consumer_bulk_explicit(moodycamel::ConcurrentQueue<std::string>& queue)
-    {
+void mcqueue_consumer_bulk_explicit(moodycamel::ConcurrentQueue<std::string>& queue)
+{
 #if VERBOSE_IO
-        BOOST_LOG_TRIVIAL(info) << "consumer thread started";
+    BOOST_LOG_TRIVIAL(info) << "consumer thread started";
 #endif
-        moodycamel::ConsumerToken token(queue);
-        std::size_t i = 0;
-        std::size_t pop_ret_cnt = 0;
-        std::array<std::string, bulk_size> retp_a;
-        while (i < nitems * nthreads) {
-            pop_ret_cnt = queue.try_dequeue_bulk(token, retp_a.data(), bulk_size);
+    moodycamel::ConsumerToken token(queue);
+    std::size_t i = 0;
+    std::size_t pop_ret_cnt = 0;
+    std::array<std::string, bulk_size> retp_a;
+    while (i < nitems * nthreads) {
+        pop_ret_cnt = queue.try_dequeue_bulk(token, retp_a.data(), bulk_size);
 #if VERBOSE_IO
-            if (pop_ret_cnt == 0) {
+        if (pop_ret_cnt == 0) {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             BOOST_LOG_TRIVIAL(info) << i << " elements consumed";
         }
 #endif
-            i += pop_ret_cnt;
-        }
-#if VERBOSE_IO
-        BOOST_LOG_TRIVIAL(info) << "consumer thread ended";
-#endif
+        i += pop_ret_cnt;
     }
-
+#if VERBOSE_IO
+    BOOST_LOG_TRIVIAL(info) << "consumer thread ended";
+#endif
+}
 
 void bench_pyqueue()
 {
@@ -230,21 +231,20 @@ void bench_moody_camel_explicit()
     consumer.join();
 }
 
-    void bench_moody_camel_implicit()
-    {
-        moodycamel::ConcurrentQueue<std::string> queue(queue_size, 0,nthreads);
-        std::vector<std::thread> producers;
-        producers.reserve(nthreads);
-        for (std::size_t i = 0; i < nthreads; i++) {
-            producers.emplace_back(mcqueue_implicit_producer, std::ref(queue), i);
-        }
-        std::thread consumer(mcqueue_consumer_bulk_implicit, std::ref(queue));
-        for (auto& producer : producers) {
-            producer.join();
-        }
-        consumer.join();
+void bench_moody_camel_implicit()
+{
+    moodycamel::ConcurrentQueue<std::string> queue(queue_size, 0, nthreads);
+    std::vector<std::thread> producers;
+    producers.reserve(nthreads);
+    for (std::size_t i = 0; i < nthreads; i++) {
+        producers.emplace_back(mcqueue_implicit_producer, std::ref(queue), i);
     }
-
+    std::thread consumer(mcqueue_consumer_bulk_implicit, std::ref(queue));
+    for (auto& producer : producers) {
+        producer.join();
+    }
+    consumer.join();
+}
 
 } // namespace
 int main()
