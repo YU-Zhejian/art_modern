@@ -1,4 +1,6 @@
 CMAKE_FLAGS ?= 
+JOBS ?= 20
+
 
 .PHONY: build
 build:
@@ -9,7 +11,7 @@ build:
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_debug -j40
+	cmake --build opt/build_debug -j$(JOBS)
 	env -C opt/build_debug ctest --output-on-failure
 	opt/build_debug/art_modern --help
 	opt/build_debug/art_modern --version # mpiexec --verbose -n 5 
@@ -23,7 +25,7 @@ release:
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_release -j40
+	cmake --build opt/build_release -j$(JOBS)
 	# cpack --config opt/build_release/CPackSourceConfig.cmake
 
 .PHONY: rel_with_dbg_alpine
@@ -37,7 +39,7 @@ rel_with_dbg_alpine:
 		-DUSE_RANDOM_GENERATOR=BOOST \
         $(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_rel_with_dbg_alpine -j40
+	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
 
 .PHONY: fmt
 fmt:

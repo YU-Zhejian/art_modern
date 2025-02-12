@@ -127,3 +127,5 @@ CMakeLists.txt.user
 /.vscode/*
 !/.vscode/ltex.dictionary.en-US.txt
 !/.vscode/ltex.disabledRules.en-US.txt
+perf.data*
+*.geany
