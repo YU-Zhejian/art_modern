@@ -17,7 +17,7 @@ export ERR_FA="data/raw_data/err.fa"
 echo "ART=${ART}"
 
 function sam2bam() {
-	# Single-threaded sorting should be fast enough
+    # Single-threaded sorting should be fast enough
     samtools sort --write-index "${1}".sam -o "${1}".bam
     python sh.d/test_small.sh.d/test_sam.py "${2}" "${1}".bam
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai

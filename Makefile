@@ -1,5 +1,5 @@
 CMAKE_FLAGS ?= 
-JOBS ?= 20
+JOBS ?= 40
 
 
 .PHONY: build
@@ -14,7 +14,7 @@ build:
 	cmake --build opt/build_debug -j$(JOBS)
 	env -C opt/build_debug ctest --output-on-failure
 	opt/build_debug/art_modern --help
-	opt/build_debug/art_modern --version # mpiexec --verbose -n 5 
+	opt/build_debug/art_modern --version
 
 .PHONY: release
 release:
@@ -68,3 +68,23 @@ raw_data:
 .PHONY: clean
 clean:
 	rm -fr opt tmp build
+
+.PHONY: testbuild-child
+testbuild-child:
+	rm -fr opt/testbuild
+	mkdir -p opt/testbuild
+	env -C opt/testbuild cmake \
+		-Wdev -Wdeprecated --warn-uninitialized \
+		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		$(CMAKE_FLAGS) \
+		$(CURDIR)
+	cmake --build opt/testbuild -j$(JOBS)
+	env -C opt/testbuild ctest --output-on-failure
+	opt/testbuild/art_modern --help
+	opt/testbuild/art_modern --version
+
+
+.PHONY: testbuild
+testbuild:
+	mkdir -p opt/testbuild
+	bash sh.d/test-build.sh

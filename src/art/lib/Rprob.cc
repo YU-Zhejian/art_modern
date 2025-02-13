@@ -107,7 +107,7 @@ double Rprob::r_prob()
     vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 0.0, 1.0);
     return result;
 #elif defined(USE_GSL_RANDOM)
-    return gsl_rng_uniform(r)
+    return gsl_rng_uniform(r);
 #endif
 }
 

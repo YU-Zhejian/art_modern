@@ -23,5 +23,3 @@ perf record -F 250 -a -g -- \
     --del_rate_1 0.1 \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
-
-

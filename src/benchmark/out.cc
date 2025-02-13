@@ -176,7 +176,8 @@ public:
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void writePE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/, [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
+    void writePE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/,
+        [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
         [[maybe_unused]] const PairwiseAlignment& /** pwa2 **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());

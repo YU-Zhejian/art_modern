@@ -49,7 +49,7 @@ void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_
     }
 }
 
-void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, std::size_t nthread)
+void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, const std::size_t nthread)
 {
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
     std::chrono::high_resolution_clock::time_point start;
@@ -67,7 +67,8 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     end = std::chrono::high_resolution_clock::now();
 }
 
-void speed2devnull(){
+void speed2devnull()
+{
     const std::size_t block_size = 4ULL * K_SIZE;
     const std::size_t n_blocks = 20ULL * M_SIZE;
     const std::string block = std::string(block_size, '\0');
@@ -78,7 +79,8 @@ void speed2devnull(){
     }
     ofs.close();
     auto end = std::chrono::high_resolution_clock::now();
-    const double speed = 1.0 * (n_blocks * block_size) / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() * 1000;
+    const double speed = 1.0 * (n_blocks * block_size)
+        / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() * 1000;
     std::cout << "Speed: " << to_si(speed) << "B/s" << std::endl;
 }
 
