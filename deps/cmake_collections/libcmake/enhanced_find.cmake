@@ -1,6 +1,6 @@
 # Finds packages.
 
-find_package(PkgConfig)
+find_package(PkgConfig QUIET)
 
 #[=======================================================================[
 ceu_cm_get_abspath_from_linker_flag -- Get absolute path of libraries from linker flag.
@@ -226,7 +226,8 @@ function(ceu_cm_enhanced_find_library)
         ceu_cm_get_library_abspath_from_pkg_config("${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS"
                                                    "${CEU_CM_EFL_PKGCONF_NAME}" "${CEU_CM_EFL_STATIC}")
     endif()
-    if(${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS)
+    if(DEFINED ${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS
+       AND ${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS)
         if(CEU_CM_EFL_STATIC)
             set(THIS_CFLAGS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_STATIC_CFLAGS_OTHER})
             set(THIS_LDFLAGS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_STATIC_LDFLAGS_OTHER})
@@ -246,7 +247,7 @@ function(ceu_cm_enhanced_find_library)
         set_target_properties(
             CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
             PROPERTIES INTERFACE_LINK_LIBRARIES "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}"
-                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS};${THIS_LDFLAGS}"
+                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS}" INTERFACE_LINK_OPTIONS "${THIS_LDFLAGS}"
                        INTERFACE_INCLUDE_DIRECTORIES "${THIS_INCDIRS}")
         unset(THIS_CFLAGS)
         unset(THIS_LDFLAGS)
@@ -276,7 +277,7 @@ function(ceu_cm_enhanced_find_library)
 
     message(
         STATUS
-            "CEU_CM_EFL: Exporting target CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}=${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS} (${CEU_CM_EFL_OUTPUT_TYPE})"
+            "CEU_CM_EFL: Exporting target CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}(${CEU_CM_EFL_OUTPUT_TYPE}) LIBS=${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS} "
     )
     unset(CEU_CM_EFL_OUTPUT_TYPE)
     unset(CEU_CM_EFL_STATIC)

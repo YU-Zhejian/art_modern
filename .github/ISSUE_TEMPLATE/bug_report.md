@@ -29,7 +29,7 @@ Please provide the following information about your system by replacing the plac
 
 - [ ] Version of dependencies and how they're installed. List those in the following format while removing those unused ones.
 
-  - GNU Binutils; `2.42-4ubuntu2.3`; Official APT Source.
+  - GNU BinUtils; `2.42-4ubuntu2.3`; Official APT Source.
   - GNU Science Library; `2.7.1==he838d99_0`; Conda under `conda-forge` channel.
   - Boost; `1.87.0`; Compiled from official source tarballs.
   - HTSLib; `1.21`; Bundled.
@@ -82,7 +82,7 @@ Please provide the following information about your system by replacing the plac
 
   ```text
   linux-vdso.so.1 (0x00007ffc101e0000)
-  libart_modern_lib.so => /workbench/opt/build_release/libart_modern_lib.so (0x00007f1cd746d000)
+  libam_support_lib.so => /workbench/opt/build_release/libam_support_lib.so (0x00007f1cd746d000)
   libboost_regex.so.1.85.0 => /lib64/libboost_regex.so.1.85.0 (0x00007f1cd741f000)
   [...]
   libgcc_s.so.1 => /lib64/libgcc_s.so.1 (0x00007f1cd6bab000)
@@ -93,7 +93,7 @@ Please provide the following information about your system by replacing the plac
   ```text
   Dynamic section at offset 0x69c88 contains 47 entries:
     Tag        Type                         Name/Value
-  0x0000000000000001 (NEEDED)             Shared library: [libart_modern_lib.so]
+  0x0000000000000001 (NEEDED)             Shared library: [libam_support_lib.so]
   0x0000000000000001 (NEEDED)             Shared library: [libboost_regex.so.1.85.0]
   0x0000000000000001 (NEEDED)             Shared library: [libboost_program_options.so.1.85.0]
   [...]

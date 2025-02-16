@@ -57,24 +57,23 @@ bin/pirs simulate -A dist -m 500 -l 300 -x "${FCOV}" -v 20 -t 20 \
     -o "${OUT_DIR}"/pirs \
     -c text \
     "${REF}" &
-
+wait
 opt/art_modern_build/art_modern --lc pe \
     --i-file "${REF}" --i-fcov "${FCOV}" --read_len 100 \
     --o-fastq "${OUT_DIR}"/pe100_art_modern.fq \
     --qual_file_1 data/e_coli_HiSeq2K_art_R1.txt \
     --qual_file_2 data/e_coli_HiSeq2K_art_R2.txt \
-    --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 &
+    --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20
 opt/art_modern_build/art_modern --lc pe \
     --i-file "${REF}" --i-fcov "${FCOV}" --read_len 300 \
     --o-fastq "${OUT_DIR}"/pe300_art_modern.fq \
     --qual_file_1 data/soybean_HiSeq2500_art_R1.txt \
     --qual_file_2 data/soybean_HiSeq2500_art_R2.txt \
-    --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20 &
+    --pe_frag_dist_mean 500 --pe_frag_dist_std_dev 20
 
 for i in 1 2; do
     for rlen in 100 300; do
         mv "${OUT_DIR}"/pirs/Sim_"${rlen}"_500_"${i}".fq "${OUT_DIR}"/pe"${rlen}"_pirs_"${i}".fq
-
         mv "${OUT_DIR}"/pe"${rlen}"_dwgsim.bwa.read"${i}".fastq "${OUT_DIR}"/pe"${rlen}"_dwgsim_"${i}".fq
 
         seqtk seq -"${i}" "${OUT_DIR}"/pe"${rlen}"_art_modern.fq >"${OUT_DIR}"/pe"${rlen}"_art_modern_"${i}".fq

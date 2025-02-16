@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2317
+# shellcheck disable=SC1091
 AMD_COMPILER_PATH="${AMD_COMPILER_PATH:-/opt/AMD/aocc-compiler-5.0.0/}"
 AMD_UPROF_PATH="${AMD_COMPILER_PATH:-/opt/AMDuProf_5.0-1479/}"
 AMD_AOCL_PATH="${AMD_COMPILER_PATH:-/opt/AMD/aocl/aocl-linux-aocc-5.0.0/aocc/}"

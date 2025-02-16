@@ -4,15 +4,15 @@
 #include <fstream>
 #include <iostream>
 
-#include "libam/Constants.hh"
-#include "libam/ds/PairwiseAlignment.hh"
-#include "libam/out/OutputDispatcher.hh"
-#include "libam/ref/batcher/Pbsim3TranscriptBatcher.hh"
-#include "libam/ref/fetch/FaidxFetch.hh"
-#include "libam/ref/fetch/InMemoryFastaFetch.hh"
-#include "libam/utils/fs_utils.hh"
-#include "libam/utils/mpi_utils.hh"
-#include "libam/utils/seq_utils.hh"
+#include "libam_support/Constants.hh"
+#include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/out/OutputDispatcher.hh"
+#include "libam_support/ref/batcher/Pbsim3TranscriptBatcher.hh"
+#include "libam_support/ref/fetch/FaidxFetch.hh"
+#include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 namespace po = boost::program_options;
 using namespace labw::art_modern;

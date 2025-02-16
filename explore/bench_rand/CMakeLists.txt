@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
 set(CMAKE_CXX_STANDARD 17)
 
 if(NOT DEFINED BOOST_CONFIG_PROVIDED_BY_BOOST)
@@ -44,13 +44,13 @@ find_package(absl REQUIRED)
 set(LINK_LIBS MKL::MKL GSL::gsl absl::random_random absl::random_distributions)
 
 add_executable(bench_common_task bench_common_task.cc)
-target_link_libraries(bench_common_task ${LINK_LIBS})
+target_link_libraries(bench_common_task PUBLIC ${LINK_LIBS})
 
 add_executable(bench_bits bench_bits.cc)
-target_link_libraries(bench_bits ${LINK_LIBS})
+target_link_libraries(bench_bits PUBLIC ${LINK_LIBS})
 
 add_executable(bench_dists bench_dists.cc)
-target_link_libraries(bench_dists ${LINK_LIBS})
+target_link_libraries(bench_dists PUBLIC ${LINK_LIBS})
 
 add_executable(bench_uniform_real bench_uniform_real.cc)
-target_link_libraries(bench_uniform_real ${LINK_LIBS})
+target_link_libraries(bench_uniform_real PUBLIC ${LINK_LIBS})

@@ -3,11 +3,11 @@
 ## IMPORTANT
 
 - ART stuck at one read. Why?
-- Separation of compile and link options required.
+- `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 
 ## Performance
 
-- The home-made "asynchronous IO" may be inefficient in SSDs.
+- The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. Consider using the method implemented in `pigz`.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -18,7 +18,6 @@
         - [MPICH](https://www.mpich.org/).
         - [OpenMPI](https://www.open-mpi.org/).
         - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-        - [MS-MPI](https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi) (For working under MSYS2). See also: [MSYS2 Package Repository](https://packages.msys2.org/packages/mingw-w64-x86_64-msmpi)
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
 - Builtin profiles take too much space on the executable. May consider:
@@ -35,3 +34,8 @@
 - Working with >65535 CIGAR operations (very unlikely)? See [here](https://github.com/lh3/minimap2?tab=readme-ov-file#working-with-65535-cigar-operations).
 - Support UCSC 2bit input format for fast on-disk random access of reference genome? Also use such formats for internal representation of DNA sequences?
 - Add flags to disable/enable diverse BAM tags.
+
+## Known Incompatibilities
+
+- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
+- GCC would fail on Debian GNU/Hurd.

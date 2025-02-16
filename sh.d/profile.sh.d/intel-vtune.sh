@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2317
+# shellcheck disable=SC1091
 set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
@@ -33,14 +34,10 @@ for collect in hotspots threading memory-consumption; do # hpc-performance memor
         --mode wgs \
         --lc pe \
         --i-parser memory \
-        --i-fcov 20 \
-        --parallel 0 \
+        --i-fcov 100 \
+        --parallel 20 \
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500 \
-        --o-sam /dev/null \
-        --o-sam-write_bam \
-        --o-hl_sam /dev/null \
-        --o-fastq /dev/null \
-        --o-pwa /dev/null
+        --o-fastq /dev/null
     vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
 done

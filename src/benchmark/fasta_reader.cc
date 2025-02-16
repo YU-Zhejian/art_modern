@@ -1,6 +1,6 @@
-#include "libam/ref/fetch/BaseFastaFetch.hh"
-#include "libam/ref/fetch/FaidxFetch.hh"
-#include "libam/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/ref/fetch/FaidxFetch.hh"
+#include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 
 #include <htslib/hts.h>
 

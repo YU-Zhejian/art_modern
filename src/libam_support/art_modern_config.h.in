@@ -1,0 +1,52 @@
+#ifndef ART_MODERN_CONFIG_H
+#define ART_MODERN_CONFIG_H
+
+// Names and versions
+
+#cmakedefine USED_HTSLIB_NAME "${USED_HTSLIB_NAME}"
+#cmakedefine ART_MODERN_VERSION "${ART_MODERN_VERSION}"
+#cmakedefine ART_MODERN_LINK_LIBS "${ART_MODERN_LINK_LIBS}"
+
+// Random Generators
+
+#cmakedefine USE_STL_RANDOM
+#cmakedefine USE_PCG_RANDOM
+#cmakedefine USE_GSL_RANDOM
+#cmakedefine USE_BOOST_RANDOM
+#cmakedefine USE_ONEMKL_RANDOM
+
+// Library availability
+
+#cmakedefine WITH_BOOST_TIMER
+#cmakedefine WITH_MPI
+#cmakedefine WITH_GSL
+#cmakedefine WITH_ONEMKL
+#cmakedefine WITH_BOOST_STACKTRACE
+
+// Debug
+#cmakedefine CEU_CM_IS_DEBUG
+#cmakedefine USE_ASIO_PARALLEL
+#cmakedefine USE_BS_PARALLEL
+#cmakedefine USE_NOP_PARALLEL
+
+// std::map alternatives
+#cmakedefine USE_WALKER_QUALGEN
+#cmakedefine USE_STL_QUALGEN
+
+// Malloc
+#cmakedefine WITH_MIMALLOC
+#cmakedefine WITH_JEMALLOC
+
+// OpenMP
+#cmakedefine WITH_OPENMP
+#cmakedefine OpenMP_C_SPEC_DATE "${OpenMP_C_SPEC_DATE}"
+#cmakedefine OpenMP_CXX_SPEC_DATE "${OpenMP_CXX_SPEC_DATE}"
+#cmakedefine OpenMP_C_VERSION "${OpenMP_C_VERSION}"
+#cmakedefine OpenMP_CXX_VERSION "${OpenMP_CXX_VERSION}"
+
+// Git
+#cmakedefine WITH_GIT
+#cmakedefine CEU_CM_GIT_COMMIT_HASH "${CEU_CM_GIT_COMMIT_HASH}"
+#cmakedefine CEU_CM_GIT_COMMIT_DATE "${CEU_CM_GIT_COMMIT_DATE}"
+#cmakedefine CEU_CM_GIT_COMMIT_MESSAGE "${CEU_CM_GIT_COMMIT_MESSAGE}"
+#endif

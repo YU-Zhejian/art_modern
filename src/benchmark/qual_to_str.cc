@@ -1,5 +1,5 @@
-#include "libam/Dtypes.hh"
-#include "libam/utils/seq_utils.hh"
+#include "libam_support/Dtypes.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 #include <chrono>
 #include <cstdlib>

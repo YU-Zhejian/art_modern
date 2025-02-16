@@ -1,4 +1,5 @@
-# shell=bash
+# shellcheck shell=bash
+
 # Trans mode with constant coverage
 parser=memory
 FCOV=10

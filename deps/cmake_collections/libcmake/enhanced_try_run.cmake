@@ -1,10 +1,6 @@
 # TODO: Refactor this sh*t.
 include("${CMAKE_CURRENT_LIST_DIR}/../enable_debug.cmake")
 
-if(DEFINED CEU_CM_ADD_ETR_AS_TESTS)
-    enable_testing()
-endif()
-
 if(NOT DEFINED CEU_CM_TRY_COMPILE_INCLUDES)
     set(CEU_CM_TRY_COMPILE_INCLUDES
         ""
@@ -33,37 +29,6 @@ function(ceu_cm_enhanced_try_run)
             0
             CACHE INTERNAL "SKIP_ALL_TRY_RUN was set, skip all tests.")
         return()
-    endif()
-
-    # Add as test and evaluate later.
-    if(DEFINED CEU_CM_ADD_ETR_AS_TESTS)
-        set(TARGET_NAME CEU_CM_ "${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_${TARGET_POSTFIX}")
-
-        if(NOT TARGET "${TARGET_NAME}")
-            add_executable("${TARGET_NAME}" "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}")
-            message(STATUS "CEU_CM: Adding test ${TARGET_NAME}")
-            add_test("${TARGET_NAME}" "${TARGET_NAME}")
-
-            if(DEFINED CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS)
-                target_compile_definitions("${TARGET_NAME}" PRIVATE ${CEU_CM_ENHANCED_TRY_RUN_COMPILE_DEFS})
-            endif()
-
-            if(DEFINED CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES)
-                target_link_libraries("${TARGET_NAME}" PRIVATE ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES})
-            endif()
-
-            if(CEU_CM_ENHANCED_TRY_RUN_STATIC)
-                ceu_cm_set_static_target("${TARGET_NAME}")
-            endif()
-
-            set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
-                ON
-                CACHE INTERNAL "doc")
-            set(CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
-                0
-                CACHE INTERNAL "doc")
-            return()
-        endif()
     endif()
 
     # Start processing

@@ -1,4 +1,4 @@
-# shell=bash
+# shellcheck shell=bash
 
 for coverage in stranded strandless; do
     parser=memory

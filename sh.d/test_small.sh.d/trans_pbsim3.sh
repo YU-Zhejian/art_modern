@@ -1,4 +1,5 @@
-# shell=bash
+# shellcheck shell=bash
+
 # Trans mode with stranded/strandless coverage
 coverage=pbsim3
 parser=memory
