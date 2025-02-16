@@ -69,3 +69,7 @@ Bundled files:
 Bundled files:
 
 - `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
+
+## 1.1.3 (On-going)
+
+- Miscellaneous bug fixes.
