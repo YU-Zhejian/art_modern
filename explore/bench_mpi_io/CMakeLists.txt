@@ -1,10 +1,8 @@
 cmake_minimum_required(VERSION 3.17)
-set(CMAKE_CXX_STANDARD 17)
 
 project(bench_mpi_io)
 
-# Specify C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 find_package(MPI REQUIRED COMPONENTS C)
