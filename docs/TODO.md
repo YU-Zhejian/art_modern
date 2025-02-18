@@ -13,11 +13,10 @@
   - For `memory` parser, skip records based on MPI rank.
   - For `stream` parser, skip records based on MPI rank.
   - Revised dependencies section:
-    - Optional MPI library for MPI-based parallelism.
-      - MPI implementations (library and compiler). The following MPI implementations are supported:
-        - [MPICH](https://www.mpich.org/).
-        - [OpenMPI](https://www.open-mpi.org/).
-        - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
+    - Optional MPI library for MPI-based parallelism. The following MPI implementations are supported:
+      - [MPICH](https://www.mpich.org/).
+      - [OpenMPI](https://www.open-mpi.org/).
+      - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
 - Revise support over other random number generation functions.
 - Builtin profiles take too much space on the executable. May consider:

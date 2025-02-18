@@ -2,9 +2,26 @@
 
 This project uses GPL v3 License, a copy of which is available at [License.md](../License.md).
 
-Except those acknowledged in Readme, this project uses code from the following projects:
+---
 
-## GitHub `gitignore` Project
+This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under [GNU GPL v3](https://www.gnu.org/licenses/) license
+
+---
+
+This project uses code from the following projects (in no particular order):
+
+## HTSlib by Genome Research Ltd.
+
+Available from <https://github.com/samtools/htslib>.
+
+Affected files:
+
+- `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
+- `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
+
+**NOTE** This project uses the source code retrived from [SourceForge 1.21 Release Tarball](https://sourceforge.net/projects/samtools/files/samtools/1.21/htslib-1.21.tar.bz2/download).
+
+## `gitignore` by GitHub
 
 Available from <https://github.com/github/gitignore>
 
@@ -14,7 +31,7 @@ Affected files:
 
 With CC0 1.0 Universal License.
 
-## YU Zhejian's `libceu` Project
+## `libceu` by YU Zhejian
 
 Available from <https://github.com/YU-Zhejian/libceu>, commit `d1c043d8`.
 
@@ -27,7 +44,7 @@ With MIT License.
 
 **NOTE** This program was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
-## Cameron Desrochers's `moodycamel::ConcurrentQueue<T>` Project
+## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
 Available from <https://github.com/cameron314/concurrentqueue>, commit `6dd38b8`.
 
@@ -37,7 +54,7 @@ Affected files:
 
 Dual-licensed under Simplified BSD License and Boost Software License.
 
-## William Sherif's "Nibble And A Half" Project
+## Nibble And A Half by William Sherif
 
 Originally from <https://github.com/superwills/NibbleAndAHalf>.
 
@@ -51,7 +68,7 @@ Under an MIT-like License.
 
 **NOTE** Some modifications were done to supress clang-tidy warnings.
 
-## Barak Shoshany's `BS::thread_pool` Project
+## `BS::thread_pool` by Barak Shoshany
 
 Available from <https://github.com/bshoshany/thread-pool>, commit `aa3fbfb`.
   
@@ -61,7 +78,7 @@ Affected files:
   
 Under the MIT License.
 
-## Google Inc. Abseil Project
+## Abseil by Google Inc.
 
 Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
 
@@ -69,7 +86,7 @@ Affected files:
 
 - `/deps/slim_abseil/**`
 
-## Google Inc. and German Mendez Bravo C++ B-tree Project
+## Bravo C++ B-tree by Google Inc. \& German Mendez
 
 Available from <https://github.com/Kronuz/cpp-btree>, commit `3e9f417`.
 
@@ -79,7 +96,7 @@ Affected files:
 
 Under the Apache License, Version 2.0.
 
-## Victor Zverovich's `{fmt}` Project
+## `{fmt}` by Victor Zverovich
 
 Available from <https://github.com/fmtlib/fmt>, commit `a3d05d70` (tag `7.1.3`).
 
@@ -91,7 +108,7 @@ Under an MIT-like License.
 
 **NOTE** This is the last version that does not come with C++20 modules.
 
-## Melissa O'Neill and PCG Project Contributors' PCG Project
+## PCG by Melissa O'Neill \& PCG Project Contributors
 
 Available from <https://github.com/imneme/pcg-cpp>.
 

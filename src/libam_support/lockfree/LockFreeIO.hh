@@ -65,7 +65,7 @@ public:
         start_time_ = std::chrono::high_resolution_clock::now();
         thread_ = std::thread(&LockFreeIO::run, this);
     }
-    virtual void flush_and_close() { };
+    virtual void flush_and_close() {};
 
     void stop()
     {
