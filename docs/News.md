@@ -72,4 +72,5 @@ Bundled files:
 
 ## 1.1.3 (On-going)
 
+- A severe bug in builtin profiles fixed. Now all builtin profiles should be usable without problems. Also eliminated [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings) warning.
 - Miscellaneous bug fixes.

@@ -21,7 +21,7 @@ using am_cigar_type_t = uint8_t;
  */
 using am_cigar_t = uint32_t;
 /** ART quality distribution. */
-using am_qual_count_t = int;
+using am_qual_count_t = uint64_t;
 /**
  * Number of reads.
  *

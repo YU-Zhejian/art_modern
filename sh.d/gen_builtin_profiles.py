@@ -33,24 +33,30 @@ if __name__ == "__main__":
             wh.write("#pragma once\n")
             wh.write("namespace labw::art_modern {\n")
             w.write("namespace labw::art_modern {\n")
-            wh.write(f'char NULL_PROFILE[] = "\\0";\n')
+            wh.write("extern char NULL_PROFILE[1];\n")
+            w.write("char NULL_PROFILE[1] = {0};\n")
             snames = []
             snames_constructed = []
             for sname, files in sname_file_mapping.items():
                 snames.append(sname)
                 for i, file in enumerate(files):
                     with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
-                        data = str(base64.b64encode(r.read()), encoding="US-ASCII")
+                        data = r.read()  # base64.b64encode() # b"PLACEHOLDER"
+                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.cc"), "w") as sw:
+                        sw.write("namespace labw::art_modern {\n")
 
-                    w.write(f"char {sname}_{i}[] = \\")
-                    while data:
-                        w.write('\n"')
-                        w.write(data[:80])
-                        data = data[80:]
-                        w.write('"')
-                    w.write(";\n")
+                        sw.write(f"char {sname}_{i}[{len(data)}]" + " = {\n")
+                        cw = 0
+                        for c in data[:-1]:
+                            sw.write(hex(c))
+                            sw.write(", ")
+                            cw += 1
+                            if cw % 10 == 0:
+                                sw.write("\n")
+                        sw.write(hex(data[-1]))
+                        sw.write("\n};\n}\n")
 
-                    wh.write(f"extern char {sname}_{i}[];\n")
+                    wh.write(f"extern char {sname}_{i}[{len(data)}];\n")
                 snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if i == 0 else f"{sname}_1") + "}")
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
             wh.write("char* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
