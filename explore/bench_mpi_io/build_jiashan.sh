@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
-module () 
-{ 
-    eval `/usr/bin/modulecmd bash $*`
+module() {
+    eval $(/usr/bin/modulecmd bash $*)
 }
 module load mpi/openmpi/4.1.4-gcc
 

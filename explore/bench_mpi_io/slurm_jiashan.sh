@@ -8,11 +8,9 @@
 #SBATCH --error=logs/%j.err
 #SBATCH --time=72:00:00
 
-module () 
-{ 
-    eval `/usr/bin/modulecmd bash $*`
+module() {
+    eval $(/usr/bin/modulecmd bash $*)
 }
-
 
 module load mpi/openmpi/4.1.4-gcc
 

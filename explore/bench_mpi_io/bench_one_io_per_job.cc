@@ -20,7 +20,6 @@ static void mpi_job()
     MPI_Get_processor_name(processor_name, &name_len);
     const auto processor_name_str = std::string(processor_name, name_len);
 
-
     std::ostringstream ss;
     ss << "test-" << rank;
     const std::string fpath = ss.str();
