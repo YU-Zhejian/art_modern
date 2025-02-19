@@ -356,7 +356,8 @@ namespace {
                         BOOST_LOG_TRIVIAL(fatal)
                             << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
                     }
-                    auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], ENCODED_BUILTIN_PROFILES[i][1]),
+                    auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0],
+                                             ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]),
                         sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
                     qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
                     qdist.index();
