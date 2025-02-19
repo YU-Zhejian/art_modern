@@ -21,7 +21,6 @@
 - Revise support over other random number generation functions.
 - Builtin profiles take too much space on the executable. May consider:
   - Use a CMake option that disables embedding of builtin profiles.
-  - Compress builtin profiles using LZW/BWT+RLE. Write a benchmark and see which one is smaller.
 
 ## I/O Formats
 

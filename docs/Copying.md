@@ -19,7 +19,7 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrived from [SourceForge 1.21 Release Tarball](https://sourceforge.net/projects/samtools/files/samtools/1.21/htslib-1.21.tar.bz2/download).
+**NOTE** This project uses the source code retrieved from [SourceForge 1.21 Release Tarball](https://sourceforge.net/projects/samtools/files/samtools/1.21/htslib-1.21.tar.bz2/download).
 
 ## `gitignore` by GitHub
 
@@ -30,6 +30,8 @@ Affected files:
 - `/.gitignore`
 
 With CC0 1.0 Universal License.
+
+**NOTE** Added in 1.0.0.
 
 ## `libceu` by YU Zhejian
 
@@ -42,7 +44,9 @@ Affected files:
   
 With MIT License.
 
-**NOTE** This program was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
+**NOTE** Added in 1.0.0.
+
+**NOTE** This project was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
@@ -53,6 +57,8 @@ Affected files:
 - `/deps/concurrentqueue/**`
 
 Dual-licensed under Simplified BSD License and Boost Software License.
+
+**NOTE** Added in 1.0.0.
 
 ## Nibble And A Half by William Sherif
 
@@ -68,6 +74,10 @@ Under an MIT-like License.
 
 **NOTE** Some modifications were done to supress clang-tidy warnings.
 
+**NOTE** Added in 1.1.0.
+
+**NOTE** No longer used since 1.1.3.
+
 ## `BS::thread_pool` by Barak Shoshany
 
 Available from <https://github.com/bshoshany/thread-pool>, commit `aa3fbfb`.
@@ -78,6 +88,8 @@ Affected files:
   
 Under the MIT License.
 
+**NOTE** Added in 1.1.0.
+
 ## Abseil by Google Inc.
 
 Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
@@ -85,6 +97,8 @@ Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
 Affected files:
 
 - `/deps/slim_abseil/**`
+
+**NOTE** Added in 1.1.0.
 
 ## Bravo C++ B-tree by Google Inc. \& German Mendez
 
@@ -96,6 +110,10 @@ Affected files:
 
 Under the Apache License, Version 2.0.
 
+**NOTE** Added in 1.1.1.
+
+**NOTE** No longer used in main code since 1.1.2.
+
 ## `{fmt}` by Victor Zverovich
 
 Available from <https://github.com/fmtlib/fmt>, commit `a3d05d70` (tag `7.1.3`).
@@ -105,6 +123,8 @@ Affected files:
 - `/deps/slim_libfmt/**`
 
 Under an MIT-like License.
+
+**NOTE** Added in 1.1.1.
 
 **NOTE** This is the last version that does not come with C++20 modules.
 
@@ -117,5 +137,7 @@ Affected files:
 - `/deps/pcg-cpp-0.98/**`
 
 Licensed under the MIT License and Apache 2.0 License.
+
+**NOTE** Added in 1.1.1.
 
 **NOTE** This project used the version retried [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.
