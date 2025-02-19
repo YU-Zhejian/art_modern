@@ -5,6 +5,9 @@
 
 #include <pcg_random.hpp>
 
+// This library should present when linking to HTSLib.
+#include <zlib.h>
+
 #include <cstddef>
 #include <stdexcept>
 #include <vector>
@@ -94,7 +97,7 @@ private:
         runValues.push_back(currentChar);
         runLengths.push_back(count);
     }
-    std::string encode(){
+    std::string encode() const{
         std::ostringstream ss;
         uint32_t len = runLengths.size();
         ss << std::string (reinterpret_cast<const char*>(&len), 4);
@@ -125,6 +128,7 @@ private:
         }
         return ss.str();
     }
+
 public:
     static std::string compress(const std::string& src){
         RLEFormat rle = RLEFormat(src);
@@ -133,6 +137,90 @@ public:
     static std::string decompress(const std::string& src){
         RLEFormat rle = RLEFormat::decode(src);
         return rle.to_original();
+    }
+};
+
+class GZipFormat {
+private:
+    constexpr static int BUFF_SIZE = 32768;
+public:
+
+    static std::string compress(const std::string& src){
+        z_stream zs;
+        std::memset(&zs, 0, sizeof(zs));
+
+        // Initialize zlib stream for compression
+        if (deflateInit2(&zs, Z_DEFAULT_COMPRESSION, Z_DEFLATED, 16 + MAX_WBITS, 8, Z_DEFAULT_STRATEGY) != Z_OK) {
+            throw std::runtime_error("Failed to initialize zlib stream");
+        }
+
+        zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(src.c_str()));
+        zs.avail_in = src.size();
+
+        int ret;
+        char outbuffer[BUFF_SIZE];
+        std::string outstring;
+
+        // Compress the data
+        do {
+            zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+            zs.avail_out = sizeof(outbuffer);
+
+            ret = deflate(&zs, Z_FINISH);
+
+            if (outstring.size() < zs.total_out) {
+                outstring.append(outbuffer, zs.total_out - outstring.size());
+            }
+        } while (ret == Z_OK);
+
+        // Clean up
+        deflateEnd(&zs);
+
+        // Check for errors
+        if (ret != Z_STREAM_END) {
+            throw std::runtime_error("Error during zlib compression: " + std::string(zs.msg));
+        }
+
+        return outstring;
+    }
+    static std::string decompress(const std::string& src){
+        z_stream zs;
+        std::memset(&zs, 0, sizeof(zs));
+
+        // Initialize zlib stream for decompression
+        if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
+            throw std::runtime_error("Failed to initialize zlib stream");
+        }
+
+        zs.next_in = reinterpret_cast<Bytef*>(const_cast<char*>(src.c_str()));
+        zs.avail_in = src.size();
+
+        int ret;
+        char outbuffer[BUFF_SIZE];
+        std::string outstring;
+
+        // Decompress the data
+        do {
+            zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+            zs.avail_out = sizeof(outbuffer);
+
+            ret = inflate(&zs, 0);
+
+            if (outstring.size() < zs.total_out) {
+                outstring.append(outbuffer, zs.total_out - outstring.size());
+            }
+        } while (ret == Z_OK);
+
+        // Clean up
+        inflateEnd(&zs);
+
+        // Check for errors
+        if (ret != Z_STREAM_END) {
+            throw std::runtime_error("Error during zlib decompression: " + std::string(zs.msg));
+        }
+
+        return outstring;
+
     }
 };
 
