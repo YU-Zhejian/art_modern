@@ -22,9 +22,9 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 
 
 project = "art_modern"  # FIXME
-author = "YUZJ"  # FIXME
-copyright_string = f"2022-2023, {author}"  # FIXME
-release = "2.1.0"  # FIXME
+author = "YU Zhejian"  # FIXME
+copyright_string = f"2024-2025, {author}"  # FIXME
+release = "1.1.3"  # FIXME
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
@@ -34,7 +34,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "myst_parser",
     "sphinx_copybutton",
-    "sphinx_design",
+    # "sphinx_design",
 ]
 
 myst_enable_extensions = ["deflist", "dollarmath"]
