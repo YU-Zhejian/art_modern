@@ -8,6 +8,7 @@
 ## Performance
 
 - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. Consider using the method implemented in `pigz`.
+- The current implementation tightly couples Moody Camel queue with output writers, which is not wise.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.

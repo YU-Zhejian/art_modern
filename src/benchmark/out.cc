@@ -2,6 +2,7 @@
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BamReadOutput.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/FastaReadOutput.hh"
@@ -11,11 +12,7 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <concurrentqueue.h>
-
 #include <fmt/core.h>
-
-#include <boost/log/trivial.hpp>
 
 #include <chrono>
 #include <cstddef>
@@ -29,7 +26,6 @@
 #include <utility>
 #include <vector>
 
-namespace logging = boost::log;
 using namespace labw::art_modern;
 
 #if 0
@@ -137,11 +133,11 @@ public:
         lfio_.init_queue(nthreads, 0);
         lfio_.start();
     }
-    void writeSE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
+    void writeSE(const ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
-    void writePE(const moodycamel::ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
+    void writePE(const ProducerToken& token, [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
         [[maybe_unused]] const PairwiseAlignment& /** pwa2 **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
@@ -156,7 +152,7 @@ public:
     [[nodiscard]] bool require_alignment() const override { return false; }
 
     ~EmptyLFIOReadOutput() override { close(); }
-    moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
+    ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
 
 private:
     EmptyLFIO lfio_;
@@ -171,12 +167,12 @@ public:
         lfio_.init_queue(0, nthreads);
         lfio_.start();
     }
-    void writeSE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/,
+    void writeSE([[maybe_unused]] const ProducerToken& /** token **/,
         [[maybe_unused]] const PairwiseAlignment& /** pwa **/) override
     {
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void writePE([[maybe_unused]] const moodycamel::ProducerToken& /** token **/,
+    void writePE([[maybe_unused]] const ProducerToken& /** token **/,
         [[maybe_unused]] const PairwiseAlignment& /** pwa1 **/,
         [[maybe_unused]] const PairwiseAlignment& /** pwa2 **/) override
     {
@@ -192,7 +188,7 @@ public:
     [[nodiscard]] bool require_alignment() const override { return false; }
 
     ~EmptyImplicitLFIOReadOutput() override { close(); }
-    moodycamel::ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
+    ProducerToken get_producer_token() override { return lfio_.get_producer_token(); }
 
 private:
     EmptyLFIO lfio_;

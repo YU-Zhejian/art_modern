@@ -8,12 +8,11 @@
 #include "libam_support/bam/BamTags.hh"
 #include "libam_support/bam/BamUtils.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
-
-#include <concurrentqueue.h>
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
@@ -42,7 +41,7 @@ HeadlessBamReadOutput::HeadlessBamReadOutput(
     lfio_.init_queue(n_threads, 0);
     lfio_.start();
 }
-void HeadlessBamReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
+void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
@@ -82,7 +81,7 @@ void HeadlessBamReadOutput::writeSE(const moodycamel::ProducerToken& token, cons
     lfio_.push(std::move(sam_record), token);
 }
 void HeadlessBamReadOutput::writePE(
-    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+    const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -178,7 +177,7 @@ HeadlessBamReadOutput::~HeadlessBamReadOutput() { HeadlessBamReadOutput::close()
 
 bool HeadlessBamReadOutput::require_alignment() const { return true; }
 
-moodycamel::ProducerToken HeadlessBamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
+ProducerToken HeadlessBamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
 void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

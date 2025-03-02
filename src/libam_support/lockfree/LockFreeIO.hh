@@ -1,11 +1,11 @@
 #pragma once
 
 #include "libam_support/Constants.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
 #include <boost/log/trivial.hpp>
-#include <utility>
 
 #include <concurrentqueue.h>
 
@@ -16,6 +16,7 @@
 #include <mutex> // NOLINT
 #include <string>
 #include <thread>
+#include <utility>
 
 namespace labw::art_modern {
 
@@ -51,9 +52,9 @@ public:
         num_reads_in_++;
     }
 
-    void push(T&& value, const moodycamel::ProducerToken& token)
+    void push(T&& value, const ProducerToken& token)
     {
-        while (!queue_.try_enqueue(token, std::move(value))) {
+        while (!queue_.try_enqueue(token.token, std::move(value))) {
             num_wait_in_++;
             std::this_thread::sleep_for(sleep_time);
         }
@@ -82,7 +83,7 @@ public:
     }
 
     virtual void write(T value) = 0;
-    moodycamel::ProducerToken get_producer_token() { return moodycamel::ProducerToken(queue_); }
+    ProducerToken get_producer_token() { return ProducerToken { moodycamel::ProducerToken { queue_ } }; }
 
 protected:
     std::size_t num_bytes_out_ = 0;

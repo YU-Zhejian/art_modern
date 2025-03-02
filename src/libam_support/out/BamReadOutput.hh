@@ -3,12 +3,11 @@
 #include "libam_support/bam/BamLFIO.hh"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
-
-#include <concurrentqueue.h>
 
 #include <boost/program_options/options_description.hpp>
 
@@ -26,14 +25,13 @@ public:
 
     BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
         const BamOptions& sam_options, int n_threads);
-    void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
-    void writePE(
-        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
+    void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;
     ~BamReadOutput() override;
 
     [[nodiscard]] bool require_alignment() const override;
-    moodycamel::ProducerToken get_producer_token() override;
+    ProducerToken get_producer_token() override;
 
 private:
     samFile* sam_file_;

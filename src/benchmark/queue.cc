@@ -96,7 +96,7 @@ void pyqueue_consumer(PyQueue<std::string>& queue)
 #if VERBOSE_IO
     BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
 #endif
-    const moodycamel::ProducerToken token(queue);
+    const ProducerToken token(queue);
     randgen_t gen { std::random_device()() };
     std::size_t i = 0;
     while (i < nitems) {

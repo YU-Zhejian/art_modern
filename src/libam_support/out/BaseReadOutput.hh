@@ -1,11 +1,10 @@
 #pragma once
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/options_description.hpp>
-
-#include <concurrentqueue.h>
 
 #include <atomic>
 #include <exception>
@@ -25,14 +24,12 @@ public:
     DELETE_COPY(BaseReadOutput)
 
     BaseReadOutput() = default;
-    virtual void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) = 0;
-    virtual void writePE(
-        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
-        = 0;
+    virtual void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) = 0;
+    virtual void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) = 0;
     virtual void close() = 0;
     [[nodiscard]] virtual bool require_alignment() const = 0;
     virtual ~BaseReadOutput() = default;
-    virtual moodycamel::ProducerToken get_producer_token() = 0;
+    virtual ProducerToken get_producer_token() = 0;
 
 protected:
     std::atomic<bool> closed_ = false;
