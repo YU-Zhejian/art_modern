@@ -7,8 +7,8 @@
 
 ## Performance
 
-- The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. Consider using the method implemented in `pigz`.
-- The current implementation tightly couples Moody Camel queue with output writers, which is not wise.
+- The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s.
+  - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -19,7 +19,6 @@
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
-- Revise support over other random number generation functions.
 - Builtin profiles take too much space on the executable. May consider:
   - Use a CMake option that disables embedding of builtin profiles.
 
