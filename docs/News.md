@@ -71,13 +71,15 @@ Bundled files:
 
 - `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
 
-## 1.1.3 (On-going)
+## 1.1.3 (2025/03/05)
 
 - A severe bug in builtin profiles fixed. Now all builtin profiles should be usable without problems. Also eliminated [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings) warning.
 - Builtin profiles no longer being represented in base64. They're now gzip-compressed instead.
-- [Sphinx](https://www.sphinx-doc.org/en/master/)-generated documentation added.
+- **EXPERIMENTAL** [Sphinx](https://www.sphinx-doc.org/en/master/)-generated documentation added.
 - Miscellaneous bug fixes.
 
 Bundled files:
 
 - `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
+- `art_modern.pdf`: Documentation in PDF format.
+- `art_modern.html.zip`: Documentation in HTML format.
