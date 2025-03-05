@@ -83,3 +83,7 @@ Bundled files:
 - `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
 - `art_modern.pdf`: Documentation in PDF format.
 - `art_modern.html.zip`: Documentation in HTML format.
+
+## 1.1.4 (Ongoing)
+
+- Miscellaneous bug fixes.

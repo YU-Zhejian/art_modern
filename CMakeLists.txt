@@ -10,7 +10,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.3)
+    VERSION 1.1.4)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
