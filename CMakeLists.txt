@@ -1,18 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
 
-if(NOT DEFINED BOOST_CONFIG_PROVIDED_BY_BOOST)
-    set(BOOST_CONFIG_PROVIDED_BY_BOOST ON)
-endif()
-set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
-
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
-    if(BOOST_CONFIG_PROVIDED_BY_BOOST)
-        cmake_policy(SET CMP0167 NEW)
-    else()
-        cmake_policy(SET CMP0167 OLD)
-    endif()
-endif()
-
 if(NOT DEFINED USE_CCACHE)
     set(USE_CCACHE OFF)
 endif()

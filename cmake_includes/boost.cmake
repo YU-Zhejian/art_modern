@@ -1,3 +1,16 @@
+if(NOT DEFINED BOOST_CONFIG_PROVIDED_BY_BOOST)
+    set(BOOST_CONFIG_PROVIDED_BY_BOOST ON)
+endif()
+set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
+
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
+    if(BOOST_CONFIG_PROVIDED_BY_BOOST)
+        cmake_policy(SET CMP0167 NEW)
+    else()
+        cmake_policy(SET CMP0167 OLD)
+    endif()
+endif()
+
 if(BUILD_SHARED_LIBS)
     add_definitions(-DBOOST_ALL_DYN_LINK)
     add_definitions(-DBOOST_LOG_DYN_LINK)
