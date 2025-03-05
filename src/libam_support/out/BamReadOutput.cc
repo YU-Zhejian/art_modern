@@ -8,6 +8,7 @@
 #include "libam_support/bam/BamTags.hh"
 #include "libam_support/bam/BamUtils.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
@@ -19,8 +20,6 @@
 #include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
-
-#include <concurrentqueue.h>
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>
@@ -34,7 +33,7 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 
-void BamReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
+void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
@@ -75,8 +74,7 @@ void BamReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pairwi
     lfio_.push(std::move(sam_record), token);
 }
 
-void BamReadOutput::writePE(
-    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -177,7 +175,7 @@ void BamReadOutput::close()
 
 bool BamReadOutput::require_alignment() const { return true; }
 
-moodycamel::ProducerToken BamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
+ProducerToken BamReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
 void BamReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

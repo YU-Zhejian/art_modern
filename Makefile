@@ -88,3 +88,7 @@ testbuild-child:
 testbuild:
 	mkdir -p opt/testbuild
 	bash sh.d/test-build.sh
+
+.PHONY: doc
+doc:
+	$(MAKE) -C docs/sphinx.d

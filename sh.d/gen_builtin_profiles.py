@@ -1,6 +1,7 @@
 import base64
 import os
 import sys
+import gzip
 
 sname_file_mapping = {
     # TODO: Separate this data to some INI/JSON file
@@ -25,35 +26,47 @@ sname_file_mapping = {
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
 }
 
+DTYPE = "unsigned char"
 
 if __name__ == "__main__":
     os.makedirs(sys.argv[1], exist_ok=True)
     with open(os.path.join(sys.argv[1], "builtin_profiles.cc"), "w") as w:
         with open(os.path.join(sys.argv[1], "builtin_profiles.hh"), "w") as wh:
-            wh.write("#pragma once\n")
+            wh.write("#pragma once\n#include <cstddef>\n")
             wh.write("namespace labw::art_modern {\n")
             w.write("namespace labw::art_modern {\n")
-            wh.write(f'char NULL_PROFILE[] = "\\0";\n')
+            wh.write(f"extern {DTYPE} NULL_PROFILE[1];\n")
+            w.write(DTYPE + " NULL_PROFILE[1] = {0};\n")
             snames = []
             snames_constructed = []
+            slengths_constructed = []
             for sname, files in sname_file_mapping.items():
+                slengths = []
                 snames.append(sname)
                 for i, file in enumerate(files):
                     with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
-                        data = str(base64.b64encode(r.read()), encoding="US-ASCII")
+                        data = gzip.compress(r.read(), 9)  # base64.b64encode() # b"PLACEHOLDER"
+                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.cc"), "w") as sw:
+                        sw.write("namespace labw::art_modern {\n")
 
-                    w.write(f"char {sname}_{i}[] = \\")
-                    while data:
-                        w.write('\n"')
-                        w.write(data[:80])
-                        data = data[80:]
-                        w.write('"')
-                    w.write(";\n")
+                        sw.write(f"{DTYPE} {sname}_{i}[{len(data)}]" + " = {\n")
+                        cw = 0
+                        for c in data[:-1]:
+                            sw.write(hex(c))
+                            sw.write(", ")
+                            cw += 1
+                            if cw % 10 == 0:
+                                sw.write("\n")
+                        sw.write(hex(data[-1]))
+                        sw.write("\n};\n}\n")
+                    slengths.append(len(data))
 
-                    wh.write(f"extern char {sname}_{i}[];\n")
+                    wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
                 snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if i == 0 else f"{sname}_1") + "}")
+                slengths_constructed.append("{" + f"{slengths[0]}, " + ("0" if i == 0 else f"{slengths[1]}") + "}")
+
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
-            wh.write("char* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
+            wh.write(DTYPE + "* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
             for sname_constructed in snames_constructed:
                 wh.write(f"    {sname_constructed},\n")
             wh.write("};\n")
@@ -61,6 +74,11 @@ if __name__ == "__main__":
             wh.write("const char* const BUILTIN_PROFILE_NAMES[N_BUILTIN_PROFILE] = {\n")
             for sname in snames:
                 wh.write(f'    "{sname}",\n')
+            wh.write("};\n")
+
+            wh.write("const std::size_t BUILTIN_PROFILE_LENGTHS[N_BUILTIN_PROFILE][2] = {\n")
+            for slength_constructed in slengths_constructed:
+                wh.write("    " + slength_constructed + ",\n")
             wh.write("};\n")
             wh.write("} // namespace labw::art_modern\n")
             w.write("} // namespace labw::art_modern\n")

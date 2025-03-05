@@ -1,18 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
 
-if(NOT DEFINED BOOST_CONFIG_PROVIDED_BY_BOOST)
-    set(BOOST_CONFIG_PROVIDED_BY_BOOST ON)
-endif()
-set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
-
-if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.30)
-    if(BOOST_CONFIG_PROVIDED_BY_BOOST)
-        cmake_policy(SET CMP0167 NEW)
-    else()
-        cmake_policy(SET CMP0167 OLD)
-    endif()
-endif()
-
 if(NOT DEFINED USE_CCACHE)
     set(USE_CCACHE OFF)
 endif()
@@ -23,7 +10,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.2)
+    VERSION 1.1.3)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
@@ -187,6 +174,17 @@ elseif(Boost_unit_test_framework_FOUND)
         set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
         target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC am_support_lib Boost::unit_test_framework)
+        add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
+        target_compile_options("${ART_MODERN_TEST_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
+    endforeach()
+
+    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/art/test/*.cc")
+
+    foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
+        get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
+        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
+        add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
+        target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC am_support_lib Boost::unit_test_framework art_modern_lib)
         add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
         target_compile_options("${ART_MODERN_TEST_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()

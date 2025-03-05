@@ -2,6 +2,7 @@
 #include "libam_support/Dtypes.hh"
 
 #include <cstddef>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -38,6 +39,19 @@ template <typename T> static void reverse(T* ptr, const size_t n)
         ptr[i] = ptr[n - i - 1];
         ptr[n - i - 1] = tmp;
     }
+}
+
+template <typename T> std::string vec2str(const std::vector<T>& vec)
+{
+    std::ostringstream oss;
+    std::size_t i = 0;
+    oss << "[";
+    while (i < vec.size() - 1) {
+        oss << std::to_string(vec[i]) + ", ";
+        i++;
+    }
+    oss << std::to_string(vec[i]) << "]";
+    return oss.str();
 }
 
 } // namespace labw::art_modern

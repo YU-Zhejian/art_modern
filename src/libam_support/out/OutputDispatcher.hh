@@ -1,13 +1,12 @@
 #pragma once
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/options_description.hpp>
-
-#include <concurrentqueue.h>
 
 #include <atomic>
 #include <memory>
@@ -21,7 +20,7 @@ class OutputDispatcher {
 public:
     DELETE_MOVE(OutputDispatcher)
     DELETE_COPY(OutputDispatcher)
-    using TokenRing = std::vector<moodycamel::ProducerToken>;
+    using TokenRing = std::vector<ProducerToken>;
 
     [[nodiscard]] bool require_alignment() const;
 

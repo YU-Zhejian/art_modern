@@ -316,3 +316,21 @@ cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boos
 ```
 
 You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).
+
+## Building Documentations
+
+Create a new conda environment and install the dependencies using:
+
+```shell
+conda env create -f env/art_modern_doc.yml
+conda activate art_modern_doc
+make doc
+```
+
+And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
+
+This step can be executed under Microsoft Windows if you have some GNU Make installed. If you use MikTeX, it may complain on not finding a `perl`. But you can have it installed through [Conda](https://docs.conda.io) anyway through:
+
+```shell
+conda install -c conda-forge perl
+```

@@ -321,7 +321,7 @@ namespace {
 
     void validate_min_max_qual(const am_qual_t min_qual, const am_qual_t max_qual)
     {
-        if (min_qual < 0 || min_qual > MAX_QUAL) {
+        if (min_qual < MIN_QUAL || min_qual > MAX_QUAL) {
             BOOST_LOG_TRIVIAL(fatal) << "Input Error: The minimum quality score must be an integer in [0," << MAX_QUAL
                                      << "]";
             abort_mpi();
@@ -356,7 +356,8 @@ namespace {
                         BOOST_LOG_TRIVIAL(fatal)
                             << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
                     }
-                    auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], ENCODED_BUILTIN_PROFILES[i][1]),
+                    auto qdist = Empdist(BuiltinProfile(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0],
+                                             ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]),
                         sep_flag, art_lib_const_mode != ART_LIB_CONST_MODE::SE, read_len);
                     qdist.shift_all_emp(sep_flag, q_shift_1, q_shift_2, min_qual, max_qual);
                     qdist.index();

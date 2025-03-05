@@ -1,10 +1,9 @@
 #include "libam_support/out/PwaReadOutput.hh"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
-
-#include <concurrentqueue.h>
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -27,7 +26,7 @@ namespace {
     }
 } // namespace
 
-void PwaReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
+void PwaReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
@@ -36,8 +35,7 @@ void PwaReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pairwi
     lfio_.push(std::move(os), token);
 }
 
-void PwaReadOutput::writePE(
-    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void PwaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -67,7 +65,7 @@ void PwaReadOutput::close()
 
 bool PwaReadOutput::require_alignment() const { return true; }
 
-moodycamel::ProducerToken PwaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
+ProducerToken PwaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
 void PwaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

@@ -1,10 +1,9 @@
 #include "libam_support/out/FastaReadOutput.hh"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
-
-#include <concurrentqueue.h>
 
 #include <fmt/core.h>
 
@@ -30,7 +29,7 @@ namespace {
 
 } // namespace
 
-void FastaReadOutput::writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa)
+void FastaReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment& pwa)
 {
     if (closed_) {
         return;
@@ -38,8 +37,7 @@ void FastaReadOutput::writeSE(const moodycamel::ProducerToken& token, const Pair
     lfio_.push(format_fasta(pwa), token);
 }
 
-void FastaReadOutput::writePE(
-    const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
+void FastaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
 {
     if (closed_) {
         return;
@@ -66,7 +64,7 @@ void FastaReadOutput::close()
 
 bool FastaReadOutput::require_alignment() const { return false; }
 
-moodycamel::ProducerToken FastaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
+ProducerToken FastaReadOutput::get_producer_token() { return lfio_.get_producer_token(); }
 
 void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {

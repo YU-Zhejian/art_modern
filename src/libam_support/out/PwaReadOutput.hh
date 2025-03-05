@@ -1,12 +1,11 @@
 #pragma once
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/lockfree/SimpleLFIO.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
-
-#include <concurrentqueue.h>
 
 #include <boost/program_options/options_description.hpp>
 
@@ -22,10 +21,9 @@ public:
     DELETE_COPY(PwaReadOutput)
 
     explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, int n_threads);
-    void writeSE(const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa) override;
-    void writePE(
-        const moodycamel::ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
-    moodycamel::ProducerToken get_producer_token() override;
+    void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
+    void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
+    ProducerToken get_producer_token() override;
 
     bool require_alignment() const override;
 
