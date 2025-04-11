@@ -44,33 +44,33 @@ PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_n
 
 std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
 {
-    const am_cigar_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
-    const am_cigar_t bam_diff = use_m ? BAM_CMATCH : BAM_CDIFF;
+    const am_cigar_ops_t bam_eq = use_m ? BAM_CMATCH : BAM_CEQUAL;
+    const am_cigar_ops_t bam_diff = use_m ? BAM_CMATCH : BAM_CDIFF;
 
     std::vector<am_cigar_t> cigar;
-    am_cigar_t current_cigar = 0;
-    am_cigar_t prev_cigar = bam_eq;
-    am_cigar_t cigar_len = 0;
+    am_cigar_ops_t current_cigar_ops = 0;
+    am_cigar_ops_t prev_cigar_ops = bam_eq;
+    am_cigar_len_t cigar_len = 0;
     const auto ref_len = aln_ref.length();
     for (decltype(aln_ref.length()) i = 0; i < ref_len; i++) {
         if (aln_ref[i] == aln_query[i]) {
-            current_cigar = bam_eq;
+            current_cigar_ops = bam_eq;
         } else if (aln_ref[i] == ALN_GAP) {
-            current_cigar = BAM_CINS;
+            current_cigar_ops = BAM_CINS;
         } else if (aln_query[i] == ALN_GAP) {
-            current_cigar = BAM_CDEL;
+            current_cigar_ops = BAM_CDEL;
         } else {
-            current_cigar = bam_diff;
+            current_cigar_ops = bam_diff;
         }
-        if (current_cigar != prev_cigar && cigar_len > 0) {
-            cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));
+        if (current_cigar_ops != prev_cigar_ops && cigar_len > 0) {
+            cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar_ops));
             cigar_len = 0;
         }
         cigar_len++;
-        prev_cigar = current_cigar;
+        prev_cigar_ops = current_cigar_ops;
     }
     if (cigar_len != 0) {
-        cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar));
+        cigar.emplace_back(bam_cigar_gen(cigar_len, prev_cigar_ops));
     }
     return cigar;
 }

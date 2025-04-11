@@ -45,8 +45,8 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
     hts_pos_t pos_on_ref = 0;
     std::ostringstream md_str_ss;
     int32_t nm = 0;
-    am_cigar_t this_cigar_len = 0;
-    am_cigar_t this_cigar_ops = 0;
+    am_cigar_len_t this_cigar_len = 0;
+    am_cigar_ops_t this_cigar_ops = 0;
 
     for (const auto& this_cigar : cigar) {
         this_cigar_len = bam_cigar_oplen(this_cigar);
@@ -147,8 +147,8 @@ void BamUtils::assert_correct_cigar(
 
     hts_pos_t pos_on_read = 0;
     hts_pos_t pos_on_ref = 0;
-    am_cigar_t this_cigar_ops = 0;
-    am_cigar_t this_cigar_len = 0;
+    am_cigar_ops_t this_cigar_ops = 0;
+    am_cigar_len_t this_cigar_len = 0;
     am_cigar_type_t this_cigar_type = 0;
     bool is_equal = false;
 

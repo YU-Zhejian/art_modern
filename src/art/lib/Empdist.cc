@@ -201,14 +201,10 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             continue;
         }
         leading_base = line[0];
-        if (sep_qual_ && (leading_base == 'A' || leading_base == 'C' || leading_base == 'G' || leading_base == 'T')) {
+        if ((sep_qual_ && (leading_base == 'A' || leading_base == 'C' || leading_base == 'G' || leading_base == 'T'))
+            || (!sep_qual_ && leading_base == '.')) {
             // Normal condition.
-        } else if (!sep_qual_ && leading_base == '.') {
-            // Normal condition.
-        } else if (leading_base == 'N') {
-            // TODO: Normal condition, ignored.
-            // However, the current version does not support N now
-            continue;
+            // Note that the current version does not support N now
         } else {
             continue;
         }
