@@ -26,6 +26,9 @@ if(TARGET CEU_CM_EFL::libbz2_shared)
         CEU_CM_EFL::libbz2_shared
         DEPENDS
         C_HELLOWORLD)
+    else()
+    set(CEU_CM_HAVE_WORKING_LIBBZ2_RUN_SHARED 127 CACHE INTERNAL "libbz2 not found.")
+    set(CEU_CM_HAVE_WORKING_LIBBZ2_COMPILE_SHARED OFF CACHE INTERNAL "libbz2 not found.")
 endif()
 if(TARGET CEU_CM_EFL::libbz2_static)
     ceu_cm_enhanced_try_run(
@@ -38,6 +41,9 @@ if(TARGET CEU_CM_EFL::libbz2_static)
         CEU_CM_EFL::libbz2_static
         DEPENDS
         C_HELLOWORLD)
+    else()
+    set(CEU_CM_HAVE_WORKING_LIBBZ2_RUN_STATIC 127 CACHE INTERNAL "libbz2 not found.")
+    set(CEU_CM_HAVE_WORKING_LIBBZ2_COMPILE_STATIC OFF CACHE INTERNAL "libbz2 not found.")
 endif()
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)
