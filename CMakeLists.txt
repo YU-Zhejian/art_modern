@@ -60,7 +60,7 @@ set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency scripts.
+# Dealing with dependency scripts.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
@@ -72,12 +72,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency libs as subdirs.
+# Dealing with dependency libs as subdirs.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency includes.
+# Dealing with dependency includes.
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")

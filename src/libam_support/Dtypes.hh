@@ -24,7 +24,7 @@ using am_cigar_ops_t = uint32_t;
 /**
  * Cigar length.
  */
-using am_cigar_len_t = uint32_t;
+using am_cigar_len_t = int32_t;
 /** ART quality distribution. */
 using am_qual_count_t = uint64_t;
 /**
