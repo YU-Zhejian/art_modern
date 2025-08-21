@@ -26,9 +26,13 @@ if(TARGET CEU_CM_EFL::liblzma_shared)
         CEU_CM_EFL::liblzma_shared
         DEPENDS
         C_HELLOWORLD)
-        else()
-        set(CEU_CM_HAVE_WORKING_LIBLZMA_RUN_SHARED 127 CACHE INTERNAL "liblzma not found.")
-        set(CEU_CM_HAVE_WORKING_LIBLZMA_COMPILE_SHARED OFF CACHE INTERNAL "liblzma not found.")
+else()
+    set(CEU_CM_HAVE_WORKING_LIBLZMA_RUN_SHARED
+        127
+        CACHE INTERNAL "liblzma not found.")
+    set(CEU_CM_HAVE_WORKING_LIBLZMA_COMPILE_SHARED
+        OFF
+        CACHE INTERNAL "liblzma not found.")
 endif()
 if(TARGET CEU_CM_EFL::liblzma_static)
     ceu_cm_enhanced_try_run(
@@ -41,9 +45,13 @@ if(TARGET CEU_CM_EFL::liblzma_static)
         CEU_CM_EFL::liblzma_static
         DEPENDS
         C_HELLOWORLD)
-        else()
-        set(CEU_CM_HAVE_WORKING_LIBLZMA_RUN_STATIC 127 CACHE INTERNAL "liblzma not found.")
-        set(CEU_CM_HAVE_WORKING_LIBLZMA_COMPILE_STATIC OFF CACHE INTERNAL "liblzma not found.")
+else()
+    set(CEU_CM_HAVE_WORKING_LIBLZMA_RUN_STATIC
+        127
+        CACHE INTERNAL "liblzma not found.")
+    set(CEU_CM_HAVE_WORKING_LIBLZMA_COMPILE_STATIC
+        OFF
+        CACHE INTERNAL "liblzma not found.")
 endif()
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)

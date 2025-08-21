@@ -6,7 +6,6 @@
 #include "libam_support/Dtypes.hh"
 
 #include <cstdint>
-#include <string>
 
 namespace labw::art_modern {
 
