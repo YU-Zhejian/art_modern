@@ -20,4 +20,3 @@ else()
     add_library(slim_libceu STATIC ${CEU_LIBRARY_SOURCES})
 endif()
 install(TARGETS slim_libceu)
-

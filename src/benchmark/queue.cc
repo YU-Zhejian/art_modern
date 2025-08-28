@@ -195,7 +195,6 @@ void mcqueue_consumer_bulk_explicit(moodycamel::ConcurrentQueue<std::string>& qu
 #endif
 }
 
-
 void bench_pyqueue()
 {
     PyQueue<std::string> queue(queue_size);

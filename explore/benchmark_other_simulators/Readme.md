@@ -1,6 +1,6 @@
 # Benchmarks
 
-Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler with `-Ofast` and `-mtune=native`.
+Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler with `-O3` and `-mtune=native`.
 
 ## Instructions
 

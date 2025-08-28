@@ -334,3 +334,8 @@ This step can be executed under Microsoft Windows if you have some GNU Make inst
 ```shell
 conda install -c conda-forge perl
 ```
+
+## Known Incompatibilities
+
+- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
+- GCC would fail on Debian GNU/Hurd.

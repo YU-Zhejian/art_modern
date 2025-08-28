@@ -10,7 +10,7 @@ set -ue
 env -C src/htslib-1.21 \
     ./configure --prefix="$(pwd)"/opt \
     CC=icx \
-    CFLAGS='-Ofast -mtune=native -march=native'
+    CFLAGS='-O3 -mtune=native -march=native'
 env -C src/htslib-1.21 make -j20
 env -C src/htslib-1.21 make -j20 install
 
@@ -19,12 +19,12 @@ env -C src/gsl-2.8 \
     --enable-shared=yes \
     --enable-static=yes \
     CC=icx \
-    CFLAGS='-Ofast -mtune=native -march=native'
+    CFLAGS='-O3 -mtune=native -march=native'
 env -C src/gsl-2.8 make -j20
 env -C src/gsl-2.8 make -j20 install
 
 # Build Original ART
-icpx -Ofast -w -mtune=native -march=native \
+icpx -O3 -w -mtune=native -march=native \
     -lgsl -lgslcblas \
     -Lopt/lib/ \
     -Iopt/include \
@@ -32,7 +32,7 @@ icpx -Ofast -w -mtune=native -march=native \
     -o bin/art_original src/art_original/*.cpp
 
 # Build wgsim
-icpx -Ofast -w -mtune=native -march=native \
+icpx -O3 -w -mtune=native -march=native \
     -lhts -lz -lpthread -lm -lc \
     -Lopt/lib/ \
     -Iopt/include \
@@ -40,7 +40,7 @@ icpx -Ofast -w -mtune=native -march=native \
     -o bin/wgsim src/wgsim.c
 
 # Build DWGSIM
-icx -Ofast -w -mtune=native -march=native \
+icx -O3 -w -mtune=native -march=native \
     -lhts -lm -lc \
     -Lopt/lib/ \
     -Iopt/include \
@@ -51,7 +51,7 @@ icx -Ofast -w -mtune=native -march=native \
     -DPACKAGE_VERSION='"0.1.15"' \
     -o bin/dwgsim src/dwgsim/*.c
 
-icpx -Ofast -w -fopenmp -std=c++17 -march=native -mtune=native \
+icpx -O3 -w -fopenmp -std=c++17 -march=native -mtune=native \
     -lz -lpthread \
     -DSFMT_MEXP=19937 -DHAVE_CONFIG_H -DPKGDATADIR='"/usr/local/share/pirs"' \
     -Isrc/pirs/SFMT-src-1.4 \

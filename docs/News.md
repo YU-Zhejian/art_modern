@@ -4,6 +4,7 @@
 
 - 2 environemnt variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controlles the behaviour of log directory creation.
 - Some files without clear license were removed.
+- Add support for `cmake --install`.
 - Miscellaneous bug fixes.
 
 ## 1.1.3 (2025/03/05)
@@ -11,6 +12,7 @@
 - A severe bug in builtin profiles fixed. Now all builtin profiles should be usable without problems. Also eliminated [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings) warning.
 - Builtin profiles no longer being represented in base64. They're now gzip-compressed instead.
 - **EXPERIMENTAL** [Sphinx](https://www.sphinx-doc.org/en/master/)-generated documentation added.
+- Compiler flag `-Ofast` switched back to `-O3` for release build.
 - Miscellaneous bug fixes.
 
 Bundled files:

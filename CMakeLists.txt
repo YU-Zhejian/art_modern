@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
 
-# TODO: icpx: warning: argument '-Ofast' is deprecated; use '-O3 -ffast-math' for the same behavior, or '-O3' to enable only conforming optimizations [-Wdeprecated-ofast]
-
 if(NOT DEFINED USE_CCACHE)
     set(USE_CCACHE OFF)
 endif()
@@ -41,9 +39,11 @@ set(ART_MODERN_LINK_LIBS "")
 
 # Installation
 include(GNUInstallDirs)
-if (NOT DEFINED CMAKE_INSTALL_PREFIX)
-    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
-endif ()
+if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX
+        "/usr/local"
+        CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 # Macros from LibCEU.

@@ -13,7 +13,7 @@ Function:
     - Detect whether test should be built. If CMake variable `CEU_CM_SHOULD_ENABLE_TEST` was set, would skip this step. Otherwise, will setup test if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`.
     - Detect whether we should build the application with native hardware support. If CMake variable `CEU_CM_SHOULD_USE_NATIVE` was not set, would set it to `OFF`. If this variable was set `ON`, would try and set `-march=native` `-mtune=native` `-mtune` flags.
     - Detect build type using CMake variable `CMAKE_BUILD_TYPE`.
-        - If `Release`, will supress warnings (`-W0` `-w`), supress debug information (`-g0`) and enable optimization (`-Ofast` `-O3` `-O2`)
+        - If `Release`, will supress warnings (`-W0` `-w`), supress debug information (`-g0`) and enable optimization (`-O3` `-O2`)
         - If `RelWithDebInfo` (Release with Debug Information), will supress warnings, enable debug information (`-g`) and enable optimization.
         - If `Debug` or if is others, will enable all warnings (`-Wall`) and extra warnings (`-Wextra`), enable pedantic mode (`-pedantic` `-Wpedantic`), enable full debug information (`-Og`) (`-g3`) and supress optimization (`-Og`). It will add `CEU_CM_IS_DEBUG` to compiler flags (i.e., `-DCEU_CM_IS_DEBUG`).
     - Print basic C/C++/Fortran information, including test and native information.

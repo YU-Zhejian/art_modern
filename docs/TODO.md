@@ -19,8 +19,6 @@
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
   - Share the arguments between the main thread and the worker threads using pure MPI communication.
-- Builtin profiles take too much space on the executable. May consider:
-  - Use a CMake option that disables embedding of builtin profiles.
 
 ## I/O Formats
 
@@ -28,8 +26,3 @@
 - Support UCSC MAF output format?
 - Support UCSC 2bit input format for fast on-disk random access of reference genome?
 - Add flags to disable/enable diverse BAM tags.
-
-## Known Incompatibilities
-
-- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
-- GCC would fail on Debian GNU/Hurd.

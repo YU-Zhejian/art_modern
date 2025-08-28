@@ -28,9 +28,7 @@ SNAME_FILE_MAPPING = {
 
 DTYPE = "unsigned char"
 AUTOGEN_HEADER = (
-    f"// This file is auto-generated "
-    f"by {os.path.basename(__file__)} "
-    f"at {datetime.datetime.now().isoformat()}\n"
+    f"// This file is auto-generated " f"by {os.path.basename(__file__)} " f"at {datetime.datetime.now().isoformat()}\n"
 )
 NAMESPACE_HEADER = "namespace labw::art_modern {\n"
 NAMESPACE_FOOTER = "}\n // namespace labw::art_modern\n"
