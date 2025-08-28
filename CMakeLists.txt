@@ -39,7 +39,10 @@ set(ART_MODERN_LINK_LIBS "")
 
 # Installation
 include(GNUInstallDirs)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
+if (NOT DEFINED CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX "/usr/local" CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+endif ()
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
@@ -139,6 +142,7 @@ target_link_libraries(am_support_lib PUBLIC ${ART_MODERN_LINK_LIBS})
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(am_support_lib)
 endif()
+install(TARGETS am_support_lib)
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
@@ -150,6 +154,7 @@ target_link_libraries(art_modern_lib PUBLIC am_support_lib)
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(art_modern_lib)
 endif()
+install(TARGETS art_modern_lib)
 
 file(GLOB ART_MODERN_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/exe/*.cc")
 add_executable(art_modern ${ART_MODERN_EXE_SOURCE})
@@ -158,6 +163,7 @@ target_link_libraries(art_modern PUBLIC art_modern_lib)
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(art_modern)
 endif()
+install(TARGETS art_modern)
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.

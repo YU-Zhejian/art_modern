@@ -10,11 +10,15 @@ build:
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS) \
+		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
+		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_debug_install/ \
 		$(CURDIR)
 	cmake --build opt/build_debug -j$(JOBS)
+	cmake --install opt/build_debug
 	env -C opt/build_debug ctest --output-on-failure
-	opt/build_debug/art_modern --help
-	opt/build_debug/art_modern --version
+	opt/build_debug_install/bin/art_modern --help
+	opt/build_debug_install/bin/art_modern --version
 
 .PHONY: release
 release:
