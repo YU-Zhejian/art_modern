@@ -1,7 +1,5 @@
 #include "libam_support/ds/PyQueue.hh"
 
-#include "align_blkring.hh"
-
 #include <boost/lockfree/queue.hpp> // NOLINT
 #include <boost/log/trivial.hpp> // NOLINT
 
@@ -70,48 +68,6 @@ void pyqueue_consumer(PyQueue<std::string>& queue)
     std::size_t i = 0;
     while (i < nitems * nthreads) {
         if (queue.get(item, false)) {
-            i++;
-        }
-#if VERBOSE_IO
-        else {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            BOOST_LOG_TRIVIAL(info) << i << " elements consumed";
-        }
-#endif
-    }
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "consumer thread ended";
-#endif
-}
-
-void blkring_producer(RingBuffer<char*>& queue, [[maybe_unused]] std::size_t id)
-{
-#if VERBOSE_IO
-    {
-        BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
-    }
-#endif
-    std::size_t i = 0;
-    while (i < nitems) {
-        auto* string = randstr_cstr();
-        if (queue.enqueue_ringbuf(&string) == 0) {
-            i++;
-        }
-    }
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
-#endif
-}
-
-void blkring_consumer(RingBuffer<char*>& queue)
-{
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "consumer thread started";
-#endif
-    std::size_t i = 0;
-    while (i < nitems * nthreads) {
-        char** item = nullptr;
-        if (queue.dequeue_ringbuf(&item) == 0) {
             i++;
         }
 #if VERBOSE_IO
@@ -239,20 +195,7 @@ void mcqueue_consumer_bulk_explicit(moodycamel::ConcurrentQueue<std::string>& qu
 #endif
 }
 
-void bench_blkring()
-{
-    RingBuffer<char*> rb { queue_size };
-    std::vector<std::thread> producers;
-    producers.reserve(nthreads);
-    for (std::size_t i = 0; i < nthreads; i++) {
-        producers.emplace_back(blkring_producer, std::ref(rb), i);
-    }
-    std::thread consumer(blkring_consumer, std::ref(rb));
-    for (auto& producer : producers) {
-        producer.join();
-    }
-    consumer.join();
-}
+
 void bench_pyqueue()
 {
     PyQueue<std::string> queue(queue_size);
@@ -303,12 +246,6 @@ int main()
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
-
-    start = std::chrono::high_resolution_clock::now();
-    bench_blkring();
-    end = std::chrono::high_resolution_clock::now();
-    BOOST_LOG_TRIVIAL(info) << "RingBuffer: "
-                            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms";
 
     start = std::chrono::high_resolution_clock::now();
     bench_pyqueue();

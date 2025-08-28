@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 
+# TODO: icpx: warning: argument '-Ofast' is deprecated; use '-O3 -ffast-math' for the same behavior, or '-O3' to enable only conforming optimizations [-Wdeprecated-ofast]
+
 if(NOT DEFINED USE_CCACHE)
     set(USE_CCACHE OFF)
 endif()

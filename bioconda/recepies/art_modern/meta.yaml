@@ -1,5 +1,5 @@
 {% set name = "art_modern" %}
-{% set version = "1.1.3" %} # TODO: Change this every release.
+{% set version = "1.1.4" %} # TODO: Change this every release.
 
 package:
   name: {{ name|lower }}
@@ -20,23 +20,22 @@ requirements:
     - cmake
     - make
     - pkg-config
-    - {{ compiler('cxx') }}
     - coreutils
     - bash
+    - {{ compiler('cxx') }}
   host:
-    - boost-cpp
-    - python ==3.*
-    - htslib
+    - python {{ python }}
+    # Boost version copied from package ProMod3 at bioconda recepies ver. 0ff2abb3f8
+    - libboost-devel >=1.86,<1.87
     - zlib
   run:
-    - python ==3.*
-    - libboost
-    - htslib
+    - python {{ python }}
+    - libboost >=1.86,<1.87
     - zlib
 
 test:
   commands:
-    - art_modern --version | grep -q "{{ version }}"
+    - ART_NO_LOG_DIR=1 art_modern --version 2>&1 | grep -q "{{ version }}"
 
 about:
   home: "https://github.com/YU-Zhejian/art_modern"

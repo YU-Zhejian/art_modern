@@ -2,6 +2,8 @@
 
 ## 1.1.4 (Ongoing)
 
+- 2 environemnt variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controlles the behaviour of log directory creation.
+- Some files without clear license were removed.
 - Miscellaneous bug fixes.
 
 ## 1.1.3 (2025/03/05)

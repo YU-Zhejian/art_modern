@@ -184,7 +184,11 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     char leading_base = 0;
     std::string line;
 
-    int tmp_qual = 0; // FIXME: Should have been am_qual_t
+    // ChatGPT: When using stringstream >> int8_t,
+    // the extraction operator treats int8_t as a char,
+    // so it reads a single character, not a number.
+    // This can lead to unexpected results.
+    int tmp_qual = 0;
     am_qual_count_t tmp_count = 0;
 
     std::vector<am_qual_t> qual;
