@@ -269,8 +269,8 @@ namespace {
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
-#ifdef WITH_GIT
-    std::cout << "On git commit: (" << CEU_CM_GIT_COMMIT_HASH << ") " << CEU_CM_GIT_COMMIT_DATE << std::endl;
+#if defined(WITH_GIT) && defined(CEU_CM_GIT_COMMIT_HASH) && defined(CEU_CM_GIT_COMMIT_DATE)
+    std::cout << "Git: (" << CEU_CM_GIT_COMMIT_HASH << ") " << CEU_CM_GIT_COMMIT_DATE << std::endl;
 #else
     std::cout << "Git: N/A" << std::endl;
 #endif
