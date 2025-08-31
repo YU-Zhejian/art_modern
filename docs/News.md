@@ -1,10 +1,10 @@
 # News \& Release Notes
 
-## 1.1.4 (Ongoing)
+## 1.1.4 (2025/08/31)
 
 - 2 environemnt variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controlles the behaviour of log directory creation.
 - Some files without clear license were removed.
-- Add support for `cmake --install`.
+- Add support for `cmake --install`. **NOTE** Currently, only built libraries and binaries will be installed. Documentation and header files are not included yet.
 - Miscellaneous bug fixes.
 
 ## 1.1.3 (2025/03/05)

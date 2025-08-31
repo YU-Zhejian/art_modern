@@ -50,10 +50,22 @@ rel_with_dbg_alpine:
 		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
 		-DBUILD_SHARED_LIBS=OFF \
-		-DUSE_RANDOM_GENERATOR=BOOST \
+		-DUSE_MALLOC=NOP \
         $(CMAKE_FLAGS) \
+		-DCMAKE_INSTALL_LIBDIR=bin \
+		-DCMAKE_INSTALL_INCLUDEDIR=bin \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_rel_with_dbg_alpine_install/ \
 		$(CURDIR)
 	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
+	cmake --install opt/build_rel_with_dbg_alpine
+	env -C opt/build_rel_with_dbg_alpine_install/bin \
+		zip -9 -r $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.zip \
+		art_modern \
+		libam_support_lib.a \
+		libart_modern_lib.a \
+		liblabw_slim_htslib.a \
+		libslim_libceu.a \
+		libslim_libfmt.a
 
 .PHONY: fmt
 fmt:

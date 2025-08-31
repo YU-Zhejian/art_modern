@@ -1,14 +1,18 @@
 # Benchmarks
 
-Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler with `-O3` and `-mtune=native`.
+Benchmark of `art_modern` with WGSim (Bundled with SAMtools) and the original ART simulator. All benchmarks are performed on a Linux machine with Intel DPC++/C++ compiler (version `2025.2.1 (2025.2.0.20250806)`) with `-O3` and `-mtune=native`.
+
+The GCC build of `art_modern` (Using GCC version `13.3.0-6ubuntu2~24.04`) is also included for reference.
+
+`art_modern` was linked to Jemalloc version `5.3.0-0-g54eaed1d8b56b1aa528be3bdd1877e59c56fa90c`, MKL version `2025.0.2.0 (20250200)` and Boost version `1.83.0`.
 
 ## Instructions
 
-Use `build.sh` to build other simulators.
+Use `build-others.sh` to build other simulators.
 
 Use `build-update.sh` to build and update `art_modern`.
 
-Use `run.sh` to run benchmark.
+Use `run-*.sh` to run benchmark.
 
 ## Datasets
 
@@ -26,16 +30,7 @@ The simulators were asked to generate a FASTQ on both datasets with paired-end r
 - **MEM** 2 * 16GB Hynix/Hyundai 5600MHz No-ECC (HMCG78AGBSA095N)
 - **SSD** WD_BLACK SN750 NVMe SSD (WDS200T3X0C-00SJG0)
 - **OS** Linux Mint 22
-- **KERNEL** Linux 6.8.0-49-generic
-
-### PC 2
-
-- **MODEL** Self-assembled HEDT.
-- **CPU** Intel Core i9-10980XE
-- **MEM** G.Skill F4-3600C18-32GTRS
-- **SSD** WDC/HGST Ultrastar DC SA210 0TS1655 HBS3A1948A4M4B1
-- **OS** Debian Testing (Trixie)
-- **KERNEL** Linux 6.5.0-2-amd64
+- **KERNEL** Linux 6.8.0-79-generic
 
 ## Used Third-Party Codes
 

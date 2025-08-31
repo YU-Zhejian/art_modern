@@ -20,7 +20,7 @@
     --o-hl_sam-num_threads 2 \
     --o-hl_sam-compress_level u \
     --o-hl_sam-write_bam
-if type -p fastqc &> /dev/null && type -p x-www-browser &>/dev/null; then
+if type -p fastqc &>/dev/null && type -p x-www-browser &>/dev/null; then
     fastqc "${OUT_DIR}"/test_small_se_template_memory_sep.fastq
     # Open the browser and ignore what's happening afterwards
     {

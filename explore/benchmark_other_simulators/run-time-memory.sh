@@ -154,3 +154,5 @@ for i in {1..3}; do
         --i-batch_size 1024
 done
 rm -fr "${OUT_DIR}"
+
+Rscript plot_time_memory.R
