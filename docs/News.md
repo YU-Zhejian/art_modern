@@ -1,5 +1,9 @@
 # News \& Release Notes
 
+## 1.1.5 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 ## 1.1.4 (2025/08/31)
 
 - 2 environemnt variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controlles the behaviour of log directory creation.

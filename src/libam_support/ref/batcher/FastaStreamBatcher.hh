@@ -8,7 +8,7 @@
 #include <mutex>
 
 namespace labw::art_modern {
-class FastaStreamBatcher {
+class FastaStreamBatcher final {
 public:
     /**
      *

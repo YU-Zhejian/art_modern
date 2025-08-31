@@ -21,10 +21,10 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 # -- Project information -----------------------------------------------------
 
 
-project = "art_modern"  # FIXME
-author = "YU Zhejian"  # FIXME
+project = "art_modern"
+author = "YU Zhejian"
 copyright_string = f"2024-2025, {author}"  # FIXME
-release = "1.1.4"  # FIXME
+release = "1.1.5"  # FIXME
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
