@@ -5,8 +5,6 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/si_utils.hh"
 
-#include "align_blkring.hh"
-
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>

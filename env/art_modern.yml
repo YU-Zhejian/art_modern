@@ -32,3 +32,4 @@ dependencies:
   - conda-forge::make
   - conda-forge::coreutils
   - conda-forge::bash
+  - conda-forge::pkg-config

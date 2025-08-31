@@ -73,9 +73,10 @@ public:
     {
         reporter_.start();
     }
+
     void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
     {
-        OutParams params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
+        OutParams const params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
         out_dispatcher_ = out_dispatcher_factory.create(params);
     }
 
@@ -98,8 +99,8 @@ public:
 
 private:
     int job_id_ = 0;
-    ArtParams art_params_;
-    ArtIOParams art_io_params_;
+    const ArtParams art_params_;
+    const ArtIOParams art_io_params_;
     JobPool job_pool_;
     JobPoolReporter reporter_;
     std::shared_ptr<OutputDispatcher> out_dispatcher_;
@@ -110,7 +111,7 @@ void print_banner()
     BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << " v. " ART_MODERN_VERSION << ")";
     BOOST_LOG_TRIVIAL(info) << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
     BOOST_LOG_TRIVIAL(info) << "Originally written by: Weichun Huang <whduke@gmail.com>";
-    BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <Zhejianyu@intl.zju.edu.cn>";
+    BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <yuzj25@seas.upenn.edu>";
 #ifdef CEU_CM_IS_DEBUG
     BOOST_LOG_TRIVIAL(info) << "Debugging functions enabled.";
 #endif

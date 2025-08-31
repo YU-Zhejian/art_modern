@@ -1,9 +1,9 @@
-import base64
+import datetime
+import gzip
 import os
 import sys
-import gzip
 
-sname_file_mapping = {
+SNAME_FILE_MAPPING = {
     # TODO: Separate this data to some INI/JSON file
     "GA1_36bp": ("Emp36R1.txt", "Emp36R2.txt"),
     "GA1_44bp": ("Emp44R1.txt", "Emp44R2.txt"),
@@ -27,27 +27,40 @@ sname_file_mapping = {
 }
 
 DTYPE = "unsigned char"
+AUTOGEN_HEADER = (
+    f"// This file is auto-generated " f"by {os.path.basename(__file__)} " f"at {datetime.datetime.now().isoformat()}\n"
+)
+NAMESPACE_HEADER = "namespace labw::art_modern {\n"
+NAMESPACE_FOOTER = "}\n // namespace labw::art_modern\n"
 
 if __name__ == "__main__":
     os.makedirs(sys.argv[1], exist_ok=True)
-    with open(os.path.join(sys.argv[1], "builtin_profiles.cc"), "w") as w:
-        with open(os.path.join(sys.argv[1], "builtin_profiles.hh"), "w") as wh:
-            wh.write("#pragma once\n#include <cstddef>\n")
-            wh.write("namespace labw::art_modern {\n")
-            w.write("namespace labw::art_modern {\n")
+    with open(os.path.join(sys.argv[1], "builtin_profiles.cc"), "w", encoding="US-ASCII") as wc:
+        with open(os.path.join(sys.argv[1], "builtin_profiles.hh"), "w", encoding="US-ASCII") as wh:
+            wh.write(AUTOGEN_HEADER)
+            wc.write(AUTOGEN_HEADER)
+
+            wh.write("#pragma once\n")
+            wh.write("#include <cstddef>\n")
+            wh.write(NAMESPACE_HEADER)
+            wc.write(NAMESPACE_HEADER)
+
             wh.write(f"extern {DTYPE} NULL_PROFILE[1];\n")
-            w.write(DTYPE + " NULL_PROFILE[1] = {0};\n")
+            wc.write(DTYPE + " NULL_PROFILE[1] = {0};\n")
+
             snames = []
             snames_constructed = []
             slengths_constructed = []
-            for sname, files in sname_file_mapping.items():
+            for sname, files in SNAME_FILE_MAPPING.items():
                 slengths = []
                 snames.append(sname)
                 for i, file in enumerate(files):
                     with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
-                        data = gzip.compress(r.read(), 9)  # base64.b64encode() # b"PLACEHOLDER"
-                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.cc"), "w") as sw:
-                        sw.write("namespace labw::art_modern {\n")
+                        data = gzip.compress(r.read(), 9)
+
+                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.cc"), "w", encoding="US-ASCII") as sw:
+                        sw.write(AUTOGEN_HEADER)
+                        sw.write(NAMESPACE_HEADER)
 
                         sw.write(f"{DTYPE} {sname}_{i}[{len(data)}]" + " = {\n")
                         cw = 0
@@ -58,7 +71,9 @@ if __name__ == "__main__":
                             if cw % 10 == 0:
                                 sw.write("\n")
                         sw.write(hex(data[-1]))
-                        sw.write("\n};\n}\n")
+                        sw.write("\n")
+                        sw.write("};\n")
+                        sw.write(NAMESPACE_FOOTER)
                     slengths.append(len(data))
 
                     wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
@@ -80,5 +95,6 @@ if __name__ == "__main__":
             for slength_constructed in slengths_constructed:
                 wh.write("    " + slength_constructed + ",\n")
             wh.write("};\n")
-            wh.write("} // namespace labw::art_modern\n")
-            w.write("} // namespace labw::art_modern\n")
+
+            wh.write(NAMESPACE_FOOTER)
+            wc.write(NAMESPACE_FOOTER)

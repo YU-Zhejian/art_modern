@@ -19,7 +19,7 @@ std::size_t hts_tell(htsFile* fp)
     case bcf: /** fall through */
         return htell(fp->fp.bgzf->fp);
     case cram: /** fall through */
-        return -1; // TODO: no support for cram
+        return -1;
     case empty_format: /** fall through */
     case text_format: /** fall through */
     case bed: /** fall through */

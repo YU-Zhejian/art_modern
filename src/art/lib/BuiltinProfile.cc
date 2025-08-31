@@ -1,7 +1,5 @@
 #include "art/lib/BuiltinProfile.hh"
 
-// #include <base64.h>
-
 #include <zlib.h>
 
 #include <cstring>
@@ -25,7 +23,7 @@ namespace {
         zs.next_in = const_cast<unsigned char*>(src);
         zs.avail_in = slen;
 
-        int ret;
+        int ret = Z_OK;
         char outbuffer[BUFF_SIZE];
         std::string outstring;
 

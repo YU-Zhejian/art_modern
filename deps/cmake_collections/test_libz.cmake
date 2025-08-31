@@ -28,6 +28,13 @@ if(TARGET CEU_CM_EFL::libz_shared)
         CEU_CM_EFL::libz_shared
         DEPENDS
         C_HELLOWORLD)
+else()
+    set(CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED
+        127
+        CACHE INTERNAL "libz not found.")
+    set(CEU_CM_HAVE_WORKING_LIBZ_COMPILE_SHARED
+        OFF
+        CACHE INTERNAL "libz not found.")
 endif()
 if(TARGET CEU_CM_EFL::libz_static)
     ceu_cm_enhanced_try_run(
@@ -40,6 +47,13 @@ if(TARGET CEU_CM_EFL::libz_static)
         CEU_CM_EFL::libz_static
         DEPENDS
         C_HELLOWORLD)
+else()
+    set(CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC
+        127
+        CACHE INTERNAL "libz not found.")
+    set(CEU_CM_HAVE_WORKING_LIBZ_COMPILE_STATIC
+        OFF
+        CACHE INTERNAL "libz not found.")
 endif()
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
     set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)

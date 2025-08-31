@@ -36,6 +36,9 @@ private:
 
     const ArtParams& art_params_;
     SimulationJob job_;
+    /**
+     * Cached MPI rank in string.
+     */
     const std::string mpi_rank_;
     am_readnum_t total_num_reads_generated_ = 0;
     std::shared_ptr<OutputDispatcher> output_dispatcher_;

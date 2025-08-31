@@ -95,12 +95,15 @@ if __name__ == "__main__":
             query_seq = aln.query_sequence.upper()
             ref_ptr = 0
             query_ptr = 0
+            exon_no = 0
             genomic_ptr = aln.reference_start
 
             def where_we_are():
-                return f"Q:{query_ptr}/R:{ref_ptr}/G:{genomic_ptr}/A:{aln.reference_name}:{aln.reference_start}- {aln.reference_end}:{'-' if aln.is_reverse else '+'}"
+                return f"{aln.query_name}:Q:{query_ptr}/R:{ref_ptr}/G:{genomic_ptr}/A:{aln.reference_name}:{aln.reference_start}-{aln.reference_end}:{'-' if aln.is_reverse else '+'} (cigar:{cigar_id}/{len(aln.cigartuples)}:{cigar_len}{CigarOps.INT_TO_STR[cigar_op]}) (exon:{exon_no})\n"
 
-            for cigar_op, cigar_len in aln.cigartuples:
+            for cigar_id, (cigar_op, cigar_len) in enumerate(aln.cigartuples):
+                if cigar_len == 0:
+                    raise ValueError(f"Cigar length is zero {where_we_are()}")
                 if cigar_op == CigarOps.BAM_CEQUAL:
                     ref_seg = ref_seq[ref_ptr : ref_ptr + cigar_len]
                     query_seg = query_seq[query_ptr : query_ptr + cigar_len]
@@ -114,6 +117,8 @@ if __name__ == "__main__":
                 if CigarOps.CONSUMES_REFERENCE[cigar_op]:
                     ref_ptr += cigar_len
                     genomic_ptr += cigar_len
+                if cigar_op == CigarOps.BAM_CREF_SKIP:
+                    exon_no += 1
             assert genomic_ptr == aln.reference_end, f"{genomic_ptr} != {aln.reference_end} {where_we_are()}"
             assert query_ptr == len(query_seq), f"{query_ptr} != {len(query_seq)} {where_we_are()}"
             assert ref_ptr == len(ref_seq), f"{ref_ptr} != {len(ref_seq)} {where_we_are()}"

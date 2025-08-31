@@ -245,6 +245,11 @@ This output writer supports other BAM formatting parameters.
 
 Quality distributions bundled with the original ART can be found [here](../data/Illumina_profiles).
 
+## Environment Variables
+
+- `ART_NO_LOG_DIR`: If set (to any value), disables creation of a log directory. Logging to files is skipped, and a warning is printed.
+- `ART_LOG_DIR`: If set, specifies the directory where log files will be written. If not set, defaults to `log.d` and a warning is printed. Ignored if `ART_NO_LOG_DIR` is set.
+
 ## Performance Hint
 
 When building `art_modern`, set `USE_HTSLIB` to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native` and linked with [libdeflate](https://github.com/ebiggers/libdeflate). Set `CMAKE_BUILD_TYPE` to `Release` or `RelWithDebInfo`, and `USE_RANDOM_GENERATOR` to `ONEMKL` on Intel/AMD machines.

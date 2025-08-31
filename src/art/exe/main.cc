@@ -23,6 +23,7 @@
 #endif
 
 #include <cstdlib>
+#include <string>
 
 using namespace labw::art_modern; // NOLINT
 
@@ -83,7 +84,20 @@ int main(int argc, char* argv[])
     // 1st round initialization of a working console logger
     init_logger();
     print_banner();
-    init_file_logger("log.d");
+    if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
+        BOOST_LOG_TRIVIAL(warning) << "ART_NO_LOG_DIR defined; No log directory will be created.";
+    } else {
+        char* art_log_dir_c = std::getenv("ART_LOG_DIR");
+        std::string art_log_dir;
+        if (art_log_dir_c == nullptr) {
+            BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";
+            art_log_dir = "log.d";
+        } else {
+            art_log_dir = art_log_dir_c;
+        }
+        init_file_logger(art_log_dir);
+    }
+
     handle_mpi_child();
     handle_dumps();
 

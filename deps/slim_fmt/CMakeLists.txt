@@ -17,3 +17,4 @@ endif()
 
 message(STATUS "slim_libfmt compiler flags: ${SLIM_LIBFMT_CC_FLAGS}")
 target_compile_options(slim_libfmt BEFORE PRIVATE "${SLIM_LIBFMT_CC_FLAGS}")
+install(TARGETS slim_libfmt)

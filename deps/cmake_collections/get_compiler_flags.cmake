@@ -28,9 +28,9 @@ endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release") # Release
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g0)
-    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Ofast -O3 -O2)
+    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O3 -O2)
 elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Information
-    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Ofast -O3 -O2)
+    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O3 -O2)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g)
 else() # Debug, the default.
     # ceu_cm_enhanced_check_compiler_flag(-fsanitize=address)

@@ -7,6 +7,9 @@
 namespace labw::art_modern {
 /**
  * @brief Know where we are.
+ *
+ * Note: no support for cram
+ *
  * @param fp HTS file pointer
  * @return Where we are.
  */

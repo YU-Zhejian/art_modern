@@ -10,7 +10,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.3)
+    VERSION 1.1.4)
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
@@ -39,7 +39,12 @@ set(ART_MODERN_LINK_LIBS "")
 
 # Installation
 include(GNUInstallDirs)
-set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_LIBDIR}")
+if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    set(CMAKE_INSTALL_PREFIX
+        "/usr/local"
+        CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
+endif()
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
@@ -60,7 +65,7 @@ set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency scripts.
+# Dealing with dependency scripts.
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
@@ -72,12 +77,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency libs as subdirs.
+# Dealing with dependency libs as subdirs.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 
 # -----------------------------------------------------------------------------
-# Dealing with depencency includes.
+# Dealing with dependency includes.
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
 include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
@@ -139,6 +144,7 @@ target_link_libraries(am_support_lib PUBLIC ${ART_MODERN_LINK_LIBS})
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(am_support_lib)
 endif()
+install(TARGETS am_support_lib)
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
@@ -150,6 +156,7 @@ target_link_libraries(art_modern_lib PUBLIC am_support_lib)
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(art_modern_lib)
 endif()
+install(TARGETS art_modern_lib)
 
 file(GLOB ART_MODERN_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/exe/*.cc")
 add_executable(art_modern ${ART_MODERN_EXE_SOURCE})
@@ -158,6 +165,7 @@ target_link_libraries(art_modern PUBLIC art_modern_lib)
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(art_modern)
 endif()
+install(TARGETS art_modern)
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.

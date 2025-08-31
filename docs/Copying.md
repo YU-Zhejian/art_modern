@@ -60,27 +60,9 @@ Dual-licensed under Simplified BSD License and Boost Software License.
 
 **NOTE** Added in 1.0.0.
 
-## Nibble And A Half by William Sherif
-
-Originally from <https://github.com/superwills/NibbleAndAHalf>.
-
-Affected files:
-
-- `/deps/base64/**`
-
-Under an MIT-like License.
-
-**NOTE** The version used in this project comes from [MMseqs2](https://github.com/soedinglab/MMseqs2), commit `b804fbe3`, which is copyrighted by The MMseqs2 Development Team under the MIT License. We use this version instead of the latest one since this version is clean and header-only.
-
-**NOTE** Some modifications were done to supress clang-tidy warnings.
-
-**NOTE** Added in 1.1.0.
-
-**NOTE** No longer used since 1.1.3.
-
 ## `BS::thread_pool` by Barak Shoshany
 
-Available from <https://github.com/bshoshany/thread-pool>, commit `aa3fbfb`.
+Available from <https://github.com/bshoshany/thread-pool>, commit [`aa3fbfb`](https://github.com/bshoshany/thread-pool/commit/aa3fbfbe80762fe3ac90e2bf05e153b92536277a) at tag [`v5.0.0`](https://github.com/bshoshany/thread-pool/releases/tag/v5.0.0).
   
 Affected files:
 

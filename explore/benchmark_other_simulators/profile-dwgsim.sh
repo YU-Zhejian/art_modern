@@ -6,7 +6,7 @@ set +ue
 . /opt/intel/oneapi/setvars.sh
 set -ue
 collect=hotspot
-icx -Ofast -w -mtune=native -g \
+icx -O3 -w -mtune=native -g \
     -lhts -lz -lm -lc \
     -Lopt/lib/ \
     -Iopt/include \

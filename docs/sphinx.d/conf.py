@@ -24,7 +24,7 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 project = "art_modern"  # FIXME
 author = "YU Zhejian"  # FIXME
 copyright_string = f"2024-2025, {author}"  # FIXME
-release = "1.1.3"  # FIXME
+release = "1.1.4"  # FIXME
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
