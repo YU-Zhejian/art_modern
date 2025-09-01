@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# mamba create -n bioconda -c conda-forge -c bioconda bioconda-utils
 set -uxeo pipefail
 
 conda run -n bioconda \
@@ -7,10 +6,14 @@ conda run -n bioconda \
     bioconda-utils lint \
     ./recepies \
     config.yml \
-    --cache ./.cache
+    --packages art_modern \
+    --cache ./.cache \
+    --logfile bioconda-utils-lint.log
 conda run -n bioconda \
     --no-capture-output --live-stream \
     bioconda-utils build \
     ./recepies \
+    --packages art_modern \
     --docker \
-    --mulled-test
+    --mulled-test \
+    --logfile bioconda-utils-build.log

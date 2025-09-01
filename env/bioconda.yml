@@ -1,0 +1,7 @@
+name: bioconda
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - bioconda-utils
+  - conda-package-handling

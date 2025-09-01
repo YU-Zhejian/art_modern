@@ -28,8 +28,8 @@ dependencies:
   - scipy
   # Build tools
   - conda-forge::ninja
-  - conda-forge::cmake
+  - conda-forge::cmake >=3.17
   - conda-forge::make
-  - conda-forge::coreutils
+  - conda-forge::coreutils >=8.28
   - conda-forge::bash
   - conda-forge::pkg-config

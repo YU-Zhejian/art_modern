@@ -8,7 +8,7 @@ The project assumes modern GNU/Linux distributions that are still under official
 
 Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
 
-This project depends on [Google Abseil](https://abseil.io/), whose requirements are available [here](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md).
+This project used bundled source code of [Google Abseil](https://abseil.io/), whose requirements are available [here](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md).
 
 ## Compiler Infrastructure
 
@@ -64,19 +64,44 @@ Although not tested, the following compilers can also theoretically be of use:
     - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
     - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
 
-### Essential Tools for Building
+## Essential Tools for Building
+
+### CMake
+
+[CMake](https://cmake.org/) 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+
+The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+
+### Linkers, Assemblers, Archivers, etc.
 
 You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. Under normal circumstances they should come together with your compiler if you install them using your package management systems. The latter may require additional CMake variables to be set.
 
-For C library, this project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested.
+### C Library
 
-For Apple Mac OS X, FreeBSD, and Alpine Linux users: Please install [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [GNU Bash](https://www.gnu.org/software/bash/) and [GNU Make](https://www.gnu.org/software/make) as your original system tools shipped with the operating system/BusyBox may **NOT** work.
+This project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 should work.
+
+### `pkgconf` or `pkg-config`
 
 The project may take advantage of [pkgconf](https://github.com/pkgconf/pkgconf) or [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) to locate the dependencies. Installing such is **HIGHLY** recommended.
 
+### Command-Line Ultilities
+
+For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions with obsolete packages, please consider check the version of the following tools:
+
+- [GNU CoreUtils](https://www.gnu.org/software/coreutils/) (At least 8.28) for the use of `env -C` (introduced in 8.28) and `readlink -f` (introduced in 8.0).
+  - **NOTE** CMake may have its own requirements on the version of GNU CoreUtils.
+- [GNU Bash](https://www.gnu.org/software/bash/) (At least 4.2) for the possible use of advanced array operations.
+  - **NOTE** CMake may have its own requirements on the version of GNU Bash.
+- [GNU Make](https://www.gnu.org/software/make) (Lowest version TBD) as the BSD variant is known to be incompatible.
+  - **NOTE** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
+
+as your original system tools shipped with the operating system/BusyBox may **NOT** work.
+
+### Miscellaneous
+
 The project may use [ccache](https://ccache.dev/) to speed up the compilation process. However, this may cause bugs in some systems and is not enabled by default.
 
-## Dependencies
+## Library Dependencies
 
 Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
@@ -109,6 +134,10 @@ See [official HTSLib documentation](https://github.com/samtools/samtools/blob/ma
 
 To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes.
 
+### [zlib](https://www.zlib.net/)
+
+For compression and decompression bundled ART error profiles. At least 1.2.0 (launched 2003/03/09) is required.
+
 ### Other Optional Libraries
 
 - Various libraries for accelerating random number generation. Including:
@@ -118,11 +147,7 @@ To use external HTSLib, consult your system administrator. Those libraries usual
   - **OPTIONAL** [mi-malloc](https://github.com/microsoft/mimalloc).
   - **OPTIONAL** [jemalloc](https://github.com/jemalloc/jemalloc).
 
-## Using CMake Building System
-
-[CMake](https://cmake.org/) 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
-
-The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+## CMake Variables
 
 This project relies on diverse CMake variables that control the build behavior. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
 
