@@ -2,7 +2,6 @@
 set -euo pipefail
 TMPDIR="$(mktemp -d)"
 mkdir -p "${TMPDIR}"
-which env >&2
 env -C "${TMPDIR}" cmake \
     -Wdev -Wdeprecated --warn-uninitialized \
     -DCEU_CM_SHOULD_USE_NATIVE=OFF \
