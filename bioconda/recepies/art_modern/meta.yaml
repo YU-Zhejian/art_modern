@@ -1,14 +1,12 @@
 {% set name = "art_modern" %}
-{% set version = "1.1.4" %} # TODO: Change this every release.
+{% set version = "1.1.4" %}
 
 package:
   name: {{ name|lower }}
   version: {{ version }}
 
 source:
-  # url: https://github.com/YU-Zhejian/art_modern/archive/refs/heads/devel.zip
   url: https://github.com/YU-Zhejian/art_modern/archive/refs/tags/{{ version }}.zip
-  # TODO: Change this every release.
   sha256: 66ecbd1c5f0fd4cb7ba501303f6ee58a6128a3aff3fb81b2dbabd31aae3b34be
 
 build:
@@ -33,7 +31,6 @@ requirements:
   run:
     - python {{ python }}
     - libboost >=1.86,<1.87
-    - zlib
 
 test:
   commands:
@@ -43,12 +40,12 @@ about:
   home: "https://github.com/YU-Zhejian/art_modern"
   license: "GPL-3.0-only"
   license_family: GPL3
-  license_file: License.md
+  license_file: "License.md"
   summary: "Simulator of Diverse Next-Generation Sequencing Reads"
   dev_url: "https://github.com/YU-Zhejian/art_modern"
   doc_url: "https://github.com/YU-Zhejian/art_modern/releases/download/{{ version }}/art_modern.pdf"
 
-# TODO: Remove this section once a hash is provided above.
-#extra:
-#  skip-lints:
-#    - missing_hash
+extra:
+  additional-platforms:
+    - linux-aarch64
+    - osx-arm64

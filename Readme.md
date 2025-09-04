@@ -2,8 +2,10 @@
 
 Badages:
 [![GitHub Contributors](https://img.shields.io/github/contributors/YU-Zhejian/art_modern)](https://github.com/YU-Zhejian/art_modern)
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total)
+](https://github.com/YU-Zhejian/art_modern/releases/)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue)](https://www.gnu.org/licenses/)
+[![Anaconda.org](https://anaconda.org/bioconda/art_modern/badges/version.svg)](https://anaconda.org/bioconda/art_modern)
 
 ## Introduction
 
@@ -12,6 +14,16 @@ High-performance simulation of realistic next-generation sequencing (NGS) data i
 ## Quick Start
 
 ### Installation
+
+#### Installation through Conda
+
+% TODO: Revision of this section required.
+
+```shell
+conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
+```
+
+#### Installation through Compiling the Source Code
 
 Clone this repository:
 
