@@ -27,3 +27,7 @@
 - Support UCSC MAF output format?
 - Support UCSC 2bit input format for fast on-disk random access of reference genome?
 - Add flags to disable/enable diverse BAM tags.
+
+## Simulate Allele-Specific Expression
+
+The simulator will accept a genome, a variation VCF file, and a gene annotation GTF file.

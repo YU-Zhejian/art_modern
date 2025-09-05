@@ -1,11 +1,12 @@
-# `art_modern`: Simulator of Diverse Next-Generation Sequencing Reads
+# `art_modern`: Modernized ART Simulator of Diverse Next-Generation Sequencing Reads
 
-Badages:
+Badges:
 [![GitHub Contributors](https://img.shields.io/github/contributors/YU-Zhejian/art_modern)](https://github.com/YU-Zhejian/art_modern)
-[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total)
-](https://github.com/YU-Zhejian/art_modern/releases/)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total)](https://github.com/YU-Zhejian/art_modern/releases/)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue)](https://www.gnu.org/licenses/)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Anaconda.org](https://anaconda.org/bioconda/art_modern/badges/version.svg)](https://anaconda.org/bioconda/art_modern)
+[![Anaconda-Server Badge](https://anaconda.org/bioconda/art_modern/badges/downloads.svg)](https://anaconda.org/bioconda/art_modern)
 
 ## Introduction
 
@@ -17,22 +18,34 @@ High-performance simulation of realistic next-generation sequencing (NGS) data i
 
 #### Installation through Conda
 
-% TODO: Revision of this section required.
+[Conda](https://docs.conda.io/) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed [Conda](https://docs.conda.io/). Then:
 
 ```shell
-conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
+conda create -y -n art_modern_bioconda -c bioconda -c conda-forge art_modern
 ```
+
+to create an environment named `art_modern_bioconda` with `art_modern` installed.
+
+You may use [Mamba](https://mamba.readthedocs.io/en/latest/) or [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) as a Conda replacement.
 
 #### Installation through Compiling the Source Code
 
-Clone this repository:
+Use [Git](https://git-scm.com/) to clone this repository:
 
 ```shell
 git clone https://github.com/YU-Zhejian/art_modern.git
 cd art_modern
 ```
 
-Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably GCC >= 9.5.0). Also check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/) [Python 3](https://www.python.org/), and HTSLib-dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
+Or, if you have no Git:
+
+```shell
+curl -L https://github.com/YU-Zhejian/art_modern/archive/refs/heads/master.zip -o art_modern-master.zip
+unzip art_modern-master.zip
+cd art_modern-master
+```
+
+Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/) [Python 3](https://www.python.org/), and HTSLib-dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
 
 Build the project using:
 
