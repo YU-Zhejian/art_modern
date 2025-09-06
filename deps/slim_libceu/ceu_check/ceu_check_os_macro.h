@@ -203,6 +203,8 @@
 #define CEU_ON_UNIX
 #endif
 
+
+// Note that MSYS and MinGW are NOT POSIX.
 #if defined(CEU_ON_UNIX) || defined(CEU_ON_CYGWIN_LIKE)
 #define CEU_ON_POSIX
 #endif

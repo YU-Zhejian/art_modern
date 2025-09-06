@@ -23,6 +23,6 @@ env -C opt/art_modern_prev_ver_build/ cmake \
     -DUSE_RANDOM_GENERATOR=ONEMKL \
     -DUSE_HTSLIB=hts \
     -DCMAKE_PREFIX_PATH="$(pwd)"/opt \
-    -DCMAKE_INCLUDE_PATH="$(pwd)"/opt/include \
+    -DC_INCLUDE_PATH="$(pwd)"/opt/include \
     -G Ninja "$(pwd)"/src/am_prev_ver
 env -C opt/art_modern_prev_ver_build/ ninja

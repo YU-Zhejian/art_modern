@@ -31,7 +31,10 @@
 #define CEU_ON_MINGW32
 #endif
 
-#if defined(CEU_ON_CYGWIN) || defined(CEU_ON_MINGW64) || defined(CEU_ON_MINGW32) || defined(CEU_ON_MSYS)
+#if defined(CEU_ON_CYGWIN)
+/**
+ * @deprecated Use CEU_ON_CYGWIN, CEU_ON_MSYS, CEU_ON_MINGW32, CEU_ON_MINGW64 instead.
+ */
 #define CEU_ON_CYGWIN_LIKE
 #endif
 

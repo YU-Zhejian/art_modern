@@ -74,7 +74,7 @@ The CMake modules used in this project further require [Python](https://www.pyth
 
 ### Linkers, Assemblers, Archivers, etc.
 
-You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. Under normal circumstances they should come together with your compiler if you install them using your package management systems. The latter may require additional CMake variables to be set.
+You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. Under normal circumstances, they should come together with your compiler if you install them using your package management systems. The latter may require additional CMake variables to be set.
 
 ### C Library
 

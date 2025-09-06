@@ -83,14 +83,14 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency includes.
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
-include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
@@ -126,11 +126,8 @@ include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/src/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/include/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/gen/src/")
 
-if(DEFINED env.INCLUDE)
-    include_directories(AFTER SYSTEM ${env.INCLUDE})
-endif()
-if(DEFINED CMAKE_INCLUDE_PATH)
-    include_directories(AFTER SYSTEM ${CMAKE_INCLUDE_PATH})
+if(DEFINED C_INCLUDE_PATH)
+    include_directories(AFTER ${C_INCLUDE_PATH})
 endif()
 
 # -----------------------------------------------------------------------------
