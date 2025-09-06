@@ -263,6 +263,10 @@ function(ceu_cm_enhanced_find_library)
     endif()
     if(NOT ${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS)
         set(${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS ${CEU_CM_EFL_OUTPUT_VARIABLE}-NOTFOUND)
+        message(
+            STATUS
+                "CEU_CM_EFL: Exporting target CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE} (${CEU_CM_EFL_OUTPUT_TYPE}): NOTFOUND"
+        )
 
         unset(CEU_CM_EFL_OUTPUT_TYPE)
         unset(CEU_CM_EFL_STATIC)
@@ -272,8 +276,10 @@ function(ceu_cm_enhanced_find_library)
         return()
     endif()
     add_library(CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE} ${CEU_CM_EFL_OUTPUT_TYPE} IMPORTED)
-    set_target_properties(CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
-                          PROPERTIES IMPORTED_LOCATION "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}")
+    set_target_properties(
+        CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
+        PROPERTIES IMPORTED_LOCATION "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}"
+                   IMPORTED_IMPLIB "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}")
 
     message(
         STATUS
