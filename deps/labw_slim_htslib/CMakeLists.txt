@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.17)
 project(
     htslib
-    VERSION 1.21
+    VERSION 1.22.1
     LANGUAGES C)
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
