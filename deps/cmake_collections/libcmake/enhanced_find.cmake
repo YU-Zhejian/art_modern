@@ -1,11 +1,13 @@
 # Finds packages.
 
-find_package(PkgConfig QUIET)
+if(NOT DEFINED PKGCONF_FOUND)
+    find_package(PkgConfig)
+endif()
 
 #[=======================================================================[
 ceu_cm_get_abspath_from_linker_flag -- Get absolute path of libraries from linker flag.
 
-Synopsis: `ceu_cm_get_abspath_from_linker_flag(OUTPUT_VARIABLE LINKER_FLAG IS_STATIC)`
+Synopsis: `ceu_cm_get_abspath_from_linker_flag(OUTPUT_VARIABLE LINKER_FLAG IS_STATIC LIBDIRS)`
 
 Params:
     - `OUTPUT_VARIABLE`: Name of the output variable.
@@ -13,8 +15,8 @@ Params:
     - `IS_STATIC`: Whether to find static or dynamic libraries.
 
 Sample:
-    - `ceu_cm_get_abspath_from_linker_flag(OV z ON)` -> `libz.a`
-    - `ceu_cm_get_abspath_from_linker_flag(OV z OFF)` -> `libz.so`
+    - `ceu_cm_get_abspath_from_linker_flag(OV z ON "")` -> `libz.a`
+    - `ceu_cm_get_abspath_from_linker_flag(OV z OFF "")` -> `libz.so`
 
 Sets:
     - `OUTPUT_VARIABLE`: Parent scope level.
@@ -169,7 +171,7 @@ function(ceu_cm_get_library_abspath_from_pkg_config OUTPUT_VARIABLE PKGCONF_NAME
         else()
             set(THIS_LIBDIRS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_LIBRARY_DIRS})
         endif()
-        ceu_cm_get_abspath_from_linker_flag(${LINKER_FLAG}_LIBRARY_ABSPATH ${LINKER_FLAG} ${IS_STATIC} ${THIS_LIBDIRS})
+        ceu_cm_get_abspath_from_linker_flag(${LINKER_FLAG}_LIBRARY_ABSPATH "${LINKER_FLAG}" "${IS_STATIC}" "${THIS_LIBDIRS}")
         if(${LINKER_FLAG}_LIBRARY_ABSPATH)
             list(APPEND THIS_LIBRARY_ABSPATHS ${${LINKER_FLAG}_LIBRARY_ABSPATH})
         else()

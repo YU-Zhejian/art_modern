@@ -72,7 +72,7 @@ Although not tested, the following compilers can also theoretically be of use:
 
 The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
-### Linkers, Assemblers, Archivers, etc.
+### Linkers, Assemblers, Archivers, etc
 
 You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM BinUtils Replacements](https://llvm.org/docs/CommandGuide/#gnu-binutils-replacements) to perform assembling and linking. Under normal circumstances, they should come together with your compiler if you install them using your package management systems. The latter may require additional CMake variables to be set.
 
