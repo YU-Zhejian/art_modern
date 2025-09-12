@@ -1,3 +1,4 @@
+# Environment used for building bioconda packages
 name: bioconda
 channels:
   - conda-forge

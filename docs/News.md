@@ -1,7 +1,12 @@
 # News \& Release Notes
 
-## 1.1.5 (Ongoing)
+## 1.1.6 (Ongoing)
 
+- Miscellaneous bug fixes.
+
+## 1.1.5 (2025/09/12)
+
+- Bumped bundled HTSLib to 1.22.1.
 - Miscellaneous bug fixes.
 
 ## 1.1.4 (2025/08/31)

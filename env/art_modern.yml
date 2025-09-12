@@ -1,3 +1,4 @@
+# Work under Linux only.
 name: art_modern
 channels:
   - nodefaults

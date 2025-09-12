@@ -1,6 +1,10 @@
 CMAKE_FLAGS ?= 
 JOBS ?= 40
 
+.PHONY: help
+help:
+	echo "debug release rel_with_dbg_alpine fmt scc touch testsmall testsmall-conda testsmall-release raw_data clean testbuild doc cleandoc"
+
 # build as an alias to debug
 .PHONY: build
 build: debug
@@ -128,4 +132,9 @@ testbuild:
 
 .PHONY: doc
 doc:
+	$(MAKE) -C docs/sphinx.d
+
+.PHONY: cleandoc
+cleandoc:
+	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
