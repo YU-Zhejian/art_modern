@@ -1,6 +1,10 @@
 # News \& Release Notes
 
-## 1.1.5 (Ongoing)
+## 1.1.6 (2025/09/12)
+
+- A severe bug in CMakefiles of labw_slim_htslib fixed.
+
+## 1.1.5 (2025/09/12)
 
 - Bumped bundled HTSLib to 1.22.1.
 - Miscellaneous bug fixes.
