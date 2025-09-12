@@ -123,3 +123,27 @@ Licensed under the MIT License and Apache 2.0 License.
 **NOTE** Added in 1.1.1.
 
 **NOTE** This project used the version retried [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.
+
+## `cgranges` by Dana-Farber Cancer Institute
+
+Available from <https://github.com/lh3/cgranges>, commit `b3d5e2c5`.
+
+Affected files:
+
+- `deps/cgranges/*`.
+
+With MIT License.
+
+**NOTE** Added in 1.1.5.
+
+## `EWAHBoolArray` by Daniel Lemire
+
+Available from <https://github.com/lemire/EWAHBoolArray>, commit `a6a28d2`.
+
+Affected files:
+
+- `deps/EWAHBoolArray/*`.
+
+With Apache/MIT License.
+
+**NOTE** Added in 1.1.5.

@@ -91,6 +91,8 @@ include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cgranges/cpp")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
