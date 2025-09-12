@@ -171,7 +171,8 @@ function(ceu_cm_get_library_abspath_from_pkg_config OUTPUT_VARIABLE PKGCONF_NAME
         else()
             set(THIS_LIBDIRS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_LIBRARY_DIRS})
         endif()
-        ceu_cm_get_abspath_from_linker_flag(${LINKER_FLAG}_LIBRARY_ABSPATH "${LINKER_FLAG}" "${IS_STATIC}" "${THIS_LIBDIRS}")
+        ceu_cm_get_abspath_from_linker_flag(${LINKER_FLAG}_LIBRARY_ABSPATH "${LINKER_FLAG}" "${IS_STATIC}"
+                                            "${THIS_LIBDIRS}")
         if(${LINKER_FLAG}_LIBRARY_ABSPATH)
             list(APPEND THIS_LIBRARY_ABSPATHS ${${LINKER_FLAG}_LIBRARY_ABSPATH})
         else()
