@@ -4,7 +4,7 @@
 
 - ART stuck at one read. Why?
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-- Add help message if no arguments are given.
+- Update HTSLib to 1.22.1.
 
 ## Performance
 
@@ -27,3 +27,7 @@
 - Support UCSC MAF output format?
 - Support UCSC 2bit input format for fast on-disk random access of reference genome?
 - Add flags to disable/enable diverse BAM tags.
+
+## Simulate Allele-Specific Expression
+
+The simulator will accept a genome, a variation VCF file, and a gene annotation GTF file.

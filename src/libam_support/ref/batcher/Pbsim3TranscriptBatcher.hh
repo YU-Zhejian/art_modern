@@ -12,7 +12,7 @@
 
 namespace labw::art_modern {
 
-class Pbsim3TranscriptBatcher {
+class Pbsim3TranscriptBatcher final {
 public:
     DELETE_COPY(Pbsim3TranscriptBatcher)
     DELETE_MOVE(Pbsim3TranscriptBatcher)

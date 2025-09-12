@@ -179,6 +179,12 @@ namespace {
     po::variables_map generate_vm_while_handling_help_version(
         const po::options_description& po_desc, const int argc, char** argv)
     {
+        if (argc == 1) {
+            // No command line arguments.
+            print_help(po_desc);
+            bye_mpi();
+            exit_mpi(EXIT_FAILURE);
+        }
         po::variables_map vm_;
 
         try {

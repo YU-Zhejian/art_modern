@@ -105,14 +105,14 @@ FreeBSD: 14.2-RELEASE with x86\_64 kernel.
 
 Installed packages:
 
-| Package            | Version                 |
-|--------------------|-------------------------|
-| `cmake`            | 3.31.4                  |
-| `binutils`         | 2.43.1.1  |
-| `cmake`            | 3.31.3 |
-| `boost-all`| 1.86.0         |
-| `gmake`             | 4.4.1          |
-| `python311`          | 3.11.11           |
+| Package     | Version  |
+|-------------|----------|
+| `cmake`     | 3.31.4   |
+| `binutils`  | 2.43.1.1 |
+| `cmake`     | 3.31.3   |
+| `boost-all` | 1.86.0   |
+| `gmake`     | 4.4.1    |
+| `python311` | 3.11.11  |
 
 `art_modern --version` output:
 

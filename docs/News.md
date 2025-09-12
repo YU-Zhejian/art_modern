@@ -1,10 +1,16 @@
 # News \& Release Notes
 
+## 1.1.5 (Ongoing)
+
+- Bumped bundled HTSLib to 1.22.1.
+- Miscellaneous bug fixes.
+
 ## 1.1.4 (2025/08/31)
 
-- 2 environemnt variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controlles the behaviour of log directory creation.
+- 2 environment variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controllers the behavior of log directory creation.
 - Some files without clear license were removed.
 - Add support for `cmake --install`. **NOTE** Currently, only built libraries and binaries will be installed. Documentation and header files are not included yet.
+- The package is published at BioConda. See [here](https://bioconda.github.io/recipes/art_modern/README.html) for details.
 - Miscellaneous bug fixes.
 
 ## 1.1.3 (2025/03/05)
@@ -52,7 +58,7 @@ Bundled files:
 - `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
 - [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
 - Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
-- Tested MacOS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
+- Tested Mac OS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
 
