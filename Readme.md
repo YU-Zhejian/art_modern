@@ -1,10 +1,9 @@
 # `art_modern`: Modernized ART Simulator of Diverse Next-Generation Sequencing Reads
 
-[![GitHub Contributors](https://img.shields.io/github/contributors/YU-Zhejian/art_modern)](https://github.com/YU-Zhejian/art_modern)
-[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total)](https://github.com/YU-Zhejian/art_modern/releases/)
-[![License](https://img.shields.io/badge/licence-GPL_3.0-blue)](https://www.gnu.org/licenses/)
+[![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total.svg)](https://github.com/YU-Zhejian/art_modern/releases/)
+[![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
 
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/art_modern/README.html)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Anaconda.org](https://anaconda.org/bioconda/art_modern/badges/version.svg)](https://anaconda.org/bioconda/art_modern)
 [![Anaconda-Server Badge](https://anaconda.org/bioconda/art_modern/badges/downloads.svg)](https://anaconda.org/bioconda/art_modern)
 

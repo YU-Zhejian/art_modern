@@ -34,7 +34,9 @@ extensions = [
     "sphinx.ext.viewcode",
     "myst_parser",
     "sphinx_copybutton",
-    # "sphinx_design",
+    # FIXME: Use some library that does not rasterize the SVG images
+    # "sphinx.ext.imgconverter",
+    "sphinxcontrib.cairosvgconverter",
 ]
 
 myst_enable_extensions = ["deflist", "dollarmath"]

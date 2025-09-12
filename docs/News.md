@@ -2,6 +2,7 @@
 
 ## 1.1.5 (Ongoing)
 
+- Bumped bundled HTSLib to 1.22.1.
 - Miscellaneous bug fixes.
 
 ## 1.1.4 (2025/08/31)
