@@ -1,4 +1,7 @@
-project(slim_libceu LANGUAGES CXX)
+project(
+    slim_libceu
+    LANGUAGES CXX
+    VERSION 1.0.0)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 include_directories("${CMAKE_BINARY_DIR}/include")
 
@@ -19,4 +22,5 @@ if(BUILD_SHARED_LIBS)
 else()
     add_library(slim_libceu STATIC ${CEU_LIBRARY_SOURCES})
 endif()
+set_target_properties(slim_libceu PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION 1)
 install(TARGETS slim_libceu)

@@ -3,3 +3,6 @@ Bug-Submit: https://github.com/YU-Zhejian/art_modern/issues/new
 Changelog: https://github.com/YU-Zhejian/art_modern/blob/master/docs/News.md
 Repository-Browse: https://github.com/YU-Zhejian/art_modern/
 Repository: https://github.com/YU-Zhejian/art_modern.git
+Registry:
+ - Name: conda:bioconda
+   Entry: https://anaconda.org/bioconda/art_modern

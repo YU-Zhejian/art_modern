@@ -195,9 +195,8 @@ else()
     ceu_cm_set_static_target(labw_slim_htslib)
 endif()
 target_compile_options(labw_slim_htslib BEFORE PRIVATE "${HTSLIB_CC_FLAGS}")
-set_target_properties(labw_slim_htslib PROPERTIES
-        VERSION ${PROJECT_VERSION}
-        SOVERSION 3 # Same to Debian package libhts3t64
+set_target_properties(
+    labw_slim_htslib PROPERTIES VERSION ${PROJECT_VERSION} SOVERSION 3 # Same to Debian package libhts3t64
 )
 message(STATUS "HTSLib compiler flags: ${HTSLIB_CC_FLAGS}")
 message(STATUS "HTSLib link libs: ${LABW_SLIM_HTSLIB_LINK_LIBRARIES}")
