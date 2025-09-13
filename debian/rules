@@ -2,20 +2,10 @@
 include /usr/share/dpkg/default.mk
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
-export DH_VERBOSE = 1
-
-
-# See FEATURE AREAS in dpkg-buildflags(1).
-#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-
-# See ENVIRONMENT in dpkg-buildflags(1).
-# Package maintainers to append CFLAGS.
-#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
-# Package maintainers to append LDFLAGS.
-#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+export DH_VERBOSE = 0
 
 %:
-	dh $@ --verbose --buildsystem=cmake
+	dh $@ --buildsystem=cmake
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -24,6 +14,9 @@ override_dh_auto_configure:
     -DCEU_CM_SHOULD_ENABLE_TEST=ON \
     -DUSE_MALLOC=NOP \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
-    -DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
+    -DCMAKE_INSTALL_LIBDIR=lib/art-modern \
+    -DCMAKE_INSTALL_INCLUDEDIR=include/art-modern/include \
     -DUSE_HTSLIB=hts
+
+override_dh_makeshlibs:
+# We do not install libraries in standard locations, so we skip this step

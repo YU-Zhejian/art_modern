@@ -24,7 +24,7 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 project = "art_modern"
 author = "YU Zhejian"
 copyright_string = f"2024-2025, {author}"  # FIXME
-release = "1.1.7"  # FIXME
+release = os.environ("PACKAGE_VERSION")
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
@@ -34,8 +34,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "myst_parser",
     "sphinx_copybutton",
-    # FIXME: Use some library that does not rasterize the SVG images
-    # "sphinx.ext.imgconverter",
+    # Replaces "sphinx.ext.imgconverter",
     "sphinxcontrib.cairosvgconverter",
 ]
 

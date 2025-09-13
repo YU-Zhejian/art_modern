@@ -1,9 +1,16 @@
 CMAKE_FLAGS ?= 
-JOBS ?= 40
+JOBS ?= $(shell cat /proc/cpuinfo | grep processor | wc -l)
+BASH ?= bash
+
+export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
+
+$(info Using $(JOBS) parallel jobs for building)
+$(info Building for version $(PACKAGE_VERSION))
+$(info Using following additional CMake flags: $(CMAKE_FLAGS))
 
 .PHONY: help
 help:
-	echo "debug release rel_with_dbg_alpine fmt scc touch testsmall testsmall-conda testsmall-release raw_data clean testbuild doc cleandoc"
+	@echo "debug release rel_with_dbg_alpine fmt scc touch testsmall testsmall-conda testsmall-release raw_data clean testbuild doc cleandoc deb"
 
 # build as an alias to debug
 .PHONY: build
@@ -16,10 +23,10 @@ debug:
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		$(CMAKE_FLAGS) \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
 		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_debug_install/ \
+		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build opt/build_debug -j$(JOBS)
 	cmake --install opt/build_debug
@@ -35,10 +42,10 @@ release:
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Release \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
-		$(CMAKE_FLAGS) \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
 		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_release_install/ \
+		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build opt/build_release -j$(JOBS)
 	cmake --install opt/build_release
@@ -55,10 +62,10 @@ rel_with_dbg_alpine:
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DUSE_MALLOC=NOP \
-        $(CMAKE_FLAGS) \
 		-DCMAKE_INSTALL_LIBDIR=bin \
 		-DCMAKE_INSTALL_INCLUDEDIR=bin \
 		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_rel_with_dbg_alpine_install/ \
+        $(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
 	cmake --install opt/build_rel_with_dbg_alpine
@@ -73,30 +80,30 @@ rel_with_dbg_alpine:
 
 .PHONY: fmt
 fmt:
-	bash sh.d/fmt.sh
+	$(BASH) sh.d/fmt.sh
 
 .PHONY: scc
 scc:
-	bash sh.d/scc.sh
+	$(BASH) sh.d/scc.sh
 
 .PHONY: touch
 touch:
-	bash sh.d/touch-all.sh
+	$(BASH) sh.d/touch-all.sh
 
 .PHONY: testsmall
 testsmall: debug raw_data
-	env ART=opt/build_debug_install/bin/art_modern bash sh.d/test_small.sh
+	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test_small.sh
 
 .PHONY: testsmall-conda
 testsmall-conda: raw_data
 	# TODO: This Makefile block requires extensive revision.
 	conda env remove -n _art_modern_bioconda -y || true
 	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(conda run -n _art_modern_bioconda which art_modern)" bash sh.d/test_small.sh
+	env ART="$(conda run -n _art_modern_bioconda which art_modern)" $(BASH) sh.d/test_small.sh
 
 .PHONY: testsmall-release
 testsmall-release: release raw_data
-	env ART=opt/build_release_install/bin/art_modern bash sh.d/test_small.sh
+	env ART=opt/build_release_install/bin/art_modern $(BASH) sh.d/test_small.sh
 
 .PHONY: raw_data
 raw_data:
@@ -128,7 +135,7 @@ testbuild-child:
 .PHONY: testbuild
 testbuild:
 	mkdir -p opt/testbuild
-	bash sh.d/test-build.sh
+	$(BASH) sh.d/test-build.sh
 
 .PHONY: doc
 doc:
@@ -138,3 +145,10 @@ doc:
 cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
+
+.PHONY: deb
+deb:
+	# NOTE: This target will fail under WSL
+	# since the file debian/doc will be regarded as executable under WSL
+	# which have a different meaning for debuild.
+	$(BASH) sh.d/deb.sh
