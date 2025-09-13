@@ -2,6 +2,7 @@
 # shellcheck disable=SC2086
 # TODO: Supress -Wdate-time
 # TODO: FIX: exit-in-shared-library
+# TODO: Add abseil, pcg-cpp, and libfmt to versions.
 set -ue
 
 SRC_DIR="$(dirname "$(readlink -f "${0}")")/../"
@@ -20,6 +21,10 @@ git ls-files |
     grep -v '^bioconda/' |
     grep -v '^chroot/' |
     grep -v '^deps/labw_slim_htslib/' |
+    grep -v '^deps/slim_fmt/' |
+    grep -v '^deps/pcg-cpp-0.98/' |
+    grep -v '^deps/thread-pool/' |
+    grep -v '^deps/slim_abseil/' |
     grep -v '^explore/' |
     grep -v '^env/' \
         >opt/build_deb/git-files.txt

@@ -11,6 +11,7 @@ if("${USE_THREAD_PARALLEL}" STREQUAL "ASIO")
 elseif("${USE_THREAD_PARALLEL}" STREQUAL "NOP")
     set(USE_NOP_PARALLEL ON)
 elseif("${USE_THREAD_PARALLEL}" STREQUAL "BS")
+    include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
     set(USE_BS_PARALLEL ON)
 else()
     message(

@@ -12,11 +12,16 @@ override_dh_auto_configure:
     -Wdev -Wdeprecated --warn-uninitialized \
     -DCEU_CM_SHOULD_USE_NATIVE=OFF \
     -DCEU_CM_SHOULD_ENABLE_TEST=ON \
+    -DUSE_THREAD_PARALLEL=ASIO \
     -DUSE_MALLOC=NOP \
+    -DUSE_RANDOM_GENERATOR=STL \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCMAKE_INSTALL_LIBDIR=lib/art-modern \
     -DCMAKE_INSTALL_INCLUDEDIR=include/art-modern/include \
-    -DUSE_HTSLIB=hts
+    -DUSE_HTSLIB=hts \
+    -DUSE_LIBFMT=fmt \
+    -DUSE_CONCURRENT_QUEUE=/usr/include/concurrentqueue/moodycamel/ \
+    -DUSE_ABSL=SYSTEM
 
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step

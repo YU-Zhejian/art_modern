@@ -6,7 +6,7 @@ Configuration file for the Sphinx documentation builder.
 
 import os
 
-import tomli
+import datetime
 from docutils.parsers.null import Parser as NullParser
 from sphinx.application import Sphinx
 
@@ -23,8 +23,8 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 
 project = "art_modern"
 author = "YU Zhejian"
-copyright_string = f"2024-2025, {author}"  # FIXME
-release = os.environ("PACKAGE_VERSION")
+copyright_string = f"2024-{datetime.datetime.now().year}, {author}"
+release = os.environ.get("PACKAGE_VERSION")
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
