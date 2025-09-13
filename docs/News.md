@@ -1,5 +1,9 @@
 # News \& Release Notes
 
+## 1.1.7 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 ## 1.1.6 (2025/09/12)
 
 - A severe bug in CMakefiles of labw_slim_htslib fixed.
