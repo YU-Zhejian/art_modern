@@ -9,10 +9,10 @@ channels:
   - free
 
 dependencies:
-  - python=3.10
+  - python=3.11
   - samtools
   - pysam
-  - art
+  # - art # No longer requires old ART.
   - black
   - tqdm
   - fastp
@@ -34,3 +34,12 @@ dependencies:
   - conda-forge::coreutils >=8.28
   - conda-forge::bash
   - conda-forge::pkg-config
+
+  # Sphinx documentation
+  - sphinx=8.3
+  - sphinx-copybutton=0.5
+  - sphinxcontrib-svg2pdfconverter # Failed under Windows
+  - furo=2024.8.6
+  - myst-parser=4.0.1
+  - perl # For Windows MikTeX users
+  - cairosvg
