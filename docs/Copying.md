@@ -35,8 +35,6 @@ With CC0 1.0 Universal License.
 
 ## `libceu` by YU Zhejian
 
-Available from <https://github.com/YU-Zhejian/libceu>, commit `d1c043d8`.
-
 Affected files:
 
 - `/deps/cmake_collections/**`
@@ -66,7 +64,7 @@ Available from <https://github.com/bshoshany/thread-pool>, commit [`aa3fbfb`](ht
   
 Affected files:
 
-- `/deps/thread_pool/**`
+- `/deps/thread-pool/**`
   
 Under the MIT License.
 
@@ -82,27 +80,13 @@ Affected files:
 
 **NOTE** Added in 1.1.0.
 
-## Bravo C++ B-tree by Google Inc. \& German Mendez
-
-Available from <https://github.com/Kronuz/cpp-btree>, commit `3e9f417`.
-
-Affected files:
-
-- `/deps/cpp-btree/**`
-
-Under the Apache License, Version 2.0.
-
-**NOTE** Added in 1.1.1.
-
-**NOTE** No longer used in main code since 1.1.2.
-
 ## `{fmt}` by Victor Zverovich
 
-Available from <https://github.com/fmtlib/fmt>, commit `a3d05d70` (tag `7.1.3`).
+Available from <https://github.com/fmtlib/fmt>, commit [`7bdf062`](https://github.com/fmtlib/fmt/commit/7bdf0628b1276379886c7f6dda2cef2b3b374f0b) (tag [`7.1.3`](https://github.com/fmtlib/fmt/releases/tag/7.1.3)).
 
 Affected files:
 
-- `/deps/slim_libfmt/**`
+- `/deps/slim_fmt/**`
 
 Under an MIT-like License.
 
@@ -110,19 +94,17 @@ Under an MIT-like License.
 
 **NOTE** This is the last version that does not come with C++20 modules.
 
-## PCG by Melissa O'Neill \& PCG Project Contributors
+## PCG by Melissa O'Neill
 
-Available from <https://github.com/imneme/pcg-cpp>.
+Available from <https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip>. Currently developed at <https://github.com/imneme/pcg-cpp>.
 
 Affected files:
 
 - `/deps/pcg-cpp-0.98/**`
 
-Licensed under the MIT License and Apache 2.0 License.
+Licensed under the Apache 2.0 License.
 
 **NOTE** Added in 1.1.1.
-
-**NOTE** This project used the version retried [here](https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip), which was at that time licensed under Apache 2.0 License.
 
 ## `cgranges` by Dana-Farber Cancer Institute
 
@@ -147,3 +129,4 @@ Affected files:
 With Apache/MIT License.
 
 **NOTE** Added in 1.1.5.
+

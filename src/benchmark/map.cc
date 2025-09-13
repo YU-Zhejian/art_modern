@@ -16,14 +16,12 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-#include <btree/map.h>
-
-#include <cstdint>
 #include <pcg_random.hpp>
 
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <functional>
 #include <map>
@@ -334,32 +332,6 @@ private:
     std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingBTreeMap : public SlimEmpDist {
-public:
-    DELETE_MOVE(SlimEmpDistUsingBTreeMap)
-    DELETE_COPY(SlimEmpDistUsingBTreeMap)
-    SlimEmpDistUsingBTreeMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
-    {
-        for (decltype(count.size()) i = 0; i < count.size(); i++) {
-            dist_[count[i]] = qual[i];
-        }
-    }
-    ~SlimEmpDistUsingBTreeMap() override = default;
-
-    void gen_qualities(std::vector<am_qual_t>& qual) override
-    {
-        std::vector<am_qual_count_t> count;
-        count.resize(READ_LEN);
-        std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
-        for (std::size_t i = 0; i < qual.size(); i++) {
-            qual[i] = dist_.lower_bound(count[i])->second;
-        }
-    }
-
-private:
-    btree::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
-};
-
 namespace {
 void bench(std::unique_ptr<SlimEmpDist> empdist, const std::string& name)
 {
@@ -397,7 +369,6 @@ int main()
     bench(std::make_unique<SlimEmpDistUsingStdMap>(empdist_quals, empdist_counts), "std::map");
     bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::map");
     bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::flat_map");
-    bench(std::make_unique<SlimEmpDistUsingBTreeMap>(empdist_quals, empdist_counts), "btree::map");
     bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::dd");
     bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::dd");
     bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::dd (float)");

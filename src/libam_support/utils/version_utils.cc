@@ -9,6 +9,9 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 #include "ceu_check/ceu_check_os.hh"
 
+// Abseil
+#include <absl/base/config.h>
+
 // Boost
 #include <boost/algorithm/string/join.hpp>
 #include <boost/version.hpp>
@@ -114,6 +117,25 @@ namespace {
         std::cout << "GSL: not used" << std::endl;
 #endif
     }
+
+    void print_absl_version()
+    {
+#if defined(ABSL_LTS_RELEASE_VERSION) && defined(ABSL_LTS_RELEASE_PATCH_LEVEL)
+        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION  << "." << ABSL_LTS_RELEASE_PATCH_LEVEL
+                  << std::endl;
+#else
+        std::cout << "Abseil: Not on LTS" << std::endl;
+#endif
+    }
+
+    void print_pcg_version() {
+#ifdef USE_PCG_RANDOM
+        std::cout << "PCG: " << "0.98" << std::endl;
+#else
+        std::cout << "PCG: not used" << std::endl;
+#endif
+    }
+
 
     void print_bs_version()
     {
@@ -276,10 +298,12 @@ void print_version()
 #endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
+    print_absl_version();
     print_fmt_version();
     print_boost_version();
     print_gsl_version();
     print_onemkl_version();
+    print_pcg_version();
     print_mpi_version();
     print_protobuf_version();
     print_openmp_version();

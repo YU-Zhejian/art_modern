@@ -15,7 +15,7 @@
 #include <string>
 
 namespace labw::art_modern {
-[[noreturn]] void exit_mpi(const int status)
+void exit_mpi(const int  /*status*/)
 {
     BOOST_LOG_TRIVIAL(info) << "EXIT";
 #ifdef WITH_MPI
@@ -29,7 +29,6 @@ namespace labw::art_modern {
         BOOST_LOG_TRIVIAL(debug) << "MPI already finalized.";
     }
 #endif
-    std::exit(status);
 }
 
 [[noreturn]] void abort_mpi([[maybe_unused]] const int status)

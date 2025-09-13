@@ -69,6 +69,9 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/libfmt.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/absl.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
@@ -79,25 +82,17 @@ include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
-add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency includes.
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cgranges/cpp")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
 
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt Threads::Threads)
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu Threads::Threads)
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
 message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 

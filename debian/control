@@ -10,7 +10,10 @@ Build-Depends: debhelper-compat (= 13),
                cmake,
                liblzma-dev,
                libbz2-dev,
-               python3
+               python3,
+               libfmt-dev (>= 7.1.3),
+               libconcurrentqueue-dev,
+               libabsl-dev,
 Standards-Version: 4.6.2
 Homepage: https://github.com/YU-Zhejian/art_modern
 
@@ -25,8 +28,8 @@ Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Read
  High-performance simulation of realistic next-generation sequencing (NGS)
  data is a must for various algorithm development and benchmarking tasks.
  However, most existing simulators are either slow or generate data that
- does not reflect the real-world error profile of simulators. Here we
- introduce `art_modern`, a modern re-implementation of the popular ART
+ does not reflect the real-world error profile of simulators. Here
+ introduces `art_modern`, a modern re-implementation of the popular ART
  simulator with enhanced performance and functionality. It can be used for
  anyone who wants to simulate sequencing data for their own research, like
  benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the
@@ -34,6 +37,6 @@ Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Read
  testing of pipelines on a cluster. This simulator would be best suited
  for GNU/Linux-based High-End Desktops (HEDTs) with multiple cores and a
  fast SSD. However, it can also work on laptops or high-performance
- clusters (HPCs) with only one node. We believe with such simulators, the
+ clusters (HPCs) with only one node. With such simulators, the
  testing and benchmarking of NGS-related bioinformatics algorithms can be
  largely accelerated.
