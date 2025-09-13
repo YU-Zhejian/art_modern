@@ -3,6 +3,7 @@
 ## 1.1.6 (2025/09/12)
 
 - A severe bug in CMakefiles of labw_slim_htslib fixed.
+- **EXPERIMENTAL** Debian DEB package built under Linuxmint 22 Wilma.
 
 ## 1.1.5 (2025/09/12)
 
