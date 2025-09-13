@@ -80,20 +80,6 @@ Affected files:
 
 **NOTE** Added in 1.1.0.
 
-## Bravo C++ B-tree by Google Inc. \& German Mendez
-
-Available from <https://github.com/Kronuz/cpp-btree>, commit `3e9f417`.
-
-Affected files:
-
-- `/deps/cpp-btree/**`
-
-Under the Apache License, Version 2.0.
-
-**NOTE** Added in 1.1.1.
-
-**NOTE** No longer used in main code since 1.1.2.
-
 ## `{fmt}` by Victor Zverovich
 
 Available from <https://github.com/fmtlib/fmt>, commit [`7bdf062`](https://github.com/fmtlib/fmt/commit/7bdf0628b1276379886c7f6dda2cef2b3b374f0b) (tag [`7.1.3`](https://github.com/fmtlib/fmt/releases/tag/7.1.3)).

@@ -73,12 +73,6 @@ Files: deps/slim_abseil/*
 Copyright: 2017, The Abseil Authors
 License: Apache-2.0
 
-Files: deps/cpp-btree/*
-Copyright:
- 2013, Google Inc
- 2019, German Mendez Bravo (Kronuz)
-License: Apache-2.0
-
 Files: deps/slim_fmt/*
 Copyright: 2012-2020 Victor Zverovich
 License: MIT
