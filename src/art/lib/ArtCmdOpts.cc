@@ -182,8 +182,7 @@ namespace {
         if (argc == 1) {
             // No command line arguments.
             print_help(po_desc);
-            bye_mpi();
-            exit_mpi(EXIT_FAILURE);
+            abort_mpi();
         }
         po::variables_map vm_;
 
@@ -200,11 +199,13 @@ namespace {
             print_version();
             bye_mpi();
             exit_mpi(EXIT_SUCCESS);
+            std::exit(EXIT_SUCCESS);
         }
         if (vm_.count(ARG_HELP) != 0U) {
             print_help(po_desc);
             bye_mpi();
             exit_mpi(EXIT_SUCCESS);
+            std::exit(EXIT_SUCCESS);
         }
         return vm_;
     }

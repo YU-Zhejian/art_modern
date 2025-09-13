@@ -15,13 +15,13 @@ const char MPI_MESSAGE_BYE[] = "BYE\0";
 void init_mpi(int* argc, char*** argv);
 
 /**
- * Call `MPI_Finalize` (if MPI is not finalized) or `std::exit` with the given status.
+ * Call `MPI_Finalize` (if MPI is not finalized) with the given status.
  *
  * Every process should call this method.
  *
  * @param status Exit status.
  */
-[[noreturn]] void exit_mpi(int status);
+void exit_mpi(int status);
 
 /**
  * Call `MPI_Abort` or `std::abort` with the given status.

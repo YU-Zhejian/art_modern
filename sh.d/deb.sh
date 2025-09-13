@@ -2,7 +2,6 @@
 # shellcheck disable=SC2086
 # TODO: Supress -Wdate-time
 # TODO: FIX: exit-in-shared-library
-# TODO: Add abseil, pcg-cpp, and libfmt to versions.
 set -ue
 
 SRC_DIR="$(dirname "$(readlink -f "${0}")")/../"

@@ -119,4 +119,5 @@ int main(int argc, char* argv[])
 #endif
     bye_mpi();
     exit_mpi(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
 }
