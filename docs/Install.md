@@ -163,6 +163,8 @@ This instructs CMake whether to build shared libraries. It will also affect beha
 - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
 - `OFF`: Will search for static libraries and use static linking.
 
+The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software. However, this may lead to a larger binary size and security risks. See [this Debian Wiki](https://wiki.debian.org/StaticLinking) for more details.
+
 ### [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
 
 This instructs CMake to build executables/libraries with different optimization and debugging levels.

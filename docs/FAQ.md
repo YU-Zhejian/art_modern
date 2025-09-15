@@ -2,10 +2,6 @@
 
 ## Simulation
 
-### What kinds of CPUs are supported by the simulator?
-
-Although this application should theoretically support both endianness, only little endian is tested. That is, if you're working on an Intel or AMD CPU, this application should work fine.
-
 ### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?
 
 This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `1.fq`:
@@ -19,15 +15,31 @@ seqtk seq 1.fq -2 > 1_2.fq
 
 You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`.
 
-### Is there an interface for Python, Java, and more?
-
-We may develop a C interface in the future after the APIs and design of the core library are settled.
-
 ### How to add adaptors \& primers to the reads?
 
 Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
 
+### How to support new Illumina models?
+
+The code listed in `deps/ART_profiler_illumina` is Perl files that are used to create ART/`art_modern` profiles out of raw FASTQ files, and I would highly recommend that you create them on your own using the following steps:
+
+1. Download FASTQ files produced by your desired sequencer, like Illumina NovaSeq.
+2. Use the code in `deps/ART_profiler_illumina` to create ART/`art_modern` compatible profiles out of the FASTQ files.
+3. Use the generated profile with `art_modern` or ART.
+
+An example of generating HiSeq2000 and HiSeq2500 profiles is at <https://github.com/YU-Zhejian/art_modern/blob/master/explore/benchmark_other_simulators/run-fit.sh>.
+
+See also: GitHub Issue [#4](https://github.com/YU-Zhejian/art_modern/issues/4).
+
 ## Software Engineering
+
+### What kinds of CPUs are supported by the simulator?
+
+Although this application should theoretically support both endianness, only little endian is tested. That is, if you're working on an Intel or AMD CPU, this application should work fine.
+
+### Is there an interface for Python, Java, and more?
+
+We may develop a C interface in the future after the APIs and design of the core library are settled.
 
 ### Why you use `boost::filesystem` instead of `std::filesystem`, which was introduced in C++17?
 

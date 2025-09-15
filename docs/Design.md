@@ -40,10 +40,4 @@ Output writers are asynchronous. The `PairwiseAlignment`s are firstly formatted 
 
 ## Other Performance Bottlenecks
 
-A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. Google B-tree map is used since it allows multiple values to be held in one node, which improves performance when being compared red-black tree used in most STL implementations (including [EASTL](https://github.com/electronicarts/EASTL)).
-
-## Building System
-
-### Static Linking
-
-The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software.
+A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. This was addressed by using Walker's algorithm.
