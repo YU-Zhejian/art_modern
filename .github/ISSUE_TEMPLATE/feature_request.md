@@ -7,12 +7,14 @@ assignees: ''
 
 ---
 
+- [ ] I've read the [TODO](https://github.com/YU-Zhejian/art_modern/blob/master/docs/TODO.md) on all Git branches and am sure the feature request is not already proposed.
+- [ ] I've read the [Design](https://github.com/YU-Zhejian/art_modern/blob/master/docs/Design.md) on all Git branches and am sure the feature request is not denied.
+
 ## Nature of the Request
 
 - What's the problem your feature request is trying to solve?
   - [ ] Simulate new kinds of biological data. e.g., simulate circular RNA.
   - [ ] Add new I/O formats. e.g., support UCSC 2bit files.
-  - [ ] Support new sequencer error profile.
   - [ ] Suggest new software design/engineering approaches. e.g., use a new algorithm/scheduler/build system.
   - [ ] Others.
 

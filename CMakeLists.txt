@@ -1,16 +1,15 @@
 cmake_minimum_required(VERSION 3.17)
 
-if(NOT DEFINED USE_CCACHE)
-    set(USE_CCACHE OFF)
-endif()
-if(USE_CCACHE)
-    include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
+if(DEFINED USE_CCACHE)
+    message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
 endif()
 
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.7)
+    VERSION 1.1.7
+    DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
+    HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
@@ -66,18 +65,18 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency scripts.
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/libfmt.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/absl.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/concurrentqueue.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/qualgen.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/boost.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/absl.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
 # OpenMP temporarily disabled.
-# include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
+# include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/openmp.cmake")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.
@@ -101,7 +100,7 @@ message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
     execute_process(
-        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/sh.d/gen_builtin_profiles.py"
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/gen_builtin_profiles.py"
                 "${CMAKE_BINARY_DIR}/gen/src/art/"
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" COMMAND_ECHO STDERR
         RESULT_VARIABLE PYTHON_RES)

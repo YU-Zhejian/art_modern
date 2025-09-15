@@ -16,6 +16,18 @@
   [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
   ```
 
+## Packing
+
+- Add copyright to all .cc/.hh files using one of the tools in <https://wiki.debian.org/CopyrightReviewTools>.
+- Read <https://wiki.debian.org/Hardening>.
+- Add public headers.
+- Add manual pages.
+- Generate RPM packages. See <https://rpm-packaging-guide.github.io/>.
+- Make sure that my package is good with <https://wiki.debian.org/UpstreamGuide> and <https://wiki.ubuntu.com/UpstreamGuide>.
+- Is it a good idea to add `libpcg-cpp-dev` as compile dependency?
+- Document additional CMake flags to rule out the bundled libraries.
+- Update bundled abseil and fmt to the latest versions.
+
 ## Performance
 
 - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s.

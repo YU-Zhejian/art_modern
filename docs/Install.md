@@ -53,6 +53,8 @@ Reference:
 
 For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`). Only the latest version is tested.
 
+**NOTE** Distributing binaries built with this compiler may require you to comply with Intel's license.
+
 ### Other Compilers
 
 Although not tested, the following compilers can also theoretically be of use:
@@ -66,9 +68,9 @@ Although not tested, the following compilers can also theoretically be of use:
 
 ## Essential Tools for Building
 
-### CMake
+### [CMake](https://cmake.org/)
 
-[CMake](https://cmake.org/) 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+CMake 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
 The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
@@ -80,9 +82,9 @@ You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM 
 
 This project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 should work.
 
-### `pkgconf` or `pkg-config`
+### [`pkgconf`](https://github.com/pkgconf/pkgconf)  or [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/)
 
-The project may take advantage of [pkgconf](https://github.com/pkgconf/pkgconf) or [pkg-config](https://www.freedesktop.org/wiki/Software/pkg-config/) to locate the dependencies. Installing such is **HIGHLY** recommended.
+The project may take advantage of pkgconfor pkg-config to locate the dependencies. Installing such is **HIGHLY** recommended.
 
 ### Command-Line Ultilities
 
@@ -96,10 +98,6 @@ For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions wit
   - **NOTE** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
 
 as your original system tools shipped with the operating system/BusyBox may **NOT** work.
-
-### Miscellaneous
-
-The project may use [ccache](https://ccache.dev/) to speed up the compilation process. However, this may cause bugs in some systems and is not enabled by default.
 
 ## Library Dependencies
 
@@ -117,18 +115,15 @@ This is an umbrella project of diverse small modules that can be used independen
 - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
 - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
 
-- **NOTE** Clang < 10 with Boost > 1.77 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
-- **NOTE** Boost < 1.66 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
-
 ### [HTSLib](https://www.htslib.org/)
 
 You may either use the one bundled with the project or an external one that had already been installed inside your system. To use bundled HTSLib sources, you need to have:
 
 - **REQUIRED** [zlib](https://www.zlib.net/).
 - **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
-- **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression, which is now not supported.
+- **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression. Note that CRAM format is currently not supported as an output format for `art_modern`.
 - **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression, which is now not supported.
-- **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
+- **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output. **HIGHLY RECOMMENDED**.
 
 See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
 
@@ -142,8 +137,10 @@ For compression and decompression bundled ART error profiles. At least 1.2.0 (la
 
 - Various libraries for accelerating random number generation. Including:
   - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). Highly recommended if you are using Intel CPUs.
+    - **NOTE** OneMKL is available for Intel CPUs only.
+    - **NOTE** This library is propertary software.
   - **OPTIONAL** [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
-- Alternate `malloc`/`free` implementations. Including:
+- Alternate `malloc`/`free` implementations that may improve performance. Including:
   - **OPTIONAL** [mi-malloc](https://github.com/microsoft/mimalloc).
   - **OPTIONAL** [jemalloc](https://github.com/jemalloc/jemalloc).
 
@@ -166,6 +163,8 @@ This instructs CMake whether to build shared libraries. It will also affect beha
 - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
 - `OFF`: Will search for static libraries and use static linking.
 
+The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software. However, this may lead to a larger binary size and security risks. See [this Debian Wiki](https://wiki.debian.org/StaticLinking) for more details.
+
 ### [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
 
 This instructs CMake to build executables/libraries with different optimization and debugging levels.
@@ -175,7 +174,7 @@ This instructs CMake to build executables/libraries with different optimization 
 - `Release`: Optimized executables/libraries without debug symbols. Used for daily use.
 - `RelWithDebInfo`: Optimized executables/libraries with debug symbols. Used for profiling.
 
-### `Python3_EXECUTABLE`
+### [`Python3_EXECUTABLE`](https://cmake.org/cmake/help/latest/module/FindPython3.html)
 
 Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
 
@@ -269,18 +268,10 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
-### `USE_CCACHE`
-
-Available since 1.1.1.
-
-Whether to use [ccache](https://ccache.dev/) to speed up the compilation process. However, it may not work on some systems.
-
-- **`OFF` (DEFAULT): Will not use ccache.**
-- `ON`: Will use ccache if available.
-
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.
+- `USE_CCACHE` was deprecated in 1.1.7.
 
 ## Platform-Specific Building Instructions
 
@@ -344,11 +335,10 @@ You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts
 
 ## Building Documentations
 
-Create a new conda environment and install the dependencies using:
+Create the development environment and make the documentation through:
 
 ```shell
-conda env create -f env/art_modern_doc.yml
-conda activate art_modern_doc
+conda activate art_modern
 make doc
 ```
 
@@ -362,5 +352,7 @@ conda install -c conda-forge perl
 
 ## Known Incompatibilities
 
+- Clang < 10 with Boost > 1.77 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
+- Boost < 1.66 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
 - GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
 - GCC would fail on Debian GNU/Hurd.

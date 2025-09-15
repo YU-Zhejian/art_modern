@@ -2,12 +2,14 @@
 
 ## 1.1.7 (Ongoing)
 
+- Support over `ccache` deprecated.
+- Some files without clear license were removed.
 - Miscellaneous bug fixes.
 
 ## 1.1.6 (2025/09/12)
 
-- A severe bug in CMakefiles of labw_slim_htslib fixed.
-- **EXPERIMENTAL** Debian DEB package built under Linuxmint 22 Wilma.
+- A severe bug in CMakefiles of `labw_slim_htslib` fixed.
+- **EXPERIMENTAL** Debian DEB package built under Linux Mint 22 Wilma.
 
 ## 1.1.5 (2025/09/12)
 
@@ -30,12 +32,6 @@
 - Compiler flag `-Ofast` switched back to `-O3` for release build.
 - Miscellaneous bug fixes.
 
-Bundled files:
-
-- `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
-- `art_modern.pdf`: Documentation in PDF format.
-- `art_modern.html.zip`: Documentation in HTML format.
-
 ## 1.1.2 (2025/02/16)
 
 - The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
@@ -43,13 +39,9 @@ Bundled files:
 - The performance of MoodyCamel queue was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
 - Miscellaneous bug fixes.
 
-Bundled files:
-
-- `build_rel_with_dbg_alpine-x86_64.zip`: Static linked libraries and executable binaries built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
-
 ## 1.1.1 (2025/02/02)
 
-- Possible build acceleration using [ccache](https://ccache.dev/) supported.
+- ~~Possible build acceleration using [ccache](https://ccache.dev/) supported.~~
 - Alternate `malloc`/`free` implementations like [jemalloc](https://github.com/jemalloc/jemalloc) and [mi-malloc](https://github.com/microsoft/mimalloc) supported.
 - Formatting engine of FASTQ changed to [`{fmt}`](https://github.com/fmtlib/fmt), which is slightly faster.
 - FASTA output format supported.
@@ -57,10 +49,6 @@ Bundled files:
 - The default random generator for the Intel MKL library changed from `VSL_BRNG_MT19937` to `VSL_BRNG_SFMT19937`, which is slightly faster.
 - [PCG](https://www.pcg-random.org/) added as an alternative random number generator. **THIS GENERATOR MAY NOT WORK UNDER MAC OS X.**
 - ~~[C++ B+ Tree](https://github.com/Kronuz/cpp-btree) added for accelerated map implementation.~~
-
-Bundled files:
-
-- `art_modern_alpine`: Static linked binary built under x86\_64 Alpine Linux. Should work on most x86\_64 Linux distributions.
 
 ## 1.1.0 (2025/01/23)
 
@@ -106,4 +94,3 @@ Changes in software implementation:
 - Largely eliminated POSIX-only routines by Boost.
 - Argument parser implemented in Boost.
 - Output writers were made asynchronous using `moodycamel::ConcurrentQueue<T>`.
-

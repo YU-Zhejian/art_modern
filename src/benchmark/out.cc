@@ -28,87 +28,12 @@
 
 using namespace labw::art_modern;
 
-#if 0
-template <typename T> class LockedIO {
-public:
-    DELETE_MOVE(LockedIO)
-    DELETE_COPY(LockedIO)
-
-    constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
-
-    explicit LockedIO(std::string name)
-        : name_(std::move(name)) { };
-
-    virtual ~LockedIO() = default;
-
-    void push(T&& value)
-    {
-        std::scoped_lock lock(mutex_);
-        num_reads_in_++;
-        write(std::move(value));
-        num_reads_out_++;
-    }
-    void start() { start_time_ = std::chrono::high_resolution_clock::now(); }
-    virtual void flush_and_close() { };
-
-    void stop()
-    {
-        flush_and_close();
-        end_time_ = std::chrono::high_resolution_clock::now();
-        if (!had_logged_) {
-            log_();
-        }
-        had_logged_ = true;
-    }
-
-    virtual void write(T value) = 0;
-
-protected:
-    std::atomic<std::size_t> num_bytes_out_ = 0;
-    const std::string name_;
-
-private:
-    std::chrono::high_resolution_clock::time_point start_time_;
-    std::chrono::high_resolution_clock::time_point end_time_;
-    std::atomic<std::size_t> num_reads_in_ = 0;
-    std::atomic<std::size_t> num_reads_out_ = 0;
-    std::atomic<std::size_t> num_wait_in_ = 0;
-    std::atomic<std::size_t> num_wait_out_not_full_ = 0;
-    std::atomic<std::size_t> num_wait_out_empty_ = 0;
-    std::atomic<std::size_t> num_nowait_out_ = 0;
-    std::atomic<bool> had_logged_ = false;
-
-    std::mutex mutex_;
-
-    void run()
-    {
-        // Does nothing!
-    }
-    void log_() const
-    {
-        const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_ - start_time_).count();
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << num_reads_in_ << " reads and writes "
-                                << num_reads_out_ << " reads.";
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. Waitings (I/ONotFull/OEmpty): " << num_wait_in_ << " / "
-                                << num_wait_out_not_full_ << "("
-                                << (100.0 * num_wait_out_not_full_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%) / " << num_wait_out_empty_ << "("
-                                << (100.0 * num_wait_out_empty_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%).";
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: " << to_si(num_bytes_out_) << "B written in " << time / 1000.0
-                                << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
-    }
-};
-#endif
-
 class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
     DELETE_MOVE(EmptyLFIO)
     EmptyLFIO()
-        : LockFreeIO<std::unique_ptr<std::nullptr_t>>("Empty")
+        : LockFreeIO("Empty")
     {
     }
     ~EmptyLFIO() override { stop(); };

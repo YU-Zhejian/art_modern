@@ -1,5 +1,5 @@
 if(DEFINED USE_CONCURRENT_QUEUE)
     include_directories(BEFORE "${USE_CONCURRENT_QUEUE}")
 else()
-    include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/../deps/concurrentqueue")
+    include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/../../deps/concurrentqueue")
 endif()

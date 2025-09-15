@@ -28,7 +28,7 @@ public:
     static const int QUEUE_SIZE = M_SIZE;
     static const int BULK_SIZE = K_SIZE;
 
-    constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
+    constexpr static std::chrono::duration sleep_time = std::chrono::microseconds(10);
 
     explicit LockFreeIO(std::string name)
         : name_(std::move(name))
@@ -46,19 +46,19 @@ public:
     void push(T&& value)
     {
         while (!queue_.try_enqueue(std::move(value))) {
-            num_wait_in_++;
+            ++num_wait_in_;
             std::this_thread::sleep_for(sleep_time);
         }
-        num_reads_in_++;
+        ++num_reads_in_;
     }
 
     void push(T&& value, const ProducerToken& token)
     {
         while (!queue_.try_enqueue(token.token, std::move(value))) {
-            num_wait_in_++;
+            ++num_wait_in_;
             std::this_thread::sleep_for(sleep_time);
         }
-        num_reads_in_++;
+        ++num_reads_in_;
     }
 
     void start()

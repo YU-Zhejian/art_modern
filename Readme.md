@@ -17,6 +17,14 @@ High-performance simulation of realistic next-generation sequencing (NGS) data i
 
 ### Installation
 
+**NOTE** Although we're providing compiled binaries for Linux, we still recommend compiling the source code yourself for maximum performance.
+
+#### Using Fully Static Build
+
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux. It should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
+
+**WARNING** Static builds may lead to compromized security.
+
 #### Installation through Conda
 
 [Conda](https://docs.conda.io/) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed [Conda](https://docs.conda.io/). Then:
