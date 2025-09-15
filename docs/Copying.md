@@ -8,7 +8,7 @@ This project is based on the source code of [ART](https://www.niehs.nih.gov/rese
 
 ---
 
-This project uses code from the following projects (in no particular order):
+This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
 
 ## HTSlib by Genome Research Ltd.
 
@@ -78,6 +78,8 @@ Affected files:
 
 - `/deps/slim_abseil/**`
 
+Under the Apache-2.0 license.
+
 **NOTE** Added in 1.1.0.
 
 ## `{fmt}` by Victor Zverovich
@@ -105,3 +107,15 @@ Affected files:
 Licensed under the Apache 2.0 License.
 
 **NOTE** Added in 1.1.1.
+
+## GNU Science Library by M. Galassi et al.
+
+Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of GSL 2.8 source tarball.
+
+Affected files:
+
+- `src/libam_support/ds/GslDiscreteDistribution.hh`, which is a re-implemented in C++ from <randist/discrete.c> in GSL 2.8.
+
+Licensed under the GPL 3.0 license.
+
+**NOTE** Added in 1.1.2.

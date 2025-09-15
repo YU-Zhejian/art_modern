@@ -92,18 +92,18 @@ touch:
 
 .PHONY: testsmall
 testsmall: debug raw_data
-	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test_small.sh
+	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-conda
 testsmall-conda: raw_data
 	# TODO: This Makefile block requires extensive revision.
 	conda env remove -n _art_modern_bioconda -y || true
 	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(conda run -n _art_modern_bioconda which art_modern)" $(BASH) sh.d/test_small.sh
+	env ART="$(conda run -n _art_modern_bioconda which art_modern)" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release
 testsmall-release: release raw_data
-	env ART=opt/build_release_install/bin/art_modern $(BASH) sh.d/test_small.sh
+	env ART=opt/build_release_install/bin/art_modern $(BASH) sh.d/test-small.sh
 
 .PHONY: raw_data
 raw_data:

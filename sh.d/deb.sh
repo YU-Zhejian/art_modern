@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2086
-# TODO: Supress -Wdate-time
-# TODO: FIX: exit-in-shared-library
 set -ue
 
 SRC_DIR="$(dirname "$(readlink -f "${0}")")/../"
@@ -14,18 +12,22 @@ echo "DEB: Building for version ${PACKAGE_VERSION}"
 # Generate orig tarball from git files
 echo "DEB: Generate orig tarball from git files"
 git ls-files |
-    grep -v '^debian/' |
+    grep -v '^.idea/' |
     grep -v '^.github/' |
     grep -v '^.vscode/' |
     grep -v '^bioconda/' |
     grep -v '^chroot/' |
+    grep -v '^debian/' |
+    grep -v '^deps/ART_profiler_illumina/' |
+    grep -v '^deps/concurrentqueue/' |
     grep -v '^deps/labw_slim_htslib/' |
-    grep -v '^deps/slim_fmt/' |
     grep -v '^deps/pcg-cpp-0.98/' |
-    grep -v '^deps/thread-pool/' |
+    grep -v '^deps/slim_fmt/' |
     grep -v '^deps/slim_abseil/' |
+    grep -v '^deps/thread-pool/' |
     grep -v '^explore/' |
-    grep -v '^env/' \
+    grep -v '^env/' |
+    grep -v '^sh.d/' \
         >opt/build_deb/git-files.txt
 export BUILD_DIR="opt/build_deb/art-modern-${PACKAGE_VERSION}+dfsg"
 mkdir -p "${BUILD_DIR}"
@@ -34,7 +36,9 @@ while read -r line; do
         install -D "${line}" "${BUILD_DIR}/${line}"
     fi
 done <opt/build_deb/git-files.txt
-env -C opt/build_deb/ tar -czf "art-modern_${PACKAGE_VERSION}+dfsg.orig.tar.gz" "art-modern-${PACKAGE_VERSION}+dfsg"
+env -C opt/build_deb/ \
+    tar -czf "art-modern_${PACKAGE_VERSION}+dfsg.orig.tar.gz" \
+    "art-modern-${PACKAGE_VERSION}+dfsg"
 
 # Copy debian files
 echo "DEB: Copy debian files"
