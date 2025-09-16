@@ -268,6 +268,34 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
+### `USE_LIBFMT`
+
+Available since 1.1.7.
+
+Whether to use bundled `{fmt}` library for formatting strings.
+
+- **unset (DEFAULT): Will use bundled `{fmt}`.**
+- `fmt`  : Will use the `{fmt}` (`libfmt.so`) found in the system.
+- Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system.
+
+### `USE_CONCURRENT_QUEUE`
+
+Available since 1.1.7.
+
+Whether to use bundled `moodycamel::ConcurrentQueue`.
+
+- **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue`.**
+- Any value `[val]`: Will search for MoodyCamel ConcurrentQueue at including path `[val]`. For example, if you use Debian GNU/Linux and intalled [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/`.
+
+### `USE_ABSL`
+
+Available since 1.1.7.
+
+Whether to use bundled Abseil library.
+
+- **unset (DEFAULT): Will use bundled Abseil.**
+- Any value `[val]`: Will use system Abseil found by the CMake module `abslConfig.cmake`, which is shipped with official Abseil libraries.
+
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.

@@ -72,7 +72,7 @@ Under the MIT License.
 
 ## Abseil by Google Inc.
 
-Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
+Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.0`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0). The bundled source code is tailored from the release tarball.
 
 Affected files:
 

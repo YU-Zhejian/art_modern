@@ -3,6 +3,7 @@
 ## 1.1.7 (Ongoing)
 
 - Support over `ccache` deprecated.
+- Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).
 - Some files without clear license were removed.
 - Miscellaneous bug fixes.
 

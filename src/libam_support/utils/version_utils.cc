@@ -121,21 +121,20 @@ namespace {
     void print_absl_version()
     {
 #if defined(ABSL_LTS_RELEASE_VERSION) && defined(ABSL_LTS_RELEASE_PATCH_LEVEL)
-        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION  << "." << ABSL_LTS_RELEASE_PATCH_LEVEL
-                  << std::endl;
+        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION << "." << ABSL_LTS_RELEASE_PATCH_LEVEL << std::endl;
 #else
         std::cout << "Abseil: Not on LTS" << std::endl;
 #endif
     }
 
-    void print_pcg_version() {
+    void print_pcg_version()
+    {
 #ifdef USE_PCG_RANDOM
         std::cout << "PCG: " << "0.98" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif
     }
-
 
     void print_bs_version()
     {
