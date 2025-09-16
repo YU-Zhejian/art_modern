@@ -1,6 +1,7 @@
+cmake_minimum_required(VERSION 3.17)
 project(
     slim_libceu
-    LANGUAGES CXX
+    LANGUAGES C CXX
     VERSION 1.0.0)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 include_directories("${CMAKE_BINARY_DIR}/include")
@@ -24,3 +25,11 @@ else()
 endif()
 set_target_properties(slim_libceu PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION 1)
 install(TARGETS slim_libceu)
+
+if(DEFINED PROJECT_IS_TOP_LEVEL AND PROJECT_IS_TOP_LEVEL)
+    add_executable(ceu_check_exe exe/ceu_check_exe.cc)
+    target_link_libraries(ceu_check_exe PUBLIC slim_libceu)
+    install(TARGETS ceu_check_exe)
+else()
+    message(STATUS "Skipping ceu_check_exe target because this may not be the top-level project")
+endif()

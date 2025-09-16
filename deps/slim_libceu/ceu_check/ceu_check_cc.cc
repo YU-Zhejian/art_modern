@@ -59,7 +59,7 @@ std::string ceu_check_get_compiler_info()
     std::string msc_minor_ver = "unknown";
 #endif
     oss << "\t" << "MSVC compatible version number: " << msc_major_ver << '.' << msc_minor_ver << '.'
-        << msc_internal_ver << '.' << msc_build_ver << ", with Visual Studio ver. " << CEU_VISUAL_STUDIO_VER;
+        << msc_internal_ver << '.' << msc_build_ver << ", with Visual Studio ver. " << CEU_VISUAL_STUDIO_VER << std::endl;
 #endif
 
 #if defined(CEU_COMPILER_IS_NVHPC)
