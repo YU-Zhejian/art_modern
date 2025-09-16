@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
         BOOST_LOG_TRIVIAL(warning) << "ART_NO_LOG_DIR defined; No log directory will be created.";
     } else {
-        char* art_log_dir_c = std::getenv("ART_LOG_DIR");
+        const char* art_log_dir_c = std::getenv("ART_LOG_DIR");
         std::string art_log_dir;
         if (art_log_dir_c == nullptr) {
             BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";

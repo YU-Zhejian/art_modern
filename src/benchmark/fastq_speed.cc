@@ -79,8 +79,8 @@ void speed2devnull()
     }
     ofs.close();
     auto end = std::chrono::high_resolution_clock::now();
-    const double speed = 1.0 * (n_blocks * block_size)
-        / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() * 1000;
+    const double speed = static_cast<double>(n_blocks * block_size)
+        / static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) * 1000.0;
     std::cout << "Speed: " << to_si(speed) << "B/s" << std::endl;
 }
 

@@ -10,6 +10,7 @@
 #include "art_modern_config.h"
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/fs_utils.hh"
@@ -588,63 +589,6 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
              },
         { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel, batch_size, vm_,
             std::move(args) } };
-}
-
-/**
- * For CAPI; Not finished; Do NOT use.
- */
-ArtParams parse_args2(const int argc, char** argv)
-{
-    const po::options_description po_desc_ = option_parser();
-
-    const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
-    const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));
-    const auto& art_lib_const_mode = get_art_lib_const_mode(get_param<std::string>(vm_, ARG_LIB_CONST_MODE));
-
-    auto id = get_param<std::string>(vm_, ARG_ID);
-
-    const auto sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
-    const auto max_indel = get_param<int>(vm_, ARG_MAX_INDEL);
-    const auto max_n = get_param<int>(vm_, ARG_MAX_N);
-    const auto read_len = get_param<int>(vm_, ARG_READ_LEN);
-    validate_read_length(read_len);
-
-    auto per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
-    auto per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel);
-    auto per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
-    auto per_base_del_rate_2 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel);
-
-    const auto pe_frag_dist_mean = get_param<double>(vm_, ARG_PE_FRAG_DIST_MEAN);
-    const auto pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
-    validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len, art_lib_const_mode, art_simulation_mode);
-    const auto pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
-
-    auto qdist
-        = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
-            get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len, art_lib_const_mode, sep_flag,
-            get_param<am_qual_t>(vm_, ARG_Q_SHIFT_1), get_param<am_qual_t>(vm_, ARG_Q_SHIFT_2),
-            get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
-    std::array<double, HIGHEST_QUAL> err_prob {};
-    for (am_qual_t i = 0; i < HIGHEST_QUAL; i++) {
-        err_prob[i] = std::pow(10, -i / 10.0);
-    }
-    return {
-        art_simulation_mode,
-        art_lib_const_mode,
-        sep_flag,
-        std::move(id),
-        max_n,
-        read_len,
-        pe_frag_dist_mean,
-        pe_frag_dist_std_dev,
-        std::move(per_base_ins_rate_1),
-        std::move(per_base_del_rate_1),
-        std::move(per_base_ins_rate_2),
-        std::move(per_base_del_rate_2),
-        err_prob,
-        pe_dist_mean_minus_2_std,
-        std::move(qdist),
-    };
 }
 
 } // namespace labw::art_modern

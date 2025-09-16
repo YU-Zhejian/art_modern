@@ -120,7 +120,7 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
         revcomp_inplace(seq1);
     }
 
-    const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
+    const hts_pos_t isize1 = pos2 > pos1 ? static_cast<hts_pos_t>(pos2 + rlen - pos1) : -static_cast<hts_pos_t>(pos1 + rlen - pos2);
     const hts_pos_t isize2 = -isize1;
 
     auto sam_record1 = BamUtils::init_uptr();

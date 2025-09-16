@@ -25,7 +25,7 @@ public:
 
 private:
     std::size_t batch_size_;
-    std::size_t current_index_;
+    std::size_t current_index_ {0};
     const std::shared_ptr<InMemoryFastaFetch>& stream_;
     std::mutex mutex_;
 };

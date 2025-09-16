@@ -48,7 +48,13 @@ void ArtRead::generate_pairwise_aln()
         }
         pos_on_aln_str++;
     }
-    num_match = ref_.size() - pos_on_ref;
+    num_match = static_cast<hts_pos_t>(ref_.size() - pos_on_ref);
+#ifdef CEU_CM_IS_DEBUG
+    if (num_match < 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "num_match < 0: " << num_match;
+        abort_mpi();
+    }
+#endif
     std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
     std::memcpy(aln_ref_.data() + pos_on_aln_str, ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
@@ -263,7 +269,14 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
         }
         pos_on_aln_str++;
     }
-    num_match = ref_.size() - pos_on_ref;
+    num_match = static_cast<hts_pos_t>(ref_.size() - pos_on_ref);
+
+#ifdef CEU_CM_IS_DEBUG
+    if (num_match < 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "num_match < 0: " << num_match;
+        abort_mpi();
+    }
+#endif
     std::memcpy(query_.data() + pos_on_read, ref_.data() + pos_on_ref, num_match);
 #else // Old code for historical purposes
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
@@ -336,10 +349,7 @@ PairwiseAlignment ArtRead::to_pwa()
 }
 bool ArtRead::is_good() const
 {
-    if (std::count(query_.begin(), query_.end(), 'N') > art_params_.max_n) {
-        return false;
-    }
-    return true;
+    return std::count(query_.begin(), query_.end(), 'N') <= art_params_.max_n;
 }
 
 } // namespace labw::art_modern

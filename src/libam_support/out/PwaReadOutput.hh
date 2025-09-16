@@ -44,6 +44,6 @@ public:
 
     [[nodiscard]] const std::string name() const override { return "PWA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
+    [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };
 } // namespace labw::art_modern

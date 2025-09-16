@@ -18,7 +18,7 @@ namespace labw::art_modern {
 
 constexpr char DUMP_FILENAME[] = "./backtrace.dump";
 namespace {
-
+// FIXME: The signal handler is not guaranteed to be thread safe. The return values are also unprocessed.
     void my_signal_handler(const int signum)
     {
         std::signal(signum, SIG_DFL);

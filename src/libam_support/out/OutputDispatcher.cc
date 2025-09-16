@@ -1,7 +1,6 @@
 #include "libam_support/out/OutputDispatcher.hh"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
-#include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BamReadOutput.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/FastaReadOutput.hh"

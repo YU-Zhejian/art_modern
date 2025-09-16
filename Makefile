@@ -142,7 +142,8 @@ clean:
 testbuild-child:
 	rm -fr opt/testbuild
 	mkdir -p opt/testbuild
-	env -C opt/testbuild cmake \
+	# Ninja is required here for acceleration
+	env -C opt/testbuild cmake -G Ninja \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS) \

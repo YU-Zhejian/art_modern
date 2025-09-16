@@ -46,7 +46,7 @@ public:
     /**
      * @throw OutputNotSpecifiedException if output file is not specified.
      */
-    virtual std::shared_ptr<BaseReadOutput> create(const OutParams& params) const = 0;
+    [[nodiscard]] virtual std::shared_ptr<BaseReadOutput> create(const OutParams& params) const = 0;
     virtual ~BaseReadOutputFactory() = default;
 };
 

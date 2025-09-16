@@ -28,7 +28,6 @@ std::shared_ptr<InMemoryFastaFetch> InMemoryFastaBatcher::fetch()
 InMemoryFastaBatcher::InMemoryFastaBatcher(
     const std::size_t batch_size, const std::shared_ptr<InMemoryFastaFetch>& stream)
     : batch_size_(batch_size)
-    , current_index_(0)
     , stream_(stream)
 {
 }

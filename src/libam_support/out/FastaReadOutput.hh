@@ -4,11 +4,10 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/lockfree/SimpleLFIO.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <memory>
 #include <string>
@@ -40,6 +39,6 @@ public:
 
     [[nodiscard]] const std::string name() const override { return "FASTA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
-    std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
+    [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };
 } // namespace labw::art_modern

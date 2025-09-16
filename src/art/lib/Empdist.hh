@@ -46,14 +46,14 @@ private:
         DEFAULT_MOVE(SlimEmpDistGslDiscrete)
         explicit SlimEmpDistGslDiscrete(const dist_map_type& dist)
         {
-            std::vector<am_qual_count_t> count;
+            std::vector<double> count;
             for (const auto& [this_count, this_qual] : dist) {
                 qual_.emplace_back(this_qual);
-                count.emplace_back(this_count);
+                count.emplace_back(static_cast<double >(this_count));
             }
             std::vector<double> init_list;
             double prev = 0;
-            for (const int i : count) {
+            for (const auto i : count) {
                 init_list.emplace_back(i - prev);
                 prev = i;
             }

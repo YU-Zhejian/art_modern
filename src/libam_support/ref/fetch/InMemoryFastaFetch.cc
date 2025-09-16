@@ -8,7 +8,6 @@
 #include <cstddef>
 #include <fstream>
 #include <istream>
-#include <sstream>
 #include <string>
 #include <tuple>
 #include <utility>

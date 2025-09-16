@@ -11,7 +11,6 @@
 #include "libam_support/utils/mpi_utils.hh" // NOLINT
 #include "libam_support/utils/seq_utils.hh"
 
-#include <algorithm>
 #include <fmt/core.h>
 
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar

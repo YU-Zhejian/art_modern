@@ -45,7 +45,6 @@ public:
 
     OutputDispatcherFactory();
 
-    [[nodiscard]] const std::string name() const { return "OD"; }
     void patch_options(boost::program_options::options_description& desc) const;
     [[nodiscard]] std::shared_ptr<OutputDispatcher> create(const OutParams& params) const;
     ~OutputDispatcherFactory();
