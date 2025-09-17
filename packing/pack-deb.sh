@@ -2,7 +2,7 @@
 set -ue
 export PACKAGE_VERSION=1.1.6 # FIXME
 ./sh.d/prepare-orig-tgz-for-deb.sh
-for name in debian-12 debian-13 ubuntu-2204 ubuntu-2404; do
+for name in debian-12 debian-13 ubuntu-2404; do
     rm -fr artifacts/build_deb-"${name}"
     mkdir -p artifacts/build_deb-"${name}"
     singularity exec \
@@ -11,4 +11,5 @@ for name in debian-12 debian-13 ubuntu-2204 ubuntu-2404; do
         --bind artifacts/build_deb-"${name}":/mnt/build_deb \
         dockerfiles/${name}.sif \
         bash /build_deb.sh
+    rm -fr artifacts/build_deb-"${name}"/"art-modern_${PACKAGE_VERSION}+dfsg"
 done

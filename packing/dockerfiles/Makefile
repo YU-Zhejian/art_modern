@@ -7,7 +7,6 @@ all: almalinux-8.sif \
 	 almalinux-9.sif \
 	 debian-12.sif \
 	 debian-13.sif \
-	 ubuntu-2204.sif \
 	 ubuntu-2404.sif \
 
 clean:

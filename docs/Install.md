@@ -127,7 +127,7 @@ You may either use the one bundled with the project or an external one that had 
 
 See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
 
-To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes.
+To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
 
 ### [zlib](https://www.zlib.net/)
 
