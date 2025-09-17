@@ -21,4 +21,3 @@ env -C opt/build_deb/ \
     -EIi --pedantic --tag-display-limit 0 2>&1 |
     sed 's/^/LINTIAN: /' |
     tee opt/build_deb/lintian.log
-

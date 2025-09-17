@@ -22,7 +22,7 @@
 
 #include <boost/log/trivial.hpp>
 
-namespace lab::art_modern::details {
+namespace labw::art_modern::details {
 #ifdef CEU_ON_POSIX
 void print_memory_usage(const char* file, const int line)
 {
