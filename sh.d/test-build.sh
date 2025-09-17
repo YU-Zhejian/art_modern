@@ -15,7 +15,7 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo SomeNonesense; do
                     CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_MALLOC=${USE_MALLOC}"
 
                     echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-                    make testbuild-child CMAKE_FLAGS="${CMAKE_FLAGS}" &>> opt/testbuild.log || exit 1
+                    make testbuild-child CMAKE_FLAGS="${CMAKE_FLAGS}" &>>opt/testbuild.log || exit 1
                 done
             done
         done
