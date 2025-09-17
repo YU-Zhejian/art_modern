@@ -16,6 +16,7 @@ ceu_cm_enhanced_try_run(
     C_HELLOWORLD)
 
 # TODO: PKGCONF_NAME regex failed under Windows with MSYS2
+# TODO: MSYS2 static regex requires additional -ltre.
 if(NOT TARGET CEU_CM_EFL::libregex_shared)
     ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libregex_shared LINKER_FLAG regex)
 endif()

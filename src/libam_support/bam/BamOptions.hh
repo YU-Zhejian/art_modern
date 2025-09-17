@@ -3,8 +3,6 @@
 #include "art_modern_config.h"
 #include "libam_support/Constants.hh"
 
-#include <absl/base/attributes.h>
-
 #include <string>
 
 namespace labw::art_modern {
@@ -54,5 +52,5 @@ struct BamOptions {
      * Compression level `[u0-9]`.
      */
     char compress_level = '4';
-} ABSL_ATTRIBUTE_PACKED;
+};
 } // namespace labw::art_modern

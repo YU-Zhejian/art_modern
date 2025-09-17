@@ -19,12 +19,10 @@
 ## Packing
 
 - Add copyright to all .cc/.hh files using one of the tools in <https://wiki.debian.org/CopyrightReviewTools>.
-- Read <https://wiki.debian.org/Hardening>.
 - Add manual pages.
 - Generate RPM packages. See <https://rpm-packaging-guide.github.io/>.
-- Make sure that my package is good with <https://wiki.debian.org/UpstreamGuide> and <https://wiki.ubuntu.com/UpstreamGuide>.
 - Is it a good idea to add `libpcg-cpp-dev` as compile dependency?
-- Update bundled abseil and fmt to the latest versions.
+- Docker-ize the synthesis of DEBs, RPMs, Alpine Linux tarballs, etc.
 
 ## Performance
 

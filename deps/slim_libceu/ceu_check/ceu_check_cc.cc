@@ -1,9 +1,13 @@
 #include "ceu_check/ceu_check_cc.hh"
+#include "libceu_stddef.h"
 #include <sstream>
 
 std::string ceu_check_get_compiler_info()
 {
     std::ostringstream oss;
+    #ifdef CEU_REPRODUCIBLE_BUILDS
+    oss << "Compiled at: N/A due to reproducible build" << std::endl;
+#else
 #if defined(__DATE__)
     std::string date_str = __DATE__;
 #else
@@ -15,6 +19,7 @@ std::string ceu_check_get_compiler_info()
     std::string time_str = "unknown time";
 #endif
     oss << "Compiled at: " << date_str << ", " << time_str << std::endl;
+    #endif
     oss << "Compiler Identification:" << std::endl;
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     oss << "\t" << "Intel Clang compatible version number: " << __INTEL_CLANG_COMPILER / 10000 << '.'

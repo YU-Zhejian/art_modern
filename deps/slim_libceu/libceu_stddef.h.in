@@ -8,3 +8,6 @@
 
 // Whether <_mingw.h> is available
 #cmakedefine01 CEU_HAVE_INCLUDE__MINGW_H
+
+// Whether to enable reproducible builds
+#cmakedefine01 CEU_REPRODUCIBLE_BUILDS

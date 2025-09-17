@@ -10,7 +10,7 @@
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <boost/log/trivial.hpp>
 

@@ -4,11 +4,11 @@ This project uses GPL v3 License, a copy of which is available at [License.md](.
 
 ---
 
-This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under [GNU GPL v3](https://www.gnu.org/licenses/) license
+This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under the [GNU GPL v3](https://www.gnu.org/licenses/) license
 
 ---
 
-This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
+This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license that is [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
 
 ## HTSlib by Genome Research Ltd
 
@@ -84,7 +84,7 @@ Under the Apache-2.0 license.
 
 ## `{fmt}` by Victor Zverovich
 
-Available from <https://github.com/fmtlib/fmt>, commit [`7bdf062`](https://github.com/fmtlib/fmt/commit/7bdf0628b1276379886c7f6dda2cef2b3b374f0b) (tag [`7.1.3`](https://github.com/fmtlib/fmt/releases/tag/7.1.3)).
+Available from <https://github.com/fmtlib/fmt>, commit [`40626af`](https://github.com/fmtlib/fmt/commit/40626af88bd7df9a5fb80be7b25ac85b122d6c21) (tag [`11.2.0`](https://github.com/fmtlib/fmt/releases/tag/11.2.0)).
 
 Affected files:
 
@@ -93,8 +93,6 @@ Affected files:
 Under an MIT-like License.
 
 **NOTE** Added in 1.1.1.
-
-**NOTE** This is the last version that does not come with C++20 modules.
 
 ## PCG by Melissa O'Neill
 

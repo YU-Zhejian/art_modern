@@ -5,7 +5,7 @@
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>

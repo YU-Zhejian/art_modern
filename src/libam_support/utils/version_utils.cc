@@ -55,7 +55,7 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 // CPPSTDLIB
 #include <iostream>

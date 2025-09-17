@@ -5,7 +5,7 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>

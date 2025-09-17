@@ -2,7 +2,7 @@
 
 #include "libam_support/Constants.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <cstddef>
 #include <cstdint>

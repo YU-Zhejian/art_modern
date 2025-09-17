@@ -1,8 +1,9 @@
 #!/usr/bin/make -f
-include /usr/share/dpkg/default.mk
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+include /usr/share/dpkg/default.mk
 
-export DH_VERBOSE = 0
+# Disable verbose output from debhelper
+export DH_QUIET:=1
 
 %:
 	dh $@ --buildsystem=cmake
@@ -21,7 +22,8 @@ override_dh_auto_configure:
     -DUSE_HTSLIB=hts \
     -DUSE_LIBFMT=fmt \
     -DUSE_CONCURRENT_QUEUE=/usr/include/concurrentqueue/moodycamel/ \
-    -DUSE_ABSL=SYSTEM
+    -DUSE_ABSL=SYSTEM \
+    -DREPRODUCIBLE_BUILDS=ON
 
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step

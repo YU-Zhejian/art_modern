@@ -3,7 +3,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>

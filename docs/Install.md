@@ -296,6 +296,15 @@ Whether to use bundled Abseil library.
 - **unset (DEFAULT): Will use bundled Abseil.**
 - Any value `[val]`: Will use system Abseil found by the CMake module `abslConfig.cmake`, which is shipped with official Abseil libraries.
 
+### `REPRODUCIBLE_BUILDS`
+
+Available since 1.1.7.
+
+Whether to enable reproducible builds. This complies Debian policies.
+
+- **unset (DEFAULT): Will not enable reproducible builds.**
+- `ON`: Will enable reproducible builds. All used `__DATE__` and `__TIME__` macros will be replaced with fixed values.
+
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.
