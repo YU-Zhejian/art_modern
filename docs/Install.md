@@ -305,6 +305,15 @@ Whether to enable reproducible builds. This complies Debian policies.
 - **unset (DEFAULT): Will not enable reproducible builds.**
 - `ON`: Will enable reproducible builds. All used `__DATE__` and `__TIME__` macros will be replaced with fixed values.
 
+### `BUILD_ART_MODERN_BENCHMARKS`
+
+Available since 1.1.7.
+
+Whether to build mini benchmarks executable.
+
+- **unset (DEFAULT): Will not build benchmarks.**
+- `ON`: Will build benchmarks.
+
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.

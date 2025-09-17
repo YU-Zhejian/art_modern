@@ -204,7 +204,7 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with art_modern benchmarks.
 
-if(CEU_CM_SHOULD_ENABLE_TEST)
+if(BUILD_ART_MODERN_BENCHMARKS)
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})

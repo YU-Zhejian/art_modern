@@ -28,7 +28,6 @@ Copyright: 2025, YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
 Files:
- deps/ART_profiler_illumina/*
  data/Illumina_profiles/*
  docs/original_art_docs/*
 Copyright: 2008-2016 Weichun Huang <whduke@gmail.com>

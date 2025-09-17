@@ -18,7 +18,6 @@
 
 ## Packing
 
-- Add copyright to all .cc/.hh files using one of the tools in <https://wiki.debian.org/CopyrightReviewTools>.
 - Add manual pages.
 - Generate RPM packages. See <https://rpm-packaging-guide.github.io/>.
 - Is it a good idea to add `libpcg-cpp-dev` as compile dependency?

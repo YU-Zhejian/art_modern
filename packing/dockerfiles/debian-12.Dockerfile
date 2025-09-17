@@ -1,9 +1,9 @@
 FROM debian:12-slim
 
-COPY build_deb.sh /build_deb.sh
-
 # Install necessary packages
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && \
+    apt-get full-upgrade -y && \
+    apt-get install --no-install-recommends -y \
     build-essential \
     g++ \
     binutils \
@@ -14,6 +14,8 @@ RUN apt-get update && apt-get install -y \
     sed \
     grep \
     cmake \
+    devscripts \
+    lintian \
     dh-cmake \
     libhts-dev \
     pkgconf \
@@ -22,4 +24,7 @@ RUN apt-get update && apt-get install -y \
     libfmt-dev \
     libconcurrentqueue-dev \
     libabsl-dev \
-    && apt clean \
+    && apt clean
+
+COPY build_deb.sh /
+RUN mkdir -p /mnt/debian /mnt/build_deb

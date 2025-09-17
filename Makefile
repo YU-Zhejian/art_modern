@@ -175,12 +175,3 @@ doc:
 cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
-
-.PHONY: deb
-# Build Debian package
-#
-# **NOTE** This target will fail under WSL
-# since the file debian/doc will be regarded as executable under WSL
-# which have a different meaning for `debuild`.
-deb:
-	$(BASH) sh.d/deb.sh

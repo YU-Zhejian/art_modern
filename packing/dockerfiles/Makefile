@@ -10,7 +10,6 @@ all: almalinux-8.sif \
 	 ubuntu-2204.sif \
 	 ubuntu-2404.sif \
 
-
 clean:
 	rm -f *.sif
 	rm -f *.tar
@@ -31,4 +30,4 @@ clean:
 	$(DOCKER) rmi $(basename $<):latest
 
 %.sif: %-squashed.tar
-	$(SINGULARITY) build $@ docker-archive://$^
+	$(SINGULARITY) build --force $@ docker-archive://$^

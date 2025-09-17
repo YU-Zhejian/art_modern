@@ -2,8 +2,14 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 include /usr/share/dpkg/default.mk
 
-# Disable verbose output from debhelper
-export DH_QUIET:=1
+ifeq ($(wildcard /usr/include/concurrentqueue/moodycamel/concurrentqueue.h),/usr/include/concurrentqueue/moodycamel/concurrentqueue.h)
+    USE_CONCURRENT_QUEUE_PATH := /usr/include/concurrentqueue/moodycamel/
+else ifeq ($(wildcard /usr/include/concurrentqueue/concurrentqueue.h),/usr/include/concurrentqueue/concurrentqueue.h)
+    USE_CONCURRENT_QUEUE_PATH := /usr/include/concurrentqueue/
+else
+    $(error concurrentqueue.h not found in expected locations.)
+endif
+$(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 
 %:
 	dh $@ --buildsystem=cmake
@@ -21,7 +27,7 @@ override_dh_auto_configure:
     -DCMAKE_INSTALL_INCLUDEDIR=include/art-modern/include \
     -DUSE_HTSLIB=hts \
     -DUSE_LIBFMT=fmt \
-    -DUSE_CONCURRENT_QUEUE=/usr/include/concurrentqueue/moodycamel/ \
+    -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)" \
     -DUSE_ABSL=SYSTEM \
     -DREPRODUCIBLE_BUILDS=ON
 
