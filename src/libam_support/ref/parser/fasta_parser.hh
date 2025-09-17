@@ -29,10 +29,9 @@ namespace labw::art_modern {
 
 using FastaRecord = std::pair<std::string, std::string>;
 
-struct EOFException : std::exception {
+struct EOFException final : std::exception {
 } ABSL_ATTRIBUTE_PACKED;
-struct MalformedFastaException : std::exception {
-public:
+struct MalformedFastaException final : std::exception {
     [[nodiscard]] const char* what() const noexcept override;
 } ABSL_ATTRIBUTE_PACKED;
 
@@ -40,16 +39,17 @@ class FastaIterator {
 public:
     explicit FastaIterator(std::istream& istream);
 
-    FastaRecord next();
-
     DELETE_COPY(FastaIterator)
     DELETE_MOVE(FastaIterator)
     ~FastaIterator() = default;
+
+    FastaRecord next();
 
 private:
     std::istream& _istream;
     std::size_t _lineno = 0;
     std::mutex mutex_;
+    std::string staged_next_record_id_ {};
 };
 
 } // namespace labw::art_modern

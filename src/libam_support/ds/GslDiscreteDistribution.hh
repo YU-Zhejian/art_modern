@@ -53,7 +53,7 @@ public:
     explicit GslDiscreteDistribution(const std::vector<FloatType>& prob_array);
 
     /**
-     * @param u An uniform random number in [0,1)
+     * @param u A uniform random number in [0,1)
      * @return
      */
     size_t operator()(FloatType u) const;
@@ -69,7 +69,7 @@ public:
     explicit GslDiscreteIntDistribution(const std::vector<IntType>& prob_array);
 
     /**
-     * @param u An uniform random number in [0,K)
+     * @param u A uniform random number in [0,K)
      * @return
      */
     size_t operator()(IntType u) const;
@@ -77,13 +77,15 @@ public:
 
 template <typename FloatType>
 GslDiscreteDistribution<FloatType>::GslDiscreteDistribution()
-        : K(0) { }
+    : K(0)
+{
+}
 
 template <typename FloatType>
 GslDiscreteDistribution<FloatType>::GslDiscreteDistribution(const std::vector<FloatType>& prob_array)
-        : K(prob_array.size())
-        , F(std::vector<FloatType>(prob_array.size()))
-        , A(std::vector<size_t>(prob_array.size()))
+    : K(prob_array.size())
+    , F(std::vector<FloatType>(prob_array.size()))
+    , A(std::vector<size_t>(prob_array.size()))
 {
     std::stack<size_t> Bigs;
     std::stack<size_t> Smalls;
@@ -145,8 +147,7 @@ GslDiscreteDistribution<FloatType>::GslDiscreteDistribution(const std::vector<Fl
 #endif
 }
 
-template <typename FloatType>
-size_t GslDiscreteDistribution<FloatType>::operator()(FloatType u) const
+template <typename FloatType> size_t GslDiscreteDistribution<FloatType>::operator()(FloatType u) const
 {
     size_t c = 0;
 #if (1) // KNUTH_CONVENTION
@@ -165,13 +166,15 @@ size_t GslDiscreteDistribution<FloatType>::operator()(FloatType u) const
 
 template <typename IntType>
 GslDiscreteIntDistribution<IntType>::GslDiscreteIntDistribution()
-        : K(0) { }
+    : K(0)
+{
+}
 
 template <typename IntType>
 GslDiscreteIntDistribution<IntType>::GslDiscreteIntDistribution(const std::vector<IntType>& prob_array)
-        : K(prob_array.size())
-        , F(std::vector<IntType>(prob_array.size()))
-        , A(std::vector<size_t>(prob_array.size()))
+    : K(prob_array.size())
+    , F(std::vector<IntType>(prob_array.size()))
+    , A(std::vector<size_t>(prob_array.size()))
 {
     std::stack<size_t> Bigs;
     std::stack<size_t> Smalls;
@@ -229,8 +232,7 @@ GslDiscreteIntDistribution<IntType>::GslDiscreteIntDistribution(const std::vecto
 #endif
 }
 
-template <typename IntType>
-size_t GslDiscreteIntDistribution<IntType>::operator()(IntType u) const
+template <typename IntType> size_t GslDiscreteIntDistribution<IntType>::operator()(IntType u) const
 {
     size_t c = 0;
 #if (1) // KNUTH_CONVENTION

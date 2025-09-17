@@ -15,5 +15,8 @@
 #pragma once
 
 namespace labw::art_modern {
+/**
+ * Handle previous dumps if any.
+ */
 void handle_dumps();
 } // namespace labw::art_modern

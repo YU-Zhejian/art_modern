@@ -94,6 +94,10 @@ public:
     ProducerToken get_producer_token();
 
 protected:
+    /** Number of bytes written out. Should be set by each @link write @endlink  call **/
+    std::size_t num_bytes_out_ = 0;
+    /** Name of this IO worker, used for logging. **/
+    const std::string name_;
     /**
      * Implementation of flushing and closing the actual filesystem, web socket, etc.
      * Default implementation does nothing.
@@ -104,10 +108,6 @@ protected:
      * Implementation of writing a value to the actual filesystem, web socket, etc.
      */
     virtual void write(T /**value**/);
-    /** Number of bytes written out. Should be set by each @link write @endlink  call **/
-    std::size_t num_bytes_out_ = 0;
-    /** Name of this IO worker, used for logging. **/
-    const std::string name_;
 
 private:
     /** Time point when the IO worker starts. **/
@@ -171,7 +171,7 @@ void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const s
     queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
 }
 
-template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline  void LockFreeIO<T>::push(T&& value)
+template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline void LockFreeIO<T>::push(T&& value)
 {
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {
@@ -184,7 +184,8 @@ template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline  void LockFreeIO<T>::p
     ++num_reads_in_;
 }
 
-template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline  void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
+template <typename T>
+ABSL_ATTRIBUTE_ALWAYS_INLINE inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {
