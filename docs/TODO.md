@@ -19,7 +19,6 @@
 ## Packing
 
 - Add manual pages.
-- Generate RPM packages. See <https://rpm-packaging-guide.github.io/>.
 - Is it a good idea to add `libpcg-cpp-dev` as compile dependency?
 - Docker-ize the synthesis of DEBs, RPMs, Alpine Linux tarballs, etc.
 

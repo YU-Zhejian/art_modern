@@ -1,7 +1,8 @@
 FROM alpine:latest
 
 # Install necessary packages
-RUN apk update && apk upgrade --no-cache && \
+RUN apk update && \
+    apk upgrade --no-cache && \
     apk add --no-cache \
     g++ \
     binutils \
@@ -16,12 +17,11 @@ RUN apk update && apk upgrade --no-cache && \
     boost1.84-static \
     sed \
     grep \
-    htslib-static \
-    htslib-dev \
     xz-static \
     xz-dev \
     bzip2-static \
     bzip2-dev \
     libdeflate-static \
     libdeflate-dev
-# Bundled {fmt}, moodycamel, and abseil libraries are used \
+# Bundled {fmt}, moodycamel, HTSLib, and abseil libraries are used
+# Since we're not releasing a package, using bundled libraries is acceptable.
