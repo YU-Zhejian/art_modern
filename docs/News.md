@@ -4,6 +4,7 @@
 
 - Support over `ccache` deprecated.
 - Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).
+- Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version.
 - Some files without clear license were removed.
 - Miscellaneous bug fixes.
 
@@ -37,7 +38,7 @@
 
 - The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
 - Support over B-Tree was dropped. Its performance was found worse than STL map in corrected benchmarks.
-- The performance of MoodyCamel queue was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
+- The performance of `moodycamel::ConcurrentQueue<T>` was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
 - Miscellaneous bug fixes.
 
 ## 1.1.1 (2025/02/02)

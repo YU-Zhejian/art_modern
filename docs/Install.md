@@ -282,10 +282,10 @@ Whether to use bundled `{fmt}` library for formatting strings.
 
 Available since 1.1.7.
 
-Whether to use bundled `moodycamel::ConcurrentQueue`.
+Whether to use bundled `moodycamel::ConcurrentQueue<T>`.
 
-- **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue`.**
-- Any value `[val]`: Will search for MoodyCamel ConcurrentQueue at including path `[val]`. For example, if you use Debian GNU/Linux and intalled [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/`.
+- **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.**
+- Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. For example, if you use Debian GNU/Linux and intalled [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/`.
 
 ### `USE_ABSL`
 

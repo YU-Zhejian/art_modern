@@ -10,7 +10,7 @@ This project is based on the source code of [ART](https://www.niehs.nih.gov/rese
 
 This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
 
-## HTSlib by Genome Research Ltd.
+## HTSlib by Genome Research Ltd
 
 Available from <https://github.com/samtools/htslib>.
 
@@ -19,11 +19,11 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrieved from [SourceForge 1.21 Release Tarball](https://sourceforge.net/projects/samtools/files/samtools/1.21/htslib-1.21.tar.bz2/download).
+**NOTE** This project uses the source code retrieved from [GitHub 1.22.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.22.1/htslib-1.22.1.tar.bz2).
 
 ## `gitignore` by GitHub
 
-Available from <https://github.com/github/gitignore>
+Available from <https://github.com/github/gitignore>.
 
 Affected files:
 
@@ -48,7 +48,7 @@ With MIT License.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
-Available from <https://github.com/cameron314/concurrentqueue>, commit `6dd38b8`.
+Available from <https://github.com/cameron314/concurrentqueue>, commit [`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03).
 
 Affected files:
 
@@ -70,9 +70,9 @@ Under the MIT License.
 
 **NOTE** Added in 1.1.0.
 
-## Abseil by Google Inc.
+## Abseil by Abseil Authors
 
-Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.0`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0). The bundled source code is tailored from the release tarball.
+Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.0`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0). The bundled source code is tailored from the [release tarball](https://github.com/abseil/abseil-cpp/releases/download/20250814.0/abseil-cpp-20250814.0.tar.gz).
 
 Affected files:
 
@@ -108,9 +108,9 @@ Licensed under the Apache 2.0 License.
 
 **NOTE** Added in 1.1.1.
 
-## GNU Science Library by M. Galassi et al.
+## GNU Science Library by M. Galassi _et al._
 
-Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of GSL 2.8 source tarball.
+Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of [GSL 2.8 source tarball](https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz).
 
 Affected files:
 
