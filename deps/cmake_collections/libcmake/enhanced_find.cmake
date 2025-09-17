@@ -250,7 +250,8 @@ function(ceu_cm_enhanced_find_library)
         set_target_properties(
             CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
             PROPERTIES INTERFACE_LINK_LIBRARIES "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}"
-                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS}" INTERFACE_LINK_OPTIONS "${THIS_LDFLAGS}"
+                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS}"
+                       INTERFACE_LINK_OPTIONS "${THIS_LDFLAGS}"
                        INTERFACE_INCLUDE_DIRECTORIES "${THIS_INCDIRS}")
         unset(THIS_CFLAGS)
         unset(THIS_LDFLAGS)

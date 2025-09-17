@@ -33,7 +33,7 @@ using namespace labw::art_modern;
 
 namespace {
 
-void test_fasta(std::unique_ptr<BaseFastaFetch> fastaFetch)
+void test_fasta(const std::unique_ptr<BaseFastaFetch>& fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch(2, 2, 15) == "TANNTGNATNATG");
@@ -55,7 +55,7 @@ void test_fasta(std::unique_ptr<BaseFastaFetch> fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {
-    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2\r\n>chr3\nTTTT\n\n");
+    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2 BBBB name=ignored\r\n>chr3\tAAAA FFFF\nTTTT\n\n");
     FastaIterator fai(iss);
     std::vector<std::string> chrNames = { "chr1", "chr2", "chr3" };
     std::vector<std::string> seqs = { "AAAACCC", "", "TTTT" };
@@ -71,6 +71,13 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
         i++;
     }
     BOOST_TEST(i == chrNames.size());
+}
+
+BOOST_AUTO_TEST_CASE(test_fasta_parser_3)
+{
+    std::istringstream iss(">\r\nAAAA\n\n");
+    FastaIterator fai(iss);
+    BOOST_REQUIRE_EXCEPTION(fai.next(), MalformedFastaException, [](const auto&) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)

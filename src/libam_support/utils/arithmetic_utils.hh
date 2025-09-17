@@ -15,6 +15,15 @@
 #pragma once
 
 namespace labw::art_modern {
+/** @brief Returns the maximum of two values.
+ *
+ * This function takes two values of the same type and returns the larger of the two.
+ *
+ * @tparam T The type of the input values. Must support comparison operators.
+ * @param a The first value to compare.
+ * @param b The second value to compare.
+ * @return The maximum of the two input values.
+ */
 template <typename T> T am_max(T a, T b)
 {
     if (a > b) {
@@ -22,6 +31,15 @@ template <typename T> T am_max(T a, T b)
     }
     return b;
 }
+/** @brief Returns the minimum of two values.
+ *
+ * This function takes two values of the same type and returns the smaller of the two.
+ *
+ * @tparam T The type of the input values. Must support comparison operators.
+ * @param a The first value to compare.
+ * @param b The second value to compare.
+ * @return The minimum of the two input values.
+ */
 template <typename T> T am_min(T a, T b)
 {
     if (a < b) {
@@ -29,4 +47,5 @@ template <typename T> T am_min(T a, T b)
     }
     return b;
 }
+
 } // namespace labw::art_modern

@@ -26,7 +26,7 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <chrono>
 #include <cstddef>
@@ -82,11 +82,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 
@@ -118,11 +114,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>());
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 

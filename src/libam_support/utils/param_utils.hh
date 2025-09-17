@@ -24,7 +24,12 @@
 
 namespace labw::art_modern {
 
-template <typename T> T get_param(const boost::program_options::variables_map& vm, const std::string& name)
+template <typename T> T get_param(const boost::program_options::variables_map& vm, const std::string& name);
+
+} // namespace labw::art_modern
+
+template <typename T>
+T labw::art_modern::get_param(const boost::program_options::variables_map& vm, const std::string& name)
 {
     try {
         return vm[name].as<T>();
@@ -33,5 +38,3 @@ template <typename T> T get_param(const boost::program_options::variables_map& v
         abort_mpi();
     }
 }
-
-} // namespace labw::art_modern

@@ -4,7 +4,7 @@ This project uses GPL v3 License, a copy of which is available at [License.md](.
 
 ---
 
-This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under the [GNU GPL v3](https://www.gnu.org/licenses/) license
+This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under the [GNU GPL v3](https://www.gnu.org/licenses/) license.
 
 ---
 
@@ -117,3 +117,27 @@ Affected files:
 Licensed under the GPL 3.0 license.
 
 **NOTE** Added in 1.1.2.
+
+---
+
+## Appendicies
+
+### Copyright of `epmdist.h` in Original ART
+
+On the original source code, the copyright notice of `empdist.h` contains a banner indicating that it is copyrighted with all rights reserved. After contacting the original author, I've confirmed that the `empdist.h` can be distributed under the GPL v3 license. The email is as follows:
+
+```text
+FROM: w. h <whduke@gmail.com>
+TO  : Yu, Zhejian <zhejianyu@intl.zju.edu.cn>
+SUBJ: Re: Questions Concerning ART License
+DATE: 11/5/2024 2:33:17 AM GMT+8
+
+Dear Zhejian,
+
+It is great that you are using ART codes for your research. No worries about the license
+banner in empdist.h. It should be under GPL3.
+
+[...]
+
+Thanks!
+```

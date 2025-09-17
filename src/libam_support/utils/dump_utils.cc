@@ -30,10 +30,10 @@
 namespace labw::art_modern {
 #ifdef WITH_BOOST_STACKTRACE
 
-constexpr char DUMP_FILENAME[] = "./backtrace.dump";
 namespace {
+    constexpr char DUMP_FILENAME[] = "./backtrace.dump";
     // FIXME: The signal handler is not guaranteed to be thread safe. The return values are also unprocessed.
-    void my_signal_handler(const int signum)
+    void my_signal_handler(const int signum) noexcept
     {
         std::signal(signum, SIG_DFL);
         boost::stacktrace::safe_dump_to(DUMP_FILENAME);
@@ -41,9 +41,10 @@ namespace {
     }
 
 } // namespace
-
+#endif
 void handle_dumps()
 {
+#ifdef WITH_BOOST_STACKTRACE
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
     if (boost::filesystem::exists(DUMP_FILENAME)) {
@@ -57,8 +58,7 @@ void handle_dumps()
         ifs.close();
         boost::filesystem::remove(DUMP_FILENAME);
     }
-}
 #else
-void handle_dumps() { }
 #endif
+}
 } // namespace labw::art_modern

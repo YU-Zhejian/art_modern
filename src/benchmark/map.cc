@@ -30,8 +30,6 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-#include <pcg_random.hpp>
-
 #include <algorithm>
 #include <chrono>
 #include <cmath>
@@ -62,7 +60,7 @@ constexpr am_qual_count_t MAX_DIST_NUMBER = 1'000'000;
 
 constexpr am_readnum_t NUM_TRIALS = K_SIZE << 8;
 constexpr am_readnum_t READ_LEN = K_SIZE;
-pcg32_fast gen { 0 };
+std::mt19937 gen { 0 };
 std::uniform_int_distribution<am_qual_count_t> one_to_dist_end(1, DIST_END);
 std::uniform_int_distribution<am_qual_count_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
 } // namespace
