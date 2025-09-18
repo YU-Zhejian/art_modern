@@ -34,7 +34,7 @@ env -C "${BUILD_DIR}" debuild -us -uc \
 env -C "${BUILD_DIR}" debuild -- clean &>/dev/null
 env -C "${BUILD_DIR}" debc 2>&1 | sed 's/^/DEBCHECK: /' | tee /mnt/build_deb/debcheck.log
 env -C /mnt/build_deb/ \
-    lintian art-modern_${PACKAGE_VERSION}+dfsg-1_amd64.changes \
-    -EIi --pedantic --tag-display-limit 0 2>&1 |
+    lintian art-modern_"${PACKAGE_VERSION}"+dfsg-1_amd64.changes \
+    -EviIL +pedantic --tag-display-limit 0 2>&1 |
     sed 's/^/LINTIAN: /' |
     tee /mnt/build_deb/lintian.log

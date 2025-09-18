@@ -14,6 +14,9 @@ $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 %:
 	dh $@ --buildsystem=cmake
 
+art_modern.1: art_modern.1.md
+	lowdown -s -Tman -o $@ $<
+
 override_dh_auto_configure:
 	dh_auto_configure -- \
     -Wdev -Wdeprecated --warn-uninitialized \
