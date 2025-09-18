@@ -3,9 +3,7 @@ SINGULARITY ?= singularity
 
 .PHONY: all clean
 
-all: almalinux-8.sif \
-	 almalinux-9.sif \
-	 debian-12.sif \
+all: debian-12.sif \
 	 debian-13.sif \
 	 ubuntu-2404.sif \
 

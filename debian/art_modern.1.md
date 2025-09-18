@@ -1,6 +1,9 @@
-% art_modern(1) | User Commands
-% YU Zhejian <yuzj@seas.upenn.edu>
-% September 2025
+---
+title: art_modern
+section: 1
+author: YU Zhejian <yuzj25@seas.upenn.edu>
+date: 2025-09-18
+---
 
 # NAME
 

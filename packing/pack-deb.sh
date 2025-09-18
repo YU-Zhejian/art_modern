@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -ue
-export PACKAGE_VERSION=1.1.6 # FIXME
+if [ -z "${PACKAGE_VERSION:-}" ]; then
+    export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
+fi
 ./sh.d/prepare-orig-tgz-for-deb.sh
 for name in debian-12 debian-13 ubuntu-2404; do
     rm -fr artifacts/build_deb-"${name}"

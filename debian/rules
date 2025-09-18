@@ -11,11 +11,11 @@ else
 endif
 $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 
+%.1: %.1.md
+	lowdown -s -Tman -o $@ $<
+
 %:
 	dh $@ --buildsystem=cmake
-
-art_modern.1: art_modern.1.md
-	lowdown -s -Tman -o $@ $<
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -34,5 +34,13 @@ override_dh_auto_configure:
     -DUSE_ABSL=SYSTEM \
     -DREPRODUCIBLE_BUILDS=ON
 
+
+#TODO:
+#    -DCMAKE_C_FLAGS="$(CPPFLAGS) $(CFLAGS)" \
+#    -DCMAKE_CXX_FLAGS="$(CPPFLAGS) $(CXXFLAGS)" \
+
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step
+
+override_dh_installdocs: debian/art_modern.1
+	dh_installdocs

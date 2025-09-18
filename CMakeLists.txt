@@ -66,10 +66,15 @@ if(GIT_FOUND)
     set(WITH_GIT ON)
 endif()
 
+# TODO
+#if(DEFINED CMAKE_C_FLAGS AND DEFINED CMAKE_CXX_FLAGS)
+#    string(REPLACE " " ";" AM_CC_FLAGS "${CMAKE_CXX_FLAGS}")
+#else()
 unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
+#endif()
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 

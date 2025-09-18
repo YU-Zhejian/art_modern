@@ -24,6 +24,7 @@ RUN apt-get update && \
     libfmt-dev \
     libconcurrentqueue-dev \
     libabsl-dev \
+    lowdown \
     && apt clean
 
 COPY build_deb.sh /
