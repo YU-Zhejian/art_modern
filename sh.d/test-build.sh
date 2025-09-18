@@ -39,7 +39,10 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo SomeNonesense; do
                                 fi
                             fi
                             echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-                            make testbuild-child CMAKE_FLAGS="${CMAKE_FLAGS}" BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" &>>opt/testbuild.log || exit 1
+                            make testbuild-child \
+                                CMAKE_FLAGS="${CMAKE_FLAGS}" \
+                                BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
+                                &>>opt/testbuild.log || exit 1
                         done
                     done
                 done
@@ -61,7 +64,10 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
             CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_MALLOC=${USE_MALLOC}"
 
             echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-            make testbuild-child CMAKE_FLAGS="${CMAKE_FLAGS}" BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" &>>opt/testbuild.log || exit 1
+            make testbuild-child \
+                CMAKE_FLAGS="${CMAKE_FLAGS}" \
+                BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
+                &>>opt/testbuild.log || exit 1
         done
     done
 done

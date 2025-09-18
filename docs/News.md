@@ -1,6 +1,6 @@
 # News \& Release Notes
 
-## 1.1.7 (Ongoing)
+## 1.1.7 (2025/09/18)
 
 - Support over `ccache` deprecated, which also deprecated CMake option `USE_CCACHE`.
 - Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).

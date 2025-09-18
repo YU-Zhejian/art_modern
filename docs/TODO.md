@@ -18,9 +18,7 @@
 
 ## Packing
 
-- Add manual pages.
-- Is it a good idea to add `libpcg-cpp-dev` as compile dependency?
-- Docker-ize the synthesis of DEBs, RPMs, Alpine Linux tarballs, etc.
+- Supress all lintian issues.
 
 ## Performance
 

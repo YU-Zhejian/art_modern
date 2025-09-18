@@ -85,7 +85,7 @@ rel_with_dbg_alpine:
 	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
 	cmake --install opt/build_rel_with_dbg_alpine
 	env -C opt/build_rel_with_dbg_alpine_install/bin \
-		zip -9 -r $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.zip \
+		tar cvzf $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.tar.gz \
 		art_modern \
 		libam_support_lib.a \
 		libart_modern_lib.a \

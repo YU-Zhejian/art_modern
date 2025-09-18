@@ -12,7 +12,9 @@ endif
 $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 
 %.1: %.1.md
-	lowdown -s -Tman -o $@ $<
+	# TODO: Supress: art-modern: wrong-manual-section 1 != 7 [usr/share/man/man1/art_modern.1.gz:2]
+	# Tried: sed -E 's;^\.TH "([^"]+)" "([^"]+)" "([^"]+)";.TH \1 \2 \3;'
+	lowdown -s -Tman -o /dev/stdout $< > $@
 
 %:
 	dh $@ --buildsystem=cmake
@@ -33,11 +35,6 @@ override_dh_auto_configure:
     -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)" \
     -DUSE_ABSL=SYSTEM \
     -DREPRODUCIBLE_BUILDS=ON
-
-
-#TODO:
-#    -DCMAKE_C_FLAGS="$(CPPFLAGS) $(CFLAGS)" \
-#    -DCMAKE_CXX_FLAGS="$(CPPFLAGS) $(CXXFLAGS)" \
 
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step

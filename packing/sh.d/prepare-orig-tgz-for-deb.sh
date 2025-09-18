@@ -2,9 +2,11 @@
 # shellcheck disable=SC2086
 set -ue
 
+export ORIG_TGZ_DIR="packing/artifacts/build_orig_tgz"
+export ORIG_TGZ_PACKAGE_DIR="${ORIG_TGZ_DIR}/${PACKAGE_FULL_NAME}"
+
 SRC_DIR="$(dirname "$(readlink -f "${0}")")/../../"
 cd "${SRC_DIR}" || exit 1
-ORIG_TGZ_DIR="packing/artifacts/build_orig_tgz"
 rm -fr "${ORIG_TGZ_DIR}"
 mkdir -p "${ORIG_TGZ_DIR}"
 
@@ -29,16 +31,14 @@ git ls-files |
     grep -v '^sh.d/' \
         >"${ORIG_TGZ_DIR}"/git-files.txt
 
-export BUILD_DIR="${ORIG_TGZ_DIR}/art-modern-${PACKAGE_VERSION}+dfsg"
-mkdir -p "${BUILD_DIR}"
+mkdir -p "${ORIG_TGZ_PACKAGE_DIR}"
 
 while read -r line; do
     if [ -f "${line}" ]; then
-        install -D "${line}" "${BUILD_DIR}/${line}"
+        install -D "${line}" "${ORIG_TGZ_PACKAGE_DIR}/${line}"
     fi
 done <"${ORIG_TGZ_DIR}"/git-files.txt
 
 env -C "${ORIG_TGZ_DIR}"/ \
-    tar -czf "art-modern_${PACKAGE_VERSION}+dfsg.orig.tar.gz" \
-    "art-modern-${PACKAGE_VERSION}+dfsg"
-rm -fr "art-modern-${PACKAGE_VERSION}+dfsg"
+    tar -czf "${PACKAGE_FULL_NAME}.orig.tar.gz" "${PACKAGE_FULL_NAME}"
+rm -fr "${PACKAGE_FULL_NAME}"
