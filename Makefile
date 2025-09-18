@@ -156,6 +156,7 @@ testbuild-child:
 	env -C opt/testbuild ctest --output-on-failure
 	opt/testbuild_install/bin/art_modern --help
 	opt/testbuild_install/bin/art_modern --version
+	env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh
 
 
 .PHONY: testbuild
