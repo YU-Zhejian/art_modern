@@ -13,7 +13,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art/lib/ArtCmdOpts.hh"
+#include "art/exe/ArtCmdOpts.hh"
 
 #include "art/builtin_profiles.hh"
 #include "art/lib/ArtConstants.hh"
