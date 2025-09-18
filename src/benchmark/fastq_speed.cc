@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "libam_support/Constants.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
@@ -79,8 +93,8 @@ void speed2devnull()
     }
     ofs.close();
     auto end = std::chrono::high_resolution_clock::now();
-    const double speed = 1.0 * (n_blocks * block_size)
-        / std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() * 1000;
+    const double speed = static_cast<double>(n_blocks * block_size)
+        / static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) * 1000.0;
     std::cout << "Speed: " << to_si(speed) << "B/s" << std::endl;
 }
 

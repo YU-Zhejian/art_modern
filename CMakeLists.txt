@@ -4,6 +4,14 @@ if(DEFINED USE_CCACHE)
     message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
 endif()
 
+if(DEFINED REPRODUCIBLE_BUILD)
+    set(CEU_REPRODUCIBLE_BUILDS
+        ON
+        CACHE BOOL "Whether to build reproducible builds" FORCE)
+else()
+    unset(CEU_REPRODUCIBLE_BUILDS)
+endif()
+
 project(
     art_modern
     LANGUAGES C CXX
@@ -17,7 +25,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(CYGWIN)
+if(CYGWIN
+   OR MINGW
+   OR MSYS)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
@@ -196,7 +206,7 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with art_modern benchmarks.
 
-if(CEU_CM_SHOULD_ENABLE_TEST)
+if(BUILD_ART_MODERN_BENCHMARKS)
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})

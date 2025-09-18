@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "test_adaptor.h"
 
 #define BOOST_TEST_MODULE test_fasta_parser // NOLINT
@@ -19,7 +33,7 @@ using namespace labw::art_modern;
 
 namespace {
 
-void test_fasta(std::unique_ptr<BaseFastaFetch> fastaFetch)
+void test_fasta(const std::unique_ptr<BaseFastaFetch>& fastaFetch)
 {
     BOOST_TEST(fastaFetch->num_seqs() == 5);
     BOOST_TEST(fastaFetch->fetch(2, 2, 15) == "TANNTGNATNATG");
@@ -41,7 +55,7 @@ void test_fasta(std::unique_ptr<BaseFastaFetch> fastaFetch)
 
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {
-    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2\r\n>chr3\nTTTT\n\n");
+    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2 BBBB name=ignored\r\n>chr3\tAAAA FFFF\nTTTT\n\n");
     FastaIterator fai(iss);
     std::vector<std::string> chrNames = { "chr1", "chr2", "chr3" };
     std::vector<std::string> seqs = { "AAAACCC", "", "TTTT" };
@@ -57,6 +71,13 @@ BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
         i++;
     }
     BOOST_TEST(i == chrNames.size());
+}
+
+BOOST_AUTO_TEST_CASE(test_fasta_parser_3)
+{
+    std::istringstream iss(">\r\nAAAA\n\n");
+    FastaIterator fai(iss);
+    BOOST_REQUIRE_EXCEPTION(fai.next(), MalformedFastaException, [](const auto&) { return true; });
 }
 
 BOOST_AUTO_TEST_CASE(test_faidx_fetch)

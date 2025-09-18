@@ -4,13 +4,13 @@ This project uses GPL v3 License, a copy of which is available at [License.md](.
 
 ---
 
-This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under [GNU GPL v3](https://www.gnu.org/licenses/) license
+This project is based on the source code of [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) by [Weichun Huang](mailto:whduke@gmail.com) _et al._, under the [GNU GPL v3](https://www.gnu.org/licenses/) license.
 
 ---
 
-This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
+This project uses code from the following projects (in no particular order). All code used is either in the public domain or under a license that is [compatible with GPL v3](https://www.gnu.org/licenses/license-list.en.html#GPLCompatibleLicenses).
 
-## HTSlib by Genome Research Ltd.
+## HTSlib by Genome Research Ltd
 
 Available from <https://github.com/samtools/htslib>.
 
@@ -19,11 +19,11 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrieved from [SourceForge 1.21 Release Tarball](https://sourceforge.net/projects/samtools/files/samtools/1.21/htslib-1.21.tar.bz2/download).
+**NOTE** This project uses the source code retrieved from [GitHub 1.22.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.22.1/htslib-1.22.1.tar.bz2).
 
 ## `gitignore` by GitHub
 
-Available from <https://github.com/github/gitignore>
+Available from <https://github.com/github/gitignore>.
 
 Affected files:
 
@@ -48,7 +48,7 @@ With MIT License.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
-Available from <https://github.com/cameron314/concurrentqueue>, commit `6dd38b8`.
+Available from <https://github.com/cameron314/concurrentqueue>, commit [`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03).
 
 Affected files:
 
@@ -70,9 +70,9 @@ Under the MIT License.
 
 **NOTE** Added in 1.1.0.
 
-## Abseil by Google Inc.
+## Abseil by Abseil Authors
 
-Available from <https://github.com/abseil/abseil-cpp>, commit `fd8b35b9`.
+Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.0`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0). The bundled source code is tailored from the [release tarball](https://github.com/abseil/abseil-cpp/releases/download/20250814.0/abseil-cpp-20250814.0.tar.gz).
 
 Affected files:
 
@@ -84,7 +84,7 @@ Under the Apache-2.0 license.
 
 ## `{fmt}` by Victor Zverovich
 
-Available from <https://github.com/fmtlib/fmt>, commit [`7bdf062`](https://github.com/fmtlib/fmt/commit/7bdf0628b1276379886c7f6dda2cef2b3b374f0b) (tag [`7.1.3`](https://github.com/fmtlib/fmt/releases/tag/7.1.3)).
+Available from <https://github.com/fmtlib/fmt>, commit [`40626af`](https://github.com/fmtlib/fmt/commit/40626af88bd7df9a5fb80be7b25ac85b122d6c21) (tag [`11.2.0`](https://github.com/fmtlib/fmt/releases/tag/11.2.0)).
 
 Affected files:
 
@@ -93,8 +93,6 @@ Affected files:
 Under an MIT-like License.
 
 **NOTE** Added in 1.1.1.
-
-**NOTE** This is the last version that does not come with C++20 modules.
 
 ## PCG by Melissa O'Neill
 
@@ -108,9 +106,9 @@ Licensed under the Apache 2.0 License.
 
 **NOTE** Added in 1.1.1.
 
-## GNU Science Library by M. Galassi et al.
+## GNU Science Library by M. Galassi _et al._
 
-Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of GSL 2.8 source tarball.
+Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of [GSL 2.8 source tarball](https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz).
 
 Affected files:
 
@@ -120,7 +118,7 @@ Licensed under the GPL 3.0 license.
 
 **NOTE** Added in 1.1.2.
 
-## `cgranges` by Dana-Farber Cancer Institute
+## `cgranges` by Heng Li
 
 Available from <https://github.com/lh3/cgranges>, commit `b3d5e2c5`.
 
@@ -130,7 +128,7 @@ Affected files:
 
 With MIT License.
 
-**NOTE** Added in 1.1.5.
+**NOTE** Added in 1.2.0.
 
 ## `EWAHBoolArray` by Daniel Lemire
 
@@ -142,4 +140,26 @@ Affected files:
 
 With Apache/MIT License.
 
-**NOTE** Added in 1.1.5.
+**NOTE** Added in 1.2.0.
+
+## Appendicies
+
+### Copyright of `epmdist.h` in Original ART
+
+On the original source code, the copyright notice of `empdist.h` contains a banner indicating that it is copyrighted with all rights reserved. After contacting the original author, I've confirmed that the `empdist.h` can be distributed under the GPL v3 license. The email is as follows:
+
+```text
+FROM: w. h <whduke@gmail.com>
+TO  : Yu, Zhejian <zhejianyu@intl.zju.edu.cn>
+SUBJ: Re: Questions Concerning ART License
+DATE: 11/5/2024 2:33:17 AM GMT+8
+
+Dear Zhejian,
+
+It is great that you are using ART codes for your research. No worries about the license
+banner in empdist.h. It should be under GPL3.
+
+[...]
+
+Thanks!
+```

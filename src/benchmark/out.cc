@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "libam_support/Constants.hh"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
@@ -12,7 +26,7 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <chrono>
 #include <cstddef>
@@ -68,11 +82,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 
@@ -104,11 +114,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>());
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 

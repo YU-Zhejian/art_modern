@@ -9,10 +9,6 @@ Checks:
   # As we're not using LLVM LibC
   - -llvmlibc-*
 
-  # We used std::snprintf family of functions for acceleration purposes.
-  # Clang would suggest snprintf_s, which is not available in all platforms.
-  - -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
-
   # We use magic numbers for some constants that are associated with specific
   # bioinformatics file formats & algorithms & conventions that appears only once.
   - -cppcoreguidelines-avoid-magic-numbers
@@ -21,9 +17,13 @@ Checks:
   # For C headers, we use our own format of header guard
   # For C++ headers, we use `#pragma once` which is implemented in almost all C++ compilers.
   - -llvm-header-guard
+  - -portability-avoid-pragma-once
 
   # This warning is nonsense.
   - -bugprone-easily-swappable-parameters
+
+  # This warning is nonsense.
+  - -cppcoreguidelines-avoid-do-while
 
   # This warning is nonsense.
   - -readability-math-missing-parentheses
@@ -79,11 +79,14 @@ Checks:
   # Those checks would suggest boost replacements over STL, so disabled.
   - -boost-use-*
 
-  # This prevents us from using std::snprintf, so we disable it.
+  # This prevents us from using several HTSLib functions, so we disable it.
   - -*vararg
 
   # Sometimes we use goto for error handling.
   - -*-avoid-goto
+
+  # We have no GSLs
+  - -cppcoreguidelines-owning-memory
 
   # Numerous third-party header files violates this warning.
   # So disabled to avoid false positives.

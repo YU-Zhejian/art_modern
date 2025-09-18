@@ -2,8 +2,13 @@
 
 ## 1.1.7 (Ongoing)
 
-- Support over `ccache` deprecated.
-- Some files without clear license were removed.
+- Support over `ccache` deprecated, which also deprecated CMake option `USE_CCACHE`.
+- Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).
+- Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version.
+- Updated bundled `{fmt}` to [11.2.0](https://github.com/fmtlib/fmt/releases/tag/11.2.0).
+- Some files without clear license were removed. Unused files from bundled `{fmt}`, `moodycamel::ConcurrentQueue<T>`, and HTSLib removed.
+- CMake options to use system shipped dependencies instead of bundled ones are added to comply with Debian policies. Namely, `USE_LIBFMT`, `USE_CONCURRENT_QUEUE`, `USE_ABSL`, and `REPRODUCIBLE_BUILDS`.
+- Separated CMake flag that controlls building of mini benchmarks to `BUILD_ART_MODERN_BENCHMARKS`.
 - Miscellaneous bug fixes.
 
 ## 1.1.6 (2025/09/12)
@@ -36,7 +41,7 @@
 
 - The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
 - Support over B-Tree was dropped. Its performance was found worse than STL map in corrected benchmarks.
-- The performance of MoodyCamel queue was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
+- The performance of `moodycamel::ConcurrentQueue<T>` was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
 - Miscellaneous bug fixes.
 
 ## 1.1.1 (2025/02/02)

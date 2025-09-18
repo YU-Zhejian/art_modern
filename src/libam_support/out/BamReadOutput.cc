@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art_modern_config.h" // For USED_HTSLIB_NAME
 
 #include "libam_support/out/BamReadOutput.hh"
@@ -120,7 +134,8 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
         revcomp_inplace(seq1);
     }
 
-    const hts_pos_t isize1 = pos2 > pos1 ? pos2 + rlen - pos1 : -(pos1 + rlen - pos2);
+    const hts_pos_t isize1
+        = pos2 > pos1 ? static_cast<hts_pos_t>(pos2 + rlen - pos1) : -static_cast<hts_pos_t>(pos1 + rlen - pos2);
     const hts_pos_t isize2 = -isize1;
 
     auto sam_record1 = BamUtils::init_uptr();

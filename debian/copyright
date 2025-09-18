@@ -19,18 +19,15 @@ Files: *
 Copyright: 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
+Files: .gitignore
+Copyright: GitHub, Inc.
+License: CC0-1.0
+
 Files: debian/*
 Copyright: 2025, YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
-Files: src/*
-Copyright:
- 2008-2016 Weichun Huang <whduke@gmail.com>
- 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
-License: GPL-3+
-
 Files:
- deps/ART_profiler_illumina/*
  data/Illumina_profiles/*
  docs/original_art_docs/*
 Copyright: 2008-2016 Weichun Huang <whduke@gmail.com>
@@ -40,9 +37,17 @@ Files: deps/cmake_collections/* deps/slim_libceu/*
 Copyright: 2021-2025 YU Zhejian
 License: MIT
 
-Files: .gitignore
-Copyright: GitHub, Inc.
-License: CC0-1.0
+Files: src/art/exe/* src/art/lib/*
+Copyright:
+ 2008-2016 Weichun Huang <whduke@gmail.com>
+ 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+License: GPL-3+
+
+Files: src/libam_support/ds/GslDiscreteDistribution.hh
+Copyright:
+ 1996, 1997, 1998, 1999, 2000, 2007, 2009 James Theiler, Brian Gough
+ 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+License: GPL-3+
 
 License: GPL-3+
  This package is free software; you can redistribute it and/or modify

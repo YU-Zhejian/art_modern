@@ -6,60 +6,37 @@
 #include <sstream>
 #include <string>
 
-#include <boost/format.hpp>
-
 std::string ceu_check_get_ctypes_limit_info()
 {
     std::ostringstream oss;
     oss << "Compile-time C Types max, min, etc. limits:" << std::endl;
-    oss << "\t"
-        << boost::format("char           (%llu size):      %+21d -> %+21d") % sizeof(char)
-        % CHAR_MIN % CHAR_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("schar          (%llu size):      %+21d -> %+21d") % sizeof(signed char) % SCHAR_MIN
-        % SCHAR_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("uchar          (%llu size):      %+21d -> %+21d") % sizeof(unsigned char) % 0 % UCHAR_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("size_t         (%llu size):      %+21d -> %+21d") % sizeof(size_t) % 0 % SIZE_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("ptrdiff_t      (%llu size):      %+21d -> %+21d") % sizeof(ptrdiff_t) % PTRDIFF_MIN
-        % PTRDIFF_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("short          (%llu size):      %+21hd -> %+21hd") % sizeof(short) % SHRT_MIN % SHRT_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("ushort         (%llu size):      %+21hd -> %+21hd") % sizeof(unsigned short) % 0u
-        % USHRT_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("int            (%llu size):      %+21d -> %+21d") % sizeof(int) % INT_MIN % INT_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("uint           (%llu size):      %+21u -> %+21u") % sizeof(unsigned int) % 0u % UINT_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("long           (%llu size):      %+21ld -> %+21ld") % sizeof(long) % LONG_MIN % LONG_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("ulong          (%llu size):      %+21ld -> %+21lu") % sizeof(unsigned long) % 0 % ULONG_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("llong          (%llu size):      %+21lld -> %+21lld") % sizeof(long long) % LLONG_MIN
-        % LLONG_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("ullong         (%llu size):      %+21lld -> %+21llu") % sizeof(unsigned long long) % 0
-        % ULLONG_MAX
-        << std::endl;
-    oss << "\t"
-        << boost::format("bool           (%llu size):      %+21d -> %+21d") % sizeof(bool) % static_cast<int>(false) % static_cast<int>(true)
-        << std::endl;
-
+    oss << "\tchar           (" << sizeof(char) << " size):      "
+        << std::showpos << static_cast<int>(CHAR_MIN) << " -> " << static_cast<int>(CHAR_MAX) << std::noshowpos << std::endl;
+    oss << "\tschar          (" << sizeof(signed char) << " size):      "
+        << std::showpos << static_cast<int>(SCHAR_MIN) << " -> " << static_cast<int>(SCHAR_MAX) << std::noshowpos << std::endl;
+    oss << "\tuchar          (" << sizeof(unsigned char) << " size):      "
+        << std::showpos << 0 << " -> " << static_cast<unsigned int>(UCHAR_MAX) << std::noshowpos << std::endl;
+    oss << "\tsize_t         (" << sizeof(size_t) << " size):      "
+        << std::showpos << 0 << " -> " << SIZE_MAX << std::noshowpos << std::endl;
+    oss << "\tptrdiff_t      (" << sizeof(ptrdiff_t) << " size):      "
+        << std::showpos << PTRDIFF_MIN << " -> " << PTRDIFF_MAX << std::noshowpos << std::endl;
+    oss << "\tshort          (" << sizeof(short) << " size):      "
+        << std::showpos << SHRT_MIN << " -> " << SHRT_MAX << std::noshowpos << std::endl;
+    oss << "\tushort         (" << sizeof(unsigned short) << " size):      "
+        << std::showpos << 0 << " -> " << USHRT_MAX << std::noshowpos << std::endl;
+    oss << "\tint            (" << sizeof(int) << " size):      "
+        << std::showpos << INT_MIN << " -> " << INT_MAX << std::noshowpos << std::endl;
+    oss << "\tuint           (" << sizeof(unsigned int) << " size):      "
+        << std::showpos << 0 << " -> " << UINT_MAX << std::noshowpos << std::endl;
+    oss << "\tlong           (" << sizeof(long) << " size):      "
+        << std::showpos << LONG_MIN << " -> " << LONG_MAX << std::noshowpos << std::endl;
+    oss << "\tulong          (" << sizeof(unsigned long) << " size):      "
+        << std::showpos << 0 << " -> " << ULONG_MAX << std::noshowpos << std::endl;
+    oss << "\tllong          (" << sizeof(long long) << " size):      "
+        << std::showpos << LLONG_MIN << " -> " << LLONG_MAX << std::noshowpos << std::endl;
+    oss << "\tullong         (" << sizeof(unsigned long long) << " size):      "
+        << std::showpos << 0 << " -> " << ULLONG_MAX << std::noshowpos << std::endl;
+    oss << "\tbool           (" << sizeof(bool) << " size):      "
+        << std::showpos << static_cast<int>(false) << " -> " << static_cast<int>(true) << std::noshowpos << std::endl;
     return oss.str();
 }

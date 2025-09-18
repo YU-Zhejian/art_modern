@@ -127,7 +127,7 @@ You may either use the one bundled with the project or an external one that had 
 
 See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
 
-To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes.
+To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
 
 ### [zlib](https://www.zlib.net/)
 
@@ -267,6 +267,52 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
+
+### `USE_LIBFMT`
+
+Available since 1.1.7.
+
+Whether to use bundled `{fmt}` library for formatting strings.
+
+- **unset (DEFAULT): Will use bundled `{fmt}`.**
+- `fmt`  : Will use the `{fmt}` (`libfmt.so`) found in the system.
+- Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system.
+
+### `USE_CONCURRENT_QUEUE`
+
+Available since 1.1.7.
+
+Whether to use bundled `moodycamel::ConcurrentQueue<T>`.
+
+- **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.**
+- Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. For example, if you use Debian GNU/Linux and intalled [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/`.
+
+### `USE_ABSL`
+
+Available since 1.1.7.
+
+Whether to use bundled Abseil library.
+
+- **unset (DEFAULT): Will use bundled Abseil.**
+- Any value `[val]`: Will use system Abseil found by the CMake module `abslConfig.cmake`, which is shipped with official Abseil libraries.
+
+### `REPRODUCIBLE_BUILDS`
+
+Available since 1.1.7.
+
+Whether to enable reproducible builds. This complies Debian policies.
+
+- **unset (DEFAULT): Will not enable reproducible builds.**
+- `ON`: Will enable reproducible builds. All used `__DATE__` and `__TIME__` macros will be replaced with fixed values.
+
+### `BUILD_ART_MODERN_BENCHMARKS`
+
+Available since 1.1.7.
+
+Whether to build mini benchmarks executable.
+
+- **unset (DEFAULT): Will not build benchmarks.**
+- `ON`: Will build benchmarks.
 
 ### Deprecated Options
 

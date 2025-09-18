@@ -142,7 +142,8 @@ clean:
 testbuild-child:
 	rm -fr opt/testbuild
 	mkdir -p opt/testbuild
-	env -C opt/testbuild cmake \
+	# Ninja is required here for acceleration
+	env -C opt/testbuild cmake -G Ninja \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS) \
@@ -155,6 +156,7 @@ testbuild-child:
 	env -C opt/testbuild ctest --output-on-failure
 	opt/testbuild_install/bin/art_modern --help
 	opt/testbuild_install/bin/art_modern --version
+	env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh
 
 
 .PHONY: testbuild
@@ -174,12 +176,3 @@ doc:
 cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
-
-.PHONY: deb
-# Build Debian package
-#
-# **NOTE** This target will fail under WSL
-# since the file debian/doc will be regarded as executable under WSL
-# which have a different meaning for `debuild`.
-deb:
-	$(BASH) sh.d/deb.sh

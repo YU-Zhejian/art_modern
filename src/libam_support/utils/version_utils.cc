@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art_modern_config.h"
 
 #include "libam_support/utils/version_utils.hh"
@@ -55,7 +69,7 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 // CPPSTDLIB
 #include <iostream>
@@ -121,21 +135,20 @@ namespace {
     void print_absl_version()
     {
 #if defined(ABSL_LTS_RELEASE_VERSION) && defined(ABSL_LTS_RELEASE_PATCH_LEVEL)
-        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION  << "." << ABSL_LTS_RELEASE_PATCH_LEVEL
-                  << std::endl;
+        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION << "." << ABSL_LTS_RELEASE_PATCH_LEVEL << std::endl;
 #else
         std::cout << "Abseil: Not on LTS" << std::endl;
 #endif
     }
 
-    void print_pcg_version() {
+    void print_pcg_version()
+    {
 #ifdef USE_PCG_RANDOM
         std::cout << "PCG: " << "0.98" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif
     }
-
 
     void print_bs_version()
     {
