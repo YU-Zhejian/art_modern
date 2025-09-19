@@ -59,6 +59,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/set_static_target.cmake")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libz.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_cxx17.cmake")
 unset(WITH_GIT)
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/git_adapter.cmake")
@@ -66,10 +67,15 @@ if(GIT_FOUND)
     set(WITH_GIT ON)
 endif()
 
+# TODO
+#if(DEFINED CMAKE_C_FLAGS AND DEFINED CMAKE_CXX_FLAGS)
+#    string(REPLACE " " ";" AM_CC_FLAGS "${CMAKE_CXX_FLAGS}")
+#else()
 unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
+#endif()
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
@@ -100,6 +106,20 @@ include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
+
+if(BUILD_SHARED_LIBS)
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_shared)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+else()
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_static)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+endif()
 
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu Threads::Threads)
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")

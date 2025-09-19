@@ -1,5 +1,11 @@
+art-modern (1.1.7+dfsg-1) UNRELEASED; urgency=medium
+
+    * See News.md for details.
+
+ -- YU Zhejian <yuzj25@seas.upenn.edu>  Fri, 18 Sep 2025 16:34:33 -0400
+
 art-modern (1.1.6+dfsg-1) UNRELEASED; urgency=medium
 
-  * Initial release. (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+    * Initial release.
 
  -- YU Zhejian <yuzj25@seas.upenn.edu>  Fri, 12 Sep 2025 22:28:33 -0400

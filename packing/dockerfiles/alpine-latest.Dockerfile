@@ -25,3 +25,6 @@ RUN apk update && \
     libdeflate-dev
 # Bundled {fmt}, moodycamel, HTSLib, and abseil libraries are used
 # Since we're not releasing a package, using bundled libraries is acceptable.
+
+COPY build_alpine_tgz.sh /
+RUN mkdir -p /mnt/art_modern-master

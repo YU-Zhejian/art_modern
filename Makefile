@@ -47,7 +47,6 @@ debug:
 	env -C opt/build_debug ctest --output-on-failure
 	opt/build_debug_install/bin/art_modern --help
 	opt/build_debug_install/bin/art_modern --version
-	# cpack --config opt/build_debug/CPackSourceConfig.cmake
 
 .PHONY: release
 # Generates release build with native optimizations
@@ -66,7 +65,6 @@ release:
 	cmake --install opt/build_release
 	opt/build_release_install/bin/art_modern --help
 	opt/build_release_install/bin/art_modern --version
-	# cpack --config opt/build_release/CPackSourceConfig.cmake
 
 .PHONY: rel_with_dbg_alpine
 # Generates RelWithDebInfo build without native optimizations
@@ -87,7 +85,7 @@ rel_with_dbg_alpine:
 	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
 	cmake --install opt/build_rel_with_dbg_alpine
 	env -C opt/build_rel_with_dbg_alpine_install/bin \
-		zip -9 -r $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.zip \
+		tar cvzf $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.tar.gz \
 		art_modern \
 		libam_support_lib.a \
 		libart_modern_lib.a \
@@ -156,7 +154,9 @@ testbuild-child:
 	env -C opt/testbuild ctest --output-on-failure
 	opt/testbuild_install/bin/art_modern --help
 	opt/testbuild_install/bin/art_modern --version
-	env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh
+	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
+		env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh; \
+	fi
 
 
 .PHONY: testbuild
