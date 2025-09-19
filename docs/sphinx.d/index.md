@@ -16,7 +16,6 @@ src/docs/CODE_OF_CONDUCT.md
 src/docs/Contributing.md
 src/docs/News.md
 src/docs/Security.md
-src/docs/TODO.md
 src/docs/MakefileTargets.md
 src/docs/Copying.md
 src/License.md
