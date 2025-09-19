@@ -21,7 +21,4 @@ for name in debian-12 debian-13 ubuntu-2404; do
     mv -v \
         artifacts/build_deb-"${name}"/"${PACKAGE_FULL_NAME}-1_${ARCH}.deb" \
         artifacts/RELEASE/"${PACKAGE_FULL_NAME}-1_${ARCH}-${name}.deb"
-    mv -v \
-        artifacts/build_deb-"${name}"/"${PACKAGE_FULL_NAME}-1_${ARCH}.deb" \
-        artifacts/RELEASE/"${PACKAGE_FULL_NAME}-1_${ARCH}-${name}.deb"
 done
