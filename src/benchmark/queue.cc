@@ -1,4 +1,16 @@
-#include "libam_support/ds/PyQueue.hh"
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
 
 #include <boost/lockfree/queue.hpp> // NOLINT
 #include <boost/log/trivial.hpp> // NOLINT
@@ -17,7 +29,6 @@
 
 #define VERBOSE_IO 0 // NOLINT
 #define FAST_RAND 1 // NOLINT
-using namespace labw::art_modern; // NOLINT
 
 namespace {
 
@@ -39,47 +50,6 @@ std::string randstr()
     std::string rets { cstr, data_len };
     std::free(cstr);
     return rets;
-}
-
-void pyqueue_producer(PyQueue<std::string>& queue, [[maybe_unused]] std::size_t id)
-{
-#if VERBOSE_IO
-    {
-        BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " started";
-    }
-#endif
-    std::size_t i = 0;
-    while (i < nitems) {
-        if (queue.put(randstr(), true)) {
-            i++;
-        }
-    }
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "producer thread " << id << " ended with " << i << " items enqueued";
-#endif
-}
-
-void pyqueue_consumer(PyQueue<std::string>& queue)
-{
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "consumer thread started";
-#endif
-    std::string item;
-    std::size_t i = 0;
-    while (i < nitems * nthreads) {
-        if (queue.get(item, false)) {
-            i++;
-        }
-#if VERBOSE_IO
-        else {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-            BOOST_LOG_TRIVIAL(info) << i << " elements consumed";
-        }
-#endif
-    }
-#if VERBOSE_IO
-    BOOST_LOG_TRIVIAL(info) << "consumer thread ended";
-#endif
 }
 
 [[maybe_unused]] void mcqueue_explicit_producer(
@@ -195,21 +165,6 @@ void mcqueue_consumer_bulk_explicit(moodycamel::ConcurrentQueue<std::string>& qu
 #endif
 }
 
-void bench_pyqueue()
-{
-    PyQueue<std::string> queue(queue_size);
-    std::vector<std::thread> producers;
-    producers.reserve(nthreads);
-    for (std::size_t i = 0; i < nthreads; i++) {
-        producers.emplace_back(pyqueue_producer, std::ref(queue), i);
-    }
-    std::thread consumer(pyqueue_consumer, std::ref(queue));
-    for (auto& producer : producers) {
-        producer.join();
-    }
-    consumer.join();
-}
-
 void bench_moody_camel_explicit()
 {
     moodycamel::ConcurrentQueue<std::string> queue(queue_size, nthreads, 0);
@@ -245,12 +200,6 @@ int main()
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> end;
-
-    start = std::chrono::high_resolution_clock::now();
-    bench_pyqueue();
-    end = std::chrono::high_resolution_clock::now();
-    BOOST_LOG_TRIVIAL(info) << "PyQueue: " << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()
-                            << " ms";
 
     start = std::chrono::high_resolution_clock::now();
     bench_moody_camel_implicit();

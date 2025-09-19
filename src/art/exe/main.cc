@@ -1,7 +1,22 @@
+/**
+ * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art_modern_config.h"
 
+#include "art/exe/ArtCmdOpts.hh"
 #include "art/exe/main_fn.hh"
-#include "art/lib/ArtCmdOpts.hh"
 
 #include "libam_support/utils/dump_utils.hh"
 #include "libam_support/utils/log_utils.hh"
@@ -87,7 +102,7 @@ int main(int argc, char* argv[])
     if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
         BOOST_LOG_TRIVIAL(warning) << "ART_NO_LOG_DIR defined; No log directory will be created.";
     } else {
-        char* art_log_dir_c = std::getenv("ART_LOG_DIR");
+        const char* art_log_dir_c = std::getenv("ART_LOG_DIR");
         std::string art_log_dir;
         if (art_log_dir_c == nullptr) {
             BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";
@@ -119,4 +134,5 @@ int main(int argc, char* argv[])
 #endif
     bye_mpi();
     exit_mpi(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
 }

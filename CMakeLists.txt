@@ -1,16 +1,23 @@
 cmake_minimum_required(VERSION 3.17)
 
-if(NOT DEFINED USE_CCACHE)
-    set(USE_CCACHE OFF)
+if(DEFINED USE_CCACHE)
+    message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
 endif()
-if(USE_CCACHE)
-    include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/ccache.cmake")
+
+if(DEFINED REPRODUCIBLE_BUILD)
+    set(CEU_REPRODUCIBLE_BUILDS
+        ON
+        CACHE BOOL "Whether to build reproducible builds" FORCE)
+else()
+    unset(CEU_REPRODUCIBLE_BUILDS)
 endif()
 
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.6)
+    VERSION 1.1.7
+    DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
+    HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 
 set(CMAKE_C_STANDARD 11)
@@ -18,7 +25,9 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(CYGWIN)
+if(CYGWIN
+   OR MINGW
+   OR MSYS)
     set(BUILD_SHARED_LIBS OFF)
 endif()
 
@@ -50,6 +59,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/set_static_target.cmake")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libz.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_cxx17.cmake")
 unset(WITH_GIT)
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/git_adapter.cmake")
@@ -57,45 +67,59 @@ if(GIT_FOUND)
     set(WITH_GIT ON)
 endif()
 
+# TODO
+#if(DEFINED CMAKE_C_FLAGS AND DEFINED CMAKE_CXX_FLAGS)
+#    string(REPLACE " " ";" AM_CC_FLAGS "${CMAKE_CXX_FLAGS}")
+#else()
 unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
+#endif()
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency scripts.
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/boost.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/parallel.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/htslib.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/qualgen.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/mpi.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/rng.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/malloc.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/boost.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/absl.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
 # OpenMP temporarily disabled.
-# include("${CMAKE_CURRENT_LIST_DIR}/cmake_includes/openmp.cmake")
+# include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/openmp.cmake")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.
 add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
-add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency includes.
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/concurrentqueue")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/base64/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cpp-btree/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_fmt/include/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/thread-pool/include/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_abseil/")
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/pcg-cpp-0.98/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
 
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu slim_libfmt Threads::Threads)
+if(BUILD_SHARED_LIBS)
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_shared)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+else()
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_static)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+endif()
+
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu Threads::Threads)
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
 message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
@@ -104,7 +128,7 @@ message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 
 if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
     execute_process(
-        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/sh.d/gen_builtin_profiles.py"
+        COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/gen_builtin_profiles.py"
                 "${CMAKE_BINARY_DIR}/gen/src/art/"
         WORKING_DIRECTORY "${CMAKE_CURRENT_LIST_DIR}" COMMAND_ECHO STDERR
         RESULT_VARIABLE PYTHON_RES)
@@ -200,7 +224,7 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with art_modern benchmarks.
 
-if(CEU_CM_SHOULD_ENABLE_TEST)
+if(BUILD_ART_MODERN_BENCHMARKS)
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})

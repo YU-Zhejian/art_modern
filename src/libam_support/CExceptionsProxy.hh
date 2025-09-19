@@ -1,7 +1,20 @@
 /**
  *  @brief  C exceptions proxy.
  *  An exception proxy for C exceptions, with helper functions that asserts return value of C routines.
- */
+ *
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #pragma once
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/exception_utils.hh"
@@ -62,28 +75,9 @@ public:
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_numeric(const t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
-        const std::string& details = UNKNOWN_C_EXCEPTION, const bool explain_using_strerror = false,
-        const EXPECTATION expectation = EXPECTATION::ZERO, const bool log = true)
-    {
-        if ((expectation == EXPECTATION::ZERO && c_value != 0) || (expectation == EXPECTATION::POSITIVE && c_value <= 0)
-            || (expectation == EXPECTATION::NON_NEGATIVE && c_value < 0)) {
-            std::ostringstream oss;
-            if (details != UNKNOWN_C_EXCEPTION) {
-                oss << details;
-            }
-            if (explain_using_strerror) {
-                oss << std::strerror(errno);
-            }
-            oss << " returned " << c_value;
-            auto cep = CExceptionsProxy(c_lib_name, oss.str());
-            if (log) {
-                cep.log();
-            }
-            throw_with_trace(cep);
-        }
-        return c_value;
-    }
+    static t assert_numeric(t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
+        const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false,
+        EXPECTATION expectation = EXPECTATION::ZERO, bool log = true);
 
     /**
      * Assert a C routine return value.
@@ -97,32 +91,58 @@ public:
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_not_null(const t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
-        const std::string& details = UNKNOWN_C_EXCEPTION, const bool explain_using_strerror = false,
-        const bool log = true)
-    {
-        if (c_value == nullptr) {
-            std::ostringstream oss;
-            if (details != UNKNOWN_C_EXCEPTION) {
-                oss << details;
-            }
-            if (explain_using_strerror) {
-                oss << std::strerror(errno);
-            }
-            oss << " returned null";
-
-            auto cep = CExceptionsProxy(c_lib_name, oss.str());
-            if (log) {
-                cep.log();
-            }
-            throw_with_trace(cep);
-        }
-        return c_value;
-    }
+    static t assert_not_null(t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
+        const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false, bool log = true);
 
 private:
     std::string c_lib_name_ = UNKNOWN_C_EXCEPTION;
     std::string details_ = UNKNOWN_C_EXCEPTION;
 };
+
+template <typename t>
+t CExceptionsProxy::assert_numeric(const t c_value, const std::string& c_lib_name, const std::string& details,
+    const bool explain_using_strerror, const EXPECTATION expectation, const bool log)
+{
+    if ((expectation == EXPECTATION::ZERO && c_value != 0) || (expectation == EXPECTATION::POSITIVE && c_value <= 0)
+        || (expectation == EXPECTATION::NON_NEGATIVE && c_value < 0)) {
+        std::ostringstream oss;
+        if (details != UNKNOWN_C_EXCEPTION) {
+            oss << details;
+        }
+        if (explain_using_strerror) {
+            oss << std::strerror(errno);
+        }
+        oss << " returned " << c_value;
+        const auto cep = CExceptionsProxy(c_lib_name, oss.str());
+        if (log) {
+            cep.log();
+        }
+        throw_with_trace(cep);
+    }
+    return c_value;
+}
+
+template <typename t>
+t CExceptionsProxy::assert_not_null(const t c_value, const std::string& c_lib_name, const std::string& details,
+    const bool explain_using_strerror, const bool log)
+{
+    if (c_value == nullptr) {
+        std::ostringstream oss;
+        if (details != UNKNOWN_C_EXCEPTION) {
+            oss << details;
+        }
+        if (explain_using_strerror) {
+            oss << std::strerror(errno);
+        }
+        oss << " returned null";
+
+        const auto cep = CExceptionsProxy(c_lib_name, oss.str());
+        if (log) {
+            cep.log();
+        }
+        throw_with_trace(cep);
+    }
+    return c_value;
+}
 
 } // namespace labw::art_modern

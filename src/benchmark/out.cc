@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "libam_support/Constants.hh"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
@@ -12,7 +26,7 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <chrono>
 #include <cstddef>
@@ -28,87 +42,12 @@
 
 using namespace labw::art_modern;
 
-#if 0
-template <typename T> class LockedIO {
-public:
-    DELETE_MOVE(LockedIO)
-    DELETE_COPY(LockedIO)
-
-    constexpr static const std::chrono::duration sleep_time = std::chrono::microseconds(10);
-
-    explicit LockedIO(std::string name)
-        : name_(std::move(name)) { };
-
-    virtual ~LockedIO() = default;
-
-    void push(T&& value)
-    {
-        std::scoped_lock lock(mutex_);
-        num_reads_in_++;
-        write(std::move(value));
-        num_reads_out_++;
-    }
-    void start() { start_time_ = std::chrono::high_resolution_clock::now(); }
-    virtual void flush_and_close() { };
-
-    void stop()
-    {
-        flush_and_close();
-        end_time_ = std::chrono::high_resolution_clock::now();
-        if (!had_logged_) {
-            log_();
-        }
-        had_logged_ = true;
-    }
-
-    virtual void write(T value) = 0;
-
-protected:
-    std::atomic<std::size_t> num_bytes_out_ = 0;
-    const std::string name_;
-
-private:
-    std::chrono::high_resolution_clock::time_point start_time_;
-    std::chrono::high_resolution_clock::time_point end_time_;
-    std::atomic<std::size_t> num_reads_in_ = 0;
-    std::atomic<std::size_t> num_reads_out_ = 0;
-    std::atomic<std::size_t> num_wait_in_ = 0;
-    std::atomic<std::size_t> num_wait_out_not_full_ = 0;
-    std::atomic<std::size_t> num_wait_out_empty_ = 0;
-    std::atomic<std::size_t> num_nowait_out_ = 0;
-    std::atomic<bool> had_logged_ = false;
-
-    std::mutex mutex_;
-
-    void run()
-    {
-        // Does nothing!
-    }
-    void log_() const
-    {
-        const auto time = std::chrono::duration_cast<std::chrono::milliseconds>(end_time_ - start_time_).count();
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << num_reads_in_ << " reads and writes "
-                                << num_reads_out_ << " reads.";
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. Waitings (I/ONotFull/OEmpty): " << num_wait_in_ << " / "
-                                << num_wait_out_not_full_ << "("
-                                << (100.0 * num_wait_out_not_full_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%) / " << num_wait_out_empty_ << "("
-                                << (100.0 * num_wait_out_empty_
-                                       / (num_wait_out_empty_ + num_wait_out_not_full_ + num_nowait_out_))
-                                << "%).";
-        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: " << to_si(num_bytes_out_) << "B written in " << time / 1000.0
-                                << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
-    }
-};
-#endif
-
 class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
     DELETE_MOVE(EmptyLFIO)
     EmptyLFIO()
-        : LockFreeIO<std::unique_ptr<std::nullptr_t>>("Empty")
+        : LockFreeIO("Empty")
     {
     }
     ~EmptyLFIO() override { stop(); };
@@ -143,11 +82,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
         lfio_.push(std::make_unique<std::nullptr_t>(), token);
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 
@@ -179,11 +114,7 @@ public:
         lfio_.push(std::make_unique<std::nullptr_t>());
         lfio_.push(std::make_unique<std::nullptr_t>());
     }
-    void close() override
-    {
-        lfio_.flush_and_close();
-        lfio_.stop();
-    }
+    void close() override { lfio_.stop(); }
 
     [[nodiscard]] bool require_alignment() const override { return false; }
 

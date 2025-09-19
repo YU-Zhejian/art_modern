@@ -6,7 +6,7 @@ Configuration file for the Sphinx documentation builder.
 
 import os
 
-import tomli
+import datetime
 from docutils.parsers.null import Parser as NullParser
 from sphinx.application import Sphinx
 
@@ -23,8 +23,8 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 
 project = "art_modern"
 author = "YU Zhejian"
-copyright_string = f"2024-2025, {author}"  # FIXME
-release = "1.1.6"  # FIXME
+copyright_string = f"2024-{datetime.datetime.now().year}, {author}"
+release = os.environ.get("PACKAGE_VERSION")
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
@@ -34,8 +34,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "myst_parser",
     "sphinx_copybutton",
-    # FIXME: Use some library that does not rasterize the SVG images
-    # "sphinx.ext.imgconverter",
+    # Replaces "sphinx.ext.imgconverter",
     "sphinxcontrib.cairosvgconverter",
 ]
 

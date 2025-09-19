@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/GslDiscreteDistribution.hh"
@@ -16,14 +30,10 @@
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_int_distribution.hpp>
 
-#include <btree/map.h>
-
-#include <cstdint>
-#include <pcg_random.hpp>
-
 #include <algorithm>
 #include <chrono>
 #include <cmath>
+#include <cstdint>
 #include <cstdlib>
 #include <functional>
 #include <map>
@@ -50,7 +60,7 @@ constexpr am_qual_count_t MAX_DIST_NUMBER = 1'000'000;
 
 constexpr am_readnum_t NUM_TRIALS = K_SIZE << 8;
 constexpr am_readnum_t READ_LEN = K_SIZE;
-pcg32_fast gen { 0 };
+std::mt19937 gen { 0 };
 std::uniform_int_distribution<am_qual_count_t> one_to_dist_end(1, DIST_END);
 std::uniform_int_distribution<am_qual_count_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
 } // namespace
@@ -334,32 +344,6 @@ private:
     std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingBTreeMap : public SlimEmpDist {
-public:
-    DELETE_MOVE(SlimEmpDistUsingBTreeMap)
-    DELETE_COPY(SlimEmpDistUsingBTreeMap)
-    SlimEmpDistUsingBTreeMap(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
-    {
-        for (decltype(count.size()) i = 0; i < count.size(); i++) {
-            dist_[count[i]] = qual[i];
-        }
-    }
-    ~SlimEmpDistUsingBTreeMap() override = default;
-
-    void gen_qualities(std::vector<am_qual_t>& qual) override
-    {
-        std::vector<am_qual_count_t> count;
-        count.resize(READ_LEN);
-        std::generate(count.begin(), count.end(), [] { return one_to_dist_end(gen); });
-        for (std::size_t i = 0; i < qual.size(); i++) {
-            qual[i] = dist_.lower_bound(count[i])->second;
-        }
-    }
-
-private:
-    btree::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
-};
-
 namespace {
 void bench(std::unique_ptr<SlimEmpDist> empdist, const std::string& name)
 {
@@ -397,7 +381,6 @@ int main()
     bench(std::make_unique<SlimEmpDistUsingStdMap>(empdist_quals, empdist_counts), "std::map");
     bench(std::make_unique<SlimEmpDistUsingBoostMap>(empdist_quals, empdist_counts), "boost::map");
     bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::flat_map");
-    bench(std::make_unique<SlimEmpDistUsingBTreeMap>(empdist_quals, empdist_counts), "btree::map");
     bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::dd");
     bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::dd");
     bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::dd (float)");

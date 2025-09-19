@@ -1,3 +1,18 @@
+/**
+ * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art/lib/ArtRead.hh"
 
 #include "art/lib/Rprob.hh"
@@ -48,7 +63,13 @@ void ArtRead::generate_pairwise_aln()
         }
         pos_on_aln_str++;
     }
-    num_match = ref_.size() - pos_on_ref;
+    num_match = static_cast<hts_pos_t>(ref_.size() - pos_on_ref);
+#ifdef CEU_CM_IS_DEBUG
+    if (num_match < 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "num_match < 0: " << num_match;
+        abort_mpi();
+    }
+#endif
     std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
     std::memcpy(aln_ref_.data() + pos_on_aln_str, ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
@@ -263,7 +284,14 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
         }
         pos_on_aln_str++;
     }
-    num_match = ref_.size() - pos_on_ref;
+    num_match = static_cast<hts_pos_t>(ref_.size() - pos_on_ref);
+
+#ifdef CEU_CM_IS_DEBUG
+    if (num_match < 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "num_match < 0: " << num_match;
+        abort_mpi();
+    }
+#endif
     std::memcpy(query_.data() + pos_on_read, ref_.data() + pos_on_ref, num_match);
 #else // Old code for historical purposes
     for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
@@ -334,12 +362,6 @@ PairwiseAlignment ArtRead::to_pwa()
     return { std::move(read_name_), std::move(contig_name_), std::move(query_), std::move(ref_), qual_to_str(qual_),
         std::move(aln_query_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
 }
-bool ArtRead::is_good() const
-{
-    if (std::count(query_.begin(), query_.end(), 'N') > art_params_.max_n) {
-        return false;
-    }
-    return true;
-}
+bool ArtRead::is_good() const { return std::count(query_.begin(), query_.end(), 'N') <= art_params_.max_n; }
 
 } // namespace labw::art_modern

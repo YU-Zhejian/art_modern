@@ -1,0 +1,4 @@
+*.sif
+*.timestamp
+*.tar
+artifacts/

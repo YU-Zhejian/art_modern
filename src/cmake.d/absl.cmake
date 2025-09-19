@@ -1,0 +1,7 @@
+if(DEFINED USE_ABSL)
+    unset(USE_ABSL)
+    find_package(absl REQUIRED)
+    set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} "absl::base")
+else()
+    include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/../../deps/slim_abseil")
+endif()

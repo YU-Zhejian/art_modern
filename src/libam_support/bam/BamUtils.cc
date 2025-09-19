@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art_modern_config.h"
 
 #include "libam_support/bam/BamUtils.hh"
@@ -11,8 +25,7 @@
 #include "libam_support/utils/mpi_utils.hh" // NOLINT
 #include "libam_support/utils/seq_utils.hh"
 
-#include <algorithm>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <boost/log/trivial.hpp> // Used in DEBUG build of assert_correct_cigar
 

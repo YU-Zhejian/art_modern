@@ -1,6 +1,0 @@
----
-Checks: 'clang-diagnostic-*,clang-analyzer-*,-clang-analyzer-cplusplus*,-bugprone-reserved-identifier'
-WarningsAsErrors: ''
-HeaderFilterRegex: ''
-FormatStyle: webkit
-...

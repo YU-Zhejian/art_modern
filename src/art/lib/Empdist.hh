@@ -1,3 +1,18 @@
+/**
+ * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
+ * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #pragma once
 
 #include "art_modern_config.h" // NOLINT
@@ -46,14 +61,14 @@ private:
         DEFAULT_MOVE(SlimEmpDistGslDiscrete)
         explicit SlimEmpDistGslDiscrete(const dist_map_type& dist)
         {
-            std::vector<am_qual_count_t> count;
+            std::vector<double> count;
             for (const auto& [this_count, this_qual] : dist) {
                 qual_.emplace_back(this_qual);
-                count.emplace_back(this_count);
+                count.emplace_back(static_cast<double>(this_count));
             }
             std::vector<double> init_list;
             double prev = 0;
-            for (const int i : count) {
+            for (const auto i : count) {
                 init_list.emplace_back(i - prev);
                 prev = i;
             }
