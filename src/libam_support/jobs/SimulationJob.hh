@@ -22,6 +22,9 @@
 
 namespace labw::art_modern {
 
+    /**
+     * Minimal job information for simulation.
+     */
 class SimulationJob {
 public:
     SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
