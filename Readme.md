@@ -11,7 +11,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generate data that does not reflect the real-world error profile of simulators. Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on laptops or high-performance clusters (HPCs) with only one node. We believe with such simulators, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster.
 
 ## Quick Start
 
@@ -21,21 +21,27 @@ High-performance simulation of realistic next-generation sequencing (NGS) data i
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux. It should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip`/`build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
 
 **WARNING** Static builds may lead to compromized security.
 
+#### Using `dpkg`
+
+If you use specific versions of Debian or Ubuntu, you can install `art_modern` through pre-built DEB packages available with each release. Root privileges are required.
+
+#### Using Docker/Podman
+
+See: <https://quay.io/repository/biocontainers/art_modern>.
+
 #### Installation through Conda
 
-[Conda](https://docs.conda.io/) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed [Conda](https://docs.conda.io/). Then:
+[Conda](https://docs.conda.io/) (or [Mamba](https://mamba.readthedocs.io/en/latest/)/[micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed Conda >=25.7.0 by `conda --version`. Then:
 
 ```shell
 conda create -y -n art_modern_bioconda -c bioconda -c conda-forge art_modern
 ```
 
-to create an environment named `art_modern_bioconda` with `art_modern` installed.
-
-You may use [Mamba](https://mamba.readthedocs.io/en/latest/) or [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) as a Conda replacement.
+to create an environment named `art_modern_bioconda` with the package installed.
 
 #### Installation through Compiling the Source Code
 
@@ -61,14 +67,14 @@ Build the project using:
 ```shell
 mkdir -p opt/build_release
 env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release "$(pwd)"
-env -C opt/build_release make -j40
+cmake --build opt/build_release -j40
 ```
 
 The project binary will be available at `opt/build_release/art_modern`. Now we can test whether the program runs:
 
 ```shell
 opt/build_release/art_modern --help
-opt/build_release/art_modern --version # For version information
+opt/build_release/art_modern --version
 ```
 
 ### Simulating WGS Data using _E. Coli_ Genome
@@ -278,7 +284,7 @@ Please wait for a while for the compression to finish.
 
 ## What's Next?
 
-The `art_modern` project provides diverse documentations to satisfy your needs.
+The project provides diverse documentations to satisfy your needs.
 
 - If you want to build the software with different options, see [Install](docs/Install.md).
 - For a detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).

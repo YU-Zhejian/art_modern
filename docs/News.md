@@ -8,7 +8,7 @@
 - Updated bundled `{fmt}` to [11.2.0](https://github.com/fmtlib/fmt/releases/tag/11.2.0).
 - Some files without clear license were removed. Unused files from bundled `{fmt}`, `moodycamel::ConcurrentQueue<T>`, and HTSLib removed.
 - CMake options to use system shipped dependencies instead of bundled ones are added to comply with Debian policies. Namely, `USE_LIBFMT`, `USE_CONCURRENT_QUEUE`, `USE_ABSL`, and `REPRODUCIBLE_BUILDS`.
-- Separated CMake flag that controlls building of mini benchmarks to `BUILD_ART_MODERN_BENCHMARKS`.
+- Separated CMake flag that controls building of mini benchmarks to `BUILD_ART_MODERN_BENCHMARKS`.
 - Miscellaneous bug fixes.
 
 ## 1.1.6 (2025/09/12)
@@ -35,6 +35,7 @@
 - Builtin profiles no longer being represented in base64. They're now gzip-compressed instead.
 - **EXPERIMENTAL** [Sphinx](https://www.sphinx-doc.org/en/master/)-generated documentation added.
 - Compiler flag `-Ofast` switched back to `-O3` for release build.
+- CMake option `BOOST_CONFIG_PROVIDED_BY_BOOST` added to address newer mechanisms of Boost configuration.
 - Miscellaneous bug fixes.
 
 ## 1.1.2 (2025/02/16)
