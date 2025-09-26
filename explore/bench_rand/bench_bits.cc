@@ -1,5 +1,6 @@
 #include "gsl_rng_wrapper.hh"
 #include "rprobs.hh"
+#include "vigna.h"
 #include "vmt19937_wrapper.hh"
 
 #include <mkl.h>
@@ -14,10 +15,8 @@
 
 #include <algorithm>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <fstream>
-#include <memory>
 #include <random>
 #include <utility>
 #include <vector>
@@ -239,22 +238,14 @@ void mkl_main()
 {
     bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
     bench_bits_mkl(VSL_BRNG_MT2203, "MKL::VSL_BRNG_MT2203");
-    // This fails. No idea why.
-    // bench_bits_mkl(VSL_BRNG_WH, "MKL::VSL_BRNG_WH");
     bench_bits_mkl(VSL_BRNG_SOBOL, "MKL::VSL_BRNG_SOBOL");
     bench_bits_mkl(VSL_BRNG_MCG31, "MKL::VSL_BRNG_MCG31");
     bench_bits_mkl(VSL_BRNG_R250, "MKL::VSL_BRNG_R250");
     bench_bits_mkl(VSL_BRNG_MRG32K3A, "MKL::VSL_BRNG_MRG32K3A");
-    // This fails. No idea why.
-    // bench_bits_mkl(VSL_BRNG_MCG59, "MKL::VSL_BRNG_MCG59");
     bench_bits_mkl(VSL_BRNG_NIEDERR, "MKL::VSL_BRNG_NIEDERR");
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_bits_mkl(VSL_BRNG_ARS5, "MKL::VSL_BRNG_ARS5");
     bench_bits_mkl(VSL_BRNG_PHILOX4X32X10, "MKL::VSL_BRNG_PHILOX4X32X10");
-    // These failed. No idea why.
-    // bench_bits_mkl(VSL_BRNG_IABSTRACT, "MKL::VSL_BRNG_IABSTRACT");
-    // bench_bits_mkl(VSL_BRNG_DABSTRACT, "MKL::VSL_BRNG_DABSTRACT");
-    // bench_bits_mkl(VSL_BRNG_SABSTRACT, "MKL::VSL_BRNG_SABSTRACT");
     bench_bits_mkl(VSL_BRNG_NONDETERM, "MKL::VSL_BRNG_NONDETERM");
 }
 
@@ -356,16 +347,52 @@ void mt19937_main()
     bench_bits_vmt19937<VSFMT19937BulkRandomDevice>("VSFMT19937BulkRandomDevice");
 }
 
+template <typename xoroshiro_type, typename result_type, int num_states = 2> class XoroshiroWrapper {
+public:
+    XoroshiroWrapper()
+    {
+        std::random_device rd;
+        for (int i = 0; i < num_states; ++i) {
+            xoroshiro_impl_.s[i] = rd();
+        }
+    }
+    result_type operator()() { return xoroshiro_impl_.next(); }
+    static constexpr result_type min() { return 0; }
+    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
+
+private:
+    xoroshiro_type xoroshiro_impl_ {};
+};
+
+void xoshiro_main()
+{
+    XoroshiroWrapper<old::xoroshiro_2x32_star, uint32_t> x01 {};
+    bench_bits_stl<decltype(x01)>(x01, "xoroshiro::2x32*");
+
+    XoroshiroWrapper<old::xoroshiro_2x32_star_star, uint32_t> x02 {};
+    bench_bits_stl<decltype(x02)>(x02, "xoroshiro::2x32**");
+
+    XoroshiroWrapper<old::xoshiro_4x32_plus, uint32_t, 4> x03 {};
+    bench_bits_stl<decltype(x03)>(x03, "xoshiro::4x32+");
+
+    XoroshiroWrapper<old::xoshiro_4x32_star_star, uint32_t, 4> x04 {};
+    bench_bits_stl<decltype(x04)>(x04, "xoshiro::4x32**");
+
+    XoroshiroWrapper<old::xoshiro_4x32_plus_plus, uint32_t, 4> x05 {};
+    bench_bits_stl<decltype(x05)>(x05, "xoshiro::4x32++");
+}
+
 } // namespace
 
-int main()
+int main() noexcept
 {
     mt19937_main();
     //    stl_main();
     //    boost_main();
     //    mkl_main();
-    absl_main();
+    //    absl_main();
     //    gsl_main();
-    pcg_main();
+    //    pcg_main();
+    xoshiro_main();
     return EXIT_SUCCESS;
 }

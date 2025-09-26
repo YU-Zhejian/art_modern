@@ -35,13 +35,12 @@ template <typename Matrix> void square(const Matrix& src, Matrix& dst, std::vect
 std::string mk_file_name(const GenType gen_type, const std::string& path, size_t n)
 {
     std::ostringstream os;
-    os << path
-    << (gen_type == mt? "MT":"SFMT")
-    << "F" << std::setw(5) << std::setfill('0') << n << extension;
+    os << path << (gen_type == mt ? "MT" : "SFMT") << "F" << std::setw(5) << std::setfill('0') << n << extension;
     return os.str();
 }
 
-template <GenType gen> void run(const std::string& filepath, const size_t n_threads, const size_t save_frequency, const size_t stop_index)
+template <GenType gen>
+void run(const std::string& filepath, const size_t n_threads, const size_t save_frequency, const size_t stop_index)
 {
     typename GenTraits<gen>::matrix_t f[2];
 
@@ -81,7 +80,7 @@ template <GenType gen> void run(const std::string& filepath, const size_t n_thre
         f[out].printSparsity();
 
         if ((i % save_frequency) == 0 || i > 19930) {
-            const auto fn = mk_file_name(gen,filepath, i);
+            const auto fn = mk_file_name(gen, filepath, i);
             std::cout << "  saving file: " << fn << " ... ";
             std::ofstream of(fn, ios::binary);
             f[out].toBin(of);

@@ -1,11 +1,14 @@
 #pragma once
 
+#include "class_utils.hh"
+
 #include <gsl/gsl_rng.h>
 
 #include <string>
 
 class GslRngWrapper {
 public:
+    DELETE_COPY_MOVE(GslRngWrapper)
     using result_type = unsigned long;
     explicit GslRngWrapper(const gsl_rng_type* t)
         : r(gsl_rng_alloc(t))

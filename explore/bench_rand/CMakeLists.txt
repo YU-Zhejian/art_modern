@@ -41,10 +41,16 @@ endif()
 # Find Abseil
 find_package(absl REQUIRED)
 
+# Find TestU01
+find_library(TESTU01_LIB NAMES testu01 REQUIRED)
+find_library(TESTU01_MYLIB NAMES testu01mylib mylib REQUIRED)
+find_library(TESTU01_PROBDIST NAMES testu01probdist probdist REQUIRED)
+
 # Add pcg
 
 include_directories("${CMAKE_CURRENT_LIST_DIR}/../../deps/pcg-cpp-0.98/include/")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/../../deps/VMT19937-master/include/")
+include_directories("${CMAKE_CURRENT_LIST_DIR}/../../deps/xoshiro/include/")
 
 set(LINK_LIBS MKL::MKL GSL::gsl absl::random_random absl::random_distributions)
 set(COMPILE_OPTIONS -O3 -march=native -mtune=native -Wall -Wextra -Wpedantic)
@@ -68,3 +74,7 @@ target_compile_options(bench_uniform_real PUBLIC ${COMPILE_OPTIONS})
 add_executable(jump jump.cpp)
 target_link_libraries(jump PUBLIC ${LINK_LIBS})
 target_compile_options(jump PUBLIC ${COMPILE_OPTIONS})
+
+add_executable(bench_testu01 bench_testu01.cc)
+target_link_libraries(bench_testu01 PUBLIC ${LINK_LIBS} ${TESTU01_LIB} ${TESTU01_MYLIB} ${TESTU01_PROBDIST})
+target_compile_options(bench_testu01 PUBLIC ${COMPILE_OPTIONS})
