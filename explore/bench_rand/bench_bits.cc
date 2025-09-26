@@ -1,5 +1,6 @@
 #include "gsl_rng_wrapper.hh"
 #include "rprobs.hh"
+#include "vmt19937_wrapper.hh"
 
 #include <mkl.h>
 
@@ -30,7 +31,7 @@ template <typename T> void bench_bits_stl(T& rng, const std::string& name)
     std::vector<std::result_of_t<T()>> gen_bits(N_BASES);
 
     start = std::chrono::system_clock::now();
-    for (int i = 0; i < N_TIMES; i++) {
+    for (std::size_t i = 0; i < N_TIMES; i++) {
         std::generate_n(gen_bits.begin(), N_BASES, [&rng]() { return rng(); });
     }
     end = std::chrono::system_clock::now();
@@ -52,7 +53,7 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
     gen_bits.resize(N_BASES);
 
     start = std::chrono::system_clock::now();
-    for (int i = 0; i < N_TIMES; i++) {
+    for (std::size_t i = 0; i < N_TIMES; i++) {
         viRngUniformBits(VSL_RNG_METHOD_UNIFORM_STD, stream, N_BASES, gen_bits.data());
     }
     end = std::chrono::system_clock::now();
@@ -61,6 +62,25 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
     std::cout << name << " (" << brng.NBits << " bits): "
               << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) << " us"
               << std::endl;
+}
+
+template <typename VMT19937BulkRandomDeviceImpl> void bench_bits_vmt19937(const std::string& name)
+{
+    VMT19937BulkRandomDeviceImpl rng {};
+    std::chrono::time_point<std::chrono::system_clock> start;
+    std::chrono::time_point<std::chrono::system_clock> end;
+    std::vector<std::uint32_t> gen_bits {};
+    gen_bits.resize(N_BASES);
+
+    start = std::chrono::system_clock::now();
+    for (std::size_t i = 0; i < N_TIMES; i++) {
+        rng.gen(gen_bits);
+    }
+    end = std::chrono::system_clock::now();
+
+    std::cout << name << "(" << std::to_string(rng.min()) << ", " << std::to_string(rng.max())
+              << "): " << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())
+              << " us" << std::endl;
 }
 
 void bench_gsl(const gsl_rng_type* t)
@@ -319,18 +339,21 @@ void mt19937_main()
     std::mt19937 rng_stl_mt19937 { seed() };
     bench_bits_stl<std::mt19937>(rng_stl_mt19937, "std::mt19937");
 
-    absl::InsecureBitGen rng_insecure_bitgen {};
-    bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
-
-    pcg32 rng_pcg32 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<pcg32>(rng_pcg32, "PCG::pcg32");
-
     boost::random::mt19937 rng_boost_mt19937 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::mt19937>(rng_boost_mt19937, "boost::random::mt19937");
 
     bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_gsl(gsl_rng_mt19937);
+
+    VMT19937RandomDevice rng_vmt19937;
+    bench_bits_stl<VMT19937RandomDevice>(rng_vmt19937, "VMT19937RandomDevice");
+
+    VSFMT19937RandomDevice rng_sfmt19937;
+    bench_bits_stl<VSFMT19937RandomDevice>(rng_sfmt19937, "VSFMT19937RandomDevice");
+
+    bench_bits_vmt19937<VMT19937BulkRandomDevice>("VMT19937BulkRandomDevice");
+    bench_bits_vmt19937<VSFMT19937BulkRandomDevice>("VSFMT19937BulkRandomDevice");
 }
 
 } // namespace
@@ -341,8 +364,8 @@ int main()
     //    stl_main();
     //    boost_main();
     //    mkl_main();
-    //    absl_main();
+    absl_main();
     //    gsl_main();
-    //    pcg_main();
+    pcg_main();
     return EXIT_SUCCESS;
 }

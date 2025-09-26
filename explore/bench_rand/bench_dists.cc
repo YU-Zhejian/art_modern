@@ -1,4 +1,4 @@
-
+#include "class_utils.hh"
 #include "gsl_rng_wrapper.hh"
 #include "rprobs.hh"
 
@@ -28,11 +28,14 @@ public:
     virtual std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) = 0;
     virtual std::vector<int> gen_ints(std::vector<int>& tmp_qual_dists_) = 0;
     virtual std::vector<double> gen_normal(std::vector<double>& tmp_qual_dists_) = 0;
+    SlimRprobs() = default;
     virtual ~SlimRprobs() = default;
+    DELETE_COPY_MOVE(SlimRprobs);
 };
 
 class SlimRprobsStdRand : public SlimRprobs {
 public:
+    DELETE_COPY_MOVE(SlimRprobsStdRand);
     SlimRprobsStdRand()
         : gen_(seed())
     {
@@ -65,6 +68,7 @@ private:
 
 class SlimRprobsBoost : public SlimRprobs {
 public:
+    DELETE_COPY_MOVE(SlimRprobsBoost);
     SlimRprobsBoost()
         : gen_(seed())
     {
@@ -97,6 +101,7 @@ private:
 
 class SlimRprobsAbsl : public SlimRprobs {
 public:
+    DELETE_COPY_MOVE(SlimRprobsAbsl);
     SlimRprobsAbsl()
         : gen_(seed())
     {
@@ -129,6 +134,7 @@ private:
 
 class SlimRprobsGslNative : public SlimRprobs {
 public:
+    DELETE_COPY_MOVE(SlimRprobsGslNative);
     SlimRprobsGslNative()
         : gen_(gsl_rng_alloc(gsl_rng_mt19937))
     {
@@ -159,6 +165,7 @@ private:
 
 class SlimRprobsGslBoost : public SlimRprobs {
 public:
+    DELETE_COPY_MOVE(SlimRprobsGslBoost);
     SlimRprobsGslBoost()
         : gen_(gsl_rng_mt19937, seed())
     {
