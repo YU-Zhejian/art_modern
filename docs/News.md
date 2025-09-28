@@ -1,5 +1,11 @@
 # News \& Release Notes
 
+## 1.1.8 (Ongoing)
+
+- Fixed issue #5.
+- Documentation largely revised.
+- Miscellaneous bug fixes.
+
 ## 1.1.7 (2025/09/18)
 
 - Support over `ccache` deprecated, which also deprecated CMake option `USE_CCACHE`.

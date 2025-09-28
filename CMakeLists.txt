@@ -15,7 +15,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.7
+    VERSION 1.1.8
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
