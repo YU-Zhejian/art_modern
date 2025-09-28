@@ -140,7 +140,7 @@ public:
     {
         gsl_rng_set(gen_, seed());
     }
-    ~SlimRprobsGslNative() override = default;
+    ~SlimRprobsGslNative() override { gsl_rng_free(gen_); }
     std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
     {
         std::generate_n(tmp_qual_dists_.begin(), N_BASES, [this]() { return gsl_rng_uniform(gen_) * (b - a) + a; });
@@ -234,9 +234,9 @@ void bench(std::unique_ptr<SlimRprobs> rprobs, const std::string& name)
 
 int main()
 {
-    //    bench(std::make_unique<SlimRprobsStdRand>(), "std::random");
-    //    bench(std::make_unique<SlimRprobsBoost>(), "Boost");
-    //    bench(std::make_unique<SlimRprobsAbsl>(), "Absl");
+    bench(std::make_unique<SlimRprobsStdRand>(), "std::random");
+    bench(std::make_unique<SlimRprobsBoost>(), "Boost");
+    bench(std::make_unique<SlimRprobsAbsl>(), "Absl");
 
     bench(std::make_unique<SlimRprobsGslNative>(), "GSL native");
     bench(std::make_unique<SlimRprobsGslBoost>(), "GSL Boost");

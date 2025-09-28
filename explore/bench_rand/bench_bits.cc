@@ -1,7 +1,12 @@
+/**
+ *
+ * Note: Those who failed TestU01 are NOT included.
+ */
 #include "gsl_rng_wrapper.hh"
 #include "rprobs.hh"
 #include "vigna.h"
 #include "vmt19937_wrapper.hh"
+#include "xoroshiro_wrapper.hh"
 
 #include <mkl.h>
 
@@ -27,7 +32,7 @@ template <typename T> void bench_bits_stl(T& rng, const std::string& name)
     std::chrono::time_point<std::chrono::system_clock> start;
     std::chrono::time_point<std::chrono::system_clock> end;
 
-    std::vector<std::result_of_t<T()>> gen_bits(N_BASES);
+    std::vector<std::invoke_result_t<T>> gen_bits(N_BASES);
 
     start = std::chrono::system_clock::now();
     for (std::size_t i = 0; i < N_TIMES; i++) {
@@ -108,27 +113,8 @@ void stl_main()
     std::ranlux24 rng_ranlux24 { seed() };
     bench_bits_stl<std::ranlux24>(rng_ranlux24, "std::ranlux24");
 
-    std::ranlux48_base rng_ranlux48_base { seed() };
-    bench_bits_stl<std::ranlux48_base>(rng_ranlux48_base, "std::ranlux48_base");
-
-    std::ranlux24_base rng_ranlux24_base { seed() };
-    bench_bits_stl<std::ranlux24_base>(rng_ranlux24_base, "std::ranlux24_base");
-
     std::knuth_b rng_knuth_b { seed() };
     bench_bits_stl<std::knuth_b>(rng_knuth_b, "std::knuth_b");
-
-    std::minstd_rand0 rng_minstd_rand0 { seed() };
-    bench_bits_stl<std::minstd_rand0>(rng_minstd_rand0, "std::minstd_rand0");
-
-    std::minstd_rand rng_minstd_rand { seed() };
-    bench_bits_stl<std::minstd_rand>(rng_minstd_rand, "std::minstd_rand");
-    /**
-     Very very slow
-      std::random_device rng_random_device;
-      std::vector<std::random_device::result_type> gen_bits_random_device(N_BASES);
-      bench_bits_stl<std::random_device, std::random_device::result_type>(
-          rng_random_device, gen_bits_random_device, "std::random_device");
-    **/
 }
 
 void boost_main()
@@ -142,107 +128,23 @@ void boost_main()
     boost::random::ranlux48 rng_ranlux48 { seed() };
     bench_bits_stl<boost::random::ranlux48>(rng_ranlux48, "boost::random::ranlux48");
 
-    boost::random::ranlux24 rng_ranlux24 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux24>(rng_ranlux24, "boost::random::ranlux24");
-
-    boost::random::knuth_b rng_knuth_b { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::knuth_b>(rng_knuth_b, "boost::random::knuth_b");
-
-    boost::random::minstd_rand0 rng_minstd_rand0 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::minstd_rand0>(rng_minstd_rand0, "boost::random::minstd_rand0");
-
-    boost::random::minstd_rand rng_minstd_rand { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::minstd_rand>(rng_minstd_rand, "boost::random::minstd_rand");
-
-    boost::random::ranlux48_base rng_ranlux48_base { seed() };
-    bench_bits_stl<boost::random::ranlux48_base>(rng_ranlux48_base, "boost::random::ranlux48_base");
-
-    boost::random::ranlux24_base rng_ranlux24_base { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux24_base>(rng_ranlux24_base, "boost::random::ranlux24_base");
-
-    boost::random::rand48 rng_rand48 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::rand48>(rng_rand48, "boost::random::rand48");
-
-    boost::random::ecuyer1988 rng_ecuyer1988 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ecuyer1988>(rng_ecuyer1988, "boost::random::ecuyer1988");
-
-    boost::random::kreutzer1986 rng_kreutzer1986 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::kreutzer1986>(rng_kreutzer1986, "boost::random::kreutzer1986");
-
     boost::random::taus88 rng_taus88 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::taus88>(rng_taus88, "boost::random::taus88");
 
-    boost::random::hellekalek1995 rng_hellekalek1995 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::hellekalek1995>(rng_hellekalek1995, "boost::random::hellekalek1995");
-
     boost::random::mt11213b rng_mt11213b { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::mt11213b>(rng_mt11213b, "boost::random::mt11213b");
-
-    boost::random::lagged_fibonacci607 rng_lagged_fibonacci607 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci607>(rng_lagged_fibonacci607, "boost::random::lagged_fibonacci607");
-
-    boost::random::lagged_fibonacci19937 rng_lagged_fibonacci19937 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci19937>(
-        rng_lagged_fibonacci19937, "boost::random::lagged_fibonacci19937");
-
-    boost::random::lagged_fibonacci9689 rng_lagged_fibonacci9689 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci9689>(
-        rng_lagged_fibonacci9689, "boost::random::lagged_fibonacci9689");
-
-    boost::random::lagged_fibonacci23209 rng_lagged_fibonacci23209 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci23209>(
-        rng_lagged_fibonacci23209, "boost::random::lagged_fibonacci23209");
-
-    boost::random::lagged_fibonacci1279 rng_lagged_fibonacci1279 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci1279>(
-        rng_lagged_fibonacci1279, "boost::random::lagged_fibonacci1279");
-
-    boost::random::lagged_fibonacci3217 rng_lagged_fibonacci3217 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci3217>(
-        rng_lagged_fibonacci3217, "boost::random::lagged_fibonacci3217");
-
-    boost::random::lagged_fibonacci4423 rng_lagged_fibonacci4423 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci4423>(
-        rng_lagged_fibonacci4423, "boost::random::lagged_fibonacci4423");
-
-    boost::random::lagged_fibonacci44497 rng_lagged_fibonacci44497 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci44497>(
-        rng_lagged_fibonacci44497, "boost::random::lagged_fibonacci44497");
-
-    boost::random::ranlux3 rng_ranlux3 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux3>(rng_ranlux3, "boost::random::ranlux3");
-
-    boost::random::ranlux4 rng_ranlux4 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux4>(rng_ranlux4, "boost::random::ranlux4");
 
     boost::random::ranlux64_3 rng_ranlux64_3 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::ranlux64_3>(rng_ranlux64_3, "boost::random::ranlux64_3");
 
     boost::random::ranlux64_4 rng_ranlux64_4 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::ranlux64_4>(rng_ranlux64_4, "boost::random::ranlux64_4");
-
-    boost::random::ranlux3_01 rng_ranlux3_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux3_01>(rng_ranlux3_01, "boost::random::ranlux3_01");
-
-    boost::random::ranlux4_01 rng_ranlux4_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux4_01>(rng_ranlux4_01, "boost::random::ranlux4_01");
-
-    boost::random::ranlux64_3_01 rng_ranlux64_3_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux64_3_01>(rng_ranlux64_3_01, "boost::random::ranlux64_3_01");
-
-    boost::random::ranlux64_4_01 rng_ranlux64_4_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux64_4_01>(rng_ranlux64_4_01, "boost::random::ranlux64_4_01");
 }
 
 void mkl_main()
 {
     bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
     bench_bits_mkl(VSL_BRNG_MT2203, "MKL::VSL_BRNG_MT2203");
-    bench_bits_mkl(VSL_BRNG_SOBOL, "MKL::VSL_BRNG_SOBOL");
-    bench_bits_mkl(VSL_BRNG_MCG31, "MKL::VSL_BRNG_MCG31");
-    bench_bits_mkl(VSL_BRNG_R250, "MKL::VSL_BRNG_R250");
-    bench_bits_mkl(VSL_BRNG_MRG32K3A, "MKL::VSL_BRNG_MRG32K3A");
-    bench_bits_mkl(VSL_BRNG_NIEDERR, "MKL::VSL_BRNG_NIEDERR");
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_bits_mkl(VSL_BRNG_ARS5, "MKL::VSL_BRNG_ARS5");
     bench_bits_mkl(VSL_BRNG_PHILOX4X32X10, "MKL::VSL_BRNG_PHILOX4X32X10");
@@ -284,45 +186,11 @@ void gsl_main()
     bench_gsl(gsl_rng_mt19937);
     bench_gsl(gsl_rng_mt19937_1999);
     bench_gsl(gsl_rng_mt19937_1998);
-    bench_gsl(gsl_rng_ranlxs0);
-    bench_gsl(gsl_rng_ranlxs1);
-    bench_gsl(gsl_rng_ranlxs2);
     bench_gsl(gsl_rng_ranlxd1);
     bench_gsl(gsl_rng_ranlxd2);
-    bench_gsl(gsl_rng_ranlux);
-    bench_gsl(gsl_rng_ranlux389);
-    bench_gsl(gsl_rng_cmrg);
-    bench_gsl(gsl_rng_mrg);
     bench_gsl(gsl_rng_taus);
     bench_gsl(gsl_rng_taus2);
     bench_gsl(gsl_rng_gfsr4);
-    bench_gsl(gsl_rng_rand);
-    bench_gsl(gsl_rng_random_bsd);
-    bench_gsl(gsl_rng_random_libc5);
-    bench_gsl(gsl_rng_random_glibc2);
-    bench_gsl(gsl_rng_rand48);
-    bench_gsl(gsl_rng_ranf);
-    bench_gsl(gsl_rng_ranmar);
-    bench_gsl(gsl_rng_r250);
-    bench_gsl(gsl_rng_tt800);
-    bench_gsl(gsl_rng_vax);
-    bench_gsl(gsl_rng_transputer);
-    bench_gsl(gsl_rng_randu);
-    bench_gsl(gsl_rng_minstd);
-    bench_gsl(gsl_rng_uni);
-    bench_gsl(gsl_rng_uni32);
-    bench_gsl(gsl_rng_slatec);
-    bench_gsl(gsl_rng_zuf);
-    bench_gsl(gsl_rng_knuthran2);
-    bench_gsl(gsl_rng_knuthran2002);
-    bench_gsl(gsl_rng_knuthran);
-    bench_gsl(gsl_rng_borosh13);
-    bench_gsl(gsl_rng_fishman18);
-    bench_gsl(gsl_rng_fishman20);
-    bench_gsl(gsl_rng_lecuyer21);
-    bench_gsl(gsl_rng_waterman14);
-    bench_gsl(gsl_rng_fishman2x);
-    bench_gsl(gsl_rng_coveyou);
 }
 
 void mt19937_main()
@@ -337,32 +205,9 @@ void mt19937_main()
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_gsl(gsl_rng_mt19937);
 
-    VMT19937RandomDevice rng_vmt19937;
-    bench_bits_stl<VMT19937RandomDevice>(rng_vmt19937, "VMT19937RandomDevice");
-
-    VSFMT19937RandomDevice rng_sfmt19937;
-    bench_bits_stl<VSFMT19937RandomDevice>(rng_sfmt19937, "VSFMT19937RandomDevice");
-
     bench_bits_vmt19937<VMT19937BulkRandomDevice>("VMT19937BulkRandomDevice");
     bench_bits_vmt19937<VSFMT19937BulkRandomDevice>("VSFMT19937BulkRandomDevice");
 }
-
-template <typename xoroshiro_type, typename result_type, int num_states = 2> class XoroshiroWrapper {
-public:
-    XoroshiroWrapper()
-    {
-        std::random_device rd;
-        for (int i = 0; i < num_states; ++i) {
-            xoroshiro_impl_.s[i] = rd();
-        }
-    }
-    result_type operator()() { return xoroshiro_impl_.next(); }
-    static constexpr result_type min() { return 0; }
-    static constexpr result_type max() { return std::numeric_limits<result_type>::max(); }
-
-private:
-    xoroshiro_type xoroshiro_impl_ {};
-};
 
 void xoshiro_main()
 {
@@ -387,12 +232,12 @@ void xoshiro_main()
 int main() noexcept
 {
     mt19937_main();
-    //    stl_main();
-    //    boost_main();
-    //    mkl_main();
-    //    absl_main();
-    //    gsl_main();
-    //    pcg_main();
+    stl_main();
+    boost_main();
+    mkl_main();
+    absl_main();
+    gsl_main();
+    pcg_main();
     xoshiro_main();
     return EXIT_SUCCESS;
 }

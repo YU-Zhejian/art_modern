@@ -1,7 +1,8 @@
 #include "jump_matrix.h"
 
+#include <boost/filesystem/directory.hpp>
+
 #include <algorithm>
-#include <filesystem>
 #include <optional>
 #include <sstream>
 #include <thread>
@@ -46,8 +47,8 @@ void run(const std::string& filepath, const size_t n_threads, const size_t save_
 
     size_t lastComputed = GenTraits<gen>::power2;
 
-    for (const auto& entry : std::filesystem::directory_iterator(filepath)) {
-        if (std::filesystem::is_regular_file(entry) && entry.path().has_extension()
+    for (const auto& entry : boost::filesystem::directory_iterator(filepath)) {
+        if (boost::filesystem::is_regular_file(entry) && entry.path().has_extension()
             && entry.path().extension().string() == extension) {
             std::string s = entry.path().filename().string();
             s = s.substr(1, s.length() - 1 - extension.length());
