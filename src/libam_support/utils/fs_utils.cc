@@ -73,7 +73,10 @@ void ensure_directory_exists(const std::string& dir_path)
 }
 void prepare_writer(const std::string& output_file_path)
 {
-    ensure_directory_exists(boost::filesystem::path(output_file_path).parent_path().string());
+    const auto parent_path = boost::filesystem::path(output_file_path).parent_path().string();
+    if (!parent_path.empty()) {
+        ensure_directory_exists(parent_path);
+    }
 }
 } // namespace labw::art_modern
 // labw
