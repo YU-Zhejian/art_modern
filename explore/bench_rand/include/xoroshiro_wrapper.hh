@@ -4,8 +4,9 @@
 #include <absl/base/attributes.h>
 #include <random>
 
-template <typename xoroshiro_type, typename result_type, int num_states = 2> class XoroshiroWrapper {
+template <typename xoroshiro_type, typename result_type_, int num_states = 2> class XoroshiroWrapper {
 public:
+    using result_type = result_type_;
     XoroshiroWrapper()
     {
         std::random_device rd;

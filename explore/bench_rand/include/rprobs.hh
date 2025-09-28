@@ -14,7 +14,8 @@
 #include <thread>
 
 constexpr std::size_t N_BASES = (1 << 10);
-constexpr std::size_t N_TIMES = 20UL * (1 << 10);
+constexpr std::size_t N_TIMES = (1 << 10);
+constexpr std::size_t N_REPLICA = 200UL;
 constexpr std::size_t a = 0;
 constexpr std::size_t b = 1000;
 
