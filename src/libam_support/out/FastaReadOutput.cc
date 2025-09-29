@@ -38,7 +38,7 @@ namespace {
     std::unique_ptr<std::string> format_fasta(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
         return std::make_unique<std::string>(
-            fmt::format(">{}\n{}\n>{}\n{}\n", pwa1.read_name, pwa1.query, pwa2.read_name, pwa2.query));
+            fmt::format(">{}/1\n{}\n>{}/2\n{}\n", pwa1.read_name, pwa1.query, pwa2.read_name, pwa2.query));
     }
 
 } // namespace

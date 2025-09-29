@@ -167,7 +167,7 @@ void BamUtils::assert_correct_cigar(
 
     const auto qlen = static_cast<hts_pos_t>(pwa.query.length());
     const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());
-    const auto qual_len = static_cast<hts_pos_t>(pwa.qual.length());
+    const auto qual_len = static_cast<hts_pos_t>(pwa.qual_str.length());
 
     auto reconst_ref = pwa.aln_ref;
     auto reconst_query = pwa.aln_query;
@@ -243,7 +243,7 @@ err:
                              << ", RLEN=" << cigar_rlen << ")";
     BOOST_LOG_TRIVIAL(error) << "Query  : " << pwa.query;
     BOOST_LOG_TRIVIAL(error) << "Ref    : " << pwa.ref;
-    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
+    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual_str;
     BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aln_query;
     BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aln_ref;
     abort_mpi();

@@ -47,7 +47,7 @@ public:
 private:
     bool generate_pe(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
     bool generate_se(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
-    void generate(am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig);
+    void generate(am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig, am_readnum_t& read_id);
 
     const ArtParams& art_params_;
     SimulationJob job_;

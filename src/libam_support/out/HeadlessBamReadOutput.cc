@@ -63,7 +63,7 @@ void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAl
     auto sam_record = BamUtils::init_uptr();
     const auto rlen = pwa.query.size();
     auto seq = pwa.query;
-    auto qual = pwa.qual;
+    auto qual = pwa.qual_vec;
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     BamUtils::assert_correct_cigar(pwa, cigar);
     if (!pwa.is_plus_strand) {
@@ -89,7 +89,7 @@ void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAl
                                          TID_FOR_UNMAPPED, // Unset for SE reads
                                          0, // Unset for SE reads
                                          0, // Unset for SE reads
-                                         rlen, seq.c_str(), qual.c_str(), tags.size()),
+                                         rlen, seq.c_str(), reinterpret_cast<const char *>(qual.data()), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     tags.patch(sam_record.get());
     lfio_.push(std::move(sam_record), token);
@@ -150,7 +150,7 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
+            rlen, seq1.c_str(), reinterpret_cast<const char *>(pwa1.qual_vec.data()), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.size(), pwa2.read_name.c_str(),
@@ -163,7 +163,7 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq2.c_str(), pwa2.qual.c_str(), tags2.size()),
+            rlen, seq2.c_str(), reinterpret_cast<const char *>(pwa2.qual_vec.data()), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     if (!pwa1.is_plus_strand) {

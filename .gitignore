@@ -129,3 +129,4 @@ CMakeLists.txt.user
 !/.vscode/ltex.disabledRules.en-US.txt
 perf.data*
 *.geany
+*.f[aq]

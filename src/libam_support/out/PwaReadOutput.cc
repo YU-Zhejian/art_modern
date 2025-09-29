@@ -54,9 +54,9 @@ void PwaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     if (closed_) {
         return;
     }
-    auto os1 = std::make_unique<std::string>(pwa1.serialize());
+    auto os1 = std::make_unique<std::string>(pwa1.serialize(1));
     lfio_.push(std::move(os1), token);
-    auto os2 = std::make_unique<std::string>(pwa2.serialize());
+    auto os2 = std::make_unique<std::string>(pwa2.serialize(2));
     lfio_.push(std::move(os2), token);
 }
 
