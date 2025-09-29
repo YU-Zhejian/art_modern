@@ -4,8 +4,7 @@ parser=memory
 for lc in se pe mp; do
     for mode in wgs trans template; do
         "${ART}" \
-            --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-            --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${ERR_FA}" \
             --read_len 125 \
             --mode "${mode}" \

@@ -54,8 +54,8 @@ public:
      * @param is_plus_strand Whether the reference is reverse-complemented.
      */
     PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
-                      std::string qual_str, std::vector<am_qual_t > qual_vec, std::string aligned_query, std::string aligned_ref, hts_pos_t pos_on_contig,
-                      bool is_plus_strand);
+        std::string qual_str, std::vector<am_qual_t> qual_vec, std::string aligned_query, std::string aligned_ref,
+        hts_pos_t pos_on_contig, bool is_plus_strand);
     [[maybe_unused]] static PairwiseAlignment deserialize(const std::array<std::string, NUM_LINES>& serialized);
     [[nodiscard]] std::vector<am_cigar_t> generate_cigar_array(bool use_m) const;
     [[nodiscard]] std::string serialize(int is_read_1_or_2 = 0) const;
@@ -80,7 +80,7 @@ public:
      * Quality sequence whose length should be the same as query.
      */
     const std::string qual_str;
-    const std::vector<am_qual_t > qual_vec;
+    const std::vector<am_qual_t> qual_vec;
     const std::string read_name;
     const std::string contig_name;
     const hts_pos_t pos_on_contig;

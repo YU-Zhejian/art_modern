@@ -53,8 +53,7 @@ rm -fr "${PROFILE_DIR}"/uprof_results
     --config hotspots \
     --output-dir "${PROFILE_DIR}"/uprof_results \
     "${PROFILE_DIR}"/art_modern \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-    --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --i-file data/raw_data/ce11_chr1.fa \
     --read_len 125 \
     --mode wgs \

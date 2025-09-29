@@ -70,7 +70,8 @@ namespace {
     };
 
 } // namespace
-void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig, am_readnum_t& read_id)
+void ArtJobExecutor::generate(
+    const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig, am_readnum_t& read_id)
 {
     current_contig_ = art_contig.seq_name;
     current_n_fails_ = 0;
@@ -127,10 +128,9 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
 bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
-    auto read_id = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
-    ArtRead art_read(art_params_, art_contig.seq_name,
-        std::move(read_id),
-        rprob_);
+    auto read_id
+        = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
+    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), rprob_);
     art_contig.generate_read_se(is_plus_strand, art_read);
     art_read.generate_snv_on_qual(true);
     if (require_alignment_) {

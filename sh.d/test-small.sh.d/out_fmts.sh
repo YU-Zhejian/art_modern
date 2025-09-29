@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 "${ART}" \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L150R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
     --read_len 150 \
@@ -29,15 +29,14 @@ if type -p fastqc &>/dev/null && type -p x-www-browser &>/dev/null && [ ! "${NO_
     sleep 3
 fi
 
-samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam | seqkit sort > "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
-seqkit sort < "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq > "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq
+samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam | seqkit sort >"${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
+seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
 
 "${ART}" \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L150R1.txt \
-    --qual_file_2 data/Illumina_profiles/HiSeq2500L150R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
     --read_len 150 \
@@ -65,18 +64,18 @@ samtools fastq \
     -N \
     "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam
 for fn in \
-  "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.1.fq \
-  "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.2.fq; do
-    seqkit sort < "$fn" > "$fn".srt.fq
+    "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.1.fq \
+    "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.2.fq; do
+    seqkit sort <"$fn" >"$fn".srt.fq
     mv "$fn".srt.fq "$fn"
 done
-seqtk seq -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort > "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.1.fq
-seqtk seq -2 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort > "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.2.fq
+seqtk seq -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.1.fq
+seqtk seq -2 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.2.fq
 
 for i in 1 2; do
-  cmp \
-      "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq."${i}".fq \
-      "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam."${i}".fq
+    cmp \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq."${i}".fq \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam."${i}".fq
 done
 
 if [ "${FORMAT_ONLY:-}" = "1" ]; then

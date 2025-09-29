@@ -234,7 +234,7 @@ This output writer supports other BAM formatting parameters.
 
 - `--id`: Read ID Prefix. Used to distinguish between different runs.
 - `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
-- `--qual_file_1` and `--qual_file_2`: Quality distribution files for read 1 and read 2 respectively. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode.
+- `--qual_file_1` and `--qual_file_2`: Quality distribution files for read 1 and read 2 respectively. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode. `--builtin_qual_file` may be used to specify a built-in quality distribution.
 - `--q_shift_1` and `--q_shift_2`: Shift the base quality of the quality distribution by the specified value. Please note that the shifted quality distribution will be bounded to `--min_qual` and `--max_qual`.
 - `--min_qual` and `--max_qual`: Clip the quality distribution to the specified range.
 - `--sep_flag`: Separate quality distributions for different bases in the same position.

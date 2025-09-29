@@ -96,7 +96,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10
@@ -112,8 +112,7 @@ opt/build_release/art_modern \
     --lc pe \
     --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-    --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10 \
@@ -143,7 +142,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unified_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10
@@ -173,7 +172,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unstranded_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
@@ -202,7 +201,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_stranded_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
@@ -232,7 +231,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
     --o-fastq opt/build_release/c_elegans_trans_pbsim3_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-type pbsim3_transcripts
@@ -248,8 +247,7 @@ opt/build_release/art_modern \
    --lc pe \
    --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
    --o-fastq opt/build_release/c_elegans_template_pbsim3_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
    --read_len 125 \
    --parallel 4 \
    --i-type pbsim3_transcripts
@@ -274,7 +272,7 @@ zcat opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
     --o-fastq >(pigz -p8 -9 -v -cf - > opt/build_release/e_coli_wgs_se.fastq.gz) \
     --o-pwa >(xz -9 -T5 -vv -cf - > opt/build_release/e_coli_wgs_se.pwa.xz) \
     --o-sam >(samtools sort -@9 --write-index -o opt/build_release/e_coli_wgs_se.sorted.bam) \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 5
