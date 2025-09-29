@@ -28,4 +28,4 @@
 namespace labw::art_modern::details {
 [[maybe_unused]] void print_memory_usage(const char* file, int line);
 
-} // namespace lab::art_modern::details
+} // namespace labw::art_modern::details

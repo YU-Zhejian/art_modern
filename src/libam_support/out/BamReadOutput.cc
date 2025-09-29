@@ -232,7 +232,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
     }
     throw OutputNotSpecifiedException {};
 }
-const std::string BamReadOutputFactory::name() const { return "BAM"; }
+std::string BamReadOutputFactory::name() const { return "BAM"; }
 
 BamReadOutputFactory::~BamReadOutputFactory() = default;
 } // namespace labw::art_modern

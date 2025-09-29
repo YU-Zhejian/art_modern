@@ -30,7 +30,7 @@
 
 namespace labw::art_modern {
 
-class FastqReadOutput : public BaseReadOutput {
+class FastqReadOutput final: public BaseReadOutput {
 public:
     DELETE_MOVE(FastqReadOutput)
     DELETE_COPY(FastqReadOutput)
@@ -47,14 +47,14 @@ private:
     SimpleLFIO lfio_;
 };
 
-class FastqReadOutputFactory : public BaseReadOutputFactory {
+class FastqReadOutputFactory final: public BaseReadOutputFactory {
 public:
     DELETE_MOVE(FastqReadOutputFactory)
     DELETE_COPY(FastqReadOutputFactory)
     FastqReadOutputFactory() = default;
     ~FastqReadOutputFactory() override = default;
 
-    [[nodiscard]] const std::string name() const override { return "FASTQ"; }
+    [[nodiscard]] std::string name() const override { return "FASTQ"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };

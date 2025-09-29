@@ -144,7 +144,7 @@ std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
     retq.resize(qlen);
-    std::memcpy(retq.data(), static_cast<const void*>(qual), qlen);
+    std::memcpy(retq.data(), qual, qlen);
     std::for_each(retq.begin(), retq.end(), [](char& c) { c += PHRED_OFFSET; });
     return retq;
 }
@@ -194,7 +194,7 @@ std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
     return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
 }
 
-std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n)
+std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::ostringstream oss;
     for (size_t i = 0; i < n; i += 1) {

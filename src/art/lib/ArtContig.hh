@@ -23,7 +23,7 @@
 
 #include <htslib/hts.h>
 
-#include <cstddef>
+#include <cstdlib>
 #include <memory>
 #include <string>
 
@@ -48,7 +48,7 @@ private:
     const ArtParams& art_params_;
     const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
     Rprob& rprob_;
-    const size_t seq_id_;
+    const std::size_t seq_id_;
     const hts_pos_t valid_region_;
 };
 

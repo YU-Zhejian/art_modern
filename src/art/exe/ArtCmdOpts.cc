@@ -102,7 +102,7 @@ namespace {
     {
         const OutputDispatcherFactory out_dispatcher_factory_;
         po::options_description general_opts("General Options");
-        general_opts.add_options()(static_cast<const char*>(ARG_HELP), "print out usage information");
+        general_opts.add_options()(ARG_HELP, "print out usage information");
         general_opts.add_options()(ARG_VERSION, "display version info");
 
         po::options_description required_opts("Required Options");

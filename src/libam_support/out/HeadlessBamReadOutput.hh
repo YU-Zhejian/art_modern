@@ -30,7 +30,7 @@
 
 namespace labw::art_modern {
 
-class HeadlessBamReadOutput : public BaseReadOutput {
+class HeadlessBamReadOutput final: public BaseReadOutput {
 public:
     DELETE_MOVE(HeadlessBamReadOutput)
     DELETE_COPY(HeadlessBamReadOutput)
@@ -51,13 +51,13 @@ private:
     BamLFIO lfio_;
 };
 
-class HeadlessBamReadOutputFactory : public BaseReadOutputFactory {
+class HeadlessBamReadOutputFactory final: public BaseReadOutputFactory {
 public:
     DELETE_MOVE(HeadlessBamReadOutputFactory)
     DELETE_COPY(HeadlessBamReadOutputFactory)
     HeadlessBamReadOutputFactory() = default;
 
-    [[nodiscard]] const std::string name() const override { return "HeadlessBam"; }
+    [[nodiscard]] std::string name() const override { return "HeadlessBam"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
     ~HeadlessBamReadOutputFactory() override;

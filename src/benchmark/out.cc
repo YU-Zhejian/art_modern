@@ -42,7 +42,7 @@
 
 using namespace labw::art_modern;
 
-class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
+class EmptyLFIO final: public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
     DELETE_MOVE(EmptyLFIO)
@@ -158,9 +158,7 @@ void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_
 void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, std::size_t nthread, std::ostream& oss)
 {
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
         std::thread t(working_thread, bro, M_SIZE / nthread);
@@ -170,7 +168,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
         t.join();
     }
     bro->close();
-    end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     oss << fmt::format(
         "{}\t{}\t{}\n", name, nthread, std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
     std::flush(oss);
@@ -195,11 +193,11 @@ int main()
     std::vector<BamOptions> bo_t;
     std::vector<BamOptions> bo_l;
 
-    for (auto& t : std::vector<int> { 1, 2, 4, 8, 16, 32, 64 }) {
+    for (auto& t : std::vector { 1, 2, 4, 8, 16, 32, 64 }) {
         bo_t.emplace_back();
         bo_t.back().hts_io_threads = t;
     }
-    for (auto& t : std::vector<char> { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
+    for (auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
         bo_l.emplace_back();
         bo_l.back().compress_level = t;
     }

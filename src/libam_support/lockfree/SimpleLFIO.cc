@@ -29,7 +29,7 @@
 
 namespace labw::art_modern {
 
-void SimpleLFIO::write(std::unique_ptr<std::string> value)
+void SimpleLFIO::write(const std::unique_ptr<std::string> value)
 
 {
     if (closed_) {

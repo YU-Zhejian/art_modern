@@ -23,7 +23,7 @@
 
 namespace labw::art_modern {
 
-class SimpleLFIO : public LockFreeIO<std::unique_ptr<std::string>> {
+class SimpleLFIO final: public LockFreeIO<std::unique_ptr<std::string>> {
 public:
     DELETE_MOVE(SimpleLFIO)
     DELETE_COPY(SimpleLFIO)

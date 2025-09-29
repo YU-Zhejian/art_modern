@@ -91,11 +91,11 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
         } else if (this_cigar_ops == BAM_CDEL) {
             md_str_ss << std::to_string(matched) << '^' << pwa.ref.substr(pos_on_ref, this_cigar_len);
             pos_on_ref += this_cigar_len;
-            nm += static_cast<int32_t>(this_cigar_len);
+            nm += this_cigar_len;
             matched = 0;
         } else if (this_cigar_ops == BAM_CINS) {
             pos_on_query += this_cigar_len;
-            nm += static_cast<int32_t>(this_cigar_len);
+            nm += this_cigar_len;
         } else if (this_cigar_ops == BAM_CSOFT_CLIP) {
             pos_on_query += this_cigar_len;
         } else if (this_cigar_ops == BAM_CREF_SKIP) {

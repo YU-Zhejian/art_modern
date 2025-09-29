@@ -69,7 +69,7 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <fmt/format.h>
+#include <fmt/base.h>
 
 // CPPSTDLIB
 #include <iostream>

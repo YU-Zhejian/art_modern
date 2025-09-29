@@ -24,7 +24,7 @@
 
 namespace labw::art_modern {
 
-class BamLFIO : public LockFreeIO<bam1_t_uptr> {
+class BamLFIO final: public LockFreeIO<bam1_t_uptr> {
 public:
     DELETE_MOVE(BamLFIO)
     DELETE_COPY(BamLFIO)

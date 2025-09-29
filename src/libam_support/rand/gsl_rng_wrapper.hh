@@ -30,7 +30,7 @@ public:
         : r(gsl_rng_alloc(t))
     {
     }
-    GslRngWrapper(const gsl_rng_type* t, result_type seed)
+    GslRngWrapper(const gsl_rng_type* t, const result_type seed)
         : GslRngWrapper(t)
     {
         gsl_rng_set(r, seed);

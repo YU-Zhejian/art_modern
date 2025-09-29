@@ -30,7 +30,7 @@
 
 using namespace labw::art_modern; // NOLINT
 namespace {
-void bench_ff(std::unique_ptr<BaseFastaFetch> ff, const std::string& name)
+void bench_ff(const std::unique_ptr<BaseFastaFetch>& ff, const std::string& name)
 {
     std::random_device rd;
     std::mt19937 gen(rd());

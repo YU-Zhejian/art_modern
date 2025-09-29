@@ -21,12 +21,11 @@
 
 #include <array>
 #include <exception>
-#include <ostream>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
-class PWAException : public std::exception {
+class PWAException final: public std::exception {
 public:
     [[nodiscard]] const char* what() const noexcept override;
     const char* msg;
@@ -39,7 +38,7 @@ public:
     DELETE_MOVE(PairwiseAlignment)
     ~PairwiseAlignment() = default;
 
-    static const int NUM_LINES = 4;
+    static constexpr int NUM_LINES = 4;
 
     /**
      *
@@ -47,7 +46,8 @@ public:
      * @param contig_name Name of the contig. Will be moved inside.
      * @param query Gapless query sequence. Will be moved inside.
      * @param ref Gapless reference sequence. Will be moved inside.
-     * @param qual_str Quality sequence whose length should be the same as query. Will be moved inside.
+     * @param qual_str Quality sequence (Added phread offset) whose length should be the same as query. Will be moved inside.
+     * @param qual_vec Quality vector whose length should be the same as query. Will be moved inside.
      * @param aligned_query Aligned query sequence with gaps. Will be moved inside.
      * @param aligned_ref Aligned reference sequence with gaps. Will be moved inside.
      * @param pos_on_contig
