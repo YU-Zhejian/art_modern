@@ -69,7 +69,8 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <fmt/format.h>
+// In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
+#include <fmt/format.h> // NOLINT
 
 // CPPSTDLIB
 #include <iostream>

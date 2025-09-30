@@ -24,7 +24,7 @@
 #include <string>
 
 namespace labw::art_modern {
-const char MPI_MESSAGE_BYE[] = "BYE\0";
+constexpr char MPI_MESSAGE_BYE[] = "BYE\0";
 
 void init_mpi(int* argc, char*** argv);
 

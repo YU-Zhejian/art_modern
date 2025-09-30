@@ -10,6 +10,8 @@
  *
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
+ *
+ * TODO: Use Geometric mean to better represent the performance
  **/
 
 #include <boost/lockfree/queue.hpp> // NOLINT
@@ -198,12 +200,9 @@ void bench_moody_camel_implicit()
 } // namespace
 int main()
 {
-    std::chrono::time_point<std::chrono::high_resolution_clock> start;
-    std::chrono::time_point<std::chrono::high_resolution_clock> end;
-
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     bench_moody_camel_implicit();
-    end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     BOOST_LOG_TRIVIAL(info) << "Moody Camel (Implicit): "
                             << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms";
     start = std::chrono::high_resolution_clock::now();

@@ -33,13 +33,13 @@ namespace labw::art_modern {
 namespace {
     std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa)
     {
-        return std::make_unique<std::string>(fmt::format("@{}\n{}\n+\n{}\n", pwa.read_name, pwa.query, pwa.qual));
+        return std::make_unique<std::string>(fmt::format("@{}\n{}\n+\n{}\n", pwa.read_name, pwa.query, pwa.qual_str));
     }
 
     std::unique_ptr<std::string> format_fastq(const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2)
     {
-        return std::make_unique<std::string>(fmt::format("@{}\n{}\n+\n{}\n@{}\n{}\n+\n{}\n", pwa1.read_name, pwa1.query,
-            pwa1.qual, pwa2.read_name, pwa2.query, pwa2.qual));
+        return std::make_unique<std::string>(fmt::format("@{}/1\n{}\n+\n{}\n@{}/2\n{}\n+\n{}\n", pwa1.read_name,
+            pwa1.query, pwa1.qual_str, pwa2.read_name, pwa2.query, pwa2.qual_str));
     }
 
 } // namespace

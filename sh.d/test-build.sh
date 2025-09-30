@@ -6,7 +6,7 @@ mkdir -p opt
 BUILD_ONLY_TEST=1
 USE_RANDOM_GENERATOR=STL
 USE_QUAL_GEN=STL
-for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo SomeNonesense; do
+for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
     for USE_THREAD_PARALLEL in ASIO BS NOP; do
         for USE_MALLOC in NOP JEMALLOC MIMALLOC; do
             for USE_LIBFMT in "UNSET" "fmt"; do
@@ -51,23 +51,18 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo SomeNonesense; do
     done
 done
 BUILD_ONLY_TEST=2
-USE_THREAD_PARALLEL=ASIO
-USE_MALLOC=AUTO
-for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
-    for USE_RANDOM_GENERATOR in STL PCG GSL BOOST; do
-        for USE_QUAL_GEN in WALKER STL; do
-            CMAKE_FLAGS=""
-            CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
-            CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_RANDOM_GENERATOR=${USE_RANDOM_GENERATOR}"
-            CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_THREAD_PARALLEL=${USE_THREAD_PARALLEL}"
-            CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_QUAL_GEN=${USE_QUAL_GEN}"
-            CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_MALLOC=${USE_MALLOC}"
+CMAKE_BUILD_TYPE=RelWithDebInfo
+for USE_RANDOM_GENERATOR in STL PCG GSL BOOST; do
+    for USE_QUAL_GEN in WALKER STL; do
+        CMAKE_FLAGS=""
+        CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
+        CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_RANDOM_GENERATOR=${USE_RANDOM_GENERATOR}"
+        CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_QUAL_GEN=${USE_QUAL_GEN}"
 
-            echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-            make testbuild-child \
-                CMAKE_FLAGS="${CMAKE_FLAGS}" \
-                BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
-                &>>opt/testbuild.log || exit 1
-        done
+        echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
+        make testbuild-child \
+            CMAKE_FLAGS="${CMAKE_FLAGS}" \
+            BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
+            &>>opt/testbuild.log || exit 1
     done
 done

@@ -91,11 +91,11 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
         } else if (this_cigar_ops == BAM_CDEL) {
             md_str_ss << std::to_string(matched) << '^' << pwa.ref.substr(pos_on_ref, this_cigar_len);
             pos_on_ref += this_cigar_len;
-            nm += static_cast<int32_t>(this_cigar_len);
+            nm += this_cigar_len;
             matched = 0;
         } else if (this_cigar_ops == BAM_CINS) {
             pos_on_query += this_cigar_len;
-            nm += static_cast<int32_t>(this_cigar_len);
+            nm += this_cigar_len;
         } else if (this_cigar_ops == BAM_CSOFT_CLIP) {
             pos_on_query += this_cigar_len;
         } else if (this_cigar_ops == BAM_CREF_SKIP) {
@@ -167,7 +167,7 @@ void BamUtils::assert_correct_cigar(
 
     const auto qlen = static_cast<hts_pos_t>(pwa.query.length());
     const auto rlen = static_cast<hts_pos_t>(pwa.ref.length());
-    const auto qual_len = static_cast<hts_pos_t>(pwa.qual.length());
+    const auto qual_len = static_cast<hts_pos_t>(pwa.qual_str.length());
 
     auto reconst_ref = pwa.aln_ref;
     auto reconst_query = pwa.aln_query;
@@ -243,7 +243,7 @@ err:
                              << ", RLEN=" << cigar_rlen << ")";
     BOOST_LOG_TRIVIAL(error) << "Query  : " << pwa.query;
     BOOST_LOG_TRIVIAL(error) << "Ref    : " << pwa.ref;
-    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual;
+    BOOST_LOG_TRIVIAL(error) << "Qual   : " << pwa.qual_str;
     BOOST_LOG_TRIVIAL(error) << "AQuery : " << pwa.aln_query;
     BOOST_LOG_TRIVIAL(error) << "ARef   : " << pwa.aln_ref;
     abort_mpi();

@@ -19,6 +19,7 @@
 ## Packing
 
 - Supress all lintian issues.
+- Docs: Print the version of Sphinx.
 
 ## Performance
 

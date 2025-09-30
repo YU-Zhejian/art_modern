@@ -55,9 +55,9 @@ constexpr int G_SIZE = 1U << 30U;
 constexpr char ART_VERSION[] = "2.5.8";
 
 /** Maximum mapping quality */
-constexpr int MAPQ_MAX = ((1 << 8) - 1); // 255
+constexpr int MAPQ_MAX = (1 << 8) - 1; // 255
 
-constexpr int PHRED_OFFSET = 33;
+constexpr am_qual_t PHRED_OFFSET = 33;
 
 enum class SIMULATION_MODE : std::int8_t { WGS, TRANS, TEMPLATE };
 

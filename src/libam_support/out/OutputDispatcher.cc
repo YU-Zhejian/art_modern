@@ -63,7 +63,7 @@ void OutputDispatcher::close()
     closed_ = true;
 }
 
-OutputDispatcher::~OutputDispatcher() { OutputDispatcher::close(); }
+OutputDispatcher::~OutputDispatcher() { close(); }
 
 void OutputDispatcher::add(std::shared_ptr<BaseReadOutput>&& output) { outputs_.emplace_back(std::move(output)); }
 
@@ -79,7 +79,7 @@ bool OutputDispatcher::require_alignment() const
 
 OutputDispatcher::TokenRing OutputDispatcher::get_producer_tokens()
 {
-    OutputDispatcher::TokenRing retv;
+    TokenRing retv;
     for (const auto& output : outputs_) {
         retv.emplace_back(output->get_producer_token());
     }

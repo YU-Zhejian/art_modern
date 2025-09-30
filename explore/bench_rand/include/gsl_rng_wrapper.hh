@@ -1,12 +1,17 @@
 #pragma once
 
+#include "class_utils.hh"
+
+#include <absl/base/attributes.h>
+
 #include <gsl/gsl_rng.h>
 
 #include <string>
 
 class GslRngWrapper {
 public:
-    using result_type = unsigned long;
+    DELETE_COPY_MOVE(GslRngWrapper)
+    using result_type = decltype(gsl_rng_get(nullptr));
     explicit GslRngWrapper(const gsl_rng_type* t)
         : r(gsl_rng_alloc(t))
     {
@@ -17,9 +22,9 @@ public:
         gsl_rng_set(r, seed);
     }
     ~GslRngWrapper() { gsl_rng_free(r); }
-    result_type operator()() { return gsl_rng_get(r); }
-    result_type min() { return gsl_rng_min(r); }
-    result_type max() { return gsl_rng_max(r); }
+    ABSL_ATTRIBUTE_ALWAYS_INLINE result_type operator()() { return gsl_rng_get(r); }
+    ABSL_ATTRIBUTE_ALWAYS_INLINE result_type min() { return gsl_rng_min(r); }
+    ABSL_ATTRIBUTE_ALWAYS_INLINE result_type max() { return gsl_rng_max(r); }
     [[nodiscard]] std::string name() const { return gsl_rng_name(r); }
 
 private:

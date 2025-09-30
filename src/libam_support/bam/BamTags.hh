@@ -40,6 +40,7 @@ public:
     void add_int_i(const std::string& key, int32_t value);
 
 private:
+    constexpr static std::size_t TAG_SIZE = 4;
     std::vector<tag_type> tags_;
     /**
      * Accumulated size.

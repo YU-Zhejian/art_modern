@@ -72,7 +72,7 @@ Checks:
   - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
   - -*-no-array-decay
 
-  # We don't use Abseil.
+  # We minimize the use of Abseil.
   - -abseil-*
 
   # We minimize the use of Boost.

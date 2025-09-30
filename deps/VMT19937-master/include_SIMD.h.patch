@@ -1,0 +1,13 @@
+diff --git a/deps/VMT19937-master/include/SIMD.h b/deps/VMT19937-master/include/SIMD.h
+index 6060b5c..ac517ae 100644
+--- a/deps/VMT19937-master/include/SIMD.h
++++ b/deps/VMT19937-master/include/SIMD.h
+@@ -360,7 +360,7 @@ struct SimdRegister<256, 256>
+     SimdRegister() : m_v(_mm256_undefined_si256()) {}
+     FORCE_INLINE SimdRegister(const void* p) : m_v(_mm256_load_si256((const __m256i*)p)) {}
+     FORCE_INLINE SimdRegister(uint32_t v) : m_v(_mm256_set1_epi32(v)) {}
+-    FORCE_INLINE FORCE_INLINE SimdRegister(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3)
++    FORCE_INLINE SimdRegister(uint32_t v0, uint32_t v1, uint32_t v2, uint32_t v3)
+     {
+         __m128i tmp = _mm_setr_epi32(v0, v1, v2, v3);
+         m_v = _mm256_set_m128i(tmp, tmp);

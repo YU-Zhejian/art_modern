@@ -77,7 +77,7 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& aje)
 
 JobPool::~JobPool() { stop(); }
 
-JobPool::JobPool([[maybe_unused]] std::size_t pool_size)
+JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
     {}
 #elif defined(USE_BS_PARALLEL)
