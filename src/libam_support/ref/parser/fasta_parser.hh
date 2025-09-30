@@ -27,8 +27,7 @@ namespace labw::art_modern {
 
 using FastaRecord = std::pair<std::string, std::string>;
 
-class EOFException final : std::exception {
-};
+class EOFException final : std::exception { };
 class MalformedFastaException final : std::exception {
     [[nodiscard]] const char* what() const noexcept override;
 };

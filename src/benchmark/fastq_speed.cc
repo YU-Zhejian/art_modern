@@ -13,6 +13,7 @@
  **/
 
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/FastqReadOutput.hh"
@@ -36,6 +37,7 @@ namespace {
 const std::string DEVNULL = "/dev/null";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
+const std::vector<am_qual_t> QUALS(150, 0);
 const PairwiseAlignment pwa { "read_1", "chr1",
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GGAGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACT"
@@ -46,6 +48,7 @@ const PairwiseAlignment pwa { "read_1", "chr1",
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+    QUALS,
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GG---AGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACTCCA"
     "GCTTATTTACAACATGGTGAGATGATTAGATGG",
@@ -53,7 +56,7 @@ const PairwiseAlignment pwa { "read_1", "chr1",
     "GGAAAAGGTCATTTCCATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAGCTCCA"
     "GCTTATTTACAACATGGTGAGAT--TTAGATGG",
     0, true };
-constexpr int NTHREAD = 20;
+const auto NTHREAD = std::thread::hardware_concurrency();
 
 void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_t num_records)
 {
@@ -66,7 +69,6 @@ void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_
 void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, const std::size_t nthread)
 {
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
         std::thread t(working_thread, bro, (200ULL * M_SIZE) / nthread);
@@ -76,7 +78,6 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
         t.join();
     }
     bro->close();
-    auto end = std::chrono::high_resolution_clock::now();
 }
 
 void speed2devnull()

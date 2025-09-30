@@ -30,7 +30,7 @@
 
 namespace labw::art_modern {
 
-class ArtJobExecutor final: public JobExecutor {
+class ArtJobExecutor final : public JobExecutor {
 public:
     ArtJobExecutor(
         SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher);

@@ -27,7 +27,7 @@
 
 namespace labw::art_modern {
 
-class OutputNotSpecifiedException final: public std::exception {
+class OutputNotSpecifiedException final : public std::exception {
 public:
     [[nodiscard]] const char* what() const noexcept override { return "Output file not specified"; }
 };

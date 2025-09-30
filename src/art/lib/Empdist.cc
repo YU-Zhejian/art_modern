@@ -52,7 +52,8 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const BuiltinProfile& builtin_profile, const bool sep_qual, const bool is_pe, const std::size_t read_len)
+Empdist::Empdist(
+    const BuiltinProfile& builtin_profile, const bool sep_qual, const bool is_pe, const std::size_t read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)

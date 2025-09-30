@@ -34,10 +34,11 @@ for collect in hotspots threading memory-consumption; do # hpc-performance memor
         --mode wgs \
         --lc pe \
         --i-parser memory \
-        --i-fcov 100 \
+        --i-fcov 200 \
         --parallel 20 \
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500 \
-        --o-fastq /dev/null
+        --o-fastq /dev/null \
+        --o-sam /dev/null
     vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
 done

@@ -29,7 +29,7 @@
 
 namespace labw::art_modern {
 
-class PwaReadOutput final: public BaseReadOutput {
+class PwaReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
@@ -49,7 +49,7 @@ private:
     SimpleLFIO lfio_;
 };
 
-class PwaReadOutputFactory final: public BaseReadOutputFactory {
+class PwaReadOutputFactory final : public BaseReadOutputFactory {
 public:
     DELETE_MOVE(PwaReadOutputFactory)
     DELETE_COPY(PwaReadOutputFactory)

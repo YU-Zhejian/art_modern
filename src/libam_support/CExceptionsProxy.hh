@@ -33,7 +33,7 @@ static const std::string UNKNOWN_C_EXCEPTION = "UNKNOWN";
  * An exception proxy for C exceptions.
  * The current implementation is stupid. It generates horrific logs.
  */
-class CExceptionsProxy: public std::exception {
+class CExceptionsProxy : public std::exception {
 public:
     /** Expected type of return value of C routines **/
     enum class EXPECTATION : std::uint8_t {

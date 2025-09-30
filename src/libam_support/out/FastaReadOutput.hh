@@ -28,7 +28,7 @@
 
 namespace labw::art_modern {
 
-class FastaReadOutput final: public BaseReadOutput {
+class FastaReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(FastaReadOutput)
     DELETE_COPY(FastaReadOutput)
@@ -44,7 +44,7 @@ private:
     SimpleLFIO lfio_;
 };
 
-class FastaReadOutputFactory final: public BaseReadOutputFactory {
+class FastaReadOutputFactory final : public BaseReadOutputFactory {
 public:
     DELETE_MOVE(FastaReadOutputFactory)
     DELETE_COPY(FastaReadOutputFactory)

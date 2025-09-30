@@ -42,7 +42,7 @@
 
 using namespace labw::art_modern;
 
-class EmptyLFIO final: public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
+class EmptyLFIO final : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
     DELETE_MOVE(EmptyLFIO)
@@ -129,6 +129,8 @@ namespace {
 const std::string DEVNULL = "/dev/null";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
+const std::vector<am_qual_t> QUALS(150, 0);
+
 const PairwiseAlignment pwa { "read_1", "chr1",
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GGAGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACT"
@@ -139,6 +141,7 @@ const PairwiseAlignment pwa { "read_1", "chr1",
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+    QUALS,
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GG---AGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACTCCA"
     "GCTTATTTACAACATGGTGAGATGATTAGATGG",

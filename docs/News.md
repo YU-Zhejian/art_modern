@@ -2,7 +2,11 @@
 
 ## 1.1.8 (Ongoing)
 
-- Fixed issue #5.
+- Fixed issue #5. In details:
+  - On prior versions, the program will crash when trying to create simulated output in the current working directory without `./` prefix.
+  - Duplicated read IDs observed in prior versions.
+  - Inconsistencies in read quality between SAM/BAM and FASTQ output observed in prior versions.
+  - Missing `/1` and `/2` suffixes in read IDs of paired-end reads observed in prior versions.
 - Documentation largely revised.
 - Miscellaneous bug fixes.
 

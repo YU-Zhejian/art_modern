@@ -30,7 +30,7 @@
 
 namespace labw::art_modern {
 
-class HeadlessBamReadOutput final: public BaseReadOutput {
+class HeadlessBamReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(HeadlessBamReadOutput)
     DELETE_COPY(HeadlessBamReadOutput)
@@ -51,7 +51,7 @@ private:
     BamLFIO lfio_;
 };
 
-class HeadlessBamReadOutputFactory final: public BaseReadOutputFactory {
+class HeadlessBamReadOutputFactory final : public BaseReadOutputFactory {
 public:
     DELETE_MOVE(HeadlessBamReadOutputFactory)
     DELETE_COPY(HeadlessBamReadOutputFactory)

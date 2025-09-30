@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 
 "${ART}" \
-    --builtin_qual_file HiSeq2500_125bp \
+    --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
     --read_len 150 \
@@ -36,7 +36,7 @@ cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
 
 "${ART}" \
-    --builtin_qual_file HiSeq2500_125bp \
+    --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
     --read_len 150 \
