@@ -1,5 +1,9 @@
 # News \& Release Notes
 
+## 1.1.9 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 ## 1.1.8 (2025/09/29)
 
 - Fixed issue #5. In details:
