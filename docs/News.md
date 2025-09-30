@@ -1,6 +1,6 @@
 # News \& Release Notes
 
-## 1.1.8 (Ongoing)
+## 1.1.8 (2025/09/29)
 
 - Fixed issue #5. In details:
   - On prior versions, the program will crash when trying to create simulated output in the current working directory without `./` prefix.
