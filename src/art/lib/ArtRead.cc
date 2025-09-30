@@ -359,8 +359,9 @@ ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::stri
 
 PairwiseAlignment ArtRead::to_pwa()
 {
-    return { std::move(read_name_), std::move(contig_name_), std::move(query_), std::move(ref_), qual_to_str(qual_),
-        std::move(aln_query_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
+    auto qual_str = qual_to_str(qual_);
+    return { std::move(read_name_), std::move(contig_name_), std::move(query_), std::move(ref_), std::move(qual_str),
+        std::move(qual_), std::move(aln_query_), std::move(aln_ref_), pos_on_contig_, is_plus_strand_ };
 }
 bool ArtRead::is_good() const { return std::count(query_.begin(), query_.end(), 'N') <= art_params_.max_n; }
 

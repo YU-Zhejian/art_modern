@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/YU-Zhejian/art_modern/archive/refs/tags/{{ version }}.zip
-  sha256: 2c40ba1f78254f0a4a54f11107cad5e90c5c61254cf3cdb00b6d07bc549ad9a9
+  sha256: 9aacc88ea582eddcea0f0c27dc72df5980707ca7066ffcceea53ff8104cd2a31
 
 build:
   number: 0

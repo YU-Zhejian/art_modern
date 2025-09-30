@@ -52,7 +52,8 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_pe, std::size_t read_len)
+Empdist::Empdist(
+    const BuiltinProfile& builtin_profile, const bool sep_qual, const bool is_pe, const std::size_t read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)
@@ -85,7 +86,7 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, bool first) const
+void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
 #ifdef USE_WALKER_QUALGEN
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;

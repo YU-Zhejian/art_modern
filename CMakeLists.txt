@@ -15,7 +15,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.7
+    VERSION 1.1.8
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
@@ -224,7 +224,10 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with art_modern benchmarks.
 
-if(BUILD_ART_MODERN_BENCHMARKS)
+if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/src/benchmark/benchmark_adaptor.h.in"
+                   "${CMAKE_BINARY_DIR}/include/benchmark_adaptor.h")
+
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})

@@ -10,6 +10,8 @@
  *
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
+ *
+ * TODO: Use Geometric mean to better represent the performance
  **/
 
 #include "libam_support/Dtypes.hh"
@@ -31,18 +33,16 @@ void bench(const int run_times, const int rlen)
     q.reserve(rlen);
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, 40);
+    std::uniform_int_distribution dis(0, 40);
     for (int i = 0; i < rlen; i++) {
         q.emplace_back(dis(gen));
     }
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
 
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     for (int i = 0; i < run_times; i++) {
         volatile auto s = qual_to_str_avx2(q.data(), rlen); // NOLINT
     }
-    end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     std::cout << "AVX2: " << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << std::endl;
 
     start = std::chrono::high_resolution_clock::now();

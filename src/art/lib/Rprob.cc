@@ -48,7 +48,7 @@ uint64_t Rprob::seed()
 {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
                .count()
-        * static_cast<uint64_t>(std::hash<std::thread::id>()(std::this_thread::get_id()));
+        * std::hash<std::thread::id>()(std::this_thread::get_id());
 }
 
 void Rprob::public_init_()
@@ -210,7 +210,7 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
     return static_cast<int>(gsl_rng_uniform_int(r, read_length_ - 2) + 1);
 #endif
 }
-int Rprob::randint(int min, int max)
+int Rprob::randint(const int min, const int max)
 {
 #if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
     return std::uniform_int_distribution<int>(min, max - 1)(gen_);

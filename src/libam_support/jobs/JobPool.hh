@@ -76,7 +76,7 @@ private:
 #if defined(USE_NOP_PARALLEL)
     // Do nothing!
 #elif defined(USE_BS_PARALLEL)
-    BS::thread_pool<BS::tp::none> pool_;
+    BS::thread_pool<> pool_;
 #elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;
 #endif

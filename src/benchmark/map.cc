@@ -10,6 +10,8 @@
  *
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
+ *
+ * TODO: Use Geometric mean to better represent the performance
  **/
 
 #include "libam_support/Constants.hh"
@@ -180,10 +182,10 @@ public:
         std::vector<double> init_list;
         double prev = 0;
         for (const int i : count) {
-            init_list.emplace_back((i - prev));
+            init_list.emplace_back(i - prev);
             prev = i;
         }
-        rd_ = GslDiscreteDistribution<double>(init_list);
+        rd_ = GslDiscreteDistribution(init_list);
     }
     ~SlimEmpDistGslDiscrete() override = default;
 
@@ -197,7 +199,7 @@ public:
 private:
     std::vector<am_qual_t> qual_;
     GslDiscreteDistribution<double> rd_;
-    boost::uniform_01<double> rnd_01_;
+    boost::uniform_01<> rnd_01_;
 };
 class SlimEmpDistGslDiscreteInt : public SlimEmpDist {
 public:
@@ -210,10 +212,10 @@ public:
         std::vector<int64_t> init_list;
         int64_t prev = 0;
         for (const int i : count) {
-            init_list.emplace_back((i - prev));
+            init_list.emplace_back(i - prev);
             prev = i;
         }
-        rd_ = GslDiscreteIntDistribution<int64_t>(init_list);
+        rd_ = GslDiscreteIntDistribution(init_list);
     }
     ~SlimEmpDistGslDiscreteInt() override = default;
 
@@ -250,7 +252,7 @@ public:
             init_list.emplace_back(count[i] - prev);
             prev = count[i];
         }
-        rd_ = GslDiscreteDistribution<double>(init_list);
+        rd_ = GslDiscreteDistribution(init_list);
     }
     ~SlimEmpDistGslDiscreteInterpolated() override = default;
 
@@ -264,7 +266,7 @@ public:
 private:
     am_qual_t qual_offset_;
     GslDiscreteDistribution<double> rd_;
-    boost::uniform_01<double> rnd_01_;
+    boost::uniform_01<> rnd_01_;
 };
 class SlimEmpDistUsingBoostMap : public SlimEmpDist {
 public:
@@ -345,24 +347,22 @@ private:
 };
 
 namespace {
-void bench(std::unique_ptr<SlimEmpDist> empdist, const std::string& name)
+void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
 {
     boost::accumulators::accumulator_set<double,
         boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::variance>>
         acc;
 
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
     std::vector<am_qual_t> qual;
     qual.resize(READ_LEN);
-    start = std::chrono::high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     for (am_readnum_t i = 0; i < NUM_TRIALS; i++) {
         empdist->gen_qualities(qual);
         for (const auto value : qual) {
             acc(value);
         }
     }
-    end = std::chrono::high_resolution_clock::now();
+    const auto end = std::chrono::high_resolution_clock::now();
 
     // Extract the mean and standard deviation
     const double mean = boost::accumulators::mean(acc);

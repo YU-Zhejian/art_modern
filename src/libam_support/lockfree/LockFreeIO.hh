@@ -70,14 +70,14 @@ public:
      * Pushing a value into the queue.
      * @param value As described.
      */
-    ABSL_ATTRIBUTE_ALWAYS_INLINE inline void push(T&& value);
+    void push(T&& value);
 
     /**
      * Pushing a value into the queue with a producer token.
      * @param value As described.
      * @param token The producer token.
      */
-    ABSL_ATTRIBUTE_ALWAYS_INLINE inline void push(T&& value, const ProducerToken& token);
+    void push(T&& value, const ProducerToken& token);
 
     /**
      * Start the IO worker thread.
@@ -220,7 +220,7 @@ template <typename T> void LockFreeIO<T>::stop()
 
 template <typename T> void LockFreeIO<T>::flush_and_close() { }
 
-template <typename T> void LockFreeIO<T>::write(T) { }
+template <typename T> void LockFreeIO<T>::write(T /**value**/) { }
 
 template <typename T> ProducerToken LockFreeIO<T>::get_producer_token()
 {

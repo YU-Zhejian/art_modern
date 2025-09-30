@@ -46,7 +46,7 @@ namespace labw::art_modern {
 
 void init_logger()
 {
-    auto core = logging::core::get();
+    const auto core = logging::core::get();
     core->remove_all_sinks();
     core->add_global_attribute("TimeStamp", boost::log::attributes::local_clock());
     core->add_global_attribute("ThreadID", boost::log::attributes::current_thread_id());

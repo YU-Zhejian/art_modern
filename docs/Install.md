@@ -25,9 +25,9 @@ echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 
 If there's no error, the compiler is supported. The CMake build scripts inside this project also contains a script that tests compiler compatibility using codes from [GNU AutoConf Archive](https://www.gnu.org/software/autoconf-archive/).
 
-### [GCC](https://gcc.gnu.org/)
+### [GCC](https://gcc.gnu.org/), at least 7.4.0
 
-The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance. The minimal version of GCC tested is GCC 7.4.0.
+The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
 
 **NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library ([`libstdc++`](https://gcc.gnu.org/onlinedocs/libstdc++/)).
 
@@ -36,7 +36,7 @@ Reference:
 - GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
 - `libstdc++` support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
 
-### [Clang](https://clang.llvm.org/)
+### [Clang](https://clang.llvm.org/), at least 5.0.1
 
 Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X. The minimal version of Clang tested is Clang 5.0.1.
 
@@ -49,11 +49,11 @@ Reference:
 
 **NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
 
-### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)
+### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html), latest
 
-For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`). Only the latest version is tested.
+For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`). Only the latest version will be tested.
 
-**NOTE** Distributing binaries built with this compiler may require you to comply with Intel's license.
+**NOTE** Distributing binaries built with this compiler may require you to comply with Intel's license and/or breaking the GPL.
 
 ### Other Compilers
 
@@ -68,11 +68,14 @@ Although not tested, the following compilers can also theoretically be of use:
 
 ## Essential Tools for Building
 
-### [CMake](https://cmake.org/)
+### [CMake](https://cmake.org/), at least 3.17
 
-CMake 3.17 or above is recommended to build this project. That further requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), using [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+CMake [3.17](https://cmake.org/cmake/help/latest/release/3.17.html) or above is required to build this project. That further requires:
+- a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+- [Python](https://www.python.org/) >= 3.7, for embedding bundled Illumina profiles.
+- POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
-The CMake modules used in this project further require [Python](https://www.python.org/) >= 3.7 and a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+**NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [here](https://cmake.org/files/v3.17/).
 
 ### Linkers, Assemblers, Archivers, etc
 
@@ -86,26 +89,26 @@ This project works on [GNU C Library](https://www.gnu.org/software/libc/) and [M
 
 The project may take advantage of pkgconfor pkg-config to locate the dependencies. Installing such is **HIGHLY** recommended.
 
-### Command-Line Ultilities
+### Command-Line Utilities
 
-For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions with obsolete packages, please consider check the version of the following tools:
+For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions with obsolete packages, please consider checking the version of the following tools:
 
 - [GNU CoreUtils](https://www.gnu.org/software/coreutils/) (At least 8.28) for the use of `env -C` (introduced in 8.28) and `readlink -f` (introduced in 8.0).
   - **NOTE** CMake may have its own requirements on the version of GNU CoreUtils.
 - [GNU Bash](https://www.gnu.org/software/bash/) (At least 4.2) for the possible use of advanced array operations.
   - **NOTE** CMake may have its own requirements on the version of GNU Bash.
-- [GNU Make](https://www.gnu.org/software/make) (Lowest version TBD) as the BSD variant is known to be incompatible.
+- [GNU Make](https://www.gnu.org/software/make) as the BSD variant is known to be incompatible.
   - **NOTE** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
 
 as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
 ## Library Dependencies
 
-Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), etc. Otherwise, contact your system administrator for where to find them or build them from source.
+Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
 ### [Boost C++ Library](https://www.boost.org/)
 
-This is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are namely:
+This is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are:
 
 - **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
 - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
@@ -117,7 +120,11 @@ This is an umbrella project of diverse small modules that can be used independen
 
 ### [HTSLib](https://www.htslib.org/)
 
-You may either use the one bundled with the project or an external one that had already been installed inside your system. To use bundled HTSLib sources, you need to have:
+You may either use the one bundled with the project or an external one that had already been installed inside your system.
+
+#### Use Bundled HTSLib
+
+To use bundled HTSLib sources, you need to have:
 
 - **REQUIRED** [zlib](https://www.zlib.net/).
 - **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
@@ -127,11 +134,13 @@ You may either use the one bundled with the project or an external one that had 
 
 See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
 
+#### Use External HTSLib, at least 1.14
+
 To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
 
-### [zlib](https://www.zlib.net/)
+### [zlib](https://www.zlib.net/), at least 1.2.0
 
-For compression and decompression bundled ART error profiles. At least 1.2.0 (launched 2003/03/09) is required.
+For compression and decompression bundled ART error profiles.
 
 ### Other Optional Libraries
 
@@ -158,6 +167,8 @@ Following is a list of CMake variables used in this project:
 
 ### [`BUILD_SHARED_LIBS`](https://cmake.org/cmake/help/latest/variable/BUILD_SHARED_LIBS.html)
 
+Available since 1.0.0.
+
 This instructs CMake whether to build shared libraries. It will also affect behavior while searching for libraries.
 
 - **`ON` (DEFAULT): Will search for shared libraries and use dynamic linking.**
@@ -166,6 +177,8 @@ This instructs CMake whether to build shared libraries. It will also affect beha
 The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software. However, this may lead to a larger binary size and security risks. See [this Debian Wiki](https://wiki.debian.org/StaticLinking) for more details.
 
 ### [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
+
+Available since 1.0.0.
 
 This instructs CMake to build executables/libraries with different optimization and debugging levels.
 
@@ -176,11 +189,13 @@ This instructs CMake to build executables/libraries with different optimization 
 
 ### [`Python3_EXECUTABLE`](https://cmake.org/cmake/help/latest/module/FindPython3.html)
 
-Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
-
 Available since 1.1.1.
 
+Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
+
 ### `CEU_CM_SHOULD_USE_NATIVE`
+
+Available since 1.0.0.
 
 Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/onlinedocs/gcc-14.1.0/gcc/x86-Options.html#index-march-16), if possible. This would result in faster executable with impaired portability (i.e., do not run on other machines).
 
@@ -188,6 +203,8 @@ Whether to build the binaries using [`-mtune=native`](https://gcc.gnu.org/online
 - `ON`: Will build native executables/libraries.
 
 ### `CEU_CM_SHOULD_ENABLE_TEST`
+
+Available since 1.0.0.
 
 Whether test should be enabled.
 
@@ -197,6 +214,8 @@ Whether test should be enabled.
 
 ### `USE_HTSLIB`
 
+Available since 1.0.0.
+
 Use which HTSLib implementation.
 
 - **unset (DEFAULT): Will use bundled HTSLib.**
@@ -204,6 +223,8 @@ Use which HTSLib implementation.
 - Any other value `[val]`: Will use the HTSLib of other names (`lib[val].so`) found in the system.
 
 ### `USE_RANDOM_GENERATOR`
+
+Available since 1.0.0.
 
 The random number generator used.
 
@@ -232,6 +253,8 @@ GSL::mt19937(0, 4294967295): 48,060 us
 
 ### `USE_THREAD_PARALLEL`
 
+Available since 1.0.0.
+
 The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
@@ -241,18 +264,18 @@ The thread-level parallelism strategy.
 
 ### `BOOST_CONFIG_PROVIDED_BY_BOOST`
 
-Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html).
+Available since 1.1.3.
+
+Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
 
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
-
-There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
 
 ### `USE_QUAL_GEN`
 
 Available since 1.1.2.
 
-The quality generation algorithm.
+The quality generation algorithm. Theoretically, different algorithms should generate identical results, with the Walker's algorithm considerably faster.
 
 - **`WALKER` (DEFAULT): Use [Walker's Algorithm](https://doi.org/10.1145/355744.355749) to accelerate quality synthesis.**
 - `STL`: Use binary search algorithm implemented in `std::map`. This is identical to the original ART.
@@ -261,7 +284,7 @@ The quality generation algorithm.
 
 Available since 1.1.1.
 
-Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc. Using those implementations can improve the performance of the program but slightly increase memory consumption.
+Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc (see above). Using those implementations can improve the performance of the program but slightly increase memory consumption.
 
 - **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc if possible.**
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
@@ -282,16 +305,18 @@ Whether to use bundled `{fmt}` library for formatting strings.
 
 Available since 1.1.7.
 
-Whether to use bundled `moodycamel::ConcurrentQueue<T>`.
+Whether to use bundled `moodycamel::ConcurrentQueue<T>`. Specifically, where `concurrentqueue.h` is located. For example, if you use Debian GNU/Linux and installed [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/` or `/usr/include/concurrentqueue/`.
 
 - **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.**
-- Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. For example, if you use Debian GNU/Linux and intalled [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/`.
+- Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`.
 
 ### `USE_ABSL`
 
 Available since 1.1.7.
 
 Whether to use bundled Abseil library.
+
+Although the project only uses a small portion of Abseil development header files, the binary `libabsl_base.so` may be linked to the final executable if you use system Abseil.
 
 - **unset (DEFAULT): Will use bundled Abseil.**
 - Any value `[val]`: Will use system Abseil found by the CMake module `abslConfig.cmake`, which is shipped with official Abseil libraries.
