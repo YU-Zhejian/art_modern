@@ -27,7 +27,6 @@
 #include <htslib/hts.h>
 
 #include <cstddef>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -74,17 +73,6 @@ namespace {
 
 } // namespace
 
-char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
-{
-    const auto reg = fmt::format("{}:{}-{}", seq_name, start + 1, end);
-    hts_pos_t pos = 0;
-    auto* const rets = fai_fetch64(faidx_, reg.c_str(), &pos);
-    if (rets == nullptr) {
-        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
-        abort_mpi();
-    }
-    return rets;
-}
 FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
 
 FaidxFetch::FaidxFetch(const std::string& file_name)
@@ -99,8 +87,13 @@ FaidxFetch::FaidxFetch(faidx_t* faidx)
 }
 std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
-    auto* const cfetch_str = cfetch_(seq_names_[seq_id].c_str(), start, end);
-    const auto rets = std::string(cfetch_str);
+    hts_pos_t len = 0;
+    auto* const cfetch_str = faidx_fetch_seq64(faidx_, seq_names_[seq_id].c_str(), start, end, &len);
+    if (cfetch_str == nullptr) {
+        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_names_[seq_id].c_str() << ":" << start << "-" << end << "!";
+        abort_mpi();
+    }
+    const auto rets = std::string(cfetch_str, len);
     std::free(cfetch_str);
     return rets;
 }
