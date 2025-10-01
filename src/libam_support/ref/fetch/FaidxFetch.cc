@@ -63,7 +63,7 @@ namespace {
             BOOST_LOG_TRIVIAL(fatal) << "FAI not found!";
             abort_mpi();
         }
-        BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
+        BOOST_LOG_TRIVIAL(debug) << "Loading existing FAI...";
         auto* const faidx = fai_load_format(file_name.c_str(), FAI_FASTA);
         if (faidx == nullptr) {
             BOOST_LOG_TRIVIAL(fatal) << "Loading FAI failed!";

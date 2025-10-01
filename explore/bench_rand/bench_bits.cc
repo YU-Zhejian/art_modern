@@ -73,18 +73,16 @@ std::string describe(const std::vector<std::size_t>& times)
 
 template <typename T> void bench_bits_stl(T& rng, const std::string& name)
 {
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
     std::vector<std::size_t> times {};
 
     std::vector<std::invoke_result_t<T>> gen_bits(N_BASES);
 
     for (std::size_t j = 0; j < N_REPLICA; j++) {
-        start = std::chrono::system_clock::now();
+        auto start = std::chrono::system_clock::now();
         for (std::size_t i = 0; i < N_TIMES; i++) {
             std::generate_n(gen_bits.begin(), N_BASES, [&rng]() { return rng(); });
         }
-        end = std::chrono::system_clock::now();
+        auto end = std::chrono::system_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
 
