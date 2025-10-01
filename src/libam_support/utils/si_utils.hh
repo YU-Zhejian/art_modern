@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // std::size_t
 #include <string>
 
 namespace labw::art_modern {

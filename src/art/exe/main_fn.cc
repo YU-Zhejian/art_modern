@@ -80,8 +80,8 @@ class Generator {
 public:
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    explicit Generator(const ArtParams& art_params, const ArtIOParams& art_io_params)
-        : art_params_(art_params)
+    explicit Generator(ArtParams art_params, const ArtIOParams& art_io_params)
+        : art_params_(std::move(art_params))
         , art_io_params_(art_io_params)
         , job_pool_(art_io_params.parallel)
         , reporter_(job_pool_)

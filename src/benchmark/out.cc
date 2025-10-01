@@ -13,6 +13,7 @@
  **/
 
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"

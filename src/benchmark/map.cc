@@ -76,7 +76,7 @@ public:
     virtual ~SlimEmpDist() = default;
 };
 
-class SlimEmpDistNop : public SlimEmpDist {
+class SlimEmpDistNop final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistNop)
     DELETE_COPY(SlimEmpDistNop)
@@ -90,7 +90,7 @@ public:
         }
     }
 };
-class SlimEmpDistOld : public SlimEmpDist {
+class SlimEmpDistOld final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistOld)
     DELETE_COPY(SlimEmpDistOld)
@@ -116,7 +116,7 @@ public:
 private:
     std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
-class SlimEmpDistStdDiscrete : public SlimEmpDist {
+class SlimEmpDistStdDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistStdDiscrete)
     DELETE_COPY(SlimEmpDistStdDiscrete)
@@ -144,7 +144,7 @@ private:
     std::vector<am_qual_t> qual_;
     std::discrete_distribution<std::size_t> rd_;
 };
-class SlimEmpDistBoostDiscrete : public SlimEmpDist {
+class SlimEmpDistBoostDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistBoostDiscrete)
     DELETE_COPY(SlimEmpDistBoostDiscrete)
@@ -172,7 +172,7 @@ private:
     std::vector<am_qual_t> qual_;
     boost::random::discrete_distribution<std::size_t> rd_;
 };
-class SlimEmpDistGslDiscrete : public SlimEmpDist {
+class SlimEmpDistGslDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscrete)
     DELETE_COPY(SlimEmpDistGslDiscrete)
@@ -201,7 +201,7 @@ private:
     GslDiscreteDistribution<double> rd_;
     boost::uniform_01<> rnd_01_;
 };
-class SlimEmpDistGslDiscreteInt : public SlimEmpDist {
+class SlimEmpDistGslDiscreteInt final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscreteInt)
     DELETE_COPY(SlimEmpDistGslDiscreteInt)
@@ -231,7 +231,7 @@ private:
     GslDiscreteIntDistribution<int64_t> rd_;
     boost::random::uniform_int_distribution<int64_t> rnd_;
 };
-class SlimEmpDistGslDiscreteInterpolated : public SlimEmpDist {
+class SlimEmpDistGslDiscreteInterpolated final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscreteInterpolated)
     DELETE_COPY(SlimEmpDistGslDiscreteInterpolated)
@@ -268,7 +268,7 @@ private:
     GslDiscreteDistribution<double> rd_;
     boost::uniform_01<> rnd_01_;
 };
-class SlimEmpDistUsingBoostMap : public SlimEmpDist {
+class SlimEmpDistUsingBoostMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostMap)
     DELETE_COPY(SlimEmpDistUsingBoostMap)
@@ -294,7 +294,7 @@ private:
     boost::container::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingBoostFlatMap : public SlimEmpDist {
+class SlimEmpDistUsingBoostFlatMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostFlatMap)
     DELETE_COPY(SlimEmpDistUsingBoostFlatMap)
@@ -320,7 +320,7 @@ private:
     boost::container::flat_map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingStdMap : public SlimEmpDist {
+class SlimEmpDistUsingStdMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingStdMap)
     DELETE_COPY(SlimEmpDistUsingStdMap)

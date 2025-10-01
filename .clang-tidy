@@ -101,13 +101,17 @@ Checks:
 
   # Commonly used in tests and entry points
   - -google-build-using-namespace
+
+  # HTSLib uses unions in several places.
+  - -cppcoreguidelines-pro-type-union-access
+
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit
 
 CheckOptions:
   - key: misc-include-cleaner.IgnoreHeaders
-    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*'
+    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*.cstdint;cstddef;fmt/format.h'
 
 HeaderFileExtensions:
   - h

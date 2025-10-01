@@ -23,7 +23,7 @@
 
 #include <htslib/hts.h>
 
-#include <cstdlib>
+#include <cstddef>
 #include <memory>
 #include <string>
 
@@ -32,8 +32,8 @@ namespace labw::art_modern {
 class ArtContig {
 
 public:
-    ArtContig(
-        const std::shared_ptr<BaseFastaFetch>& fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob);
+    ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::size_t seq_id, const ArtParams& art_params,
+        Rprob& rprob);
 
     void generate_read_se(bool is_plus_strand, ArtRead& read_1);
     void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);

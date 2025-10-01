@@ -171,7 +171,7 @@ void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const s
     queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
 }
 
-template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline void LockFreeIO<T>::push(T&& value)
+template <typename T> void LockFreeIO<T>::push(T&& value)
 {
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {

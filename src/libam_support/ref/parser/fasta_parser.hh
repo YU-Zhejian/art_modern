@@ -46,7 +46,7 @@ private:
     std::istream& _istream;
     std::size_t _lineno = 0;
     std::mutex mutex_;
-    std::string staged_next_record_id_ {};
+    std::string staged_next_record_id_;
 };
 
 } // namespace labw::art_modern

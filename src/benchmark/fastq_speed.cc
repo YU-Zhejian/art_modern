@@ -16,6 +16,7 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
+#include "libam_support/out/FastaReadOutput.hh"
 #include "libam_support/out/FastqReadOutput.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -71,7 +72,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
-        std::thread t(working_thread, bro, (200ULL * M_SIZE) / nthread);
+        std::thread t(working_thread, bro, 200ULL * M_SIZE / nthread);
         threads.emplace_back(std::move(t));
     }
     for (auto& t : threads) {
@@ -94,7 +95,7 @@ void speed2devnull()
     const auto end = std::chrono::high_resolution_clock::now();
     const double speed = static_cast<double>(n_blocks * block_size)
         / static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) * 1000.0;
-    std::cout << "Speed: " << to_si(speed) << "B/s" << std::endl;
+    std::cout << "/dev/null Speed: " << to_si(speed) << "B/s" << std::endl;
 }
 
 } // namespace
@@ -107,6 +108,7 @@ int main()
 
     // Temporarily disable logging
     bench(std::make_shared<FastqReadOutput>(DEVNULL, NTHREAD), "FastqReadOutput", NTHREAD);
+    bench(std::make_shared<FastaReadOutput>(DEVNULL, NTHREAD), "FastaReadOutput", NTHREAD);
 
     return EXIT_SUCCESS;
 }

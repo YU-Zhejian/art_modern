@@ -98,7 +98,7 @@ std::shared_ptr<OutputDispatcher> OutputDispatcherFactory::create(const OutParam
     for (auto const& factory : factories_) {
         try {
             output_dispatcher->add(factory->create(params));
-        } catch (const OutputNotSpecifiedException& e) {
+        } catch (const OutputNotSpecifiedException& /**e**/) {
             // ignored
         }
     }

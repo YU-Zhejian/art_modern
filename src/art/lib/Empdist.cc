@@ -19,7 +19,6 @@
 #include "art/lib/BuiltinProfile.hh"
 #include "art/lib/Rprob.hh"
 
-#include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"

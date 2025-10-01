@@ -32,6 +32,7 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
+#include <algorithm> // NOLINT: std::remove
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
@@ -45,19 +46,19 @@
 namespace labw::art_modern {
 
 std::string BamUtils::generate_oa_tag(
-    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const int32_t nm_tag)
+    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const std::int32_t nm_tag)
 {
     return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-',
         cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
 }
-std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
+std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar)
 {
     hts_pos_t pos_on_query = 0;
-    uint32_t matched = 0;
+    std::uint32_t matched = 0;
     hts_pos_t pos_on_ref = 0;
     std::ostringstream md_str_ss;
-    int32_t nm = 0;
+    std::int32_t nm = 0;
     am_cigar_len_t this_cigar_len = 0;
     am_cigar_ops_t this_cigar_ops = 0;
 
