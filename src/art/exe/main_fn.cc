@@ -177,7 +177,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     if (fa_view.empty()) {
                         break;
                     }
-                    generator.add(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info);
+                    generator.add(std::make_shared<InMemoryFastaFetch>(std::move(fa_view)), coverage_info);
                 }
                 fasta_stream.close();
             }

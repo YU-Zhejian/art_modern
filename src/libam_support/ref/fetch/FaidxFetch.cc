@@ -36,13 +36,11 @@
 namespace labw::art_modern {
 namespace {
 
-    std::tuple<std::vector<std::string>, std::vector<hts_pos_t>> get_seq_names_lengths(const faidx_t* faidx)
+    std::vector<std::string> get_seq_names(const faidx_t* faidx)
     {
         std::vector<std::string> seq_names;
-        std::vector<hts_pos_t> seq_lengths;
         const auto size = faidx_nseq(faidx);
         seq_names.reserve(size);
-        seq_lengths.reserve(size);
 
         for (int i = 0; i < size; i++) {
             const auto* const seq_name = faidx_iseq(faidx, i);
@@ -51,9 +49,20 @@ namespace {
                 abort_mpi();
             }
             seq_names.emplace_back(seq_name);
-            seq_lengths.emplace_back(faidx_seq_len(faidx, seq_name));
         }
-        return std::tie(seq_names, seq_lengths);
+        return seq_names;
+    }
+
+     std::vector<hts_pos_t> get_seq_lengths(const faidx_t* faidx)
+    {
+        std::vector<hts_pos_t> seq_lengths;
+        const auto size = faidx_nseq(faidx);
+        seq_lengths.reserve(size);
+
+        for (int i = 0; i < size; i++) {
+            seq_lengths.emplace_back(faidx_seq_len64(faidx, faidx_iseq(faidx, i)));
+        }
+        return seq_lengths;
     }
 
     faidx_t* get_faidx(const std::string& file_name)
@@ -81,7 +90,7 @@ FaidxFetch::FaidxFetch(const std::string& file_name)
 }
 
 FaidxFetch::FaidxFetch(faidx_t* faidx)
-    : BaseFastaFetch(get_seq_names_lengths(faidx))
+    : BaseFastaFetch(get_seq_names(faidx), get_seq_lengths(faidx))
     , faidx_(faidx)
 {
 }

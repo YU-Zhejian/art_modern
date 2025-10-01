@@ -37,13 +37,12 @@ enum class FastaFetchType : std::uint8_t {
  */
 class BaseFastaFetch {
 public:
-    BaseFastaFetch(const BaseFastaFetch& other)
-        : BaseFastaFetch(other.seq_names_, other.seq_lengths_)
+    BaseFastaFetch(BaseFastaFetch&& other) noexcept
+        : BaseFastaFetch(std::move(other.seq_names_), std::move(other.seq_lengths_))
     {
     }
-    BaseFastaFetch& operator=(const BaseFastaFetch&) = delete;
 
-    DELETE_MOVE(BaseFastaFetch)
+    DELETE_COPY(BaseFastaFetch)
 
     BaseFastaFetch() = default;
 
@@ -52,9 +51,7 @@ public:
      */
     virtual ~BaseFastaFetch() = default;
 
-    explicit BaseFastaFetch(const std::tuple<std::vector<std::string>, std::vector<hts_pos_t>>& seq_names_lengths);
     BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector<hts_pos_t>&& seq_lengths);
-    BaseFastaFetch(const std::vector<std::string>& seq_names, const std::vector<hts_pos_t>& seq_lengths);
 
     /**
      * This method is thread-safe since mutex is used for non-thread-safe implementations.
@@ -103,7 +100,7 @@ public:
     [[nodiscard]] bool empty() const;
 
 protected:
-    const std::vector<std::string> seq_names_;
-    const std::vector<hts_pos_t> seq_lengths_;
+    std::vector<std::string> seq_names_;
+    std::vector<hts_pos_t> seq_lengths_;
 };
 } // namespace labw::art_modern

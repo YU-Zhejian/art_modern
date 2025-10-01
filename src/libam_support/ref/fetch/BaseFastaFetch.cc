@@ -50,16 +50,7 @@ BaseFastaFetch::BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector
     , seq_lengths_(std::move(seq_lengths))
 {
 }
-BaseFastaFetch::BaseFastaFetch(const std::vector<std::string>& seq_names, const std::vector<hts_pos_t>& seq_lengths)
-    : seq_names_(seq_names)
-    , seq_lengths_(seq_lengths)
-{
-}
-BaseFastaFetch::BaseFastaFetch(const std::tuple<std::vector<std::string>, std::vector<hts_pos_t>>& seq_names_lengths)
-    : seq_names_(std::get<0>(seq_names_lengths))
-    , seq_lengths_(std::get<1>(seq_names_lengths))
-{
-}
+
 bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
 std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
 } // namespace labw::art_modern

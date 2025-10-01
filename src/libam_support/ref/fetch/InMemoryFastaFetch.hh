@@ -32,13 +32,14 @@ namespace labw::art_modern {
  */
 class InMemoryFastaFetch final : public BaseFastaFetch {
 public:
-    InMemoryFastaFetch(const InMemoryFastaFetch& other)
-        : BaseFastaFetch(other.seq_names_, other.seq_lengths_)
-        , seqs_(other.seqs_)
+    InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
+        : BaseFastaFetch(std::move(other.seq_names_), std::move(other.seq_lengths_))
+          , seqs_(std::move(other.seqs_))
     {
     }
-    InMemoryFastaFetch& operator=(const InMemoryFastaFetch&) = delete;
-    DELETE_MOVE(InMemoryFastaFetch)
+
+    DELETE_COPY(InMemoryFastaFetch)
+
     InMemoryFastaFetch() = default;
     ~InMemoryFastaFetch() override = default;
 
@@ -47,11 +48,10 @@ public:
     explicit InMemoryFastaFetch(std::istream& iss);
     explicit InMemoryFastaFetch(std::tuple<std::vector<std::string>, std::vector<std::string>> seq_map);
     InMemoryFastaFetch(std::vector<std::string>&& seq_name, std::vector<std::string>&& seq);
-    InMemoryFastaFetch(const std::vector<std::string>& seq_name, const std::vector<std::string>& seq);
     std::string fetch(size_t seq_id, hts_pos_t start, hts_pos_t end) override;
     std::string fetch(size_t seq_id) override;
 
 private:
-    const std::vector<std::string> seqs_;
+    std::vector<std::string> seqs_;
 };
 } // namespace labw::art_modern
