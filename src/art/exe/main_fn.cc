@@ -185,7 +185,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 std::ifstream input_file_stream(art_io_params.input_file_name);
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
-                auto [fasta_fetch, coverage_info] = batcher.fetch();
+                const auto [fasta_fetch, coverage_info] = batcher.fetch();
                 input_file_stream.close();
                 generator.init_dispatcher(fasta_fetch);
 
@@ -203,7 +203,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 std::ifstream pbsim3_transcript_stream(art_io_params.input_file_name);
                 Pbsim3TranscriptBatcher fsb(art_io_params.batch_size, pbsim3_transcript_stream);
                 while (true) {
-                    auto [fa_view, coverage_info] = fsb.fetch();
+                    const auto [fa_view, coverage_info] = fsb.fetch();
                     if (fa_view->empty()) {
                         break;
                     }
