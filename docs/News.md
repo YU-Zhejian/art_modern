@@ -2,6 +2,7 @@
 
 ## 1.1.9 (Ongoing)
 
+- BAM output routines largely accelerated by replacing string streams with pre-allocated strings.
 - Miscellaneous bug fixes.
 
 ## 1.1.8 (2025/09/29)
