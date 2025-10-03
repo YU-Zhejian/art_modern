@@ -110,6 +110,9 @@ touch:
 
 .PHONY: testsmall
 # Run small tests with debug build
+# Env. Flags:
+#     - FORMAT_ONLY=1: Stop after testing all output formats is working
+#     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
 	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test-small.sh
 

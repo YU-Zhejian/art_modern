@@ -50,8 +50,9 @@ namespace labw::art_modern {
 
 class JobPoolReporter {
 public:
-    explicit JobPoolReporter(const JobPool& jp)
+    explicit JobPoolReporter(const JobPool& jp, const std::size_t reporting_interval_seconds = 1)
         : jp_(jp)
+        , reporting_interval_seconds_(reporting_interval_seconds)
     {
     }
     void stop()
@@ -64,23 +65,24 @@ public:
 private:
     void job_()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
         while (!should_stop_) {
             BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
         }
     }
 
     const JobPool& jp_;
     std::atomic<bool> should_stop_ { false };
     std::thread thread_;
+    const std::size_t reporting_interval_seconds_;
 };
 
 class Generator {
 public:
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    explicit Generator(ArtParams art_params, const ArtIOParams& art_io_params)
+    Generator(ArtParams art_params, const ArtIOParams& art_io_params)
         : art_params_(std::move(art_params))
         , art_io_params_(art_io_params)
         , job_pool_(art_io_params.parallel)

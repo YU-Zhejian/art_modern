@@ -44,10 +44,11 @@ namespace {
 
     class AJEReporter {
     public:
-        explicit AJEReporter(const ArtJobExecutor& aje)
+        explicit AJEReporter(ArtJobExecutor& aje)
             : aje_(aje)
         {
         }
+
         void stop()
         {
             should_stop_ = true;
@@ -65,7 +66,7 @@ namespace {
             }
         }
 
-        const ArtJobExecutor& aje_;
+        ArtJobExecutor& aje_;
         std::atomic<bool> should_stop_ { false };
         std::thread thread_;
     };
@@ -162,20 +163,21 @@ bool ArtJobExecutor::is_running() const { return is_running_; }
 void ArtJobExecutor::operator()()
 {
     is_running_ = true;
-    AJEReporter reporter(*this);
-    reporter.start();
-
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
+        is_running_ = false;
         return;
     }
+
+    AJEReporter reporter(*this);
+    reporter.start();
     hts_pos_t accumulated_contig_len = 0;
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
         const auto& contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
-        if (contig_size < art_params_.read_len) {
+        if (contig_size < art_params_.read_len || /** unlikely */ contig_size == 0) {
             BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
                                      << job_.fasta_fetch->seq_len(seq_id)
                                      << "bps ) is skipped as it < the defined read length (" << art_params_.read_len
@@ -203,12 +205,18 @@ void ArtJobExecutor::operator()()
         generate(num_pos_reads, true, art_contig, read_id);
         generate(num_neg_reads, false, art_contig, read_id);
     }
+    if (accumulated_contig_len == 0) {
+        // Happens when all contigs are shorter than read length
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id
+                                << " with N/A reads (mean depth=N/A) generated.";
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
+                                << to_si(total_num_reads_generated_) << " reads (mean depth="
+                                << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
+                / static_cast<double>(accumulated_contig_len)
+                                << ") generated.";
+    }
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
-                            << to_si(total_num_reads_generated_) << " reads (mean depth="
-                            << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
-            / static_cast<double>(accumulated_contig_len)
-                            << ") generated.";
     reporter.stop();
     is_running_ = false;
 }

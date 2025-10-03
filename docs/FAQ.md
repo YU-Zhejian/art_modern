@@ -19,6 +19,37 @@ You may also generate SAM/BAM files and extract PE FASTQ from them using `samtoo
 
 Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
 
+### What kinds of FASTA files are supported?
+
+The following kinds of FASTA files are supported:
+
+```text
+>one_line_fasta
+AAAAAAAAAAAAAAAAA
+>multi_line_fasta
+AAAAAAAAA
+AAAAAAAAA
+AAAAAAAAA
+>fasta_with_empty_sequence
+>fasta_with_empty_sequence_with_newlines
+
+
+
+>fasta_with_spaces_in_name some description here
+AAAAAAAAA
+```
+
+Note that `fasta_with_empty_sequence_with_newlines` is **NOT** supported by [PacBio Formats](https://pacbiofileformats.readthedocs.io/en/13.0/FASTA.html) or NCBI GenBank FASTA Specification](https://www.ncbi.nlm.nih.gov/genbank/fastaformat/) and [NCBI GenBank Submission Guidelines](https://www.ncbi.nlm.nih.gov/genbank/genomesubmit/#files).
+
+The following kinds of FASTA files are **NOT** supported:
+
+```text
+> some_sequence_without_a_name
+AAAAAAAA
+```
+
+Also, note that all characters other than `ACGTacgt` will be regarded as `N`. We do **NOT** support IUPAC codes.
+
 ### How to support new Illumina models?
 
 The code listed in `deps/ART_profiler_illumina` is Perl files that are used to create ART/`art_modern` profiles out of raw FASTQ files, and I would highly recommend that you create them on your own using the following steps:

@@ -55,8 +55,8 @@ int main()
     std::vector<std::size_t> times;
     for (std::size_t j = 0; j < N_REPLICA; j++) {
         auto start = std::chrono::high_resolution_clock::now();
-        for (const auto& cigars : cigars) {
-            volatile auto s = cigar_arr_to_str_old(cigars.data(), cigars.size()); // NOLINT
+        for (const auto& cigar : cigars) {
+            volatile auto s = cigar_arr_to_str_old(cigar.data(), cigar.size()); // NOLINT
         }
         auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
@@ -65,8 +65,8 @@ int main()
     times.clear();
     for (std::size_t j = 0; j < N_REPLICA; j++) {
         auto start = std::chrono::high_resolution_clock::now();
-        for (const auto& cigars : cigars) {
-            volatile auto s = cigar_arr_to_str_optim(cigars.data(), cigars.size()); // NOLINT
+        for (const auto& cigar : cigars) {
+            volatile auto s = cigar_arr_to_str_optim(cigar.data(), cigar.size()); // NOLINT
         }
         auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());

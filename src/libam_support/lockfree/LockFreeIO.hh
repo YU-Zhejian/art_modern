@@ -269,6 +269,11 @@ template <typename T> void LockFreeIO<T>::log_() const
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << format_with_commas(num_reads_in_)
                             << " reads and writes " << format_with_commas(num_reads_out_) << " reads.";
     const auto num_writes = num_out_full_ + num_out_not_full_ + num_out_empty_;
+    if (num_reads_in_ == 0 && num_reads_out_ == 0) {
+        // Avoid division by zero
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Nothing written.";
+        return;
+    }
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. (IRetried/IAll): " << format_with_commas(num_wait_in_) << "("
                             << (100.0 * num_wait_in_ / num_reads_in_) << "%).";
     BOOST_LOG_TRIVIAL(info) << name_

@@ -72,8 +72,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
-        std::thread t(working_thread, bro, 200ULL * M_SIZE / nthread);
-        threads.emplace_back(std::move(t));
+        threads.emplace_back(working_thread, bro, 200ULL * M_SIZE / nthread);
     }
     for (auto& t : threads) {
         t.join();

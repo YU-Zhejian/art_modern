@@ -2,7 +2,8 @@
 
 ## 1.1.9 (Ongoing)
 
-- BAM output routines largely accelerated by replacing string streams with pre-allocated strings.
+- BAM output routines are largely accelerated by replacing string streams with pre-allocated strings.
+- The simulator now supports `/dev/null` or an empty file as input. Remember to specify `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
 - Miscellaneous bug fixes.
 
 ## 1.1.8 (2025/09/29)
