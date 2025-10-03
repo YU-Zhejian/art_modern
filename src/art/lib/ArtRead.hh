@@ -74,7 +74,10 @@ private:
     Rprob& rprob_;
     std::string query_;
     std::string ref_;
-    [[maybe_unused]] void except_() const;
+    [[
+
+        noreturn]] [[maybe_unused]] void
+    except_() const;
 };
 
 } // namespace labw::art_modern

@@ -14,11 +14,12 @@
  * TODO: Use Geometric mean to better represent the performance
  **/
 
+#include "benchmark_utils.hh"
+
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 #include "libam_support/utils/class_macros_utils.hh"
-#include "libam_support/utils/si_utils.hh"
 
 #include <boost/accumulators/accumulators_fwd.hpp>
 #include <boost/accumulators/framework/accumulator_set.hpp>
@@ -38,6 +39,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
+#include <iomanip>
 #include <map>
 #include <memory>
 #include <random>
@@ -354,23 +356,23 @@ void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
         acc;
 
     std::vector<am_qual_t> qual;
+    std::vector<std::size_t> times;
     qual.resize(READ_LEN);
-    const auto start = std::chrono::high_resolution_clock::now();
     for (am_readnum_t i = 0; i < NUM_TRIALS; i++) {
+        const auto start = std::chrono::high_resolution_clock::now();
         empdist->gen_qualities(qual);
+        const auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
         for (const auto value : qual) {
             acc(value);
         }
     }
-    const auto end = std::chrono::high_resolution_clock::now();
 
     // Extract the mean and standard deviation
     const double mean = boost::accumulators::mean(acc);
     const double sd = std::sqrt(boost::accumulators::variance(acc));
-    BOOST_LOG_TRIVIAL(info) << name << ": "
-                            << format_with_commas(
-                                   std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count())
-                            << " ns. Q: mean=" << mean << " sd=" << sd;
+    BOOST_LOG_TRIVIAL(info) << std::setw(30) << name << ": " << describe(times) << "ns Q: mean=" << mean
+                            << " sd=" << sd;
 }
 } // namespace
 

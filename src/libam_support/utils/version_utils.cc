@@ -332,4 +332,3 @@ void print_version()
     std::cout << ceu_check_get_run_time_os_info();
 }
 } // namespace labw::art_modern
-// labw

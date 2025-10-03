@@ -53,7 +53,7 @@ namespace {
         return seq_names;
     }
 
-     std::vector<hts_pos_t> get_seq_lengths(const faidx_t* faidx)
+    std::vector<hts_pos_t> get_seq_lengths(const faidx_t* faidx)
     {
         std::vector<hts_pos_t> seq_lengths;
         const auto size = faidx_nseq(faidx);
@@ -97,9 +97,10 @@ FaidxFetch::FaidxFetch(faidx_t* faidx)
 std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
     hts_pos_t len = 0;
-    auto* const cfetch_str = faidx_fetch_seq64(faidx_, seq_names_[seq_id].c_str(), start, end, &len);
-    if (cfetch_str == nullptr) {
-        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_names_[seq_id].c_str() << ":" << start << "-" << end << "!";
+    auto* const cfetch_str = faidx_fetch_seq64(faidx_, seq_names_[seq_id].c_str(), start, end - 1, &len);
+    if (cfetch_str == nullptr || len != end - start) {
+        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_names_[seq_id].c_str() << ":" << start << "-" << end
+                                 << "!";
         abort_mpi();
     }
     const auto rets = std::string(cfetch_str, len);

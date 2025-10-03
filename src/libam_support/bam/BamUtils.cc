@@ -37,8 +37,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <ostream>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -57,7 +55,8 @@ std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
     hts_pos_t pos_on_query = 0;
     std::uint32_t matched = 0;
     hts_pos_t pos_on_ref = 0;
-    std::ostringstream md_str_ss;
+    std::string md_str;
+    md_str.reserve(cigar.size() << 1); // Rough estimate: each CIGAR op is at least 2 chars
     std::int32_t nm = 0;
     am_cigar_len_t this_cigar_len = 0;
     am_cigar_ops_t this_cigar_ops = 0;
@@ -71,7 +70,8 @@ std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
             pos_on_ref += this_cigar_len;
         } else if (this_cigar_ops == BAM_CDIFF) {
             for (decltype(this_cigar_len) j = 0; j < this_cigar_len; ++j) {
-                md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                md_str += std::to_string(matched);
+                md_str += static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                 matched = 0;
                 ++nm;
                 pos_on_query++;
@@ -82,7 +82,8 @@ std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
                 if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) {
                     ++matched;
                 } else {
-                    md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                    md_str += std::to_string(matched);
+                    md_str += static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                     matched = 0;
                     ++nm;
                 }
@@ -90,7 +91,9 @@ std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_ref++;
             }
         } else if (this_cigar_ops == BAM_CDEL) {
-            md_str_ss << std::to_string(matched) << '^' << pwa.ref.substr(pos_on_ref, this_cigar_len);
+            md_str += std::to_string(matched);
+            md_str += '^';
+            md_str += pwa.ref.substr(pos_on_ref, this_cigar_len);
             pos_on_ref += this_cigar_len;
             nm += this_cigar_len;
             matched = 0;
@@ -103,9 +106,7 @@ std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
             pos_on_ref += this_cigar_len;
         }
     }
-    md_str_ss << std::to_string(matched);
-    const auto md_str = md_str_ss.str();
-
+    md_str.shrink_to_fit();
     return { nm, md_str };
 }
 

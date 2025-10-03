@@ -38,7 +38,7 @@ std::string format_with_commas(const std::size_t number)
 std::string to_si(const double number, const int precision)
 {
     std::size_t unitIndex = 0;
-    auto sizeInUnit = static_cast<double>(number);
+    auto sizeInUnit = number;
 
     while (sizeInUnit >= 1024 && unitIndex < SI_UNITS_LENGTH) {
         sizeInUnit /= 1024;

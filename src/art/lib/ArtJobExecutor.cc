@@ -24,6 +24,7 @@
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/utils/si_utils.hh"
 
 #include <fmt/format.h>
 
@@ -55,7 +56,7 @@ namespace {
         void start() { thread_ = std::thread(&AJEReporter::job_, this); }
 
     private:
-        void job_()
+        void job_() const
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             while (!should_stop_) {
@@ -203,8 +204,8 @@ void ArtJobExecutor::operator()()
         generate(num_neg_reads, false, art_contig, read_id);
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << total_num_reads_generated_
-                            << " reads (mean depth="
+    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
+                            << to_si(total_num_reads_generated_) << " reads (mean depth="
                             << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
             / static_cast<double>(accumulated_contig_len)
                             << ") generated.";
@@ -225,8 +226,8 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 std::string ArtJobExecutor::thread_info() const
 {
     return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",
-        job_.job_id, mpi_rank_, current_contig_, current_n_reads_generated_, current_n_reads_left_, current_n_fails_,
-        current_max_tolerence_, total_num_reads_generated_);
+        job_.job_id, mpi_rank_, current_contig_, to_si(current_n_reads_generated_), to_si(current_n_reads_left_),
+        to_si(current_n_fails_), to_si(current_max_tolerence_), to_si(total_num_reads_generated_));
 }
 
 } // namespace labw::art_modern

@@ -197,11 +197,11 @@ int main()
     std::vector<BamOptions> bo_t;
     std::vector<BamOptions> bo_l;
 
-    for (auto& t : std::vector { 1, 2, 4, 8, 16, 32, 64 }) {
+    for (const auto& t : std::vector { 1, 2, 4, 8, 16, 32, 64 }) {
         bo_t.emplace_back();
         bo_t.back().hts_io_threads = t;
     }
-    for (auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
+    for (const auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
         bo_l.emplace_back();
         bo_l.back().compress_level = t;
     }

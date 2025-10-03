@@ -34,7 +34,7 @@ class InMemoryFastaFetch final : public BaseFastaFetch {
 public:
     InMemoryFastaFetch(InMemoryFastaFetch&& other) noexcept
         : BaseFastaFetch(std::move(other.seq_names_), std::move(other.seq_lengths_))
-          , seqs_(std::move(other.seqs_))
+        , seqs_(std::move(other.seqs_))
     {
     }
 
