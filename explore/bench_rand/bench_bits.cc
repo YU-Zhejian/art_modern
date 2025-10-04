@@ -38,6 +38,8 @@
 
 namespace {
 
+constexpr std::size_t name_length = 65;
+
 template <typename T> T geometric_mean(const std::vector<T>& data)
 {
     double log_sum = 0.0;
@@ -78,17 +80,25 @@ template <typename T> void bench_bits_stl(T& rng, const std::string& name)
     std::vector<std::invoke_result_t<T>> gen_bits(N_BASES);
 
     for (std::size_t j = 0; j < N_REPLICA; j++) {
-        auto start = std::chrono::system_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N_TIMES; i++) {
             std::generate_n(gen_bits.begin(), N_BASES, [&rng]() { return rng(); });
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
+    std::string range;
+    if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 32)) {
+        range = "(32 bits)";
+    } else if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 48)) {
+        range = "(48 bits)";
+    } else if (rng.min() == 0 && rng.max() == std::numeric_limits<std::uint64_t>::max()) {
+        range = "(64 bits)";
+    } else {
+        range = "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + ")";
+    }
 
-    std::cout << std::setw(65)
-              << name + "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + "): " << describe(times)
-              << " us" << std::endl;
+    std::cout << std::setw(name_length) << name + range + ": " << describe(times) << " us" << std::endl;
 }
 
 void bench_bits_mkl(const MKL_INT type, const std::string& name)
@@ -97,47 +107,52 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
     vslNewStream(&stream, type, seed());
     VSLBRngProperties brng;
     vslGetBrngProperties(type, &brng);
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
     std::vector<std::size_t> times {};
     std::vector<std::uint32_t> gen_bits {};
     gen_bits.resize(N_BASES);
 
     for (std::size_t j = 0; j < N_REPLICA; j++) {
-        start = std::chrono::system_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N_TIMES; i++) {
             viRngUniformBits(VSL_RNG_METHOD_UNIFORM_STD, stream, N_BASES, gen_bits.data());
         }
-        end = std::chrono::system_clock::now();
+      auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
 
     vslDeleteStream(&stream);
-    std::cout << std::setw(65) << name + " (" + std::to_string(brng.NBits) + " bits): " << describe(times) << " us"
-              << std::endl;
+    std::cout << std::setw(name_length) << name + "(" + std::to_string(brng.NBits) + " bits): " << describe(times)
+              << " us" << std::endl;
 }
 
 template <typename VMT19937BulkRandomDeviceImpl> void bench_bits_vmt19937(const std::string& name)
 {
     VMT19937BulkRandomDeviceImpl rng {};
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
     std::vector<std::size_t> times {};
     std::vector<std::uint32_t> gen_bits {};
     gen_bits.resize(N_BASES);
 
     for (std::size_t j = 0; j < N_REPLICA; j++) {
-        start = std::chrono::system_clock::now();
+        auto start = std::chrono::high_resolution_clock::now();
         for (std::size_t i = 0; i < N_TIMES; i++) {
             rng.gen(gen_bits);
         }
-        end = std::chrono::system_clock::now();
+      auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
 
-    std::cout << std::setw(65)
-              << name + "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + "): " << describe(times)
-              << " us" << std::endl;
+    std::string range;
+    if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 32)) {
+        range = "(32 bits)";
+    } else if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 48)) {
+        range = "(48 bits)";
+    } else if (rng.min() == 0 && rng.max() == std::numeric_limits<std::uint64_t>::max()) {
+        range = "(64 bits)";
+    } else {
+        range = "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + ")";
+    }
+
+    std::cout << std::setw(name_length) << name + range + ": " << describe(times) << " us" << std::endl;
 }
 
 ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
@@ -195,7 +210,8 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_bits_mkl(VSL_BRNG_ARS5, "MKL::VSL_BRNG_ARS5");
     bench_bits_mkl(VSL_BRNG_PHILOX4X32X10, "MKL::VSL_BRNG_PHILOX4X32X10");
-    bench_bits_mkl(VSL_BRNG_NONDETERM, "MKL::VSL_BRNG_NONDETERM");
+    // Yet another /dev/random
+    // bench_bits_mkl(VSL_BRNG_NONDETERM, "MKL::VSL_BRNG_NONDETERM");
 }
 
 [[maybe_unused]] void absl_main()

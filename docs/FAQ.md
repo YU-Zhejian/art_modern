@@ -1,23 +1,6 @@
 # Frequently Asked Questions (FAQs)
 
-## Simulation
-
-### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?
-
-This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `1.fq`:
-
-```shell
-# Read 1
-seqtk seq 1.fq -1 > 1_1.fq
-# Read 2
-seqtk seq 1.fq -2 > 1_2.fq
-```
-
-You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`.
-
-### How to add adaptors \& primers to the reads?
-
-Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
+## I/O Formats
 
 ### What kinds of FASTA files are supported?
 
@@ -49,6 +32,30 @@ AAAAAAAA
 ```
 
 Also, note that all characters other than `ACGTacgt` will be regarded as `N`. We do **NOT** support IUPAC codes.
+
+### Why is UCSC 2-bit format not supported?
+
+1. Developing a 2-bit parser is time-consuming, especially when endianness (2-bit files allow both endianness), 64-bit offsets, masking, and other edge cases are considered.
+2. Whether the UCSC 2-bit format improves I/O performance is questionable. See [this HTSJDK PR](https://github.com/samtools/htsjdk/pull/1417) for details.
+
+## Simulation
+
+### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?
+
+This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `1.fq`:
+
+```shell
+# Read 1
+seqtk seq 1.fq -1 > 1_1.fq
+# Read 2
+seqtk seq 1.fq -2 > 1_2.fq
+```
+
+You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`.
+
+### How to add adaptors \& primers to the reads?
+
+Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
 
 ### How to support new Illumina models?
 

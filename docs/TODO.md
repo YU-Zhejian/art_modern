@@ -19,7 +19,8 @@
 ## Packing
 
 - Supress all lintian issues.
-- Docs: Print the version of Sphinx.
+- Declare code that is copied from [GNU AutoConf Archive](https://www.gnu.org/software/autoconf-archive/).
+- `Install.md`: Declare bundled libraries.
 
 ## Performance
 
@@ -40,7 +41,6 @@
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 - Support UCSC MAF output format?
-- Support UCSC 2bit input format for fast on-disk random access of reference genome?
 - Add flags to disable/enable diverse BAM tags.
 
 ## Simulate Allele-Specific Expression

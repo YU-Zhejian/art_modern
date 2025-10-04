@@ -16,42 +16,48 @@ This project requires a working C++ compiler that supports C++17 and a working C
 
 ### Checking C11 and C++17 Compatibility
 
-See [here](https://en.cppreference.com/w/c/11) and [here](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports C11 and C++17. You may test whether your compiler (GCC, for example) using:
+See [this cppreference article for C11](https://en.cppreference.com/w/c/11) and [this cppreference article for C++17](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports those versions. You may test whether your compiler (GCC, for example) using:
 
 ```shell
 echo 'int main(){}' | gcc --std=c11 -x c - -o /dev/null
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-If there's no error, the compiler is supported. The CMake build scripts inside this project also contains a script that tests compiler compatibility using codes from [GNU AutoConf Archive](https://www.gnu.org/software/autoconf-archive/).
+If there's no error, the compiler **MIGHT** be supported. If there's an error, the compiler is definitely **NOT** supported.
 
-### [GCC](https://gcc.gnu.org/), at least 7.4.0
+**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features.
 
-The most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
+**NOTE** The CMake build scripts inside this project contains a script that tests compiler compatibility which will be automatically executed when configuring the project.
+
+### [GCC](https://gcc.gnu.org/), at least [7.4.0](https://gcc.gnu.org/gcc-7/changes.html#GCC7.4)
+
+GNU Compiler Collections (GCC) is the most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance.
 
 **NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library ([`libstdc++`](https://gcc.gnu.org/onlinedocs/libstdc++/)).
 
-Reference:
+See also:
 
 - GCC support over [C++17](https://gcc.gnu.org/projects/cxx-status.html#cxx17) and [C11](https://gcc.gnu.org/wiki/C11Status).
 - `libstdc++` support over [C++17](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017).
 
-### [Clang](https://clang.llvm.org/), at least 5.0.1
+### [Clang](https://clang.llvm.org/), at least [5.0.1](https://releases.llvm.org/5.0.1/tools/clang/docs/ReleaseNotes.html)
 
-Another popular compiler for GNU/Linux that uses [LLVM](https://llvm.org/) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X. The minimal version of Clang tested is Clang 5.0.1.
+Another popular compiler for GNU/Linux that uses Low-Level Virtual Machine ([LLVM](https://llvm.org/)) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X.
 
-**NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [here](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
+**NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library ([`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [this LLVM article](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
 
-Reference:
+See also:
 
 - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
 - `libc++ `support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of `libstdc++` (GNU C++ Standard Library).
 
-**NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
-
 ### [Intel oneAPI DPC++/C++ Compiler](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html), latest
 
-For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`). Only the latest version will be tested.
+For accelerated binaries on Intel CPUs. Compatibilities on the latest version of this compiler will be tested.
+
+**NOTE** Here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`).
+
+**NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
 
 **NOTE** Distributing binaries built with this compiler may require you to comply with Intel's license and/or breaking the GPL.
 
@@ -60,22 +66,25 @@ For accelerated binaries on Intel CPUs. Note that here we refer to the LLVM-base
 Although not tested, the following compilers can also theoretically be of use:
 
 - Intel C++ Compiler Classic (ICC) **MAY** work with legacy systems and Boost libraries.
-- [NVidia HPC compilers](https://developer.nvidia.com/hpc-compilers) should work as all versions of this compiler support C++17. However, old CMake may not be able to recognize the compiler.
-- [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html).
-  - All (>=3.2.0) versions of this compiler support C++17. Specifically,
-    - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
-    - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
+- [NVidia HPC compilers](https://developer.nvidia.com/hpc-compilers) should work as all versions of this compiler support C++17.
+  - **NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
+- [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html) should work as all versions of this compiler support C++17. Specifically,
+  - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
+  - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
 
 ## Essential Tools for Building
 
-### [CMake](https://cmake.org/), at least 3.17
+### [CMake](https://cmake.org/), at least [3.17](https://cmake.org/cmake/help/latest/release/3.17.html)
 
-CMake [3.17](https://cmake.org/cmake/help/latest/release/3.17.html) or above is required to build this project. That further requires:
-- a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
-- [Python](https://www.python.org/) >= 3.7, for embedding bundled Illumina profiles.
-- POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+**NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake officially-built binaries](https://cmake.org/files/v3.17/).
 
-**NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [here](https://cmake.org/files/v3.17/).
+### Essential Dependencies of CMake Build System
+
+A [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+
+[Python](https://www.python.org/) >= 3.7, for embedding bundled Illumina profiles and `make help`.
+
+POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
 ### Linkers, Assemblers, Archivers, etc
 
@@ -83,11 +92,13 @@ You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM 
 
 ### C Library
 
-This project works on [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 should work.
+This project were tested working using [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 and C11 should work.
+
+**NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
 
 ### [`pkgconf`](https://github.com/pkgconf/pkgconf)  or [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/)
 
-The project may take advantage of pkgconfor pkg-config to locate the dependencies. Installing such is **HIGHLY** recommended.
+The project may take advantage of pkgconf or pkg-config to locate the dependencies. Installing such is **HIGHLY** recommended.
 
 ### Command-Line Utilities
 
@@ -102,7 +113,7 @@ For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions wit
 
 as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
-## Library Dependencies
+## Required External Library
 
 Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
@@ -114,44 +125,64 @@ This is an umbrella project of diverse small modules that can be used independen
 - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
 - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
 - **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
-- **OPTIONAL** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html): For a more developer-friendly stack trace. See [here](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for details. Can be absent for non-developers.
+- **OPTIONAL** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
+  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
 - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
-- **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU and wall-clock time at the end of the program. Can be absent if you do not care about performance.
-
-### [HTSLib](https://www.htslib.org/)
-
-You may either use the one bundled with the project or an external one that had already been installed inside your system.
-
-#### Use Bundled HTSLib
-
-To use bundled HTSLib sources, you need to have:
-
-- **REQUIRED** [zlib](https://www.zlib.net/).
-- **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
-- **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression. Note that CRAM format is currently not supported as an output format for `art_modern`.
-- **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression, which is now not supported.
-- **OPTIONAL** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output. **HIGHLY RECOMMENDED**.
-
-See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details. See also `USE_HTSLIB` CMake variable mentioned below.
-
-#### Use External HTSLib, at least 1.14
-
-To use external HTSLib, consult your system administrator. Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
+- **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
 
 ### [zlib](https://www.zlib.net/), at least 1.2.0
 
 For compression and decompression bundled ART error profiles.
 
-### Other Optional Libraries
+### Optional External Libraries
 
-- Various libraries for accelerating random number generation. Including:
-  - **OPTIONAL** [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). Highly recommended if you are using Intel CPUs.
-    - **NOTE** OneMKL is available for Intel CPUs only.
-    - **NOTE** This library is propertary software.
-  - **OPTIONAL** [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/).
-- Alternate `malloc`/`free` implementations that may improve performance. Including:
-  - **OPTIONAL** [mi-malloc](https://github.com/microsoft/mimalloc).
-  - **OPTIONAL** [jemalloc](https://github.com/jemalloc/jemalloc).
+#### Accelerated Random Number Generators
+
+Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+
+**NOTE** This library is propertary software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+
+Users may also use [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/), which may be faster in specific platforms.
+
+See also: CMake variable `USE_RANDOM_GENERATOR` below.
+
+#### Alternate `malloc`/`free` Implementations
+
+Users may use either [mi-malloc](https://github.com/microsoft/mimalloc) or [jemalloc](https://github.com/jemalloc/jemalloc) to slightly improve the performance of memory allocation and deallocation.
+
+See also: CMake variable `USE_MALLOC` below.
+
+## Required Bundled/External Libraries
+
+The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your sytstem administrator if you do not know whether and where those libraries are installed.
+
+**NOTE** Bundled dependencies may introduce security vulnerabilities.
+
+### [HTSLib](https://www.htslib.org/)
+
+Used for reading large FASTA files and generating SAM/BAM files.
+
+See also: `USE_HTSLIB` CMake variable mentioned below.
+
+#### Bundled, at [1.22.1](https://github.com/samtools/htslib/releases/tag/1.22.1)
+
+To build bundled HTSLib sources, you need to have:
+
+- **REQUIRED** [zlib](https://www.zlib.net/).
+- **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
+- **HIGHLY RECOMMENDED** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
+- **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression. 
+- **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression.
+
+**NOTE** The CRAM format is currently not supported as an output format for `art_modern`.
+
+See [official HTSLib documentation](https://github.com/samtools/samtools/blob/master/INSTALL) for more details.
+
+#### External, at least [1.14](https://github.com/samtools/htslib/releases/tag/1.14)
+
+Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
+
+### ... % TODO
 
 ## CMake Variables
 
@@ -239,17 +270,26 @@ The random number generator used.
 - `ONEMKL`: Use Intel OneAPI MKL random generators.
   - **NOTE** Highly recommended on Intel CPUs.
 
-On my system for generating 1M random bits for 20K times:
+On my system for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
 ```text
-PCG::pcg32(0, 4294967295): 2,840 us
-MKL::VSL_BRNG_SFMT19937 (32 bits): 6,472 us
-MKL::VSL_BRNG_MT19937 (32 bits): 8,672 us
-boost::random::mt19937(0, 4294967295): 12,669 us
-std::mt19937(0, 4294967295): 19,837 us
-absl::InsecureBitGen(0, 18446744073709551615): 30,928 us
-GSL::mt19937(0, 4294967295): 48,060 us
+    VSFMT19937BulkRandomDevice(32 bits): gmean:        241; mean/sd:           241/3 us
+       MKL::VSL_BRNG_SFMT19937(32 bits): gmean:        286; mean/sd:           286/3 us
+         MKL::VSL_BRNG_MT19937(32 bits): gmean:        435; mean/sd:         446/132 us
+        VSFMT19937RandomDevice(32 bits): gmean:        735; mean/sd:         743/133 us
+               PCG::pcg32_fast(32 bits): gmean:        848; mean/sd:           848/5 us
+          absl::InsecureBitGen(64 bits): gmean:      1,486; mean/sd:        1,486/33 us
+      VMT19937BulkRandomDevice(32 bits): gmean:      1,635; mean/sd:       1,641/171 us
+        boost::random::mt19937(32 bits): gmean:      1,756; mean/sd:        1,756/19 us
+                  std::mt19937(32 bits): gmean:      1,852; mean/sd:        1,853/59 us
+          VMT19937RandomDevice(32 bits): gmean:      2,062; mean/sd:        2,062/17 us
+                  GSL::mt19937(32 bits): gmean:      2,420; mean/sd:       2,422/114 us
+                  absl::BitGen(64 bits): gmean:      3,543; mean/sd:       3,548/202 us
 ```
+
+**NOTE** The performance may vary on different platforms.
+
+**NOTE** VSFMT is currently not available.
 
 ### `USE_THREAD_PARALLEL`
 

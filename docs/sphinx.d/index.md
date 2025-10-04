@@ -1,6 +1,9 @@
 # Welcome to `art_modern` Documentation
 
-This contains documentation for `art_modern` Users.
+This contains documentation for `art_modern` Users. Generated using:
+
+```{include} src/versions.md
+```
 
 ```{toctree}
 :caption: 'Contents'

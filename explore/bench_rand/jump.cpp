@@ -27,9 +27,9 @@ template <> struct GenTraits<sfmt> {
 namespace {
 template <typename Matrix> void square(const Matrix& src, Matrix& dst, std::vector<typename Matrix::buffer_t>& buffers)
 {
-    const auto start = std::chrono::system_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     dst.square(src, buffers);
-    const auto end = std::chrono::system_clock::now();
+    const auto end = std::chrono::high_resolution_clock::now();
     std::cout << "done in: " << std::fixed << std::setprecision(2) << (end - start).count() << "s" << std::endl;
 }
 

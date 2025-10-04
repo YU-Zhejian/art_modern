@@ -6,7 +6,6 @@
 
 int main(void)
 {
-    swrite_Basic = FALSE; // Disable detailed TestU01 output to stdout
     const char* temp_file = "/dev/stdin";
     char* filename = (char*)malloc(strlen(temp_file) + 1);
     if (filename == NULL) {
@@ -18,8 +17,23 @@ int main(void)
     unif01_Gen* gen = ufile_CreateReadBin(filename, 4096);
     free(filename);
 
+    swrite_Basic = FALSE;
+    swrite_Host = FALSE;
+    swrite_Parameters = FALSE;
+    swrite_Collectors = FALSE;
+    swrite_Classes = FALSE;
+    swrite_Counters = FALSE;
+
     bbattery_SmallCrush(gen);
+
+    swrite_Basic = FALSE;
+    swrite_Host = FALSE;
+    swrite_Parameters = FALSE;
+    swrite_Collectors = FALSE;
+    swrite_Classes = FALSE;
+    swrite_Counters = FALSE;
     bbattery_pseudoDIEHARD(gen);
+
     unif01_DeleteExternGenBits(gen);
 
     return EXIT_SUCCESS;

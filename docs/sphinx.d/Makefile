@@ -4,6 +4,10 @@ BUILD_DIR := $(CURDIR)/_build
 
 .PHONY: all
 all: html pdf
+	cp -r $(BUILD_DIR)/html/ $(BUILD_DIR)/art_modern.html
+	env -C  $(BUILD_DIR) zip art_modern.zip -r art_modern.html
+	cp $(BUILD_DIR)/latex/art_modern.pdf $(BUILD_DIR)/art_modern.pdf
+	rm -fr $(BUILD_DIR)/art_modern.html
 
 .PHONY: cp
 cp:
