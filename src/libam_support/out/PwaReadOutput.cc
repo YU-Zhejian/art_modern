@@ -18,6 +18,8 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -91,7 +93,8 @@ void PwaReadOutputFactory::patch_options(boost::program_options::options_descrip
 std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-pwa") != 0U) {
-        return std::make_shared<PwaReadOutput>(params.vm["o-pwa"].as<std::string>(), params.args, params.n_threads);
+        return std::make_shared<PwaReadOutput>(
+            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank()), params.args, params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

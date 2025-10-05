@@ -22,6 +22,7 @@
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh" // NOLINT
 #include "libam_support/utils/seq_utils.hh"
 
@@ -138,6 +139,7 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
         }
         mode += "wh";
     }
+    prepare_writer(filename);
 
     auto* const retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");

@@ -12,6 +12,8 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include "art_modern_config.h" // NOLINT: For WITH_MPI
+
 #include "libam_support/utils/mpi_log_attributes.hh"
 
 #include "libam_support/Constants.hh"

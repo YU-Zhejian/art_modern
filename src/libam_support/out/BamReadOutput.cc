@@ -26,6 +26,7 @@
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -228,7 +229,8 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
             abort_mpi();
         }
         return std::make_shared<BamReadOutput>(
-            params.vm["o-sam"].as<std::string>(), params.fasta_fetch, so, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank()), params.fasta_fetch, so,
+            params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

@@ -35,7 +35,6 @@
       - [MPICH](https://www.mpich.org/).
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-  - Share the arguments between the main thread and the worker threads using pure MPI communication.
 
 ## I/O Formats
 

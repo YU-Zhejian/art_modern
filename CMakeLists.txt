@@ -19,6 +19,7 @@ project(
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
+set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -49,6 +50,7 @@ set(ART_MODERN_LINK_LIBS "")
 # Installation
 include(GNUInstallDirs)
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    message(WARNING "CMAKE_INSTALL_PREFIX not defined, setting to /usr/local")
     set(CMAKE_INSTALL_PREFIX
         "/usr/local"
         CACHE PATH "Install path prefix, prepended onto install directories." FORCE)

@@ -116,7 +116,7 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name)
         for (std::size_t i = 0; i < N_TIMES; i++) {
             viRngUniformBits(VSL_RNG_METHOD_UNIFORM_STD, stream, N_BASES, gen_bits.data());
         }
-      auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
 
@@ -137,7 +137,7 @@ template <typename VMT19937BulkRandomDeviceImpl> void bench_bits_vmt19937(const 
         for (std::size_t i = 0; i < N_TIMES; i++) {
             rng.gen(gen_bits);
         }
-      auto end = std::chrono::high_resolution_clock::now();
+        auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
 

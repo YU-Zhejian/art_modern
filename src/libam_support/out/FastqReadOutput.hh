@@ -18,15 +18,13 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/lockfree/SimpleLFIO.hh"
 #include "libam_support/out/BaseReadOutput.hh"
-#include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/options_description.hpp>
-#include <boost/program_options/variables_map.hpp>
 
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace labw::art_modern {
 

@@ -213,14 +213,12 @@ namespace {
 
         if (vm_.count(ARG_VERSION) != 0U) {
             print_version();
-            bye_mpi();
-            exit_mpi(EXIT_SUCCESS);
+            exit_mpi();
             std::exit(EXIT_SUCCESS);
         }
         if (vm_.count(ARG_HELP) != 0U) {
             print_help(po_desc);
-            bye_mpi();
-            exit_mpi(EXIT_SUCCESS);
+            exit_mpi();
             std::exit(EXIT_SUCCESS);
         }
         return vm_;

@@ -18,6 +18,8 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <fmt/format.h>
 
@@ -90,7 +92,8 @@ void FastaReadOutputFactory::patch_options(boost::program_options::options_descr
 std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-fasta") != 0) {
-        return std::make_shared<FastaReadOutput>(params.vm["o-fasta"].as<std::string>(), params.n_threads);
+        return std::make_shared<FastaReadOutput>(
+            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank()), params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

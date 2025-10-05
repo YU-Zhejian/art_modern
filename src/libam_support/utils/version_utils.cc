@@ -12,7 +12,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT: for various flags
 
 #include "libam_support/utils/version_utils.hh"
 
@@ -54,6 +54,8 @@
 
 // MPI
 #ifdef WITH_MPI
+#include <boost/algorithm/string/trim.hpp>
+
 #include <mpi.h>
 #endif
 

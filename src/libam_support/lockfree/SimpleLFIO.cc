@@ -29,8 +29,10 @@
 
 namespace labw::art_modern {
 
+/**
+ * TODO: This implementation is sub-optimal since the std::unique_ptr will destruct after write returns, wasting time.
+ */
 void SimpleLFIO::write(const std::unique_ptr<std::string> value)
-
 {
     if (closed_) {
         return;

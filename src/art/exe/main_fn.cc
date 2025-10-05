@@ -13,7 +13,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT
 
 #include "art/exe/main_fn.hh"
 
@@ -34,6 +34,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -125,8 +126,14 @@ private:
 
 void print_banner()
 {
-    BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << " v. " ART_MODERN_VERSION << ")";
-    BOOST_LOG_TRIVIAL(info) << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
+#ifdef WITH_MPI
+    if (mpi_rank() != MPI_MAIN_RANK_STR) {
+        return;
+    }
+#endif
+    BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << ") v. " ART_MODERN_VERSION
+                            << " at <" << ART_MODERN_URL << ">";
+    BOOST_LOG_TRIVIAL(info) << "Based on ART_Illumina: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
     BOOST_LOG_TRIVIAL(info) << "Originally written by: Weichun Huang <whduke@gmail.com>";
     BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <yuzj25@seas.upenn.edu>";
 #ifdef CEU_CM_IS_DEBUG
@@ -138,8 +145,12 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 {
     Generator generator(art_params, art_io_params);
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        const auto coverage_info
-            = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(art_io_params.parallel));
+        std::size_t div_by = art_io_params.parallel;
+#ifdef WITH_MPI
+        // Further divide by number of MPI processes
+        div_by *= mpi_size();
+#endif
+        const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch
                 = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
@@ -155,13 +166,12 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
         }
     } else {
         // Batch-based parallelism
+        // TODO: Enable skipping loader
         if (art_io_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
-
             const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info);
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 auto fetch = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
                 generator.init_dispatcher(fetch);
-
                 InMemoryFastaBatcher fsb(static_cast<int>(fetch->num_seqs() / art_io_params.parallel + 1), fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();

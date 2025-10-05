@@ -455,12 +455,6 @@ make doc
 
 And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
 
-This step can be executed under Microsoft Windows if you have some GNU Make installed. If you use MikTeX, it may complain on not finding a `perl`. But you can have it installed through [Conda](https://docs.conda.io) anyway through:
-
-```shell
-conda install -c conda-forge perl
-```
-
 ## Known Incompatibilities
 
 - Clang < 10 with Boost > 1.77 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.

@@ -248,7 +248,9 @@ Quality distributions bundled with the original ART can be found [here](../data/
 ## Environment Variables
 
 - `ART_NO_LOG_DIR`: If set (to any value), disables creation of a log directory. Logging to files is skipped, and a warning is printed.
+  - **NOTE** If you're using `art_modern` with MPI, this discards all logs generated from rank 1, 2, 3....
 - `ART_LOG_DIR`: If set, specifies the directory where log files will be written. If not set, defaults to `log.d` and a warning is printed. Ignored if `ART_NO_LOG_DIR` is set.
+  - **NOTE** If you're running 2 `art_modern` processes simultaneously, please make sure that they are using different log directories.
 
 ## Performance Hint
 

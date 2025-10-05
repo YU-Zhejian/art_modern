@@ -86,6 +86,7 @@ constexpr char INPUT_FILE_PARSER_STREAM[] = "stream";
 constexpr char INPUT_FILE_PARSER_AUTO[] = "auto";
 
 constexpr int MPI_MAIN_RANK = 0;
+const std::string MPI_MAIN_RANK_STR = "0";
 
 constexpr int MPI_UNAVAILABLE_RANK = -1;
 
