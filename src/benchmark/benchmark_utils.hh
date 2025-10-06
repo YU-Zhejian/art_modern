@@ -35,7 +35,7 @@ template <typename T> T sd(const std::vector<T>& data, T mean_)
     return std::sqrt(sum_squared_diff / static_cast<T>(data.size() - 1));
 }
 
-static std::string describe(const std::vector<std::size_t>& times)
+    template <typename T> static std::string describe(const std::vector<T>& times)
 {
     auto const mean_ = mean(times);
     std::ostringstream oss;

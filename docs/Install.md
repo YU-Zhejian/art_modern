@@ -10,7 +10,7 @@ Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported bu
 
 This project used bundled source code of [Google Abseil](https://abseil.io/), whose requirements are available [here](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md).
 
-## Compiler Infrastructure
+## C/C++ Compilers
 
 This project requires a working C++ compiler that supports C++17 and a working C compiler that supports C11 (for bundled HTSLib). That also includes the C++ standard library, compiler runtime library, and miscellaneous tools like linker and assembler.
 
@@ -78,7 +78,7 @@ Although not tested, the following compilers can also theoretically be of use:
 
 **NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake officially-built binaries](https://cmake.org/files/v3.17/).
 
-### Essential Dependencies of CMake Build System
+### Dependencies of CMake Build System
 
 A [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
@@ -95,6 +95,10 @@ You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM 
 This project were tested working using [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 and C11 should work.
 
 **NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
+
+**NOTE** Most C libraries bundles a copy of POSIX threads library ([pthread(7)](https://www.man7.org/linux/man-pages/man7/pthreads.7.html), usually named `libpthread.so` or `libpthread.a` if statically linked) and math library (Usually named `libm.so` or `libm.a`). Those libraries are required by this project.
+
+**NOTE** Here, we assume that [`FindThread`](https://cmake.org/cmake/help/latest/module/FindThreads.html) of CMake will find pthread.
 
 ### [`pkgconf`](https://github.com/pkgconf/pkgconf)  or [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/)
 
@@ -113,7 +117,7 @@ For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions wit
 
 as your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
-## Required External Library
+## Required External Libraries
 
 Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
@@ -121,6 +125,14 @@ Dependencies are those libraries or tools that should be installed on your syste
 
 This is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are:
 
+- **REQUIRED** Essential header-only modules, including:
+  - `boost/version.hpp`
+  - `boost/random.hpp`
+  - `boost/process.hpp`
+  - `boost/math.hpp`
+  - `boost/lexical_cast.hpp`
+  - `boost/exception/all.hpp`
+  - `boost/algorithm/`
 - **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
 - **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
 - **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
@@ -130,13 +142,21 @@ This is an umbrella project of diverse small modules that can be used independen
 - **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
 - **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
 
+If benchmarking (See CMake flag `BUILD_ART_MODERN_BENCHMARKS`) is required, you may also install:
+
+- `boost/container/flat_map.hpp`
+- `boost/container/map.hpp`
+- `boost/lockfree/queue.hpp`
+
 ### [zlib](https://www.zlib.net/), at least 1.2.0
 
 For compression and decompression bundled ART error profiles.
 
-### Optional External Libraries
+## Optional External Libraries
 
-#### Accelerated Random Number Generators
+The following dependencies are optional. You may choose to install them if you want to improve the performance of the program.
+
+### Accelerated Random Number Generators
 
 Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
 
@@ -146,7 +166,7 @@ Users may also use [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/
 
 See also: CMake variable `USE_RANDOM_GENERATOR` below.
 
-#### Alternate `malloc`/`free` Implementations
+### Alternate `malloc`/`free` Implementations
 
 Users may use either [mi-malloc](https://github.com/microsoft/mimalloc) or [jemalloc](https://github.com/jemalloc/jemalloc) to slightly improve the performance of memory allocation and deallocation.
 
@@ -156,7 +176,9 @@ See also: CMake variable `USE_MALLOC` below.
 
 The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your sytstem administrator if you do not know whether and where those libraries are installed.
 
-**NOTE** Bundled dependencies may introduce security vulnerabilities.
+**NOTE** Using bundled dependencies may introduce security vulnerabilities.
+
+See also: [Copying.md](./Copying.md) for the licenses and versions of those bundled dependencies.
 
 ### [HTSLib](https://www.htslib.org/)
 
@@ -164,12 +186,12 @@ Used for reading large FASTA files and generating SAM/BAM files.
 
 See also: `USE_HTSLIB` CMake variable mentioned below.
 
-#### Bundled, at [1.22.1](https://github.com/samtools/htslib/releases/tag/1.22.1)
+#### Bundled
 
 To build bundled HTSLib sources, you need to have:
 
-- **REQUIRED** [zlib](https://www.zlib.net/).
-- **REQUIRED** [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html).
+- **REQUIRED** zlib, which is also required by this project.
+- **REQUIRED** pthread. See above section for C libraries bundling pthread.
 - **HIGHLY RECOMMENDED** [libdeflate](https://github.com/ebiggers/libdeflate): This library accelerates compressed BAM output.
 - **OPTIONAL** [libbz2](http://www.bzip.org/): For CRAM compression. 
 - **OPTIONAL** [liblzma](https://tukaani.org/xz/): For CRAM compression.
@@ -182,7 +204,63 @@ See [official HTSLib documentation](https://github.com/samtools/samtools/blob/ma
 
 Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
 
-### ... % TODO
+### [`moodycamel::ConcurrentQueue<T>`](https://github.com/cameron314/concurrentqueue)
+
+See also: `USE_CONCURRENT_QUEUE` CMake variable mentioned below.
+
+#### Bundled
+
+No additional dependency is required.
+
+#### External, at least [1.0.4](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.4)
+
+The library is header-only, so only the path to `concurrentqueue.h` is required.
+
+### [Abseil](https://github.com/abseil/abseil-cpp)
+
+See also: `USE_ABSL` CMake variable mentioned below.
+
+#### Bundled
+
+No additional dependency is required.
+
+#### External, at least [`20220623.1`](https://github.com/abseil/abseil-cpp/releases/tag/20220623.1)
+
+Make sure that Abseil can be found using CMake.
+
+### [`{fmt}`](https://github.com/fmtlib/fmt)
+
+See also: `USE_LIBFMT` CMake variable mentioned below.
+
+#### Bundled
+
+No additional dependency is required.
+
+#### External, at least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3)
+
+Make sure that `{fmt}` can be found using pkgconf. That usually requires the presence of `fmt.pc` file.
+
+## Optional Bundled/External Dependencies
+
+Not any.
+
+## Required Bundled Dependencies
+
+The required bundled depencencies of this project is `libceu`. No additional dependency is required.
+
+## Optional Bundled Dependencies
+
+### [`BS::thread_pool`](https://github.com/bshoshany/thread-pool)
+
+See also: `USE_THREAD_PARALLEL` CMake variable mentioned below.
+
+No additional dependency is required.
+
+### [PCG](https://www.pcg-random.org/)
+
+See also: `USE_RANDOM_GENERATOR` CMake variable mentioned below.
+
+No additional dependency is required.
 
 ## CMake Variables
 
@@ -260,7 +338,7 @@ Available since 1.0.0.
 The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
-- `PCG`: [PCG](https://www.pcg-random.org/) random generators. Available since 1.1.1.
+- `PCG`: PCG random generators. Available since 1.1.1.
   - **NOTE** Experimental.
   - **NOTE** This generator would fail on Mac OS X due to the lack of `cxxabi.h`.
 - `BOOST`: Use Boost random generators.
@@ -299,7 +377,7 @@ The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
   - **NOTE** This is only available in Boost >= 1.66.
-- `BS`: Will use [`BS::thread_pool`](https://github.com/bshoshany/thread-pool). Available since 1.1.1.
+- `BS`: Will use `BS::thread_pool`. Available since 1.1.1.
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
 ### `BOOST_CONFIG_PROVIDED_BY_BOOST`

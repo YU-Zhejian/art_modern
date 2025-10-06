@@ -21,11 +21,6 @@
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <boost/accumulators/accumulators_fwd.hpp>
-#include <boost/accumulators/framework/accumulator_set.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/map.hpp>
 #include <boost/log/trivial.hpp>
@@ -351,9 +346,7 @@ private:
 namespace {
 void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
 {
-    boost::accumulators::accumulator_set<double,
-        boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::variance>>
-        acc;
+    std::vector <double> acc;
 
     std::vector<am_qual_t> qual;
     std::vector<std::size_t> times;
@@ -363,16 +356,11 @@ void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
         empdist->gen_qualities(qual);
         const auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
-        for (const auto value : qual) {
-            acc(value);
-        }
+        acc.insert(acc.end(), qual.begin(), qual.end());
     }
 
     // Extract the mean and standard deviation
-    const double mean = boost::accumulators::mean(acc);
-    const double sd = std::sqrt(boost::accumulators::variance(acc));
-    BOOST_LOG_TRIVIAL(info) << std::setw(30) << name << ": " << describe(times) << "ns Q: mean=" << mean
-                            << " sd=" << sd;
+    BOOST_LOG_TRIVIAL(info) << std::setw(30) << name << ": " << describe(times) << "ns Q: values=" << describe(acc);
 }
 } // namespace
 
