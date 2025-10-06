@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 set -ue
+SHDIR="$(dirname "$(readlink -f "${0}")")"
 git ls-files |
     grep -v '\.idea' |
     grep -v 'deps' |
@@ -15,4 +16,5 @@ git ls-files |
             sed 's;$; // '"${f}"';'
     done |
     sort |
-    uniq
+    uniq |
+    python "${SHDIR}/format-boost-imports.py"
