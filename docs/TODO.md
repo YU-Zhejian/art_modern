@@ -2,7 +2,6 @@
 
 ## IMPORTANT
 
-- ART stuck at one read. Why?
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - Hack Sphinx and Sphinx SVG-to-PDF converters to allow shields.io badges in the documentation like:
 
