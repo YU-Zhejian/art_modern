@@ -37,13 +37,11 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
-#include <boost/lexical_cast.hpp>
-#include <boost/lexical_cast/bad_lexical_cast.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/math/distributions/binomial.hpp>
 #include <boost/math/distributions/complement.hpp>
-#include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
+#include <boost/program_options/parsers.hpp>
 #include <boost/program_options/value_semantic.hpp>
 #include <boost/program_options/variables_map.hpp>
 
@@ -324,14 +322,14 @@ namespace {
         }
 
         try {
-            auto d = boost::lexical_cast<double>(fcov_arg_str);
+            auto d = std::stod(fcov_arg_str);
             if (simulation_mode == SIMULATION_MODE::TEMPLATE) {
                 return CoverageInfo(d, 0.0);
             }
 
             return CoverageInfo(d);
 
-        } catch (const boost::bad_lexical_cast&) {
+        } catch (const std::invalid_argument&) {
             validate_input_filename(fcov_arg_str, ARG_FCOV);
             std::ifstream cov_fs(fcov_arg_str, std::ios::binary);
             auto coverage_info = CoverageInfo(cov_fs);

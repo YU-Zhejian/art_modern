@@ -346,7 +346,7 @@ private:
 namespace {
 void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
 {
-    std::vector <double> acc;
+    std::vector<double> acc;
 
     std::vector<am_qual_t> qual;
     std::vector<std::size_t> times;

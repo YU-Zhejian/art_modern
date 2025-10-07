@@ -3,7 +3,7 @@
 "${ART}" \
     --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
-    --i-file "${LAMBDA_PHAGE}" \
+    --i-file data/raw_data/ce11_chr1.fa \
     --read_len 150 \
     --mode wgs \
     --lc se \
@@ -21,7 +21,7 @@
     --o-hl_sam-compress_level u \
     --o-hl_sam-write_bam
 if type -p fastqc &>/dev/null && type -p x-www-browser &>/dev/null && [ ! "${NO_FASTQC:-}" = "1" ]; then
-    fastqc "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+    fastqc -t "${PARALLEL}" "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Open the browser and ignore what's happening afterwards
     {
         x-www-browser "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.html &>/dev/null || true
@@ -69,8 +69,10 @@ for fn in \
     seqkit sort <"$fn" >"$fn".srt.fq
     mv "$fn".srt.fq "$fn"
 done
-seqtk seq -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.1.fq
-seqtk seq -2 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq | seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.2.fq
+seqtk seq -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq |
+    seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.1.fq
+seqtk seq -2 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq |
+    seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.2.fq
 
 for i in 1 2; do
     cmp \

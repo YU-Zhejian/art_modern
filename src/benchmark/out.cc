@@ -210,22 +210,22 @@ int main()
         for (std::size_t const nthread : std::vector<std::size_t> { 1, 2, 4, 8, 16, 32, 64 }) {
             for (auto& bo : bo_l) {
                 bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
-                      nthread, oss);
+                    nthread, oss);
             }
             for (auto& bo : bo_t) {
                 bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
-                      nthread, oss);
+                    nthread, oss);
             }
             bench(std::make_shared<HeadlessBamReadOutput>(OUT_FILENAME, bo_defaults, nthread),
                 get_bo_name("HeadlessBamReadOutput", bo_defaults), nthread, oss);
-            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, so, nthread), get_bo_name("SamReadOutput", so), nthread,
-                  oss);
+            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, so, nthread), get_bo_name("SamReadOutput", so),
+                nthread, oss);
             bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, nthread), "FastqReadOutput", nthread, oss);
             bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, nthread), "FastaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
             bench(std::make_shared<PwaReadOutput>(OUT_FILENAME, std::vector<std::string> {}, nthread), "PwaReadOutput",
-                  nthread, oss);
+                nthread, oss);
         }
     }
 

@@ -21,6 +21,7 @@
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/si_utils.hh"
 
+#include <boost/filesystem/operations.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
@@ -30,7 +31,6 @@
 #include <string>
 #include <thread>
 #include <vector>
-#include <boost/filesystem/operations.hpp>
 
 using namespace labw::art_modern;
 

@@ -120,9 +120,9 @@ testsmall: debug raw_data
 # Run small tests with conda-installed art_modern
 # TODO: This Makefile block requires extensive revision.
 testsmall-conda: raw_data
-	conda env remove -n _art_modern_bioconda -y || true
-	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(conda run -n _art_modern_bioconda which art_modern)" $(BASH) sh.d/test-small.sh
+	# conda env remove -n _art_modern_bioconda -y || true
+	# conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
+	env ART="$(shell conda run -n _art_modern_bioconda type -p art_modern)" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release
 # Run small tests with release build

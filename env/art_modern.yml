@@ -19,6 +19,7 @@ dependencies:
   - numpy
   - pandas
   - scipy
+  - matplotlib=3.10
 
   # Code formatter
   - cmake_format

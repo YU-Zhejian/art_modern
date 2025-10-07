@@ -125,28 +125,18 @@ Dependencies are those libraries or tools that should be installed on your syste
 
 This is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are:
 
-- **REQUIRED** Essential header-only modules, including:
+- Essential header-only modules, including:
   - `boost/version.hpp`
-  - `boost/random.hpp`
-  - `boost/process.hpp`
-  - `boost/math.hpp`
-  - `boost/lexical_cast.hpp`
-  - `boost/exception/all.hpp`
-  - `boost/algorithm/`
-- **REQUIRED** [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
-- **REQUIRED** [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
-- **REQUIRED** [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
-- **REQUIRED** [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
-- **OPTIONAL** [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
-  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
-- **OPTIONAL** [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
-- **OPTIONAL** [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
+  - [Math](https://www.boost.org/doc/libs/1_85_0/libs/math/doc/html/index.html). For calulation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
+  - [Exception](https://www.boost.org/doc/libs/1_85_0/libs/exception/doc/boost-exception.html). For better exception handling.
+  - [Algorithm](https://www.boost.org/doc/libs/1_85_0/libs/algorithm/doc/html/index.html). For simple string algorithm used in non-performance-critical situations.
+- Essentiual modules that would be linked to the final executable:
+  - [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
+  - [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
+  - [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
+  - [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
 
-If benchmarking (See CMake flag `BUILD_ART_MODERN_BENCHMARKS`) is required, you may also install:
-
-- `boost/container/flat_map.hpp`
-- `boost/container/map.hpp`
-- `boost/lockfree/queue.hpp`
+**NOTE** A boost module may depend on other boost modules in either header-only or compiled form. CMake should be able to find those dependencies automatically.
 
 ### [zlib](https://www.zlib.net/), at least 1.2.0
 
@@ -155,6 +145,21 @@ For compression and decompression bundled ART error profiles.
 ## Optional External Libraries
 
 The following dependencies are optional. You may choose to install them if you want to improve the performance of the program.
+
+### Optional Boost Components
+
+- [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
+  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
+- [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
+- [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
+- [Random](https://www.boost.org/doc/libs/1_85_0/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See CMake variable `USE_RANDOM_GENERATOR` below). Can be absent if you do not choose to use Boost random number generators.
+
+If benchmarking (See CMake flag `BUILD_ART_MODERN_BENCHMARKS`) is required, you may also install:
+
+- [Container](https://www.boost.org/doc/libs/1_85_0/doc/html/container.html)
+- [LockFree](https://www.boost.org/doc/libs/1_85_0/doc/html/lockfree.html)
+- [Process](https://www.boost.org/doc/libs/1_85_0/doc/html/process.html)
+- Random.
 
 ### Accelerated Random Number Generators
 

@@ -9,7 +9,7 @@ fi
 
 export PARALLEL="0"
 export IDRATE=0.1
-export OUT_DIR="opt/tmp/"
+export OUT_DIR=$(readlink -f "opt/tmp/")
 export ART="${ART:-opt/build_debug/art_modern}"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
 export LAMBDA_PHAGE="data/raw_data/lambda_phage.fa"
