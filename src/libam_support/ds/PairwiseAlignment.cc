@@ -25,8 +25,6 @@
 #include <htslib/sam.h>
 
 #include <algorithm>
-#include <array>
-#include <cstdio>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -96,43 +94,11 @@ std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m
 std::string PairwiseAlignment::serialize(const int is_read_1_or_2) const
 {
     if (is_read_1_or_2 == 0) {
-
         return fmt::format(">{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, contig_name, pos_on_contig,
             is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
     }
     return fmt::format(">{}/{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, is_read_1_or_2, contig_name, pos_on_contig,
         is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
-}
-
-[[maybe_unused]] PairwiseAlignment PairwiseAlignment::deserialize(const std::array<std::string, NUM_LINES>& serialized)
-{
-    const auto sep_pos = serialized[0].find('\t');
-    std::string read_name = serialized[0].substr(1, sep_pos - 1);
-    const std::string& coordinate = serialized[0].substr(sep_pos + 1);
-    std::string token;
-    std::istringstream iss(coordinate);
-    std::getline(iss, token, ':');
-    std::string contig_name = std::move(token);
-    std::getline(iss, token, ':');
-    const hts_pos_t pos_on_contig = std::stol(token);
-    std::getline(iss, token, ':');
-    const bool is_plus_strand = token[0] == '+';
-
-    std::string aligned_query = serialized[1];
-    std::string aligned_ref = serialized[2];
-    std::string query = serialized[1];
-    std::string ref = serialized[2];
-    std::string qual = serialized[3];
-    query.erase(std::remove(query.begin(), query.end(), ALN_GAP), query.end());
-    ref.erase(std::remove(ref.begin(), ref.end(), ALN_GAP), ref.end());
-    std::vector<am_qual_t> qual_vec;
-    qual_vec.reserve(qual.size());
-    for (const char c : qual) {
-        qual_vec.push_back(static_cast<am_qual_t>(c) - PHRED_OFFSET);
-    }
-
-    return { std::move(read_name), std::move(contig_name), std::move(query), std::move(ref), std::move(qual),
-        std::move(qual_vec), std::move(aligned_query), std::move(aligned_ref), pos_on_contig, is_plus_strand };
 }
 
 PWAException::PWAException(const char* msg)

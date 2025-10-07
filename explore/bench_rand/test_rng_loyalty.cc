@@ -5,6 +5,8 @@
 #include <iostream>
 #include <random>
 
+namespace {
+
 std::string to_hex(char* buff)
 {
     std::string res;
@@ -21,7 +23,7 @@ std::string to_hex(char* buff)
     }
     return res;
 }
-
+} // namespace
 int main()
 {
     std::size_t i = 0;

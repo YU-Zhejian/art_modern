@@ -18,21 +18,7 @@ int main(void)
     free(filename);
 
     swrite_Basic = FALSE;
-    swrite_Host = FALSE;
-    swrite_Parameters = FALSE;
-    swrite_Collectors = FALSE;
-    swrite_Classes = FALSE;
-    swrite_Counters = FALSE;
-
     bbattery_SmallCrush(gen);
-
-    swrite_Basic = FALSE;
-    swrite_Host = FALSE;
-    swrite_Parameters = FALSE;
-    swrite_Collectors = FALSE;
-    swrite_Classes = FALSE;
-    swrite_Counters = FALSE;
-    bbattery_pseudoDIEHARD(gen);
 
     unif01_DeleteExternGenBits(gen);
 

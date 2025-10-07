@@ -3,6 +3,7 @@
 // TODO:
 // 1. Add argument parsing
 // 2. Support PE BAM/SAM
+// 3. Migrate the main logic from Perl implementations.
 
 #include "libam_support/CExceptionsProxy.hh"
 

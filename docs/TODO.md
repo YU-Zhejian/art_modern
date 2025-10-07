@@ -18,7 +18,7 @@
 ## Packing
 
 - Supress all lintian issues.
-- `Install.md`: Declare bundled libraries.
+- `Install.md`: Get instructions on validating installation of jemalloc, mimalloc, GSL, and MKL.
 
 ## Performance
 
