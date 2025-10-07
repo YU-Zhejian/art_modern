@@ -190,6 +190,15 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS art_modern)
 
+file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
+add_executable(art_profile_builder ${ART_PROFILE_BUILDER_EXE_SOURCE})
+target_compile_options(art_profile_builder BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_profile_builder PUBLIC art_modern_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_profile_builder)
+endif()
+install(TARGETS art_profile_builder)
+
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
 

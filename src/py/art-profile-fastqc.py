@@ -27,7 +27,11 @@ Under the GPL v3 license
 import sys
 from typing import Tuple, List
 
-import matplotlib.pyplot as plt
+try:
+    import matplotlib.pyplot as plt
+except ImportError:
+    print("matplotlib is required for this script", file=sys.stderr)
+    sys.exit(1)
 
 qual_max = 45
 
@@ -132,7 +136,7 @@ if __name__ == "__main__":
     means = []
     quals_list = []
     qual_counts_list = []
-    with open(sys.stdin, "r", encoding="utf-8") as f:
+    with sys.stdin as f:
         for l in f:
             if l.startswith("."):
                 next_l = next(f)
