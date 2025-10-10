@@ -155,12 +155,12 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
             std::shared_ptr<BaseFastaFetch> const fetch
                 = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
             generator.init_dispatcher(fetch);
-            for (int i = 0; i < art_io_params.parallel; ++i) {
+            for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(fetch, coverage_info);
             }
         } else {
             generator.init_dispatcher(std::make_shared<FaidxFetch>(art_io_params.input_file_name));
-            for (int i = 0; i < art_io_params.parallel; ++i) {
+            for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(std::make_shared<FaidxFetch>(art_io_params.input_file_name), coverage_info);
             }
         }

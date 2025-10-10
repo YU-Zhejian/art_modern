@@ -15,8 +15,8 @@
 
 #include "art_modern_config.h"
 
-#include "art/exe/ArtCmdOpts.hh"
 #include "art/exe/main_fn.hh"
+#include "art/exe/parse_args.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/dump_utils.hh"

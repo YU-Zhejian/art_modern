@@ -63,7 +63,8 @@ void PwaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
-PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, const int n_threads)
+PwaReadOutput::PwaReadOutput(
+    const std::string& filename, const std::vector<std::string>& args, const std::size_t n_threads)
     : lfio_("PWA", filename, preamble(args))
 {
     lfio_.init_queue(n_threads, 0);

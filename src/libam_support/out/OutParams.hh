@@ -25,7 +25,7 @@
 namespace labw::art_modern {
 
 struct OutParams {
-    const int n_threads;
+    const std::size_t n_threads;
     const boost::program_options::variables_map vm;
     const std::vector<std::string> args;
     const std::shared_ptr<BaseFastaFetch> fasta_fetch;

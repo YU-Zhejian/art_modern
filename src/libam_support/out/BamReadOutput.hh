@@ -38,7 +38,7 @@ public:
     DELETE_COPY(BamReadOutput)
 
     BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-        const BamOptions& sam_options, int n_threads);
+        const BamOptions& sam_options, std::size_t n_threads);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;

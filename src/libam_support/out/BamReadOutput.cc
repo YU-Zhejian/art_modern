@@ -168,7 +168,7 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-    const BamOptions& sam_options, const int n_threads)
+    const BamOptions& sam_options, const std::size_t n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)

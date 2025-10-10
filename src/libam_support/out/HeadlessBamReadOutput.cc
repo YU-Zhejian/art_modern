@@ -45,7 +45,7 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 HeadlessBamReadOutput::HeadlessBamReadOutput(
-    const std::string& filename, const BamOptions& sam_options, const int n_threads)
+    const std::string& filename, const BamOptions& sam_options, const std::size_t n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)

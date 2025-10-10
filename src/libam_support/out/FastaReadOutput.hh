@@ -32,7 +32,7 @@ class FastaReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(FastaReadOutput)
     DELETE_COPY(FastaReadOutput)
-    explicit FastaReadOutput(const std::string& filename, int n_threads);
+    explicit FastaReadOutput(const std::string& filename, std::size_t n_threads);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;

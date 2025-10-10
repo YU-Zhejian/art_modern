@@ -13,7 +13,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art/exe/ArtCmdOpts.hh"
+#include "art/exe/parse_args.hh"
 
 #include "art/builtin_profiles.hh"
 #include "art/lib/ArtConstants.hh"
@@ -28,11 +28,11 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/out/OutputDispatcher.hh"
+#include "libam_support/utils/frontend_utils.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/param_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
-#include "libam_support/utils/version_utils.hh"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem/operations.hpp>
@@ -65,8 +65,6 @@ namespace po = boost::program_options;
 namespace labw::art_modern {
 namespace {
 
-    constexpr char ARG_VERSION[] = "version";
-    constexpr char ARG_HELP[] = "help";
     constexpr char ARG_SIMULATION_MODE[] = "mode";
     constexpr char ARG_LIB_CONST_MODE[] = "lc";
 
@@ -99,9 +97,7 @@ namespace {
     po::options_description option_parser() noexcept
     {
         const OutputDispatcherFactory out_dispatcher_factory_;
-        po::options_description general_opts("General Options");
-        general_opts.add_options()(ARG_HELP, "print out usage information");
-        general_opts.add_options()(ARG_VERSION, "display version info");
+        auto general_opts = general_options();
 
         po::options_description required_opts("Required Options");
 
@@ -186,40 +182,6 @@ namespace {
         out_dispatcher_factory_.patch_options(po_desc);
         po_desc.add(art_opts).add(parallel_opts);
         return po_desc;
-    }
-
-    void print_help(const po::options_description& po_desc) { std::cout << po_desc << std::endl; }
-
-    po::variables_map generate_vm_while_handling_help_version(
-        const po::options_description& po_desc, const int argc, char** argv)
-    {
-        if (argc == 1) {
-            // No command line arguments.
-            print_help(po_desc);
-            abort_mpi();
-        }
-        po::variables_map vm_;
-
-        try {
-            store(parse_command_line(argc, argv, po_desc), vm_);
-            notify(vm_);
-        } catch (const std::exception& exp) {
-            BOOST_LOG_TRIVIAL(fatal) << exp.what();
-            print_help(po_desc);
-            abort_mpi();
-        }
-
-        if (vm_.count(ARG_VERSION) != 0U) {
-            print_version();
-            exit_mpi();
-            std::exit(EXIT_SUCCESS);
-        }
-        if (vm_.count(ARG_HELP) != 0U) {
-            print_help(po_desc);
-            exit_mpi();
-            std::exit(EXIT_SUCCESS);
-        }
-        return vm_;
     }
 
     SIMULATION_MODE get_simulation_mode(const std::string& simulation_mode_str)
@@ -446,25 +408,6 @@ namespace {
         }
     }
 
-    int validate_parallel(const int parallel_arg)
-    {
-        int parallel = parallel_arg;
-        const auto max_threads = static_cast<int>(std::thread::hardware_concurrency());
-        if (parallel_arg == PARALLEL_ALL) {
-            parallel = max_threads;
-        } else if (parallel_arg == PARALLEL_DISABLE) {
-            parallel = 1;
-        } else if (parallel_arg > max_threads) {
-            BOOST_LOG_TRIVIAL(warning) << "parallel (" << parallel
-                                       << ") is greater than the "
-                                          "maximum number of threads available on the system ("
-                                       << max_threads << ").";
-        } else if (parallel_arg < -1) {
-            BOOST_LOG_TRIVIAL(fatal) << "parallel (" << parallel << ") must be greater than or equal to -1.";
-        }
-        return parallel;
-    }
-
     void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_len,
         const ART_LIB_CONST_MODE art_lib_const_mode, const SIMULATION_MODE art_simulation_mode)
     {
@@ -565,7 +508,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len, art_lib_const_mode, art_simulation_mode);
     const auto pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
 
-    const auto& parallel = validate_parallel(get_param<int>(vm_, ARG_PARALLEL));
+    const auto& parallel = n_threads_from_parallel(get_param<int>(vm_, ARG_PARALLEL));
 
     auto qdist
         = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),

@@ -62,7 +62,7 @@ void FastaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
-FastaReadOutput::FastaReadOutput(const std::string& filename, const int n_threads)
+FastaReadOutput::FastaReadOutput(const std::string& filename, const std::size_t n_threads)
     : lfio_("FASTA", filename)
 {
     lfio_.init_queue(n_threads, 0);
