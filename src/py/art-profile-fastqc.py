@@ -24,7 +24,9 @@ Under the GPL v3 license
  *    along with FastQC; if not, write to the Free Software
  *    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 """
+
 import sys
+from itertools import accumulate
 from typing import Tuple, List
 
 try:
@@ -49,6 +51,7 @@ def weighted_percentile(quals, qual_counts, percentile):
     idx = np.searchsorted(cum_counts, percentile / 100 * total)
     return quals[min(idx, len(quals) - 1)]
 
+
 def get_linear_interval(length: int) -> int:
     """
     Returns a sensible interval grouping for a given length.
@@ -70,6 +73,7 @@ def get_linear_interval(length: int) -> int:
         if multiplier == 10000000:
             raise Exception(f"Couldn't find a sensible interval grouping for length '{length}'")
 
+
 def make_ungrouped_groups(max_length: int) -> List[Tuple[int, int]]:
     groups = []
     starting_base = 1
@@ -81,6 +85,7 @@ def make_ungrouped_groups(max_length: int) -> List[Tuple[int, int]]:
         groups.append((starting_base - 1, end_base))
         starting_base += interval
     return groups
+
 
 def make_linear_base_groups(max_length: int) -> List[Tuple[int, int]]:
     if max_length <= 75:
@@ -142,10 +147,16 @@ if __name__ == "__main__":
                 next_l = next(f)
                 if not next_l.startswith("."):
                     break
-                quals_list.append( list(map(int, l.strip().split("\t")[2:])) )
-                qual_counts_list.append( list(map(int, next_l.strip().split("\t")[2 :])) )
+                quals_list.append(list(map(int, l.strip().split("\t")[2:])))
+                accumulated_counts = list(map(int, next_l.strip().split("\t")[2:]))
+                not_accumulated_counts = [accumulated_counts[0]]
+                for i in range(1, len(accumulated_counts)):
+                    not_accumulated_counts.append(accumulated_counts[i] - accumulated_counts[i - 1])
+
+                qual_counts_list.append(not_accumulated_counts)
+
     read_len = len(quals_list)
-    lingrp = make_linear_base_groups(read_len) # 0-based incl. excl.
+    lingrp = make_linear_base_groups(read_len)  # 0-based incl. excl.
     for lingrp_id, (lingrp_idx_start, lingrp_idx_end) in enumerate(lingrp):
         combined_quals = []
         combined_qual_counts = []
@@ -164,8 +175,8 @@ if __name__ == "__main__":
                 combined_dedup_qual_counts.append(0)
                 for idx, (qual, count) in enumerate(zip(combined_quals, combined_qual_counts)):
                     if qual == possible_qual:
-                        combined_dedup_qual_counts[-1] +=  count
-        boxplot_data.append(boxplot_metadata(combined_dedup_quals, combined_dedup_qual_counts) )
+                        combined_dedup_qual_counts[-1] += count
+        boxplot_data.append(boxplot_metadata(combined_dedup_quals, combined_dedup_qual_counts))
         means.append(boxplot_data[-1]["mean"])
 
     fig, ax = plt.subplots()
@@ -176,7 +187,7 @@ if __name__ == "__main__":
             break
         if lingrp_idx_end > read_len:
             lingrp_idx_end = read_len
-        if lingrp_idx_start+1 == lingrp_idx_end:
+        if lingrp_idx_start + 1 == lingrp_idx_end:
             x_names.append(f"{lingrp_idx_start+1}")
         else:
             x_names.append(f"{lingrp_idx_start+1}-{lingrp_idx_end}")

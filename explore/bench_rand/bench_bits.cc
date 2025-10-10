@@ -202,7 +202,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
     bench_bits_stl<std::ranlux48>(rng_ranlux48, "std::ranlux48");
 }
 
-
 [[maybe_unused]] void boost_main()
 {
 #ifdef Boost_FOUND
@@ -229,8 +228,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
 #endif
 }
 
-
-
 [[maybe_unused]] void mkl_main()
 {
 #ifdef MKL_FOUND
@@ -244,8 +241,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
 #endif
 }
 
-
-
 [[maybe_unused]] void absl_main()
 {
 #ifdef absl_FOUND
@@ -256,7 +251,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
     bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
 #endif
 }
-
 
 [[maybe_unused]] void pcg_main()
 {
@@ -279,7 +273,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
     bench_bits_stl<pcg64_oneseq_once_insecure>(rng_pcg64_oneseq_once_insecure, "PCG::pcg64_oneseq_once_insecure");
 }
 
-
 [[maybe_unused]] void gsl_main()
 {
 #ifdef GSL_FOUND
@@ -294,8 +287,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
 #endif
 }
 
-
-
 [[maybe_unused]] void vmt19937_main()
 {
 #ifdef BENCH_RAND_ARCH_X86
@@ -309,7 +300,6 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
     bench_bits_vmt19937<VSFMT19937BulkRandomDevice>("VSFMT19937BulkRandomDevice");
 #endif
 }
-
 
 [[maybe_unused]] void xso_main()
 {

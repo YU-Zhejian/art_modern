@@ -67,6 +67,7 @@ public:
     void stop() { should_continue_ = false; }
     [[nodiscard]] std::size_t actual_bytes_transferred() const { return actual_bytes_transferred_; }
     [[nodiscard]] bool good() const { return should_continue_ && process_.running() && stdin_pipe_.is_open(); }
+
 private:
     bp::async_pipe& stdin_pipe_;
     bool should_continue_ = true;

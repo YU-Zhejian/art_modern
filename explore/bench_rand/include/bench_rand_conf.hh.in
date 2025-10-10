@@ -4,4 +4,3 @@
 #cmakedefine GSL_FOUND
 #cmakedefine absl_FOUND
 #cmakedefine Boost_FOUND
-

@@ -35,15 +35,15 @@ std::string format_with_commas(const std::size_t number)
 
     return num_str;
 }
-std::string to_si(const double number, const int precision)
+std::string to_si(const double number, const int precision, const int base)
 {
-    std::size_t unitIndex = 0;
+    std::size_t unit_index = 0;
     auto sizeInUnit = number;
 
-    while (sizeInUnit >= 1024 && unitIndex < SI_UNITS_LENGTH) {
-        sizeInUnit /= 1024;
-        ++unitIndex;
+    while (sizeInUnit >= base && unit_index < SI_UNITS_LENGTH) {
+        sizeInUnit /= base;
+        ++unit_index;
     }
-    return fmt::format("{:.{}f}{}", sizeInUnit, precision, SI_UNITS[unitIndex]);
+    return fmt::format("{:.{}f}{}", sizeInUnit, precision, SI_UNITS[unit_index]);
 }
 } // namespace labw::art_modern

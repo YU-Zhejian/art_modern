@@ -69,9 +69,9 @@ include_directories("${CMAKE_CURRENT_LIST_DIR}/../../deps/xoshiro/include/")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/../../deps/other_rngs/")
 include_directories("${CMAKE_CURRENT_LIST_DIR}/include/")
 
-configure_file("${CMAKE_CURRENT_LIST_DIR}/include/bench_rand_conf.hh.in" "${CMAKE_CURRENT_BINARY_DIR}/include/bench_rand_conf.hh")
+configure_file("${CMAKE_CURRENT_LIST_DIR}/include/bench_rand_conf.hh.in"
+               "${CMAKE_CURRENT_BINARY_DIR}/include/bench_rand_conf.hh")
 include_directories("${CMAKE_CURRENT_BINARY_DIR}/include/")
-
 
 set(COMPILE_OPTIONS
     -O3
@@ -99,14 +99,16 @@ add_executable(bench_uniform_real bench_uniform_real.cc)
 target_link_libraries(bench_uniform_real PUBLIC ${LINK_LIBS})
 target_compile_options(bench_uniform_real PUBLIC ${COMPILE_OPTIONS})
 
-if(TESTU01_LIB_FOUND AND TESTU01_MYLIB_FOUND AND TESTU01_PROBDIST_FOUND)
-add_executable(bench_testu01 bench_testu01.cc)
-target_link_libraries(bench_testu01 PUBLIC ${LINK_LIBS} ${TESTU01_LIB} ${TESTU01_MYLIB} ${TESTU01_PROBDIST})
-target_compile_options(bench_testu01 PUBLIC ${COMPILE_OPTIONS})
+if(TESTU01_LIB_FOUND
+   AND TESTU01_MYLIB_FOUND
+   AND TESTU01_PROBDIST_FOUND)
+    add_executable(bench_testu01 bench_testu01.cc)
+    target_link_libraries(bench_testu01 PUBLIC ${LINK_LIBS} ${TESTU01_LIB} ${TESTU01_MYLIB} ${TESTU01_PROBDIST})
+    target_compile_options(bench_testu01 PUBLIC ${COMPILE_OPTIONS})
 
-add_executable(testu01_main testu01_main.c)
-target_link_libraries(testu01_main PUBLIC ${LINK_LIBS} ${TESTU01_LIB} ${TESTU01_MYLIB} ${TESTU01_PROBDIST})
-target_compile_options(testu01_main PUBLIC ${COMPILE_OPTIONS})
+    add_executable(testu01_main testu01_main.c)
+    target_link_libraries(testu01_main PUBLIC ${LINK_LIBS} ${TESTU01_LIB} ${TESTU01_MYLIB} ${TESTU01_PROBDIST})
+    target_compile_options(testu01_main PUBLIC ${COMPILE_OPTIONS})
 endif()
 
 enable_testing()

@@ -189,7 +189,6 @@ namespace {
 #endif
     }
 
-
     void print_openmp_version()
     {
 #ifdef WITH_OPENMP
