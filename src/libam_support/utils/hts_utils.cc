@@ -17,6 +17,7 @@
 #include <htslib/bgzf.h> // NOLINT
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <htslib/sam.h> // NOLINT
 
 #include <cstddef>
 
@@ -52,5 +53,4 @@ std::size_t hts_tell(htsFile* fp)
     }
     return 0;
 }
-
 } // namespace labw::art_modern

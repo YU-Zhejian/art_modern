@@ -220,14 +220,19 @@ private:
 
 namespace {
 void view_sam(const std::string& file_path, const std::shared_ptr<IntermediateEmpDist>& ied, std::size_t thread_id = 0,
-    std::size_t num_threads = 1)
+    std::size_t num_threads = 1, std::size_t num_io_threads = 4)
 {
+    htsThreadPool tpool = {NULL, 0};
+    tpool.pool = CExceptionsProxy::assert_not_null(hts_tpool_init(num_io_threads), "HTSLib", "Failed to init HTS thread pool.");
+
     auto* in
         = CExceptionsProxy::assert_not_null(hts_open(file_path.c_str(), "r"), "HTSLib", "Failed to open HTS file.");
     auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), "HTSLib", "Failed to read SAM header.");
     auto* b = CExceptionsProxy::assert_not_null(bam_init1(), "HTSLib", "Failed to init BAM record.");
     am_readnum_t num_valid_reads = 0;
     am_readnum_t num_total_reads = 0;
+    hts_set_opt(in, HTS_OPT_THREAD_POOL, &tpool);
+
     // Skip thread_id reads
     for (std::size_t i = 0; i < thread_id; ++i) {
         if (sam_read1(in, hdr, b) < 0) {
@@ -267,6 +272,7 @@ destroy:
     sam_hdr_destroy(hdr);
     bam_destroy1(b);
     hts_close(in);
+    hts_tpool_destroy(tpool.pool);
 }
 } // namespace
 
@@ -280,6 +286,7 @@ int main()
     const std::size_t read_length = 300;
     const std::size_t num_threads
         = 4; // Tell the users more than 4 threads will result in tremendous waste of CPU time.
+    const std::size_t num_io_threads = 4;
     // Since all reads needs to be parsed num_threads times.
     htsFile* file
         = CExceptionsProxy::assert_not_null(hts_open(file_path.c_str(), "r"), "HTSLib", "Failed to open HTS file.");
@@ -291,6 +298,7 @@ int main()
         return EXIT_FAILURE;
     }
     hts_close(file);
+
     IntermediateEmpDist ied(read_length);
     std::vector<std::thread> threads;
     threads.reserve(num_threads);
@@ -298,7 +306,7 @@ int main()
     for (std::size_t i = 0; i < num_threads; ++i) {
         auto this_ied = std::make_shared<IntermediateEmpDist>(read_length);
         ieds.emplace_back(this_ied);
-        threads.emplace_back(view_sam, file_path, this_ied, i, num_threads);
+        threads.emplace_back(view_sam, file_path, this_ied, i, num_threads, num_io_threads);
     }
     for (auto& t : threads) {
         t.join();
@@ -317,6 +325,7 @@ int main()
     timer.stop();
     BOOST_LOG_TRIVIAL(info) << "Time elapsed: " << timer.format();
 #endif
+    // FIXME: Redo this analysis
     // Threads: 1: Time elapsed:  11.390000s wall, 11.170000s user + 0.210000s system = 11.380000s CPU (99.9%)
     // Threads: 2: Time elapsed:  7.330000s wall, 14.270000s user + 0.320000s system = 14.590000s CPU (199.0%)
 
