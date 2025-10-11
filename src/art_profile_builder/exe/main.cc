@@ -1,8 +1,8 @@
 // TODO:
 // 1. Add argument parsing
 
-#include "art_profile_builder/exe/APBConfig.hh"
-#include "art_profile_builder/exe/IntermediateEmpDist.hh"
+#include "art_profile_builder/lib/APBConfig.hh"
+#include "art_profile_builder/lib/IntermediateEmpDist.hh"
 #include "art_profile_builder/exe/main_fn.hh"
 #include "art_profile_builder/exe/parse_args.hh"
 

@@ -1,6 +1,6 @@
 #include "art_profile_builder/exe/parse_args.hh"
 
-#include "art_profile_builder/exe/APBConfig.hh"
+#include "art_profile_builder/lib/APBConfig.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"

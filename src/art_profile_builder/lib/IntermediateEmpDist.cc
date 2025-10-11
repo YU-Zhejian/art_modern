@@ -1,6 +1,6 @@
-#include "art_profile_builder/exe/IntermediateEmpDist.hh"
+#include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
-#include "art_profile_builder/exe/IntermediateEmpDistPosition.hh"
+#include "IntermediateEmpDistPosition.hh"
 
 #include "libam_support/utils/arithmetic_utils.hh"
 

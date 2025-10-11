@@ -1,6 +1,6 @@
 #pragma once
 
-#include "art_profile_builder/exe/IntermediateEmpDistPosition.hh"
+#include "art_profile_builder/lib/IntermediateEmpDistPosition.hh"
 
 #include "libam_support/utils/class_macros_utils.hh"
 

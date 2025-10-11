@@ -1,4 +1,4 @@
-#include "art_profile_builder/exe/IntermediateEmpDistPosition.hh"
+#include "art_profile_builder/lib/IntermediateEmpDistPosition.hh"
 
 #include "libam_support/Constants.hh"
 

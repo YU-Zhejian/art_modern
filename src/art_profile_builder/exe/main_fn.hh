@@ -1,6 +1,6 @@
 #pragma once
-#include "art_profile_builder/exe/APBConfig.hh"
-#include "art_profile_builder/exe/IntermediateEmpDist.hh"
+#include "art_profile_builder/lib/APBConfig.hh"
+#include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include <memory>
 

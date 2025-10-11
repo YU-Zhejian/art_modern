@@ -1,6 +1,6 @@
 #pragma once
 
-#include "art_profile_builder/exe/APBConfig.hh"
+#include "art_profile_builder/lib/APBConfig.hh"
 
 namespace labw::art_modern {
 
