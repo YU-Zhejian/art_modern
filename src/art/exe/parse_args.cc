@@ -164,14 +164,14 @@ namespace {
         art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>()->default_value(0),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
-        art_opts.add_options()(ARG_Q_SHIFT_1, po::value<am_qual_t>()->default_value(0),
-            "the amount to shift every first-read quality score by");
-        art_opts.add_options()(ARG_Q_SHIFT_2, po::value<am_qual_t>()->default_value(0),
+        art_opts.add_options()(
+            ARG_Q_SHIFT_1, po::value<int>()->default_value(0), "the amount to shift every first-read quality score by");
+        art_opts.add_options()(ARG_Q_SHIFT_2, po::value<int>()->default_value(0),
             "the amount to shift every second-read quality score by");
         art_opts.add_options()(
-            ARG_MIN_QUAL, po::value<am_qual_t>()->default_value(MIN_QUAL), "the minimum base quality score");
+            ARG_MIN_QUAL, po::value<int>()->default_value(MIN_QUAL), "the minimum base quality score");
         art_opts.add_options()(
-            ARG_MAX_QUAL, po::value<am_qual_t>()->default_value(MAX_QUAL), "the maximum base quality score");
+            ARG_MAX_QUAL, po::value<int>()->default_value(MAX_QUAL), "the maximum base quality score");
 
         po::options_description parallel_opts("Parallelism-related options");
         parallel_opts.add_options()(ARG_PARALLEL, po::value<int>()->default_value(PARALLEL_ALL),
@@ -510,11 +510,10 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
 
     const auto& parallel = n_threads_from_parallel(get_param<int>(vm_, ARG_PARALLEL));
 
-    auto qdist
-        = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
-            get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len, art_lib_const_mode, sep_flag,
-            get_param<am_qual_t>(vm_, ARG_Q_SHIFT_1), get_param<am_qual_t>(vm_, ARG_Q_SHIFT_2),
-            get_param<am_qual_t>(vm_, ARG_MIN_QUAL), get_param<am_qual_t>(vm_, ARG_MAX_QUAL));
+    auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
+        get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
+        art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
+        get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
     std::array<double, HIGHEST_QUAL> err_prob {};
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);

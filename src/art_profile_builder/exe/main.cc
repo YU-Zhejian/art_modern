@@ -1,13 +1,9 @@
-// TODO:
-// 1. Add argument parsing
-
-#include "art_profile_builder/lib/APBConfig.hh"
-#include "art_profile_builder/lib/IntermediateEmpDist.hh"
 #include "art_profile_builder/exe/main_fn.hh"
 #include "art_profile_builder/exe/parse_args.hh"
+#include "art_profile_builder/lib/APBConfig.hh"
+#include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
-#include "libam_support/CExceptionsProxy.hh"
-#include "libam_support/utils/si_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -16,13 +12,11 @@
 #endif
 
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
-#include <string>
 #include <thread>
 #include <vector>
-
-#include "libam_support/utils/mpi_utils.hh"
 
 using namespace labw::art_modern;
 
@@ -37,12 +31,11 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 #endif
+    const APBConfig config = parse_args(argc, argv);
 
 #ifdef WITH_BOOST_TIMER
     boost::timer::cpu_timer timer;
 #endif
-
-    const APBConfig config = parse_args(argc, argv);
 
     std::vector<std::thread> threads;
     threads.reserve(config.num_threads);
@@ -68,7 +61,9 @@ int main(int argc, char** argv)
         ied1.add(*other_ied);
     }
     ied1.accumulate();
-    ied1.write(std::cout);
+    std::ofstream out1_s { config.output_1_file_path, std::ios::out };
+    ied1.write(out1_s, config.is_ob);
+    out1_s.close();
 
     if (config.is_pe) {
         IntermediateEmpDist ied2(config.read_length);
@@ -76,7 +71,9 @@ int main(int argc, char** argv)
             ied2.add(*other_ied);
         }
         ied2.accumulate();
-        ied2.write(std::cout);
+        std::ofstream out2_s { config.output_2_file_path, std::ios::out };
+        ied2.write(out2_s, config.is_ob);
+        out2_s.close();
     }
 
     BOOST_LOG_TRIVIAL(info) << "Done.";
@@ -85,10 +82,6 @@ int main(int argc, char** argv)
     timer.stop();
     BOOST_LOG_TRIVIAL(info) << "Time elapsed: " << timer.format();
 #endif
-    // FIXME: Redo this analysis
-    // Threads: 1: Time elapsed:  11.390000s wall, 11.170000s user + 0.210000s system = 11.380000s CPU (99.9%)
-    // Threads: 2: Time elapsed:  7.330000s wall, 14.270000s user + 0.320000s system = 14.590000s CPU (199.0%)
-
     exit_mpi();
     return EXIT_SUCCESS;
 }

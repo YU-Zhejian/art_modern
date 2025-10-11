@@ -1,12 +1,11 @@
 #pragma once
 
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <cstdlib>
 #include <iostream>
-#include <memory>
-#include <stdexcept>
 #include <vector>
 
 namespace labw::art_modern {
@@ -14,13 +13,14 @@ class IntermediateEmpDistPosition {
 public:
     constexpr static std::size_t ALL_IDX = 0;
     constexpr static std::size_t A_IDX = 1;
-    constexpr static std::size_t C_IDX = 2;
+    constexpr static std::size_t T_IDX = 2;
     constexpr static std::size_t G_IDX = 3;
-    constexpr static std::size_t T_IDX = 4;
+    constexpr static std::size_t C_IDX = 4;
     constexpr static std::size_t N_IDX = 5;
-    constexpr static std::size_t BASE_IDX[] = { ALL_IDX, A_IDX, C_IDX, G_IDX, T_IDX, N_IDX };
-    constexpr static char IDX_BASE[] = { '.', 'A', 'C', 'G', 'T', 'N' };
+    constexpr static std::size_t BASE_IDX[] = { ALL_IDX, A_IDX, T_IDX, G_IDX, C_IDX, N_IDX };
+    constexpr static char IDX_BASE[] = { '.', 'A', 'T', 'G', 'C', 'N' };
     constexpr static std::size_t NUM_BASES = 6; // ACGTN + all
+    constexpr static std::size_t WIDTH = (MAX_QUAL - MIN_QUAL + 1);
     /** ASCII to index
      *
      *  Generated using Python:
@@ -60,7 +60,7 @@ public:
 
     void add(IntermediateEmpDistPosition const& other);
 
-    void write(std::ostream& oss, std::size_t pos_id, std::size_t base_idx) const;
+    void write(std::ostream& oss, std::size_t pos_id, std::size_t base_idx, bool is_ob) const;
 
 private:
     std::vector<std::size_t> data_;

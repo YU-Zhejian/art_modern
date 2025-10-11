@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 Based on the original FastQC source code:
 <https://github.com/s-andrews/FastQC> commit 29c8f8b
@@ -26,7 +28,6 @@ Under the GPL v3 license
 """
 
 import sys
-from itertools import accumulate
 from typing import Tuple, List
 
 try:

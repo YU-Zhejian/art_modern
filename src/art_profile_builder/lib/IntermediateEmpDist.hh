@@ -8,7 +8,6 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <memory>
 #include <vector>
 
 namespace labw::art_modern {
@@ -28,7 +27,7 @@ public:
 
     void add(const IntermediateEmpDist& other);
 
-    void write(std::ostream& oss) const;
+    void write(std::ostream& oss, bool is_ob) const;
 
 private:
     std::vector<IntermediateEmpDistPosition> positions_;

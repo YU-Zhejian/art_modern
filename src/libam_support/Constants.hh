@@ -36,9 +36,9 @@ constexpr char ALN_GAP = '-';
 
 /**
  * Maximum phred-based quality score.
- * 10^{-40} error rate, which is quite low.
+ * 10^{-71} error rate, which is quite low.
  */
-constexpr am_qual_t MAX_QUAL = 40;
+constexpr am_qual_t MAX_QUAL = 71;
 /** Minimum phred-based quality score. */
 constexpr am_qual_t MIN_QUAL = 0;
 

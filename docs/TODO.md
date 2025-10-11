@@ -19,6 +19,7 @@
 
 - Supress all lintian issues.
 - `Install.md`: Get instructions on validating installation of jemalloc, mimalloc, GSL, and MKL.
+- `--rndSeed` implementation.
 
 ## Performance
 
