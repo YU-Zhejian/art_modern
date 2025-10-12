@@ -20,6 +20,8 @@
 - Supress all lintian issues.
 - `--rndSeed` implementation. However, a large chunk of docs saying that the same random generator must be used when building `art_modern` to get reproducible results.
 - Finish `art-profile-fastqc.py`.
+- Update bundled `{fmt}` to [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
+- Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
 
 ## Performance
 

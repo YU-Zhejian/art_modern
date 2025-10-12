@@ -37,15 +37,6 @@ make doc
 
 And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
 
-### Others
-
-- Run `make fmt` to format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
-- Run `make debug` to build the executable using debug mode with default compiler found by CMake.
-- Run `make release` to build the executable using release mode with default compiler found by CMake.
-- Run `make scc` to count lines of code written. Note that this excludes third-party codes so should be preferred over pure `scc` in project root.
-- Run `make touch` to touch all files in the repository. This **MAY** work when CMake does strange things like compiling the source files again and again.
-- Run `make raw_data` to download essential test data useful to various integration tests, benchmarks, etc.
-
 ## Get Engaged
 
 ### Issues
@@ -58,8 +49,14 @@ You're welcomed to send pull requests (PRs) to this project using the standard f
 
 Before you send a PR, please make sure that:
 
-- `make testsmall` passes.
 - You've run `make fmt` to format the code.
+- All CTest passes.
+- `make clean testsmall-release` passes. This test usually requires 3 to 4 minutes.
+- `make clean testsmall` passes. This test usually requires 6 to 9 minutes. Here, the additional tests that are not enabled in release mode will be activated.
+- `make testbuild` passes. This test usually requires 2.5 to 3 hours.
+
+You may also:
+
 - You used Valgrind to check for memory leaks.
 
 ## Miscellaneous Developer-Oriented Documentation

@@ -1,6 +1,6 @@
 # News \& Release Notes
 
-## 1.1.9 (Ongoing)
+## 1.1.9 (2025/10/11)
 
 - BAM output routines are largely accelerated by replacing string streams with pre-allocated strings.
 - Implemented `art_profile_builder`, a C++ tool to build ART/`art_modern` profiles out of FASTQ or SAM/BAM files with quality scores.
@@ -23,7 +23,7 @@
 
 - Support over `ccache` deprecated, which also deprecated CMake option `USE_CCACHE`.
 - Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).
-- Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version.
+- Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03)).
 - Updated bundled `{fmt}` to [11.2.0](https://github.com/fmtlib/fmt/releases/tag/11.2.0).
 - Some files without clear license were removed. Unused files from bundled `{fmt}`, `moodycamel::ConcurrentQueue<T>`, and HTSLib removed.
 - CMake options to use system shipped dependencies instead of bundled ones are added to comply with Debian policies. Namely, `USE_LIBFMT`, `USE_CONCURRENT_QUEUE`, `USE_ABSL`, and `REPRODUCIBLE_BUILDS`.

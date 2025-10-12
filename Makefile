@@ -95,16 +95,19 @@ rel_with_dbg_alpine:
 
 .PHONY: fmt
 # Run code formatting checks and auto-formatting
+# Format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [Black](https://black.readthedocs.io/en/stable/), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
 fmt:
 	$(BASH) sh.d/fmt.sh
 
 .PHONY: scc
 # Run source code counting
+# Note that this excludes third-party codes so should be preferred over pure `scc` in project root.
 scc:
 	$(BASH) sh.d/scc.sh
 
 .PHONY: touch
 # Touch all source files to current timestamp
+# This **MAY** work when CMake does strange things like compiling the source files again and again.
 touch:
 	$(BASH) sh.d/touch-all.sh
 
@@ -115,6 +118,12 @@ touch:
 #     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
 	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test-small.sh
+
+.PHONY: test-art_profile_builder
+# Run tests for art_profile_builder with release builds
+test-art_profile_builder: raw_data release
+	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
+	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
