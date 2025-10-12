@@ -184,4 +184,3 @@ Affected files:
 With Apache/MIT License.
 
 **NOTE** Added in 1.2.0.
-
