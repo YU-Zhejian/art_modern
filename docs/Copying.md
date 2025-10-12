@@ -72,7 +72,7 @@ Under the MIT License.
 
 ## Abseil by Abseil Authors
 
-Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.0`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0). The bundled source code is tailored from the [release tarball](https://github.com/abseil/abseil-cpp/releases/download/20250814.0/abseil-cpp-20250814.0.tar.gz).
+Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1). The bundled source code is tailored from the [release tarball](https://github.com/abseil/abseil-cpp/releases/download/20250814.0/abseil-cpp-20250814.0.tar.gz).
 
 Affected files:
 
@@ -84,7 +84,7 @@ Under the Apache-2.0 license.
 
 ## `{fmt}` by Victor Zverovich
 
-Available from <https://github.com/fmtlib/fmt>, commit [`40626af`](https://github.com/fmtlib/fmt/commit/40626af88bd7df9a5fb80be7b25ac85b122d6c21) (tag [`11.2.0`](https://github.com/fmtlib/fmt/releases/tag/11.2.0)).
+Available from <https://github.com/fmtlib/fmt>, release [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
 
 Affected files:
 

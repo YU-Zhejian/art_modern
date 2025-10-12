@@ -3,6 +3,11 @@ set -ue
 mkdir -p opt
 # MKL is not tested.
 
+if [ ! -z "${CMAKE_FLAGS:-}" ]; then
+    OLD_CMAKE_FLAGS="${CMAKE_FLAGS}"
+    echo "Old CMAKE_FLAGS: ${OLD_CMAKE_FLAGS}"
+fi
+
 BUILD_ONLY_TEST=1
 USE_RANDOM_GENERATOR=STL
 USE_QUAL_GEN=STL
@@ -13,7 +18,7 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
                 for USE_HTSLIB in "UNSET" "hts"; do
                     for USE_CONCURRENT_QUEUE in "UNSET" "SYS"; do
                         for USE_ABSL in "UNSET" "SYS"; do
-                            CMAKE_FLAGS=""
+                            CMAKE_FLAGS="${OLD_CMAKE_FLAGS}"
                             CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
                             CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_RANDOM_GENERATOR=${USE_RANDOM_GENERATOR}"
                             CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_THREAD_PARALLEL=${USE_THREAD_PARALLEL}"
@@ -54,7 +59,7 @@ BUILD_ONLY_TEST=2
 CMAKE_BUILD_TYPE=RelWithDebInfo
 for USE_RANDOM_GENERATOR in STL PCG GSL BOOST; do
     for USE_QUAL_GEN in WALKER STL; do
-        CMAKE_FLAGS=""
+        CMAKE_FLAGS="${OLD_CMAKE_FLAGS}"
         CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
         CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_RANDOM_GENERATOR=${USE_RANDOM_GENERATOR}"
         CMAKE_FLAGS="${CMAKE_FLAGS} -DUSE_QUAL_GEN=${USE_QUAL_GEN}"

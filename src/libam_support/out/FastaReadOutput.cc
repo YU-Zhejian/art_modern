@@ -95,6 +95,6 @@ std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& 
         return std::make_shared<FastaReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank()), params.n_threads);
     }
-    throw OutputNotSpecifiedException {};
+    throw OutputNotSpecifiedException { };
 }
 } // namespace labw::art_modern

@@ -79,10 +79,10 @@ JobPool::~JobPool() { stop(); }
 
 JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
-    {}
+    { }
 #elif defined(USE_BS_PARALLEL)
     : pool_(pool_size)
-    , pool_size_(pool_size) {}
+    , pool_size_(pool_size) { }
 #elif defined(USE_ASIO_PARALLEL)
     : pool_(pool_size)
     , pool_size_(pool_size)

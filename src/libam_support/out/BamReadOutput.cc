@@ -232,7 +232,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
             attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank()), params.fasta_fetch, so,
             params.n_threads);
     }
-    throw OutputNotSpecifiedException {};
+    throw OutputNotSpecifiedException { };
 }
 std::string BamReadOutputFactory::name() const { return "BAM"; }
 

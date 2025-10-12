@@ -50,7 +50,7 @@ static double speed_rand_read(const std::string& file_path, const std::size_t fi
     const std::size_t n_blocks)
 {
     const std::size_t valid_end = file_length - block_size;
-    std::mt19937 gen(std::random_device {}());
+    std::mt19937 gen(std::random_device { }());
     std::uniform_int_distribution<std::size_t> dist(0, valid_end);
     std::size_t i = 0;
     auto start = std::chrono::high_resolution_clock::now();

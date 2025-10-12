@@ -20,5 +20,5 @@ public:
     SPAN_RESULT_TYPE
 
 private:
-    xoroshiro_type xoroshiro_impl_ {};
+    xoroshiro_type xoroshiro_impl_ { };
 };

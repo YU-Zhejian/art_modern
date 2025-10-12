@@ -224,7 +224,7 @@ int main()
             bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, nthread), "FastaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
-            bench(std::make_shared<PwaReadOutput>(OUT_FILENAME, std::vector<std::string> {}, nthread), "PwaReadOutput",
+            bench(std::make_shared<PwaReadOutput>(OUT_FILENAME, std::vector<std::string> { }, nthread), "PwaReadOutput",
                 nthread, oss);
         }
     }

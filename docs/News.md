@@ -2,6 +2,8 @@
 
 ## 1.1.10 (Ongoing)
 
+- Update bundled `{fmt}` to [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
+- Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
 - Miscellaneous bug fixes.
 
 ## 1.1.9 (2025/10/11)

@@ -55,6 +55,17 @@ Before you send a PR, please make sure that:
 - `make clean testsmall` passes. This test usually requires 6 to 9 minutes. Here, the additional tests that are not enabled in release mode will be activated.
 - `make testbuild` passes. This test usually requires 2.5 to 3 hours.
 
+**NOTE** A LLVM build can be tested through:
+
+```shell
+LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
+    PKG_CONFIG_PATH=${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/ \
+    make testbuild \
+    CMAKE_FLAGS='-DCMAKE_TOOLCHAIN_FILE=sh.d/toolchain/llvm-toolchain.cmake -DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/ -DCMAKE_VERBOSE_MAKEFILE=ON'
+```
+
+Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and `${HOME}/opt/boost-1.89.0-clang` respectively.
+
 You may also:
 
 - You used Valgrind to check for memory leaks.

@@ -44,6 +44,7 @@ public:
 
     VMT19937RandomDevice()
     {
+        // FIXME: Abspath warning!
         MT19937Matrix const* jumpMatrix = new MT19937Matrix(
             "/home/yuzj/Documents/pbsim3_modern/deps/VMT19937-master/dat/mt/dat2/" + std::string(get_filename()));
         rand_stream_ = new VMT19937<SIMD_N_BITS, QM_Scalar>(SEED_INIT, SEED_LENGTH, 0, nullptr, jumpMatrix);
