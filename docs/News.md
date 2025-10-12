@@ -1,5 +1,9 @@
 # News \& Release Notes
 
+## 1.1.11 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 ## 1.1.10 (2025/10/12)
 
 - Fixed #7. In details:
