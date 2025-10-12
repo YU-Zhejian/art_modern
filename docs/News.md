@@ -6,8 +6,7 @@
 - Implemented `art_profile_builder`, a C++ tool to build ART/`art_modern` profiles out of FASTQ or SAM/BAM files with quality scores.
 - Extensively revised documentation for installation.
 - The simulator now supports `/dev/null` or an empty file as input.
-  - It will generate empty FASTA/FASTQ/PWA files as output, if you ask.
-  - Remember to specify `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
+- Boost.Thread removed from required dependencies.
 - Miscellaneous bug fixes.
 
 ## 1.1.8 (2025/09/29)

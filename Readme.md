@@ -152,7 +152,7 @@ opt/build_release/art_modern \
 
 To simulate data with unstranded coverage information (i.e., same coverage on both strands), you need to provide an additional TSV file with one column of transcript ID and another column of coverage (in floating points). Please note that lines started by `#` will be ignored. An example of the coverage file:
 
-```tsv
+```text
 NM_069135	6.695683025425357
 NR_056112	5.19437291612395
 NR_051843	3.4504965075273137
@@ -182,7 +182,7 @@ opt/build_release/art_modern \
 
 To simulate data with stranded coverage information (i.e., coverage on one strand is different from the other), you need to provide an additional TSV file with one column of transcript ID and two other columns of coverage in positive and negative strand (in floating points). An example of the coverage file:
 
-```tsv
+```text
 NM_069135	2.3137902802960717	4.381892745129285
 NR_056112	3.47140212944225	1.7229707866816995
 NR_051843	1.3540475385633155	2.0964489689639985
@@ -211,7 +211,7 @@ opt/build_release/art_modern \
 
 The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarly, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
 
-```tsv
+```text
 NR_056112	3.47140212944225	1.7229707866816995	aaaa
 NR_051843	1.3540475385633155	2.0964489689639985	aaaa
 NR_066512	3.0468993830563917	1.689420648507448	aaaa

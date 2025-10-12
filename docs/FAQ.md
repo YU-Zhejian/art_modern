@@ -1,43 +1,5 @@
 # Frequently Asked Questions (FAQs)
 
-## I/O Formats
-
-### What kinds of FASTA files are supported?
-
-The following kinds of FASTA files are supported:
-
-```text
->one_line_fasta
-AAAAAAAAAAAAAAAAA
->multi_line_fasta
-AAAAAAAAA
-AAAAAAAAA
-AAAAAAAAA
->fasta_with_empty_sequence
->fasta_with_empty_sequence_with_newlines
-
-
-
->fasta_with_spaces_in_name some description here
-AAAAAAAAA
-```
-
-Note that `fasta_with_empty_sequence_with_newlines` is **NOT** supported by [PacBio Formats](https://pacbiofileformats.readthedocs.io/en/13.0/FASTA.html) or NCBI GenBank FASTA Specification](https://www.ncbi.nlm.nih.gov/genbank/fastaformat/) and [NCBI GenBank Submission Guidelines](https://www.ncbi.nlm.nih.gov/genbank/genomesubmit/#files).
-
-The following kinds of FASTA files are **NOT** supported:
-
-```text
-> some_sequence_without_a_name
-AAAAAAAA
-```
-
-Also, note that all characters other than `ACGTacgt` will be regarded as `N`. We do **NOT** support IUPAC codes.
-
-### Why is UCSC 2-bit format not supported?
-
-1. Developing a 2-bit parser is time-consuming, especially when endianness (2-bit files allow both endianness), 64-bit offsets, masking, and other edge cases are considered.
-2. Whether the UCSC 2-bit format improves I/O performance is questionable. See [this HTSJDK PR](https://github.com/samtools/htsjdk/pull/1417) for details.
-
 ## Simulation
 
 ### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?

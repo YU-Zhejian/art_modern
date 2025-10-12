@@ -18,8 +18,8 @@
 ## Packing
 
 - Supress all lintian issues.
-- `Install.md`: Get instructions on validating installation of jemalloc, mimalloc, GSL, and MKL.
-- `--rndSeed` implementation.
+- `--rndSeed` implementation. However, a large chunk of docs saying that the same random generator must be used when building `art_modern` to get reproducible results.
+- Finish `art-profile-fastqc.py`.
 
 ## Performance
 

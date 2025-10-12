@@ -9,7 +9,7 @@ if(DEFINED USE_LIBFMT)
             LINKER_FLAG
             ${USE_LIBFMT}
             PKGCONF_NAME
-            htslib)
+            fmt)
     endif()
 
     if(NOT TARGET CEU_CM_EFL::libfmt)

@@ -26,17 +26,16 @@ endif()
 if(NOT ${CMAKE_VERSION} VERSION_LESS "3.11.0")
     find_package(
         Boost REQUIRED
-        COMPONENTS filesystem program_options thread log_setup log
+        COMPONENTS filesystem program_options log_setup log
         OPTIONAL_COMPONENTS unit_test_framework timer stacktrace_basic stacktrace_backtrace stacktrace_windbg)
 else()
     # Only required modules are searched stacktrace_basic may have bug with low versions of Boost & CMake, so not
     # included.
-    find_package(Boost REQUIRED COMPONENTS filesystem program_options thread log_setup log)
+    find_package(Boost REQUIRED COMPONENTS filesystem program_options log_setup log)
 endif()
 include_directories(${Boost_INCLUDE_DIRS})
 
-set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::filesystem Boost::program_options Boost::thread
-                         Boost::log_setup Boost::log)
+set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} Boost::filesystem Boost::program_options Boost::log_setup Boost::log)
 unset(WITH_BOOST_TIMER)
 if(Boost_timer_FOUND)
     set(WITH_BOOST_TIMER ON)

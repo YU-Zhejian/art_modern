@@ -1,5 +1,7 @@
 # Installing `art_modern`
 
+Here provides a detailed installation guide for `art_modern`.
+
 ## Operating System
 
 The project assumes x86\_64 (Intel, AMD, Zhaoxin, etc.) platforms. Other platform support is not guaranteed.
@@ -12,20 +14,18 @@ This project used bundled source code of [Google Abseil](https://abseil.io/), wh
 
 ## C/C++ Compilers
 
-This project requires a working C++ compiler that supports C++17 and a working C compiler that supports C11 (for bundled HTSLib). That also includes the C++ standard library, compiler runtime library, and miscellaneous tools like linker and assembler.
-
 ### Checking C11 and C++17 Compatibility
 
-See [this cppreference article for C11](https://en.cppreference.com/w/c/11) and [this cppreference article for C++17](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports those versions. You may test whether your compiler (GCC, for example) using:
+This project requires a working C++ compiler that supports C++17 and a working C compiler that supports C11. See [this cppreference article for C11](https://en.cppreference.com/w/c/11) and [this cppreference article for C++17](https://en.cppreference.com/w/cpp/17) for a table of the minimum compiler version that supports those versions.
+
+You may also test whether your compiler (GCC, for example) supports such standard using:
 
 ```shell
 echo 'int main(){}' | gcc --std=c11 -x c - -o /dev/null
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-If there's no error, the compiler **MIGHT** be supported. If there's an error, the compiler is definitely **NOT** supported.
-
-**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features.
+**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features. In other words, if there's no error, the compiler **MIGHT** be supported. If there's an error, the compiler is definitely **NOT** supported.
 
 **NOTE** The CMake build scripts inside this project contains a script that tests compiler compatibility which will be automatically executed when configuring the project.
 
@@ -71,6 +71,7 @@ Although not tested, the following compilers can also theoretically be of use:
 - [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html) should work as all versions of this compiler support C++17. Specifically,
   - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
   - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
+- [ARM Compiler for Linux](https://developer.arm.com/Tools%20and%20Software/Arm%20Compiler%20for%20Linux#Downloads) **MAY** work on ARM-based HPC systems.
 
 ## Essential Tools for Building
 
@@ -80,11 +81,11 @@ Although not tested, the following compilers can also theoretically be of use:
 
 ### Dependencies of CMake Build System
 
-A [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
+CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable.
 
-[Python](https://www.python.org/) >= 3.7, for embedding bundled Illumina profiles and `make help`.
+This project requires [Python](https://www.python.org/) later than (inclusive) 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not requried at runtime.
 
-POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+This project also requires a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
 ### Linkers, Assemblers, Archivers, etc
 
@@ -127,20 +128,23 @@ This is an umbrella project of diverse small modules that can be used independen
 
 - Essential header-only modules, including:
   - `boost/version.hpp`
-  - [Math](https://www.boost.org/doc/libs/1_85_0/libs/math/doc/html/index.html). For calulation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
-  - [Exception](https://www.boost.org/doc/libs/1_85_0/libs/exception/doc/boost-exception.html). For better exception handling.
-  - [Algorithm](https://www.boost.org/doc/libs/1_85_0/libs/algorithm/doc/html/index.html). For simple string algorithm used in non-performance-critical situations.
+  - [Math](https://www.boost.org/doc/libs/latest/libs/math/doc/html/index.html). For calulation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
+  - [Exception](https://www.boost.org/doc/libs/latest/libs/exception/doc/boost-exception.html). For better exception handling.
+  - [Algorithm](https://www.boost.org/doc/libs/latest/libs/algorithm/doc/html/index.html). For simple string algorithm used in non-performance-critical situations.
 - Essentiual modules that would be linked to the final executable:
-  - [FileSystem](https://www.boost.org/doc/libs/1_85_0/libs/filesystem/).
-  - [Program Options](https://www.boost.org/doc/libs/1_85_0/libs/program_options/).
-  - [Thread](https://www.boost.org/doc/libs/1_85_0/libs/thread/).
-  - [Log](https://www.boost.org/doc/libs/1_85_0/libs/log/).
+  - [FileSystem](https://www.boost.org/doc/libs/latest/libs/filesystem/). See FAQ for why this module instead of C++17 `<filesystem>` is required.
+  - [Program Options](https://www.boost.org/doc/libs/latest/libs/program_options/). For parsing command-line options.
+  - [Log](https://www.boost.org/doc/libs/latest/libs/log/). For logging support.
 
 **NOTE** A boost module may depend on other boost modules in either header-only or compiled form. CMake should be able to find those dependencies automatically.
+
+Boost modules are found through `find_package(Boost ...)` command of CMake. This usually requires the presence of `BoostConfig.cmake` (Provided by Boost) or [`FindBoost.cmake`](https://cmake.org/cmake/help/latest/module/FindBoost.html) (provided by CMake) file. See `BOOST_CONFIG_PROVIDED_BY_BOOST` CMake variable mentioned below for details.
 
 ### [zlib](https://www.zlib.net/), at least 1.2.0
 
 For compression and decompression bundled ART error profiles.
+
+The project will firstly try to find HTSLib using pkgconf. That usually requires the presence of `zlib.pc` file. If failed, will fallback to `libz.so`/`libz.a` with optional version suffixes.
 
 ## Optional External Libraries
 
@@ -148,34 +152,36 @@ The following dependencies are optional. You may choose to install them if you w
 
 ### Optional Boost Components
 
-- [StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
-  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/1_85_0/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
-- [Test](https://www.boost.org/doc/libs/1_85_0/libs/test/): For unit testing only. Can be absent for non-developers.
-- [Timer](https://www.boost.org/doc/libs/1_85_0/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
-- [Random](https://www.boost.org/doc/libs/1_85_0/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See CMake variable `USE_RANDOM_GENERATOR` below). Can be absent if you do not choose to use Boost random number generators.
+- [StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
+  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
+- [Test](https://www.boost.org/doc/libs/latest/libs/test/): For unit testing only. Can be absent for non-developers.
+- [Timer](https://www.boost.org/doc/libs/latest/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
+- [Random](https://www.boost.org/doc/libs/latest/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See CMake variable [`USE_RANDOM_GENERATOR`](#use-random-generator-section) below). Can be absent if you do not choose to use Boost random number generators.
 
 If benchmarking (See CMake flag `BUILD_ART_MODERN_BENCHMARKS`) is required, you may also install:
 
-- [Container](https://www.boost.org/doc/libs/1_85_0/doc/html/container.html)
-- [LockFree](https://www.boost.org/doc/libs/1_85_0/doc/html/lockfree.html)
-- [Process](https://www.boost.org/doc/libs/1_85_0/doc/html/process.html)
+- [Container](https://www.boost.org/doc/libs/latest/doc/html/container.html).
+- [LockFree](https://www.boost.org/doc/libs/latest/doc/html/lockfree.html).
+- [Process](https://www.boost.org/doc/libs/latest/doc/html/process.html).
 - Random.
 
 ### Accelerated Random Number Generators
 
-Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html).
+Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). This requries you to install the Intel oneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
 
 **NOTE** This library is propertary software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
 
-Users may also use [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/), which may be faster in specific platforms.
+Users may also use [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/), which may be faster in specific platforms. This requires GSL to be locatable using [`FindGSL.cmake`](https://cmake.org/cmake/help/latest/module/FindGSL.html), which is shipped with CMake since 3.21.0.
 
-See also: CMake variable `USE_RANDOM_GENERATOR` below.
+See also: CMake variable [`USE_RANDOM_GENERATOR`](#use-random-generator-section) below.
 
 ### Alternate `malloc`/`free` Implementations
 
 Users may use either [mi-malloc](https://github.com/microsoft/mimalloc) or [jemalloc](https://github.com/jemalloc/jemalloc) to slightly improve the performance of memory allocation and deallocation.
 
-See also: CMake variable `USE_MALLOC` below.
+For jemalloc, `jemalloc.pc` file is required. For mi-malloc, `mimalloc-config.cmake` file is required.
+
+See also: CMake variable [`USE_MALLOC`](#use-malloc-section) below.
 
 ## Required Bundled/External Libraries
 
@@ -189,7 +195,7 @@ See also: [Copying.md](./Copying.md) for the licenses and versions of those bund
 
 Used for reading large FASTA files and generating SAM/BAM files.
 
-See also: `USE_HTSLIB` CMake variable mentioned below.
+See also: [`USE_HTSLIB`](#use-htslib-section) CMake variable mentioned below.
 
 #### Bundled
 
@@ -207,7 +213,9 @@ See [official HTSLib documentation](https://github.com/samtools/samtools/blob/ma
 
 #### External, at least [1.14](https://github.com/samtools/htslib/releases/tag/1.14)
 
-Those libraries usually named `libhts.so`/`libhts.a` with optional version suffixes. HTSLib >= 1.14 is required due to the use of `sam_flush`.
+HTSLib later than 1.14 is required due to the use of `sam_flush`.
+
+The project will firstly try to find HTSLib using pkgconf. That usually requires the presence of `htslib.pc` file. If failed, will fallback to `lib[val].so`/`lib[val].a` with optional version suffixes where `[val]` is the value of [`USE_HTSLIB`](#use-htslib-section) CMake variable.
 
 ### [`moodycamel::ConcurrentQueue<T>`](https://github.com/cameron314/concurrentqueue)
 
@@ -223,7 +231,7 @@ The library is header-only, so only the path to `concurrentqueue.h` is required.
 
 ### [Abseil](https://github.com/abseil/abseil-cpp)
 
-See also: `USE_ABSL` CMake variable mentioned below.
+See also: [`USE_ABSL`](#use-absl-section) CMake variable mentioned below.
 
 #### Bundled
 
@@ -231,11 +239,11 @@ No additional dependency is required.
 
 #### External, at least [`20220623.1`](https://github.com/abseil/abseil-cpp/releases/tag/20220623.1)
 
-Make sure that Abseil can be found using CMake.
+Make sure that Abseil can be found using CMake. This usually requires the presence of `abslConfig.cmake` file.
 
 ### [`{fmt}`](https://github.com/fmtlib/fmt)
 
-See also: `USE_LIBFMT` CMake variable mentioned below.
+See also: [`USE_LIBFMT`](#use-libfmt-section) CMake variable mentioned below.
 
 #### Bundled
 
@@ -243,7 +251,7 @@ No additional dependency is required.
 
 #### External, at least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3)
 
-Make sure that `{fmt}` can be found using pkgconf. That usually requires the presence of `fmt.pc` file.
+The project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failefd, will fallback to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable.
 
 ## Optional Bundled/External Dependencies
 
@@ -257,15 +265,15 @@ The required bundled depencencies of this project is `libceu`. No additional dep
 
 ### [`BS::thread_pool`](https://github.com/bshoshany/thread-pool)
 
-See also: `USE_THREAD_PARALLEL` CMake variable mentioned below.
-
 No additional dependency is required.
+
+See also: [`USE_THREAD_PARALLEL`](#use-thread-parallel-section) CMake variable mentioned below.
 
 ### [PCG](https://www.pcg-random.org/)
 
-See also: `USE_RANDOM_GENERATOR` CMake variable mentioned below.
-
 No additional dependency is required.
+
+See also: [`USE_RANDOM_GENERATOR`](#use-random-generator-section) CMake variable mentioned below.
 
 ## CMake Variables
 
@@ -290,6 +298,7 @@ This instructs CMake whether to build shared libraries. It will also affect beha
 
 The project should be able to be compiled into a fully static binary on [Alpine Linux](https://alpinelinux.org/) or [Void Linux](https://voidlinux.org/) with [musl libc](https://musl.libc.org/) as the standard C library. See [this blog by Li Heng](https://lh3.github.io/2014/07/12/about-static-linking) for why static linking may simplify distribution and deployment of bioinformatics software. However, this may lead to a larger binary size and security risks. See [this Debian Wiki](https://wiki.debian.org/StaticLinking) for more details.
 
+(cmake-build-type-section)=
 ### [`CMAKE_BUILD_TYPE`](https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html)
 
 Available since 1.0.0.
@@ -305,7 +314,7 @@ This instructs CMake to build executables/libraries with different optimization 
 
 Available since 1.1.1.
 
-Path to [Python](https://www.python.org/) >= 3.7. Default to `python3`.
+Path to the Python intepreter. Default to `python3`.
 
 ### `CEU_CM_SHOULD_USE_NATIVE`
 
@@ -326,6 +335,7 @@ Whether test should be enabled.
 - `OFF`: Will disable test.
 - `ON`: Will enable test.
 
+(use-htslib-section)=
 ### `USE_HTSLIB`
 
 Available since 1.0.0.
@@ -333,9 +343,10 @@ Available since 1.0.0.
 Use which HTSLib implementation.
 
 - **unset (DEFAULT): Will use bundled HTSLib.**
-- `hts`: Will use the HTSLib (`libhts.so`) found in the system.
-- Any other value `[val]`: Will use the HTSLib of other names (`lib[val].so`) found in the system.
+- `hts`: Will use the HTSLib found in the system.
+- Any other value `[val]`: Will use the HTSLib of other names (`lib[val].so`/`lib[val].a`) found in the system.
 
+(use-random-generator-section)=
 ### `USE_RANDOM_GENERATOR`
 
 Available since 1.0.0.
@@ -344,16 +355,11 @@ The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: PCG random generators. Available since 1.1.1.
-  - **NOTE** Experimental.
-  - **NOTE** This generator would fail on Mac OS X due to the lack of `cxxabi.h`.
 - `BOOST`: Use Boost random generators.
-- `GSL`: Use GSL random generators.
-  - This is used in the original ART.
-  - **NOTE** Slow on Intel CPUs.
+- `GSL`: Use GSL random generators. This is used in the original ART.
 - `ONEMKL`: Use Intel OneAPI MKL random generators.
-  - **NOTE** Highly recommended on Intel CPUs.
 
-On my system for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
+On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html)) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
 ```text
     VSFMT19937BulkRandomDevice(32 bits): gmean:        241; mean/sd:           241/3 us
@@ -374,6 +380,7 @@ On my system for generating filling 1024 random 32-bit unsigned integers 1024 ti
 
 **NOTE** VSFMT is currently not available.
 
+(use-thread-parallel-section)=
 ### `USE_THREAD_PARALLEL`
 
 Available since 1.0.0.
@@ -381,7 +388,7 @@ Available since 1.0.0.
 The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
-  - **NOTE** This is only available in Boost >= 1.66.
+  - **NOTE** This is only available in Boost later than 1.66.
 - `BS`: Will use `BS::thread_pool`. Available since 1.1.1.
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
@@ -389,7 +396,7 @@ The thread-level parallelism strategy.
 
 Available since 1.1.3.
 
-Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost < 1.70 with CMake >= 3.30.
+Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost earlier than 1.69 with CMake latter than 3.30.
 
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
@@ -403,6 +410,7 @@ The quality generation algorithm. Theoretically, different algorithms should gen
 - **`WALKER` (DEFAULT): Use [Walker's Algorithm](https://doi.org/10.1145/355744.355749) to accelerate quality synthesis.**
 - `STL`: Use binary search algorithm implemented in `std::map`. This is identical to the original ART.
 
+(use-malloc-section)=
 ### `USE_MALLOC`
 
 Available since 1.1.1.
@@ -414,6 +422,7 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
+(use-libfmt-section)=
 ### `USE_LIBFMT`
 
 Available since 1.1.7.
@@ -421,7 +430,7 @@ Available since 1.1.7.
 Whether to use bundled `{fmt}` library for formatting strings.
 
 - **unset (DEFAULT): Will use bundled `{fmt}`.**
-- `fmt`  : Will use the `{fmt}` (`libfmt.so`) found in the system.
+- `fmt`  : Will use the `{fmt}` found in the system.
 - Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system.
 
 ### `USE_CONCURRENT_QUEUE`
@@ -433,6 +442,7 @@ Whether to use bundled `moodycamel::ConcurrentQueue<T>`. Specifically, where `co
 - **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.**
 - Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`.
 
+(use-absl-section)=
 ### `USE_ABSL`
 
 Available since 1.1.7.
@@ -442,7 +452,7 @@ Whether to use bundled Abseil library.
 Although the project only uses a small portion of Abseil development header files, the binary `libabsl_base.so` may be linked to the final executable if you use system Abseil.
 
 - **unset (DEFAULT): Will use bundled Abseil.**
-- Any value `[val]`: Will use system Abseil found by the CMake module `abslConfig.cmake`, which is shipped with official Abseil libraries.
+- Any value `[val]`: Will use system Abseil. See above section for details.
 
 ### `REPRODUCIBLE_BUILDS`
 
@@ -466,6 +476,10 @@ Whether to build mini benchmarks executable.
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.
 - `USE_CCACHE` was deprecated in 1.1.7.
+
+## Build-Time Performance Hint
+
+When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [libdeflate](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines.
 
 ## Platform-Specific Building Instructions
 
@@ -526,21 +540,3 @@ cmake .. -DBoost_DIR=/Users/USERNAME/Downloads/boost_1_87_0/stage/lib/cmake/Boos
 ```
 
 You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).
-
-## Building Documentations
-
-Create the development environment and make the documentation through:
-
-```shell
-conda activate art_modern
-make doc
-```
-
-And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
-
-## Known Incompatibilities
-
-- Clang < 10 with Boost > 1.77 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
-- Boost < 1.66 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
-- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
-- GCC would fail on Debian GNU/Hurd.
