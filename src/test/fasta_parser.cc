@@ -51,15 +51,18 @@ void test_fasta(const std::unique_ptr<BaseFastaFetch>& fastaFetch)
     BOOST_TEST(fastaFetch->seq_len(1) == 74);
 }
 
+void test_fasta_null(const std::unique_ptr<BaseFastaFetch>& fastaFetch) { BOOST_TEST(fastaFetch->num_seqs() == 0); }
+
 } // namespace
 
 BOOST_AUTO_TEST_CASE(test_fasta_parser_1)
 {
-    std::istringstream iss(">chr1\r\nAAAA\nCCC\n>chr2 BBBB name=ignored\r\n>chr3\tAAAA FFFF\nTTTT\n\n");
+    std::istringstream iss(
+        ">chr1\r\nAAAA\nCCC\n>chr2 BBBB name=ignored\r\n\r\n\r\n>chr2.5\n>chr3\tAAAA FFFF\nTTTT\n\n");
     FastaIterator fai(iss);
-    std::vector<std::string> chrNames = { "chr1", "chr2", "chr3" };
-    std::vector<std::string> seqs = { "AAAACCC", "", "TTTT" };
-    int i = 0;
+    std::vector<std::string> chrNames = { "chr1", "chr2", "chr2.5", "chr3" };
+    std::vector<std::string> seqs = { "AAAACCC", "", "", "TTTT" };
+    std::size_t i = 0;
     while (true) {
         try {
             const auto& [id, sequence] = fai.next();
@@ -90,4 +93,10 @@ BOOST_AUTO_TEST_CASE(test_in_memory_fetch)
 {
     auto in_memory_fasta_fetch = std::make_unique<InMemoryFastaFetch>(TEST_RESOURCES_PATH "test.fasta");
     test_fasta(std::move(in_memory_fasta_fetch));
+}
+
+BOOST_AUTO_TEST_CASE(test_in_memory_fetch_null)
+{
+    auto in_memory_fasta_fetch = std::make_unique<InMemoryFastaFetch>("/dev/null");
+    test_fasta_null(std::move(in_memory_fasta_fetch));
 }

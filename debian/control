@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: YU Zhejian <yuzj25@seas.upenn.edu>
 Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 13),
-               libhts-dev (>= 1.14~),
+               libhts-dev (>= 1.17~),
                zlib1g-dev,
                pkgconf,
                cmake,

@@ -17,6 +17,11 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/si_utils.hh"
+
+#include <boost/log/core/core.hpp>
+#include <boost/log/keywords/filter.hpp>
+#include <boost/log/trivial.hpp>
 
 #include <htslib/hts.h>
 
@@ -44,7 +49,7 @@ void bench_ff(std::unique_ptr<BaseFastaFetch>&& ff, const std::string& name)
 
     for (std::size_t i = 0; i < ff_->num_seqs(); i++) {
         std::uniform_int_distribution<hts_pos_t> coord_dist(0, ff_->seq_len(i));
-        for (int j = 0; j < 1000; j++) {
+        for (std::size_t j = 0; j < 1000; j++) {
             gen_start = coord_dist(gen);
             gen_end = coord_dist(gen);
             if (gen_start == gen_end) {
@@ -54,21 +59,23 @@ void bench_ff(std::unique_ptr<BaseFastaFetch>&& ff, const std::string& name)
         }
     }
 
-    size_t fetched_size = 0;
+    std::size_t fetched_size = 0;
     const auto start_time = std::chrono::high_resolution_clock::now();
     for (const auto& [contig_id, start, end] : queries) {
         fetched_size += ff_->fetch(contig_id, start, end).size();
     }
     const auto end_time = std::chrono::high_resolution_clock::now();
-    std::cout << name << " fetched_size: " << fetched_size << " fetched_speed: "
-              << static_cast<double>(fetched_size)
-            / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count())
-              << "bp/us" << std::endl;
+    const auto duration
+        = static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end_time - start_time).count());
+    std::cout << name << " fetched_speed: " << to_si(static_cast<double>(fetched_size) / duration) << "bp/us with "
+              << to_si(static_cast<double>(queries.size()) / (duration / 1000 / 1000)) << " iops" << std::endl;
 }
 } // namespace
 int main()
 {
     const std::vector<std::string> data { "ce11.mRNA_head", "ce11_chr1" };
+    // Filter debug in boost.log
+    boost::log::core::get()->set_filter(boost::log::trivial::severity >= boost::log::trivial::info);
 
     for (const auto& datum : data) {
         std::unique_ptr<BaseFastaFetch> ff = std::make_unique<FaidxFetch>(std::string(RAW_DATA_PATH) + datum + ".fa");

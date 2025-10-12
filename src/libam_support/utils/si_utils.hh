@@ -14,10 +14,10 @@
 
 #pragma once
 
-#include <cstddef>
+#include <cstddef> // std::size_t
 #include <string>
 
 namespace labw::art_modern {
 std::string format_with_commas(std::size_t number);
-std::string to_si(double number, int precision = 2);
+std::string to_si(double number, int precision = 2, int base = 1024);
 } // namespace labw::art_modern

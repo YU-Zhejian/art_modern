@@ -25,6 +25,7 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
+#include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -44,7 +45,7 @@ namespace po = boost::program_options;
 
 namespace labw::art_modern {
 HeadlessBamReadOutput::HeadlessBamReadOutput(
-    const std::string& filename, const BamOptions& sam_options, const int n_threads)
+    const std::string& filename, const BamOptions& sam_options, const std::size_t n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -226,7 +227,8 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
                                      << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
-        return std::make_shared<HeadlessBamReadOutput>(params.vm["o-hl_sam"].as<std::string>(), so, params.n_threads);
+        return std::make_shared<HeadlessBamReadOutput>(
+            attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank()), so, params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

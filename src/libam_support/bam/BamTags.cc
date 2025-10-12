@@ -39,7 +39,7 @@ void BamTags::patch(bam1_t* record) const
     }
 }
 size_t BamTags::size() const { return size_; }
-void BamTags::add_string(const std::string& key, const std::string& value)
+void BamTags::add_string(const key_type& key, const std::string& value)
 {
     const auto len = value.size();
     const size_t tag_size = len + 1;
@@ -50,7 +50,7 @@ void BamTags::add_string(const std::string& key, const std::string& value)
     tags_.emplace_back(key, 'Z', tag_size, data);
     size_ += tag_size + size_of_tag_name_and_type;
 }
-void BamTags::add_int_i(const std::string& key, const int32_t value)
+void BamTags::add_int_i(const key_type& key, const std::int32_t value)
 {
     auto data = std::make_shared<std::string>();
     data->resize(TAG_SIZE);

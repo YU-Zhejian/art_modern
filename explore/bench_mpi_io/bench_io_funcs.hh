@@ -11,7 +11,7 @@
 constexpr std::size_t K_SIZE = 1 << 10;
 constexpr std::size_t M_SIZE = 1 << 20;
 constexpr std::size_t G_SIZE = 1 << 20;
-const std::string DEVNULL = "/dev/null";
+const std::string OUT_FILENAME = "/dev/null";
 
 static double speed_seq_write(const std::string& file_path, const std::size_t block_size, const std::size_t n_blocks)
 {

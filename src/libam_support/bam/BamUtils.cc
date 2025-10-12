@@ -22,6 +22,7 @@
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh" // NOLINT
 #include "libam_support/utils/seq_utils.hh"
 
@@ -32,12 +33,11 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
+#include <algorithm> // NOLINT: std::remove
 #include <cctype>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
-#include <ostream>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
@@ -45,19 +45,20 @@
 namespace labw::art_modern {
 
 std::string BamUtils::generate_oa_tag(
-    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const int32_t nm_tag)
+    const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const std::int32_t nm_tag)
 {
     return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-',
         cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
 }
-std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
+std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar)
 {
     hts_pos_t pos_on_query = 0;
-    uint32_t matched = 0;
+    std::uint32_t matched = 0;
     hts_pos_t pos_on_ref = 0;
-    std::ostringstream md_str_ss;
-    int32_t nm = 0;
+    std::string md_str;
+    md_str.reserve(cigar.size() << 1); // Rough estimate: each CIGAR op is at least 2 chars
+    std::int32_t nm = 0;
     am_cigar_len_t this_cigar_len = 0;
     am_cigar_ops_t this_cigar_ops = 0;
 
@@ -70,7 +71,8 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
             pos_on_ref += this_cigar_len;
         } else if (this_cigar_ops == BAM_CDIFF) {
             for (decltype(this_cigar_len) j = 0; j < this_cigar_len; ++j) {
-                md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                md_str += std::to_string(matched);
+                md_str += static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                 matched = 0;
                 ++nm;
                 pos_on_query++;
@@ -81,7 +83,8 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 if (pwa.query[pos_on_query] == pwa.ref[pos_on_ref]) {
                     ++matched;
                 } else {
-                    md_str_ss << std::to_string(matched) << static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
+                    md_str += std::to_string(matched);
+                    md_str += static_cast<char>(std::toupper(pwa.ref[pos_on_ref]));
                     matched = 0;
                     ++nm;
                 }
@@ -89,7 +92,9 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
                 pos_on_ref++;
             }
         } else if (this_cigar_ops == BAM_CDEL) {
-            md_str_ss << std::to_string(matched) << '^' << pwa.ref.substr(pos_on_ref, this_cigar_len);
+            md_str += std::to_string(matched);
+            md_str += '^';
+            md_str += pwa.ref.substr(pos_on_ref, this_cigar_len);
             pos_on_ref += this_cigar_len;
             nm += this_cigar_len;
             matched = 0;
@@ -102,9 +107,7 @@ std::pair<int32_t, std::string> BamUtils::generate_nm_md_tag(
             pos_on_ref += this_cigar_len;
         }
     }
-    md_str_ss << std::to_string(matched);
-    const auto md_str = md_str_ss.str();
-
+    md_str.shrink_to_fit();
     return { nm, md_str };
 }
 
@@ -136,6 +139,7 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
         }
         mode += "wh";
     }
+    prepare_writer(filename);
 
     auto* const retv = CExceptionsProxy::assert_not_null(
         sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");

@@ -13,7 +13,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT
 
 #include "art/exe/main_fn.hh"
 
@@ -34,6 +34,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -50,8 +51,9 @@ namespace labw::art_modern {
 
 class JobPoolReporter {
 public:
-    explicit JobPoolReporter(const JobPool& jp)
+    explicit JobPoolReporter(const JobPool& jp, const std::size_t reporting_interval_seconds = 1)
         : jp_(jp)
+        , reporting_interval_seconds_(reporting_interval_seconds)
     {
     }
     void stop()
@@ -64,24 +66,25 @@ public:
 private:
     void job_()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
         while (!should_stop_) {
             BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
         }
     }
 
     const JobPool& jp_;
     std::atomic<bool> should_stop_ { false };
     std::thread thread_;
+    const std::size_t reporting_interval_seconds_;
 };
 
 class Generator {
 public:
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    explicit Generator(const ArtParams& art_params, const ArtIOParams& art_io_params)
-        : art_params_(art_params)
+    Generator(ArtParams art_params, const ArtIOParams& art_io_params)
+        : art_params_(std::move(art_params))
         , art_io_params_(art_io_params)
         , job_pool_(art_io_params.parallel)
         , reporter_(job_pool_)
@@ -123,8 +126,14 @@ private:
 
 void print_banner()
 {
-    BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << " v. " ART_MODERN_VERSION << ")";
-    BOOST_LOG_TRIVIAL(info) << "Based on: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
+#ifdef WITH_MPI
+    if (mpi_rank() != MPI_MAIN_RANK_STR) {
+        return;
+    }
+#endif
+    BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << ") v. " ART_MODERN_VERSION
+                            << " at <" << ART_MODERN_URL << ">";
+    BOOST_LOG_TRIVIAL(info) << "Based on ART_Illumina: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
     BOOST_LOG_TRIVIAL(info) << "Originally written by: Weichun Huang <whduke@gmail.com>";
     BOOST_LOG_TRIVIAL(info) << "Modified by: YU Zhejian <yuzj25@seas.upenn.edu>";
 #ifdef CEU_CM_IS_DEBUG
@@ -136,30 +145,33 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 {
     Generator generator(art_params, art_io_params);
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        const auto coverage_info
-            = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(art_io_params.parallel));
+        std::size_t div_by = art_io_params.parallel;
+#ifdef WITH_MPI
+        // Further divide by number of MPI processes
+        div_by *= mpi_size();
+#endif
+        const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch
                 = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
             generator.init_dispatcher(fetch);
-            for (int i = 0; i < art_io_params.parallel; ++i) {
+            for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(fetch, coverage_info);
             }
         } else {
             generator.init_dispatcher(std::make_shared<FaidxFetch>(art_io_params.input_file_name));
-            for (int i = 0; i < art_io_params.parallel; ++i) {
+            for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(std::make_shared<FaidxFetch>(art_io_params.input_file_name), coverage_info);
             }
         }
     } else {
         // Batch-based parallelism
+        // TODO: Enable skipping loader
         if (art_io_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
-
             const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info);
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 auto fetch = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
                 generator.init_dispatcher(fetch);
-
                 InMemoryFastaBatcher fsb(static_cast<int>(fetch->num_seqs() / art_io_params.parallel + 1), fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();
@@ -177,7 +189,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     if (fa_view.empty()) {
                         break;
                     }
-                    generator.add(std::make_shared<InMemoryFastaFetch>(fa_view), coverage_info);
+                    generator.add(std::make_shared<InMemoryFastaFetch>(std::move(fa_view)), coverage_info);
                 }
                 fasta_stream.close();
             }
@@ -185,7 +197,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 std::ifstream input_file_stream(art_io_params.input_file_name);
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
-                auto [fasta_fetch, coverage_info] = batcher.fetch();
+                const auto [fasta_fetch, coverage_info] = batcher.fetch();
                 input_file_stream.close();
                 generator.init_dispatcher(fasta_fetch);
 
@@ -203,7 +215,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 std::ifstream pbsim3_transcript_stream(art_io_params.input_file_name);
                 Pbsim3TranscriptBatcher fsb(art_io_params.batch_size, pbsim3_transcript_stream);
                 while (true) {
-                    auto [fa_view, coverage_info] = fsb.fetch();
+                    const auto [fa_view, coverage_info] = fsb.fetch();
                     if (fa_view->empty()) {
                         break;
                     }

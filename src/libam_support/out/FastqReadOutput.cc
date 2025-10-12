@@ -18,6 +18,8 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <fmt/format.h>
 
@@ -61,7 +63,7 @@ void FastqReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
-FastqReadOutput::FastqReadOutput(const std::string& filename, const int n_threads)
+FastqReadOutput::FastqReadOutput(const std::string& filename, const std::size_t n_threads)
     : lfio_("FASTQ", filename)
 {
     lfio_.init_queue(n_threads, 0);
@@ -91,7 +93,8 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
 std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-fastq") != 0) {
-        return std::make_shared<FastqReadOutput>(params.vm["o-fastq"].as<std::string>(), params.n_threads);
+        return std::make_shared<FastqReadOutput>(
+            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank()), params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

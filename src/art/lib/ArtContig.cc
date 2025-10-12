@@ -101,8 +101,8 @@ void ArtContig::generate_read_pe(const bool is_plus_strand, const bool is_mp, Ar
     read_2.ref2read(std::move(seq_ref_2), !is_plus_strand, pos_2);
 }
 
-ArtContig::ArtContig(
-    const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const size_t seq_id, const ArtParams& art_params, Rprob& rprob)
+ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const std::size_t seq_id,
+    const ArtParams& art_params, Rprob& rprob)
     : seq_name(fasta_fetch->seq_name(seq_id))
     , seq_size(fasta_fetch->seq_len(seq_id))
     , art_params_(art_params)

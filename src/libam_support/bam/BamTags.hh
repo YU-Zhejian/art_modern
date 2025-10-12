@@ -33,11 +33,12 @@ public:
      * FIXME: This still seems stupid.
      */
     using data_type = std::shared_ptr<std::string>;
-    using tag_type = std::tuple<std::string, char, int, data_type>;
+    using key_type = std::string;
+    using tag_type = std::tuple<key_type, char, int, data_type>;
     void patch(bam1_t* record) const;
     [[nodiscard]] size_t size() const;
-    void add_string(const std::string& key, const std::string& value);
-    void add_int_i(const std::string& key, int32_t value);
+    void add_string(const key_type& key, const std::string& value);
+    void add_int_i(const key_type& key, std::int32_t value);
 
 private:
     constexpr static std::size_t TAG_SIZE = 4;

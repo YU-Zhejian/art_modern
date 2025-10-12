@@ -4,6 +4,8 @@
 # @author Jason Myers
 
 use strict;
+use warnings FATAL => 'all';
+
 
 # Print an error message unless the atleast two fastqReadAvg files and an output file are specified
 my $numArgs = $#ARGV + 1;

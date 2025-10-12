@@ -27,7 +27,6 @@
 #include <htslib/hts.h>
 
 #include <cstddef>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -37,13 +36,11 @@
 namespace labw::art_modern {
 namespace {
 
-    std::tuple<std::vector<std::string>, std::vector<hts_pos_t>> get_seq_names_lengths(const faidx_t* faidx)
+    std::vector<std::string> get_seq_names(const faidx_t* faidx)
     {
         std::vector<std::string> seq_names;
-        std::vector<hts_pos_t> seq_lengths;
         const auto size = faidx_nseq(faidx);
         seq_names.reserve(size);
-        seq_lengths.reserve(size);
 
         for (int i = 0; i < size; i++) {
             const auto* const seq_name = faidx_iseq(faidx, i);
@@ -52,9 +49,20 @@ namespace {
                 abort_mpi();
             }
             seq_names.emplace_back(seq_name);
-            seq_lengths.emplace_back(faidx_seq_len(faidx, seq_name));
         }
-        return std::tie(seq_names, seq_lengths);
+        return seq_names;
+    }
+
+    std::vector<hts_pos_t> get_seq_lengths(const faidx_t* faidx)
+    {
+        std::vector<hts_pos_t> seq_lengths;
+        const auto size = faidx_nseq(faidx);
+        seq_lengths.reserve(size);
+
+        for (int i = 0; i < size; i++) {
+            seq_lengths.emplace_back(faidx_seq_len64(faidx, faidx_iseq(faidx, i)));
+        }
+        return seq_lengths;
     }
 
     faidx_t* get_faidx(const std::string& file_name)
@@ -63,7 +71,7 @@ namespace {
             BOOST_LOG_TRIVIAL(fatal) << "FAI not found!";
             abort_mpi();
         }
-        BOOST_LOG_TRIVIAL(info) << "Loading existing FAI...";
+        BOOST_LOG_TRIVIAL(debug) << "Loading existing FAI...";
         auto* const faidx = fai_load_format(file_name.c_str(), FAI_FASTA);
         if (faidx == nullptr) {
             BOOST_LOG_TRIVIAL(fatal) << "Loading FAI failed!";
@@ -74,17 +82,6 @@ namespace {
 
 } // namespace
 
-char* FaidxFetch::cfetch_(const char* seq_name, const hts_pos_t start, const hts_pos_t end) const
-{
-    const auto reg = fmt::format("{}:{}-{}", seq_name, start + 1, end);
-    hts_pos_t pos = 0;
-    auto* const rets = fai_fetch64(faidx_, reg.c_str(), &pos);
-    if (rets == nullptr) {
-        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_name << ":" << start << "-" << end << "!";
-        abort_mpi();
-    }
-    return rets;
-}
 FaidxFetch::~FaidxFetch() { fai_destroy(faidx_); }
 
 FaidxFetch::FaidxFetch(const std::string& file_name)
@@ -93,14 +90,20 @@ FaidxFetch::FaidxFetch(const std::string& file_name)
 }
 
 FaidxFetch::FaidxFetch(faidx_t* faidx)
-    : BaseFastaFetch(get_seq_names_lengths(faidx))
+    : BaseFastaFetch(get_seq_names(faidx), get_seq_lengths(faidx))
     , faidx_(faidx)
 {
 }
 std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
-    auto* const cfetch_str = cfetch_(seq_names_[seq_id].c_str(), start, end);
-    const auto rets = std::string(cfetch_str);
+    hts_pos_t len = 0;
+    auto* const cfetch_str = faidx_fetch_seq64(faidx_, seq_names_[seq_id].c_str(), start, end - 1, &len);
+    if (cfetch_str == nullptr || len != end - start) {
+        BOOST_LOG_TRIVIAL(fatal) << "FaidxFetch failed at " << seq_names_[seq_id].c_str() << ":" << start << "-" << end
+                                 << "!";
+        abort_mpi();
+    }
+    const auto rets = std::string(cfetch_str, len);
     std::free(cfetch_str);
     return rets;
 }

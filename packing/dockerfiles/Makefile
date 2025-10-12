@@ -3,7 +3,7 @@ SINGULARITY ?= singularity
 
 .PHONY: all clean
 
-all: debian-12.sif \
+all: \
 	 debian-13.sif \
 	 ubuntu-2404.sif \
 	 alpine-latest.sif

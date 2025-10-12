@@ -13,6 +13,10 @@ all: \
 	ce11_chr1.fa.gz.fai \
 	lambda_phage.fa \
 	lambda_phage.fa.fai \
+	err.fa.fai \
+	err.fa.gz \
+	err.fa.gz.fai \
+
 
 .SUFFIXES:
 

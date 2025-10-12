@@ -16,10 +16,12 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/out/BaseReadOutput.hh"
+#include "libam_support/out/FastaReadOutput.hh"
 #include "libam_support/out/FastqReadOutput.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/si_utils.hh"
 
+#include <boost/filesystem/operations.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
@@ -28,13 +30,12 @@
 #include <ostream>
 #include <string>
 #include <thread>
-#include <utility>
 #include <vector>
 
 using namespace labw::art_modern;
 
 namespace {
-const std::string DEVNULL = "/dev/null";
+const std::string OUT_FILENAME = "out.bin";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
 const std::vector<am_qual_t> QUALS(150, 0);
@@ -71,8 +72,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
-        std::thread t(working_thread, bro, (200ULL * M_SIZE) / nthread);
-        threads.emplace_back(std::move(t));
+        threads.emplace_back(working_thread, bro, 200ULL * M_SIZE / nthread);
     }
     for (auto& t : threads) {
         t.join();
@@ -80,33 +80,35 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     bro->close();
 }
 
-void speed2devnull()
+void direct_io_speed()
 {
     constexpr std::size_t block_size = 4ULL * K_SIZE;
     constexpr std::size_t n_blocks = 20ULL * M_SIZE;
     const auto block = std::string(block_size, '\0');
     const auto start = std::chrono::high_resolution_clock::now();
-    auto ofs = std::ofstream(DEVNULL, std::ios::out | std::ios::binary);
+    auto ofs = std::ofstream(OUT_FILENAME, std::ios::out | std::ios::binary);
     for (std::size_t i = 0; i < n_blocks; i++) {
         ofs << block;
     }
     ofs.close();
     const auto end = std::chrono::high_resolution_clock::now();
     const double speed = static_cast<double>(n_blocks * block_size)
-        / static_cast<double>(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count()) * 1000.0;
-    std::cout << "Speed: " << to_si(speed) << "B/s" << std::endl;
+        / static_cast<double>(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) * 1000000.0;
+    std::cout << "Speed upper limit (syncronized writer): " << to_si(speed) << "B/s" << std::endl;
 }
 
 } // namespace
 
 int main()
 {
-    speed2devnull();
+    direct_io_speed();
     auto iss = std::istringstream { fasta };
     const auto ff = std::make_shared<InMemoryFastaFetch>(iss);
 
     // Temporarily disable logging
-    bench(std::make_shared<FastqReadOutput>(DEVNULL, NTHREAD), "FastqReadOutput", NTHREAD);
+    bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, NTHREAD), "FastqReadOutput", NTHREAD);
+    bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, NTHREAD), "FastaReadOutput", NTHREAD);
+    boost::filesystem::remove(OUT_FILENAME);
 
     return EXIT_SUCCESS;
 }

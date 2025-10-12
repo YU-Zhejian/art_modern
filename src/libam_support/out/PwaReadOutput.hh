@@ -34,7 +34,7 @@ public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, int n_threads);
+    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, std::size_t n_threads);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;

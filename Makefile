@@ -87,39 +87,47 @@ rel_with_dbg_alpine:
 	env -C opt/build_rel_with_dbg_alpine_install/bin \
 		tar cvzf $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.tar.gz \
 		art_modern \
-		libam_support_lib.a \
-		libart_modern_lib.a \
-		liblabw_slim_htslib.a \
-		libslim_libceu.a \
-		libslim_libfmt.a
+		art_profile_builder
 
 .PHONY: fmt
 # Run code formatting checks and auto-formatting
+# Format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [Black](https://black.readthedocs.io/en/stable/), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
 fmt:
 	$(BASH) sh.d/fmt.sh
 
 .PHONY: scc
 # Run source code counting
+# Note that this excludes third-party codes so should be preferred over pure `scc` in project root.
 scc:
 	$(BASH) sh.d/scc.sh
 
 .PHONY: touch
 # Touch all source files to current timestamp
+# This **MAY** work when CMake does strange things like compiling the source files again and again.
 touch:
 	$(BASH) sh.d/touch-all.sh
 
 .PHONY: testsmall
 # Run small tests with debug build
+# Env. Flags:
+#     - FORMAT_ONLY=1: Stop after testing all output formats is working
+#     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
 	env ART=opt/build_debug_install/bin/art_modern $(BASH) sh.d/test-small.sh
+
+.PHONY: test-art_profile_builder
+# Run tests for art_profile_builder with release builds
+test-art_profile_builder: raw_data release
+	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
+	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
 # TODO: This Makefile block requires extensive revision.
 testsmall-conda: raw_data
-	conda env remove -n _art_modern_bioconda -y || true
-	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(conda run -n _art_modern_bioconda which art_modern)" $(BASH) sh.d/test-small.sh
+	# conda env remove -n _art_modern_bioconda -y || true
+	# conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
+	env ART="$(shell conda run -n _art_modern_bioconda type -p art_modern)" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release
 # Run small tests with release build

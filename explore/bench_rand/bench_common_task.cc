@@ -2,8 +2,10 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -31,7 +33,7 @@ public:
 /**
  * Very, very, very slow.
  */
-class [[maybe_unused]] SlimRprobsTrng : public SlimRprobs {
+class [[maybe_unused]] SlimRprobsTrng final : public SlimRprobs {
 public:
     SlimRprobsTrng() = default;
     ~SlimRprobsTrng() override = default;
@@ -58,7 +60,7 @@ private:
     std::random_device gen_;
 };
 
-class SlimRprobsStdRand : public SlimRprobs {
+class SlimRprobsStdRand final : public SlimRprobs {
 public:
     SlimRprobsStdRand()
         : gen_(seed())
@@ -89,7 +91,7 @@ private:
     std::mt19937 gen_;
 };
 
-class SlimRprobsMKL : public SlimRprobs {
+class SlimRprobsMKL final : public SlimRprobs {
 public:
     SlimRprobsMKL() { vslNewStream(&vsl_stream_, VSL_BRNG_MT19937, seed()); }
     std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
@@ -115,7 +117,7 @@ private:
     VSLStreamStatePtr vsl_stream_ = nullptr;
 };
 
-class SlimRprobsBoost : public SlimRprobs {
+class SlimRprobsBoost final : public SlimRprobs {
 public:
     SlimRprobsBoost()
         : gen_(seed())
@@ -124,14 +126,14 @@ public:
     ~SlimRprobsBoost() override = default;
     std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
     {
-        boost::uniform_real<double> dist(a, b);
+        boost::uniform_real<> dist(a, b);
         std::generate_n(tmp_qual_dists_.begin(), N_BASES, [&dist, this]() { return dist(gen_); });
         return tmp_qual_dists_;
     }
 
     std::vector<int> gen_ints(std::vector<int>& tmp_qual_dists_) override
     {
-        boost::uniform_int<int> dist(a, b);
+        boost::uniform_int<> dist(a, b);
         std::generate_n(tmp_qual_dists_.begin(), N_BASES, [&dist, this]() { return dist(gen_); });
         return tmp_qual_dists_;
     }
@@ -146,7 +148,7 @@ private:
     boost::mt19937 gen_;
 };
 
-class SlimRprobsAbsl : public SlimRprobs {
+class SlimRprobsAbsl final : public SlimRprobs {
 public:
     SlimRprobsAbsl() = default;
     ~SlimRprobsAbsl() override = default;
@@ -174,7 +176,7 @@ private:
     absl::BitGen gen_;
 };
 
-class SlimRprobsGsl : public SlimRprobs {
+class SlimRprobsGsl final : public SlimRprobs {
 public:
     SlimRprobsGsl()
         : r(gsl_rng_alloc(gsl_rng_mt19937))

@@ -19,6 +19,7 @@ dependencies:
   - numpy
   - pandas
   - scipy
+  - matplotlib=3.10
 
   # Code formatter
   - cmake_format
@@ -47,3 +48,4 @@ dependencies:
   - myst-parser=4.0.1
   - perl # For Windows MikTeX users
   - cairosvg
+  - jinja2=3.1

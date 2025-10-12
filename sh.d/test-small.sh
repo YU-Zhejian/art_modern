@@ -7,12 +7,11 @@ if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python sh.d/test-small.sh.d/gen_cov.py
 fi
 
-export PARALLEL="0"
-export IDRATE=0.1
-export OUT_DIR="opt/tmp/"
+export PARALLEL="5" # Reduce parallelism overhead for small tests
+export IDRATE=0.1   # Increase indel rate to fail faster
+export OUT_DIR="$(readlink -f "opt/tmp/")"
 export ART="${ART:-opt/build_debug/art_modern}"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
-export ERR_FA="data/raw_data/err.fa"
 export LAMBDA_PHAGE="data/raw_data/lambda_phage.fa"
 
 echo "ART=${ART}"

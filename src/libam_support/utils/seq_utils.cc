@@ -16,7 +16,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
-#include <cstdio>
 
 // NOLINTBEGIN
 #if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
@@ -24,9 +23,10 @@
 #endif
 // NOLINTEND
 
-#include "htslib/sam.h"
+#include <htslib/sam.h>
 
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
 #include <sstream>
 #include <string>
@@ -155,7 +155,7 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
     if (qlen <= 100) {
         return qual_to_str_mmx(qual, qlen);
     }
-    if (qlen <= 400) {
+    if (qlen <= 200) {
         return qual_to_str_sse2(qual, qlen);
     }
     return qual_to_str_avx2(qual, qlen);
@@ -191,10 +191,10 @@ std::string revcomp(const std::string& dna)
 
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
-    return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
+    return cigar_arr_to_str_optim(cigar_arr.data(), cigar_arr.size());
 }
 
-std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
+std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::ostringstream oss;
     for (size_t i = 0; i < n; i += 1) {
@@ -204,11 +204,21 @@ std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
     return oss.str();
 }
 
+std::string cigar_arr_to_str_optim(const am_cigar_t* cigar_arr, const size_t n)
+{
+    std::string result;
+    result.reserve(n << 1); // Rough estimate: each CIGAR op is at least 2 chars
+    for (size_t i = 0; i < n; ++i) {
+        result += std::to_string(cigar_arr[i] >> BAM_CIGAR_SHIFT);
+        result += BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
+    }
+    result.shrink_to_fit();
+    return result;
+}
+
 void comp_inplace(std::string& dna)
 {
-    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
-        dna[i] = rev_comp_trans_2[dna[i] & 0xFF];
-    }
+    std::for_each(dna.begin(), dna.end(), [](char& c) { c = rev_comp_trans_2[c & 0xFF]; });
 }
 
 void revcomp_inplace(std::string& dna)
@@ -219,9 +229,7 @@ void revcomp_inplace(std::string& dna)
 
 void normalize_inplace(std::string& dna)
 {
-    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
-        dna[i] = normalization_matrix[dna[i] & 0xFF];
-    }
+    std::for_each(dna.begin(), dna.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
 }
 
 bool ends_with(const std::string& str, const std::string& suffix)

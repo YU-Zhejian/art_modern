@@ -246,6 +246,15 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
 
         qual.clear();
         while (ss >> tmp_qual) {
+            if (tmp_qual < MIN_QUAL || tmp_qual > MAX_QUAL) {
+                BOOST_LOG_TRIVIAL(fatal) << "R" << (is_first ? 1 : 2) << "L" << std::to_string(actual_line_no)
+                                         << ": Fatal error (2): Quality score " << std::to_string(tmp_qual)
+                                         << " out of range [" << std::to_string(MIN_QUAL) << ", "
+                                         << std::to_string(MAX_QUAL) << "].";
+                BOOST_LOG_TRIVIAL(fatal) << "read_pos=" << read_pos << "; n_lines_parsed=" << n_lines_parsed;
+                BOOST_LOG_TRIVIAL(fatal) << "line=" << line;
+                abort_mpi();
+            }
             qual.emplace_back(tmp_qual);
         }
 

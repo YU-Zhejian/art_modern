@@ -19,7 +19,7 @@ constexpr std::size_t N_REPLICA = 200UL;
 constexpr std::size_t a = 0;
 constexpr std::size_t b = 1000;
 
-ABSL_ATTRIBUTE_ALWAYS_INLINE static uint64_t seed()
+ABSL_ATTRIBUTE_ALWAYS_INLINE inline static uint64_t seed()
 {
     return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
                .count()

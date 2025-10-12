@@ -8,7 +8,7 @@ fi
 export PACKAGE_FULL_NAME="art-modern_${PACKAGE_VERSION}+dfsg"
 
 ./sh.d/prepare-orig-tgz-for-deb.sh
-for name in debian-12 debian-13 ubuntu-2404; do
+for name in debian-13 ubuntu-2404; do
     rm -fr artifacts/build_deb-"${name}"
     mkdir -p artifacts/build_deb-"${name}"
     singularity exec \

@@ -15,10 +15,11 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.8
+    VERSION 1.1.9
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
+set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -49,6 +50,7 @@ set(ART_MODERN_LINK_LIBS "")
 # Installation
 include(GNUInstallDirs)
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    message(WARNING "CMAKE_INSTALL_PREFIX not defined, setting to /usr/local")
     set(CMAKE_INSTALL_PREFIX
         "/usr/local"
         CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
@@ -188,6 +190,24 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS art_modern)
 
+file(GLOB ART_PROFILE_BUILDER_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/lib/*.cc")
+add_library(art_profile_builder_lib ${ART_PROFILE_BUILDER_LIB_SOURCE})
+target_compile_options(art_profile_builder_lib BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_profile_builder_lib PUBLIC am_support_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_profile_builder_lib)
+endif()
+install(TARGETS art_profile_builder_lib)
+
+file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
+add_executable(art_profile_builder ${ART_PROFILE_BUILDER_EXE_SOURCE})
+target_compile_options(art_profile_builder BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_profile_builder PUBLIC art_profile_builder_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_profile_builder)
+endif()
+install(TARGETS art_profile_builder)
+
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
 
@@ -237,6 +257,11 @@ if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" PUBLIC am_support_lib)
         target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()
+endif()
+
+if(DEFINED BUILD_ART_MODERN_STANDALONE_BENCHMARKS AND BUILD_ART_MODERN_STANDALONE_BENCHMARKS)
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_rand")
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_mpi_io")
 endif()
 
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")

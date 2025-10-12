@@ -40,4 +40,4 @@ void print_memory_usage(const char* /*file*/, const int /*line*/)
 }
 #endif
 
-} // namespace lab::art_modern::details
+} // namespace labw::art_modern::details

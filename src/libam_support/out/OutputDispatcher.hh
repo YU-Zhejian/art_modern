@@ -24,7 +24,6 @@
 
 #include <atomic>
 #include <memory>
-#include <string>
 #include <vector>
 
 namespace labw::art_modern {

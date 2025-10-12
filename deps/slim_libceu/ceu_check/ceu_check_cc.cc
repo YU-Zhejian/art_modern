@@ -1,6 +1,9 @@
 #include "ceu_check/ceu_check_cc.hh"
 #include "libceu_stddef.h"
+
+
 #include <sstream>
+#include <string>
 
 std::string ceu_check_get_compiler_info()
 {
