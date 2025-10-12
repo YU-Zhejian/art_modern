@@ -32,8 +32,8 @@ public:
     DELETE_MOVE(InMemoryFastaBatcher)
     /**
      *
-     * @return A {@link InMemoryFastaFetch} of less or equal than {@link batch_size} items.
-     * Empty {@link InMemoryFastaFetch} if the stream is exhausted.
+     * @return A {@link InMemoryFastaFetch @endlink} of less or equal than {@link batch_size @endlink} items.
+     * Empty {@link InMemoryFastaFetch @endlink} if the stream is exhausted.
      */
     std::shared_ptr<InMemoryFastaFetch> fetch();
 

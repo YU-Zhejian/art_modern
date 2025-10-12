@@ -36,9 +36,9 @@ constexpr char ALN_GAP = '-';
 
 /**
  * Maximum phred-based quality score.
- * 10^{-40} error rate, which is quite low.
+ * 10^{-71} error rate, which is quite low.
  */
-constexpr am_qual_t MAX_QUAL = 40;
+constexpr am_qual_t MAX_QUAL = 71;
 /** Minimum phred-based quality score. */
 constexpr am_qual_t MIN_QUAL = 0;
 
@@ -55,9 +55,9 @@ constexpr int G_SIZE = 1U << 30U;
 constexpr char ART_VERSION[] = "2.5.8";
 
 /** Maximum mapping quality */
-constexpr int MAPQ_MAX = ((1 << 8) - 1); // 255
+constexpr int MAPQ_MAX = (1 << 8) - 1; // 255
 
-constexpr int PHRED_OFFSET = 33;
+constexpr am_qual_t PHRED_OFFSET = 33;
 
 enum class SIMULATION_MODE : std::int8_t { WGS, TRANS, TEMPLATE };
 
@@ -86,6 +86,7 @@ constexpr char INPUT_FILE_PARSER_STREAM[] = "stream";
 constexpr char INPUT_FILE_PARSER_AUTO[] = "auto";
 
 constexpr int MPI_MAIN_RANK = 0;
+const std::string MPI_MAIN_RANK_STR = "0";
 
 constexpr int MPI_UNAVAILABLE_RANK = -1;
 

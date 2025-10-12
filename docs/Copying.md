@@ -118,6 +118,49 @@ Licensed under the GPL 3.0 license.
 
 **NOTE** Added in 1.1.2.
 
+## VMT19937 by Fabio Cannizzo
+
+Available from <https://github.com/fabiocannizzo/VMT19937>, commit [fa93111](https://github.com/fabiocannizzo/VMT19937/commit/fa93111bfc6f56f25c315990430a3487cdff9935).
+
+Affected files:
+
+- `/deps/VMT19937-master/**`
+
+Licensed under the MIT license.
+
+**NOTE** Added in 1.1.8.
+
+## `xoshiro` by Nessan Fitzmaurice, David Blackman and Sebastiano Vigna
+
+Available from <https://github.com/nessan/xoshiro> under tag [v1.0.0](https://github.com/nessan/xoshiro/releases/tag/v1.1.0) and commit [176fa19](https://github.com/nessan/xoshiro/commit/176fa191c8493e4c5cb06a44bc083010664fe39b).
+
+Affected files:
+
+- `/deps/xoshiro/**`
+
+The version we used (`vigna.h`) is a C++ implementation migrated from the C code of original authors (David Blackman and Sebastiano Vigna) as we're currently not supporting C++20. The original C code is distributed under the [CC-0 license](http://creativecommons.org/publicdomain/zero/1.0/).
+
+Other files are licensed under the MIT license.
+
+**NOTE** Added in 1.1.8.
+
+## Other Random Generators Recommended and Adapted by M.E. O'Neill
+
+M.E. O'Neill, the author of the PCG random generator, had recommended several other random generators in his [blog post](https://www.pcg-random.org/posts/some-prng-implementations.html). He generously adapted those random generators from original authors and made them available under the MIT license.
+
+Affected files in `deps/other_rngs` with their original GitHub Gist URLs:
+
+- [`jsf.hpp`](https://gist.github.com/imneme/85cff47d4bad8de6bdeb671f9c76c814)
+- [`gjrand.hpp`](https://gist.github.com/imneme/7a783e20f71259cc13e219829bcea4ac)
+- [`sfc.hpp`](https://gist.github.com/imneme/f1f7821f07cf76504a97f6537c818083)
+- [`lehmer.hpp`](https://gist.github.com/imneme/aeae7628565f15fb3fef54be8533e39c)
+- [`splitmix.hpp`](https://gist.github.com/imneme/6179748664e88ef3c34860f44309fc71)
+- [`arc4.hpp`](https://gist.github.com/imneme/4f2bf4b4f3a221ef051cf108d6b64d5a)
+
+Licensed under the MIT license.
+
+**NOTE** Added in 1.1.8.
+
 ## `cgranges` by Heng Li
 
 Available from <https://github.com/lh3/cgranges>, commit `b3d5e2c5`.
@@ -142,24 +185,3 @@ With Apache/MIT License.
 
 **NOTE** Added in 1.2.0.
 
-## Appendicies
-
-### Copyright of `epmdist.h` in Original ART
-
-On the original source code, the copyright notice of `empdist.h` contains a banner indicating that it is copyrighted with all rights reserved. After contacting the original author, I've confirmed that the `empdist.h` can be distributed under the GPL v3 license. The email is as follows:
-
-```text
-FROM: w. h <whduke@gmail.com>
-TO  : Yu, Zhejian <zhejianyu@intl.zju.edu.cn>
-SUBJ: Re: Questions Concerning ART License
-DATE: 11/5/2024 2:33:17 AM GMT+8
-
-Dear Zhejian,
-
-It is great that you are using ART codes for your research. No worries about the license
-banner in empdist.h. It should be under GPL3.
-
-[...]
-
-Thanks!
-```

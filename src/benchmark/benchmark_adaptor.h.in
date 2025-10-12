@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+* Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -13,7 +13,5 @@
  **/
 
 #pragma once
+#define RAW_DATA_PATH "${CMAKE_CURRENT_LIST_DIR}/data/raw_data/"
 
-namespace labw::art_modern {
-void validate_protobuf_version();
-} // namespace labw::art_modern

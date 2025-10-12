@@ -1,75 +1,190 @@
-#include "gsl_rng_wrapper.hh"
-#include "rprobs.hh"
+/**
+ *
+ * @brief Benchmark various RNGs for generating random bits.
+ *
+ * Note: Those who failed TestU01 SmallCrush are NOT included.
+ */
+#include "bench_rand_conf.hh" // NOLINT
 
+#include "arch_utils.hh"
+
+#include "rprobs.hh"
+#include "vigna.h"
+
+#ifdef BENCH_RAND_ARCH_X86
+#include "vmt19937_wrapper.hh"
+#endif
+
+#include "xoroshiro_wrapper.hh"
+
+#include <arc4.hpp>
+#include <gjrand.hpp>
+#include <jsf.hpp>
+#include <lehmer.hpp>
+#include <sfc.hpp>
+#include <splitmix.hpp>
+
+#ifdef MKL_FOUND
 #include <mkl.h>
+#endif
+
+#ifdef GSL_FOUND
+#include "gsl_rng_wrapper.hh"
 
 #include <gsl/gsl_rng.h>
+#endif
 
+#ifdef Boost_FOUND
 #include <boost/random.hpp>
+#endif
 
+#ifdef absl_FOUND
+#include <absl/base/attributes.h>
 #include <absl/random/random.h>
+#endif
 
 #include <pcg_random.hpp>
 
 #include <algorithm>
 #include <chrono>
-#include <cstddef>
 #include <cstdint>
 #include <fstream>
-#include <memory>
 #include <random>
 #include <utility>
 #include <vector>
 
 namespace {
-template <typename T> void bench_bits_stl(T& rng, const std::string& name)
+
+constexpr std::size_t NAME_LENGTH = 32;
+
+template <typename T> T geometric_mean(const std::vector<T>& data)
 {
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
-
-    std::vector<std::result_of_t<T()>> gen_bits(N_BASES);
-
-    start = std::chrono::system_clock::now();
-    for (int i = 0; i < N_TIMES; i++) {
-        std::generate_n(gen_bits.begin(), N_BASES, [&rng]() { return rng(); });
+    double log_sum = 0.0;
+    for (const auto& value : data) {
+        log_sum += std::log(value);
     }
-    end = std::chrono::system_clock::now();
-
-    std::cout << name << "(" << std::to_string(rng.min()) << ", " << std::to_string(rng.max())
-              << "): " << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count())
-              << " us" << std::endl;
+    return static_cast<T>(std::exp(log_sum / static_cast<double>(data.size())));
 }
 
+template <typename T> T mean(const std::vector<T>& data)
+{
+    return std::accumulate(data.begin(), data.end(), static_cast<T>(0)) / static_cast<T>(data.size());
+}
+
+template <typename T> T sd(const std::vector<T>& data, T mean_)
+{
+    T sum_squared_diff = 0;
+    for (const auto& value : data) {
+        T diff = value - mean_;
+        sum_squared_diff += diff * diff;
+    }
+    return std::sqrt(sum_squared_diff / static_cast<T>(data.size() - 1));
+}
+
+std::string describe(const std::vector<std::size_t>& times)
+{
+    auto const mean_ = mean(times);
+    std::ostringstream oss;
+    oss << "gmean: " << std::setw(10) << formatWithCommas(geometric_mean(times)) << "; mean/sd: " << std::setw(15)
+        << formatWithCommas(mean_) + "/" + formatWithCommas(sd(times, mean_));
+    return oss.str();
+}
+
+template <typename T> void bench_bits_stl(T& rng, const std::string& name)
+{
+    std::vector<std::size_t> times {};
+
+    std::vector<std::invoke_result_t<T>> gen_bits(N_BASES);
+
+    for (std::size_t j = 0; j < N_REPLICA; j++) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (std::size_t i = 0; i < N_TIMES; i++) {
+            std::generate_n(gen_bits.begin(), N_BASES, [&rng]() { return rng(); });
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+    }
+    std::string range;
+    if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 32)) {
+        range = "(32 bits)";
+    } else if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 48)) {
+        range = "(48 bits)";
+    } else if (rng.min() == 0 && rng.max() == std::numeric_limits<std::uint64_t>::max()) {
+        range = "(64 bits)";
+    } else {
+        range = "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + ")";
+    }
+
+    std::cout << std::setw(NAME_LENGTH) << name + range + ": " << describe(times) << " us" << std::endl;
+}
+
+#ifdef MKL_FOUND
 void bench_bits_mkl(const MKL_INT type, const std::string& name)
 {
     VSLStreamStatePtr stream = nullptr;
     vslNewStream(&stream, type, seed());
     VSLBRngProperties brng;
     vslGetBrngProperties(type, &brng);
-    std::chrono::time_point<std::chrono::system_clock> start;
-    std::chrono::time_point<std::chrono::system_clock> end;
+    std::vector<std::size_t> times {};
     std::vector<std::uint32_t> gen_bits {};
     gen_bits.resize(N_BASES);
 
-    start = std::chrono::system_clock::now();
-    for (int i = 0; i < N_TIMES; i++) {
-        viRngUniformBits(VSL_RNG_METHOD_UNIFORM_STD, stream, N_BASES, gen_bits.data());
+    for (std::size_t j = 0; j < N_REPLICA; j++) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (std::size_t i = 0; i < N_TIMES; i++) {
+            viRngUniformBits(VSL_RNG_METHOD_UNIFORM_STD, stream, N_BASES, gen_bits.data());
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
-    end = std::chrono::system_clock::now();
 
     vslDeleteStream(&stream);
-    std::cout << name << " (" << brng.NBits << " bits): "
-              << formatWithCommas(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) << " us"
-              << std::endl;
+    std::cout << std::setw(NAME_LENGTH) << name + "(" + std::to_string(brng.NBits) + " bits): " << describe(times)
+              << " us" << std::endl;
 }
+#endif
 
-void bench_gsl(const gsl_rng_type* t)
+#ifdef BENCH_RAND_ARCH_X86
+template <typename VMT19937BulkRandomDeviceImpl> void bench_bits_vmt19937(const std::string& name)
+{
+    VMT19937BulkRandomDeviceImpl rng {};
+    std::vector<std::size_t> times {};
+    std::vector<std::uint32_t> gen_bits {};
+    gen_bits.resize(N_BASES);
+
+    for (std::size_t j = 0; j < N_REPLICA; j++) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (std::size_t i = 0; i < N_TIMES; i++) {
+            rng.gen(gen_bits);
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+    }
+
+    std::string range;
+    if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 32)) {
+        range = "(32 bits)";
+    } else if (static_cast<std::int64_t>(rng.max()) - static_cast<std::int64_t>(rng.min()) + 1ULL == (1ULL << 48)) {
+        range = "(48 bits)";
+    } else if (rng.min() == 0 && rng.max() == std::numeric_limits<std::uint64_t>::max()) {
+        range = "(64 bits)";
+    } else {
+        range = "(" + std::to_string(rng.min()) + ", " + std::to_string(rng.max()) + ")";
+    }
+
+    std::cout << std::setw(NAME_LENGTH) << name + range + ": " << describe(times) << " us" << std::endl;
+}
+#endif
+
+#ifdef GSL_FOUND
+ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
 {
     GslRngWrapper gsl_rand_wrapper { t };
     bench_bits_stl<GslRngWrapper>(gsl_rand_wrapper, "GSL::" + gsl_rand_wrapper.name());
 }
+#endif
 
-void stl_main()
+[[maybe_unused]] void stl_main()
 {
     CustomRandomDevice rng_custom_random_device;
     bench_bits_stl<CustomRandomDevice>(rng_custom_random_device, "CustomRandomDevice");
@@ -85,35 +200,11 @@ void stl_main()
 
     std::ranlux48 rng_ranlux48 { seed() };
     bench_bits_stl<std::ranlux48>(rng_ranlux48, "std::ranlux48");
-
-    std::ranlux24 rng_ranlux24 { seed() };
-    bench_bits_stl<std::ranlux24>(rng_ranlux24, "std::ranlux24");
-
-    std::ranlux48_base rng_ranlux48_base { seed() };
-    bench_bits_stl<std::ranlux48_base>(rng_ranlux48_base, "std::ranlux48_base");
-
-    std::ranlux24_base rng_ranlux24_base { seed() };
-    bench_bits_stl<std::ranlux24_base>(rng_ranlux24_base, "std::ranlux24_base");
-
-    std::knuth_b rng_knuth_b { seed() };
-    bench_bits_stl<std::knuth_b>(rng_knuth_b, "std::knuth_b");
-
-    std::minstd_rand0 rng_minstd_rand0 { seed() };
-    bench_bits_stl<std::minstd_rand0>(rng_minstd_rand0, "std::minstd_rand0");
-
-    std::minstd_rand rng_minstd_rand { seed() };
-    bench_bits_stl<std::minstd_rand>(rng_minstd_rand, "std::minstd_rand");
-    /**
-     Very very slow
-      std::random_device rng_random_device;
-      std::vector<std::random_device::result_type> gen_bits_random_device(N_BASES);
-      bench_bits_stl<std::random_device, std::random_device::result_type>(
-          rng_random_device, gen_bits_random_device, "std::random_device");
-    **/
 }
 
-void boost_main()
+[[maybe_unused]] void boost_main()
 {
+#ifdef Boost_FOUND
     boost::random::mt19937 rng_mt19937 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::mt19937>(rng_mt19937, "boost::random::mt19937");
 
@@ -123,131 +214,45 @@ void boost_main()
     boost::random::ranlux48 rng_ranlux48 { seed() };
     bench_bits_stl<boost::random::ranlux48>(rng_ranlux48, "boost::random::ranlux48");
 
-    boost::random::ranlux24 rng_ranlux24 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux24>(rng_ranlux24, "boost::random::ranlux24");
-
-    boost::random::knuth_b rng_knuth_b { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::knuth_b>(rng_knuth_b, "boost::random::knuth_b");
-
-    boost::random::minstd_rand0 rng_minstd_rand0 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::minstd_rand0>(rng_minstd_rand0, "boost::random::minstd_rand0");
-
-    boost::random::minstd_rand rng_minstd_rand { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::minstd_rand>(rng_minstd_rand, "boost::random::minstd_rand");
-
-    boost::random::ranlux48_base rng_ranlux48_base { seed() };
-    bench_bits_stl<boost::random::ranlux48_base>(rng_ranlux48_base, "boost::random::ranlux48_base");
-
-    boost::random::ranlux24_base rng_ranlux24_base { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux24_base>(rng_ranlux24_base, "boost::random::ranlux24_base");
-
-    boost::random::rand48 rng_rand48 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::rand48>(rng_rand48, "boost::random::rand48");
-
-    boost::random::ecuyer1988 rng_ecuyer1988 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ecuyer1988>(rng_ecuyer1988, "boost::random::ecuyer1988");
-
-    boost::random::kreutzer1986 rng_kreutzer1986 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::kreutzer1986>(rng_kreutzer1986, "boost::random::kreutzer1986");
-
     boost::random::taus88 rng_taus88 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::taus88>(rng_taus88, "boost::random::taus88");
 
-    boost::random::hellekalek1995 rng_hellekalek1995 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::hellekalek1995>(rng_hellekalek1995, "boost::random::hellekalek1995");
-
     boost::random::mt11213b rng_mt11213b { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::mt11213b>(rng_mt11213b, "boost::random::mt11213b");
-
-    boost::random::lagged_fibonacci607 rng_lagged_fibonacci607 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci607>(rng_lagged_fibonacci607, "boost::random::lagged_fibonacci607");
-
-    boost::random::lagged_fibonacci19937 rng_lagged_fibonacci19937 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci19937>(
-        rng_lagged_fibonacci19937, "boost::random::lagged_fibonacci19937");
-
-    boost::random::lagged_fibonacci9689 rng_lagged_fibonacci9689 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci9689>(
-        rng_lagged_fibonacci9689, "boost::random::lagged_fibonacci9689");
-
-    boost::random::lagged_fibonacci23209 rng_lagged_fibonacci23209 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci23209>(
-        rng_lagged_fibonacci23209, "boost::random::lagged_fibonacci23209");
-
-    boost::random::lagged_fibonacci1279 rng_lagged_fibonacci1279 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci1279>(
-        rng_lagged_fibonacci1279, "boost::random::lagged_fibonacci1279");
-
-    boost::random::lagged_fibonacci3217 rng_lagged_fibonacci3217 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci3217>(
-        rng_lagged_fibonacci3217, "boost::random::lagged_fibonacci3217");
-
-    boost::random::lagged_fibonacci4423 rng_lagged_fibonacci4423 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci4423>(
-        rng_lagged_fibonacci4423, "boost::random::lagged_fibonacci4423");
-
-    boost::random::lagged_fibonacci44497 rng_lagged_fibonacci44497 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::lagged_fibonacci44497>(
-        rng_lagged_fibonacci44497, "boost::random::lagged_fibonacci44497");
-
-    boost::random::ranlux3 rng_ranlux3 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux3>(rng_ranlux3, "boost::random::ranlux3");
-
-    boost::random::ranlux4 rng_ranlux4 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux4>(rng_ranlux4, "boost::random::ranlux4");
 
     boost::random::ranlux64_3 rng_ranlux64_3 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::ranlux64_3>(rng_ranlux64_3, "boost::random::ranlux64_3");
 
     boost::random::ranlux64_4 rng_ranlux64_4 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<boost::random::ranlux64_4>(rng_ranlux64_4, "boost::random::ranlux64_4");
-
-    boost::random::ranlux3_01 rng_ranlux3_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux3_01>(rng_ranlux3_01, "boost::random::ranlux3_01");
-
-    boost::random::ranlux4_01 rng_ranlux4_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux4_01>(rng_ranlux4_01, "boost::random::ranlux4_01");
-
-    boost::random::ranlux64_3_01 rng_ranlux64_3_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux64_3_01>(rng_ranlux64_3_01, "boost::random::ranlux64_3_01");
-
-    boost::random::ranlux64_4_01 rng_ranlux64_4_01 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::ranlux64_4_01>(rng_ranlux64_4_01, "boost::random::ranlux64_4_01");
+#endif
 }
 
-void mkl_main()
+[[maybe_unused]] void mkl_main()
 {
+#ifdef MKL_FOUND
     bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
     bench_bits_mkl(VSL_BRNG_MT2203, "MKL::VSL_BRNG_MT2203");
-    // This fails. No idea why.
-    // bench_bits_mkl(VSL_BRNG_WH, "MKL::VSL_BRNG_WH");
-    bench_bits_mkl(VSL_BRNG_SOBOL, "MKL::VSL_BRNG_SOBOL");
-    bench_bits_mkl(VSL_BRNG_MCG31, "MKL::VSL_BRNG_MCG31");
-    bench_bits_mkl(VSL_BRNG_R250, "MKL::VSL_BRNG_R250");
-    bench_bits_mkl(VSL_BRNG_MRG32K3A, "MKL::VSL_BRNG_MRG32K3A");
-    // This fails. No idea why.
-    // bench_bits_mkl(VSL_BRNG_MCG59, "MKL::VSL_BRNG_MCG59");
-    bench_bits_mkl(VSL_BRNG_NIEDERR, "MKL::VSL_BRNG_NIEDERR");
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
     bench_bits_mkl(VSL_BRNG_ARS5, "MKL::VSL_BRNG_ARS5");
     bench_bits_mkl(VSL_BRNG_PHILOX4X32X10, "MKL::VSL_BRNG_PHILOX4X32X10");
-    // These failed. No idea why.
-    // bench_bits_mkl(VSL_BRNG_IABSTRACT, "MKL::VSL_BRNG_IABSTRACT");
-    // bench_bits_mkl(VSL_BRNG_DABSTRACT, "MKL::VSL_BRNG_DABSTRACT");
-    // bench_bits_mkl(VSL_BRNG_SABSTRACT, "MKL::VSL_BRNG_SABSTRACT");
-    bench_bits_mkl(VSL_BRNG_NONDETERM, "MKL::VSL_BRNG_NONDETERM");
+    // Yet another /dev/random
+    // bench_bits_mkl(VSL_BRNG_NONDETERM, "MKL::VSL_BRNG_NONDETERM");
+#endif
 }
 
-void absl_main()
+[[maybe_unused]] void absl_main()
 {
+#ifdef absl_FOUND
     absl::BitGen rng_bitgen {};
     bench_bits_stl<absl::BitGen>(rng_bitgen, "absl::BitGen");
 
     absl::InsecureBitGen rng_insecure_bitgen {};
     bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
+#endif
 }
 
-void pcg_main()
+[[maybe_unused]] void pcg_main()
 {
     pcg32 rng_pcg32 { static_cast<unsigned int>(seed()) };
     bench_bits_stl<pcg32>(rng_pcg32, "PCG::pcg32");
@@ -268,81 +273,133 @@ void pcg_main()
     bench_bits_stl<pcg64_oneseq_once_insecure>(rng_pcg64_oneseq_once_insecure, "PCG::pcg64_oneseq_once_insecure");
 }
 
-void gsl_main()
+[[maybe_unused]] void gsl_main()
 {
+#ifdef GSL_FOUND
     bench_gsl(gsl_rng_mt19937);
     bench_gsl(gsl_rng_mt19937_1999);
     bench_gsl(gsl_rng_mt19937_1998);
-    bench_gsl(gsl_rng_ranlxs0);
-    bench_gsl(gsl_rng_ranlxs1);
-    bench_gsl(gsl_rng_ranlxs2);
     bench_gsl(gsl_rng_ranlxd1);
     bench_gsl(gsl_rng_ranlxd2);
-    bench_gsl(gsl_rng_ranlux);
-    bench_gsl(gsl_rng_ranlux389);
-    bench_gsl(gsl_rng_cmrg);
-    bench_gsl(gsl_rng_mrg);
     bench_gsl(gsl_rng_taus);
     bench_gsl(gsl_rng_taus2);
     bench_gsl(gsl_rng_gfsr4);
-    bench_gsl(gsl_rng_rand);
-    bench_gsl(gsl_rng_random_bsd);
-    bench_gsl(gsl_rng_random_libc5);
-    bench_gsl(gsl_rng_random_glibc2);
-    bench_gsl(gsl_rng_rand48);
-    bench_gsl(gsl_rng_ranf);
-    bench_gsl(gsl_rng_ranmar);
-    bench_gsl(gsl_rng_r250);
-    bench_gsl(gsl_rng_tt800);
-    bench_gsl(gsl_rng_vax);
-    bench_gsl(gsl_rng_transputer);
-    bench_gsl(gsl_rng_randu);
-    bench_gsl(gsl_rng_minstd);
-    bench_gsl(gsl_rng_uni);
-    bench_gsl(gsl_rng_uni32);
-    bench_gsl(gsl_rng_slatec);
-    bench_gsl(gsl_rng_zuf);
-    bench_gsl(gsl_rng_knuthran2);
-    bench_gsl(gsl_rng_knuthran2002);
-    bench_gsl(gsl_rng_knuthran);
-    bench_gsl(gsl_rng_borosh13);
-    bench_gsl(gsl_rng_fishman18);
-    bench_gsl(gsl_rng_fishman20);
-    bench_gsl(gsl_rng_lecuyer21);
-    bench_gsl(gsl_rng_waterman14);
-    bench_gsl(gsl_rng_fishman2x);
-    bench_gsl(gsl_rng_coveyou);
+#endif
 }
 
-void mt19937_main()
+[[maybe_unused]] void vmt19937_main()
 {
-    std::mt19937 rng_stl_mt19937 { seed() };
-    bench_bits_stl<std::mt19937>(rng_stl_mt19937, "std::mt19937");
+#ifdef BENCH_RAND_ARCH_X86
+    VMT19937RandomDevice rng_vmt19937_random_device {};
+    bench_bits_stl<decltype(rng_vmt19937_random_device)>(rng_vmt19937_random_device, "VMT19937RandomDevice");
 
-    absl::InsecureBitGen rng_insecure_bitgen {};
-    bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
+    VSFMT19937RandomDevice rng_vsfmt19937_random_device {};
+    bench_bits_stl<decltype(rng_vsfmt19937_random_device)>(rng_vsfmt19937_random_device, "VSFMT19937RandomDevice");
 
-    pcg32 rng_pcg32 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<pcg32>(rng_pcg32, "PCG::pcg32");
+    bench_bits_vmt19937<VMT19937BulkRandomDevice>("VMT19937BulkRandomDevice");
+    bench_bits_vmt19937<VSFMT19937BulkRandomDevice>("VSFMT19937BulkRandomDevice");
+#endif
+}
 
-    boost::random::mt19937 rng_boost_mt19937 { static_cast<unsigned int>(seed()) };
-    bench_bits_stl<boost::random::mt19937>(rng_boost_mt19937, "boost::random::mt19937");
+[[maybe_unused]] void xso_main()
+{
+    XoroshiroWrapper<old::xoroshiro_2x32_star, uint32_t> x01 {};
+    bench_bits_stl<decltype(x01)>(x01, "xoroshiro::2x32*");
 
-    bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
-    bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");
-    bench_gsl(gsl_rng_mt19937);
+    XoroshiroWrapper<old::xoshiro_4x32_plus, uint32_t, 4> x03 {};
+    bench_bits_stl<decltype(x03)>(x03, "xoshiro::4x32+");
+
+    XoroshiroWrapper<old::xoshiro_4x32_plus_plus, uint32_t, 4> x04 {};
+    bench_bits_stl<decltype(x04)>(x04, "xoshiro::4x32++");
+
+    XoroshiroWrapper<old::xoshiro_4x32_star_star, uint32_t, 4> x05 {};
+    bench_bits_stl<decltype(x05)>(x05, "xoshiro::4x32**");
+
+    XoroshiroWrapper<old::xoroshiro_2x64_plus, uint64_t, 2> x06 {};
+    bench_bits_stl<decltype(x06)>(x06, "xoroshiro::2x64+");
+
+    XoroshiroWrapper<old::xoroshiro_2x64_plus_plus, uint64_t, 2> x07 {};
+    bench_bits_stl<decltype(x07)>(x07, "xoroshiro::2x64++");
+
+    XoroshiroWrapper<old::xoroshiro_2x64_star_star, uint64_t, 2> x08 {};
+    bench_bits_stl<decltype(x08)>(x08, "xoroshiro::2x64**");
+
+    XoroshiroWrapper<old::xoshiro_4x64_plus, uint64_t, 4> x09 {};
+    bench_bits_stl<decltype(x09)>(x09, "xoshiro::4x64+");
+
+    XoroshiroWrapper<old::xoshiro_4x64_plus_plus, uint64_t, 4> x10 {};
+    bench_bits_stl<decltype(x10)>(x10, "xoshiro::4x64++");
+
+    XoroshiroWrapper<old::xoshiro_4x64_star_star, uint64_t, 4> x11 {};
+    bench_bits_stl<decltype(x11)>(x11, "xoshiro::4x64**");
+
+    XoroshiroWrapper<old::xoshiro_8x64_plus, uint64_t, 8> x12 {};
+    bench_bits_stl<decltype(x12)>(x12, "xoshiro::8x64+");
+
+    XoroshiroWrapper<old::xoshiro_8x64_plus_plus, uint64_t, 8> x13 {};
+    bench_bits_stl<decltype(x13)>(x13, "xoshiro::8x64++");
+
+    XoroshiroWrapper<old::xoshiro_8x64_star_star, uint64_t, 8> x14 {};
+    bench_bits_stl<decltype(x14)>(x14, "xoshiro::8x64**");
+
+    XoroshiroWrapper<old::xoroshiro_16x64_star, uint64_t, 16> x15 {};
+    bench_bits_stl<decltype(x15)>(x15, "xoroshiro::16x64*");
+
+    XoroshiroWrapper<old::xoroshiro_16x64_star_star, uint64_t, 16> x16 {};
+    bench_bits_stl<decltype(x16)>(x16, "xoroshiro::16x64**");
+
+    XoroshiroWrapper<old::xoroshiro_16x64_plus_plus, uint64_t, 16> x17 {};
+    bench_bits_stl<decltype(x17)>(x17, "xoroshiro::16x64++");
+}
+
+[[maybe_unused]] void other_rngs_main()
+{
+    arc4_rand32 rng_arc4 { static_cast<arc4_rand32::result_type>(seed()) };
+    bench_bits_stl<arc4_rand32>(rng_arc4, "others::arc4_rand32");
+
+    arc4_rand64 rng_arc4_64 { static_cast<arc4_rand64::result_type>(seed()) };
+    bench_bits_stl<arc4_rand64>(rng_arc4_64, "others::arc4_rand64");
+
+    gjrand32 rng_gjrand32 { static_cast<gjrand32::result_type>(seed()) };
+    bench_bits_stl<gjrand32>(rng_gjrand32, "others::gjrand32");
+
+    gjrand64 rng_gjrand63 { static_cast<gjrand64::result_type>(seed()) };
+    bench_bits_stl<gjrand64>(rng_gjrand63, "others::gjrand64");
+
+    jsf32 rng_jsf32 { static_cast<jsf32::result_type>(seed()) };
+    bench_bits_stl<jsf32>(rng_jsf32, "others::jsf32");
+
+    mcg128 rng_mcg128 { static_cast<mcg128::result_type>(seed()) };
+    bench_bits_stl<mcg128>(rng_mcg128, "others::mcg128");
+
+    mcg128_fast rng_mcg128_fast { static_cast<mcg128_fast::result_type>(seed()) };
+    bench_bits_stl<mcg128_fast>(rng_mcg128_fast, "others::mcg128_fast");
+
+    sfc32 rng_sfc32 { static_cast<sfc32::result_type>(seed()) };
+    bench_bits_stl<sfc32>(rng_sfc32, "others::sfc32");
+
+    sfc64 rng_sfc64 { static_cast<sfc64::result_type>(seed()) };
+    bench_bits_stl<sfc64>(rng_sfc64, "others::sfc64");
+
+    splitmix32 rng_splitmix32 { static_cast<splitmix32::result_type>(seed()) };
+    bench_bits_stl<splitmix32>(rng_splitmix32, "others::splitmix32");
+
+    splitmix64 rng_splitmix64 { static_cast<splitmix64::result_type>(seed()) };
+    bench_bits_stl<splitmix64>(rng_splitmix64, "others::splitmix64");
 }
 
 } // namespace
 
-int main()
+int main() noexcept
 {
-    mt19937_main();
-    //    stl_main();
-    //    boost_main();
-    //    mkl_main();
-    //    absl_main();
-    //    gsl_main();
-    //    pcg_main();
+    stl_main();
+    boost_main();
+    mkl_main();
+    absl_main();
+    gsl_main();
+    pcg_main();
+    xso_main();
+    vmt19937_main();
+    other_rngs_main();
     return EXIT_SUCCESS;
 }

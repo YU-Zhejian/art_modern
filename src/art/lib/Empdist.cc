@@ -52,7 +52,8 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_pe, std::size_t read_len)
+Empdist::Empdist(
+    const BuiltinProfile& builtin_profile, const bool sep_qual, const bool is_pe, const std::size_t read_len)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , read_len_(read_len)
@@ -85,7 +86,7 @@ Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filen
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
-void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, bool first) const
+void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
 #ifdef USE_WALKER_QUALGEN
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
@@ -245,6 +246,15 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
 
         qual.clear();
         while (ss >> tmp_qual) {
+            if (tmp_qual < MIN_QUAL || tmp_qual > MAX_QUAL) {
+                BOOST_LOG_TRIVIAL(fatal) << "R" << (is_first ? 1 : 2) << "L" << std::to_string(actual_line_no)
+                                         << ": Fatal error (2): Quality score " << std::to_string(tmp_qual)
+                                         << " out of range [" << std::to_string(MIN_QUAL) << ", "
+                                         << std::to_string(MAX_QUAL) << "].";
+                BOOST_LOG_TRIVIAL(fatal) << "read_pos=" << read_pos << "; n_lines_parsed=" << n_lines_parsed;
+                BOOST_LOG_TRIVIAL(fatal) << "line=" << line;
+                abort_mpi();
+            }
             qual.emplace_back(tmp_qual);
         }
 

@@ -1,5 +1,7 @@
 #include "ceu_check/ceu_check_c_cxx_std.hh"
+
 #include <sstream>
+#include <string>
 
 std::string ceu_interpret_c_std_version()
 {

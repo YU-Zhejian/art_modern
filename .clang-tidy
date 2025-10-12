@@ -72,7 +72,7 @@ Checks:
   - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
   - -*-no-array-decay
 
-  # We don't use Abseil.
+  # We minimize the use of Abseil.
   - -abseil-*
 
   # We minimize the use of Boost.
@@ -101,13 +101,17 @@ Checks:
 
   # Commonly used in tests and entry points
   - -google-build-using-namespace
+
+  # HTSLib uses unions in several places.
+  - -cppcoreguidelines-pro-type-union-access
+
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit
 
 CheckOptions:
   - key: misc-include-cleaner.IgnoreHeaders
-    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*'
+    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*.cstdint;cstddef;fmt/format.h'
 
 HeaderFileExtensions:
   - h

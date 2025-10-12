@@ -14,12 +14,15 @@
 
 #define BOOST_TEST_MODULE test_seq_utils // NOLINT
 
-#include "libam_support/utils/seq_utils.hh"
+#include "libam_support/Dtypes.hh"
+
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <vector>
 
 using namespace labw::art_modern;
 
@@ -27,7 +30,7 @@ BOOST_AUTO_TEST_CASE(test_seq_utils_1)
 {
     const std::string aligned_ref("---AAACCCTTTGG-GAA");
     const std::string aligned_query("TAAAAA-CCCA--GTG--");
-    const PairwiseAlignment pwa("", "", "", "", "", aligned_query, aligned_ref, 0, true);
+    const PairwiseAlignment pwa("", "", "", "", "", std::vector<am_qual_t>(), aligned_query, aligned_ref, 0, true);
     BOOST_TEST("3I3=1D2=2X2D1=1I1=2D" == cigar_arr_to_str(pwa.generate_cigar_array(false)));
     BOOST_TEST("3I3M1D4M2D1M1I1M2D" == cigar_arr_to_str(pwa.generate_cigar_array(true)));
 }

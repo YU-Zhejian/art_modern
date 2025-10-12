@@ -32,8 +32,8 @@ namespace labw::art_modern {
 class ArtContig {
 
 public:
-    ArtContig(
-        const std::shared_ptr<BaseFastaFetch>& fasta_fetch, size_t seq_id, const ArtParams& art_params, Rprob& rprob);
+    ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::size_t seq_id, const ArtParams& art_params,
+        Rprob& rprob);
 
     void generate_read_se(bool is_plus_strand, ArtRead& read_1);
     void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);
@@ -48,7 +48,7 @@ private:
     const ArtParams& art_params_;
     const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
     Rprob& rprob_;
-    const size_t seq_id_;
+    const std::size_t seq_id_;
     const hts_pos_t valid_region_;
 };
 

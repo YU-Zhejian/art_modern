@@ -11,7 +11,7 @@
 
 ## Introduction
 
-High-performance simulation of realistic next-generation sequencing (NGS) data is a must for various algorithm development and benchmarking tasks. However, most existing simulators are either slow or generate data that does not reflect the real-world error profile of simulators. Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster. This simulator would be best suited for GNU/Linux-based [High-End Desktops (HEDTs)](https://www.pcmag.com/encyclopedia/term/hedt) with multiple cores and a fast SSD. However, it can also work on laptops or high-performance clusters (HPCs) with only one node. We believe with such simulators, the testing and benchmarking of NGS-related bioinformatics algorithms can be largely accelerated.
+Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster.
 
 ## Quick Start
 
@@ -21,21 +21,27 @@ High-performance simulation of realistic next-generation sequencing (NGS) data i
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux. It should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip`/`build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
 
 **WARNING** Static builds may lead to compromized security.
 
+#### Using `dpkg`
+
+If you use specific versions of Debian or Ubuntu, you can install `art_modern` through pre-built DEB packages available with each release. Root privileges are required.
+
+#### Using Docker/Podman
+
+See: <https://quay.io/repository/biocontainers/art_modern>.
+
 #### Installation through Conda
 
-[Conda](https://docs.conda.io/) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed [Conda](https://docs.conda.io/). Then:
+[Conda](https://docs.conda.io/) (or [Mamba](https://mamba.readthedocs.io/en/latest/)/[micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed Conda >=25.7.0 by `conda --version`. Then:
 
 ```shell
 conda create -y -n art_modern_bioconda -c bioconda -c conda-forge art_modern
 ```
 
-to create an environment named `art_modern_bioconda` with `art_modern` installed.
-
-You may use [Mamba](https://mamba.readthedocs.io/en/latest/) or [micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html) as a Conda replacement.
+to create an environment named `art_modern_bioconda` with the package installed.
 
 #### Installation through Compiling the Source Code
 
@@ -61,14 +67,14 @@ Build the project using:
 ```shell
 mkdir -p opt/build_release
 env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release "$(pwd)"
-env -C opt/build_release make -j40
+cmake --build opt/build_release -j40
 ```
 
 The project binary will be available at `opt/build_release/art_modern`. Now we can test whether the program runs:
 
 ```shell
 opt/build_release/art_modern --help
-opt/build_release/art_modern --version # For version information
+opt/build_release/art_modern --version
 ```
 
 ### Simulating WGS Data using _E. Coli_ Genome
@@ -90,7 +96,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10
@@ -106,8 +112,7 @@ opt/build_release/art_modern \
     --lc pe \
     --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-    --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10 \
@@ -137,7 +142,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unified_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 10
@@ -147,7 +152,7 @@ opt/build_release/art_modern \
 
 To simulate data with unstranded coverage information (i.e., same coverage on both strands), you need to provide an additional TSV file with one column of transcript ID and another column of coverage (in floating points). Please note that lines started by `#` will be ignored. An example of the coverage file:
 
-```tsv
+```text
 NM_069135	6.695683025425357
 NR_056112	5.19437291612395
 NR_051843	3.4504965075273137
@@ -167,7 +172,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unstranded_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
@@ -177,7 +182,7 @@ opt/build_release/art_modern \
 
 To simulate data with stranded coverage information (i.e., coverage on one strand is different from the other), you need to provide an additional TSV file with one column of transcript ID and two other columns of coverage in positive and negative strand (in floating points). An example of the coverage file:
 
-```tsv
+```text
 NM_069135	2.3137902802960717	4.381892745129285
 NR_056112	3.47140212944225	1.7229707866816995
 NR_051843	1.3540475385633155	2.0964489689639985
@@ -196,7 +201,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_stranded_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
@@ -206,7 +211,7 @@ opt/build_release/art_modern \
 
 The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarly, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file (Sequences represented as `aaaa`):
 
-```tsv
+```text
 NR_056112	3.47140212944225	1.7229707866816995	aaaa
 NR_051843	1.3540475385633155	2.0964489689639985	aaaa
 NR_066512	3.0468993830563917	1.689420648507448	aaaa
@@ -226,7 +231,7 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
     --o-fastq opt/build_release/c_elegans_trans_pbsim3_se.fastq \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-type pbsim3_transcripts
@@ -242,8 +247,7 @@ opt/build_release/art_modern \
    --lc pe \
    --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
    --o-fastq opt/build_release/c_elegans_template_pbsim3_se.fastq \
-   --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
-   --qual_file_2 data/Illumina_profiles/HiSeq2500L125R2.txt \
+    --builtin_qual_file HiSeq2500_125bp \
    --read_len 125 \
    --parallel 4 \
    --i-type pbsim3_transcripts
@@ -268,7 +272,7 @@ zcat opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
     --o-fastq >(pigz -p8 -9 -v -cf - > opt/build_release/e_coli_wgs_se.fastq.gz) \
     --o-pwa >(xz -9 -T5 -vv -cf - > opt/build_release/e_coli_wgs_se.pwa.xz) \
     --o-sam >(samtools sort -@9 --write-index -o opt/build_release/e_coli_wgs_se.sorted.bam) \
-    --qual_file_1 data/Illumina_profiles/HiSeq2500L125R1.txt \
+    --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
     --parallel 4 \
     --i-fcov 5
@@ -278,7 +282,7 @@ Please wait for a while for the compression to finish.
 
 ## What's Next?
 
-The `art_modern` project provides diverse documentations to satisfy your needs.
+The project provides diverse documentations to satisfy your needs.
 
 - If you want to build the software with different options, see [Install](docs/Install.md).
 - For a detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).

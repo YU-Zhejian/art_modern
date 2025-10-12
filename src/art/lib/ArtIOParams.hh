@@ -29,7 +29,7 @@ struct ArtIOParams {
     const INPUT_FILE_TYPE art_input_file_type;
     const INPUT_FILE_PARSER art_input_file_parser;
     const CoverageInfo coverage_info;
-    const int parallel;
+    const std::size_t parallel;
     const int batch_size;
     const boost::program_options::variables_map vm;
     const std::vector<std::string> args;

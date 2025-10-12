@@ -17,6 +17,7 @@
 #include <htslib/bgzf.h> // NOLINT
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+#include <htslib/sam.h> // NOLINT
 
 #include <cstddef>
 
@@ -41,15 +42,15 @@ std::size_t hts_tell(htsFile* fp)
     case fastq_format: /** fall through */
     case sam: /** fall through */
     case vcf: /** fall through */
+    {
         if (fp->format.compression != no_compression) {
             return htell(fp->fp.bgzf->fp);
-        } else {
-            return htell(fp->fp.hfile);
         }
+        return htell(fp->fp.hfile);
+    }
     default:
         break;
     }
     return 0;
 }
-
 } // namespace labw::art_modern

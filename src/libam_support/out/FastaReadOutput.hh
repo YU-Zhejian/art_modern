@@ -28,11 +28,11 @@
 
 namespace labw::art_modern {
 
-class FastaReadOutput : public BaseReadOutput {
+class FastaReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(FastaReadOutput)
     DELETE_COPY(FastaReadOutput)
-    explicit FastaReadOutput(const std::string& filename, int n_threads);
+    explicit FastaReadOutput(const std::string& filename, std::size_t n_threads);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;
@@ -44,14 +44,14 @@ private:
     SimpleLFIO lfio_;
 };
 
-class FastaReadOutputFactory : public BaseReadOutputFactory {
+class FastaReadOutputFactory final : public BaseReadOutputFactory {
 public:
     DELETE_MOVE(FastaReadOutputFactory)
     DELETE_COPY(FastaReadOutputFactory)
     FastaReadOutputFactory() = default;
     ~FastaReadOutputFactory() override = default;
 
-    [[nodiscard]] const std::string name() const override { return "FASTA"; }
+    [[nodiscard]] std::string name() const override { return "FASTA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };

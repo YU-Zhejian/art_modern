@@ -18,6 +18,8 @@
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/algorithm/string/join.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -54,14 +56,15 @@ void PwaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     if (closed_) {
         return;
     }
-    auto os1 = std::make_unique<std::string>(pwa1.serialize());
+    auto os1 = std::make_unique<std::string>(pwa1.serialize(1));
     lfio_.push(std::move(os1), token);
-    auto os2 = std::make_unique<std::string>(pwa2.serialize());
+    auto os2 = std::make_unique<std::string>(pwa2.serialize(2));
     lfio_.push(std::move(os2), token);
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
-PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, const int n_threads)
+PwaReadOutput::PwaReadOutput(
+    const std::string& filename, const std::vector<std::string>& args, const std::size_t n_threads)
     : lfio_("PWA", filename, preamble(args))
 {
     lfio_.init_queue(n_threads, 0);
@@ -91,7 +94,8 @@ void PwaReadOutputFactory::patch_options(boost::program_options::options_descrip
 std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-pwa") != 0U) {
-        return std::make_shared<PwaReadOutput>(params.vm["o-pwa"].as<std::string>(), params.args, params.n_threads);
+        return std::make_shared<PwaReadOutput>(
+            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank()), params.args, params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }

@@ -12,7 +12,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT: for various flags
 
 #include "libam_support/utils/version_utils.hh"
 
@@ -54,12 +54,9 @@
 
 // MPI
 #ifdef WITH_MPI
-#include <mpi.h>
-#endif
+#include <boost/algorithm/string/trim.hpp>
 
-// Protobuf
-#ifdef WITH_PROTOBUF
-#include <google/protobuf/stubs/common.h>
+#include <mpi.h>
 #endif
 
 // malloc
@@ -69,7 +66,8 @@
 #include <jemalloc/jemalloc.h>
 #endif
 
-#include <fmt/format.h>
+// In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
+#include <fmt/format.h> // NOLINT
 
 // CPPSTDLIB
 #include <iostream>
@@ -191,23 +189,6 @@ namespace {
 #endif
     }
 
-    void print_protobuf_version()
-    {
-#ifdef WITH_PROTOBUF
-        const int version = GOOGLE_PROTOBUF_VERSION;
-
-        // Extract major, minor, and patch numbers
-        const int major = version / 1000000;
-        const int minor = (version % 1000000) / 1000;
-        const int patch = version % 1000;
-
-        // Print the version
-        std::cout << "Protobuf: " << major << "." << minor << "." << patch << std::endl;
-#else
-        std::cout << "Protobuf: not used" << std::endl;
-#endif
-    }
-
     void print_openmp_version()
     {
 #ifdef WITH_OPENMP
@@ -318,7 +299,6 @@ void print_version()
     print_onemkl_version();
     print_pcg_version();
     print_mpi_version();
-    print_protobuf_version();
     print_openmp_version();
     print_simde_version();
     print_bs_version();
@@ -331,4 +311,3 @@ void print_version()
     std::cout << ceu_check_get_run_time_os_info();
 }
 } // namespace labw::art_modern
-// labw

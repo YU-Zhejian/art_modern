@@ -24,6 +24,7 @@
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/utils/si_utils.hh"
 
 #include <fmt/format.h>
 
@@ -43,10 +44,11 @@ namespace {
 
     class AJEReporter {
     public:
-        explicit AJEReporter(const ArtJobExecutor& aje)
+        explicit AJEReporter(ArtJobExecutor& aje)
             : aje_(aje)
         {
         }
+
         void stop()
         {
             should_stop_ = true;
@@ -55,7 +57,7 @@ namespace {
         void start() { thread_ = std::thread(&AJEReporter::job_, this); }
 
     private:
-        void job_()
+        void job_() const
         {
             std::this_thread::sleep_for(std::chrono::seconds(1));
             while (!should_stop_) {
@@ -64,13 +66,14 @@ namespace {
             }
         }
 
-        const ArtJobExecutor& aje_;
+        ArtJobExecutor& aje_;
         std::atomic<bool> should_stop_ { false };
         std::thread thread_;
     };
 
 } // namespace
-void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig)
+void ArtJobExecutor::generate(
+    const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig, am_readnum_t& read_id)
 {
     current_contig_ = art_contig.seq_name;
     current_n_fails_ = 0;
@@ -79,7 +82,6 @@ void ArtJobExecutor::generate(const am_readnum_t targeted_num_reads, const bool 
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     bool retv = false;
     current_n_reads_left_ = targeted_num_reads;
-    am_readnum_t read_id = 0;
     while (current_n_reads_left_ > 0) {
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             retv = generate_se(art_contig, is_positive, read_id);
@@ -128,9 +130,9 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
 
 bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
-    ArtRead art_read(art_params_, art_contig.seq_name,
-        fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads),
-        rprob_);
+    auto read_id
+        = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
+    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), rprob_);
     art_contig.generate_read_se(is_plus_strand, art_read);
     art_read.generate_snv_on_qual(true);
     if (require_alignment_) {
@@ -161,20 +163,21 @@ bool ArtJobExecutor::is_running() const { return is_running_; }
 void ArtJobExecutor::operator()()
 {
     is_running_ = true;
-    AJEReporter reporter(*this);
-    reporter.start();
-
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
+        is_running_ = false;
         return;
     }
+
+    AJEReporter reporter(*this);
+    reporter.start();
     hts_pos_t accumulated_contig_len = 0;
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
         const auto& contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
-        if (contig_size < art_params_.read_len) {
+        if (contig_size < art_params_.read_len || /** unlikely */ contig_size == 0) {
             BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
                                      << job_.fasta_fetch->seq_len(seq_id)
                                      << "bps ) is skipped as it < the defined read length (" << art_params_.read_len
@@ -198,15 +201,22 @@ void ArtJobExecutor::operator()()
                                      << " due to insufficient coverage (pos=" << cov_pos << ", neg=" << cov_neg << ")";
             continue;
         }
-        generate(num_pos_reads, true, art_contig);
-        generate(num_neg_reads, false, art_contig);
+        am_readnum_t read_id = 0;
+        generate(num_pos_reads, true, art_contig, read_id);
+        generate(num_neg_reads, false, art_contig, read_id);
+    }
+    if (accumulated_contig_len == 0) {
+        // Happens when all contigs are shorter than read length
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id
+                                << " with N/A reads (mean depth=N/A) generated.";
+    } else {
+        BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
+                                << to_si(total_num_reads_generated_) << " reads (mean depth="
+                                << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
+                / static_cast<double>(accumulated_contig_len)
+                                << ") generated.";
     }
 
-    BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with " << total_num_reads_generated_
-                            << " reads (mean depth="
-                            << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
-            / static_cast<double>(accumulated_contig_len)
-                            << ") generated.";
     reporter.stop();
     is_running_ = false;
 }
@@ -224,8 +234,8 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 std::string ArtJobExecutor::thread_info() const
 {
     return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",
-        job_.job_id, mpi_rank_, current_contig_, current_n_reads_generated_, current_n_reads_left_, current_n_fails_,
-        current_max_tolerence_, total_num_reads_generated_);
+        job_.job_id, mpi_rank_, current_contig_, to_si(current_n_reads_generated_), to_si(current_n_reads_left_),
+        to_si(current_n_fails_), to_si(current_max_tolerence_), to_si(total_num_reads_generated_));
 }
 
 } // namespace labw::art_modern

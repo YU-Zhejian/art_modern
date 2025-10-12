@@ -27,7 +27,7 @@
 
 namespace labw::art_modern {
 
-class OutputNotSpecifiedException : public std::exception {
+class OutputNotSpecifiedException final : public std::exception {
 public:
     [[nodiscard]] const char* what() const noexcept override { return "Output file not specified"; }
 };
@@ -55,7 +55,7 @@ public:
     DELETE_COPY(BaseReadOutputFactory)
     BaseReadOutputFactory() = default;
 
-    [[nodiscard]] virtual const std::string name() const = 0;
+    [[nodiscard]] virtual std::string name() const = 0;
     virtual void patch_options(boost::program_options::options_description& desc) const = 0;
     /**
      * @throw OutputNotSpecifiedException if output file is not specified.

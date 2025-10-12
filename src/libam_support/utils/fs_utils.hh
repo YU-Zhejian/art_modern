@@ -24,6 +24,15 @@ void validate_input_filename(const std::string& input_file_path, const std::stri
 am_filelen_t get_file_size(const std::string& file_path) noexcept;
 
 void ensure_directory_exists(const std::string& dir_path);
+/**
+ * Prepare the directory for the output file path.
+ *
+ * Warn about existing files that will be overwritten.
+ *
+ * @param output_file_path As described.
+ */
 void prepare_writer(const std::string& output_file_path);
+
+std::string attach_mpi_rank_to_path(const std::string& file_path, const std::string& rank_str);
 
 } // namespace labw::art_modern

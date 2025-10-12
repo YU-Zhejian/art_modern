@@ -12,8 +12,9 @@
 #include <cstdlib>
 #include <random>
 #include <vector>
-namespace {
 
+namespace {
+// FIXME: Who gives me this code?
 template <typename Engine> double pcg32_generate_uniform_double(Engine& engine, const double min, const double max)
 {
     return ldexpl((static_cast<uint64_t>(engine()) << 32) | engine(), -64) * (max - min) + min;

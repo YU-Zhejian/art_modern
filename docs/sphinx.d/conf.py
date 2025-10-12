@@ -5,8 +5,13 @@ Configuration file for the Sphinx documentation builder.
 # pylint: disable=wrong-import-position, invalid-name
 
 import os
-
 import datetime
+import sys
+
+import jinja2
+from sphinx import __version__ as sphinx_version
+from myst_parser import __version__ as myst_parser_version
+
 from docutils.parsers.null import Parser as NullParser
 from sphinx.application import Sphinx
 
@@ -54,3 +59,16 @@ latex_elements = {
     # Additional stuff for the LaTeX preamble.
     "preamble": PREAMBLE,
 }
+
+template_path = os.path.join(THIS_DIR, "versions.md.jinja2")
+context = {
+    "sphinx_version": sphinx_version,
+    "python_version": sys.version,
+    "myst_parser_version": myst_parser_version,
+}
+
+with open(template_path, encoding="UTF-8") as f:
+    template = jinja2.Template(f.read())
+
+with open(os.path.join(THIS_DIR, "src", "versions.md"), "w", encoding="UTF-8") as f:
+    f.write(template.render(context))

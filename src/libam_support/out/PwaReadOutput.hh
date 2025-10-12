@@ -29,12 +29,12 @@
 
 namespace labw::art_modern {
 
-class PwaReadOutput : public BaseReadOutput {
+class PwaReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, int n_threads);
+    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, std::size_t n_threads);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;
@@ -49,14 +49,14 @@ private:
     SimpleLFIO lfio_;
 };
 
-class PwaReadOutputFactory : public BaseReadOutputFactory {
+class PwaReadOutputFactory final : public BaseReadOutputFactory {
 public:
     DELETE_MOVE(PwaReadOutputFactory)
     DELETE_COPY(PwaReadOutputFactory)
     PwaReadOutputFactory() = default;
     ~PwaReadOutputFactory() override = default;
 
-    [[nodiscard]] const std::string name() const override { return "PWA"; }
+    [[nodiscard]] std::string name() const override { return "PWA"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
 };

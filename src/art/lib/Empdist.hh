@@ -72,7 +72,7 @@ private:
                 init_list.emplace_back(i - prev);
                 prev = i;
             }
-            rd_ = GslDiscreteDistribution<double>(init_list);
+            rd_ = GslDiscreteDistribution(init_list);
         }
         ~SlimEmpDistGslDiscrete() = default;
 

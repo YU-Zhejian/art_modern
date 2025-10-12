@@ -13,6 +13,7 @@
  **/
 
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.hh"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"
@@ -42,7 +43,7 @@
 
 using namespace labw::art_modern;
 
-class EmptyLFIO : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
+class EmptyLFIO final : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
     DELETE_MOVE(EmptyLFIO)
@@ -126,9 +127,11 @@ private:
 };
 
 namespace {
-const std::string DEVNULL = "/dev/null";
+const std::string OUT_FILENAME = "/dev/null";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
+const std::vector<am_qual_t> QUALS(150, 0);
+
 const PairwiseAlignment pwa { "read_1", "chr1",
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GGAGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACT"
@@ -139,6 +142,7 @@ const PairwiseAlignment pwa { "read_1", "chr1",
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
     "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!",
+    QUALS,
     "GGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAG"
     "GG---AGGTCATTTCTATGACGGGGGGACCAGAGCCGCGGTGCATCACTCTAGAACTCCA"
     "GCTTATTTACAACATGGTGAGATGATTAGATGG",
@@ -158,9 +162,7 @@ void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_
 void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, std::size_t nthread, std::ostream& oss)
 {
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
         std::thread t(working_thread, bro, M_SIZE / nthread);
@@ -170,7 +172,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
         t.join();
     }
     bro->close();
-    end = std::chrono::high_resolution_clock::now();
+    auto end = std::chrono::high_resolution_clock::now();
     oss << fmt::format(
         "{}\t{}\t{}\n", name, nthread, std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
     std::flush(oss);
@@ -195,11 +197,11 @@ int main()
     std::vector<BamOptions> bo_t;
     std::vector<BamOptions> bo_l;
 
-    for (auto& t : std::vector<int> { 1, 2, 4, 8, 16, 32, 64 }) {
+    for (const auto& t : std::vector { 1, 2, 4, 8, 16, 32, 64 }) {
         bo_t.emplace_back();
         bo_t.back().hts_io_threads = t;
     }
-    for (auto& t : std::vector<char> { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
+    for (const auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
         bo_l.emplace_back();
         bo_l.back().compress_level = t;
     }
@@ -207,22 +209,22 @@ int main()
     for (int i = 0; i < 5; i++) {
         for (std::size_t const nthread : std::vector<std::size_t> { 1, 2, 4, 8, 16, 32, 64 }) {
             for (auto& bo : bo_l) {
-                bench(std::make_shared<BamReadOutput>(DEVNULL, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
+                bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
                     nthread, oss);
             }
             for (auto& bo : bo_t) {
-                bench(std::make_shared<BamReadOutput>(DEVNULL, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
+                bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread), get_bo_name("BamReadOutput", bo),
                     nthread, oss);
             }
-            bench(std::make_shared<HeadlessBamReadOutput>(DEVNULL, bo_defaults, nthread),
+            bench(std::make_shared<HeadlessBamReadOutput>(OUT_FILENAME, bo_defaults, nthread),
                 get_bo_name("HeadlessBamReadOutput", bo_defaults), nthread, oss);
-            bench(std::make_shared<BamReadOutput>(DEVNULL, ff, so, nthread), get_bo_name("SamReadOutput", so), nthread,
-                oss);
-            bench(std::make_shared<FastqReadOutput>(DEVNULL, nthread), "FastqReadOutput", nthread, oss);
-            bench(std::make_shared<FastaReadOutput>(DEVNULL, nthread), "FastaReadOutput", nthread, oss);
+            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, so, nthread), get_bo_name("SamReadOutput", so),
+                nthread, oss);
+            bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, nthread), "FastqReadOutput", nthread, oss);
+            bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, nthread), "FastaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
-            bench(std::make_shared<PwaReadOutput>(DEVNULL, std::vector<std::string> {}, nthread), "PwaReadOutput",
+            bench(std::make_shared<PwaReadOutput>(OUT_FILENAME, std::vector<std::string> {}, nthread), "PwaReadOutput",
                 nthread, oss);
         }
     }

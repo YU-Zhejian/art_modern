@@ -10,19 +10,17 @@
  *
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
+ *
+ * TODO: Use Geometric mean to better represent the performance
  **/
+
+#include "benchmark_utils.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.hh"
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 #include "libam_support/utils/class_macros_utils.hh"
-#include "libam_support/utils/si_utils.hh"
 
-#include <boost/accumulators/accumulators_fwd.hpp>
-#include <boost/accumulators/framework/accumulator_set.hpp>
-#include <boost/accumulators/statistics/mean.hpp>
-#include <boost/accumulators/statistics/stats.hpp>
-#include <boost/accumulators/statistics/variance.hpp>
 #include <boost/container/flat_map.hpp>
 #include <boost/container/map.hpp>
 #include <boost/log/trivial.hpp>
@@ -36,6 +34,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <functional>
+#include <iomanip>
 #include <map>
 #include <memory>
 #include <random>
@@ -74,7 +73,7 @@ public:
     virtual ~SlimEmpDist() = default;
 };
 
-class SlimEmpDistNop : public SlimEmpDist {
+class SlimEmpDistNop final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistNop)
     DELETE_COPY(SlimEmpDistNop)
@@ -88,7 +87,7 @@ public:
         }
     }
 };
-class SlimEmpDistOld : public SlimEmpDist {
+class SlimEmpDistOld final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistOld)
     DELETE_COPY(SlimEmpDistOld)
@@ -114,7 +113,7 @@ public:
 private:
     std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
-class SlimEmpDistStdDiscrete : public SlimEmpDist {
+class SlimEmpDistStdDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistStdDiscrete)
     DELETE_COPY(SlimEmpDistStdDiscrete)
@@ -142,7 +141,7 @@ private:
     std::vector<am_qual_t> qual_;
     std::discrete_distribution<std::size_t> rd_;
 };
-class SlimEmpDistBoostDiscrete : public SlimEmpDist {
+class SlimEmpDistBoostDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistBoostDiscrete)
     DELETE_COPY(SlimEmpDistBoostDiscrete)
@@ -170,7 +169,7 @@ private:
     std::vector<am_qual_t> qual_;
     boost::random::discrete_distribution<std::size_t> rd_;
 };
-class SlimEmpDistGslDiscrete : public SlimEmpDist {
+class SlimEmpDistGslDiscrete final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscrete)
     DELETE_COPY(SlimEmpDistGslDiscrete)
@@ -180,10 +179,10 @@ public:
         std::vector<double> init_list;
         double prev = 0;
         for (const int i : count) {
-            init_list.emplace_back((i - prev));
+            init_list.emplace_back(i - prev);
             prev = i;
         }
-        rd_ = GslDiscreteDistribution<double>(init_list);
+        rd_ = GslDiscreteDistribution(init_list);
     }
     ~SlimEmpDistGslDiscrete() override = default;
 
@@ -197,9 +196,9 @@ public:
 private:
     std::vector<am_qual_t> qual_;
     GslDiscreteDistribution<double> rd_;
-    boost::uniform_01<double> rnd_01_;
+    boost::uniform_01<> rnd_01_;
 };
-class SlimEmpDistGslDiscreteInt : public SlimEmpDist {
+class SlimEmpDistGslDiscreteInt final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscreteInt)
     DELETE_COPY(SlimEmpDistGslDiscreteInt)
@@ -210,10 +209,10 @@ public:
         std::vector<int64_t> init_list;
         int64_t prev = 0;
         for (const int i : count) {
-            init_list.emplace_back((i - prev));
+            init_list.emplace_back(i - prev);
             prev = i;
         }
-        rd_ = GslDiscreteIntDistribution<int64_t>(init_list);
+        rd_ = GslDiscreteIntDistribution(init_list);
     }
     ~SlimEmpDistGslDiscreteInt() override = default;
 
@@ -229,7 +228,7 @@ private:
     GslDiscreteIntDistribution<int64_t> rd_;
     boost::random::uniform_int_distribution<int64_t> rnd_;
 };
-class SlimEmpDistGslDiscreteInterpolated : public SlimEmpDist {
+class SlimEmpDistGslDiscreteInterpolated final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscreteInterpolated)
     DELETE_COPY(SlimEmpDistGslDiscreteInterpolated)
@@ -250,7 +249,7 @@ public:
             init_list.emplace_back(count[i] - prev);
             prev = count[i];
         }
-        rd_ = GslDiscreteDistribution<double>(init_list);
+        rd_ = GslDiscreteDistribution(init_list);
     }
     ~SlimEmpDistGslDiscreteInterpolated() override = default;
 
@@ -264,9 +263,9 @@ public:
 private:
     am_qual_t qual_offset_;
     GslDiscreteDistribution<double> rd_;
-    boost::uniform_01<double> rnd_01_;
+    boost::uniform_01<> rnd_01_;
 };
-class SlimEmpDistUsingBoostMap : public SlimEmpDist {
+class SlimEmpDistUsingBoostMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostMap)
     DELETE_COPY(SlimEmpDistUsingBoostMap)
@@ -292,7 +291,7 @@ private:
     boost::container::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingBoostFlatMap : public SlimEmpDist {
+class SlimEmpDistUsingBoostFlatMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingBoostFlatMap)
     DELETE_COPY(SlimEmpDistUsingBoostFlatMap)
@@ -318,7 +317,7 @@ private:
     boost::container::flat_map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-class SlimEmpDistUsingStdMap : public SlimEmpDist {
+class SlimEmpDistUsingStdMap final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistUsingStdMap)
     DELETE_COPY(SlimEmpDistUsingStdMap)
@@ -345,32 +344,23 @@ private:
 };
 
 namespace {
-void bench(std::unique_ptr<SlimEmpDist> empdist, const std::string& name)
+void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
 {
-    boost::accumulators::accumulator_set<double,
-        boost::accumulators::stats<boost::accumulators::tag::mean, boost::accumulators::tag::variance>>
-        acc;
+    std::vector<double> acc;
 
-    std::chrono::high_resolution_clock::time_point start;
-    std::chrono::high_resolution_clock::time_point end;
     std::vector<am_qual_t> qual;
+    std::vector<std::size_t> times;
     qual.resize(READ_LEN);
-    start = std::chrono::high_resolution_clock::now();
     for (am_readnum_t i = 0; i < NUM_TRIALS; i++) {
+        const auto start = std::chrono::high_resolution_clock::now();
         empdist->gen_qualities(qual);
-        for (const auto value : qual) {
-            acc(value);
-        }
+        const auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count());
+        acc.insert(acc.end(), qual.begin(), qual.end());
     }
-    end = std::chrono::high_resolution_clock::now();
 
     // Extract the mean and standard deviation
-    const double mean = boost::accumulators::mean(acc);
-    const double sd = std::sqrt(boost::accumulators::variance(acc));
-    BOOST_LOG_TRIVIAL(info) << name << ": "
-                            << format_with_commas(
-                                   std::chrono::duration_cast<std::chrono::nanoseconds>(end - start).count())
-                            << " ns. Q: mean=" << mean << " sd=" << sd;
+    BOOST_LOG_TRIVIAL(info) << std::setw(30) << name << ": " << describe(times) << "ns Q: values=" << describe(acc);
 }
 } // namespace
 

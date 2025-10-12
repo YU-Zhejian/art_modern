@@ -26,6 +26,7 @@
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -77,7 +78,7 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
             0, // Unset for SE reads
             0, // Unset for SE reads
             0, // Unset for SE reads
-            rlen, seq.c_str(), pwa.qual.c_str(), tags.size()),
+            rlen, seq.c_str(), reinterpret_cast<const char*>(pwa.qual_vec.data()), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
         reverse(bam_get_qual(sam_record.get()), rlen);
@@ -143,29 +144,31 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1.get(), pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
-            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(), pwa1.qual.c_str(), tags1.size()),
+            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(),
+            reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
-            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(), pwa2.qual.c_str(), tags2.size()),
+            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(),
+            reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-
-    if (pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record2.get()), rlen);
-        reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
-    } else {
+    if (!pwa1.is_plus_strand) {
         reverse(bam_get_qual(sam_record1.get()), rlen);
         reverse(bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
+    } else {
+        reverse(bam_get_qual(sam_record2.get()), rlen);
+        reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
     }
 
     tags1.patch(sam_record1.get());
     tags2.patch(sam_record2.get());
+
     lfio_.push(std::move(sam_record1), token);
     lfio_.push(std::move(sam_record2), token);
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-    const BamOptions& sam_options, const int n_threads)
+    const BamOptions& sam_options, const std::size_t n_threads)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -226,11 +229,12 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
             abort_mpi();
         }
         return std::make_shared<BamReadOutput>(
-            params.vm["o-sam"].as<std::string>(), params.fasta_fetch, so, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank()), params.fasta_fetch, so,
+            params.n_threads);
     }
     throw OutputNotSpecifiedException {};
 }
-const std::string BamReadOutputFactory::name() const { return "BAM"; }
+std::string BamReadOutputFactory::name() const { return "BAM"; }
 
 BamReadOutputFactory::~BamReadOutputFactory() = default;
 } // namespace labw::art_modern

@@ -15,10 +15,11 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.7
+    VERSION 1.1.10
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
+set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
@@ -49,6 +50,7 @@ set(ART_MODERN_LINK_LIBS "")
 # Installation
 include(GNUInstallDirs)
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
+    message(WARNING "CMAKE_INSTALL_PREFIX not defined, setting to /usr/local")
     set(CMAKE_INSTALL_PREFIX
         "/usr/local"
         CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
@@ -59,6 +61,7 @@ set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/set_static_target.cmake")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libz.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_cxx17.cmake")
 unset(WITH_GIT)
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/git_adapter.cmake")
@@ -66,10 +69,15 @@ if(GIT_FOUND)
     set(WITH_GIT ON)
 endif()
 
+# TODO
+#if(DEFINED CMAKE_C_FLAGS AND DEFINED CMAKE_CXX_FLAGS)
+#    string(REPLACE " " ";" AM_CC_FLAGS "${CMAKE_CXX_FLAGS}")
+#else()
 unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
+#endif()
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
@@ -100,6 +108,20 @@ include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)
+
+if(BUILD_SHARED_LIBS)
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_shared)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+else()
+    if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_STATIC} EQUAL 0)
+        set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_static)
+    else()
+        message(FATAL_ERROR "-lz not found!")
+    endif()
+endif()
 
 set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} slim_libceu Threads::Threads)
 message(STATUS "art_modern link libs: ${ART_MODERN_LINK_LIBS}")
@@ -170,6 +192,24 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS art_modern)
 
+file(GLOB ART_PROFILE_BUILDER_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/lib/*.cc")
+add_library(art_profile_builder_lib ${ART_PROFILE_BUILDER_LIB_SOURCE})
+target_compile_options(art_profile_builder_lib BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_profile_builder_lib PUBLIC am_support_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_profile_builder_lib)
+endif()
+install(TARGETS art_profile_builder_lib)
+
+file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
+add_executable(art_profile_builder ${ART_PROFILE_BUILDER_EXE_SOURCE})
+target_compile_options(art_profile_builder BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_profile_builder PUBLIC art_profile_builder_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_profile_builder)
+endif()
+install(TARGETS art_profile_builder)
+
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
 
@@ -206,7 +246,10 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with art_modern benchmarks.
 
-if(BUILD_ART_MODERN_BENCHMARKS)
+if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
+    configure_file("${CMAKE_CURRENT_LIST_DIR}/src/benchmark/benchmark_adaptor.h.in"
+                   "${CMAKE_BINARY_DIR}/include/benchmark_adaptor.h")
+
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
 
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
@@ -216,6 +259,11 @@ if(BUILD_ART_MODERN_BENCHMARKS)
         target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" PUBLIC am_support_lib)
         target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()
+endif()
+
+if(DEFINED BUILD_ART_MODERN_STANDALONE_BENCHMARKS AND BUILD_ART_MODERN_STANDALONE_BENCHMARKS)
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_rand")
+    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_mpi_io")
 endif()
 
 # file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")

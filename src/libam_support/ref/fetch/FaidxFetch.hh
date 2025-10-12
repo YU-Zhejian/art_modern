@@ -30,7 +30,7 @@ namespace labw::art_modern {
  *
  * That is, all threads MUST own their own FaidxFetch.
  */
-class FaidxFetch : public BaseFastaFetch {
+class FaidxFetch final : public BaseFastaFetch {
 public:
     DELETE_COPY(FaidxFetch)
     DELETE_MOVE(FaidxFetch)
@@ -42,6 +42,5 @@ public:
 
 private:
     faidx_t* faidx_;
-    char* cfetch_(const char* seq_name, hts_pos_t start, hts_pos_t end) const;
 };
 } // namespace labw::art_modern

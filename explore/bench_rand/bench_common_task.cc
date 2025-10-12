@@ -2,8 +2,10 @@
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
+#include <iostream>
 #include <memory>
 #include <random>
+#include <string>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -18,12 +20,6 @@
 #include <absl/random/uniform_int_distribution.h>
 #include <absl/random/uniform_real_distribution.h>
 
-#define WITH_CURAND 0
-
-#if WITH_CURAND
-#include <curand.h>
-#endif
-
 #include "rprobs.hh"
 
 class SlimRprobs {
@@ -37,7 +33,7 @@ public:
 /**
  * Very, very, very slow.
  */
-class [[maybe_unused]] SlimRprobsTrng : public SlimRprobs {
+class [[maybe_unused]] SlimRprobsTrng final : public SlimRprobs {
 public:
     SlimRprobsTrng() = default;
     ~SlimRprobsTrng() override = default;
@@ -64,7 +60,7 @@ private:
     std::random_device gen_;
 };
 
-class SlimRprobsStdRand : public SlimRprobs {
+class SlimRprobsStdRand final : public SlimRprobs {
 public:
     SlimRprobsStdRand()
         : gen_(seed())
@@ -95,7 +91,7 @@ private:
     std::mt19937 gen_;
 };
 
-class SlimRprobsMKL : public SlimRprobs {
+class SlimRprobsMKL final : public SlimRprobs {
 public:
     SlimRprobsMKL() { vslNewStream(&vsl_stream_, VSL_BRNG_MT19937, seed()); }
     std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
@@ -121,7 +117,7 @@ private:
     VSLStreamStatePtr vsl_stream_ = nullptr;
 };
 
-class SlimRprobsBoost : public SlimRprobs {
+class SlimRprobsBoost final : public SlimRprobs {
 public:
     SlimRprobsBoost()
         : gen_(seed())
@@ -130,14 +126,14 @@ public:
     ~SlimRprobsBoost() override = default;
     std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
     {
-        boost::uniform_real<double> dist(a, b);
+        boost::uniform_real<> dist(a, b);
         std::generate_n(tmp_qual_dists_.begin(), N_BASES, [&dist, this]() { return dist(gen_); });
         return tmp_qual_dists_;
     }
 
     std::vector<int> gen_ints(std::vector<int>& tmp_qual_dists_) override
     {
-        boost::uniform_int<int> dist(a, b);
+        boost::uniform_int<> dist(a, b);
         std::generate_n(tmp_qual_dists_.begin(), N_BASES, [&dist, this]() { return dist(gen_); });
         return tmp_qual_dists_;
     }
@@ -152,7 +148,7 @@ private:
     boost::mt19937 gen_;
 };
 
-class SlimRprobsAbsl : public SlimRprobs {
+class SlimRprobsAbsl final : public SlimRprobs {
 public:
     SlimRprobsAbsl() = default;
     ~SlimRprobsAbsl() override = default;
@@ -180,7 +176,7 @@ private:
     absl::BitGen gen_;
 };
 
-class SlimRprobsGsl : public SlimRprobs {
+class SlimRprobsGsl final : public SlimRprobs {
 public:
     SlimRprobsGsl()
         : r(gsl_rng_alloc(gsl_rng_mt19937))
@@ -209,48 +205,6 @@ public:
 private:
     gsl_rng* r;
 };
-#if WITH_CURAND
-class SlimRprobsCurand : public SlimRprobs {
-public:
-    SlimRprobsCurand()
-    {
-        curandCreateGenerator(&gen_, CURAND_RNG_PSEUDO_MT19937);
-        curandSetPseudoRandomGeneratorSeed(gen_, seed());
-    }
-    ~SlimRprobsCurand() override { curandDestroyGenerator(gen_); }
-    std::vector<double> gen_doubles(std::vector<double>& tmp_qual_dists_) override
-    {
-        double* d_random_numbers = nullptr;
-        cudaMalloc(&d_random_numbers, N_BASES * sizeof(double));
-        curandGenerateUniformDouble(gen_, d_random_numbers, N_BASES);
-        // FIXME: No scaling was performed!
-        // Copy the random numbers back to the host
-        cudaMemcpy(tmp_qual_dists_.data(), d_random_numbers, N_BASES * sizeof(double), cudaMemcpyDeviceToHost);
-        cudaFree(d_random_numbers);
-        return tmp_qual_dists_;
-    }
-    std::vector<int> gen_ints(std::vector<int>& tmp_qual_dists_) override
-    {
-        std::vector<double> tmp_qual_dists_double_;
-        tmp_qual_dists_double_.resize(N_BASES);
-        double* d_random_numbers = nullptr;
-        cudaMalloc(&d_random_numbers, N_BASES * sizeof(double));
-        curandGenerateUniformDouble(gen_, d_random_numbers, N_BASES);
-
-        // Copy the random numbers back to the host
-        cudaMemcpy(tmp_qual_dists_double_.data(), d_random_numbers, N_BASES * sizeof(double), cudaMemcpyDeviceToHost);
-        for (std::size_t i = 0; i < N_BASES; ++i) {
-            tmp_qual_dists_[i] = static_cast<int>(tmp_qual_dists_double_[i] / 1.0 * (b - a) + a);
-        }
-
-        cudaFree(d_random_numbers);
-        return tmp_qual_dists_;
-    }
-
-private:
-    curandGenerator_t gen_ {};
-};
-#endif
 
 namespace {
 void bench(std::unique_ptr<SlimRprobs> rprobs, const std::string& name)
@@ -286,8 +240,5 @@ int main()
     bench(std::make_unique<SlimRprobsBoost>(), "Boost");
     bench(std::make_unique<SlimRprobsGsl>(), "GSL");
     bench(std::make_unique<SlimRprobsAbsl>(), "Absl");
-#if WITH_CURAND
-    bench(std::make_unique<SlimRprobsCurand>(), "Curand");
-#endif
     // bench(std::make_unique<SlimRprobsTrng>(), "Trng");
 }

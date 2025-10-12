@@ -2,7 +2,6 @@
 
 ## IMPORTANT
 
-- ART stuck at one read. Why?
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - Hack Sphinx and Sphinx SVG-to-PDF converters to allow shields.io badges in the documentation like:
 
@@ -18,14 +17,19 @@
 
 ## Packing
 
-- Add manual pages.
-- Is it a good idea to add `libpcg-cpp-dev` as compile dependency?
-- Docker-ize the synthesis of DEBs, RPMs, Alpine Linux tarballs, etc.
+- Supress all lintian issues.
+- `--rndSeed` implementation. However, a large chunk of docs saying that the same random generator must be used when building `art_modern` to get reproducible results.
+- Finish `art-profile-fastqc.py`.
+- Update bundled `{fmt}` to [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
+- Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
 
 ## Performance
 
-- The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s.
+- I/O:
+  - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. This problem is more obvious on smaller objects, like FASTA when being compared to FASTQ.
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
+  - The current implementation passes too many small objects accross the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
+
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
   - For `memory` parser, skip records based on MPI rank.
@@ -35,13 +39,11 @@
       - [MPICH](https://www.mpich.org/).
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-  - Share the arguments between the main thread and the worker threads using pure MPI communication.
 
 ## I/O Formats
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 - Support UCSC MAF output format?
-- Support UCSC 2bit input format for fast on-disk random access of reference genome?
 - Add flags to disable/enable diverse BAM tags.
 
 ## Simulate Allele-Specific Expression

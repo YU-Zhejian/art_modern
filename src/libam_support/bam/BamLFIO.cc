@@ -28,7 +28,7 @@
 
 namespace labw::art_modern {
 
-void BamLFIO::write(bam1_t_uptr ss)
+void BamLFIO::write(const bam1_t_uptr ss)
 {
     if (closed_) {
         return;

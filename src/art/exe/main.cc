@@ -16,8 +16,9 @@
 #include "art_modern_config.h"
 
 #include "art/exe/main_fn.hh"
-#include "art/lib/ArtCmdOpts.hh"
+#include "art/exe/parse_args.hh"
 
+#include "libam_support/Constants.hh"
 #include "libam_support/utils/dump_utils.hh"
 #include "libam_support/utils/log_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -42,53 +43,22 @@
 
 using namespace labw::art_modern; // NOLINT
 
-#ifdef WITH_MPI
-int main_mpi_child()
-{
-    char buffer[100];
-    std::string received_message;
-    MPI_Request request;
-    MPI_Ibcast(buffer, 100, MPI_CHAR, MPI_MAIN_RANK, MPI_COMM_WORLD, &request);
-
-    while (true) {
-        BOOST_LOG_TRIVIAL(info) << "Receiving signal...";
-        MPI_Status status;
-        int flag;
-        MPI_Test(&request, &flag, &status);
-        if (flag) {
-            if (std::strncmp(buffer, MPI_MESSAGE_BYE, std::strlen(MPI_MESSAGE_BYE)) == 0) {
-                BOOST_LOG_TRIVIAL(info) << "Received BYE signal.";
-                return EXIT_SUCCESS;
-            } else {
-                BOOST_LOG_TRIVIAL(info) << "Received wrong signal.";
-                std::current_thread::sleep_for(std::chrono::seconds(1));
-            }
-        } else {
-            BOOST_LOG_TRIVIAL(info) << "Received no signal.";
-            std::current_thread::sleep_for(std::chrono::seconds(1));
-        }
-    }
-}
-#endif
 namespace {
 
 void handle_mpi_child()
 {
 #ifdef WITH_MPI
-    int mpi_comm_rank;
-    MPI_Comm_rank(MPI_COMM_WORLD, &mpi_comm_rank);
-    if (mpi_comm_rank == MPI_MAIN_RANK) {
-        print_banner();
-        int mpi_comm_size;
-        MPI_Comm_size(MPI_COMM_WORLD, &mpi_comm_size);
-        BOOST_LOG_TRIVIAL(info) << "MPI detected with " << mpi_comm_size
-                                << " MPI-parallelized processes running in total.";
+    if (mpi_rank() == MPI_MAIN_RANK_STR) {
+        BOOST_LOG_TRIVIAL(info) << "MPI found! Cross-node parallelism enabled.";
+        BOOST_LOG_TRIVIAL(info) << "MPI main process started.";
     } else {
-        BOOST_LOG_TRIVIAL(info) << "MPI detected. This process have rank " << mpi_comm_rank << ".";
-        exit_mpi(main_mpi_child());
+        BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank() << " started.";
     }
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    exit_mpi();
+    std::exit(EXIT_SUCCESS);
 #else
-    BOOST_LOG_TRIVIAL(warning) << "MPI not found! Cross-node parallelism disabled.";
+    BOOST_LOG_TRIVIAL(info) << "MPI not found! Cross-node parallelism disabled.";
 #endif
 }
 } // namespace
@@ -99,20 +69,7 @@ int main(int argc, char* argv[])
     // 1st round initialization of a working console logger
     init_logger();
     print_banner();
-    if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
-        BOOST_LOG_TRIVIAL(warning) << "ART_NO_LOG_DIR defined; No log directory will be created.";
-    } else {
-        const char* art_log_dir_c = std::getenv("ART_LOG_DIR");
-        std::string art_log_dir;
-        if (art_log_dir_c == nullptr) {
-            BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";
-            art_log_dir = "log.d";
-        } else {
-            art_log_dir = art_log_dir_c;
-        }
-        init_file_logger(art_log_dir);
-    }
-
+    init_file_logger();
     handle_mpi_child();
     handle_dumps();
 
@@ -132,7 +89,6 @@ int main(int argc, char* argv[])
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");
 #endif
-    bye_mpi();
-    exit_mpi(EXIT_SUCCESS);
+    exit_mpi();
     std::exit(EXIT_SUCCESS);
 }

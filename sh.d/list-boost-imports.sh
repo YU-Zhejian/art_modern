@@ -1,17 +1,20 @@
 #!/usr/bin/env bash
 set -ue
+SHDIR="$(dirname "$(readlink -f "${0}")")"
 git ls-files |
     grep -v '\.idea' |
     grep -v 'deps' |
     grep -v 'Illumina_profiles' |
     grep -v 'benchmark_other_simulators/src' |
-    grep -e '\.cc$' -e '\.c$' -e '\.hh' -e '\.hh' |
+    grep -e '\.cc$' -e '\.cpp$' -e '\.cxx$' -e '\.c$' -e '\.h$' -e '\.hpp$' -e '\.hxx$' -e '\.hh$' |
     while read -r f; do
         cat "${f}" |
+            sed -e 's;^\s+;;' |
             grep '^#include' |
-            grep '<boost/' |
+            grep -e '<boost/' -e '"boost/' |
             sed -e 's;[[:space:]]*//.*;;' |
             sed 's;$; // '"${f}"';'
     done |
     sort |
-    uniq
+    uniq |
+    python "${SHDIR}/format-boost-imports.py"

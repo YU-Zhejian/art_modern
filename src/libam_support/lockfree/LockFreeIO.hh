@@ -70,14 +70,14 @@ public:
      * Pushing a value into the queue.
      * @param value As described.
      */
-    ABSL_ATTRIBUTE_ALWAYS_INLINE inline void push(T&& value);
+    void push(T&& value);
 
     /**
      * Pushing a value into the queue with a producer token.
      * @param value As described.
      * @param token The producer token.
      */
-    ABSL_ATTRIBUTE_ALWAYS_INLINE inline void push(T&& value, const ProducerToken& token);
+    void push(T&& value, const ProducerToken& token);
 
     /**
      * Start the IO worker thread.
@@ -171,7 +171,7 @@ void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const s
     queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
 }
 
-template <typename T> ABSL_ATTRIBUTE_ALWAYS_INLINE inline void LockFreeIO<T>::push(T&& value)
+template <typename T> void LockFreeIO<T>::push(T&& value)
 {
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {
@@ -220,7 +220,7 @@ template <typename T> void LockFreeIO<T>::stop()
 
 template <typename T> void LockFreeIO<T>::flush_and_close() { }
 
-template <typename T> void LockFreeIO<T>::write(T) { }
+template <typename T> void LockFreeIO<T>::write(T /**value**/) { }
 
 template <typename T> ProducerToken LockFreeIO<T>::get_producer_token()
 {
@@ -269,6 +269,11 @@ template <typename T> void LockFreeIO<T>::log_() const
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Finished, consuming " << format_with_commas(num_reads_in_)
                             << " reads and writes " << format_with_commas(num_reads_out_) << " reads.";
     const auto num_writes = num_out_full_ + num_out_not_full_ + num_out_empty_;
+    if (num_reads_in_ == 0 && num_reads_out_ == 0) {
+        // Avoid division by zero
+        BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Nothing written.";
+        return;
+    }
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: N. (IRetried/IAll): " << format_with_commas(num_wait_in_) << "("
                             << (100.0 * num_wait_in_ / num_reads_in_) << "%).";
     BOOST_LOG_TRIVIAL(info) << name_

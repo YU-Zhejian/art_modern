@@ -80,12 +80,6 @@ std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start
     return seqs_[seq_id].substr(start, end - start);
 }
 
-InMemoryFastaFetch::InMemoryFastaFetch(const std::vector<std::string>& seq_name, const std::vector<std::string>& seq)
-    : BaseFastaFetch(seq_name, get_seq_lengths(seq))
-    , seqs_(seq)
-{
-}
-
 InMemoryFastaFetch::InMemoryFastaFetch(std::vector<std::string>&& seq_name, std::vector<std::string>&& seq)
     : BaseFastaFetch(std::move(seq_name), get_seq_lengths(seq))
     , seqs_(std::move(seq))

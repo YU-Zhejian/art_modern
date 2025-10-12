@@ -3,30 +3,34 @@ name: art_modern
 channels:
   - nodefaults
   - conda-forge
-  - anaconda
   - bioconda
-  - main
-  - free
 
 dependencies:
   - python=3.11
   - samtools
   - pysam
-  # - art # No longer requires old ART.
-  - black
   - tqdm
   - fastp
   - seqtk
   - seqkit
-  - go-shfmt
-  - cmake_format
-  - curl
   - pyfastx
   - fastqc
   - bwa
   - numpy
   - pandas
   - scipy
+  - matplotlib=3.10
+
+  # Code formatter
+  - cmake_format
+  - black
+  - go-shfmt
+
+  # Downloader
+  - curl
+  - entrez-direct
+  - sra-tools=3.2.1
+
   # Build tools
   - conda-forge::ninja
   - conda-forge::cmake >=3.17
@@ -37,10 +41,11 @@ dependencies:
   - docker-squash
 
   # Sphinx documentation
-  - sphinx=8.3
+  - conda-forge::sphinx=8.2
   - sphinx-copybutton=0.5
   - sphinxcontrib-svg2pdfconverter # Failed under Windows
   - furo=2024.8.6
   - myst-parser=4.0.1
   - perl # For Windows MikTeX users
   - cairosvg
+  - jinja2=3.1

@@ -1,6 +1,5 @@
 #include "ceu_check/ceu_check_os.hh"
 #include "libceu_stddef.h"
-#include <sstream>
 
 #ifdef CEU_ON_POSIX
 // Should NOT be removed
@@ -22,6 +21,9 @@
 #if defined(CEU_ON_WINDOWS)
 #include <windows.h>
 #endif
+
+#include <sstream>
+#include <string>
 
 std::string ceu_check_get_compile_time_os_info()
 {
