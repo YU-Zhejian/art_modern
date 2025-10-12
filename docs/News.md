@@ -1,10 +1,13 @@
 # News \& Release Notes
 
-## 1.1.10 (Ongoing)
+## 1.1.10 (2025/10/12)
 
+- Fixed #7. In details:
+  - Some build failure under Mac OS X using Apple Clang 18 fixed.
+  - More tests added to pure-Clang/LLVM build.
 - Update bundled `{fmt}` to [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
 - Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
-- Miscellaneous bug fixes.
+- Debian/Ubuntu/Alpine builder container updated to the latest versions.
 
 ## 1.1.9 (2025/10/11)
 
