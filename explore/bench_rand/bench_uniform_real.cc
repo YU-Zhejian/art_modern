@@ -28,9 +28,9 @@ template <typename Engine> float pcg32_generate_uniform_float(Engine& engine, co
 } // namespace
 int main()
 {
-    pcg32_fast engine {};
+    pcg32_fast engine { };
 
-    std::vector<double> tmp_qual_dists_ {};
+    std::vector<double> tmp_qual_dists_ { };
     tmp_qual_dists_.reserve(N_BASES);
     std::chrono::high_resolution_clock::time_point start;
     std::chrono::high_resolution_clock::time_point end;

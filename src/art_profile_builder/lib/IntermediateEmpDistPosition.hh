@@ -49,7 +49,7 @@ public:
     IntermediateEmpDistPosition();
     ~IntermediateEmpDistPosition() = default;
     DEFAULT_COPY(IntermediateEmpDistPosition)
-    DELETE_MOVE(IntermediateEmpDistPosition)
+    DEFAULT_MOVE(IntermediateEmpDistPosition)
 
     void add(char base, am_qual_t qual);
 

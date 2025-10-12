@@ -147,7 +147,7 @@ public:
     void rand_bytes_adaptor(ContinuousDataWriter& cdw)
     {
         auto uid = std::uniform_int_distribution<N>(0, std::numeric_limits<N>::max());
-        std::vector<N> buffer {};
+        std::vector<N> buffer { };
         buffer.resize(4096);
         while (cdw.good()) {
             std::generate_n(buffer.begin(), buffer.size(), [&uid, this]() { return uid(rng_); });
@@ -179,7 +179,7 @@ public:
     void rand_bytes_adaptor(ContinuousDataWriter& cdw)
     {
         auto uid = std::uniform_int_distribution<N>(0, std::numeric_limits<N>::max());
-        std::vector<N> buffer {};
+        std::vector<N> buffer { };
         buffer.resize(4096);
         while (cdw.good()) {
             viRngUniformBits32(VSL_RNG_METHOD_UNIFORMBITS32_STD, stream_, buffer.size(), buffer.data());
@@ -214,7 +214,7 @@ public:
 
     void rand_bytes_adaptor(ContinuousDataWriter& cdw)
     {
-        std::vector<N> buffer {};
+        std::vector<N> buffer { };
         buffer.resize(4096);
         while (cdw.good()) {
             std::generate_n(buffer.begin(), buffer.size(),
@@ -434,11 +434,11 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name) { MklBenchmarki
 [[maybe_unused]] void absl_main()
 {
     // All tests were passed
-    absl::BitGen rng_bitgen {};
+    absl::BitGen rng_bitgen { };
     bench_bits_stl<absl::BitGen>(rng_bitgen, "absl::BitGen");
 
     // All tests were passed
-    absl::InsecureBitGen rng_insecure_bitgen {};
+    absl::InsecureBitGen rng_insecure_bitgen { };
     bench_bits_stl<absl::InsecureBitGen>(rng_insecure_bitgen, "absl::InsecureBitGen");
 }
 
@@ -509,11 +509,11 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name) { MklBenchmarki
 [[maybe_unused]] void vmt19937_main()
 {
     // All tests were passed
-    VMT19937RandomDevice rng_vmt19937_random_device {};
+    VMT19937RandomDevice rng_vmt19937_random_device { };
     bench_bits_stl<decltype(rng_vmt19937_random_device)>(rng_vmt19937_random_device, "VMT19937RandomDevice");
 
     // All tests were passed
-    VSFMT19937RandomDevice rng_vsfmt19937_random_device {};
+    VSFMT19937RandomDevice rng_vsfmt19937_random_device { };
     bench_bits_stl<decltype(rng_vsfmt19937_random_device)>(rng_vsfmt19937_random_device, "VSFMT19937RandomDevice");
 }
 
@@ -735,7 +735,7 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name) { MklBenchmarki
 [[maybe_unused]] void xso_main()
 {
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_2x32_star, uint32_t> x01 {};
+    XoroshiroWrapper<old::xoroshiro_2x32_star, uint32_t> x01 { };
     bench_bits_stl<decltype(x01)>(x01, "xoroshiro::2x32*");
 
     //        Test                          p-value
@@ -747,63 +747,63 @@ void bench_bits_mkl(const MKL_INT type, const std::string& name) { MklBenchmarki
     // bench_bits_stl<decltype(x02)>(x02, "xoroshiro::2x32**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x32_plus, uint32_t, 4> x03 {};
+    XoroshiroWrapper<old::xoshiro_4x32_plus, uint32_t, 4> x03 { };
     bench_bits_stl<decltype(x03)>(x03, "xoshiro::4x32+");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x32_plus_plus, uint32_t, 4> x04 {};
+    XoroshiroWrapper<old::xoshiro_4x32_plus_plus, uint32_t, 4> x04 { };
     bench_bits_stl<decltype(x04)>(x04, "xoshiro::4x32++");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x32_star_star, uint32_t, 4> x05 {};
+    XoroshiroWrapper<old::xoshiro_4x32_star_star, uint32_t, 4> x05 { };
     bench_bits_stl<decltype(x05)>(x05, "xoshiro::4x32**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_2x64_plus, uint64_t, 2> x06 {};
+    XoroshiroWrapper<old::xoroshiro_2x64_plus, uint64_t, 2> x06 { };
     bench_bits_stl<decltype(x06)>(x06, "xoroshiro::2x64+");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_2x64_plus_plus, uint64_t, 2> x07 {};
+    XoroshiroWrapper<old::xoroshiro_2x64_plus_plus, uint64_t, 2> x07 { };
     bench_bits_stl<decltype(x07)>(x07, "xoroshiro::2x64++");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_2x64_star_star, uint64_t, 2> x08 {};
+    XoroshiroWrapper<old::xoroshiro_2x64_star_star, uint64_t, 2> x08 { };
     bench_bits_stl<decltype(x08)>(x08, "xoroshiro::2x64**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x64_plus, uint64_t, 4> x09 {};
+    XoroshiroWrapper<old::xoshiro_4x64_plus, uint64_t, 4> x09 { };
     bench_bits_stl<decltype(x09)>(x09, "xoshiro::4x64+");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x64_plus_plus, uint64_t, 4> x10 {};
+    XoroshiroWrapper<old::xoshiro_4x64_plus_plus, uint64_t, 4> x10 { };
     bench_bits_stl<decltype(x10)>(x10, "xoshiro::4x64++");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_4x64_star_star, uint64_t, 4> x11 {};
+    XoroshiroWrapper<old::xoshiro_4x64_star_star, uint64_t, 4> x11 { };
     bench_bits_stl<decltype(x11)>(x11, "xoshiro::4x64**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_8x64_plus, uint64_t, 8> x12 {};
+    XoroshiroWrapper<old::xoshiro_8x64_plus, uint64_t, 8> x12 { };
     bench_bits_stl<decltype(x12)>(x12, "xoshiro::8x64+");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_8x64_plus_plus, uint64_t, 8> x13 {};
+    XoroshiroWrapper<old::xoshiro_8x64_plus_plus, uint64_t, 8> x13 { };
     bench_bits_stl<decltype(x13)>(x13, "xoshiro::8x64++");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoshiro_8x64_star_star, uint64_t, 8> x14 {};
+    XoroshiroWrapper<old::xoshiro_8x64_star_star, uint64_t, 8> x14 { };
     bench_bits_stl<decltype(x14)>(x14, "xoshiro::8x64**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_16x64_star, uint64_t, 16> x15 {};
+    XoroshiroWrapper<old::xoroshiro_16x64_star, uint64_t, 16> x15 { };
     bench_bits_stl<decltype(x15)>(x15, "xoroshiro::16x64*");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_16x64_star_star, uint64_t, 16> x16 {};
+    XoroshiroWrapper<old::xoroshiro_16x64_star_star, uint64_t, 16> x16 { };
     bench_bits_stl<decltype(x16)>(x16, "xoroshiro::16x64**");
 
     // All tests were passed
-    XoroshiroWrapper<old::xoroshiro_16x64_plus_plus, uint64_t, 16> x17 {};
+    XoroshiroWrapper<old::xoroshiro_16x64_plus_plus, uint64_t, 16> x17 { };
     bench_bits_stl<decltype(x17)>(x17, "xoroshiro::16x64++");
 }
 
