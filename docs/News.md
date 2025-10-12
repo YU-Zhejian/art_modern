@@ -1,5 +1,9 @@
 # News \& Release Notes
 
+## 1.1.10 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 ## 1.1.9 (2025/10/11)
 
 - BAM output routines are largely accelerated by replacing string streams with pre-allocated strings.
