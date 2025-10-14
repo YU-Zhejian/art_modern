@@ -155,7 +155,7 @@ char Rprob::rand_base()
 #elif defined(USE_ONEMKL_RANDOM)
     int index = 0;
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &index, 0, 4);
-    return "ACGT"[index];
+    return ART_ACGT[index];
 #elif defined(USE_GSL_RANDOM)
     return ART_ACGT[gsl_rng_uniform_int(r, 4)];
 #endif

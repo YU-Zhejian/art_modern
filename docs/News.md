@@ -2,7 +2,8 @@
 
 ## 1.1.11 (Ongoing)
 
-- The GNU Science Library (GSL) random generator deprecated due to performance issues. They will be removed in the next release.
+- Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
+- The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
 - Miscellaneous bug fixes.
 
 ## 1.1.10 (2025/10/12)
