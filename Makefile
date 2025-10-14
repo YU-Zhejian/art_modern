@@ -123,10 +123,9 @@ test-art_profile_builder: raw_data release
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
-# TODO: This Makefile block requires extensive revision.
 testsmall-conda: raw_data
-	# conda env remove -n _art_modern_bioconda -y || true
-	# conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
+	conda env remove -n _art_modern_bioconda -y || true
+	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
 	env ART="$(shell conda run -n _art_modern_bioconda type -p art_modern)" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release
@@ -168,7 +167,6 @@ testbuild-child:
 
 .PHONY: testbuild
 # Test building using diverse conditions
-# TODO: Make it faster!
 testbuild:
 	mkdir -p opt/testbuild
 	$(BASH) sh.d/test-build.sh

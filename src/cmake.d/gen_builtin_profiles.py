@@ -4,7 +4,6 @@ import os
 import sys
 
 SNAME_FILE_MAPPING = {
-    # TODO: Separate this data to some INI/JSON file
     "GA1_36bp": ("Emp36R1.txt", "Emp36R2.txt"),
     "GA1_44bp": ("Emp44R1.txt", "Emp44R2.txt"),
     "GA2_50bp": ("Emp50R1.txt", "Emp50R2.txt"),

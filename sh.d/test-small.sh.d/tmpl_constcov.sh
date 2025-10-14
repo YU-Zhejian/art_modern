@@ -14,8 +14,13 @@ for lc in se pe mp; do
         --parallel "${PARALLEL}" \
         --ins_rate_1 "${IDRATE}" \
         --del_rate_1 "${IDRATE}" \
-        --o-sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".sam
+        --o-sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".sam \
+        --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}" "${MRNA_HEAD}"
+    python sh.d/test-small.sh.d/test_sam.py \
+        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \
+        "${FCOV}" \
+        CONST_COV
 done
 
 parser=stream
@@ -32,8 +37,13 @@ for lc in se pe mp; do
         --parallel "${PARALLEL}" \
         --ins_rate_1 "${IDRATE}" \
         --del_rate_1 "${IDRATE}" \
-        --o-hl_sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl.sam
+        --o-hl_sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl.sam \
+        --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl "${MRNA_HEAD}"
+        python sh.d/test-small.sh.d/test_sam.py \
+            "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \
+            "${FCOV}" \
+            CONST_COV
 done
 rm -fr "${OUT_DIR}"/test_small_??_template_stream.hl.sam
 unset FCOV
