@@ -12,11 +12,6 @@
 #include "sfc.hpp"
 #include "splitmix.hpp"
 
-// TestU01 library does not have C++ headers
-extern "C" {
-#include <TestU01.h>
-}
-
 #include <mkl.h>
 
 #include <gsl/gsl_rng.h>
