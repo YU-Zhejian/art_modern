@@ -166,9 +166,9 @@ testbuild-child:
 		env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh; \
 	fi
 
-
 .PHONY: testbuild
 # Test building using diverse conditions
+# TODO: Make it faster!
 testbuild:
 	mkdir -p opt/testbuild
 	$(BASH) sh.d/test-build.sh
@@ -184,3 +184,13 @@ doc:
 cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
+
+.PHONY: packing
+# Create binary packages
+packing:
+	$(MAKE) -C packing
+
+.PHONY: packing-update-containers
+# Update Docker and Singularity containers used for packing
+packing-update-containers:
+	$(MAKE) -C packing update-containers

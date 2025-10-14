@@ -138,9 +138,9 @@ Affected files:
 
 - `/deps/xoshiro/**`
 
-The version we used (`vigna.h`) is a C++ implementation migrated from the C code of original authors (David Blackman and Sebastiano Vigna) as we're currently not supporting C++20. The original C code is distributed under the [CC-0 license](http://creativecommons.org/publicdomain/zero/1.0/).
+The version we used (`vigna.h`) is a C++ implementation migrated from the C code of original authors (David Blackman and Sebastiano Vigna) as we're currently not supporting C++20.
 
-Other files are licensed under the MIT license.
+The original C code is distributed under the [CC-0 license](http://creativecommons.org/publicdomain/zero/1.0/) with other files licensed under the MIT license.
 
 **NOTE** Added in 1.1.8.
 
