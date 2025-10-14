@@ -18,8 +18,6 @@
 ## Packing
 
 - Supress all lintian issues.
-- `--rndSeed` implementation. However, a large chunk of docs saying that the same random generator must be used when building `art_modern` to get reproducible results.
-- Finish `art-profile-fastqc.py`.
 
 ## Performance
 
