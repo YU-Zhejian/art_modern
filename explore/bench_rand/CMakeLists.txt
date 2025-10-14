@@ -92,17 +92,9 @@ set(COMPILE_OPTIONS
     -Og
     -g)
 
-add_executable(bench_common_task bench_common_task.cc)
-target_link_libraries(bench_common_task PUBLIC ${LINK_LIBS})
-target_compile_options(bench_common_task PUBLIC ${COMPILE_OPTIONS})
-
 add_executable(bench_bits bench_bits.cc)
 target_link_libraries(bench_bits PUBLIC ${LINK_LIBS})
 target_compile_options(bench_bits PUBLIC ${COMPILE_OPTIONS})
-
-add_executable(bench_dists bench_dists.cc)
-target_link_libraries(bench_dists PUBLIC ${LINK_LIBS})
-target_compile_options(bench_dists PUBLIC ${COMPILE_OPTIONS})
 
 add_executable(bench_uniform_real bench_uniform_real.cc)
 target_link_libraries(bench_uniform_real PUBLIC ${LINK_LIBS})

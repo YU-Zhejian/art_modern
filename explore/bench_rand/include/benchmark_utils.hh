@@ -1,5 +1,7 @@
 #pragma once
 
+#include "rprobs.hh"
+
 #include <cmath>
 #include <cstdlib>
 #include <iomanip>
@@ -32,7 +34,7 @@ template <typename T> T sd(const std::vector<T>& data, T mean_)
     return std::sqrt(sum_squared_diff / static_cast<T>(data.size() - 1));
 }
 
-std::string describe(const std::vector<std::size_t>& times)
+static std::string describe(const std::vector<std::size_t>& times)
 {
     auto const mean_ = mean(times);
     std::ostringstream oss;

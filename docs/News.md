@@ -2,6 +2,7 @@
 
 ## 1.1.11 (Ongoing)
 
+- The GNU Science Library (GSL) random generator deprecated due to performance issues. They will be removed in the next release.
 - Miscellaneous bug fixes.
 
 ## 1.1.10 (2025/10/12)
