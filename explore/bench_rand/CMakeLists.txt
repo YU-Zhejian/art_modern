@@ -58,6 +58,15 @@ if(absl_FOUND)
     set(LINK_LIBS absl::random_random absl::random_distributions absl::base ${LINK_LIBS})
 endif()
 
+# Find ARMPL (ARM Performance Libraries)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(ARMPL armpl)
+if(ARMPL_FOUND)
+    include_directories(${ARMPL_INCLUDEDIR})
+    set(LINK_LIBS ${ARMPL_LIBRARIES} ${LINK_LIBS})
+    add_definitions(-DARMPL_FOUND)
+endif()
+
 # Find TestU01. See <https://packages.debian.org/trixie/libtestu01-0-dev>
 find_library(TESTU01_LIB NAMES testu01)
 find_library(TESTU01_MYLIB NAMES testu01mylib mylib)

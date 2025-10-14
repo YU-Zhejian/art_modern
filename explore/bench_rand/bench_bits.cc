@@ -28,6 +28,10 @@
 #include <mkl.h>
 #endif
 
+#ifdef ARMPL_FOUND
+#include <armpl.h>
+#endif
+
 #ifdef GSL_FOUND
 #include "gsl_rng_wrapper.hh"
 
@@ -49,13 +53,14 @@
 #include <chrono>
 #include <cstdint>
 #include <fstream>
+#include <iomanip>
 #include <random>
 #include <utility>
 #include <vector>
 
 namespace {
 
-constexpr std::size_t NAME_LENGTH = 32;
+constexpr std::size_t NAME_LENGTH = 48;
 
 template <typename T> T geometric_mean(const std::vector<T>& data)
 {
@@ -118,7 +123,7 @@ template <typename T> void bench_bits_stl(T& rng, const std::string& name)
     std::cout << std::setw(NAME_LENGTH) << name + range + ": " << describe(times) << " us" << std::endl;
 }
 
-#ifdef MKL_FOUND
+#if defined(MKL_FOUND) || defined(ARMPL_FOUND)
 void bench_bits_mkl(const MKL_INT type, const std::string& name)
 {
     VSLStreamStatePtr stream = nullptr;
@@ -230,7 +235,7 @@ ABSL_ATTRIBUTE_ALWAYS_INLINE void bench_gsl(const gsl_rng_type* t)
 
 [[maybe_unused]] void mkl_main()
 {
-#ifdef MKL_FOUND
+#if defined(MKL_FOUND) || defined(ARMPL_FOUND)
     bench_bits_mkl(VSL_BRNG_MT19937, "MKL::VSL_BRNG_MT19937");
     bench_bits_mkl(VSL_BRNG_MT2203, "MKL::VSL_BRNG_MT2203");
     bench_bits_mkl(VSL_BRNG_SFMT19937, "MKL::VSL_BRNG_SFMT19937");

@@ -359,7 +359,7 @@ The random number generator used.
 - `GSL`: Use GSL random generators. This is used in the original ART.
 - `ONEMKL`: Use Intel OneAPI MKL random generators.
 
-On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html)) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
+On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
 ```text
     VSFMT19937BulkRandomDevice(32 bits): gmean:        241; mean/sd:           241/3 us
@@ -374,6 +374,17 @@ On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/conte
           VMT19937RandomDevice(32 bits): gmean:      2,062; mean/sd:        2,062/17 us
                   GSL::mt19937(32 bits): gmean:      2,420; mean/sd:       2,422/114 us
                   absl::BitGen(64 bits): gmean:      3,543; mean/sd:       3,548/202 us
+```
+
+On another [OrangePi 3B](http://www.orangepi.org/html/hardWare/computerAndMicrocontrollers/details/Orange-Pi-3B.html) ARM development board (Rockchip RK3566 quad-core 64-bit CPU, Arm C/C++/Fortran Compiler version 24.10.1 (build number 4) (based on LLVM 19.1.0)), the performance is:
+
+```text
+               PCG::pcg32_fast(32 bits): gmean:       4,452; mean/sd:        4,452/30 us
+          absl::InsecureBitGen(64 bits): gmean:      12,787; mean/sd:       12,787/66 us
+        boost::random::mt19937(32 bits): gmean:      15,489; mean/sd:      15,490/117 us
+                  std::mt19937(32 bits): gmean:      17,848; mean/sd:      17,848/137 us
+                  GSL::mt19937(32 bits): gmean:      20,802; mean/sd:      20,802/144 us
+                  absl::BitGen(64 bits): gmean:      29,104; mean/sd:      29,104/112 us
 ```
 
 **NOTE** The performance may vary on different platforms.
