@@ -19,6 +19,7 @@ for lc in se pe mp; do
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}" "${MRNA_HEAD}"
     python sh.d/test-small.sh.d/test_sam.py \
         "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \
+        "${MRNA_HEAD}" \
         "${FCOV}" \
         CONST_COV
 done
@@ -42,6 +43,7 @@ for lc in se pe mp; do
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl "${MRNA_HEAD}"
         python sh.d/test-small.sh.d/test_sam.py \
             "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \
+            "${MRNA_HEAD}" \
             "${FCOV}" \
             CONST_COV
 done
