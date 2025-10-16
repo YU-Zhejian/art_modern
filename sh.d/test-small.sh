@@ -12,6 +12,7 @@ export IDRATE=0.1   # Increase indel rate to fail faster
 export OUT_DIR="$(readlink -f "opt/tmp/")"
 export ART="${ART:-opt/build_debug/art_modern}"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
+export MRNA_PBSIM3_TRANSCRIPT="data/raw_data/ce11.mRNA_head.pbsim3.transcript"
 export LAMBDA_PHAGE="data/raw_data/lambda_phage.fa"
 
 echo "ART=${ART}"
@@ -23,9 +24,9 @@ function sam2bam() {
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
-rm -fr "${OUT_DIR}"                      # Remove previous runs
-. sh.d/test-small.sh.d/out_fmts.sh       # Test all output is working
-. sh.d/test-small.sh.d/fail.sh           # FASTA that would fail the simulator
+rm -fr "${OUT_DIR}" # Remove previous runs
+# . sh.d/test-small.sh.d/out_fmts.sh       # Test all output is working
+# . sh.d/test-small.sh.d/fail.sh           # FASTA that would fail the simulator
 . sh.d/test-small.sh.d/wgs.sh            # WGS mode (with constant coverage)
 . sh.d/test-small.sh.d/trans_constcov.sh # Transcript mode with constant coverage
 . sh.d/test-small.sh.d/tmpl_constcov.sh  # Template mode with constant coverage

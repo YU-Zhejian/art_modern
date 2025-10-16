@@ -1,5 +1,4 @@
 /**
- * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
  * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
@@ -13,26 +12,24 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#pragma once
-#include "libam_support/Constants.hh"
-#include "libam_support/ds/CoverageInfo.hh"
+#define BOOST_TEST_MODULE test_depth_utils // NOLINT
 
-#include <boost/program_options/variables_map.hpp>
+#include "libam_support/utils/depth_utils.hh"
 
-#include <cstdlib>
-#include <string>
-#include <vector>
+#include <boost/test/unit_test.hpp>
 
-namespace labw::art_modern {
+using namespace labw::art_modern;
 
-struct ArtIOParams {
-    const std::string input_file_name;
-    const INPUT_FILE_TYPE art_input_file_type;
-    const INPUT_FILE_PARSER art_input_file_parser;
-    const CoverageInfo coverage_info;
-    const std::size_t parallel;
-    const int batch_size;
-    const boost::program_options::variables_map vm;
-    const std::vector<std::string> args;
-};
-} // namespace labw::art_modern
+BOOST_AUTO_TEST_CASE(test_depth_utils_1)
+{
+    auto [npr, nnr] = calculate_num_reads(225, 125, 5.0, 5.0, 1);
+    BOOST_TEST(9 == npr);
+    BOOST_TEST(9 == nnr);
+}
+
+BOOST_AUTO_TEST_CASE(test_depth_utils_2)
+{
+    auto [npr, nnr] = calculate_num_reads(225, 125, 5.0, 5.0, 2);
+    BOOST_TEST(10 == npr);
+    BOOST_TEST(8 == nnr);
+}

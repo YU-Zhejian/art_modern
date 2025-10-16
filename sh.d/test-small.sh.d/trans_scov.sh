@@ -20,11 +20,12 @@ for coverage in stranded strandless; do
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 500
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}" "${MRNA_HEAD}"
-    python sh.d/test-small.sh.d/test_sam.py \
-        "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}".fq \
-        "${MRNA_HEAD}" \
-        data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
-        COV_TSV
+        python sh.d/test-small.sh.d/validate_cov.py \
+            "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}".fq \
+            "${MRNA_HEAD}" \
+            data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
+            COV_TSV \
+            NOT_TEMPLATE
     done
 done
 # No need to test stream FASTA parser

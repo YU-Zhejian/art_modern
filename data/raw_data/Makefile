@@ -33,7 +33,7 @@ ce11.mRNA.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/bigZips/refMrna.fa.gz | gunzip -cdf > ce11.mRNA.fa
 
 ce11.mRNA_head.fa:
-	seqtk sample ce11.mRNA.fa 1000 > ce11.mRNA_head.fa
+	seqkit grep -s -v -p N ce11.mRNA.fa | seqkit seq -m 200 | seqtk sample /dev/stdin 1000 > ce11.mRNA_head.fa
 
 ce11_chr1.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/chromosomes/chrI.fa.gz  | gunzip -cdf > ce11_chr1.fa

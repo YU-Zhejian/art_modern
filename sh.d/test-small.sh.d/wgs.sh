@@ -20,11 +20,12 @@ for parser in memory htslib; do
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 500
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}" data/raw_data/ce11_chr1.fa
-                python sh.d/test-small.sh.d/test_sam.py \
-                    "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
-                    data/raw_data/ce11_chr1.fa \
-                    "${FCOV}" \
-                    CONST_COV
+        python sh.d/test-small.sh.d/validate_cov.py \
+            "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
+            data/raw_data/ce11_chr1.fa \
+            "${FCOV}" \
+            CONST_COV \
+            NOT_TEMPLATE
     done
 done
 unset FCOV

@@ -17,11 +17,12 @@ for coverage in stranded strandless; do
             --o-sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam \
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}" "${MRNA_HEAD}"
-    python sh.d/test-small.sh.d/test_sam.py \
-        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
-        "${MRNA_HEAD}" \
-        data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
-        COV_TSV
+        python sh.d/test-small.sh.d/validate_cov.py \
+            "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
+            "${MRNA_HEAD}" \
+            data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
+            COV_TSV \
+            IS_TEMPLATE
     done
 
     parser=stream
@@ -41,11 +42,12 @@ for coverage in stranded strandless; do
             --o-hl_sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl.sam \
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl "${MRNA_HEAD}"
-            python sh.d/test-small.sh.d/test_sam.py \
-                "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
-                "${MRNA_HEAD}" \
-                data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
-                COV_TSV
+        python sh.d/test-small.sh.d/validate_cov.py \
+            "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
+            "${MRNA_HEAD}" \
+            data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
+            COV_TSV \
+            IS_TEMPLATE
     done
     rm -fr "${OUT_DIR}"/test_small_??_template_"${parser}"_"${coverage}".hl.sam
 done

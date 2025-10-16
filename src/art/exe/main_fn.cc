@@ -149,6 +149,8 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 #ifdef WITH_MPI
         // Further divide by number of MPI processes
         div_by *= mpi_size();
+#else
+        div_by *= 1; // To supress the const warning
 #endif
         const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
