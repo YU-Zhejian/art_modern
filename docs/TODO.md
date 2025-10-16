@@ -35,6 +35,9 @@
       - [MPICH](https://www.mpich.org/).
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
+  - The following class needs to support SLS:
+    - FastaStreamBatcher
+    - Pbsim3TranscriptBatcher
 
 ## I/O Formats
 

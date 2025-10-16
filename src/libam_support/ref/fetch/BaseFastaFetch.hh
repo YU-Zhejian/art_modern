@@ -22,7 +22,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <string>
-#include <tuple>
+#include <utility>
 #include <vector>
 
 namespace labw::art_modern {
@@ -41,6 +41,8 @@ public:
         : BaseFastaFetch(std::move(other.seq_names_), std::move(other.seq_lengths_))
     {
     }
+
+    DELETE_MOVE_ASSIGNMENT(BaseFastaFetch)
 
     DELETE_COPY(BaseFastaFetch)
 

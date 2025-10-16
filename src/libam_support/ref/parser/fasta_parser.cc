@@ -20,7 +20,7 @@
 #include <utility>
 
 namespace labw::art_modern {
-FastaRecord FastaIterator::next()
+FastaIterator::FastaRecord FastaIterator::next()
 {
     const std::scoped_lock rhs_lk(mutex_);
     std::string next_record_id;

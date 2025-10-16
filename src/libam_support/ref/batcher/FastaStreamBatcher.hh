@@ -13,6 +13,7 @@
  **/
 
 #pragma once
+#include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/ref/parser/fasta_parser.hh"
 #include "libam_support/utils/class_macros_utils.hh"
@@ -31,7 +32,7 @@ public:
      */
     InMemoryFastaFetch fetch();
 
-    FastaStreamBatcher(std::size_t batch_size, std::istream& stream);
+    FastaStreamBatcher(std::size_t batch_size, std::istream& stream, const SkipLoaderSettings& sls);
 
     DELETE_COPY(FastaStreamBatcher)
     DELETE_MOVE(FastaStreamBatcher)
@@ -41,6 +42,7 @@ private:
     std::size_t batch_size_;
     FastaIterator fasta_iterator_;
     std::mutex mutex_;
+    const SkipLoaderSettings& sls_;
 };
 
 } // namespace labw::art_modern

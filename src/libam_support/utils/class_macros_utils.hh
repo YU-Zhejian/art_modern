@@ -15,20 +15,26 @@
 #pragma once
 // NOLINTBEGIN
 
+#define DELETE_COPY_ASSIGNMENT(classname) classname& operator=(const classname&) = delete;
+#define DELETE_MOVE_ASSIGNMENT(classname) classname& operator=(classname&&) = delete;
+
+#define DELETE_COPY_CONSTRUCTOR(classname) classname(const classname&) = delete;
+#define DELETE_MOVE_CONSTRUCTOR(classname) classname(classname&&) = delete;
+
 /**
  * @brief Macro to delete copy constructor and copy assignment operator for a class.
  * @param classname  The name of the class for which to delete copy operations.
  */
 #define DELETE_COPY(classname)                                                                                         \
-    classname(const classname&) = delete;                                                                              \
-    classname& operator=(const classname&) = delete;
+    DELETE_COPY_ASSIGNMENT(classname)                                                                                  \
+    DELETE_COPY_CONSTRUCTOR(classname)
 /**
  * @brief  Macro to delete move constructor and move assignment operator for a class.
  * @param classname  The name of the class for which to delete move operations.
  */
 #define DELETE_MOVE(classname)                                                                                         \
-    classname(classname&&) = delete;                                                                                   \
-    classname& operator=(classname&&) = delete;
+    DELETE_MOVE_ASSIGNMENT(classname)                                                                                  \
+    DELETE_MOVE_CONSTRUCTOR(classname)
 
 /**
  *  @brief Macro to default copy constructor and copy assignment operator for a class.

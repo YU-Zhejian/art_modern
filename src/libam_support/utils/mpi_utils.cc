@@ -25,9 +25,19 @@
 #endif
 
 #include <cstdlib>
+#include <stdexcept> // NOLINT: for std::runtime_error
 #include <string>
 
 namespace labw::art_modern {
+
+bool have_mpi()
+{
+#ifdef WITH_MPI
+    return true;
+#else
+    return false;
+#endif
+}
 
 bool is_mpi_finalized()
 {
@@ -36,7 +46,7 @@ bool is_mpi_finalized()
     MPI_Finalized(&mpi_finalized_flag);
     return mpi_finalized_flag != 0;
 #else
-    return true;
+    throw std::runtime_error("MPI is not available.");
 #endif
 }
 
@@ -85,17 +95,52 @@ void init_mpi([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv)
     MPI_Init(argc, argv);
 #endif
 }
-std::string mpi_rank()
+std::size_t mpi_rank()
 {
 #ifdef WITH_MPI
-    int rank = MPI_UNAVAILABLE_RANK;
     if (is_mpi_finalized()) {
-        return std::to_string(rank);
+        throw std::runtime_error("MPI is finalized.");
     }
+    int rank = MPI_UNAVAILABLE_RANK;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return rank;
+#else
+    throw std::runtime_error("MPI is not available.");
+#endif
+}
+std::string mpi_rank_s()
+{
+#ifdef WITH_MPI
+    if (is_mpi_finalized()) {
+        throw std::runtime_error("MPI is finalized.");
+    }
+    int rank = MPI_UNAVAILABLE_RANK;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     return std::to_string(rank);
 #else
     return "nompi";
 #endif
+}
+
+bool is_on_mpi_main_process_or_nompi()
+{
+#ifdef WITH_MPI
+    return mpi_rank() == 0;
+#else
+    return true;
+#endif
+}
+std::string mpi_hostname()
+{
+#ifdef WITH_MPI
+    if (is_mpi_finalized()) {
+        return "N/A";
+    }
+    char hostname[MPI_MAX_PROCESSOR_NAME];
+    int name_len = 0;
+    MPI_Get_processor_name(hostname, &name_len);
+    return std::string(hostname, name_len);
+#endif
+    return "N/A";
 }
 } // namespace labw::art_modern

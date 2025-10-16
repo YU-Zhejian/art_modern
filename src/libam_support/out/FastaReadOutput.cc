@@ -93,7 +93,7 @@ std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& 
 {
     if (params.vm.count("o-fasta") != 0) {
         return std::make_shared<FastaReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank()), params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank_s()), params.n_threads);
     }
     throw OutputNotSpecifiedException { };
 }

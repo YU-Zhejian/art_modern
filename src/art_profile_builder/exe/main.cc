@@ -1,3 +1,5 @@
+#include "art_modern_config.h" // NOLINT: For WITH_BOOST_TIMER, WITH_MPI
+
 #include "art_profile_builder/exe/main_fn.hh"
 #include "art_profile_builder/exe/parse_args.hh"
 #include "art_profile_builder/lib/APBConfig.hh"
@@ -24,13 +26,12 @@ int main(int argc, char** argv)
 {
     init_mpi(&argc, &argv);
 
-#ifdef WITH_MPI
-    if (mpi_rank() != MPI_MAIN_RANK_STR) {
+    if (!is_on_mpi_main_process_or_nompi()) {
         // Only rank 0 does the work
         exit_mpi();
         return EXIT_SUCCESS;
     }
-#endif
+
     const APBConfig config = parse_args(argc, argv);
 
 #ifdef WITH_BOOST_TIMER

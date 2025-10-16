@@ -18,7 +18,6 @@
 #include "art/exe/main_fn.hh"
 #include "art/exe/parse_args.hh"
 
-#include "libam_support/Constants.hh"
 #include "libam_support/utils/dump_utils.hh"
 #include "libam_support/utils/log_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -30,16 +29,10 @@
 #include <boost/timer/timer.hpp>
 #endif
 
-// MPI
-#ifdef WITH_MPI
-#include <mpi.h>
-
-#include <chrono>
-#include <thread>
-#endif
-
+#include <chrono> // NOLINT
 #include <cstdlib>
 #include <string>
+#include <thread> // NOLINT
 
 using namespace labw::art_modern; // NOLINT
 
@@ -47,19 +40,19 @@ namespace {
 
 void handle_mpi_child()
 {
-#ifdef WITH_MPI
-    if (mpi_rank() == MPI_MAIN_RANK_STR) {
-        BOOST_LOG_TRIVIAL(info) << "MPI found! Cross-node parallelism enabled.";
-        BOOST_LOG_TRIVIAL(info) << "MPI main process started.";
+    if (have_mpi()) {
+        if (is_on_mpi_main_process_or_nompi()) {
+            BOOST_LOG_TRIVIAL(info) << "MPI found! Cross-node parallelism enabled.";
+            BOOST_LOG_TRIVIAL(info) << "MPI main process started.";
+        } else {
+            BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank() << " started.";
+        }
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        exit_mpi();
+        std::exit(EXIT_SUCCESS);
     } else {
-        BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank() << " started.";
+        BOOST_LOG_TRIVIAL(info) << "MPI not found! Cross-node parallelism disabled.";
     }
-    std::this_thread::sleep_for(std::chrono::seconds(5));
-    exit_mpi();
-    std::exit(EXIT_SUCCESS);
-#else
-    BOOST_LOG_TRIVIAL(info) << "MPI not found! Cross-node parallelism disabled.";
-#endif
 }
 } // namespace
 

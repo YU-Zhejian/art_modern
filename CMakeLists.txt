@@ -44,7 +44,7 @@ if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
     set(CEU_CM_SHOULD_USE_NATIVE OFF)
 endif()
 
-set(WITH_MPI OFF) # TODO
+set(WITH_MPI ON) # TODO
 set(ART_MODERN_LINK_LIBS "")
 
 # Installation

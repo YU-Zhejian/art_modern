@@ -228,7 +228,7 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
             abort_mpi();
         }
         return std::make_shared<HeadlessBamReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank()), so, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank_s()), so, params.n_threads);
     }
     throw OutputNotSpecifiedException { };
 }

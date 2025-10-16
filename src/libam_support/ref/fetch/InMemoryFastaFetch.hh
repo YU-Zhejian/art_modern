@@ -23,6 +23,7 @@
 #include <istream>
 #include <string>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 namespace labw::art_modern {
@@ -37,6 +38,7 @@ public:
         , seqs_(std::move(other.seqs_))
     {
     }
+    DELETE_MOVE_ASSIGNMENT(InMemoryFastaFetch)
 
     DELETE_COPY(InMemoryFastaFetch)
 

@@ -154,7 +154,7 @@ ArtJobExecutor::ArtJobExecutor(
     SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
     : art_params_(art_params)
     , job_(std::move(job))
-    , mpi_rank_(mpi_rank())
+    , mpi_rank_(mpi_rank_s())
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)

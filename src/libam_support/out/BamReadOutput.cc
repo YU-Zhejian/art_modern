@@ -229,7 +229,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
             abort_mpi();
         }
         return std::make_shared<BamReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank()), params.fasta_fetch, so,
+            attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank_s()), params.fasta_fetch, so,
             params.n_threads);
     }
     throw OutputNotSpecifiedException { };

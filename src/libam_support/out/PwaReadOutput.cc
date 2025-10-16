@@ -95,7 +95,7 @@ std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const OutParams& pa
 {
     if (params.vm.count("o-pwa") != 0U) {
         return std::make_shared<PwaReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank()), params.args, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank_s()), params.args, params.n_threads);
     }
     throw OutputNotSpecifiedException { };
 }

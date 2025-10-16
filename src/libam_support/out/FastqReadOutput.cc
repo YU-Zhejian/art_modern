@@ -94,7 +94,7 @@ std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& 
 {
     if (params.vm.count("o-fastq") != 0) {
         return std::make_shared<FastqReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank()), params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s()), params.n_threads);
     }
     throw OutputNotSpecifiedException { };
 }
