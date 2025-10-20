@@ -20,6 +20,10 @@
     --o-hl_sam-num_threads 2 \
     --o-hl_sam-compress_level u \
     --o-hl_sam-write_bam
+merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam
+merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta
+
 if type -p fastqc &>/dev/null && type -p x-www-browser &>/dev/null && [ ! "${NO_FASTQC:-}" = "1" ]; then
     fastqc -t "${PARALLEL}" "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Open the browser and ignore what's happening afterwards
@@ -34,6 +38,14 @@ seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq >"${OUT_DIR}"/test_
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
+seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
+seqtk seq -A < "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq > "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa
+cmp \
+    "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa \
+    "${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
+
+rm -fr "${OUT_DIR}"/test_small_se_wgs_memory_sep.* "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.*
+assert_cleandir
 
 "${ART}" \
     --builtin_qual_file HiSeq2500_150bp \
@@ -57,6 +69,9 @@ cmp \
     --o-hl_sam-write_bam \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
+merge_file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq
+merge_file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam
+merge_file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fasta
 
 samtools fastq \
     -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.1.fq \
@@ -80,7 +95,9 @@ for i in 1 2; do
         "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam."${i}".fq
 done
 
+rm -fr "${OUT_DIR}"/test_small_pe_wgs_memory_sep.*
+assert_cleandir
+
 if [ "${FORMAT_ONLY:-}" = "1" ]; then
     exit 0
 fi
-rm -fr "${OUT_DIR}"/test_small_?e_wgs_memory_sep.* "${OUT_DIR}"/test_small_?e_wgs_memory_sep_fastqc.*

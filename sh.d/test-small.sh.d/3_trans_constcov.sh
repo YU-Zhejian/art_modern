@@ -26,6 +26,8 @@ for lc in se pe mp; do
         "${FCOV}" \
         CONST_COV \
         NOT_TEMPLATE
+        rm -fr "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq
+        assert_cleandir
 done
 # No need to test stream FASTA parser
 unset FCOV

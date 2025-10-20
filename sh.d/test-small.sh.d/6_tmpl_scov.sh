@@ -23,6 +23,8 @@ for coverage in stranded strandless; do
             data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
             COV_TSV \
             IS_TEMPLATE
+        rm -fr "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
+        assert_cleandir
     done
 
     parser=stream
@@ -48,6 +50,9 @@ for coverage in stranded strandless; do
             data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
             COV_TSV \
             IS_TEMPLATE
+        rm -fr \
+        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
+        "${OUT_DIR}"/test_small_??_template_"${parser}"_"${coverage}".hl.sam
+        assert_cleandir
     done
-    rm -fr "${OUT_DIR}"/test_small_??_template_"${parser}"_"${coverage}".hl.sam
 done

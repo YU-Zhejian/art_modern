@@ -23,6 +23,8 @@ for lc in se pe mp; do
         "${FCOV}" \
         CONST_COV \
         IS_TEMPLATE
+        rm -fr "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq
+        assert_cleandir
 done
 
 parser=stream
@@ -48,6 +50,9 @@ for lc in se pe mp; do
         "${FCOV}" \
         CONST_COV \
         IS_TEMPLATE
+        rm -fr \
+        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \
+        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".hl.sam
+        assert_cleandir
 done
-rm -fr "${OUT_DIR}"/test_small_??_template_stream.hl.sam
 unset FCOV

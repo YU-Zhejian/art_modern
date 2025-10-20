@@ -28,6 +28,7 @@ for lc in se pe mp; do
             --i-type fasta
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+        assert_cleandir
     done
 done
 
@@ -58,6 +59,7 @@ for lc in se pe mp; do
         --i-type fasta
     cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
     rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+    assert_cleandir
 done
 
 parser=stream
@@ -86,6 +88,7 @@ for lc in se pe mp; do
             --i-type fasta
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+        assert_cleandir
     done
 done
 
@@ -119,6 +122,7 @@ for lc in se pe mp; do
                     --i-type "${i_type}"
                 cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
                 rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+                assert_cleandir
             done
         done
     done
@@ -152,6 +156,7 @@ for lc in se pe mp; do
             --i-type "${i_type}"
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+        assert_cleandir
     done
 done
 

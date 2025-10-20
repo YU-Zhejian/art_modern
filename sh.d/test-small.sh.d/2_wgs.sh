@@ -5,7 +5,7 @@ for parser in memory htslib; do
     for lc in se pe mp; do
         "${ART}" \
             --builtin_qual_file HiSeq2500_125bp \
-            --i-file data/raw_data/ce11_chr1.fa \
+            --i-file "${CE11_CHR1}" \
             --read_len 125 \
             --i-batch_size 100 \
             --mode wgs \
@@ -19,13 +19,15 @@ for parser in memory htslib; do
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 500
-        sam2bam "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}" data/raw_data/ce11_chr1.fa
+        sam2bam "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}" "${CE11_CHR1}"
         python sh.d/test-small.sh.d/validate_cov.py \
             "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
-            data/raw_data/ce11_chr1.fa \
+            "${CE11_CHR1}" \
             "${FCOV}" \
             CONST_COV \
             NOT_TEMPLATE
+        rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
+        assert_cleandir
     done
 done
 unset FCOV

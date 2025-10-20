@@ -7,13 +7,16 @@ if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python sh.d/test-small.sh.d/gen_cov.py
 fi
 
-export PARALLEL="5" # Reduce parallelism overhead for small tests
+export PARALLEL="4" # Reduce parallelism overhead for small tests
+export MPI_PARALLEL="4"
 export IDRATE=0.1   # Increase indel rate to fail faster
-export OUT_DIR="$(readlink -f "opt/tmp/")"
+OUT_DIR="$(readlink -f "opt/tmp/")"
+export OUT_DIR
 export ART="${ART:-opt/build_debug/art_modern}"
 export MRNA_HEAD="data/raw_data/ce11.mRNA_head.fa"
 export MRNA_PBSIM3_TRANSCRIPT="data/raw_data/ce11.mRNA_head.pbsim3.transcript"
 export LAMBDA_PHAGE="data/raw_data/lambda_phage.fa"
+export CE11_CHR1="data/raw_data/ce11_chr1.fa"
 
 echo "ART=${ART}"
 
@@ -24,14 +27,59 @@ function sam2bam() {
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
+# TODO: Only used in 0_out_fmts.sh for checking.
+function merge_file(){
+    # Given $1: "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+    # Find:
+    #   (With MPI)    Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.*.fastq
+    #   (Without MPI) Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+    # Merge into: "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+    if [ -f "${1}" ]; then
+        # No MPI run, nothing to do
+        return
+    fi
+    # Only FASTQ, FASTA or SAM files can be merged. Get the extension.
+    ext="${1##*.}"
+    base="${filename%.*}"
+    files_to_merge=("${base}".*."${ext}")
+    if [ "${ext}" == "fastq" ] || [ "${ext}" == "fq" ] || [ "${ext}" == "fasta" ] || [ "${ext}" == "fa" ]; then
+        cat "${files_to_merge[@]}" >"${1}"
+    elif [ "${ext}" == "sam" ] || [ "${ext}" == "bam" ]; then
+      # Sort all files before merging
+      new_files_to_merge=()
+      for fn in "${files_to_merge[@]}"; do
+          samtools sort --write-index "${fn}" -o "${fn}".sorted.bam
+          new_files_to_merge+=("${fn}".sorted.bam)
+        done
+        samrtools merge -o "${1}".sorted.bam "${new_files_to_merge[@]}"
+        # Convert back to SAM if needed
+        samtools view -o "${1}" "${1}".sorted.bam
+        rm -fr "${1}".sorted.bam "${1}".sorted.bam.csi "${1}".sorted.bam.bai
+        # Clean up sorted BAM files
+        for fn in "${new_files_to_merge[@]}"; do
+            rm -fr "${fn}" "${fn}".csi "${fn}".bai
+        done
+    else
+        echo "merge_file: Unsupported extension: ${ext}" >&2
+        exit 1
+    fi
+}
+
+# Ensure OUT_DIR is clean
+function assert_cleandir(){
+    rm -d "${OUT_DIR}"
+    mkdir "${OUT_DIR}"
+}
+
 rm -fr "${OUT_DIR}" # Remove previous runs
-# . sh.d/test-small.sh.d/out_fmts.sh       # Test all output is working
-# . sh.d/test-small.sh.d/fail.sh           # FASTA that would fail the simulator
-. sh.d/test-small.sh.d/wgs.sh            # WGS mode (with constant coverage)
-. sh.d/test-small.sh.d/trans_constcov.sh # Transcript mode with constant coverage
-. sh.d/test-small.sh.d/tmpl_constcov.sh  # Template mode with constant coverage
-. sh.d/test-small.sh.d/trans_scov.sh     # Transcript mode with stranded/strandless coverage
-. sh.d/test-small.sh.d/tmpl_scov.sh      # Template mode with stranded/strandless coverage
-. sh.d/test-small.sh.d/trans_pbsim3.sh   # Transcript mode with pbsim3-formatted coverage
-. sh.d/test-small.sh.d/tmpl_pbsim3.sh    # Template mode with pbsim3-formatted coverage
+assert_cleandir
+. sh.d/test-small.sh.d/0_out_fmts.sh       # Test all output is working
+. sh.d/test-small.sh.d/1_fail.sh           # FASTA that would fail the simulator
+. sh.d/test-small.sh.d/2_wgs.sh            # WGS mode (with constant coverage)
+. sh.d/test-small.sh.d/3_trans_constcov.sh # Transcript mode with constant coverage
+. sh.d/test-small.sh.d/4_tmpl_constcov.sh  # Template mode with constant coverage
+. sh.d/test-small.sh.d/5_trans_scov.sh     # Transcript mode with stranded/strandless coverage
+. sh.d/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
+. sh.d/test-small.sh.d/7_trans_pbsim3.sh   # Transcript mode with pbsim3-formatted coverage
+. sh.d/test-small.sh.d/8_tmpl_pbsim3.sh    # Template mode with pbsim3-formatted coverage
 rm -d "${OUT_DIR}"                       # Which should now be empty

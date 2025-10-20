@@ -14,13 +14,14 @@
 
 #pragma once
 
-#include "absl/base/attributes.h"
 #include "libam_support/Constants.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
 #include <boost/log/trivial.hpp>
+
+#include <absl/base/attributes.h>
 
 #include <concurrentqueue.h>
 

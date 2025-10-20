@@ -26,4 +26,6 @@ for lc in se pe mp; do
         "${MRNA_PBSIM3_TRANSCRIPT}" \
         PBSIM3_TRANSCRIPT \
         NOT_TEMPLATE
+              rm -fr "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}".fq
+              assert_cleandir
 done
