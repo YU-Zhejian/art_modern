@@ -4,7 +4,7 @@
 parser=memory
 for coverage in stranded strandless; do
     for lc in se pe mp; do
-        "${ART}" \
+        "${ART_CMD_ASSEMBLED[@]}" \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${MRNA_HEAD}" \
             --read_len 125 \
@@ -19,6 +19,8 @@ for coverage in stranded strandless; do
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}".fq \
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 500
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".sam
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}" "${MRNA_HEAD}"
         python sh.d/test-small.sh.d/validate_cov.py \
             "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}"_"${coverage}".fq \

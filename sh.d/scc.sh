@@ -45,7 +45,7 @@ for dir in deps/* explore/*; do
         continue
     fi
     SOURCES=$(git ls-files "${dir}" | xargs)
-    "${SCC}" --include-ext c,cc,h,hh,cpp,hpp,cxx,hxx --format json ${SOURCES} > deps_code_count.json
+    "${SCC}" --include-ext c,cc,h,hh,cpp,hpp,cxx,hxx --format json ${SOURCES} >deps_code_count.json
     COUNTS=$(jq 'reduce .[] as $item (0; . + $item.Count)' deps_code_count.json)
     LINES=$(jq 'reduce .[] as $item (0; . + $item.Lines)' deps_code_count.json)
     printf "Directory: %-48s has %-10d files with %-6d lines of C/C++ code\n" "${dir}" "${COUNTS}" "${LINES}"

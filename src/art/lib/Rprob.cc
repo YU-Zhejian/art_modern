@@ -13,7 +13,6 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-
 #include "art/lib/Rprob.hh"
 
 #include "art/lib/ArtConstants.hh"
@@ -44,10 +43,7 @@
 
 namespace labw::art_modern {
 
-std::uint64_t Rprob::seed()
-{
-    return rand_seed();
-}
+std::uint64_t Rprob::seed() { return rand_seed(); }
 
 void Rprob::public_init_()
 {

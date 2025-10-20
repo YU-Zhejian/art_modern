@@ -42,7 +42,7 @@ FastaStreamBatcher::FastaStreamBatcher(
             fasta_iterator_.next();
         } catch (EOFException&) {
             break;
-        } catch (MalformedFastaException & e) {
+        } catch (MalformedFastaException& e) {
             BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
             abort_mpi();
         }
@@ -53,7 +53,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
     const std::scoped_lock lock(mutex_);
     std::vector<std::string> seq_names;
     std::vector<std::string> seqs;
-    if (batch_size_ != std::numeric_limits<int>::max()) {
+    if (batch_size_ != std::numeric_limits<decltype(batch_size_)>::max()) {
         seq_names.reserve(batch_size_);
         seqs.reserve(batch_size_);
     }
@@ -71,7 +71,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
             seqs.emplace_back(std::move(sequence));
         } catch (EOFException&) {
             break;
-        }catch (MalformedFastaException & e) {
+        } catch (MalformedFastaException& e) {
             BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
             abort_mpi();
         }
@@ -81,7 +81,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
                 fasta_iterator_.next();
             } catch (EOFException&) {
                 break;
-            }catch (MalformedFastaException & e) {
+            } catch (MalformedFastaException& e) {
                 BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
                 abort_mpi();
             }

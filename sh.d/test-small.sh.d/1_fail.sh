@@ -4,7 +4,7 @@ parser=memory
 err_file="data/raw_data/err.fa"
 for lc in se pe mp; do
     for mode in wgs trans template; do
-        "${ART}" \
+        "${ART_CMD_ASSEMBLED[@]}" \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -26,6 +26,7 @@ for lc in se pe mp; do
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 200 \
             --i-type fasta
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
         assert_cleandir
@@ -35,7 +36,7 @@ done
 parser=htslib
 mode=wgs
 for lc in se pe mp; do
-    "${ART}" \
+    "${ART_CMD_ASSEMBLED[@]}" \
         --builtin_qual_file HiSeq2500_125bp \
         --i-file "${err_file}" \
         --read_len 125 \
@@ -57,6 +58,7 @@ for lc in se pe mp; do
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 200 \
         --i-type fasta
+    merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
     cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
     rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
     assert_cleandir
@@ -65,7 +67,7 @@ done
 parser=stream
 for lc in se pe mp; do
     for mode in trans template; do
-        "${ART}" \
+        "${ART_CMD_ASSEMBLED[@]}" \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -86,20 +88,23 @@ for lc in se pe mp; do
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 200 \
             --i-type fasta
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
         assert_cleandir
     done
 done
 
-err_file="/dev/null"
+touch "${OUT_DIR}/dev_null"
+
+err_file="${OUT_DIR}/dev_null"
 
 for lc in se pe mp; do
     for mode in trans template; do
         for parser in memory stream; do
             # No, do not use SAM output.
             for i_type in fasta pbsim3_transcripts; do
-                "${ART}" \
+                "${ART_CMD_ASSEMBLED[@]}" \
                     --builtin_qual_file HiSeq2500_125bp \
                     --i-file "${err_file}" \
                     --read_len 125 \
@@ -120,8 +125,10 @@ for lc in se pe mp; do
                     --pe_frag_dist_std_dev 20 \
                     --pe_frag_dist_mean 200 \
                     --i-type "${i_type}"
+                merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
                 cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
                 rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+                cmp "${OUT_DIR}/dev_null" /dev/null
                 assert_cleandir
             done
         done
@@ -133,7 +140,7 @@ i_type=fasta
 for lc in se pe mp; do
     for mode in wgs trans template; do
         # No, do not use SAM output.
-        "${ART}" \
+        "${ART_CMD_ASSEMBLED[@]}" \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -154,8 +161,10 @@ for lc in se pe mp; do
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 200 \
             --i-type "${i_type}"
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
+        cmp "${OUT_DIR}/dev_null" /dev/null
         assert_cleandir
     done
 done

@@ -39,7 +39,6 @@ int main(int argc, char** argv)
 #endif
 
     std::vector<std::thread> threads;
-    threads.reserve(config.num_threads);
 
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r1;
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r2;

@@ -17,16 +17,17 @@
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/log/trivial.hpp>
 
 #include <cstddef>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <mutex>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
@@ -53,7 +54,7 @@ std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pb
     CoverageInfo::coverage_map coverage_negative;
     std::vector<std::string> seq_names;
     std::vector<std::string> seqs;
-    if (batch_size_ != std::numeric_limits<int>::max()) {
+    if (batch_size_ != std::numeric_limits<decltype(batch_size_)>::max()) {
         seq_names.reserve(batch_size_);
         seqs.reserve(batch_size_);
     }

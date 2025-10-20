@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-"${ART}" \
+"${ART_CMD_ASSEMBLED[@]}" \
     --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file data/raw_data/ce11_chr1.fa \
@@ -38,8 +38,8 @@ seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq >"${OUT_DIR}"/test_
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
-seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
-seqtk seq -A < "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq > "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa
+seqkit sort --line-width 0 <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
+seqtk seq -A <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
@@ -47,7 +47,7 @@ cmp \
 rm -fr "${OUT_DIR}"/test_small_se_wgs_memory_sep.* "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.*
 assert_cleandir
 
-"${ART}" \
+"${ART_CMD_ASSEMBLED[@]}" \
     --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
@@ -97,6 +97,7 @@ done
 
 rm -fr "${OUT_DIR}"/test_small_pe_wgs_memory_sep.*
 assert_cleandir
+# I suppose the FASTA format does not need to be tested here.
 
 if [ "${FORMAT_ONLY:-}" = "1" ]; then
     exit 0

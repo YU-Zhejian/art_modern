@@ -3,7 +3,7 @@
 FCOV=0.2
 for parser in memory htslib; do
     for lc in se pe mp; do
-        "${ART}" \
+        "${ART_CMD_ASSEMBLED[@]}" \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${CE11_CHR1}" \
             --read_len 125 \
@@ -19,6 +19,8 @@ for parser in memory htslib; do
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
             --pe_frag_dist_std_dev 20 \
             --pe_frag_dist_mean 500
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
+        merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".sam
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}" "${CE11_CHR1}"
         python sh.d/test-small.sh.d/validate_cov.py \
             "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \

@@ -54,7 +54,7 @@ namespace {
                 seqs.emplace_back(std::move(sequence));
             } catch (EOFException&) {
                 break;
-            }catch (MalformedFastaException & e) {
+            } catch (MalformedFastaException& e) {
                 BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
                 abort_mpi();
             }

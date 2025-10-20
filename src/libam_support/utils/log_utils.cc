@@ -50,23 +50,17 @@ void init_logger()
     if (have_mpi()) {
         core->add_global_attribute("MPIRank", MPIRankLoggerAttribute());
         core->add_global_attribute("MPIHostName", MPIHostNameLoggerAttribute());
-        // Add console sink for MPI process with rank 0
-        if (is_on_mpi_main_process_or_nompi()) {
-            const auto sink = add_console_log(std::cerr,
-                boost::log::keywords::format
-                = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%",
-                logging::keywords::filter = (logging::trivial::severity >= logging::trivial::info));
-            core->add_sink(sink);
-        }
-    } else {
+    }
+    if (is_on_mpi_main_process_or_nompi()) {
         const auto sink = add_console_log(std::cerr,
             boost::log::keywords::format = "[%TimeStamp%] [T=%ThreadID%] %Severity%: %Message%",
-            logging::keywords::filter = logging::trivial::severity >= logging::trivial::info);
+            logging::keywords::filter = (logging::trivial::severity >= logging::trivial::info));
         core->add_sink(sink);
     }
 }
 void init_file_logger()
 {
+    const auto core = logging::core::get();
     if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
         if (have_mpi()) {
             if (is_on_mpi_main_process_or_nompi()) {
@@ -90,11 +84,17 @@ void init_file_logger()
         if (!boost::filesystem::exists(art_log_dir)) {
             boost::filesystem::create_directories(art_log_dir);
         }
-        std::stringstream file_name_ss;
-        file_name_ss << art_log_dir << "/" << mpi_rank() << ".log";
-        logging::add_file_log(logging::keywords::file_name = file_name_ss.str(),
+        const auto file_name = (boost::filesystem::canonical(art_log_dir) / (mpi_rank_s() + ".log")).string();
+        const auto sink = logging::add_file_log(logging::keywords::file_name = file_name,
             logging::keywords::format
             = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%");
+        core->add_sink(sink);
+        BOOST_LOG_TRIVIAL(info) << "Log file sink to '" << file_name << "' added.";
     }
+}
+void flush_all_sinks()
+{
+    const auto core = logging::core::get();
+    core->flush();
 }
 } // namespace labw::art_modern

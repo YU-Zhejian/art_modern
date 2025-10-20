@@ -62,6 +62,7 @@ bool is_on_mpi_main_process_or_nompi();
  *
  * @return The current MPI rank in string.
  * "nompi" if MPI is not available.
+ * "mpi-finalized" if MPI had stopped.
  * @warning Should be used in logging or filename only.
  */
 std::string mpi_rank_s();

@@ -220,9 +220,6 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 }
                 pbsim3_transcript_stream.close();
             }
-        } else {
-            BOOST_LOG_TRIVIAL(fatal) << "Unsupported input file type '" << art_io_params.art_input_file_type  << "'.";
-            abort_mpi();
         }
     }
 

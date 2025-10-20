@@ -16,7 +16,6 @@
 
 #include "libam_support/utils/class_macros_utils.hh"
 
-
 #include <cstddef>
 #include <exception>
 #include <istream>
@@ -32,9 +31,10 @@ namespace labw::art_modern {
  */
 class EOFException final : public std::exception { };
 
-class MalformedFastaException final  :  public  std::runtime_error {
+class MalformedFastaException final : public std::runtime_error {
 public:
-    explicit MalformedFastaException( std::string reason) : std::runtime_error(std::move(reason)) {};
+    explicit MalformedFastaException(std::string reason)
+        : std::runtime_error(std::move(reason)) { };
     ~MalformedFastaException() override = default;
 };
 

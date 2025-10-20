@@ -3,7 +3,7 @@
 parser=memory
 coverage=pbsim3
 for lc in se pe mp; do
-    "${ART}" \
+    "${ART_CMD_ASSEMBLED[@]}" \
         --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_PBSIM3_TRANSCRIPT}" \
         --read_len 125 \
@@ -16,6 +16,8 @@ for lc in se pe mp; do
         --del_rate_1 "${IDRATE}" \
         --o-sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam \
         --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
+    merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam
+    merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}" "${MRNA_HEAD}"
     python sh.d/test-small.sh.d/validate_cov.py \
         "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
@@ -23,13 +25,13 @@ for lc in se pe mp; do
         "${MRNA_PBSIM3_TRANSCRIPT}" \
         PBSIM3_TRANSCRIPT \
         IS_TEMPLATE
-        rm -fr "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
-        assert_cleandir
+    rm -fr "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
+    assert_cleandir
 done
 
 parser=stream
 for lc in se pe mp; do
-    "${ART}" \
+    "${ART_CMD_ASSEMBLED[@]}" \
         --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_PBSIM3_TRANSCRIPT}" \
         --read_len 125 \
@@ -43,6 +45,8 @@ for lc in se pe mp; do
         --del_rate_1 "${IDRATE}" \
         --o-hl_sam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl.sam \
         --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
+    merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl.sam
+    merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl "${MRNA_HEAD}"
     python sh.d/test-small.sh.d/validate_cov.py \
         "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
@@ -50,9 +54,9 @@ for lc in se pe mp; do
         "${MRNA_PBSIM3_TRANSCRIPT}" \
         PBSIM3_TRANSCRIPT \
         IS_TEMPLATE
-        rm -fr \
+    rm -fr \
         "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
         "${OUT_DIR}"test_small_"${lc}"_template_"${parser}"_"${coverage}".hl.sam
-        assert_cleandir
+    assert_cleandir
 done
 rm -fr "${OUT_DIR}"/test_small_??_template_"${parser}"_"${coverage}".hl.sam

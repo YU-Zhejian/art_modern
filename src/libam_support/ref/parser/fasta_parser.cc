@@ -41,7 +41,8 @@ FastaIterator::FastaRecord FastaIterator::next()
                 next_line.pop_back();
             }
             if (next_line[0] != '>') {
-                throw MalformedFastaException("Record ID of FASTA must start with '>' at line " + std::to_string(_lineno));
+                throw MalformedFastaException(
+                    "Record ID of FASTA must start with '>' at line " + std::to_string(_lineno));
             }
             // Directly extract the record ID without splitting the whole line
             next_record_id = next_line.substr(/**Exclude > **/ 1, next_line.find_first_of(" \t\f") - 1);

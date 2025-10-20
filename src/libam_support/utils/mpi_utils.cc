@@ -16,6 +16,8 @@
 
 #include "libam_support/utils/mpi_utils.hh"
 
+#include "libam_support/utils/log_utils.hh"
+
 #include "libam_support/Constants.hh" // NOLINT: Used in MPI functions
 
 #include <boost/log/trivial.hpp>
@@ -33,17 +35,18 @@
 
 namespace labw::art_modern {
 
-
-    namespace{
-        [[noreturn]] void exception_mpi_is_finalized(){
-            BOOST_LOG_TRIVIAL(fatal) << "MPI is finalized.";
-            abort_mpi(EXIT_FAILURE);
-        }
-         [[noreturn]] void exception_mpi_not_available(){
-            BOOST_LOG_TRIVIAL(fatal) << "MPI is not available.";
-            abort_mpi(EXIT_FAILURE);
-         }
+namespace {
+    [[noreturn]] [[maybe_unused]] void exception_mpi_is_finalized()
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "MPI is finalized.";
+        abort_mpi(EXIT_FAILURE);
     }
+    [[noreturn]] [[maybe_unused]] void exception_mpi_not_available()
+    {
+        BOOST_LOG_TRIVIAL(fatal) << "MPI is not available.";
+        abort_mpi(EXIT_FAILURE);
+    }
+} // namespace
 
 bool have_mpi() noexcept
 {
@@ -77,20 +80,25 @@ void exit_mpi() noexcept
         BOOST_LOG_TRIVIAL(debug) << "MPI already finalized.";
     }
 #endif
+    flush_all_sinks();
 }
 
 [[noreturn]] void abort_mpi([[maybe_unused]] const int status) noexcept
 {
     BOOST_LOG_TRIVIAL(info) << "ABORT";
+#ifdef WITH_BOOST_STACKTRACE
+    BOOST_LOG_TRIVIAL(info) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
+#endif
 #ifdef WITH_MPI
     BOOST_LOG_TRIVIAL(debug) << "Sending MPI_ABORT...";
+    flush_all_sinks();
     MPI_Abort(MPI_COMM_WORLD, status);
-#endif
-#ifdef WITH_BOOST_STACKTRACE
-        BOOST_LOG_TRIVIAL(info ) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
-#endif
-    BOOST_LOG_TRIVIAL(debug) << "Sending std::abort...";
     std::abort();
+#else
+    BOOST_LOG_TRIVIAL(debug) << "Sending std::abort...";
+    flush_all_sinks();
+    std::abort();
+#endif
 }
 
 std::size_t mpi_size()
@@ -130,7 +138,7 @@ std::string mpi_rank_s()
 {
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
-        exception_mpi_is_finalized();
+        return "mpi-finalized";
     }
     int rank = MPI_UNAVAILABLE_RANK;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
