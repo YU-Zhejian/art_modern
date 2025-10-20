@@ -27,7 +27,7 @@
 
 namespace labw::art_modern {
 
-bool have_mpi();
+bool have_mpi() noexcept;
 
 bool is_mpi_finalized();
 
@@ -45,7 +45,7 @@ std::size_t mpi_size();
  *
  * Every process should call this method.
  */
-void exit_mpi();
+void exit_mpi() noexcept;
 
 /**
  * Call `MPI_Abort` or `std::abort` with the given status.
@@ -53,7 +53,7 @@ void exit_mpi();
  *
  * @param status Exit status.
  */
-[[noreturn]] void abort_mpi(int status = EXIT_FAILURE);
+[[noreturn]] void abort_mpi(int status = EXIT_FAILURE) noexcept;
 
 bool is_on_mpi_main_process_or_nompi();
 

@@ -12,7 +12,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h" // NOLINT: for WITH_MPI
+#include "art_modern_config.h" // NOLINT: for WITH_MPI, WITH_BOOST_STACKTRACE
 
 #include "libam_support/utils/mpi_utils.hh"
 
@@ -20,17 +20,32 @@
 
 #include <boost/log/trivial.hpp>
 
+#ifdef WITH_BOOST_STACKTRACE
+#include <boost/stacktrace/stacktrace.hpp>
+#endif
+
 #ifdef WITH_MPI
 #include <mpi.h>
 #endif
 
 #include <cstdlib>
-#include <stdexcept> // NOLINT: for std::runtime_error
 #include <string>
 
 namespace labw::art_modern {
 
-bool have_mpi()
+
+    namespace{
+        [[noreturn]] void exception_mpi_is_finalized(){
+            BOOST_LOG_TRIVIAL(fatal) << "MPI is finalized.";
+            abort_mpi(EXIT_FAILURE);
+        }
+         [[noreturn]] void exception_mpi_not_available(){
+            BOOST_LOG_TRIVIAL(fatal) << "MPI is not available.";
+            abort_mpi(EXIT_FAILURE);
+         }
+    }
+
+bool have_mpi() noexcept
 {
 #ifdef WITH_MPI
     return true;
@@ -46,11 +61,11 @@ bool is_mpi_finalized()
     MPI_Finalized(&mpi_finalized_flag);
     return mpi_finalized_flag != 0;
 #else
-    throw std::runtime_error("MPI is not available.");
+    exception_mpi_not_available();
 #endif
 }
 
-void exit_mpi()
+void exit_mpi() noexcept
 {
     BOOST_LOG_TRIVIAL(info) << "EXIT";
 #ifdef WITH_MPI
@@ -64,12 +79,15 @@ void exit_mpi()
 #endif
 }
 
-[[noreturn]] void abort_mpi([[maybe_unused]] const int status)
+[[noreturn]] void abort_mpi([[maybe_unused]] const int status) noexcept
 {
     BOOST_LOG_TRIVIAL(info) << "ABORT";
 #ifdef WITH_MPI
     BOOST_LOG_TRIVIAL(debug) << "Sending MPI_ABORT...";
     MPI_Abort(MPI_COMM_WORLD, status);
+#endif
+#ifdef WITH_BOOST_STACKTRACE
+        BOOST_LOG_TRIVIAL(info ) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
 #endif
     BOOST_LOG_TRIVIAL(debug) << "Sending std::abort...";
     std::abort();
@@ -80,7 +98,7 @@ std::size_t mpi_size()
     int size = 1;
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
-        throw std::runtime_error("MPI is finalized.");
+        exception_mpi_is_finalized();
     }
     MPI_Comm_size(MPI_COMM_WORLD, &size);
     return static_cast<std::size_t>(size);
@@ -99,20 +117,20 @@ std::size_t mpi_rank()
 {
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
-        throw std::runtime_error("MPI is finalized.");
+        exception_mpi_is_finalized();
     }
     int rank = MPI_UNAVAILABLE_RANK;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     return rank;
 #else
-    throw std::runtime_error("MPI is not available.");
+    exception_mpi_not_available();
 #endif
 }
 std::string mpi_rank_s()
 {
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
-        throw std::runtime_error("MPI is finalized.");
+        exception_mpi_is_finalized();
     }
     int rank = MPI_UNAVAILABLE_RANK;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);

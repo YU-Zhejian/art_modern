@@ -13,11 +13,13 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+
 #include "art/lib/Rprob.hh"
 
 #include "art/lib/ArtConstants.hh"
 
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/rand_utils.hh"
 
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
@@ -36,19 +38,15 @@
 #endif
 
 #include <algorithm> // NOLINT
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <thread>
 #include <vector>
 
 namespace labw::art_modern {
 
-uint64_t Rprob::seed()
+std::uint64_t Rprob::seed()
 {
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
-               .count()
-        * std::hash<std::thread::id>()(std::this_thread::get_id());
+    return rand_seed();
 }
 
 void Rprob::public_init_()

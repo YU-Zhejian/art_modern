@@ -47,9 +47,6 @@ void handle_mpi_child()
         } else {
             BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank() << " started.";
         }
-        std::this_thread::sleep_for(std::chrono::seconds(5));
-        exit_mpi();
-        std::exit(EXIT_SUCCESS);
     } else {
         BOOST_LOG_TRIVIAL(info) << "MPI not found! Cross-node parallelism disabled.";
     }
@@ -82,6 +79,7 @@ int main(int argc, char* argv[])
     t.stop();
     BOOST_LOG_TRIVIAL(info) << "Time spent: " << t.format(3, "%ws wall, %us user + %ss system = %ts CPU (%p%)");
 #endif
+    BOOST_LOG_TRIVIAL(info) << "Done.";
     exit_mpi();
     std::exit(EXIT_SUCCESS);
 }

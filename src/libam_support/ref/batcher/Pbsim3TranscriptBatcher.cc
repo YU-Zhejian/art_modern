@@ -80,7 +80,8 @@ std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pb
             seq_names.emplace_back(tokens.at(0));
             seqs.emplace_back(tokens.at(3));
         } else {
-            throw std::invalid_argument("Cannot parse PBSIM3 transcript " + line);
+            BOOST_LOG_TRIVIAL(fatal) << "Invalid line: " << line;
+            abort_mpi(EXIT_FAILURE);
         }
     }
     return { std::make_shared<InMemoryFastaFetch>(std::move(seq_names), std::move(seqs)),

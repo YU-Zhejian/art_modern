@@ -17,6 +17,7 @@
 #include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/ref/parser/fasta_parser.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -41,6 +42,9 @@ FastaStreamBatcher::FastaStreamBatcher(
             fasta_iterator_.next();
         } catch (EOFException&) {
             break;
+        } catch (MalformedFastaException & e) {
+            BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+            abort_mpi();
         }
     }
 }
@@ -67,6 +71,9 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
             seqs.emplace_back(std::move(sequence));
         } catch (EOFException&) {
             break;
+        }catch (MalformedFastaException & e) {
+            BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+            abort_mpi();
         }
         // Skip others
         for (std::size_t i = 0; i < sls_.skip_others(); ++i) {
@@ -74,6 +81,9 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
                 fasta_iterator_.next();
             } catch (EOFException&) {
                 break;
+            }catch (MalformedFastaException & e) {
+                BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+                abort_mpi();
             }
         }
     }

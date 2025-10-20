@@ -24,7 +24,7 @@
 - I/O:
   - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. This problem is more obvious on smaller objects, like FASTA when being compared to FASTQ.
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
-  - The current implementation passes too many small objects accross the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
+  - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
 
 - Support MPI-based parallelization. Basic ideas:
   - For `htslib` parser, just divide sequencing depth.
@@ -35,9 +35,11 @@
       - [MPICH](https://www.mpich.org/).
       - [OpenMPI](https://www.open-mpi.org/).
       - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-  - The following class needs to support SLS:
-    - FastaStreamBatcher
-    - Pbsim3TranscriptBatcher
+- Add support for automated testing.
+
+## Exception Handling
+
+Eliminate all use of `std::runtime_error` to either specific exceptions for low-level base classes or `abort_mpi()` with Boost log calls for high-level classes.
 
 ## I/O Formats
 

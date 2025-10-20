@@ -16,6 +16,9 @@
 
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/parser/fasta_parser.hh"
+#include "libam_support/utils/mpi_utils.hh"
+
+#include <boost/log/trivial.hpp>
 
 #include <htslib/hts.h>
 
@@ -51,6 +54,9 @@ namespace {
                 seqs.emplace_back(std::move(sequence));
             } catch (EOFException&) {
                 break;
+            }catch (MalformedFastaException & e) {
+                BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+                abort_mpi();
             }
         }
         return { std::move(seq_names), std::move(seqs) };

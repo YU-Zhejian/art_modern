@@ -35,6 +35,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/exception_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -220,7 +221,8 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 pbsim3_transcript_stream.close();
             }
         } else {
-            throw std::runtime_error("Unsupported input file type");
+            BOOST_LOG_TRIVIAL(fatal) << "Unsupported input file type '" << art_io_params.art_input_file_type  << "'.";
+            abort_mpi();
         }
     }
 

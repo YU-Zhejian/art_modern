@@ -4,8 +4,9 @@
 
 - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
 - The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
+- Seeding of random number generators revised.
 - The number of reads generated from each contig is now calculated using complicated rounding instead of flooring, which may increase the total number of reads by a small amount but overall makes the capturing more precise.
-  - In details, the number of reads geenrated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+  - In details, the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
   - For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
     - In SE mode, 9 reads will be generated on positive and negative strands.
     - In PE/MP mode, 10 and 8 reads will be generated on positive and negative strands respectively.
