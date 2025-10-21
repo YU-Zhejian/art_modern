@@ -1,15 +1,24 @@
 # News \& Release Notes
 
-## 1.1.11 (Ongoing)
+## 1.2.0 (Ongoing)
 
 - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
 - The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
-- Seeding of random number generators revised.
-- The number of reads generated from each contig is now calculated using complicated rounding instead of flooring, which may increase the total number of reads by a small amount but overall makes the capturing more precise.
-  - In details, the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
-  - For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
-    - In SE mode, 9 reads will be generated on positive and negative strands.
-    - In PE/MP mode, 10 and 8 reads will be generated on positive and negative strands respectively.
+- **EXPERIMENTAL** Support over MPI added.
+  - Currently tested MPI vendors:
+    - Debian OpenMPI, ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023.
+  - MPI-related revisions:
+    - Seeding of random number generators revised to advoid seed colission accross different threads and processes.
+    - The number of reads generated from each contig is now calculated using complicated rounding instead of flooring, which may increase the total number of reads by a small amount but overall makes the capturing more precise.
+      - In details, the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+      - For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
+        - In SE mode, 9 reads will be generated on positive and negative strands.
+        - In PE/MP mode, 10 and 8 reads will be generated on positive and negative strands respectively.
+    - Makefile quick build targets `debug`, `release` have their MPI counterparts: `debug-mpi` and `release-mpi`.
+    - Makefile integration test targets `testsmall`, `testsmall-release`, `testbuild` have their MPI counterparts: `testsmall-mpi`, `testsmall-release-mpi`, and `testbuild-mpi`.
+    - Integration test `testbuild` revised to make it run faster.
+    - CMake option `WITH_MPI` added to enable MPI support. This option is by default `OFF`.
+  - **NOTE** The author currently have no access to computing clusters with MPI, so the MPI parallelization on an actual multi-node cluster may be problematic and suboptimal. Users are welcomed to report bugs or tell the author how to simulate MPI-enabled cluster using a laptop to improve the MPI support.
 - Miscellaneous bug fixes.
 
 ## 1.1.10 (2025/10/12)

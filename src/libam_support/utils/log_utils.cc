@@ -58,7 +58,7 @@ void init_logger()
         core->add_sink(sink);
     }
 }
-void init_file_logger()
+void init_file_logger(const bool auto_flush)
 {
     const auto core = logging::core::get();
     if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
@@ -87,7 +87,9 @@ void init_file_logger()
         const auto file_name = (boost::filesystem::canonical(art_log_dir) / (mpi_rank_s() + ".log")).string();
         const auto sink = logging::add_file_log(logging::keywords::file_name = file_name,
             logging::keywords::format
-            = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%");
+            = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%",
+            logging::keywords::auto_flush = auto_flush
+                    );
         core->add_sink(sink);
         BOOST_LOG_TRIVIAL(info) << "Log file sink to '" << file_name << "' added.";
     }

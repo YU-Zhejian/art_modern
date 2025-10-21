@@ -36,16 +36,23 @@ function do_build() {
         fi
     fi
     echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-    make testbuild-child \
-        CMAKE_FLAGS="${CMAKE_FLAGS}" \
-        BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
-        &>>opt/testbuild.log || exit 1
+    if [ -z "${MPIRUN:-}" ]; then
+        make testbuild-child \
+            CMAKE_FLAGS="${CMAKE_FLAGS}" \
+            BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
+            &>>opt/testbuild.log || exit 1
+    else
+        make testbuild-child-mpi \
+            CMAKE_FLAGS="${CMAKE_FLAGS}" \
+            BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \
+            &>>opt/testbuild.log || exit 1
+    fi
 }
 
 SHDIR="$(dirname "$(readlink -f "${0}")")"
 
 # A list of possible random generators
-RANDOM_GENERATORS=(STL PCG BOOST)
+RANDOM_GENERATORS=(STL PCG BOOST) # Here PCG is included to make the default case test at once.
 
 if cmake -P "${SHDIR}/test-build.d/test-gsl.cmake" &>>/dev/null; then
     RANDOM_GENERATORS+=(GSL)
@@ -54,20 +61,21 @@ if cmake -P "${SHDIR}/test-build.d/test-mkl.cmake" &>>/dev/null; then
     RANDOM_GENERATORS+=(MKL)
 fi
 
-# Default options
-USE_RANDOM_GENERATOR=PCG
-USE_QUAL_GEN=WALKER
-USE_MALLOC=AUTO
-USE_LIBFMT=UNSET
-USE_HTSLIB=UNSET
-USE_CONCURRENT_QUEUE=UNSET
-USE_ABSL=UNSET
-
 for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
+    # Default options
+    USE_RANDOM_GENERATOR=PCG
+    USE_QUAL_GEN=WALKER
+    USE_MALLOC=AUTO
+    USE_LIBFMT=UNSET
+    USE_HTSLIB=UNSET
+    USE_CONCURRENT_QUEUE=UNSET
+    USE_ABSL=UNSET
+
+    # Test normal case first
     BUILD_ONLY_TEST=1
 
-    for USE_THREAD_PARALLEL in ASIO BS NOP; do
-        do_build
+    for USE_THREAD_PARALLEL in BS NOP; do
+        do_build # No need to test ASIO as it's default
     done
     USE_THREAD_PARALLEL=ASIO
 
@@ -76,24 +84,20 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
     done
     USE_MALLOC=AUTO
 
-    for USE_LIBFMT in "UNSET" "fmt"; do
-        do_build
-    done
+    USE_LIBFMT=fmt
+    do_build
     USE_LIBFMT=UNSET
 
-    for USE_HTSLIB in "UNSET" "hts"; do
-        do_build
-    done
+    USE_HTSLIB=hts
+    do_build
     USE_HTSLIB=UNSET
 
-    for USE_CONCURRENT_QUEUE in "UNSET" "SYS"; do
-        do_build
-    done
+    USE_CONCURRENT_QUEUE=SYS
+    do_build
     USE_CONCURRENT_QUEUE=UNSET
 
-    for USE_ABSL in "UNSET" "SYS"; do
-        do_build
-    done
+    USE_ABSL=SYS
+    do_build
     USE_ABSL=UNSET
 
     BUILD_ONLY_TEST=2 # Now we requires a testsmall to be run
@@ -103,10 +107,7 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
     done
     USE_RANDOM_GENERATOR=PCG
 
-    # TODO: Migrate this thing to unit tests
-
-    for USE_QUAL_GEN in WALKER STL; do
-        do_build
-    done
+    USE_QUAL_GEN=STL
+    do_build
     USE_QUAL_GEN=WALKER
 done

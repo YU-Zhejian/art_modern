@@ -51,11 +51,17 @@ Before you send a PR, please make sure that:
 
 - You've run `make fmt` to format the code.
 - All CTest passes.
-- `make clean testsmall-release` passes. This test usually requires 3 to 4 minutes.
-- `make clean testsmall` passes. This test usually requires 6 to 9 minutes. Here, the additional tests that are not enabled in release mode will be activated.
-- `make testbuild` passes. This test usually requires 2.5 to 3 hours.
+- `make clean testsmall-release testsmall-release-mpi` passes. This test usually requires 6 to 8 minutes.
+- `make clean testsmall testsmall-mpi` passes. This test usually requires 12 to 18 minutes. Here, the additional tests that are not enabled in release mode will be activated.
+- `make testbuild testbuild-mpi` passes. This test usually requires 4 to 6 hours.
 
-**NOTE** A LLVM build can be tested through:
+You may also:
+
+- You used Valgrind to check for memory leaks.
+
+## Scripts for Testing
+
+### Pure LLVM/Clang Toolchain
 
 ```shell
 LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
@@ -66,9 +72,13 @@ LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
 
 Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and `${HOME}/opt/boost-1.89.0-clang` respectively.
 
-You may also:
+### Intel DPCPP Toolchain
 
-- You used Valgrind to check for memory leaks.
+```shell
+. /opt/intel/oneapi/setvars.sh
+make testbuild \
+    CMAKE_FLAGS='-DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
+```
 
 ## Miscellaneous Developer-Oriented Documentation
 

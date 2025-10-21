@@ -15,6 +15,8 @@ BASH ?= bash
 PYTHON ?= python3
 
 # MPI run command. Used in MPI-related tests only
+# NOTE: Setting this target does NOT enable MPI build!
+# Use release-mpi or debug-mpi targets to build with MPI support.
 MPIRUN ?= mpirun
 
 # Package version, derived from the latest git tag if not set
@@ -234,17 +236,23 @@ testbuild-child-mpi:
 	cmake --build opt/testbuild-mpi -j$(JOBS)
 	cmake --install opt/testbuild-mpi
 	env -C opt/testbuild-mpi ctest --output-on-failure
-	opt/testbuild_install-mpi/bin/art_modern --help
-	opt/testbuild_install-mpi/bin/art_modern --version
+	opt/testbuild_install-mpi/bin/art_modern-mpi --help
+	opt/testbuild_install-mpi/bin/art_modern-mpi --version
 	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=opt/testbuild_install-mpi/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh; \
+		env ART=opt/testbuild_install-mpi/bin/art_modern-mpi MPIRUN="" $(BASH) sh.d/test-small.sh; \
 	fi
 
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
 	mkdir -p opt/testbuild
-	$(BASH) sh.d/test-build.sh
+	env MPIRUN="" $(BASH) sh.d/test-build.sh
+
+.PHONY: testbuild-mpi
+# testbuild with MPI
+testbuild-mpi:
+	mkdir -p opt/testbuild
+	env MPIRUN="$(MPIRUN)" $(BASH) sh.d/test-build.sh
 
 .PHONY: doc
 # Build documentation
