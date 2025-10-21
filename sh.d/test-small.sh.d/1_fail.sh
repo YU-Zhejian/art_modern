@@ -4,7 +4,7 @@ parser=memory
 err_file="data/raw_data/err.fa"
 for lc in se pe mp; do
     for mode in wgs trans template; do
-        "${ART_CMD_ASSEMBLED[@]}" \
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -36,7 +36,7 @@ done
 parser=htslib
 mode=wgs
 for lc in se pe mp; do
-    "${ART_CMD_ASSEMBLED[@]}" \
+    AM_EXEC \
         --builtin_qual_file HiSeq2500_125bp \
         --i-file "${err_file}" \
         --read_len 125 \
@@ -67,7 +67,7 @@ done
 parser=stream
 for lc in se pe mp; do
     for mode in trans template; do
-        "${ART_CMD_ASSEMBLED[@]}" \
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -95,8 +95,6 @@ for lc in se pe mp; do
     done
 done
 
-touch "${OUT_DIR}/dev_null"
-
 err_file="${OUT_DIR}/dev_null"
 
 for lc in se pe mp; do
@@ -104,7 +102,8 @@ for lc in se pe mp; do
         for parser in memory stream; do
             # No, do not use SAM output.
             for i_type in fasta pbsim3_transcripts; do
-                "${ART_CMD_ASSEMBLED[@]}" \
+                touch "${err_file}"
+                AM_EXEC \
                     --builtin_qual_file HiSeq2500_125bp \
                     --i-file "${err_file}" \
                     --read_len 125 \
@@ -128,7 +127,8 @@ for lc in se pe mp; do
                 merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
                 cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
                 rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
-                cmp "${OUT_DIR}/dev_null" /dev/null
+                cmp "${err_file}" /dev/null
+                rm -f "${err_file}"
                 assert_cleandir
             done
         done
@@ -140,7 +140,8 @@ i_type=fasta
 for lc in se pe mp; do
     for mode in wgs trans template; do
         # No, do not use SAM output.
-        "${ART_CMD_ASSEMBLED[@]}" \
+        touch "${err_file}"
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
             --read_len 125 \
@@ -164,7 +165,8 @@ for lc in se pe mp; do
         merge_file "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq
         cmp "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.fastq /dev/null
         rm -f "${OUT_DIR}"/test_small_"${lc}"_"${mode}"_"${parser}"_willfail.*
-        cmp "${OUT_DIR}/dev_null" /dev/null
+        cmp "${err_file}" /dev/null
+        rm -f "${err_file}"
         assert_cleandir
     done
 done

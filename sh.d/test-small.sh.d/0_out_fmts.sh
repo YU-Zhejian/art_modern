@@ -1,6 +1,6 @@
 # shellcheck shell=bash
 
-"${ART_CMD_ASSEMBLED[@]}" \
+AM_EXEC \
     --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file data/raw_data/ce11_chr1.fa \
@@ -47,7 +47,7 @@ cmp \
 rm -fr "${OUT_DIR}"/test_small_se_wgs_memory_sep.* "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.*
 assert_cleandir
 
-"${ART_CMD_ASSEMBLED[@]}" \
+AM_EXEC \
     --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \

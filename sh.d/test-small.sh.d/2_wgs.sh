@@ -3,7 +3,7 @@
 FCOV=0.2
 for parser in memory htslib; do
     for lc in se pe mp; do
-        "${ART_CMD_ASSEMBLED[@]}" \
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${CE11_CHR1}" \
             --read_len 125 \

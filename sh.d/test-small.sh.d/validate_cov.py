@@ -85,8 +85,9 @@ def validate(in_fq: str, in_fa: str, in_cov: Union[float, str], file_type: FileT
         diff_weights.append(design_cov[contig_name] * fq_contig_lengths[contig_name])
     # Geometric mean not used since the data is highly likely to contain zeros
     # stddev not used since the data may contain 1 data point only
-    print("Diff: mean=", statistics.fmean(diffs, diff_weights), ".", sep="")
-    if len(fq_cov) > 1:
+    diff_mean = statistics.fmean(diffs, diff_weights)
+    print("Diff: mean=", diff_mean, ".", sep="")
+    if (diff_mean) > 0.1:
         plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01)
         plt.show()
         plt.clf()

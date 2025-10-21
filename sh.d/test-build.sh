@@ -5,6 +5,8 @@ mkdir -p opt
 if [ ! -z "${CMAKE_FLAGS:-}" ]; then
     OLD_CMAKE_FLAGS="${CMAKE_FLAGS}"
     echo "Old CMAKE_FLAGS: ${OLD_CMAKE_FLAGS}"
+else
+    OLD_CMAKE_FLAGS=""
 fi
 
 function do_build() {
@@ -108,5 +110,3 @@ for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
     done
     USE_QUAL_GEN=WALKER
 done
-
-# TODO: Add a test that checks generated depth. Important for MPI builds.

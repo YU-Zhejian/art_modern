@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1091
-set -uex
-cd "$(readlink -f "$(dirname "${0}")/../")"
+set -ue
+SHDIR="$(readlink -f "$(dirname "${0}")")"
+cd "${SHDIR}/../"
 
 if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python sh.d/test-small.sh.d/gen_cov.py
@@ -71,12 +72,30 @@ function merge_file() {
         echo "merge_file: Unsupported extension: ${ext}" >&2
         exit 1
     fi
+    # Remove original files
+    for fn in "${files_to_merge[@]}"; do
+        rm -f "${fn}"
+    done
 }
 
 # Ensure OUT_DIR is clean
 function assert_cleandir() {
     rm -d "${OUT_DIR}"
     mkdir "${OUT_DIR}"
+}
+
+function AM_EXEC() {
+    echo "EXEC: ${ART_CMD_ASSEMBLED[*]} $*"
+    "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec.log
+    if [ ${?} -ne 0 ]; then
+        echo "AM_EXEC failed with exit code ${?}" >&2
+        cat "${OUT_DIR}"/am_exec.log >&2
+        exit 1
+    else
+        echo "AM_EXEC succeeded."
+        rm -f "${OUT_DIR}"/am_exec.log
+    fi
+    return ${?}
 }
 
 rm -fr "${OUT_DIR}" # Remove previous runs
@@ -88,6 +107,6 @@ mkdir "${OUT_DIR}"
 . sh.d/test-small.sh.d/4_tmpl_constcov.sh  # Template mode with constant coverage
 . sh.d/test-small.sh.d/5_trans_scov.sh     # Transcript mode with stranded/strandless coverage
 . sh.d/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
-. sh.d/test-small.sh.d/7_trans_pbsim3.sh   # Transcript mode with pbsim3-formatted coverage
-. sh.d/test-small.sh.d/8_tmpl_pbsim3.sh    # Template mode with pbsim3-formatted coverage
+. sh.d/test-small.sh.d/7_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
+. sh.d/test-small.sh.d/8_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
 rm -d "${OUT_DIR}"                         # Which should now be empty

@@ -3,7 +3,7 @@
 for coverage in stranded strandless; do
     parser=memory
     for lc in se pe mp; do
-        "${ART_CMD_ASSEMBLED[@]}" \
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${MRNA_HEAD}" \
             --read_len 125 \
@@ -31,7 +31,7 @@ for coverage in stranded strandless; do
 
     parser=stream
     for lc in se pe mp; do
-        "${ART_CMD_ASSEMBLED[@]}" \
+        AM_EXEC \
             --builtin_qual_file HiSeq2500_125bp \
             --i-file "${MRNA_HEAD}" \
             --read_len 125 \
