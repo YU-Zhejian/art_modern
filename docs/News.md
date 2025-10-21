@@ -1,6 +1,10 @@
 # News \& Release Notes
 
-## 1.2.0 (Ongoing)
+## 1.2.1 (Ongoing)
+
+- Miscellaneous bug fixes.
+
+## 1.2.0 (2025/10/21)
 
 - Main repo slimmed.
   - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
