@@ -1,7 +1,7 @@
 .PHONY: all
 all: dockerfiles
+	bash ./pack-alpine-tgz.sh
 	bash ./pack-deb.sh
-	bash ./pack-alpine_tgz.sh
 
 .PHONY: update-containers
 update-containers:
