@@ -236,10 +236,10 @@ testbuild-child-mpi:
 	cmake --build opt/testbuild-mpi -j$(JOBS)
 	cmake --install opt/testbuild-mpi
 	env -C opt/testbuild-mpi ctest --output-on-failure
-	opt/testbuild_install-mpi/bin/art_modern-mpi --help
-	opt/testbuild_install-mpi/bin/art_modern-mpi --version
+	$(MPIRUN) -np 4 opt/testbuild_install-mpi/bin/art_modern-mpi --help
+	$(MPIRUN) -np 4 opt/testbuild_install-mpi/bin/art_modern-mpi --version
 	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=opt/testbuild_install-mpi/bin/art_modern-mpi MPIRUN="" $(BASH) sh.d/test-small.sh; \
+		env ART=opt/testbuild_install-mpi/bin/art_modern-mpi MPIRUN="$(MPIRUN)" $(BASH) sh.d/test-small.sh; \
 	fi
 
 .PHONY: testbuild

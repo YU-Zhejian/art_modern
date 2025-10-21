@@ -32,6 +32,11 @@ The parallelization strategy of different modes and input parsers are as follows
 
 Here, "coverage" means that all contigs are passed to all threads with coverage divided by the number of threads, while "batch" means that the entire data were split into batches (partitioning the existing in-memory data structure for `memory` parser or `--i-batch_size` for `stream` parser) and passed to different threads. The current batch-based design may be suboptimal if transcript/template lengths or coverages are not evenly distributed. You're recommended to shuffle the input data to avoid such problems using, i.e., `seqkit shuffle`. For even larger data, a proposed MPI-based parallelization strategy is in [TODO.md](TODO.md).
 
+For MPI-based parallelization, the strategy is as follows:
+
+- For `wgs` parser, just divide sequencing depth.
+- For non-`wgs` parser, skip records based on MPI rank and word size.
+
 ## Random Generators
 
 ### Bits Generation

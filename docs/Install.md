@@ -183,6 +183,22 @@ For jemalloc, `jemalloc.pc` file is required. For mi-malloc, `mimalloc-config.cm
 
 See also: CMake variable [`USE_MALLOC`](#use-malloc-section) below.
 
+### MPI Library
+
+The MPI standard required in this project is MPI 1.0, which is published in 1994. Thus, most MPI libraries should work. MPI libraries from the following vendors are supported for MPI-based parallelization:
+
+- [MPICH](https://www.mpich.org/).
+- [OpenMPI](https://www.open-mpi.org/).
+- [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
+
+The system should theoritically support:
+
+- [MVAPICH2](https://mvapich.cse.ohio-state.edu/).
+
+The MPI installation with MPI C API should be locatable using CMake module [`FindMPI.cmake`](https://cmake.org/cmake/help/latest/module/FindMPI.html), which is shipped with CMake. We do **NOT** need the MPI C++ API, which is deprecated in later MPI standards.
+
+See also: CMake variable [`WITH_MPI`](#with-mpi-section) below.
+
 ## Required Bundled/External Libraries
 
 The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your sytstem administrator if you do not know whether and where those libraries are installed.
@@ -482,6 +498,16 @@ Whether to build mini benchmarks executable.
 
 - **unset (DEFAULT): Will not build benchmarks.**
 - `ON`: Will build benchmarks.
+
+(with-mpi-section)=
+### `WITH_MPI`
+
+Available since 1.2.0.
+
+Whether to enable MPI-based parallelization.
+
+- **unset (DEFAULT)/OFF: Will not enable MPI-based parallelization.**
+- `ON`: Will enable MPI-based parallelization.
 
 ### Deprecated Options
 

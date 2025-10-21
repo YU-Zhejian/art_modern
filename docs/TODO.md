@@ -18,6 +18,9 @@
 ## Packing
 
 - Supress all lintian issues.
+- Pack MPI-enabled Debian packages, BioConda build, etc.
+- Change all `mpirun` to `mpiexec` and `-np` to `-n` in scripts and docs for standardization.
+- Test Intel MPI support.
 
 ## Performance
 
@@ -26,16 +29,7 @@
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
   - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
 
-- Support MPI-based parallelization. Basic ideas:
-  - For `htslib` parser, just divide sequencing depth.
-  - For `memory` parser, skip records based on MPI rank.
-  - For `stream` parser, skip records based on MPI rank.
-  - Revised dependencies section:
-    - Optional MPI library for MPI-based parallelism. The following MPI implementations are supported:
-      - [MPICH](https://www.mpich.org/).
-      - [OpenMPI](https://www.open-mpi.org/).
-      - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
-- Add support for automated testing.
+- Add MPI to docs.
 
 ## Exception Handling
 
