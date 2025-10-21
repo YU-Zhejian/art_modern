@@ -272,18 +272,3 @@ if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
         target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()
 endif()
-
-if(DEFINED BUILD_ART_MODERN_STANDALONE_BENCHMARKS AND BUILD_ART_MODERN_STANDALONE_BENCHMARKS)
-    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_mpi_io")
-endif()
-
-# file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
-
-# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES})
-# get_filename_component(ART_MODERN_UTIL_EXEC "${ART_MODERN_UTIL_SOURCE}" NAME_WE)
-# set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
-# add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}")
-# target_link_libraries("${ART_MODERN_UTIL_EXEC}" PUBLIC am_support_lib)
-# endforeach()
-
-# include(CPack)
