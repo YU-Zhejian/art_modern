@@ -23,6 +23,7 @@
 #include "libam_support/Dtypes.hh"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
+#include "libam_support/utils/depth_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
@@ -32,8 +33,12 @@
 
 #include <htslib/hts.h>
 
+#include <array>
 #include <atomic>
 #include <chrono>
+#include <cmath>
+#include <cstdlib>
+#include <limits>
 #include <memory>
 #include <string>
 #include <thread>
@@ -149,7 +154,7 @@ ArtJobExecutor::ArtJobExecutor(
     SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
     : art_params_(art_params)
     , job_(std::move(job))
-    , mpi_rank_(mpi_rank())
+    , mpi_rank_(mpi_rank_s())
     , output_dispatcher_(output_dispatcher)
     , rprob_(art_params.pe_frag_dist_mean, art_params.pe_frag_dist_std_dev, art_params.read_len)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
@@ -187,14 +192,21 @@ void ArtJobExecutor::operator()()
         accumulated_contig_len += contig_size;
 
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
-        const double cov_ratio = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
-            ? 1
-            : static_cast<double>(contig_size) / art_params_.read_len;
+
+        am_readnum_t num_pos_reads = 0;
+        am_readnum_t num_neg_reads = 0;
         const auto cov_pos = job_.coverage_info->coverage_positive(contig_name);
         const auto cov_neg = job_.coverage_info->coverage_negative(contig_name);
-
-        const auto num_pos_reads = static_cast<am_readnum_t>(cov_pos * cov_ratio);
-        const auto num_neg_reads = static_cast<am_readnum_t>(cov_neg * cov_ratio);
+        if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
+            const auto [npr, nnr] = calculate_num_reads(1, 1, cov_pos, cov_neg, num_reads_to_reduce_);
+            num_pos_reads = npr;
+            num_neg_reads = nnr;
+        } else {
+            const auto [npr, nnr]
+                = calculate_num_reads(contig_size, art_params_.read_len, cov_pos, cov_neg, num_reads_to_reduce_);
+            num_pos_reads = npr;
+            num_neg_reads = nnr;
+        }
 
         if (num_pos_reads + num_neg_reads == 0) {
             BOOST_LOG_TRIVIAL(debug) << "No read will be generated for the reference sequence " << contig_name
@@ -211,7 +223,7 @@ void ArtJobExecutor::operator()()
                                 << " with N/A reads (mean depth=N/A) generated.";
     } else {
         BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
-                                << to_si(total_num_reads_generated_) << " reads (mean depth="
+                                << to_si(static_cast<double>(total_num_reads_generated_)) << " reads (mean depth="
                                 << static_cast<double>(total_num_reads_generated_) * art_params_.read_len
                 / static_cast<double>(accumulated_contig_len)
                                 << ") generated.";

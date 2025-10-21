@@ -18,25 +18,22 @@
 ## Packing
 
 - Supress all lintian issues.
-- `--rndSeed` implementation. However, a large chunk of docs saying that the same random generator must be used when building `art_modern` to get reproducible results.
-- Finish `art-profile-fastqc.py`.
+- Pack MPI-enabled Debian packages, BioConda build, etc.
+- Change all `mpirun` to `mpiexec` and `-np` to `-n` in scripts and docs for standardization.
+- Have tests optimized.
 
 ## Performance
 
 - I/O:
   - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. This problem is more obvious on smaller objects, like FASTA when being compared to FASTQ.
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
-  - The current implementation passes too many small objects accross the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
+  - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
 
-- Support MPI-based parallelization. Basic ideas:
-  - For `htslib` parser, just divide sequencing depth.
-  - For `memory` parser, skip records based on MPI rank.
-  - For `stream` parser, skip records based on MPI rank.
-  - Revised dependencies section:
-    - Optional MPI library for MPI-based parallelism. The following MPI implementations are supported:
-      - [MPICH](https://www.mpich.org/).
-      - [OpenMPI](https://www.open-mpi.org/).
-      - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
+- Add MPI to docs.
+
+## Exception Handling
+
+Eliminate all use of `std::runtime_error` to either specific exceptions for low-level base classes or `abort_mpi()` with Boost log calls for high-level classes.
 
 ## I/O Formats
 

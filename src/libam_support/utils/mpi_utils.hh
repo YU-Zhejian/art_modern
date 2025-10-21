@@ -27,6 +27,8 @@
 
 namespace labw::art_modern {
 
+bool have_mpi() noexcept;
+
 bool is_mpi_finalized();
 
 void init_mpi(int* argc, char*** argv);
@@ -43,7 +45,7 @@ std::size_t mpi_size();
  *
  * Every process should call this method.
  */
-void exit_mpi();
+void exit_mpi() noexcept;
 
 /**
  * Call `MPI_Abort` or `std::abort` with the given status.
@@ -51,8 +53,19 @@ void exit_mpi();
  *
  * @param status Exit status.
  */
+[[noreturn]] void abort_mpi(int status = EXIT_FAILURE) noexcept;
 
-[[noreturn]] void abort_mpi(int status = EXIT_FAILURE);
+bool is_on_mpi_main_process_or_nompi();
+
+/**
+ * Get the current MPI rank in string.
+ *
+ * @return The current MPI rank in string.
+ * "nompi" if MPI is not available.
+ * "mpi-finalized" if MPI had stopped.
+ * @warning Should be used in logging or filename only.
+ */
+std::string mpi_rank_s();
 
 /**
  * Get the current MPI rank in string.
@@ -61,6 +74,12 @@ void exit_mpi();
  * MPI_UNAVAILABLE_RANK if MPI had stopped.
  * "nompi" if MPI is not available.
  */
-std::string mpi_rank();
+std::size_t mpi_rank();
+
+/**
+ * Get the hostname of the current MPI process.
+ * @return
+ */
+std::string mpi_hostname();
 
 } // namespace labw::art_modern

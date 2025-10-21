@@ -1,6 +1,0 @@
-#pragma once
-
-#cmakedefine MKL_FOUND
-#cmakedefine GSL_FOUND
-#cmakedefine absl_FOUND
-#cmakedefine Boost_FOUND

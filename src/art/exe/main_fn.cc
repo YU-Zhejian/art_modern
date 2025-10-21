@@ -24,6 +24,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/ds/CoverageInfo.hh"
+#include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/jobs/JobPool.hh"
 #include "libam_support/jobs/SimulationJob.hh"
 #include "libam_support/out/OutParams.hh"
@@ -34,6 +35,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/exception_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -126,11 +128,9 @@ private:
 
 void print_banner()
 {
-#ifdef WITH_MPI
-    if (mpi_rank() != MPI_MAIN_RANK_STR) {
+    if (!is_on_mpi_main_process_or_nompi()) {
         return;
     }
-#endif
     BOOST_LOG_TRIVIAL(info) << "YuZJ Modified ART_Illumina (" << ART_PROGRAM_NAME << ") v. " ART_MODERN_VERSION
                             << " at <" << ART_MODERN_URL << ">";
     BOOST_LOG_TRIVIAL(info) << "Based on ART_Illumina: v. 2008-2016, Q Version 2.5.8 (June 6, 2016)";
@@ -145,11 +145,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 {
     Generator generator(art_params, art_io_params);
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        std::size_t div_by = art_io_params.parallel;
-#ifdef WITH_MPI
-        // Further divide by number of MPI processes
-        div_by *= mpi_size();
-#endif
+        const std::size_t div_by = art_io_params.parallel * (have_mpi() ? mpi_size() : 1);
         const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch
@@ -166,11 +162,13 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
         }
     } else {
         // Batch-based parallelism
-        // TODO: Enable skipping loader
+        const auto sls = SkipLoaderSettings::from_mpi();
         if (art_io_params.art_input_file_type == INPUT_FILE_TYPE::FASTA) {
             const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info);
+            std::ifstream fasta_stream(art_io_params.input_file_name);
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
-                auto fetch = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
+                FastaStreamBatcher fsb_f(std::numeric_limits<std::size_t>::max(), fasta_stream, sls);
+                auto fetch = std::make_shared<InMemoryFastaFetch>(fsb_f.fetch());
                 generator.init_dispatcher(fetch);
                 InMemoryFastaBatcher fsb(static_cast<int>(fetch->num_seqs() / art_io_params.parallel + 1), fetch);
                 while (true) {
@@ -181,22 +179,21 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     generator.add(fa_view, coverage_info);
                 }
             } else {
-                std::ifstream fasta_stream(art_io_params.input_file_name);
-                FastaStreamBatcher fsb(art_io_params.batch_size, fasta_stream);
+                FastaStreamBatcher fsb_f(art_io_params.batch_size, fasta_stream, sls);
                 generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>());
                 while (true) {
-                    auto fa_view = fsb.fetch();
+                    auto fa_view = fsb_f.fetch();
                     if (fa_view.empty()) {
                         break;
                     }
                     generator.add(std::make_shared<InMemoryFastaFetch>(std::move(fa_view)), coverage_info);
                 }
-                fasta_stream.close();
             }
+            fasta_stream.close();
         } else if (art_io_params.art_input_file_type == INPUT_FILE_TYPE::PBSIM3_TRANSCRIPTS) {
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 std::ifstream input_file_stream(art_io_params.input_file_name);
-                Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream);
+                Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream, sls);
                 const auto [fasta_fetch, coverage_info] = batcher.fetch();
                 input_file_stream.close();
                 generator.init_dispatcher(fasta_fetch);
@@ -213,7 +210,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
             } else { // Stream
                 generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>());
                 std::ifstream pbsim3_transcript_stream(art_io_params.input_file_name);
-                Pbsim3TranscriptBatcher fsb(art_io_params.batch_size, pbsim3_transcript_stream);
+                Pbsim3TranscriptBatcher fsb(art_io_params.batch_size, pbsim3_transcript_stream, sls);
                 while (true) {
                     const auto [fa_view, coverage_info] = fsb.fetch();
                     if (fa_view->empty()) {
@@ -223,8 +220,6 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 }
                 pbsim3_transcript_stream.close();
             }
-        } else {
-            throw std::runtime_error("Unsupported input file type");
         }
     }
 

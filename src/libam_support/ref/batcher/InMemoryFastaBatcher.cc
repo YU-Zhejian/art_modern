@@ -12,7 +12,7 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "InMemoryFastaBatcher.hh"
+#include "libam_support/ref/batcher/InMemoryFastaBatcher.hh"
 
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 

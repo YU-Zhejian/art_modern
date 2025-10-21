@@ -78,7 +78,7 @@ public:
     std::vector<int> tmp_qual_dists_;
 
 private:
-    static uint64_t seed();
+    static std::uint64_t seed();
     void public_init_();
 #if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
 #if defined(USE_STL_RANDOM)

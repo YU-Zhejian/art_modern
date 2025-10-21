@@ -15,6 +15,8 @@
 #include "art_modern_config.h"
 
 #include "libam_support/utils/dump_utils.hh"
+#include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/filesystem/operations.hpp>
 
@@ -26,17 +28,21 @@
 #include <csignal>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 namespace labw::art_modern {
 #ifdef WITH_BOOST_STACKTRACE
 
 namespace {
-    constexpr char DUMP_FILENAME[] = "./backtrace.dump";
+    constexpr char DUMP_BASE_FILENAME[] = "./backtrace.dump";
+
     // FIXME: The signal handler is not guaranteed to be thread safe. The return values are also unprocessed.
     void my_signal_handler(const int signum) noexcept
     {
         std::signal(signum, SIG_DFL);
-        boost::stacktrace::safe_dump_to(DUMP_FILENAME);
+        const std::string dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, mpi_rank_s());
+
+        boost::stacktrace::safe_dump_to(dump_filename.c_str());
         std::raise(SIGABRT);
     }
 
@@ -47,18 +53,19 @@ void handle_dumps()
 #ifdef WITH_BOOST_STACKTRACE
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
-    if (boost::filesystem::exists(DUMP_FILENAME)) {
+
+    std::string const possible_dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, "0");
+    if (boost::filesystem::exists(possible_dump_filename)) {
         // there is a backtrace
-        std::ifstream ifs(DUMP_FILENAME);
-
-        const boost::stacktrace::stacktrace st = boost::stacktrace::stacktrace::from_dump(ifs);
-        std::cout << "Previous run crashed:\n" << st << std::endl;
-
-        // cleaning up
-        ifs.close();
-        boost::filesystem::remove(DUMP_FILENAME);
+        if (is_on_mpi_main_process_or_nompi()) {
+            std::ifstream ifs(possible_dump_filename);
+            const boost::stacktrace::stacktrace st = boost::stacktrace::stacktrace::from_dump(ifs);
+            std::cout << "Previous run crashed:\n" << st << std::endl;
+            // cleaning up
+            ifs.close();
+        }
+        boost::filesystem::remove(possible_dump_filename);
     }
-#else
 #endif
 }
 } // namespace labw::art_modern

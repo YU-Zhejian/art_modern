@@ -20,7 +20,7 @@
 #include <utility>
 
 namespace labw::art_modern {
-FastaRecord FastaIterator::next()
+FastaIterator::FastaRecord FastaIterator::next()
 {
     const std::scoped_lock rhs_lk(mutex_);
     std::string next_record_id;
@@ -41,12 +41,13 @@ FastaRecord FastaIterator::next()
                 next_line.pop_back();
             }
             if (next_line[0] != '>') {
-                throw MalformedFastaException();
+                throw MalformedFastaException(
+                    "Record ID of FASTA must start with '>' at line " + std::to_string(_lineno));
             }
             // Directly extract the record ID without splitting the whole line
             next_record_id = next_line.substr(/**Exclude > **/ 1, next_line.find_first_of(" \t\f") - 1);
             if (next_record_id.empty()) {
-                throw MalformedFastaException();
+                throw MalformedFastaException("Record ID is empty at line " + std::to_string(_lineno));
             }
             break;
         }
@@ -69,7 +70,7 @@ FastaRecord FastaIterator::next()
             // Directly extract the record ID without splitting the whole line
             staged_next_record_id_ = next_line.substr(/**Exclude > **/ 1, next_line.find_first_of(" \t\f") - 1);
             if (staged_next_record_id_.empty()) {
-                throw MalformedFastaException();
+                throw MalformedFastaException("Record ID is empty at line " + std::to_string(_lineno));
             }
             return { std::move(next_record_id), std::move(next_record_sequence) };
         }
@@ -80,6 +81,4 @@ FastaIterator::FastaIterator(std::istream& istream)
     : _istream(istream)
 {
 }
-
-const char* MalformedFastaException::what() const noexcept { return "FASTA parse error"; }
 } // namespace labw::art_modern

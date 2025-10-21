@@ -15,6 +15,7 @@
 #pragma once
 
 #include "libam_support/ds/CoverageInfo.hh"
+#include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
@@ -32,13 +33,14 @@ public:
     DELETE_MOVE(Pbsim3TranscriptBatcher)
     ~Pbsim3TranscriptBatcher() = default;
 
-    explicit Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream);
+    explicit Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream, const SkipLoaderSettings& sls);
     std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> fetch();
 
 private:
     std::size_t batch_size_;
     std::istream& istream_;
     std::mutex mutex_;
+    const SkipLoaderSettings& sls_;
 };
 
 } // namespace labw::art_modern

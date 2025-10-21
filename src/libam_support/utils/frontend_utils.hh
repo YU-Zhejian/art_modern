@@ -3,15 +3,13 @@
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/version_utils.hh"
 
-#include <boost/algorithm/string/join.hpp>
-#include <boost/filesystem/operations.hpp>
-#include <boost/filesystem/path.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/program_options/variables_map.hpp>
 
 #include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <thread>
 
@@ -28,7 +26,9 @@ static boost::program_options::variables_map generate_vm_while_handling_help_ver
 {
     if (argc == 1) {
         // No command line arguments.
-        print_help(po_desc);
+        if (is_on_mpi_main_process_or_nompi()) {
+            print_help(po_desc);
+        }
         abort_mpi();
     }
     boost::program_options::variables_map vm_;
@@ -38,17 +38,23 @@ static boost::program_options::variables_map generate_vm_while_handling_help_ver
         notify(vm_);
     } catch (const std::exception& exp) {
         BOOST_LOG_TRIVIAL(fatal) << exp.what();
-        print_help(po_desc);
+        if (is_on_mpi_main_process_or_nompi()) {
+            print_help(po_desc);
+        }
         abort_mpi();
     }
 
     if (vm_.count(ARG_VERSION) != 0U) {
-        print_version();
+        if (is_on_mpi_main_process_or_nompi()) {
+            print_version();
+        }
         exit_mpi();
         std::exit(EXIT_SUCCESS);
     }
     if (vm_.count(ARG_HELP) != 0U) {
-        print_help(po_desc);
+        if (is_on_mpi_main_process_or_nompi()) {
+            print_help(po_desc);
+        }
         exit_mpi();
         std::exit(EXIT_SUCCESS);
     }

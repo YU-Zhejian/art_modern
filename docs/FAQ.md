@@ -31,6 +31,13 @@ An example of generating HiSeq2000 and HiSeq2500 profiles is at <https://github.
 
 See also: GitHub Issue [#4](https://github.com/YU-Zhejian/art_modern/issues/4).
 
+### Can I use seed to generate deterministic results?
+
+No. Reasons:
+
+- If a seed is passed to different threads, all thread will generate the same results, making the result looked wierd (Batches of reads with identical start, end, and error profiles stacked together).
+- Different machines may build the program with different random number generators, making the results non-reproducible even if a seed is provided.
+
 ## Software Engineering
 
 ### What kinds of CPUs are supported by the simulator?

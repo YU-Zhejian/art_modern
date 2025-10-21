@@ -16,7 +16,8 @@
 namespace labw::art_modern {
 
 void init_logger();
-void init_file_logger();
+void init_file_logger(bool auto_flush = false);
+void flush_all_sinks();
 
 } // namespace labw::art_modern
 // labw

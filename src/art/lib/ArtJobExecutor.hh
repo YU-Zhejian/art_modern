@@ -58,7 +58,7 @@ private:
     am_readnum_t total_num_reads_generated_ = 0;
     std::shared_ptr<OutputDispatcher> output_dispatcher_;
     Rprob rprob_;
-    const int num_reads_to_reduce_;
+    const am_readnum_t num_reads_to_reduce_;
     const bool require_alignment_;
     std::atomic<bool> is_running_ = false;
     std::string current_contig_;

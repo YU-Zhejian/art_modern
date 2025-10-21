@@ -15,7 +15,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.1.10
+    VERSION 1.2.0
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
@@ -44,7 +44,9 @@ if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
     set(CEU_CM_SHOULD_USE_NATIVE OFF)
 endif()
 
-set(WITH_MPI OFF) # TODO
+if(NOT DEFINED WITH_MPI)
+    set(WITH_MPI OFF)
+endif()
 set(ART_MODERN_LINK_LIBS "")
 
 # Installation
@@ -181,14 +183,20 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS art_modern_lib)
 
-file(GLOB ART_MODERN_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/exe/*.cc")
-add_executable(art_modern ${ART_MODERN_EXE_SOURCE})
-target_compile_options(art_modern BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(art_modern PUBLIC art_modern_lib)
-if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(art_modern)
+if(WITH_MPI)
+    set(ART_MODERN_EXE art_modern-mpi)
+else()
+    set(ART_MODERN_EXE art_modern)
 endif()
-install(TARGETS art_modern)
+
+file(GLOB ART_MODERN_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/exe/*.cc")
+add_executable(${ART_MODERN_EXE} ${ART_MODERN_EXE_SOURCE})
+target_compile_options(${ART_MODERN_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_MODERN_EXE} PUBLIC art_modern_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(${ART_MODERN_EXE})
+endif()
+install(TARGETS ${ART_MODERN_EXE})
 
 file(GLOB ART_PROFILE_BUILDER_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/lib/*.cc")
 add_library(art_profile_builder_lib ${ART_PROFILE_BUILDER_LIB_SOURCE})
@@ -199,14 +207,20 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS art_profile_builder_lib)
 
-file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
-add_executable(art_profile_builder ${ART_PROFILE_BUILDER_EXE_SOURCE})
-target_compile_options(art_profile_builder BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(art_profile_builder PUBLIC art_profile_builder_lib)
-if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(art_profile_builder)
+if(WITH_MPI)
+    set(ART_PROFILER_BUILDER_EXE art_profile_builder-mpi)
+else()
+    set(ART_PROFILER_BUILDER_EXE art_profile_builder)
 endif()
-install(TARGETS art_profile_builder)
+
+file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
+add_executable(${ART_PROFILER_BUILDER_EXE} ${ART_PROFILE_BUILDER_EXE_SOURCE})
+target_compile_options(${ART_PROFILER_BUILDER_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_PROFILER_BUILDER_EXE} PUBLIC art_profile_builder_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(${ART_PROFILER_BUILDER_EXE})
+endif()
+install(TARGETS ${ART_PROFILER_BUILDER_EXE})
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
@@ -258,19 +272,3 @@ if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
         target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()
 endif()
-
-if(DEFINED BUILD_ART_MODERN_STANDALONE_BENCHMARKS AND BUILD_ART_MODERN_STANDALONE_BENCHMARKS)
-    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_rand")
-    add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/explore/bench_mpi_io")
-endif()
-
-# file(GLOB ART_MODERN_UTIL_SOURCES "src/util/*.cc")
-
-# foreach(ART_MODERN_UTIL_SOURCE ${ART_MODERN_UTIL_SOURCES})
-# get_filename_component(ART_MODERN_UTIL_EXEC "${ART_MODERN_UTIL_SOURCE}" NAME_WE)
-# set(ART_MODERN_UTIL_EXEC "am_util_${ART_MODERN_UTIL_EXEC}")
-# add_executable("${ART_MODERN_UTIL_EXEC}" "${ART_MODERN_UTIL_SOURCE}")
-# target_link_libraries("${ART_MODERN_UTIL_EXEC}" PUBLIC am_support_lib)
-# endforeach()
-
-# include(CPack)

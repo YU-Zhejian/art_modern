@@ -20,20 +20,27 @@
 #include <exception>
 #include <istream>
 #include <mutex>
+#include <stdexcept>
 #include <string>
 #include <utility>
 
 namespace labw::art_modern {
 
-using FastaRecord = std::pair<std::string, std::string>;
+/**
+ * Indicates the end of the FASTA file.
+ */
+class EOFException final : public std::exception { };
 
-class EOFException final : std::exception { };
-class MalformedFastaException final : std::exception {
-    [[nodiscard]] const char* what() const noexcept override;
+class MalformedFastaException final : public std::runtime_error {
+public:
+    explicit MalformedFastaException(std::string reason)
+        : std::runtime_error(std::move(reason)) { };
+    ~MalformedFastaException() override = default;
 };
 
 class FastaIterator {
 public:
+    using FastaRecord = std::pair<std::string, std::string>;
     explicit FastaIterator(std::istream& istream);
 
     DELETE_COPY(FastaIterator)

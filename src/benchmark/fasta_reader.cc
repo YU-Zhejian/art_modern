@@ -22,6 +22,8 @@
 #include <boost/log/core/core.hpp>
 #include <boost/log/keywords/filter.hpp>
 #include <boost/log/trivial.hpp>
+#include <boost/log/utility/setup/console.hpp>
+#include <boost/log/utility/setup/file.hpp>
 
 #include <htslib/hts.h>
 

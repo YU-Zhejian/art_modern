@@ -32,6 +32,17 @@ The parallelization strategy of different modes and input parsers are as follows
 
 Here, "coverage" means that all contigs are passed to all threads with coverage divided by the number of threads, while "batch" means that the entire data were split into batches (partitioning the existing in-memory data structure for `memory` parser or `--i-batch_size` for `stream` parser) and passed to different threads. The current batch-based design may be suboptimal if transcript/template lengths or coverages are not evenly distributed. You're recommended to shuffle the input data to avoid such problems using, i.e., `seqkit shuffle`. For even larger data, a proposed MPI-based parallelization strategy is in [TODO.md](TODO.md).
 
+For MPI-based parallelization, the strategy is as follows:
+
+- For `wgs` parser, just divide sequencing depth.
+- For non-`wgs` parser, skip records based on MPI rank and word size.
+
+The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in 1.2.0, where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+
+- For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
+- In SE mode, 9 reads will be generated on positive and negative strands.
+- In PE/MP mode, 10 and 8 reads will be generated on positive and negative strands respectively.
+
 ## Random Generators
 
 ### Bits Generation

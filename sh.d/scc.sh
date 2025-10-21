@@ -5,44 +5,18 @@
 builtin set -ue
 NAME="scc.sh"
 VERSION=0.1
+SCC="scc"
 
-if builtin type -p "${SCC:-}" &>/dev/null; then
-    true
-elif builtin type -p scc &>/dev/null; then
-    SCC=scc
-elif builtin type -p cloc &>/dev/null; then
-    SCC=cloc
-else
-    CLOC_INFO="scc or cloc required!"
-    builtin exit 1
-fi
+for requested_binaries in git jq scc awk grep sed xargs; do
+    if builtin type -p "${requested_binaries}" &>/dev/null; then
+        true
+    else
+        echo "${requested_binaries} required!"
+        builtin exit 1
+    fi
+done
 
-# SHDIR="$(dirname "$(readlink -f "${0}")")"
-
-LAST_COMMIT=$(git log --pretty=oneline --abbrev-commit --graph --branches -n 1)
-AUTHOR_INFO=$(git shortlog --numbered --summary --email)
-AD_MINUS=$(
-    git log --numstat --pretty="%an$(echo -e "\t")%H" |
-        awk '
-    BEGIN{
-        FS="\t"
-    }
-    {
-        if (NF == 2){
-            name = $1
-        };
-        if(NF == 3) {
-            plus[name] += $1; minus[name] += $2
-        }
-    }
-    END {
-        for (name in plus) {
-            print name":\t+"plus[name]"\t-"minus[name]
-        }
-    }' |
-        sort -k2 -gr |
-        sed 's;^;\t;'
-)
+echo "Enumerating sources ..."
 
 SOURCES=$(
     git ls-files |
@@ -59,14 +33,22 @@ CLOC_INFO=$("${SCC}" ${SOURCES})
 cat <<EOF
 ${NAME} ver. ${VERSION}
 Called by: ${0} ${*}
-Repository version information:
-	The last commit is: ${LAST_COMMIT}
-Author Information:
-${AUTHOR_INFO}
-Author changes:
-${AD_MINUS}
 Code count:
 ${CLOC_INFO}
 EOF
 
+# Inflation Detection
+echo "Detecting external C/C++ code ..."
+
+for dir in deps/* explore/*; do
+    if [ ! -d "${dir}" ]; then
+        continue
+    fi
+    SOURCES=$(git ls-files "${dir}" | xargs)
+    "${SCC}" --include-ext c,cc,h,hh,cpp,hpp,cxx,hxx --format json ${SOURCES} >deps_code_count.json
+    COUNTS=$(jq 'reduce .[] as $item (0; . + $item.Count)' deps_code_count.json)
+    LINES=$(jq 'reduce .[] as $item (0; . + $item.Lines)' deps_code_count.json)
+    printf "Directory: %-48s has %-10d files with %-6d lines of C/C++ code\n" "${dir}" "${COUNTS}" "${LINES}"
+    rm -f deps_code_count.json
+done
 builtin exit 0

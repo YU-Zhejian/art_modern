@@ -3,7 +3,6 @@
 
 """
 Format boost imports.
-
 """
 
 import sys

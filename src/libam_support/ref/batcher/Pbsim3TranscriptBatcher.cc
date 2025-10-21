@@ -15,26 +15,37 @@
 #include "libam_support/ref/batcher/Pbsim3TranscriptBatcher.hh"
 
 #include "libam_support/ds/CoverageInfo.hh"
+#include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/log/trivial.hpp>
 
 #include <cstddef>
 #include <iostream>
 #include <limits>
 #include <memory>
 #include <mutex>
-#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace labw::art_modern {
-Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(const std::size_t batch_size, std::istream& istream)
+Pbsim3TranscriptBatcher::Pbsim3TranscriptBatcher(
+    const std::size_t batch_size, std::istream& istream, const SkipLoaderSettings& sls)
     : batch_size_(batch_size)
     , istream_(istream)
+    , sls_(sls)
 {
+    for (std::size_t i = 0; i < sls_.skip_first(); ++i) {
+        std::string dummy;
+        std::getline(istream_, dummy);
+        if (istream_.eof()) {
+            break;
+        }
+    }
 }
 std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pbsim3TranscriptBatcher::fetch()
 {
@@ -43,16 +54,23 @@ std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pb
     CoverageInfo::coverage_map coverage_negative;
     std::vector<std::string> seq_names;
     std::vector<std::string> seqs;
-    if (batch_size_ != std::numeric_limits<int>::max()) {
+    if (batch_size_ != std::numeric_limits<decltype(batch_size_)>::max()) {
         seq_names.reserve(batch_size_);
         seqs.reserve(batch_size_);
     }
-
     std::string line;
     std::vector<std::string> tokens;
     while (seq_names.size() < batch_size_ && !istream_.eof()) {
         tokens.clear();
         std::getline(istream_, line);
+        // Skip others first
+        for (std::size_t i = 0; i < sls_.skip_others(); ++i) {
+            std::string dummy;
+            std::getline(istream_, dummy);
+            if (istream_.eof()) {
+                break;
+            }
+        }
         if (line.empty() || line.at(0) == '#') {
             continue;
         }
@@ -63,7 +81,8 @@ std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> Pb
             seq_names.emplace_back(tokens.at(0));
             seqs.emplace_back(tokens.at(3));
         } else {
-            throw std::invalid_argument("Cannot parse PBSIM3 transcript " + line);
+            BOOST_LOG_TRIVIAL(fatal) << "Invalid line: " << line;
+            abort_mpi(EXIT_FAILURE);
         }
     }
     return { std::make_shared<InMemoryFastaFetch>(std::move(seq_names), std::move(seqs)),

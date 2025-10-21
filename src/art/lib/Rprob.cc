@@ -18,6 +18,7 @@
 #include "art/lib/ArtConstants.hh"
 
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/rand_utils.hh"
 
 #if defined(USE_GSL_RANDOM)
 #include <gsl/gsl_randist.h>
@@ -36,20 +37,13 @@
 #endif
 
 #include <algorithm> // NOLINT
-#include <chrono>
 #include <cstddef>
 #include <cstdint>
-#include <thread>
 #include <vector>
 
 namespace labw::art_modern {
 
-uint64_t Rprob::seed()
-{
-    return std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::system_clock::now().time_since_epoch())
-               .count()
-        * std::hash<std::thread::id>()(std::this_thread::get_id());
-}
+std::uint64_t Rprob::seed() { return rand_seed(); }
 
 void Rprob::public_init_()
 {
@@ -97,6 +91,9 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
+    // FIXME: Why are we using VSL_BRNG_MT19937 instead of VSL_BRNG_SFMT19937?
+    // Hypothesis: Involking VSL_BRNG_MT19937 with lots of short vectors is faster than using VSL_BRNG_SFMT19937.
+    // Check through Intel profiler and see if there's any performance difference.
     vslNewStream(&stream_, VSL_BRNG_MT19937, seed());
     public_init_();
 }
@@ -155,7 +152,7 @@ char Rprob::rand_base()
 #elif defined(USE_ONEMKL_RANDOM)
     int index = 0;
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &index, 0, 4);
-    return "ACGT"[index];
+    return ART_ACGT[index];
 #elif defined(USE_GSL_RANDOM)
     return ART_ACGT[gsl_rng_uniform_int(r, 4)];
 #endif

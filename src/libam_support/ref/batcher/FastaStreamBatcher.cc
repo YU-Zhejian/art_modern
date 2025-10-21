@@ -12,10 +12,12 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "FastaStreamBatcher.hh"
+#include "libam_support/ref/batcher/FastaStreamBatcher.hh"
 
+#include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/ref/parser/fasta_parser.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -28,17 +30,30 @@
 #include <vector>
 
 namespace labw::art_modern {
-FastaStreamBatcher::FastaStreamBatcher(const std::size_t batch_size, std::istream& stream)
+FastaStreamBatcher::FastaStreamBatcher(
+    const std::size_t batch_size, std::istream& stream, const SkipLoaderSettings& sls)
     : batch_size_(batch_size)
     , fasta_iterator_(stream)
+    , sls_(sls)
 {
+    // Skip initial lines
+    for (std::size_t i = 0; i < sls_.skip_first(); ++i) {
+        try {
+            fasta_iterator_.next();
+        } catch (EOFException&) {
+            break;
+        } catch (MalformedFastaException& e) {
+            BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+            abort_mpi();
+        }
+    }
 }
 InMemoryFastaFetch FastaStreamBatcher::fetch()
 {
     const std::scoped_lock lock(mutex_);
     std::vector<std::string> seq_names;
     std::vector<std::string> seqs;
-    if (batch_size_ != std::numeric_limits<int>::max()) {
+    if (batch_size_ != std::numeric_limits<decltype(batch_size_)>::max()) {
         seq_names.reserve(batch_size_);
         seqs.reserve(batch_size_);
     }
@@ -56,6 +71,20 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
             seqs.emplace_back(std::move(sequence));
         } catch (EOFException&) {
             break;
+        } catch (MalformedFastaException& e) {
+            BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+            abort_mpi();
+        }
+        // Skip others
+        for (std::size_t i = 0; i < sls_.skip_others(); ++i) {
+            try {
+                fasta_iterator_.next();
+            } catch (EOFException&) {
+                break;
+            } catch (MalformedFastaException& e) {
+                BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
+                abort_mpi();
+            }
         }
     }
     BOOST_LOG_TRIVIAL(info) << "FASTA Read batch " << fetch_s << " to " << fetch_e << " (" << seq_names.size()

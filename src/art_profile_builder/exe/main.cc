@@ -1,3 +1,5 @@
+#include "art_modern_config.h" // NOLINT: For WITH_BOOST_TIMER, WITH_MPI
+
 #include "art_profile_builder/exe/main_fn.hh"
 #include "art_profile_builder/exe/parse_args.hh"
 #include "art_profile_builder/lib/APBConfig.hh"
@@ -24,13 +26,12 @@ int main(int argc, char** argv)
 {
     init_mpi(&argc, &argv);
 
-#ifdef WITH_MPI
-    if (mpi_rank() != MPI_MAIN_RANK_STR) {
+    if (!is_on_mpi_main_process_or_nompi()) {
         // Only rank 0 does the work
         exit_mpi();
         return EXIT_SUCCESS;
     }
-#endif
+
     const APBConfig config = parse_args(argc, argv);
 
 #ifdef WITH_BOOST_TIMER
@@ -38,7 +39,6 @@ int main(int argc, char** argv)
 #endif
 
     std::vector<std::thread> threads;
-    threads.reserve(config.num_threads);
 
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r1;
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r2;
