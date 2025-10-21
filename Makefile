@@ -214,7 +214,30 @@ testbuild-child:
 	opt/testbuild_install/bin/art_modern --help
 	opt/testbuild_install/bin/art_modern --version
 	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=opt/testbuild_install/bin/art_modern $(BASH) sh.d/test-small.sh; \
+		env ART=opt/testbuild_install/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh; \
+	fi
+
+.PHONY: testbuild-child-mpi
+testbuild-child-mpi:
+	rm -fr opt/testbuild-mpi
+	mkdir -p opt/testbuild-mpi
+	# Ninja is required here for acceleration
+	env -C opt/testbuild-mpi cmake -G Ninja \
+		-Wdev -Wdeprecated --warn-uninitialized \
+		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DWITH_MPI=ON \
+		$(CMAKE_FLAGS) \
+		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
+		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
+		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/testbuild_install-mpi/ \
+		$(CURDIR)
+	cmake --build opt/testbuild-mpi -j$(JOBS)
+	cmake --install opt/testbuild-mpi
+	env -C opt/testbuild-mpi ctest --output-on-failure
+	opt/testbuild_install-mpi/bin/art_modern --help
+	opt/testbuild_install-mpi/bin/art_modern --version
+	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
+		env ART=opt/testbuild_install-mpi/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh; \
 	fi
 
 .PHONY: testbuild

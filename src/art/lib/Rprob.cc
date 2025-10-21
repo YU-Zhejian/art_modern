@@ -91,6 +91,9 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
+    // FIXME: Why are we using VSL_BRNG_MT19937 instead of VSL_BRNG_SFMT19937?
+    // Hypothesis: Involking VSL_BRNG_MT19937 with lots of short vectors is faster than using VSL_BRNG_SFMT19937.
+    // Check through Intel profiler and see if there's any performance difference.
     vslNewStream(&stream_, VSL_BRNG_MT19937, seed());
     public_init_();
 }

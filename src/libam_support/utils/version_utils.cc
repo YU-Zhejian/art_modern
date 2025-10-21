@@ -54,8 +54,6 @@
 
 // MPI
 #ifdef WITH_MPI
-#include <boost/algorithm/string/trim.hpp>
-
 #include <mpi.h>
 #endif
 
@@ -182,7 +180,6 @@ namespace {
         int libversion_len = 0;
         MPI_Get_library_version(libversion_string, &libversion_len);
         auto lib_ver_str = std::string(libversion_string, libversion_len - 1); // -1 to remove trailing null char
-        boost::algorithm::trim(lib_ver_str);
         std::cout << "\tLibrary Version: " << lib_ver_str << std::endl;
 #else
         std::cout << "MPI: not used" << std::endl;
