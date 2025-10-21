@@ -57,9 +57,17 @@ RANDOM_GENERATORS=(STL PCG BOOST) # Here PCG is included to make the default cas
 if cmake -P "${SHDIR}/test-build.d/test-gsl.cmake" &>>/dev/null; then
     RANDOM_GENERATORS+=(GSL)
 fi
-if cmake -P "${SHDIR}/test-build.d/test-mkl.cmake" &>>/dev/null; then
+if {
+  PROJ_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
+  BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
+  mkdir -p "${PROJ_DIR}"
+  cp "${SHDIR}/test-build.d/test-mkl.cmake" "${PROJ_DIR}/CMakeLists.txt"
+  env -C "${BUILD_DIR}" cmake "${PROJ_DIR}/CMakeLists.txt"
+  rm -rf "${PROJ_DIR}" "${BUILD_DIR}"
+} &>>/dev/null; then
     RANDOM_GENERATORS+=(MKL)
 fi
+echo "Random generators to be tested: ${RANDOM_GENERATORS[*]}"
 
 for CMAKE_BUILD_TYPE in Debug Release RelWithDebInfo; do
     # Default options
