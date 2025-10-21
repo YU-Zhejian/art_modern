@@ -9,6 +9,17 @@ else
     OLD_CMAKE_FLAGS=""
 fi
 
+function test_mkl_support(){
+    PROJ_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
+    BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
+    mkdir -p "${PROJ_DIR}"
+    cp "${SHDIR}/test-build.d/test-mkl.cmake" "${PROJ_DIR}/CMakeLists.txt"
+    env -C "${BUILD_DIR}" cmake "${PROJ_DIR}/CMakeLists.txt"
+    retv=$?
+    rm -rf "${PROJ_DIR}" "${BUILD_DIR}"
+    return ${retv}
+}
+
 function do_build() {
     CMAKE_FLAGS="${OLD_CMAKE_FLAGS}"
     CMAKE_FLAGS="${CMAKE_FLAGS} -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
@@ -57,15 +68,8 @@ RANDOM_GENERATORS=(STL PCG BOOST) # Here PCG is included to make the default cas
 if cmake -P "${SHDIR}/test-build.d/test-gsl.cmake" &>>/dev/null; then
     RANDOM_GENERATORS+=(GSL)
 fi
-if {
-  PROJ_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
-  BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
-  mkdir -p "${PROJ_DIR}"
-  cp "${SHDIR}/test-build.d/test-mkl.cmake" "${PROJ_DIR}/CMakeLists.txt"
-  env -C "${BUILD_DIR}" cmake "${PROJ_DIR}/CMakeLists.txt"
-  rm -rf "${PROJ_DIR}" "${BUILD_DIR}"
-} &>>/dev/null; then
-    RANDOM_GENERATORS+=(MKL)
+if test_mkl_support &>>/dev/null; then
+    RANDOM_GENERATORS+=(ONEMKL)
 fi
 echo "Random generators to be tested: ${RANDOM_GENERATORS[*]}"
 

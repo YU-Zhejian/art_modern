@@ -2,7 +2,9 @@
 
 ## 1.2.0 (Ongoing)
 
-- Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
+- Main repo slimmed.
+  - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
+  - Benchmark of other simulators moved to <https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators>.
 - The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
 - **EXPERIMENTAL** Support over MPI added.
   - Currently tested MPI vendors:

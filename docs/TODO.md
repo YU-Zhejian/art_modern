@@ -20,7 +20,7 @@
 - Supress all lintian issues.
 - Pack MPI-enabled Debian packages, BioConda build, etc.
 - Change all `mpirun` to `mpiexec` and `-np` to `-n` in scripts and docs for standardization.
-- Test Intel MPI support and LLVM non-MPI build.
+- Test Intel with/without MPI support.
 - Have tests optimized.
 
 ## Performance
