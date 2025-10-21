@@ -37,6 +37,12 @@ For MPI-based parallelization, the strategy is as follows:
 - For `wgs` parser, just divide sequencing depth.
 - For non-`wgs` parser, skip records based on MPI rank and word size.
 
+The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in 1.2.0, where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+
+- For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
+- In SE mode, 9 reads will be generated on positive and negative strands.
+- In PE/MP mode, 10 and 8 reads will be generated on positive and negative strands respectively.
+
 ## Random Generators
 
 ### Bits Generation

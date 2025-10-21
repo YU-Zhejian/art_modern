@@ -33,7 +33,7 @@ If you use specific versions of Debian or Ubuntu, you can install `art_modern` t
 
 See: <https://quay.io/repository/biocontainers/art_modern>.
 
-#### Installation through Conda
+#### Using Conda
 
 [Conda](https://docs.conda.io/) (or [Mamba](https://mamba.readthedocs.io/en/latest/)/[micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed Conda >=25.7.0 by `conda --version`. Then:
 
@@ -43,7 +43,7 @@ conda create -y -n art_modern_bioconda -c bioconda -c conda-forge art_modern
 
 to create an environment named `art_modern_bioconda` with the package installed.
 
-#### Installation through Compiling the Source Code
+#### Compiling the Source Code
 
 Use [Git](https://git-scm.com/) to clone this repository:
 
@@ -66,7 +66,7 @@ Build the project using:
 
 ```shell
 mkdir -p opt/build_release
-env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=Release "$(pwd)"
+env -C opt/build_release cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo "$(pwd)"
 cmake --build opt/build_release -j40
 ```
 
@@ -82,10 +82,11 @@ opt/build_release/art_modern --version
 Download _E. coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 sub-strand as an example.
 
 ```shell
+mkdir -p opt/data/
 wget \
     -4 https://ftp.ncbi.nlm.nih.gov/genomes/all/GCF/000/005/845/GCF_000005845.2_ASM584v2/GCF_000005845.2_ASM584v2_genomic.fna.gz \
-    -O opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
-gunzip -k opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz
+    -O opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
+gunzip -k opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
 
 Now we can simulate WGS data using E. coli reference genome. Let's start with single-end sequencing using HiSeq 2500 with 125 bp read length and 10X coverage.
@@ -94,7 +95,7 @@ Now we can simulate WGS data using E. coli reference genome. Let's start with si
 opt/build_release/art_modern \
     --mode wgs \
     --lc se \
-    --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
+    --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_se.fastq \
     --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
@@ -110,7 +111,7 @@ We may also simulate paired-end data with the following configuration:
 opt/build_release/art_modern \
     --mode wgs \
     --lc pe \
-    --i-file opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna \
+    --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
     --builtin_qual_file HiSeq2500_125bp \
     --read_len 125 \
@@ -262,7 +263,7 @@ With UNIX pipelines, we can redirect the input and output of `art_modern` from/t
 This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [xz-utils](https://tukaani.org/xz/).
 
 ```shell
-zcat opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
+zcat opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
     opt/build_release/art_modern \
     --mode wgs \
     --lc se \
@@ -279,6 +280,86 @@ zcat opt/build_release/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
 ```
 
 Please wait for a while for the compression to finish.
+
+## Using MPI
+
+If you're working on a cluster with [MPI](https://www.mpi-forum.org/) installed, you can use the MPI version of `art_modern` to speed up the simulation by executing `art_modern` on different nodes in parallel.
+
+**NOTE** Please consult your cluster administrator/cluster documentation before using MPI version, since some clusters may have special configurations and/or quota limitations.
+
+See also:
+
+- [Documentation for MPI Integration in Slurm](https://slurm.schedmd.com/mpi_guide.html) if your cluster uses [Slurm Workload Manager](https://slurm.schedmd.com/).
+
+Documentations from MPI vendors:
+
+- [Open MPI Documentation](https://www.open-mpi.org/doc/), esecially [Launching MPI applications](https://docs.open-mpi.org/en/v5.0.x/launching-apps/index.html) section.
+- [MPICH Documentation](https://www.mpich.org/documentation/).
+- [Intel MPI Documentation](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html?wapkw=MPI).
+
+You may also find the following information helpful:
+
+- [OpenHPC Community](https://openhpc.community/) if you'd like to build your own HPC cluster.
+
+### Building MPI-Enabled `art_modern`
+
+Load the MPI environment on your cluster. Then execute:
+
+```shell
+mkdir -p opt/build_release-mpi
+env -C opt/build_release-mpi cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_MPI=ON "$(pwd)"
+cmake --build opt/build_release-mpi -j40
+```
+
+Test whether MPI runtime library is correctly linked to the executable. For example:
+
+```shell
+ldd opt/build_release-mpi/art_modern-mpi | grep mpi
+# [...]
+#         libmpi_cxx.so.40 => /lib/x86_64-linux-gnu/libmpi_cxx.so.40 (0x00007ee9f64b0000)
+#         libmpi.so.40 => /lib/x86_64-linux-gnu/libmpi.so.40 (0x00007ee9f637c000
+```
+
+indicates that the MPI runtime library are correctly linked. Note that the executable name is now suffixed with `-mpi`.
+
+Test whether the MPI version works:
+
+```shell
+mpiexec -n 1 opt/build_release-mpi/art_modern-mpi --version
+```
+
+You should be able to see the output MPI standard version and vendor-specific information. For example:
+
+```text
+MPI:
+        Standard Version: 3.1
+        Library Version: Open MPI v4.1.6, [...]
+```
+
+### Output Files
+
+Let us run a WGS simulation with 4 MPI processes:
+
+```shell
+mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
+    --mode wgs \
+    --lc se \
+    --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
+    --o-fastq opt/build_release-mpi/e_coli_wgs_se.fastq \
+    --builtin_qual_file HiSeq2500_125bp \
+    --read_len 125 \
+    --parallel 4 \
+    --i-fcov 20
+```
+
+4 files, namely `e_coli_wgs_se.0.fastq`, `e_coli_wgs_se.1.fastq`, `e_coli_wgs_se.2.fastq`, and `e_coli_wgs_se.3.fastq` will be generated in `opt/build_release-mpi/` directory. Each file corresponds to the output from each MPI process (rank 0 to rank 3). This behavior is the same for other output files (e.g., PWA, SAM/BAM).
+
+**NOTE** In the avove example, the actual number of threads used in simulation will be 16 (4 MPI processes * 4 threads per process) since we've specified `--parallel 4`.
+
+### Other Differences Between MPI and Non-MPI Versions
+
+- The simulator will not be able to support UNIX devices and/or redirctions for input/output files. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
+- Logging issues: Only log messages from rank 0 process will be printed to standard error. Other ranks' log messages will be written to disk (If environment variable `ART_NO_LOG_DIR` is not set) or discarded (If environment variable `ART_NO_LOG_DIR` is set).
 
 ## What's Next?
 
