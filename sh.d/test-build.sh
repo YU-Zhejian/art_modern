@@ -9,7 +9,7 @@ else
     OLD_CMAKE_FLAGS=""
 fi
 
-function test_mkl_support(){
+function test_mkl_support() {
     PROJ_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
     BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
     mkdir -p "${PROJ_DIR}"
