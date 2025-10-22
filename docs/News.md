@@ -2,6 +2,9 @@
 
 ## 1.2.1 (Ongoing)
 
+- For Intel MKL random generator:
+  - The bit generation function changed to `VSL_BRNG_SFMT19937`, which is faster.
+  - More random numbers are generated in bulk to reduce overhead.
 - Miscellaneous bug fixes.
 
 ## 1.2.0 (2025/10/21)
