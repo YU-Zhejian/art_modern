@@ -28,15 +28,13 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #elif defined(USE_ONEMKL_RANDOM)
 #include <mkl.h> // NOLINT
-#elif defined(USE_GSL_RANDOM)
-#include <gsl/gsl_rng.h>
 #elif defined(USE_PCG_RANDOM)
 #include <pcg_random.hpp>
 
 #include <random>
 #else
 #error                                                                                                                 \
-    "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM or USE_GSL_RANDOM for random generators!"
+    "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM for random generators!"
 #endif
 
 #include <cstddef>
@@ -106,10 +104,6 @@ private:
     boost::random::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
-    double pe_frag_dist_mean_;
-    double pe_frag_dist_std_dev_;
-#elif defined(USE_GSL_RANDOM)
-    gsl_rng* r;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
 #endif

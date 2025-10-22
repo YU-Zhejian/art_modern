@@ -65,9 +65,6 @@ SHDIR="$(dirname "$(readlink -f "${0}")")"
 # A list of possible random generators
 RANDOM_GENERATORS=(STL PCG BOOST) # Here PCG is included to make the default case test at once.
 
-if cmake -P "${SHDIR}/test-build.d/test-gsl.cmake" &>>/dev/null; then
-    RANDOM_GENERATORS+=(GSL)
-fi
 if test_mkl_support &>>/dev/null; then
     RANDOM_GENERATORS+=(ONEMKL)
 fi

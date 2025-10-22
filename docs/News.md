@@ -2,6 +2,7 @@
 
 ## 1.2.1 (Ongoing)
 
+- The GNU Science Library (GSL) random generator removed.
 - Miscellaneous bug fixes.
 
 ## 1.2.0 (2025/10/21)

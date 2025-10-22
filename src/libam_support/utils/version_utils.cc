@@ -42,11 +42,6 @@
 #include <omp.h>
 #endif
 
-// GSL
-#ifdef WITH_GSL
-#include <gsl/gsl_version.h>
-#endif
-
 // MKL
 #ifdef WITH_ONEMKL
 #include <mkl_version.h>
@@ -117,15 +112,6 @@ namespace {
         constexpr int minor = BOOST_VERSION / 100 % 1000;
         constexpr int major = BOOST_VERSION / 100000;
         std::cout << "BOOST: " << major << "." << minor << "." << patch_level << std::endl;
-    }
-
-    void print_gsl_version()
-    {
-#ifdef USE_GSL_RANDOM
-        std::cout << "GSL: " << gsl_version << std::endl;
-#else
-        std::cout << "GSL: not used" << std::endl;
-#endif
     }
 
     void print_absl_version()
@@ -292,7 +278,6 @@ void print_version()
     print_absl_version();
     print_fmt_version();
     print_boost_version();
-    print_gsl_version();
     print_onemkl_version();
     print_pcg_version();
     print_mpi_version();

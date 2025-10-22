@@ -171,8 +171,6 @@ Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel 
 
 **NOTE** This library is propertary software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
 
-Users may also use [GNU Science Library (GSL)](https://www.gnu.org/software/gsl/), which may be faster in specific platforms. This requires GSL to be locatable using [`FindGSL.cmake`](https://cmake.org/cmake/help/latest/module/FindGSL.html), which is shipped with CMake since 3.21.0.
-
 See also: CMake variable [`USE_RANDOM_GENERATOR`](#use-random-generator-section) below.
 
 ### Alternate `malloc`/`free` Implementations
@@ -372,7 +370,6 @@ The random number generator used.
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: PCG random generators. Available since 1.1.1.
 - `BOOST`: Use Boost random generators.
-- `GSL`: Use GSL random generators. This is used in the original ART.
 - `ONEMKL`: Use Intel OneAPI MKL random generators.
 
 On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
@@ -513,6 +510,7 @@ Whether to enable MPI-based parallelization.
 
 - `USE_BTREE_MAP` was deprecated in 1.1.2.
 - `USE_CCACHE` was deprecated in 1.1.7.
+- `GSL` option of `USE_RANDOM_GENERATOR` was deprecated in 1.2.0 and removed in 1.2.1.
 
 ## Build-Time Performance Hint
 
