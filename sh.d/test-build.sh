@@ -2,7 +2,7 @@
 set -ue
 mkdir -p opt
 
-if [ ! -z "${CMAKE_FLAGS:-}" ]; then
+if [ -n "${CMAKE_FLAGS:-}" ]; then
     OLD_CMAKE_FLAGS="${CMAKE_FLAGS}"
     echo "Old CMAKE_FLAGS: ${OLD_CMAKE_FLAGS}"
 else
@@ -10,8 +10,8 @@ else
 fi
 
 function test_mkl_support() {
-    PROJ_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
-    BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX)"
+    PROJ_DIR="$(mktemp -d test-mkl.cmake.proj.d.XXX --tmpdir=/tmp)"
+    BUILD_DIR="$(mktemp -d test-mkl.cmake.build.d.XXX --tmpdir=/tmp)"
     mkdir -p "${PROJ_DIR}"
     cp "${SHDIR}/test-build.d/test-mkl.cmake" "${PROJ_DIR}/CMakeLists.txt"
     env -C "${BUILD_DIR}" cmake "${PROJ_DIR}/CMakeLists.txt"
@@ -47,7 +47,7 @@ function do_build() {
         fi
     fi
     echo "Testing with CMAKE_FLAGS: ${CMAKE_FLAGS}" | tee opt/testbuild.log
-    if [ -z "${MPIRUN:-}" ]; then
+    if [ -z "${MPIEXEC:-}" ]; then
         make testbuild-child \
             CMAKE_FLAGS="${CMAKE_FLAGS}" \
             BUILD_ONLY_TEST="${BUILD_ONLY_TEST}" \

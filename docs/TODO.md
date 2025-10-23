@@ -19,8 +19,7 @@
 
 - Supress all lintian issues.
 - Pack MPI-enabled Debian packages, BioConda build, etc.
-- Change all `mpirun` to `mpiexec` and `-np` to `-n` in scripts and docs for standardization.
-- Have tests optimized.
+- Have tests optimized. Move testbuild and testbuild-mpi to Python.
 
 ## Performance
 

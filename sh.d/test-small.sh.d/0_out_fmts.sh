@@ -24,27 +24,41 @@ merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta
 
-if type -p fastqc &>/dev/null && type -p x-www-browser &>/dev/null && [ ! "${NO_FASTQC:-}" = "1" ]; then
-    fastqc -t "${PARALLEL}" "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
+if [ ! "${NO_FASTQC:-}" = "1" ] && type -p fastqc &>/dev/null; then
+    fastqc -t "${SAMTOOLS_THREADS}" "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Open the browser and ignore what's happening afterwards
     {
-        x-www-browser "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.html &>/dev/null || true
+        if type -p x-www-browser &>/dev/null ; then
+            x-www-browser "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.html &>/dev/null || true
+        fi
     } &
     sleep 3
 fi
 
-samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam | seqkit sort >"${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
-seqkit sort <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq
+# Test whether the SAM and FASTQ files are consistent
+samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam | \
+    seqkit sort >"${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
+seqkit sort \
+    <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq \
+    >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
-seqkit sort --line-width 0 <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
-seqtk seq -A <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa
+
+# Test whether the FASTA and FASTQ files are consistent
+seqkit sort --line-width 0 \
+    <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta \
+    >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
+seqtk seq -A \
+    <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fq \
+    >"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa
 cmp \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq.srt.fa \
     "${OUT_DIR}"/test_small_se_wgs_memory_sep.fasta.srt.fa
 
-rm -fr "${OUT_DIR}"/test_small_se_wgs_memory_sep.* "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.*
+rm -fr \
+    "${OUT_DIR}"/test_small_se_wgs_memory_sep.* \
+    "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.*
 assert_cleandir
 
 AM_EXEC \
@@ -81,8 +95,8 @@ samtools fastq \
 for fn in \
     "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.1.fq \
     "${OUT_DIR}"/test_small_pe_wgs_memory_sep.sam.2.fq; do
-    seqkit sort <"$fn" >"$fn".srt.fq
-    mv "$fn".srt.fq "$fn"
+    seqkit sort <"${fn}" >"${fn}".srt.fq
+    mv "${fn}".srt.fq "${fn}"
 done
 seqtk seq -1 "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq |
     seqkit sort >"${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.1.fq
@@ -97,6 +111,7 @@ done
 
 rm -fr "${OUT_DIR}"/test_small_pe_wgs_memory_sep.*
 assert_cleandir
+
 # I suppose the FASTA format does not need to be tested here.
 
 if [ "${FORMAT_ONLY:-}" = "1" ]; then
