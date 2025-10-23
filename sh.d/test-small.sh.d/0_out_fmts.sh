@@ -28,7 +28,7 @@ if [ ! "${NO_FASTQC:-}" = "1" ] && type -p fastqc &>/dev/null; then
     fastqc -t "${SAMTOOLS_THREADS}" "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Open the browser and ignore what's happening afterwards
     {
-        if type -p x-www-browser &>/dev/null ; then
+        if type -p x-www-browser &>/dev/null; then
             x-www-browser "${OUT_DIR}"/test_small_se_wgs_memory_sep_fastqc.html &>/dev/null || true
         fi
     } &
@@ -36,7 +36,7 @@ if [ ! "${NO_FASTQC:-}" = "1" ] && type -p fastqc &>/dev/null; then
 fi
 
 # Test whether the SAM and FASTQ files are consistent
-samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam | \
+samtools fastq "${OUT_DIR}"/test_small_se_wgs_memory_sep.sam |
     seqkit sort >"${OUT_DIR}"/test_small_se_wgs_memory_sep.sam.fq
 seqkit sort \
     <"${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq \

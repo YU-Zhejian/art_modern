@@ -47,6 +47,7 @@ debug:
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
 		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_debug_install/ \
@@ -66,6 +67,7 @@ debug-mpi:
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
 		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_debug_install-mpi/ \
@@ -85,6 +87,7 @@ release:
 	env -C $(OPT_DIR)/build_release cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
@@ -103,6 +106,7 @@ release-mpi:
 	env -C $(OPT_DIR)/build_release-mpi cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
@@ -124,6 +128,7 @@ rel_with_dbg_alpine:
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DUSE_MALLOC=NOP \
 		-DCMAKE_INSTALL_LIBDIR=bin \
@@ -205,14 +210,12 @@ clean:
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	mkdir -p $(OPT_DIR)/testbuild
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --dry-run
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
-	mkdir -p $(OPT_DIR)/testbuild
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py--mpi
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation

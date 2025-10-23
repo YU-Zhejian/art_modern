@@ -57,9 +57,6 @@ void IntermediateEmpDist::accumulate()
 
 void IntermediateEmpDist::add(const IntermediateEmpDist& other)
 {
-    if (read_length_ != other.read_length_) {
-        throw std::runtime_error("Incompatible IntermediateEmpDist sizes");
-    }
     for (std::size_t i = 0; i < read_length_; ++i) {
         positions_[i].add(other.positions_[i]);
     }

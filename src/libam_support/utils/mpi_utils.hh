@@ -34,7 +34,7 @@ bool is_mpi_finalized();
 void init_mpi(int* argc, char*** argv);
 
 /**
- * @throw std::runtime_error if the MPI is finalized (in case init_mpi is not called).
+ * Abort if the MPI is finalized (in case init_mpi is not called).
  *
  * @return 1 if MPI is not available. Otherwise, return the size of MPI_COMM_WORLD.
  */

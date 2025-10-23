@@ -91,8 +91,8 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     cached_rand_pos_on_read_.resize(CACHE_SIZE_);
     cached_rand_pos_on_read_not_head_and_tail_.resize(CACHE_SIZE_);
     cached_insertion_lengths_.resize(CACHE_SIZE_);
-    cached_rand_base_indices_.resize( CACHE_SIZE_);
-    cached_rand_quality_less_than_10_.resize( CACHE_SIZE_);
+    cached_rand_base_indices_.resize(CACHE_SIZE_);
+    cached_rand_quality_less_than_10_.resize(CACHE_SIZE_);
     public_init_();
 }
 #endif
@@ -112,8 +112,8 @@ int Rprob::insertion_length()
     return static_cast<int>(insertion_length_gaussian_(gen_));
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_insertion_lengths_index_ == 0) {
-        vdRngGaussian(
-                VSL_RNG_METHOD_GAUSSIAN_ICDF, stream_, CACHE_SIZE_, cached_insertion_lengths_.data(), pe_frag_dist_mean_, pe_frag_dist_std_dev_);
+        vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_ICDF, stream_, CACHE_SIZE_, cached_insertion_lengths_.data(),
+            pe_frag_dist_mean_, pe_frag_dist_std_dev_);
         cached_insertion_lengths_index_ = CACHE_SIZE_;
     }
     return static_cast<int>(cached_insertion_lengths_[--cached_insertion_lengths_index_]);
@@ -126,8 +126,7 @@ char Rprob::rand_base()
     return ART_ACGT[base_(gen_)];
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_base_indices_index_ == 0) {
-        viRngUniform(
-                VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_base_indices_.data(), 0, 4);
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_base_indices_.data(), 0, 4);
         cached_rand_base_indices_index_ = CACHE_SIZE_;
     }
     return ART_ACGT[cached_rand_base_indices_[--cached_rand_base_indices_index_]];
@@ -149,8 +148,7 @@ int Rprob::rand_quality_less_than_10()
     return quality_less_than_10_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_quality_less_than_10_index_ == 0) {
-        viRngUniform(
-                VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
         cached_rand_quality_less_than_10_index_ = CACHE_SIZE_;
     }
     return cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_];

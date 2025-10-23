@@ -17,7 +17,6 @@ if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python "${SHDIR}"/test-small.sh.d/gen_cov.py
 fi
 
-
 # Create a temporary output directory
 OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir=/tmp)"
 
@@ -28,8 +27,8 @@ CE11_CHR1="$(readlink -f "data/raw_data/ce11_chr1.fa")"
 
 export MPI_PARALLEL="${MPI_PARALLEL:-4}"
 export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
-export IDRATE=0.1 # Increase indel rate to fail faster
-export ART="${ART}" # Do NOT have a default, must be set from outside
+export IDRATE=0.1                                 # Increase indel rate to fail faster
+export ART="${ART}"                               # Do NOT have a default, must be set from outside
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
@@ -40,10 +39,10 @@ export MRNA_PBSIM3_TRANSCRIPT
 # If MPIEXEC is set, use it to run ART in parallel using MPI
 if [ -z "${MPIEXEC:-}" ]; then
     ART_CMD_ASSEMBLED=("${ART}")
-    export PARALLEL="4" # Reduce parallelism overhead for small tests
+    export PARALLEL="${PARALLEL:-4}" # Reduce parallelism overhead for small tests
 else
     export MPIEXEC
-    export PARALLEL="2"
+    export PARALLEL="${PARALLEL:-2}"
     ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART}")
 fi
 
@@ -141,4 +140,4 @@ fi
 . "${SHDIR}"/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
 . "${SHDIR}"/test-small.sh.d/7_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
 . "${SHDIR}"/test-small.sh.d/8_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
-rm -d "${OUT_DIR}"                         # Which should now be empty
+rm -d "${OUT_DIR}"                               # Which should now be empty

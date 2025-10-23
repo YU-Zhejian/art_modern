@@ -13,9 +13,6 @@ from typing import List, Optional
 import threading
 import argparse
 
-OLD_CMAKE_FLAGS = list(
-    filter(bool, (os.environ.get("CMAKE_FLAGS", "")).split(" "))
-)  # TODO: parse
 MPIEXEC = os.environ.get("MPIEXEC")
 MAKE = shutil.which("make")
 CMAKE = shutil.which("cmake")
@@ -69,11 +66,13 @@ class BuildConfig:
         self.USE_HTSLIB = "UNSET"
         self.USE_CONCURRENT_QUEUE = "UNSET"
         self.USE_ABSL = "UNSET"
-        self.BUILD_ONLY_TEST = 1
+        self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
+        self.CMAKE_BUILD_TYPE = "Debug"
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
+        cmake_flags.append(f"-DCMAKE_BUILD_TYPE={self.CMAKE_BUILD_TYPE}")
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
         cmake_flags.append(f"-DUSE_QUAL_GEN={self.USE_QUAL_GEN}")
         cmake_flags.append(f"-DUSE_MALLOC={self.USE_MALLOC}")
@@ -98,55 +97,51 @@ class BuildConfig:
         new_config.USE_HTSLIB = self.USE_HTSLIB
         new_config.USE_CONCURRENT_QUEUE = self.USE_CONCURRENT_QUEUE
         new_config.USE_ABSL = self.USE_ABSL
-        new_config.BUILD_ONLY_TEST = self.BUILD_ONLY_TEST
+        new_config.HELP_VERSION_ONLY = self.HELP_VERSION_ONLY
         return new_config
 
 
 def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
     build_dir = os.path.abspath(tempfile.mkdtemp(prefix="art_modern-test-build-"))
-    install_dir = os.path.abspath(
-        tempfile.mkdtemp(prefix="art_modern-test-build-install-")
-    )
+    install_dir = os.path.abspath(tempfile.mkdtemp(prefix="art_modern-test-build-install-"))
     with IO_MUTEX:
         print(f"{this_job_id} {' '.join(cmake_opts)}")
         print(f"{this_job_id} B: {build_dir}, I: {install_dir}")
     log_path = os.path.join(LOG_DIR, f"{this_job_id}.txt")
     with open(log_path, "wb") as log_file:
         log_file.write(f"Build log for job {this_job_id}\n".encode("utf-8"))
+        log_file.flush()
         log_file.write(f"CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
-        log_file.write(
-            f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8")
-        )
+        log_file.flush()
+        log_file.write(f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
+        log_file.flush()
         # Invoke CMake to configure the build
 
         def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs):
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} START")
-            log_file.write(
-                    f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode(
-                        "utf-8"
-                    )
-                )
+            log_file.write(f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
+            log_file.flush()
             log_file.write(f"{this_job_id} {step_name} START\n".encode("utf-8"))
+            log_file.flush()
             if DRY_RUN:
                 with IO_MUTEX:
                     print(f"{this_job_id} {step_name} DRYRUN")
-                log_file.write(
-                        f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8")
-                    )
+                log_file.write(f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
+                log_file.flush()
             else:
                 proc = subprocess.run(cmdline, *args, **kwargs)
                 if proc.returncode != 0:
                     with IO_MUTEX:
                         print(f"{this_job_id} {step_name} FAILED")
-                    log_file.write(
-                            f"{this_job_id} {step_name} FAILED\n".encode("utf-8")
-                        )
+                    log_file.write(f"{this_job_id} {step_name} FAILED\n".encode("utf-8"))
+                    log_file.flush()
                     raise RuntimeError(f"Step {step_name} failed for job {this_job_id}")
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} DONE")
             log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
+            log_file.flush()
 
         run_wrapper(
             "CONFIG",
@@ -158,6 +153,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "-Wdeprecated",
                 "--warn-uninitialized",
                 "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
+                "-DCMAKE_VERBOSE_MAKEFILE=ON",
                 *cmake_opts,
                 f"-DCMAKE_INSTALL_PREFIX={install_dir}",
                 os.getcwd(),
@@ -201,19 +197,21 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             stderr=log_file,
             env={
                 **os.environ,
-                "ART": os.path.join(
-                    install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")
-                ),
-                "HELP_VERSION_ONLY": "0" if config.BUILD_ONLY_TEST == 1 else "1",
+                "ART": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
+                "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
                 "MPIEXEC": MPIEXEC if WITH_MPI else "",
+                "SAMTOOLS_THREADS": "4",
+                "MPI_PARALLEL": "4",
+                "PARALLEL": "2",
             },
         )
 
         shutil.rmtree(build_dir)
-        log_file.write( "RMDIR BUILD DONE\n".encode("utf-8"))
+        log_file.write("RMDIR BUILD DONE\n".encode("utf-8"))
+        log_file.flush()
         shutil.rmtree(install_dir)
-        log_file.write( "RMDIR INSTALL DONE\n".encode("utf-8"))
-
+        log_file.write("RMDIR INSTALL DONE\n".encode("utf-8"))
+        log_file.flush()
 
 
 if __name__ == "__main__":
@@ -224,10 +222,12 @@ if __name__ == "__main__":
         help="Perform a dry run without executing commands.",
     )
     parser.add_argument(
-        "--mpi", action="store_true", help="Use MPI for builds and tests."
+        "--mpi",
+        action="store_true",
+        help="Use MPI for builds and tests.",
     )
 
-    args = parser.parse_args()
+    args, old_cmake_flags = parser.parse_known_args()
     DRY_RUN = args.dry_run
     WITH_MPI = args.mpi
 
@@ -235,16 +235,16 @@ if __name__ == "__main__":
         if MPIEXEC is None:
             MPIEXEC = shutil.which("mpiexec")
         if MPIEXEC is None:
-            raise RuntimeError(
-                "MPIEXEC not found in environment and mpiexec not in PATH"
-            )
+            raise RuntimeError("MPIEXEC not found in environment and mpiexec not in PATH")
 
     assert MAKE is not None, "make not found in PATH"
     assert CMAKE is not None, "cmake not found in PATH"
     assert CTEST is not None, "ctest not found in PATH"
     assert BASH is not None, "bash not found in PATH"
 
-    os.makedirs(LOG_DIR, exist_ok=True)
+    if os.path.exists(LOG_DIR):
+        shutil.rmtree(LOG_DIR)
+    os.makedirs(LOG_DIR)
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
     print("Probing for MKL...")
@@ -256,10 +256,11 @@ if __name__ == "__main__":
 
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
     job_id = 0
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    max_workers = min(5, os.cpu_count() // 4)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for cmake_build_type in cmake_build_types:
-            bc = BuildConfig(OLD_CMAKE_FLAGS)
-            bc.BUILD_ONLY_TEST = 1
+            bc = BuildConfig(old_cmake_flags)
+            bc.CMAKE_BUILD_TYPE = cmake_build_type
 
             for use_thread_parallel in ["BS", "NOP"]:
                 bc.USE_THREAD_PARALLEL = use_thread_parallel
@@ -294,7 +295,7 @@ if __name__ == "__main__":
             job_id += 1
             bc.USE_ABSL = "UNSET"
 
-            bc.BUILD_ONLY_TEST = 2
+            bc.HELP_VERSION_ONLY = False
 
             for use_random_generator in RANDOM_GENERATORS:
                 bc.USE_RANDOM_GENERATOR = use_random_generator

@@ -33,8 +33,7 @@
 
 #include <random>
 #else
-#error                                                                                                                 \
-    "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM for random generators!"
+#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM for random generators!"
 #endif
 
 #include <cstddef>
@@ -81,7 +80,6 @@ public:
     std::vector<int> tmp_qual_dists_;
 
 private:
-
     static std::uint64_t seed();
     void public_init_();
 
@@ -96,10 +94,10 @@ private:
     std::size_t cached_insertion_lengths_index_ = 0;
 
     std::vector<int> cached_rand_base_indices_;
-    std::size_t  cached_rand_base_indices_index_ = 0;
+    std::size_t cached_rand_base_indices_index_ = 0;
 
-        std::vector<int> cached_rand_quality_less_than_10_;
-        std::size_t  cached_rand_quality_less_than_10_index_ = 0;
+    std::vector<int> cached_rand_quality_less_than_10_;
+    std::size_t cached_rand_quality_less_than_10_index_ = 0;
 
     constexpr static std::size_t CACHE_SIZE_ = 4096;
 #endif

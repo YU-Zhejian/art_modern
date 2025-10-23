@@ -65,9 +65,11 @@ You may also:
 
 ```shell
 LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
+    LD_RUN_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
     PKG_CONFIG_PATH=${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/ \
+    CMAKE_TOOLCHAIN_FILE=sh.d/toolchain/llvm-toolchain.cmake \
     make testbuild \
-    CMAKE_FLAGS='-DCMAKE_TOOLCHAIN_FILE=sh.d/toolchain/llvm-toolchain.cmake -DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/ -DCMAKE_VERBOSE_MAKEFILE=ON'
+    CMAKE_FLAGS='-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/'
 ```
 
 Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and `${HOME}/opt/boost-1.89.0-clang` respectively.
@@ -77,7 +79,7 @@ Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and
 ```shell
 . /opt/intel/oneapi/setvars.sh
 make testbuild \
-    CMAKE_FLAGS='-DCMAKE_VERBOSE_MAKEFILE=ON -DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
+    CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 ```
 
 ## Miscellaneous Developer-Oriented Documentation
