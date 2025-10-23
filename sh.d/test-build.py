@@ -1,24 +1,31 @@
 """
 This re-implementation of test-build.sh does not call make.
-
-TODO: Parallelization.
 """
 
+from __future__ import annotations
+
+import concurrent.futures
 import os
 import shutil
 import subprocess
 import tempfile
 from typing import List, Optional
+import threading
+import argparse
 
-OLD_CMAKE_FLAGS = os.environ.get("CMAKE_FLAGS")
+OLD_CMAKE_FLAGS = list(
+    filter(bool, (os.environ.get("CMAKE_FLAGS", "")).split(" "))
+)  # TODO: parse
 MPIEXEC = os.environ.get("MPIEXEC")
 MAKE = shutil.which("make")
 CMAKE = shutil.which("cmake")
 CTEST = shutil.which("ctest")
 BASH = shutil.which("bash")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
-WITH_MPI = True
 SHDIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d"))
+
+IO_MUTEX = threading.Lock()
 
 
 def probe_mkl() -> bool:
@@ -35,7 +42,6 @@ def probe_mkl() -> bool:
             stderr=subprocess.DEVNULL,
         )
         return result.returncode == 0
-
 
 
 def probe_concurrent_queue() -> Optional[str]:
@@ -66,7 +72,7 @@ class BuildConfig:
         self.BUILD_ONLY_TEST = 1
         self.old_cmake_flags = old_cmake_flags
 
-    def generate_cmake_opts(self):
+    def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
         cmake_flags.append(f"-DUSE_QUAL_GEN={self.USE_QUAL_GEN}")
@@ -82,17 +88,68 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_ABSL={self.USE_ABSL}")
         return cmake_flags
 
+    def copy(self) -> BuildConfig:
+        new_config = BuildConfig(self.old_cmake_flags.copy())
+        new_config.USE_RANDOM_GENERATOR = self.USE_RANDOM_GENERATOR
+        new_config.USE_QUAL_GEN = self.USE_QUAL_GEN
+        new_config.USE_MALLOC = self.USE_MALLOC
+        new_config.USE_THREAD_PARALLEL = self.USE_THREAD_PARALLEL
+        new_config.USE_LIBFMT = self.USE_LIBFMT
+        new_config.USE_HTSLIB = self.USE_HTSLIB
+        new_config.USE_CONCURRENT_QUEUE = self.USE_CONCURRENT_QUEUE
+        new_config.USE_ABSL = self.USE_ABSL
+        new_config.BUILD_ONLY_TEST = self.BUILD_ONLY_TEST
+        return new_config
 
-def do_build(config: BuildConfig, log_path: str):
+
+def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
-    print("Building with the following CMake options: " + " ".join(cmake_opts))
     build_dir = os.path.abspath(tempfile.mkdtemp(prefix="art_modern-test-build-"))
     install_dir = os.path.abspath(
         tempfile.mkdtemp(prefix="art_modern-test-build-install-")
     )
+    with IO_MUTEX:
+        print(f"{this_job_id} {' '.join(cmake_opts)}")
+        print(f"{this_job_id} B: {build_dir}, I: {install_dir}")
+    log_path = os.path.join(LOG_DIR, f"{this_job_id}.txt")
     with open(log_path, "wb") as log_file:
+        log_file.write(f"Build log for job {this_job_id}\n".encode("utf-8"))
+        log_file.write(f"CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
+        log_file.write(
+            f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8")
+        )
         # Invoke CMake to configure the build
-        subprocess.run(
+
+        def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs):
+            with IO_MUTEX:
+                print(f"{this_job_id} {step_name} START")
+            log_file.write(
+                    f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode(
+                        "utf-8"
+                    )
+                )
+            log_file.write(f"{this_job_id} {step_name} START\n".encode("utf-8"))
+            if DRY_RUN:
+                with IO_MUTEX:
+                    print(f"{this_job_id} {step_name} DRYRUN")
+                log_file.write(
+                        f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8")
+                    )
+            else:
+                proc = subprocess.run(cmdline, *args, **kwargs)
+                if proc.returncode != 0:
+                    with IO_MUTEX:
+                        print(f"{this_job_id} {step_name} FAILED")
+                    log_file.write(
+                            f"{this_job_id} {step_name} FAILED\n".encode("utf-8")
+                        )
+                    raise RuntimeError(f"Step {step_name} failed for job {this_job_id}")
+            with IO_MUTEX:
+                print(f"{this_job_id} {step_name} DONE")
+            log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
+
+        run_wrapper(
+            "CONFIG",
             [
                 CMAKE,
                 "-G",
@@ -108,93 +165,145 @@ def do_build(config: BuildConfig, log_path: str):
             cwd=build_dir,
             stdout=log_file,
             stderr=log_file,
-            check=True,
         )
-        # Build and test
-        subprocess.run(
+
+        run_wrapper(
+            "BUILD",
             [
                 CMAKE,
                 "--build",
                 build_dir,
                 "-j",
-                20,  # TODO: make JOBS configurable
+                str(4),
             ],
             stdout=log_file,
             stderr=log_file,
-            check=True,
         )
-        subprocess.run(
+        run_wrapper(
+            "CTEST",
             [CTEST, "--output-on-failure"],
             cwd=build_dir,
             stdout=log_file,
             stderr=log_file,
-            check=True,
         )
-        subprocess.run(
+
+        run_wrapper(
+            "INSTALL",
             [CMAKE, "--install", build_dir],
             stdout=log_file,
             stderr=log_file,
-            check=True,
         )
-        subprocess.run(
+
+        run_wrapper(
+            "TESTSMALL",
             [BASH, os.path.join(SHDIR, "test-small.sh")],
             stdout=log_file,
             stderr=log_file,
-            env = {
+            env={
                 **os.environ,
-                "ART": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if MPIEXEC else "")),
-                "HELP_VERSION_ONLY":  "0" if config.BUILD_ONLY_TEST == 1 else "1",
-                "MPIEXEC": MPIEXEC if MPIEXEC else "",
+                "ART": os.path.join(
+                    install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")
+                ),
+                "HELP_VERSION_ONLY": "0" if config.BUILD_ONLY_TEST == 1 else "1",
+                "MPIEXEC": MPIEXEC if WITH_MPI else "",
             },
-            check=True,
         )
-    shutil.rmtree(build_dir)
-    shutil.rmtree(install_dir)
+
+        shutil.rmtree(build_dir)
+        log_file.write( "RMDIR BUILD DONE\n".encode("utf-8"))
+        shutil.rmtree(install_dir)
+        log_file.write( "RMDIR INSTALL DONE\n".encode("utf-8"))
+
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Test build script re-implementation.")
+    parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Perform a dry run without executing commands.",
+    )
+    parser.add_argument(
+        "--mpi", action="store_true", help="Use MPI for builds and tests."
+    )
+
+    args = parser.parse_args()
+    DRY_RUN = args.dry_run
+    WITH_MPI = args.mpi
+
+    if WITH_MPI:
+        if MPIEXEC is None:
+            MPIEXEC = shutil.which("mpiexec")
+        if MPIEXEC is None:
+            raise RuntimeError(
+                "MPIEXEC not found in environment and mpiexec not in PATH"
+            )
+
+    assert MAKE is not None, "make not found in PATH"
+    assert CMAKE is not None, "cmake not found in PATH"
+    assert CTEST is not None, "ctest not found in PATH"
+    assert BASH is not None, "bash not found in PATH"
+
+    os.makedirs(LOG_DIR, exist_ok=True)
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
+
+    print("Probing for MKL...")
     if probe_mkl():
         RANDOM_GENERATORS.append("MKL")
+
+    print("Probing for concurrent queue...")
+    concurrent_queue_path = probe_concurrent_queue()
+
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
-    for cmake_build_type in cmake_build_types:
-        bc = BuildConfig([] ) # TODO
-        bc.BUILD_ONLY_TEST = 1
+    job_id = 0
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        for cmake_build_type in cmake_build_types:
+            bc = BuildConfig(OLD_CMAKE_FLAGS)
+            bc.BUILD_ONLY_TEST = 1
 
-        for use_thread_parallel in ["BS", "NOP"]:
-            bc.USE_THREAD_PARALLEL = use_thread_parallel
-            do_build(bc, f"build_log_{cmake_build_type}_{use_thread_parallel}.txt")
-        bc.USE_THREAD_PARALLEL = "ASIO"
+            for use_thread_parallel in ["BS", "NOP"]:
+                bc.USE_THREAD_PARALLEL = use_thread_parallel
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+            bc.USE_THREAD_PARALLEL = "ASIO"
 
-        for use_malloc in ["NOP", "JEMALLOC", "MIMALLOC"]:
-            bc.USE_MALLOC = use_malloc
-            do_build(bc, f"build_log_{cmake_build_type}_{use_malloc}.txt")
-        bc.USE_MALLOC = "AUTO"
+            for use_malloc in ["NOP", "JEMALLOC", "MIMALLOC"]:
+                bc.USE_MALLOC = use_malloc
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+            bc.USE_MALLOC = "AUTO"
 
-        bc.USE_LIBFMT = "fmt"
-        do_build(bc, f"build_log_{cmake_build_type}_libfmt.txt")
-        bc.USE_LIBFMT = "UNSET"
+            bc.USE_LIBFMT = "fmt"
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.USE_LIBFMT = "UNSET"
 
-        bc.USE_HTSLIB = "hts"
-        do_build(bc, f"build_log_{cmake_build_type}_htslib.txt")
-        bc.USE_HTSLIB = "UNSET"
+            bc.USE_HTSLIB = "hts"
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.USE_HTSLIB = "UNSET"
 
-        bc.USE_CONCURRENT_QUEUE = probe_concurrent_queue()
-        if bc.USE_CONCURRENT_QUEUE is not None:
-            do_build(bc, f"build_log_{cmake_build_type}_concurrent_queue_path.txt")
-        bc.USE_CONCURRENT_QUEUE = "UNSET"
+            if concurrent_queue_path is not None:
+                bc.USE_CONCURRENT_QUEUE = concurrent_queue_path
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+            bc.USE_CONCURRENT_QUEUE = "UNSET"
 
-        bc.USE_ABSL = "SYS"
-        do_build(bc, f"build_log_{cmake_build_type}_absl.txt")
-        bc.USE_ABSL = "UNSET"
+            bc.USE_ABSL = "SYS"
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.USE_ABSL = "UNSET"
 
-        bc.BUILD_ONLY_TEST = 2
+            bc.BUILD_ONLY_TEST = 2
 
-        for use_random_generator in RANDOM_GENERATORS:
-            bc.USE_RANDOM_GENERATOR = use_random_generator
-            do_build(bc, f"build_log_{cmake_build_type}_randgen_{use_random_generator}.txt")
-        bc.USE_RANDOM_GENERATOR = "PCG"
+            for use_random_generator in RANDOM_GENERATORS:
+                bc.USE_RANDOM_GENERATOR = use_random_generator
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+            bc.USE_RANDOM_GENERATOR = "PCG"
 
-        bc.USE_QUAL_GEN = "STL"
-        do_build(bc, f"build_log_{cmake_build_type}_qualgen_stl.txt")
-        bc.USE_QUAL_GEN = "WALKER"
+            bc.USE_QUAL_GEN = "STL"
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.USE_QUAL_GEN = "WALKER"
+    executor.shutdown()

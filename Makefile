@@ -202,54 +202,17 @@ raw_data:
 clean:
 	rm -fr $(OPT_DIR) tmp build
 
-.PHONY: testbuild-child
-testbuild-child:
-	rm -fr $(OPT_DIR)/testbuild
-	mkdir -p $(OPT_DIR)/testbuild
-	# Ninja is required here for acceleration
-	env -C $(OPT_DIR)/testbuild cmake -G Ninja \
-		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		$(CMAKE_FLAGS) \
-		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/testbuild_install/ \
-		$(CURDIR)
-	cmake --build $(OPT_DIR)/testbuild -j$(JOBS)
-	cmake --install $(OPT_DIR)/testbuild
-	env -C $(OPT_DIR)/testbuild ctest --output-on-failure
-	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=$(OPT_DIR)/testbuild_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh; \
-	fi
-
-.PHONY: testbuild-child-mpi
-testbuild-child-mpi:
-	rm -fr $(OPT_DIR)/testbuild-mpi
-	mkdir -p $(OPT_DIR)/testbuild-mpi
-	# Ninja is required here for acceleration
-	env -C $(OPT_DIR)/testbuild-mpi cmake -G Ninja \
-		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		-DWITH_MPI=ON \
-		$(CMAKE_FLAGS) \
-		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/testbuild_install-mpi/ \
-		$(CURDIR)
-	cmake --build $(OPT_DIR)/testbuild-mpi -j$(JOBS)
-	cmake --install $(OPT_DIR)/testbuild-mpi
-	env -C $(OPT_DIR)/testbuild-mpi ctest --output-on-failure
-	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=$(OPT_DIR)/testbuild_install-mpi/bin/art_modern-mpi MPIEXEC="$(MPIEXEC)" $(BASH) sh.d/test-small.sh; \
-	fi
-
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
 	mkdir -p $(OPT_DIR)/testbuild
-	env MPIEXEC="" $(BASH) sh.d/test-build.sh
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --dry-run
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
 	mkdir -p $(OPT_DIR)/testbuild
-	env MPIEXEC="$(MPIEXEC)" $(BASH) sh.d/test-build.sh
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py--mpi
 
 .PHONY: doc
 # Build documentation

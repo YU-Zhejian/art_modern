@@ -132,3 +132,4 @@ perf.data*
 *.f[aq]
 *.pm
 *.dump
+*.log.d
