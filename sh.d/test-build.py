@@ -24,12 +24,20 @@ LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d
 
 IO_MUTEX = threading.Lock()
 
+def probe_using_cmake_script(cmake_file_path: str) -> bool:
+    # Dummy implementation for MKL probing
+    result = subprocess.run(
+        [CMAKE, "-P",  os.path.join(SHDIR, "test-build.d", cmake_file_path)],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
 
-def probe_mkl() -> bool:
+def probe_using_cmake_project(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
     with tempfile.TemporaryDirectory() as proj_dir, tempfile.TemporaryDirectory() as build_dir:
         shutil.copy(
-            os.path.join(SHDIR, "test-build.d", "test-mkl.cmake"),
+            os.path.join(SHDIR, "test-build.d", cmake_file_path),
             os.path.join(proj_dir, "CMakeLists.txt"),
         )
         result = subprocess.run(
@@ -40,6 +48,23 @@ def probe_mkl() -> bool:
         )
         return result.returncode == 0
 
+def probe_mkl() -> bool:
+    return probe_using_cmake_project("test-mkl.cmake")
+
+def probe_absl() -> bool:
+    return probe_using_cmake_project("test-absl.cmake")
+
+def probe_mimalloc() -> bool:
+    return probe_using_cmake_project("test-mimalloc.cmake")
+
+def probe_jemalloc()-> bool:
+    return probe_using_cmake_script("test-jemalloc.cmake")
+
+def probe_htshtslib()-> bool:
+    return probe_using_cmake_script("test-htslib.cmake")
+
+def probe_libfmt()-> bool:
+    return probe_using_cmake_script("test-libfmt.cmake")
 
 def probe_concurrent_queue() -> Optional[str]:
     """
@@ -54,7 +79,6 @@ def probe_concurrent_queue() -> Optional[str]:
         if os.path.exists(p):
             return os.path.dirname(p)
     return None
-
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
@@ -109,39 +133,36 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         print(f"{this_job_id} {' '.join(cmake_opts)}")
         print(f"{this_job_id} B: {build_dir}, I: {install_dir}")
     log_path = os.path.join(LOG_DIR, f"{this_job_id}.txt")
-    with open(log_path, "wb") as log_file:
+    with open(log_path, "wb", buffering=0) as log_file:
         log_file.write(f"Build log for job {this_job_id}\n".encode("utf-8"))
-        log_file.flush()
         log_file.write(f"CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
-        log_file.flush()
         log_file.write(f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
-        log_file.flush()
         # Invoke CMake to configure the build
 
         def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs):
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} START")
             log_file.write(f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
-            log_file.flush()
+            
             log_file.write(f"{this_job_id} {step_name} START\n".encode("utf-8"))
-            log_file.flush()
+            
             if DRY_RUN:
                 with IO_MUTEX:
                     print(f"{this_job_id} {step_name} DRYRUN")
                 log_file.write(f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
-                log_file.flush()
+                
             else:
                 proc = subprocess.run(cmdline, *args, **kwargs)
                 if proc.returncode != 0:
                     with IO_MUTEX:
                         print(f"{this_job_id} {step_name} FAILED")
                     log_file.write(f"{this_job_id} {step_name} FAILED\n".encode("utf-8"))
-                    log_file.flush()
+                    
                     raise RuntimeError(f"Step {step_name} failed for job {this_job_id}")
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} DONE")
             log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
-            log_file.flush()
+            
 
         run_wrapper(
             "CONFIG",
@@ -207,12 +228,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         )
 
         shutil.rmtree(build_dir)
-        log_file.write("RMDIR BUILD DONE\n".encode("utf-8"))
-        log_file.flush()
-        shutil.rmtree(install_dir)
-        log_file.write("RMDIR INSTALL DONE\n".encode("utf-8"))
-        log_file.flush()
-
+    os.remove(log_path) # Remove log if successful.
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test build script re-implementation.")
@@ -247,12 +263,54 @@ if __name__ == "__main__":
     os.makedirs(LOG_DIR)
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
-    print("Probing for MKL...")
+    print("Probing for MKL...", end="")
     if probe_mkl():
         RANDOM_GENERATORS.append("MKL")
+        print("SUCCESS")
+    else:
+        print("FAIL")
 
-    print("Probing for concurrent queue...")
+    print("Probing for Abseil...", end="")
+    is_absl_exist = probe_absl()
+    if is_absl_exist:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
+    print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
+    if concurrent_queue_path:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
+    MALLOCS = ["NOP"]
+    print("Probing for jemalloc...", end="")
+    if probe_jemalloc():
+        MALLOCS.append("JEMALLOC")
+        print("SUCCESS")
+    else:
+        print("FAIL")
+    print("Probing for mimalloc...", end="")
+    if probe_mimalloc():
+        MALLOCS.append("MIMALLOC")
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
+    print("Probing for HTSLib...", end="")
+    is_htslib_exist = probe_htshtslib()
+    if is_htslib_exist:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
+    print("Probing for {fmt}...", end="")
+    is_libfmt_exist = probe_libfmt()
+    if is_libfmt_exist:
+        print("SUCCESS")
+    else:
+        print("FAIL")
 
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
     job_id = 0
@@ -268,21 +326,23 @@ if __name__ == "__main__":
                 job_id += 1
             bc.USE_THREAD_PARALLEL = "ASIO"
 
-            for use_malloc in ["NOP", "JEMALLOC", "MIMALLOC"]:
+            for use_malloc in MALLOCS:
                 bc.USE_MALLOC = use_malloc
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_MALLOC = "AUTO"
 
-            bc.USE_LIBFMT = "fmt"
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.USE_LIBFMT = "UNSET"
+            if is_libfmt_exist:
+                bc.USE_LIBFMT = "fmt"
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+                bc.USE_LIBFMT = "UNSET"
 
-            bc.USE_HTSLIB = "hts"
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.USE_HTSLIB = "UNSET"
+            if is_htslib_exist:
+                bc.USE_HTSLIB = "hts"
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+                bc.USE_HTSLIB = "UNSET"
 
             if concurrent_queue_path is not None:
                 bc.USE_CONCURRENT_QUEUE = concurrent_queue_path
@@ -290,10 +350,11 @@ if __name__ == "__main__":
                 job_id += 1
             bc.USE_CONCURRENT_QUEUE = "UNSET"
 
-            bc.USE_ABSL = "SYS"
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.USE_ABSL = "UNSET"
+            if is_absl_exist:
+                bc.USE_ABSL = "SYS"
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+                bc.USE_ABSL = "UNSET"
 
             bc.HELP_VERSION_ONLY = False
 

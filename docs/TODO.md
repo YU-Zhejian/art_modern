@@ -46,7 +46,7 @@
 
 - Supress all lintian issues.
 - Pack MPI-enabled Debian packages, BioConda build, etc.
-- Have tests optimized. Move testbuild and testbuild-mpi to Python.
+- Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
 
 ## Performance
 
