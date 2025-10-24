@@ -7,6 +7,7 @@
   - The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster.
   - More random numbers are generated in bulk to reduce overhead.
 - Makefile integration test target `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
+- `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
 - Miscellaneous bug fixes.
 
 ## 1.2.0 (2025/10/21)

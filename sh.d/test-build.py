@@ -24,14 +24,16 @@ LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d
 
 IO_MUTEX = threading.Lock()
 
+
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
     result = subprocess.run(
-        [CMAKE, "-P",  os.path.join(SHDIR, "test-build.d", cmake_file_path)],
+        [CMAKE, "-P", os.path.join(SHDIR, "test-build.d", cmake_file_path)],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     return result.returncode == 0
+
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
@@ -48,23 +50,30 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
         )
         return result.returncode == 0
 
+
 def probe_mkl() -> bool:
     return probe_using_cmake_project("test-mkl.cmake")
+
 
 def probe_absl() -> bool:
     return probe_using_cmake_project("test-absl.cmake")
 
+
 def probe_mimalloc() -> bool:
     return probe_using_cmake_project("test-mimalloc.cmake")
 
-def probe_jemalloc()-> bool:
+
+def probe_jemalloc() -> bool:
     return probe_using_cmake_script("test-jemalloc.cmake")
 
-def probe_htshtslib()-> bool:
+
+def probe_htshtslib() -> bool:
     return probe_using_cmake_script("test-htslib.cmake")
 
-def probe_libfmt()-> bool:
+
+def probe_libfmt() -> bool:
     return probe_using_cmake_script("test-libfmt.cmake")
+
 
 def probe_concurrent_queue() -> Optional[str]:
     """
@@ -79,6 +88,7 @@ def probe_concurrent_queue() -> Optional[str]:
         if os.path.exists(p):
             return os.path.dirname(p)
     return None
+
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
@@ -143,26 +153,25 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} START")
             log_file.write(f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
-            
+
             log_file.write(f"{this_job_id} {step_name} START\n".encode("utf-8"))
-            
+
             if DRY_RUN:
                 with IO_MUTEX:
                     print(f"{this_job_id} {step_name} DRYRUN")
                 log_file.write(f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
-                
+
             else:
                 proc = subprocess.run(cmdline, *args, **kwargs)
                 if proc.returncode != 0:
                     with IO_MUTEX:
                         print(f"{this_job_id} {step_name} FAILED")
                     log_file.write(f"{this_job_id} {step_name} FAILED\n".encode("utf-8"))
-                    
+
                     raise RuntimeError(f"Step {step_name} failed for job {this_job_id}")
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} DONE")
             log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
-            
 
         run_wrapper(
             "CONFIG",
@@ -228,7 +237,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         )
 
         shutil.rmtree(build_dir)
-    os.remove(log_path) # Remove log if successful.
+    os.remove(log_path)  # Remove log if successful.
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Test build script re-implementation.")
