@@ -19,15 +19,17 @@
 #include <string>
 
 #define READ_1                                                                                                         \
-    retv = sam_read1(in, hdr, b) < 0;                                                                                  \
+    retv = sam_read1(in, hdr, b);                                                                                      \
     num_parsed_reads++;                                                                                                \
     if (retv == -1 /** EOF **/) {                                                                                      \
         goto destroy;                                                                                                  \
     } else if (retv < -1) {                                                                                            \
         goto except;                                                                                                   \
     }
+constexpr std::size_t REPORT_SIZE = 10000000; // 10 Million reads
 
 namespace labw::art_modern {
+
 void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::shared_ptr<IntermediateEmpDist>& ied2,
     const std::size_t thread_id, const APBConfig& config)
 {
@@ -57,7 +59,7 @@ void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::share
             num_valid_reads++;
         }
         num_total_reads++;
-        if (num_total_reads % 500000 == 0) {
+        if (num_total_reads % REPORT_SIZE == 0) {
             BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id << ": Processed "
                                     << to_si(static_cast<double>(num_total_reads), 2, 1000) << " reads, "
                                     << to_si(static_cast<double>(num_valid_reads), 2, 1000) << " ("

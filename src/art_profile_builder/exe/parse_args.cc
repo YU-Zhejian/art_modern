@@ -36,7 +36,7 @@ namespace {
     constexpr char ARG_OUT2[] = "o-file2";
     constexpr char ARG_OB[] = "old_behavior";
 
-    void valid_file(const std::string& file_path)
+    htsExactFormat valid_file(const std::string& file_path)
     {
         if (file_path.empty()) {
             BOOST_LOG_TRIVIAL(error) << "Input file path is empty.";
@@ -56,6 +56,7 @@ namespace {
             abort_mpi();
         }
         hts_close(file);
+        return format->format;
     }
     po::options_description option_parser() noexcept
     {
@@ -107,12 +108,12 @@ APBConfig parse_args(int argc, char** argv)
     const auto out1 = get_param<std::string>(vm_, ARG_OUT1);
     const auto out2 = is_pe ? get_param<std::string>(vm_, ARG_OUT2) : "";
 
-    valid_file(input_file_name);
+    const auto format = valid_file(input_file_name);
     prepare_writer(out1);
     if (is_pe) {
         prepare_writer(out2);
     }
 
-    return { input_file_name, read_length, num_threads, num_io_threads, is_pe, is_ob, out1, out2 };
+    return { input_file_name, read_length, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format };
 }
 } // namespace labw::art_modern

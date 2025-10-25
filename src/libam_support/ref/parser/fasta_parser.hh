@@ -29,13 +29,15 @@ namespace labw::art_modern {
 /**
  * Indicates the end of the FASTA file.
  */
-class EOFException final : public std::exception { };
+class FastaEOFException final : public std::exception { };
 
 class MalformedFastaException final : public std::runtime_error {
 public:
-    explicit MalformedFastaException(std::string reason)
-        : std::runtime_error(std::move(reason)) { };
+    explicit MalformedFastaException(const std::string& reason)
+        : std::runtime_error(reason) { };
     ~MalformedFastaException() override = default;
+    DEFAULT_COPY(MalformedFastaException)
+    DEFAULT_MOVE(MalformedFastaException)
 };
 
 class FastaIterator {

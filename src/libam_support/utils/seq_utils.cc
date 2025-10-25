@@ -53,6 +53,50 @@ constexpr char normalization_matrix[] = { 78, 78, 78, 78, 78, 78, 78, 78, 78, 78
     78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 65, 78, 67, 78, 78, 78, 71, 78, 78,
     78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 84, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78, 78 };
 
+void str_to_qual(std::vector<am_qual_t>& qual, const std::string& str)
+{
+    str_to_qual(qual.data(), str.c_str(), str.size());
+}
+void str_to_qual(am_qual_t* qual, const char* str, size_t qlen)
+{
+#if defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__)
+    if (qlen <= 100) {
+        str_to_qual_mmx(qual, str, qlen);
+        return;
+    }
+    if (qlen <= 200) {
+        str_to_qual_sse2(qual, str, qlen);
+        return;
+    }
+    str_to_qual_avx2(qual, str, qlen);
+#else
+    str_to_qual_foreach(qual, str, qlen);
+#endif
+}
+
+void str_to_qual_mmx(am_qual_t* qual, const char* str, const size_t qlen)
+{
+    size_t i = 0;
+#ifdef __MMX__
+    // NOLINTBEGIN
+    const size_t num_elements_per_simd = 8; // MMX processes 8 uint8_t elements at a time
+    const size_t aligned_size = (qlen >> 3) << 3; // Align to 8-byte boundary
+    __m64 phred_offset_vec = _mm_set1_pi8(static_cast<uint8_t>(PHRED_OFFSET));
+
+    for (; i < aligned_size; i += num_elements_per_simd) {
+        __m64 str_vec = *reinterpret_cast<const __m64*>(&str[i]);
+        __m64 result_vec = _mm_sub_pi8(str_vec, phred_offset_vec);
+        *reinterpret_cast<__m64*>(&qual[i]) = result_vec;
+    }
+    _mm_empty(); // Empty the MMX state
+    // NOLINTEND
+#endif
+    // Handle the remaining elements that do not fit into a full SIMD register
+    for (; i < qlen; ++i) {
+        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
+    }
+}
+
 std::string qual_to_str_mmx(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
@@ -104,6 +148,27 @@ std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
     return retq;
 }
 
+void str_to_qual_sse2(am_qual_t* qual, const char* str, const size_t qlen)
+{
+    size_t i = 0;
+#ifdef __SSE2__
+    // NOLINTBEGIN
+    const size_t num_elements_per_simd = 16; // SSE2 processes 16
+    const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
+    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
+    for (; i < aligned_size; i += num_elements_per_simd) {
+        __m128i str_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&str[i]));
+        __m128i result_vec = _mm_sub_epi8(str_vec, phred_offset_vec);
+        _mm_storeu_si128(reinterpret_cast<__m128i*>(&qual[i]), result_vec);
+    }
+    // NOLINTEND
+#endif
+    // Handle the remaining elements that do not fit into a full SIMD register
+    for (; i < qlen; ++i) {
+        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
+    }
+}
+
 std::string qual_to_str_avx2(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
@@ -129,6 +194,27 @@ std::string qual_to_str_avx2(const am_qual_t* qual, const size_t qlen)
     return retq;
 }
 
+void str_to_qual_avx2(am_qual_t* qual, const char* str, const size_t qlen)
+{
+    size_t i = 0;
+#ifdef __AVX2__
+    // NOLINTBEGIN
+    const size_t num_elements_per_simd = 32; // AVX2 processes 32 uint8_t elements at a time
+    const size_t aligned_size = (qlen >> 5) << 5; // Align to 32-byte boundary
+    __m256i phred_offset_vec = _mm256_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
+    for (; i < aligned_size; i += num_elements_per_simd) {
+        __m256i str_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&str[i]));
+        __m256i result_vec = _mm256_sub_epi8(str_vec, phred_offset_vec);
+        _mm256_storeu_si256(reinterpret_cast<__m256i*>(&qual[i]), result_vec);
+    }
+    // NOLINTEND
+#endif
+    // Handle the remaining elements that do not fit into a full SIMD register
+    for (; i < qlen; ++i) {
+        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
+    }
+}
+
 std::string qual_to_str_for_loop(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
@@ -140,6 +226,13 @@ std::string qual_to_str_for_loop(const am_qual_t* qual, const size_t qlen)
     return retq;
 }
 
+void str_to_qual_for_loop(am_qual_t* qual, const char* str, const size_t qlen)
+{
+    for (size_t i = 0; i < qlen; ++i) {
+        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
+    }
+}
+
 std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
 {
     std::string retq;
@@ -147,6 +240,12 @@ std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
     std::memcpy(retq.data(), qual, qlen);
     std::for_each(retq.begin(), retq.end(), [](char& c) { c += PHRED_OFFSET; });
     return retq;
+}
+
+void str_to_qual_foreach(am_qual_t* qual, const char* str, const size_t qlen)
+{
+    std::memcpy(qual, str, qlen);
+    std::for_each(qual, qual + qlen, [](am_qual_t& c) { c -= PHRED_OFFSET; });
 }
 
 std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
