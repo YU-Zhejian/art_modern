@@ -54,8 +54,6 @@
   - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. This problem is more obvious on smaller objects, like FASTA when being compared to FASTQ.
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
   - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
-- The profile builder is slow when parsing FASTQ files. Consider using faster parsers.
-- The memory usage is wierdly high, indicating potential memory leaks.
 
 ## I/O Formats
 

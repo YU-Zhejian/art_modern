@@ -22,6 +22,9 @@ pigz -k -9 -f -p16 opt/test-art_profile_builder/out_se.fq -vv
 time deps/ART_profiler_illumina/art_profiler_illumina \
     "${TEST_DIR}"/out_se_art_perl_uncompressed "${TEST_DIR}"/ fq 16
 
+# real    53m3.775s
+# user    58m22.411s
+# sys     1m15.205s
 time deps/ART_profiler_illumina/art_profiler_illumina \
     "${TEST_DIR}"/out_se_art_perl_compressed "${TEST_DIR}"/ fq.gz 16
 

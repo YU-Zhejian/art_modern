@@ -133,3 +133,6 @@ perf.data*
 *.pm
 *.dump
 *.log.d
+*.heap
+/intel/
+/.intel/

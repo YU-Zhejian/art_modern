@@ -19,8 +19,31 @@ env -C "${PROFILE_DIR}" ninja -j120
 
 "${PROFILE_DIR}"/art_modern --version
 ldd "${PROFILE_DIR}"/art_modern
+collect=memory-consumption
+rm -fr "${PROFILE_DIR}"/vtune-"${collect}"
+vtune \
+    -collect="${collect}" \
+    -knob mem-object-size-min-thres=4096 \
+    -source-search-dir=".." \
+    -result-dir="${PROFILE_DIR}"/vtune-"${collect}" -- \
+    "${PROFILE_DIR}"/art_modern \
+    --builtin_qual_file HiSeq2500_125bp \
+    --i-file data/raw_data/ce11_chr1.fa \
+    --read_len 125 \
+    --mode wgs \
+    --lc pe \
+    --i-parser memory \
+    --i-fcov 400 \
+    --parallel 16 \
+    --pe_frag_dist_std_dev 20 \
+    --pe_frag_dist_mean 500 \
+    --o-fastq /dev/null \
+    --o-fasta /dev/null \
+    --o-pwa /dev/null
 
-for collect in hotspots threading memory-consumption; do # hpc-performance memory-access io
+vtune-gui "${PROFILE_DIR}"/vtune-"${collect}"
+
+for collect in hotspots threading; do # hpc-performance memory-access io
     rm -fr "${PROFILE_DIR}"/vtune-"${collect}"
     vtune \
         -collect="${collect}" \

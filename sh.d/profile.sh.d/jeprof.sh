@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -ue
-PROFILE_DIR=opt/build_profile_valgrind
+PROFILE_DIR=opt/build_profile_jeprof
 mkdir -p "${PROFILE_DIR}"
 
 env -C "${PROFILE_DIR}" cmake \
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
-    -Wdev -Wdeprecated --warn-uninitialized \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_VERBOSE_MAKEFILE=ON \
-    -DCEU_CM_SHOULD_USE_NATIVE=ON \
+		-Wdev -Wdeprecated --warn-uninitialized \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
+		-DCEU_CM_SHOULD_USE_NATIVE=ON \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
     -DUSE_RANDOM_GENERATOR=PCG \
     -DUSE_MALLOC=JEMALLOC \
@@ -17,19 +17,7 @@ env -C "${PROFILE_DIR}" cmake \
 
 env -C "${PROFILE_DIR}" ninja -j120
 
-VALGRIND_LOG="${PROFILE_DIR}/valgrind.log"
-
-valgrind \
-    --tool=memcheck \
-    --leak-check=full \
-    --show-leak-kinds=all \
-    --track-origins=yes \
-    --errors-for-leak-kinds=definite,possible \
-    --num-callers=40 \
-    --malloc-fill=0xAA \
-    --free-fill=0xDA \
-    --gen-suppressions=all \
-    --log-file="${VALGRIND_LOG}" \
+MALLOC_CONF=prof_leak:true,lg_prof_sample:0,prof_final:true \
     "${PROFILE_DIR}"/art_modern \
     --builtin_qual_file HiSeq2500_125bp \
     --i-file data/raw_data/lambda_phage.fa \
@@ -38,7 +26,7 @@ valgrind \
     --lc pe \
     --i-parser memory \
     --i-fcov 4 \
-    --parallel 2 \
+    --parallel 0 \
     --ins_rate_1 0.1 \
     --del_rate_1 0.1 \
     --pe_frag_dist_std_dev 20 \
