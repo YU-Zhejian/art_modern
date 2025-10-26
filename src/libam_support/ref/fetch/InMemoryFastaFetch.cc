@@ -107,6 +107,7 @@ InMemoryFastaFetch::InMemoryFastaFetch(
 
     void InMemoryFastaFetch::clear() {
         seqs_.clear();
+        seqs_.shrink_to_fit();
         BaseFastaFetch::clear();
 }
 

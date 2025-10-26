@@ -42,10 +42,10 @@
 
 #include <atomic>
 #include <chrono>
+#include <cstdlib>
 #include <fstream>
 #include <limits>
 #include <memory>
-#include <stdexcept>
 #include <thread>
 #include <utility>
 
@@ -53,7 +53,7 @@ namespace labw::art_modern {
 
 class JobPoolReporter {
 public:
-    explicit JobPoolReporter(const JobPool& jp, const std::size_t reporting_interval_seconds = 1)
+    explicit JobPoolReporter(JobPool& jp, const std::size_t reporting_interval_seconds = 1)
         : jp_(jp)
         , reporting_interval_seconds_(reporting_interval_seconds)
     {
@@ -75,7 +75,7 @@ private:
         }
     }
 
-    const JobPool& jp_;
+    JobPool& jp_;
     std::atomic<bool> should_stop_ { false };
     std::thread thread_;
     const std::size_t reporting_interval_seconds_;

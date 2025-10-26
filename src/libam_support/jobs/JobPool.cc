@@ -33,17 +33,22 @@
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <utility>
 
 namespace labw::art_modern {
 
-std::size_t JobPool::n_running_ajes() const
+std::size_t JobPool::n_running_ajes()
 {
+    const std::scoped_lock lock(mutex_);
     std::size_t n_running = 0;
-    for (const auto& aje : ajes_) {
+    std::vector< std::shared_ptr<JobExecutor> > passed_ajes_;
+    for (auto aje : ajes_) {
         if (aje && aje->is_running()) {
             n_running++;
+            passed_ajes_.emplace_back( std::move(aje) );
         }
     }
+    ajes_ = std::move(passed_ajes_);
     return n_running;
 }
 
@@ -60,19 +65,21 @@ void JobPool::stop()
 
 void JobPool::add(const std::shared_ptr<JobExecutor>& aje)
 {
-    const std::scoped_lock lock(mutex_);
     // Spin until there's a slot
     while (n_running_ajes() >= pool_size_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        std::this_thread::yield();
     }
-    ajes_.emplace_back(aje);
+    {
+        const std::scoped_lock lock(mutex_);
+        ajes_.emplace_back(aje);
 #if defined(USE_NOP_PARALLEL)
-    aje->operator()();
+        aje->operator()();
 #elif defined(USE_BS_PARALLEL)
-    [[maybe_unused]] auto future = pool_.submit_task([this_aje = aje]() mutable { this_aje->operator()(); });
+        [[maybe_unused]] auto future = pool_.submit_task([this_aje = aje]() mutable { this_aje->operator()(); });
 #elif defined(USE_ASIO_PARALLEL)
-    post(pool_, [this_aje = aje]() mutable { this_aje->operator()(); });
+        post(pool_, [this_aje = aje]() mutable { this_aje->operator()(); });
 #endif
+    }
 }
 
 JobPool::~JobPool() { stop(); }

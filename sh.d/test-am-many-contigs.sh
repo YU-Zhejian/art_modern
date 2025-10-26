@@ -18,12 +18,11 @@ cd "${SHDIR}/../"
         --lc se \
         --i-parser stream \
         --i-fcov 2 \
-        --parallel 0
-# First, we will not attach any writer
-exit
-
---o-hl_sam /dev/null \
-    --o-hl_sam-num_threads 4 \
-    --o-hl_sam-compress_level u \
-    --o-hl_sam-write_bam \
-    --o-fastq /dev/null
+        --i-batch_size 1048576 \
+        --parallel 0 \
+        --o-hl_sam /dev/null \
+      --o-hl_sam-num_threads 4 \
+      --o-hl_sam-compress_level u \
+      --o-hl_sam-write_bam \
+      --o-fastq /dev/null
+# This generates 10G reads.

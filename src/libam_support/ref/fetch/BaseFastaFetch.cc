@@ -56,5 +56,7 @@ std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_i
     void BaseFastaFetch::clear() {
         seq_names_.clear();
         seq_lengths_.clear();
+        seq_names_.shrink_to_fit();
+        seq_lengths_.shrink_to_fit();
     }
 } // namespace labw::art_modern

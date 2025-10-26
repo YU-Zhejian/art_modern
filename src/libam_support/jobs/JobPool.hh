@@ -67,10 +67,10 @@ public:
      */
     void stop();
     /**
-     * Number of job instances that are still alive in the pool.
+     * Number of job instances that are still alive in the pool. Also remove AJEs that are not running.
      * @return As described.
      */
-    [[nodiscard]] std::size_t n_running_ajes() const;
+    [[nodiscard]] std::size_t n_running_ajes();
 
 private:
 #if defined(USE_NOP_PARALLEL)

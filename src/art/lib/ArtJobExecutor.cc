@@ -150,12 +150,7 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-ArtJobExecutor::~ArtJobExecutor()
-{
-    if (clear_after_use_) {
-        job_.fasta_fetch->clear();
-    }
-}
+ArtJobExecutor::~ArtJobExecutor() = default;
 ArtJobExecutor::ArtJobExecutor(
     SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
     : art_params_(art_params)
@@ -235,8 +230,10 @@ void ArtJobExecutor::operator()()
                 / static_cast<double>(accumulated_contig_len)
                                 << ") generated.";
     }
-
     reporter.stop();
+    if (clear_after_use_) {
+        job_.fasta_fetch->clear();
+    }
     is_running_ = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
