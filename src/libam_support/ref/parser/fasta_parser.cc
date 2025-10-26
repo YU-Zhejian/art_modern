@@ -30,7 +30,7 @@ FastaIterator::FastaRecord FastaIterator::next()
         // Fetch and parse the ID.
         while (true) {
             if (_istream.eof()) {
-                throw EOFException();
+                throw FastaEOFException();
             }
             std::getline(_istream, next_line);
             _lineno += 1;

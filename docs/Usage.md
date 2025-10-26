@@ -365,3 +365,5 @@ Using empty file or `/dev/null` as input is allowed since 1.1.9. It will generat
 ### Run-Time Performance Hint
 
 When executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.
+
+SAM/BAM output writers are memory- and time-consuming due to compression. If you don't need SAM/BAM output, please don't enable it.

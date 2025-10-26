@@ -11,7 +11,6 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <stdexcept>
 #include <string>
 #include <vector>
 
@@ -21,6 +20,17 @@ IntermediateEmpDist::IntermediateEmpDist(const std::size_t read_length)
     : read_length_(read_length)
 {
     positions_.resize(read_length);
+}
+
+bool IntermediateEmpDist::parse_read(const std::string& seq, const std::vector<am_qual_t>& qual)
+{
+    const std::size_t effective_read_length = am_min(seq.size(), read_length_);
+    for (std::size_t i = 0; i < effective_read_length; ++i) {
+        positions_[i].add(seq[i], qual[i]);
+    }
+    total_reads_ += 1;
+    total_bases_ += effective_read_length;
+    return true;
 }
 
 bool IntermediateEmpDist::parse_read(const bam1_t* b)
@@ -45,6 +55,8 @@ bool IntermediateEmpDist::parse_read(const bam1_t* b)
     for (std::size_t i = 0; i < effective_read_length; ++i) {
         positions_[i].add(seq_str[i], static_cast<am_qual_t>(qual[i]));
     }
+    total_reads_ += 1;
+    total_bases_ += effective_read_length;
     return true;
 }
 
@@ -60,6 +72,8 @@ void IntermediateEmpDist::add(const IntermediateEmpDist& other)
     for (std::size_t i = 0; i < read_length_; ++i) {
         positions_[i].add(other.positions_[i]);
     }
+    total_bases_ += other.total_bases_;
+    total_reads_ += other.total_reads_;
 }
 
 void IntermediateEmpDist::write(std::ostream& oss, const bool is_ob) const
@@ -70,4 +84,6 @@ void IntermediateEmpDist::write(std::ostream& oss, const bool is_ob) const
         }
     }
 }
+std::size_t IntermediateEmpDist::get_total_reads() const { return total_reads_; }
+std::size_t IntermediateEmpDist::get_total_bases() const { return total_bases_; }
 } // namespace labw::art_modern

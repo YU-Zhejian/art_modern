@@ -31,17 +31,30 @@ constexpr std::size_t N_REPLICA = 200UL;
 
 namespace {
 
-void bech_impl(std::string (*f)(const signed char*, std::size_t), const std::string& name, const int run_times,
+void bech_impl(std::string (*f_qual_to_str)(const signed char*, std::size_t),
+    void (*f_str_to_qual)(am_qual_t* qual, const char* str, size_t qlen), const std::string& name, const int run_times,
     const int rlen, const std::vector<am_qual_t>& q)
 {
+    std::vector<am_qual_t> q_regen;
+    q_regen.resize(rlen);
     std::vector<std::size_t> times;
+    std::string s;
     for (std::size_t j = 0; j < N_REPLICA; j++) {
         auto start = std::chrono::high_resolution_clock::now();
         for (int i = 0; i < run_times; i++) {
-            volatile auto s = f(q.data(), rlen); // NOLINT
+            s = f_qual_to_str(q.data(), rlen); // NOLINT
+            f_str_to_qual(q_regen.data(), s.c_str(), rlen);
         }
         auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+    }
+    if (s != qual_to_str_foreach(q.data(), rlen)) {
+        std::cerr << "Error in " << name << ": regenerated string does not match original string." << std::endl;
+        std::abort();
+    }
+    if (q_regen != q) {
+        std::cerr << "Error in " << name << ": regenerated qual does not match original qual." << std::endl;
+        std::abort();
     }
     std::cout << std::setw(25) << (name + ": ") << describe(times) << std::endl;
 }
@@ -58,27 +71,11 @@ void bench(const int run_times, const int rlen)
         q.emplace_back(dis(gen));
     }
 
-    bech_impl(qual_to_str_for_loop, "Scala (for loop)", run_times, rlen, q);
-    bech_impl(qual_to_str_foreach, "Scala (std::for_each)", run_times, rlen, q);
-    bech_impl(qual_to_str_mmx, "MMX", run_times, rlen, q);
-    bech_impl(qual_to_str_sse2, "SSE2", run_times, rlen, q);
-    bech_impl(qual_to_str_avx2, "AVX2", run_times, rlen, q);
-
-    if (qual_to_str_sse2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        std::abort();
-    }
-
-    if (qual_to_str_mmx(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        std::abort();
-    }
-
-    if (qual_to_str_for_loop(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        std::abort();
-    }
-
-    if (qual_to_str_avx2(q.data(), rlen) != qual_to_str_foreach(q.data(), rlen)) {
-        std::abort();
-    }
+    bech_impl(qual_to_str_for_loop, str_to_qual_for_loop, "Scala (for loop)", run_times, rlen, q);
+    bech_impl(qual_to_str_foreach, str_to_qual_foreach, "Scala (std::for_each)", run_times, rlen, q);
+    bech_impl(qual_to_str_mmx, str_to_qual_mmx, "MMX", run_times, rlen, q);
+    bech_impl(qual_to_str_sse2, str_to_qual_sse2, "SSE2", run_times, rlen, q);
+    bech_impl(qual_to_str_avx2, str_to_qual_avx2, "AVX2", run_times, rlen, q);
 }
 
 } // namespace
