@@ -119,6 +119,8 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
         if self.USE_ABSL != "UNSET":
             cmake_flags.append(f"-DUSE_ABSL={self.USE_ABSL}")
+        if WITH_MPI:
+            cmake_flags.append("-DWITH_MPI=ON")
         return cmake_flags
 
     def copy(self) -> BuildConfig:

@@ -73,10 +73,13 @@ public:
      */
     void stop();
     /**
-     * Number of job instances that are still alive in the pool. Also remove AJEs that are not running.
+     * Number of job instances that are still alive in the pool.
      * @return As described.
      */
     [[nodiscard]] std::size_t n_running_executors() const;
+    /**
+     * Prune finished jobs from the pool.
+     */
     void prune_finished_jobs();
 
 private:
