@@ -52,10 +52,9 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
-#include <exception>
 #include <fstream>
 #include <iostream>
-#include <thread>
+#include <stdexcept>
 #include <tuple>
 #include <utility>
 #include <vector>
@@ -94,6 +93,9 @@ namespace {
     constexpr char ARG_Q_SHIFT_1[] = "q_shift_1";
     constexpr char ARG_Q_SHIFT_2[] = "q_shift_2";
 
+    constexpr char ARG_REPORTING_INTERVAL_AJE[] = "reporting_interval-job_executor";
+    constexpr char ARG_REPORTING_INTERVAL_JP[] = "reporting_interval-job_pool";
+
     po::options_description option_parser() noexcept
     {
         const OutputDispatcherFactory out_dispatcher_factory_;
@@ -128,6 +130,12 @@ namespace {
             "the fold of read coverage to be simulated or number of reads/read pairs "
             "generated for each sequence for simulating cDNA reads, or a double for "
             "simulating WGS reads.");
+
+        po::options_description reporting_opts("Reporting options");
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_AJE, po::value<std::size_t>()->default_value(1),
+                                     "The reporting interval (in seconds) for individual art_modern job.");
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_JP, po::value<std::size_t>()->default_value(5),
+                                     "The reporting interval (in seconds) for JobPool.");
 
         po::options_description art_opts("ART-specific options");
         art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
@@ -180,7 +188,7 @@ namespace {
         po::options_description po_desc;
         po_desc.add(general_opts).add(required_opts);
         out_dispatcher_factory_.patch_options(po_desc);
-        po_desc.add(art_opts).add(parallel_opts);
+        po_desc.add(art_opts).add(parallel_opts).add(reporting_opts);
         return po_desc;
     }
 
@@ -498,6 +506,9 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     const auto read_len = get_param<int>(vm_, ARG_READ_LEN);
     validate_read_length(read_len);
 
+    const auto report_interval_aje = get_param<std::size_t> (vm_, ARG_REPORTING_INTERVAL_AJE);
+    const auto report_interval_jp = get_param<std::size_t> (vm_, ARG_REPORTING_INTERVAL_JP);
+
     auto per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
     auto per_base_del_rate_1 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel);
     auto per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
@@ -539,6 +550,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
                  err_prob,
                  pe_dist_mean_minus_2_std,
                  std::move(qdist),
+                 report_interval_jp, report_interval_aje
              },
         { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel, batch_size, vm_,
             std::move(args) } };

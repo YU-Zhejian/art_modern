@@ -26,6 +26,7 @@
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/jobs/JobPool.hh"
+#include "libam_support/jobs/JobPoolReporter.hh"
 #include "libam_support/jobs/SimulationJob.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/out/OutputDispatcher.hh"
@@ -35,51 +36,17 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
-#include "libam_support/utils/exception_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
-#include <atomic>
-#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <limits>
 #include <memory>
-#include <thread>
 #include <utility>
 
 namespace labw::art_modern {
-
-class JobPoolReporter {
-public:
-    explicit JobPoolReporter(JobPool& jp, const std::size_t reporting_interval_seconds = 1)
-        : jp_(jp)
-        , reporting_interval_seconds_(reporting_interval_seconds)
-    {
-    }
-    void stop()
-    {
-        should_stop_ = true;
-        thread_.join();
-    }
-    void start() { thread_ = std::thread(&JobPoolReporter::job_, this); }
-
-private:
-    void job_()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
-        while (!should_stop_) {
-            BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_ajes() << " JobExecutors running";
-            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
-        }
-    }
-
-    JobPool& jp_;
-    std::atomic<bool> should_stop_ { false };
-    std::thread thread_;
-    const std::size_t reporting_interval_seconds_;
-};
 
 class Generator {
 public:
@@ -89,7 +56,7 @@ public:
         : art_params_(std::move(art_params))
         , art_io_params_(art_io_params)
         , job_pool_(art_io_params.parallel)
-        , reporter_(job_pool_)
+        , reporter_(job_pool_, art_params_.job_pool_reporting_interval_seconds)
     {
         reporter_.start();
     }

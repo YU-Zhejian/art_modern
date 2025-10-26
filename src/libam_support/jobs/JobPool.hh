@@ -29,9 +29,11 @@
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_BS_PARALLEL, USE_ASIO_PARALLEL"
 #endif
 
+#include <atomic>
 #include <cstddef>
 #include <memory>
 #include <mutex>
+#include <thread>
 #include <vector>
 
 namespace labw::art_modern {
@@ -58,9 +60,9 @@ public:
     /**
      * Add a job to the pool.
      *
-     * @param aje Job to add.
+     * @param job_executor Job to add.
      */
-    void add(const std::shared_ptr<JobExecutor>& aje);
+    void add(const std::shared_ptr<JobExecutor>& job_executor);
 
     /**
      * Stop the pool.
@@ -70,7 +72,8 @@ public:
      * Number of job instances that are still alive in the pool. Also remove AJEs that are not running.
      * @return As described.
      */
-    [[nodiscard]] std::size_t n_running_ajes();
+    [[nodiscard]] std::size_t n_running_executors() const;
+    void prune_finished_jobs();
 
 private:
 #if defined(USE_NOP_PARALLEL)
@@ -80,9 +83,24 @@ private:
 #elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;
 #endif
-    std::vector<std::shared_ptr<JobExecutor>> ajes_;
+    /** Prune the finished jobs periodically. */
+    void supervisor_();
+
+    /** All running executors inside the pool. */
+    std::vector<std::shared_ptr<JobExecutor>> executors_;
+    /** Cached number of running executors. */
+    std::size_t n_running_executors_ = 0;
+    /** Size of the pool. */
     std::size_t pool_size_ = 1;
-    std::mutex mutex_;
+    /** Mutex for operations on the pool. */
+    std::mutex operation_mutex_;
+    /** Mutex for adding jobs. */
+    std::mutex add_mutex_;
+    std::thread supervisor_thread_;
+    std::atomic<bool> should_stop_ { false  };
+    std::size_t add_spin_waits_ms_ = 100;
+    std::size_t supervisor_interval_ms_ = 500;
+
 };
 
 } // namespace labw::art_modern

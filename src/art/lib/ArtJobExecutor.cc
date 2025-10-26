@@ -33,12 +33,10 @@
 
 #include <htslib/hts.h>
 
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
-#include <limits>
 #include <memory>
 #include <string>
 #include <thread>
@@ -49,8 +47,9 @@ namespace {
 
     class AJEReporter {
     public:
-        explicit AJEReporter(ArtJobExecutor& aje)
+        explicit AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
             : aje_(aje)
+            , reporting_interval_seconds_(reporting_interval_seconds)
         {
         }
 
@@ -74,7 +73,7 @@ namespace {
         ArtJobExecutor& aje_;
         std::atomic<bool> should_stop_ { false };
         std::thread thread_;
-        std::size_t reporting_interval_seconds_ = 1;
+        std::size_t reporting_interval_seconds_;
     };
 
 } // namespace
@@ -177,7 +176,7 @@ void ArtJobExecutor::operator()()
         return;
     }
 
-    AJEReporter reporter(*this);
+    AJEReporter reporter(*this, art_params_.art_job_executor_reporting_interval_seconds);
     reporter.start();
     hts_pos_t accumulated_contig_len = 0;
 

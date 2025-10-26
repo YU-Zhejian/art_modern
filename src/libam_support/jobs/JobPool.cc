@@ -16,6 +16,7 @@
 
 #include "libam_support/jobs/JobExecutor.hh"
 #include "libam_support/jobs/JobPool.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #if defined(USE_NOP_PARALLEL)
 // Do nothing!
@@ -27,6 +28,7 @@
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_BS_PARALLEL, USE_ASIO_PARALLEL"
 #endif
 
+#include <atomic>
 #include <chrono>
 #include <cstddef>
 #include <memory>
@@ -37,19 +39,24 @@
 
 namespace labw::art_modern {
 
-std::size_t JobPool::n_running_ajes()
+
+std::size_t JobPool::n_running_executors() const
 {
-    const std::scoped_lock lock(mutex_);
+    return n_running_executors_;
+}
+
+void JobPool::prune_finished_jobs(){
+    const std::scoped_lock op_lock(operation_mutex_);
     std::size_t n_running = 0;
     std::vector<std::shared_ptr<JobExecutor>> passed_ajes_;
-    for (auto aje : ajes_) {
+    for (auto aje : executors_) {
         if (aje && aje->is_running()) {
             n_running++;
             passed_ajes_.emplace_back(std::move(aje));
         }
     }
-    ajes_ = std::move(passed_ajes_);
-    return n_running;
+    executors_ = std::move(passed_ajes_);
+    n_running_executors_ = n_running;
 }
 
 void JobPool::stop()
@@ -61,24 +68,39 @@ void JobPool::stop()
 #elif defined(USE_ASIO_PARALLEL)
     pool_.join();
 #endif
+    should_stop_ = true;
+    if (supervisor_thread_.joinable()) {
+        supervisor_thread_.join();
+    }
 }
 
-void JobPool::add(const std::shared_ptr<JobExecutor>& aje)
-{
-    // Spin until there's a slot
-    while (n_running_ajes() >= pool_size_) {
-        std::this_thread::yield();
+void JobPool::supervisor_() {
+    while (! should_stop_){
+        prune_finished_jobs();
+        std::this_thread::sleep_for(std::chrono::milliseconds(supervisor_interval_ms_));
     }
-    {
-        const std::scoped_lock lock(mutex_);
-        ajes_.emplace_back(aje);
+}
+
+void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
+{
+    const std::scoped_lock add_lock(add_mutex_);
+    // Spin until there's a slot
+    while (n_running_executors_ >= pool_size_){
+        prune_finished_jobs();
+        std::this_thread::sleep_for(std::chrono::milliseconds(add_spin_waits_ms_));
+    }
+    // Start the job first
 #if defined(USE_NOP_PARALLEL)
         aje->operator()();
 #elif defined(USE_BS_PARALLEL)
         [[maybe_unused]] auto future = pool_.submit_task([this_aje = aje]() mutable { this_aje->operator()(); });
 #elif defined(USE_ASIO_PARALLEL)
-        post(pool_, [this_aje = aje]() mutable { this_aje->operator()(); });
+        post(pool_, [this_aje = job_executor]() mutable { this_aje->operator()(); });
 #endif
+    // Then add to the list
+    {
+        const std::scoped_lock op_lock(operation_mutex_);
+        executors_.emplace_back(job_executor);
     }
 }
 
@@ -86,7 +108,9 @@ JobPool::~JobPool() { stop(); }
 
 JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
-    { }
+    {
+    // No need to start the supervisor thread
+    }
 #elif defined(USE_BS_PARALLEL)
     : pool_(pool_size)
     , pool_size_(pool_size) { }
@@ -94,6 +118,7 @@ JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
     : pool_(pool_size)
     , pool_size_(pool_size)
 {
+    supervisor_thread_ = std::thread(&JobPool::supervisor_, this);
 }
 #endif
 
