@@ -64,10 +64,10 @@ You may also:
 ### Pure LLVM/Clang Toolchain
 
 ```shell
-LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
-    LD_RUN_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
-    PKG_CONFIG_PATH=${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/ \
-    CMAKE_TOOLCHAIN_FILE=sh.d/toolchain/llvm-toolchain.cmake \
+LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
+    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}"\
+    PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
+    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/llvm-toolchain.cmake" \
     make testbuild \
     CMAKE_FLAGS='-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/'
 ```

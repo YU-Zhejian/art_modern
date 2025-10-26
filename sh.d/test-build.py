@@ -27,17 +27,18 @@ IO_MUTEX = threading.Lock()
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
-    result = subprocess.run(
-        [CMAKE, "-P", os.path.join(SHDIR, "test-build.d", cmake_file_path)],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
+    with open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file:
+        result = subprocess.run(
+            [CMAKE, "-P", os.path.join(SHDIR, "test-build.d", cmake_file_path)],
+            stdout=log_file,
+            stderr=log_file,
+        )
     return result.returncode == 0
 
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
-    with tempfile.TemporaryDirectory() as proj_dir, tempfile.TemporaryDirectory() as build_dir:
+    with tempfile.TemporaryDirectory() as proj_dir, tempfile.TemporaryDirectory() as build_dir,open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file:
         shutil.copy(
             os.path.join(SHDIR, "test-build.d", cmake_file_path),
             os.path.join(proj_dir, "CMakeLists.txt"),
@@ -45,8 +46,8 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
         result = subprocess.run(
             [CMAKE, os.path.join(proj_dir, "CMakeLists.txt")],
             cwd=build_dir,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+            stdout=log_file,
+            stderr=log_file,
         )
         return result.returncode == 0
 

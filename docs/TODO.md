@@ -49,6 +49,7 @@
 - Supress all lintian issues.
 - Pack MPI-enabled Debian packages, BioConda build, etc.
 - Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
+- Support `libtcmalloc.pc` and `libtcmalloc_minimal.pc`. Provided by Debian package `libgoogle-perftools-dev` (wierd). Also support Google profilers.
 
 ## Performance
 

@@ -22,5 +22,7 @@ make -C "${SHDIR}"/test-am-many-contigs.d/
         --o-hl_sam-num_threads 4 \
         --o-hl_sam-compress_level u \
         --o-hl_sam-write_bam \
-        --o-fastq /dev/null
+        --o-fastq /dev/null \
+        --reporting_interval-job_executor 10 \
+        --reporting_interval-job_pool 50
 # This generates 10G reads.
