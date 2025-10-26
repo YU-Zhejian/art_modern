@@ -105,4 +105,9 @@ InMemoryFastaFetch::InMemoryFastaFetch(
 {
 }
 
+    void InMemoryFastaFetch::clear() {
+        seqs_.clear();
+        BaseFastaFetch::clear();
+}
+
 } // namespace labw::art_modern

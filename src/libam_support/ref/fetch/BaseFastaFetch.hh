@@ -101,6 +101,8 @@ public:
 
     [[nodiscard]] bool empty() const;
 
+    virtual void clear();
+
 protected:
     std::vector<std::string> seq_names_;
     std::vector<hts_pos_t> seq_lengths_;

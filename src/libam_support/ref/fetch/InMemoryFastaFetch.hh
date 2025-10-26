@@ -52,6 +52,7 @@ public:
     InMemoryFastaFetch(std::vector<std::string>&& seq_name, std::vector<std::string>&& seq);
     std::string fetch(size_t seq_id, hts_pos_t start, hts_pos_t end) override;
     std::string fetch(size_t seq_id) override;
+    void clear() override;
 
 private:
     std::vector<std::string> seqs_;

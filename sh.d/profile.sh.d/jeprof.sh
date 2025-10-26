@@ -6,10 +6,10 @@ mkdir -p "${PROFILE_DIR}"
 env -C "${PROFILE_DIR}" cmake \
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
-		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
-		-DCMAKE_VERBOSE_MAKEFILE=ON \
-		-DCEU_CM_SHOULD_USE_NATIVE=ON \
+    -Wdev -Wdeprecated --warn-uninitialized \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DCEU_CM_SHOULD_USE_NATIVE=ON \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
     -DUSE_RANDOM_GENERATOR=PCG \
     -DUSE_MALLOC=JEMALLOC \

@@ -150,8 +150,14 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
+ArtJobExecutor::~ArtJobExecutor()
+{
+    if (clear_after_use_) {
+        job_.fasta_fetch->clear();
+    }
+}
 ArtJobExecutor::ArtJobExecutor(
-    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
+    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank_s())
@@ -160,6 +166,7 @@ ArtJobExecutor::ArtJobExecutor(
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(output_dispatcher->require_alignment())
     , token_ring_(output_dispatcher->get_producer_tokens())
+    , clear_after_use_(clear_after_use)
 {
 }
 
@@ -241,6 +248,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(other.require_alignment_)
     , token_ring_(std::move(other.token_ring_))
+    , clear_after_use_(other.clear_after_use_)
 {
 }
 std::string ArtJobExecutor::thread_info() const

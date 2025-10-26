@@ -33,8 +33,8 @@ namespace labw::art_modern {
 class ArtJobExecutor final : public JobExecutor {
 public:
     ArtJobExecutor(
-        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher);
-    ~ArtJobExecutor() override = default;
+        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher, bool clear_after_use);
+    ~ArtJobExecutor() override;
 
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
     ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
@@ -67,6 +67,7 @@ private:
     am_readnum_t current_max_tolerence_ = 0;
     am_readnum_t current_n_reads_generated_ = 0;
     OutputDispatcher::TokenRing token_ring_;
+    bool clear_after_use_ = true;
 };
 
 } // namespace labw::art_modern
