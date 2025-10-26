@@ -53,10 +53,11 @@ BaseFastaFetch::BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector
 bool BaseFastaFetch::empty() const { return this->seq_names_.empty(); }
 std::string BaseFastaFetch::fetch(const std::size_t seq_id) { return fetch(seq_id, 0, seq_lengths_[seq_id]); }
 
-    void BaseFastaFetch::clear() {
-        seq_names_.clear();
-        seq_lengths_.clear();
-        seq_names_.shrink_to_fit();
-        seq_lengths_.shrink_to_fit();
-    }
+void BaseFastaFetch::clear()
+{
+    seq_names_.clear();
+    seq_lengths_.clear();
+    seq_names_.shrink_to_fit();
+    seq_lengths_.shrink_to_fit();
+}
 } // namespace labw::art_modern

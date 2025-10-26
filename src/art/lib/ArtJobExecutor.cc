@@ -151,8 +151,8 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
 }
 
 ArtJobExecutor::~ArtJobExecutor() = default;
-ArtJobExecutor::ArtJobExecutor(
-    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
+ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
+    const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank_s())

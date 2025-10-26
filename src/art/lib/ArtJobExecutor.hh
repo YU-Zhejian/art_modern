@@ -32,8 +32,8 @@ namespace labw::art_modern {
 
 class ArtJobExecutor final : public JobExecutor {
 public:
-    ArtJobExecutor(
-        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher, bool clear_after_use);
+    ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
+        const std::shared_ptr<OutputDispatcher>& output_dispatcher, bool clear_after_use);
     ~ArtJobExecutor() override;
 
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;

@@ -32,8 +32,8 @@
 #include <memory>
 #include <mutex>
 #include <thread>
-#include <vector>
 #include <utility>
+#include <vector>
 
 namespace labw::art_modern {
 
@@ -41,11 +41,11 @@ std::size_t JobPool::n_running_ajes()
 {
     const std::scoped_lock lock(mutex_);
     std::size_t n_running = 0;
-    std::vector< std::shared_ptr<JobExecutor> > passed_ajes_;
+    std::vector<std::shared_ptr<JobExecutor>> passed_ajes_;
     for (auto aje : ajes_) {
         if (aje && aje->is_running()) {
             n_running++;
-            passed_ajes_.emplace_back( std::move(aje) );
+            passed_ajes_.emplace_back(std::move(aje));
         }
     }
     ajes_ = std::move(passed_ajes_);

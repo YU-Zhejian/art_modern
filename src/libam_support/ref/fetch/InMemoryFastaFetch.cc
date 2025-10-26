@@ -105,10 +105,11 @@ InMemoryFastaFetch::InMemoryFastaFetch(
 {
 }
 
-    void InMemoryFastaFetch::clear() {
-        seqs_.clear();
-        seqs_.shrink_to_fit();
-        BaseFastaFetch::clear();
+void InMemoryFastaFetch::clear()
+{
+    seqs_.clear();
+    seqs_.shrink_to_fit();
+    BaseFastaFetch::clear();
 }
 
 } // namespace labw::art_modern

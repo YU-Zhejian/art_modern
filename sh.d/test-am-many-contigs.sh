@@ -4,9 +4,7 @@ CC="${CC:-cc}"
 set -ue
 SHDIR="$(readlink -f "$(dirname "${0}")")"
 cd "${SHDIR}/../"
-"${CC}" "${CFLAGS[@]}" -std=c11 \
-    -o "${SHDIR}"/test-am-many-contigs.d/generate_many_contigs \
-    "${SHDIR}"/test-am-many-contigs.d/generate_many_contigs.c
+make -C "${SHDIR}"/test-am-many-contigs.d/
 
 "${SHDIR}"/test-am-many-contigs.d/generate_many_contigs |
     opt/build_release_install/bin/art_modern \
@@ -21,8 +19,8 @@ cd "${SHDIR}/../"
         --i-batch_size 1048576 \
         --parallel 0 \
         --o-hl_sam /dev/null \
-      --o-hl_sam-num_threads 4 \
-      --o-hl_sam-compress_level u \
-      --o-hl_sam-write_bam \
-      --o-fastq /dev/null
+        --o-hl_sam-num_threads 4 \
+        --o-hl_sam-compress_level u \
+        --o-hl_sam-write_bam \
+        --o-fastq /dev/null
 # This generates 10G reads.

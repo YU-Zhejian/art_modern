@@ -26,7 +26,7 @@ namespace labw::art_modern {
 class SimulationJob {
 public:
     SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-        const std::shared_ptr<CoverageInfo>& coverage_info,  std::size_t job_id);
+        const std::shared_ptr<CoverageInfo>& coverage_info, std::size_t job_id);
     SimulationJob& operator=(SimulationJob&&) = delete;
 
     SimulationJob(SimulationJob&& other) noexcept;
