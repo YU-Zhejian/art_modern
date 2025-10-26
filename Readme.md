@@ -372,7 +372,7 @@ The project provides diverse documentations to satisfy your needs.
   - [Design](docs/Design.md) for the latest design of the software.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
   - [News](docs/News.md) for changes over the project.
-- For a comparison of this project with other simulators, see [Benchmark](explore/benchmark_other_simulators).
+- For a comparison of this project with other simulators, see [Benchmark](https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators).
 - The original ART documentation is copied to [here](docs/original_art_docs).
 
 ## Acknowledgements
