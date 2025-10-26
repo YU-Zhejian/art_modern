@@ -64,16 +64,17 @@ namespace {
     private:
         void job_() const
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
             while (!should_stop_) {
                 BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
             }
         }
 
         ArtJobExecutor& aje_;
         std::atomic<bool> should_stop_ { false };
         std::thread thread_;
+        std::size_t reporting_interval_seconds_ = 1;
     };
 
 } // namespace
