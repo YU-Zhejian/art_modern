@@ -3,6 +3,7 @@
 ## IMPORTANT
 
 - For large-contigs test, the evenness of the coverage should be assessed.
+- Add new options to docs.
 - Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE: 
 
   ```shell

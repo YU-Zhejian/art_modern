@@ -29,12 +29,16 @@
 #error "No parallel strategy defined! One of: USE_NOP_PARALLEL, USE_BS_PARALLEL, USE_ASIO_PARALLEL"
 #endif
 
+#if !defined(USE_NOP_PARALLEL)
 #include <atomic>
-#include <cstddef>
-#include <memory>
+#include <chrono>
 #include <mutex>
 #include <thread>
 #include <vector>
+#endif
+
+#include <cstddef>
+#include <memory>
 
 namespace labw::art_modern {
 
@@ -85,7 +89,7 @@ private:
 #endif
     /** Prune the finished jobs periodically. */
     void supervisor_();
-
+#if !defined(USE_NOP_PARALLEL)
     /** All running executors inside the pool. */
     std::vector<std::shared_ptr<JobExecutor>> executors_;
     /** Cached number of running executors. */
@@ -97,10 +101,10 @@ private:
     /** Mutex for adding jobs. */
     std::mutex add_mutex_;
     std::thread supervisor_thread_;
-    std::atomic<bool> should_stop_ { false  };
+    std::atomic<bool> should_stop_ { false };
     std::size_t add_spin_waits_ms_ = 100;
     std::size_t supervisor_interval_ms_ = 500;
-
+#endif
 };
 
 } // namespace labw::art_modern
