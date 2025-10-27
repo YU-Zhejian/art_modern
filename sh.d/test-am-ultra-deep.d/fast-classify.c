@@ -2,11 +2,11 @@
 #include <libdeflate.h>
 #include <zlib.h>
 
+#define _POSIX_C_SOURCE 200809L // For getline, CLOCK_MONOTONIC
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include <netbsd/getdelim.h>
 
 const size_t NUM_CLASSES = 16 * 16; // 256 classes for 2 hex digits
 

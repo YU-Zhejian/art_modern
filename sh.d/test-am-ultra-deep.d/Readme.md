@@ -52,14 +52,6 @@ Affected files:
 
 Under the MIT license.
 
-### Code Fragment from NetBSD Project
-
-Affected files:
-
-- `netbsd/getdelim.c`, from [NetBSD CVS Repo](https://cvsweb.netbsd.org/bsdweb.cgi/pkgsrc/pkgtools/libnbcompat/files/getdelim.c?only_with_tag=pkgsrc-2025Q3-base).
-
-Under the BSD license.
-
 ## Hedley by Evan Nemerson
 
 Available at [Git repo](https://github.com/nemequ/hedley) commit [`8fb0604`](https://github.com/nemequ/hedley/commit/8fb0604a8095f6c907378cc3f0391520ae843f6f).

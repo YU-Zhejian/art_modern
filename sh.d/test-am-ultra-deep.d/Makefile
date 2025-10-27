@@ -6,10 +6,10 @@ LIBS ?= -lz -ldeflate -lxxhash
 .PHONY: all
 all: fast-classify find-dups
 
-fast-classify: fast-classify.o netbsd/getdelim.o
+fast-classify: fast-classify.o
 	$(CC) -o $@ $^ $(LIBS)
 
-find-dups: find-dups.o netbsd/getdelim.o bloom/bloom.o
+find-dups: find-dups.o bloom/bloom.o
 	$(CC) -o $@ $^ $(LIBS)
 
 %.o: %.c

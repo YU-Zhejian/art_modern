@@ -6,14 +6,19 @@
 
 #include <bloom/bloom.h>
 #include <klib/khash.h>
-#include <netbsd/getdelim.h>
-#include <rapidhash/rapidhash.h>
+// #include <netbsd/getdelim.h>
 #include <hedley/hedley.h>
+#include <rapidhash/rapidhash.h>
+
+#define _POSIX_C_SOURCE 200809L // For getline, CLOCK_MONOTONIC
 
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <time.h>
+#include <unistd.h>
 
 KHASH_INIT(dup_set, kh_cstr_t, char, 0, kh_str_hash_func, kh_str_hash_equal)
 
@@ -56,10 +61,14 @@ int main(void)
     size_t linecount = 0;
     size_t bloom_errors = 0;
     bool fucked = false;
+    struct timespec ts_start;
+    struct timespec ts_end;
+    clock_gettime(CLOCK_MONOTONIC, &ts_start);
+
     while ((linelen = getline(&line, &bufflen, stdin)) != -1) {
         linecount++;
         // Check if the line is in the bloom filter
-        if (bloom_test(bloom_filter, line, linelen)) {
+        if (true) { // bloom_test(bloom_filter, line, linelen)
             // Potential duplicate
             k = kh_get(dup_set, dups, line);
             if (k != kh_end(dups)) {
@@ -82,8 +91,11 @@ int main(void)
             goto cleanup;
         }
         if (linecount % REPORT_INTERVAL == 0) {
-            fprintf(
-                stderr, "Read %zu lines; Bloom error rate: %f\n", linecount, (double)bloom_errors / REPORT_INTERVAL);
+            clock_gettime(CLOCK_MONOTONIC, &ts_end);
+            double elapsed = (ts_end.tv_sec - ts_start.tv_sec) + (ts_end.tv_nsec - ts_start.tv_nsec) / 1e9;
+            double lps = REPORT_INTERVAL / elapsed;
+            fprintf(stderr, "Read %zu lines; Bloom error rate: %f; Lines per second: %f\n", linecount,
+                (double)bloom_errors / REPORT_INTERVAL, lps);
             bloom_errors = 0;
         }
     }
