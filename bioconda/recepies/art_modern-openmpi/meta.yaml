@@ -1,4 +1,4 @@
-{% set name = "art_modern" %}
+{% set name = "art_modern-openmpi" %}
 {% set version = "1.2.0" %}
 
 package:
@@ -12,7 +12,7 @@ source:
 build:
   number: 0
   run_exports:
-    - {{ pin_subpackage('art_modern', max_pin="x.x") }}
+    - {{ pin_subpackage('art_modern-openmpi', max_pin="x.x") }}
 
 requirements:
   build:
@@ -40,8 +40,11 @@ requirements:
 
 test:
   commands:
-    - ART_NO_LOG_DIR=1 mpiexec -n 2 art_modern-mpi --version 2>&1 | grep -q "{{ version }}"
-    - ART_NO_LOG_DIR=1 mpiexec -n 2 art_profile_builder-mpi --version 2>&1 | grep -q "{{ version }}"
+    # Note that the -x parameter is OpenMPI-specific to pass env vars to the remote nodes.
+    # MPICH, instead, uses -env.
+    # The --allow-run-as-root is needed to test inside containers.
+    - mpiexec --allow-run-as-root -x ART_NO_LOG_DIR=1 -n 2 art_modern-mpi --version 2>&1 | grep -q "{{ version }}"
+    - mpiexec --allow-run-as-root -x ART_NO_LOG_DIR=1 -n 1 art_profile_builder-mpi --version 2>&1 | grep -q "{{ version }}"
 
 about:
   home: "https://github.com/YU-Zhejian/art_modern"

@@ -6,14 +6,14 @@ conda run -n bioconda \
     bioconda-utils lint \
     ./recepies \
     config.yml \
-    --packages art_modern \
+    --packages art_modern art_modern-openmpi \
     --cache ./.cache \
     --logfile bioconda-utils-lint.log
 conda run -n bioconda \
     --no-capture-output --live-stream \
     bioconda-utils build \
     ./recepies \
-    --packages art_modern \
+    --packages art_modern art_modern-openmpi \
     --docker \
     --mulled-test \
     --logfile bioconda-utils-build.log

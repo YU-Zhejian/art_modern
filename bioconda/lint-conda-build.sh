@@ -8,10 +8,12 @@ conda run -n bioconda \
     conda build purge-all
 conda run -n bioconda \
     --no-capture-output --live-stream \
-    conda build ./recepies/art_modern \
+    conda build \
     --no-anaconda-upload \
     --strict-verify \
     --output-folder ./test_output \
     --package-format 2 \
     -c bioconda \
-    -c conda-forge
+    -c conda-forge \
+    ./recepies/art_modern \
+    ./recepies/art_modern-openmpi
