@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "getdelim.h"
+#include <netbsd/getdelim.h>
 
 const size_t NUM_CLASSES = 16 * 16; // 256 classes for 2 hex digits
 

@@ -1,12 +1,15 @@
-CFLAGS ?= -O3 -mtune=native -march=native -Wall -Wextra -Wpedantic
+CFLAGS ?= -O3 -mtune=native -march=native -Wall -Wextra -Wpedantic -g
 CC ?= gcc
 
-LIBS ?= -lz -ldeflate
+LIBS ?= -lz -ldeflate -lxxhash
 
 .PHONY: all
-all: fast-classify
+all: fast-classify find-dups
 
-fast-classify: fast-classify.o getdelim.o
+fast-classify: fast-classify.o netbsd/getdelim.o
+	$(CC) -o $@ $^ $(LIBS)
+
+find-dups: find-dups.o netbsd/getdelim.o bloom/bloom.o
 	$(CC) -o $@ $^ $(LIBS)
 
 %.o: %.c
@@ -14,4 +17,4 @@ fast-classify: fast-classify.o getdelim.o
 
 .PHONY: clean
 clean:
-	rm *.o fast-classify
+	rm -f *.o */*.o fast-classify find-dups
