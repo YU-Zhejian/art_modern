@@ -25,6 +25,8 @@ In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zi
 
 **WARNING** Static builds may lead to compromized security.
 
+**NOTE** The fully static build does **NOT** come with MPI support.
+
 #### Using `dpkg`
 
 If you use specific versions of Debian or Ubuntu, you can install `art_modern` through pre-built DEB packages available with each release. Root privileges are required.
