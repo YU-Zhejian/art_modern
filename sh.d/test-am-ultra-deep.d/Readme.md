@@ -9,3 +9,7 @@ All FASTQ read IDs will firstly be separated based on their first 2 hex digits o
 ## Dependencies
 
 Requires zlib and libdeflate.
+
+## TODO
+
+A bloom filter is available [here](https://git.sr.ht/~sircmpwn/bloom/tree/master/item/main.c). However, we need to collect some hash functions.

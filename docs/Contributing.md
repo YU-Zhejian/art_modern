@@ -37,6 +37,18 @@ make doc
 
 And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
 
+## Release Cycle
+
+- Feature freeze: All new features merged into the `develop` branch.
+- Code freeze: All **production** code changes (including bug fixes) merged into the `develop` branch. Run `make fmt` to format the code. Ensure that integration test passes.
+- Integration test: `make testbuild` and `make testbuild-mpi` are executed using GCC, pure LLVM/Clang, and Intel oneAPI DPCPP toolchain to ensure compatibility. Ensure `make packing` passes without errors.
+- Documentation freeze: All documentation changes merged into the `develop` branch. Note:
+  - Update `News.md`.
+  - Update version number in `CMakeLists.txt`.
+  - Ensure `make cleandoc` passes without errors.
+- Release: The `develop` branch is merged into the main branch, tagged with a new version number.
+- Generate artifact: Run `make packing` and `make cleandoc`.
+
 ## Get Engaged
 
 ### Issues
