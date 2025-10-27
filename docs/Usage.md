@@ -18,14 +18,29 @@ See [here](https://www.illumina.com/science/technology/next-generation-sequencin
   - **For `wgs` and `trans` mode:** A read may start from any position in the reference contig that is long enough to contain the read.
   - **For `template` mode:** A read will start from position 0 in the reference contig.
 - `pe` for paired-end reads. That includes:
-  - **For `wgs` and `trans` mode:** A fragment, whose length is drawn from a Gaussian distribution specified by `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev`, is created from any position in the reference contig that is long enough to contain the fragment.
+  - **For `wgs` and `trans` mode:** A fragment (called insert in some other simulators), whose length is drawn from a Gaussian distribution specified by `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev`, is created from any position in the reference contig that is long enough to contain the fragment.
   - **For `template` mode:** A fragment that spans the entire length of the reference contig is created.
   - Paired-end reads facing inward of the fragment are then created from both ends of the fragment.
 - `mp` for mate-paired reads. That includes:
   - Extraction of the fragment as-is in `pe` mode.
   - Mate-paired reads facing outward of the fragment are created from both ends of the fragment.
 
-Parameters `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev` are needed to specify the length distribution of fragments. In original ART, the fragment lengths obey Gaussian (normal) distribution.
+A graphical representation of the above three scenarios:
+
+```text
+FRAGMENT:  |==============================|
+SE READ:   |------->
+
+FRAGMENT:  |==============================|
+PE READ 1: |------->
+PE READ 2:                        |<------|
+
+FRAGMENT:  |==============================|
+MP READ 1: <-------|
+MP READ 2:                        |------->
+```
+
+Parameters `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev` are needed to specify the length distribution of fragments. In original ART, the fragment lengths is modelled using Gaussian (normal) distribution.
 
 (parallelism-section)=
 ### Parallelism (`--parallel`)
@@ -44,35 +59,47 @@ Currently, we support input in FASTA and PBSIM3 Transcripts format. They are con
   - `fasta` for FASTA files.
   - `pbsim3_transcripts` for PBSIM3 Transcripts format.
 
+**NOTE** If you use UNIX devices like `/dev/stdin`, please make sure that the `--i-type` option is specified.
+
 #### Input Parser (`--i-parser`)
 
-- **`auto` (DEFAULT) for size-based determination.**
-  - If the file size larger than 1 GiB or cannot be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode).
-  - Otherwise, use `memory`.
-- `memory`: The entire file will be read into the memory.
-  - Fast for small reference files.
-- `htslib`: Store FASTA Index in memory and fetch sequences from disk using [HTSLib](https://github.com/samtools/htslib).
-  - A FASTA Index (Usually ends with `.fai` and can be built using `samtools faidx`) will be needed.
-  - Memory-efficient for large genome assembly FASTA files with limited number of long contigs.
-  - Inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
-  - Each thread will hold its own FASTA Index in memory.
-  - **DO NOT SUPPORT PBSIM3 TRANSCRIPT FORMAT.**
-- `stream`: Streamline the input reference as batches and process them one by one.
-  - Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
-  - **CONTIG NUMBER AND LENGTH INFORMATION NOT AVAILABLE**, so use headless SAM/BAM output if a SAM/BAM output is needed.
-  - Batch size controlled by `--i-batch_size`.
+**`auto` (DEFAULT) for size-based determination.**
+
+- If the file size larger than 1 GiB or cannot be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode).
+- Otherwise, use `memory`.
+
+`memory`: The entire file will be read into the memory.
+
+- Fast for small reference files.
+
+`htslib`: Store FASTA Index in memory and fetch sequences from disk using [HTSLib](https://github.com/samtools/htslib).
+
+- A FASTA Index (Usually ends with `.fai` and can be built using `samtools faidx`) will be needed.
+- Memory-efficient for large genome assembly FASTA files with limited number of long contigs.
+- Inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+- **NOTE** Do not support PBSIM3 Transcripts format.
+- **NOTE** Do not support UNIX devices for input.
+- **NOTE** `htslib` parser can be used on a `.fa.gz` file. However, please note that:
+  - The GZ file **MUST** be bgzip-compressed. Plain GZip will **NOT** work.
+  - Specify `--i-type fasta` to use this parser.
+
+`stream`: Streamline the input reference as batches and process them one by one.
+
+- Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+- **CONTIG NUMBER AND LENGTH INFORMATION NOT AVAILABLE**, so use headless SAM/BAM output if a SAM/BAM output is needed.
+- Batch size controlled by `--i-batch_size`.
 
 #### Coverage (`--i-fcov`)
-
-**NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`.
 
 This option allows you to specify coverage. `art_modern` supports the following coverage mode:
 
 - Unified coverage in `double` data type (e.g., 10.0). Under this scenario, the coverage is identical for all contigs.
-- Per-contig coverage without strand information.
-- Per-contig coverage with strand information.
+- Per-contig coverage tab-separated value (TSV) without strand information.
+- Per-contig coverage TSV with strand information.
 
-**NOTE** We prefer unified coverage. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify per-contig coverage.
+**NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`. This format comes with contig-specific coverage information.
+
+**NOTE** We prefer unified coverage over coverage TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
 
 #### Conclusive Remarks
 
@@ -222,6 +249,8 @@ Quality distributions bundled with the original ART can be found [here](../data/
 This new executable is designed to supress the old `art_profiler_illumina` Shell/Perl scripts for building ART-compatible quality profiles. It supports building profiles from FASTQ and SAM/BAM files.
 
 **NOTE** All reads with quality will be used to build the profile. So if you use SAM/BAM files as input, please make sure that primiary- and un-aligned reads have quality information, and secondary- or supplementary-aligned reads have no quality information.
+
+**NOTE** For MPI users: Currently, this executable runs under one slot (`mpiexec -n 1`) only. If more than one slot is provided, processes with MPI rank larger than 0 will terminate themselves.
 
 ### Options
 
