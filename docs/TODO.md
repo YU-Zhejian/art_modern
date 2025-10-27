@@ -4,6 +4,9 @@
 
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Add new options to docs.
+- Perform large contig and many contig tests.
+- Add ultra-deep test: Ask the simulator to generate 5G reads on one contig.
+- Add FreeBSD getdelim at sh.d/test-am-ultra-deep.d/getdelim.c to Copying.md.
 - Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE: 
 
   ```shell

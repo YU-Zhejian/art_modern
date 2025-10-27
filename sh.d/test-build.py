@@ -38,7 +38,11 @@ def probe_using_cmake_script(cmake_file_path: str) -> bool:
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
-    with tempfile.TemporaryDirectory() as proj_dir, tempfile.TemporaryDirectory() as build_dir,open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file:
+    with (
+        tempfile.TemporaryDirectory() as proj_dir,
+        tempfile.TemporaryDirectory() as build_dir,
+        open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file,
+    ):
         shutil.copy(
             os.path.join(SHDIR, "test-build.d", cmake_file_path),
             os.path.join(proj_dir, "CMakeLists.txt"),
@@ -278,7 +282,7 @@ if __name__ == "__main__":
 
     print("Probing for MKL...", end="")
     if probe_mkl():
-        RANDOM_GENERATORS.append("MKL")
+        RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
         print("FAIL")
