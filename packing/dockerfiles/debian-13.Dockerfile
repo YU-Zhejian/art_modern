@@ -25,6 +25,8 @@ RUN apt-get update && \
     libconcurrentqueue-dev \
     libabsl-dev \
     lowdown \
+    openmpi-bin \
+    libopenmpi-dev \
     && apt clean
 
 COPY build_deb.sh /

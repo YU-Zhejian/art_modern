@@ -18,11 +18,10 @@ Build-Depends: debhelper-compat (= 13),
                libopenmpi-dev,
 Standards-Version: 4.7.0
 Homepage: https://github.com/YU-Zhejian/art_modern
-Rules-Requires-Root: no
 
 Package: art-modern
-Architecture: any
-Multi-Arch: foreign
+Architecture: amd64 arm64
+Multi-Arch: same
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
@@ -45,10 +44,9 @@ Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Read
  testing and benchmarking of NGS-related bioinformatics algorithms can be
  largely accelerated.
 
-
 Package: art-modern-openmpi
-Architecture: any
-Multi-Arch: foreign
+Architecture: amd64 arm64
+Multi-Arch: same
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},

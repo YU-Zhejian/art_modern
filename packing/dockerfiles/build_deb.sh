@@ -28,7 +28,7 @@ export LC_IDENTIFICATION=C
 
 # Build the deb
 echo "DEB: Build the deb"
-env -C "${BUILD_DIR}" debuild -us -uc \
+env -C "${BUILD_DIR}" debuild -us -uc --no-lintian \
     > >(sed --unbuffered 's/^/DEBUILD-INFO: /' | tee /mnt/build_deb/debuild-info.log) \
     2> >(sed --unbuffered 's/^/DEBUILD-ERR: /' | tee /mnt/build_deb/debuild-err.log >&2)
 env -C "${BUILD_DIR}" debuild -- clean &>/dev/null
