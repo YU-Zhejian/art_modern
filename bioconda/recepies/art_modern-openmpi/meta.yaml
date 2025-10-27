@@ -30,23 +30,25 @@ requirements:
     - libboost-devel >=1.86,<1.87
     - zlib
     - abseil-cpp
+    - openmpi
     - htslib # samtools does not specify HTSLib version, so do us.
     - fmt
     # Conda do not have moodycamel-concurrentqueue, so using the bundled one.
   run:
+    - openmpi
     - libboost >=1.86,<1.87
 
 test:
   commands:
-    - ART_NO_LOG_DIR=1 art_modern --version 2>&1 | grep -q "{{ version }}"
-    - ART_NO_LOG_DIR=1 art_profile_builder --version 2>&1 | grep -q "{{ version }}"
+    - ART_NO_LOG_DIR=1 mpiexec -n 2 art_modern-mpi --version 2>&1 | grep -q "{{ version }}"
+    - ART_NO_LOG_DIR=1 mpiexec -n 2 art_profile_builder-mpi --version 2>&1 | grep -q "{{ version }}"
 
 about:
   home: "https://github.com/YU-Zhejian/art_modern"
   license: "GPL-3.0-only"
   license_family: GPL3
   license_file: "License.md"
-  summary: "Modernized ART simulator of diverse Next-Generation Sequencing reads"
+  summary: "Modernized ART simulator of diverse Next-Generation Sequencing reads with MPI support"
   dev_url: "https://github.com/YU-Zhejian/art_modern"
   doc_url: "https://github.com/YU-Zhejian/art_modern/releases/download/{{ version }}/art_modern.pdf"
 
@@ -54,3 +56,6 @@ extra:
   additional-platforms:
     - linux-aarch64
     - osx-arm64
+  container:
+    # openmpi needs ssh/rsh
+    extended-base: True
