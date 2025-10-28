@@ -1,13 +1,13 @@
 # Usage
 
-This is the detailed usage of `art_modern`. Every parameter and their combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
+This is the detailed usage of `art_modern` and its companying binaries. Every parameter and their combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
 
 ## The Main Simulator: `art_modern` Executable
 
 ### Simulation Modes (`--mode`)
 
-- **`wgs` (DEFAULT) for whole-genome sequencing.** For scenarios with a limited number of sized contigs.
-- `trans` for transcriptome simulation. For scenarios with many short contigs.
+- **`wgs` (DEFAULT) for whole-genome sequencing.** For scenarios with constant coverage over a limited number of sized contigs.
+- `trans` for transcriptome simulation. For scenarios with many short contigs and/or contig-specific coverage.
 - `template` for template simulation. Often being used with a high-level simulator that produces read fragments.
 
 ### Library Construction Methods (`--lc`)
