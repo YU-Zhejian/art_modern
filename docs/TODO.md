@@ -3,9 +3,10 @@
 ## IMPORTANT
 
 - For large-contigs test, the evenness of the coverage should be assessed.
-- Add new options to docs.
 - Perform large contig, many contig, and ultra deep tests.
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
+- Add `--builtin_qual_file` to error description when none of the quality profile options are specified.
+- WGS by default? `HiSeq2500_125bp` by default? Use longest available read length by default?
 - Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE: 
 
   ```shell

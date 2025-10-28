@@ -74,3 +74,15 @@ We choose not to support [UCSC 2-bit](http://genome.ucsc.edu/FAQ/FAQformat.html#
 ## Other Performance Bottlenecks
 
 A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. This was addressed by using Walker's algorithm.
+
+## Miscellaneous
+
+### Filesystem Support
+
+We use `boost::filesystem` to handle filesystem operations like creating directories since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific filesystem APIs. The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC <= 9.1; `-lc++fs` for Clang <= 9.0; `-lc++experimental` for Clang <= 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.
+
+See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem) and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
+
+### Thread Pool Implementation
+
+Intel TBB is an excellent library that supports diverse parallel programming models and data structures. However, this library loads into the memory in run-time, which would consume a lot of time in short-running applications. This also makes the project incapable of being distributed in a fully static form (See [Design.md](Design.md)).

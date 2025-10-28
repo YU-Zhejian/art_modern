@@ -1,4 +1,4 @@
-# Developing \& Contsibuting
+# Developing \& Contributing
 
 ## Common Development-Oriented Tasks
 
@@ -7,7 +7,7 @@
 Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also require other dependencies. Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
 
 ```shell
-conda env create -f art_modern.yml
+conda env create -f env/art_modern.yml
 ```
 
 ### Testing
@@ -75,12 +75,16 @@ You may also:
 
 ### Pure LLVM/Clang Toolchain
 
+A LLVM toolchain file is provided in `sh.d/toolchain/llvm-toolchain.cmake` for users who want to use Clang/LLVM toolchain. This toolchain uses LLVM `libc++` as C++ standard library and LLVM `ld.lld` as linker.
+
+**NOTE** The Boost library shipped through your system may be compiled with GNU C++ ABI, which is not compatible with LLVM `libc++`. You may need to build Boost from source using Clang/LLVM toolchain. All C libraries do not have this issue since C ABI is generally compatible across different compilers under GNU/Linux.
+
 ```shell
 LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
     LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}"\
     PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
     CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/llvm-toolchain.cmake" \
-    make testbuild \
+    make testbuild testbuild-mpi \
     CMAKE_FLAGS='-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/'
 ```
 
@@ -90,7 +94,7 @@ Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and
 
 ```shell
 . /opt/intel/oneapi/setvars.sh
-make testbuild \
+make testbuild testbuild-mpi \
     CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
 ```
 

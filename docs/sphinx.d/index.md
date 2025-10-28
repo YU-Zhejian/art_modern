@@ -13,6 +13,7 @@ This contains documentation for `art_modern` Users. Generated using:
 src/Readme.md
 src/docs/Install.md
 src/docs/Usage.md
+src/docs/Guide.md
 src/docs/FAQ.md
 src/docs/Design.md
 src/docs/Contributing.md

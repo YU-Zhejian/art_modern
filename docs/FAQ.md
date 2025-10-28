@@ -21,15 +21,7 @@ Currently, there's no support for such features in the simulator. However, you m
 
 ### How to support new Illumina models?
 
-The code listed in `deps/ART_profiler_illumina` is Perl files that are used to create ART/`art_modern` profiles out of raw FASTQ files, and I would highly recommend that you create them on your own using the following steps:
-
-1. Download FASTQ files produced by your desired sequencer, like Illumina NovaSeq.
-2. Use the code in `deps/ART_profiler_illumina` to create ART/`art_modern` compatible profiles out of the FASTQ files.
-3. Use the generated profile with `art_modern` or ART.
-
-An example of generating HiSeq2000 and HiSeq2500 profiles is at <https://github.com/YU-Zhejian/art_modern/blob/master/explore/benchmark_other_simulators/run-fit.sh>.
-
-See also: GitHub Issue [#4](https://github.com/YU-Zhejian/art_modern/issues/4).
+See the documentation of [`art_profile_builder`](#art_profile_builder-usage-section) to build new profiles from real sequencing data.
 
 ### Can I use seed to generate deterministic results?
 
@@ -47,16 +39,6 @@ Although this application should theoretically support both endianness, only lit
 ### Is there an interface for Python, Java, and more?
 
 We may develop a C interface in the future after the APIs and design of the core library are settled.
-
-### Why you use `boost::filesystem` instead of `std::filesystem`, which was introduced in C++17?
-
-The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC <= 9.1; `-lc++fs` for Clang <= 9.0; `-lc++experimental` for Clang <= 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.
-
-See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem) and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
-
-### Why don't you use Intel Thread-Building Blocks (TBB)?
-
-Intel TBB is an excellent library that supports diverse parallel programming models and data structures. However, this library loads into the memory in run-time, which would consume a lot of time in short-running applications. This also makes the project incapable of being distributed in a fully static form (See [Design.md](Design.md)).
 
 ### Does this program support cross-compilation?
 
@@ -85,7 +67,7 @@ Where you may find the required information:
   - If your CMake correctly identifies your compiler, you may put the first several lines of CMake output to the bug report.
   - If you use GCC, it will be `g++ --version`.
   - If you use LLVM Clang, it will be `clang++ --version`.
-  - If you use Intel (R) oneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh`, before invoking this command.
+  - If you use Intel (R) oneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh` (if you installl it in default location using APT), before invoking this command.
   - Consult your compiler's documentation for other compilers.
 
 ## My question is still unanswered
