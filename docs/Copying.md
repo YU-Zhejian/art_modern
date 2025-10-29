@@ -44,7 +44,7 @@ With MIT License.
 
 **NOTE** Added in [1.0.0](#v-1.0.0-section).
 
-**NOTE** This project was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
+**NOTE** This project was dead. New projects should consider [Boost::Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
@@ -106,13 +106,13 @@ Licensed under the Apache 2.0 License.
 
 **NOTE** Added in [1.1.1](#v-1.1.1-section).
 
-## GNU Science Library by M. Galassi _et al._
+## GNU Scientific Library by M. Galassi _et al._
 
 Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of [GSL 2.8 source tarball](https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz).
 
 Affected files:
 
-- `src/libam_support/ds/GslDiscreteDistribution.hh`, which is a re-implemented in C++ from <randist/discrete.c> in GSL 2.8.
+- `src/libam_support/ds/GslDiscreteDistribution.hh`, which is a re-implemented in C++ from [`randist/discrete.c`](https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/randist/discrete.c) in GSL 2.8.
 
 Licensed under the GPL 3.0 license.
 

@@ -7,7 +7,7 @@
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
 - Add `--builtin_qual_file` to error description when none of the quality profile options are specified.
 - WGS by default? `HiSeq2500_125bp` by default? Use longest available read length by default?
-- Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE: 
+- Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE:
 
   ```shell
   LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \

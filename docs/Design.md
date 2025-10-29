@@ -78,9 +78,9 @@ A majority of time was spent on generation of quality scores, which extensively 
 ## Miscellaneous
 
 (filesystem-section)=
-### Filesystem Support
+### File System Support
 
-We use `boost::filesystem` to handle filesystem operations like creating directories since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific filesystem APIs. The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC <= 9.1; `-lc++fs` for Clang <= 9.0; `-lc++experimental` for Clang <= 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.
+We use `boost::filesystem` to handle file system operations like creating directories since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific file system APIs. The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC prior or equal to 9.1; `-lc++fs` for Clang prior or equal to 9.0; `-lc++experimental` for Clang prior or equal to 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.
 
 See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem) and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
 

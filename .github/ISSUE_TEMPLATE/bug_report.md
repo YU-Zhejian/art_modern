@@ -30,7 +30,7 @@ Please provide the following information about your system by replacing the plac
 - [ ] Version of dependencies and how they're installed. List those in the following format while removing those unused ones.
 
   - GNU BinUtils; `2.42-4ubuntu2.3`; Official APT Source.
-  - GNU Science Library; `2.7.1==he838d99_0`; Conda under `conda-forge` channel.
+  - GNU Scientific Library; `2.7.1==he838d99_0`; Conda under `conda-forge` channel.
   - Boost; `1.87.0`; Compiled from official source tarballs.
   - HTSLib; `1.21`; Bundled.
   - Intel Math Kernel Library; `2023.0.0`; From official binary distribution.

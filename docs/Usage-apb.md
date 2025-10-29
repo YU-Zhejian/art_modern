@@ -1,7 +1,7 @@
 (art_profile_builder-usage-section)=
 # Usage of `art_profile_builder`
 
-This new executable is designed to supress the old `art_profiler_illumina` Shell/Perl scripts for building ART-compatible quality profiles. It supports building profiles from FASTQ and SAM/BAM files. Added in [1.1.9](#v-1.1.9-section).
+This new executable is designed to suppress the old `art_profiler_illumina` Shell/Perl scripts for building ART-compatible quality profiles. It supports building profiles from FASTQ and SAM/BAM files. Added in [1.1.9](#v-1.1.9-section).
 
 **NOTE** All reads with quality will be used to build the profile. So if you use SAM/BAM files as input, please make sure that primiary- and un-aligned reads have quality information, and secondary- or supplementary-aligned reads have no quality information.
 
@@ -16,7 +16,7 @@ This new executable is designed to supress the old `art_profiler_illumina` Shell
 - `--o-file1`: Output quality profile file path for read 1.
 - `--o-file2`: Output quality profile file path for read 2. Required if `--is_pe` is set.
 - `--parallel`: Same as [`art_modern`'s `--parallel`](#parallelism-section).
-- `--old_behavior`:  Simulate the behaviour of original ART profile builder. If set, all qualities will be offsetted by 1. See also: [The Bug in `Srcurity.md`](#original-art-profile-builder-bug).
+- `--old_behavior`: Simulate the behavior of original ART profile builder. If set, all qualities will be offset by 1. See also: [The Bug in `Srcurity.md`](#original-art-profile-builder-bug).
 
 ## Environment Variables
 

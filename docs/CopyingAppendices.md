@@ -1,7 +1,7 @@
 ---
 orphan: true
 ---
-# Copying Appendicies
+# Copying Appendices
 
 ## Copyright of `epmdist.h` in Original ART
 

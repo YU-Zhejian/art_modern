@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
 
 `art_modern` badges:
-[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
+[![install with BioConda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Anaconda.org](https://anaconda.org/bioconda/art_modern/badges/version.svg)](https://anaconda.org/bioconda/art_modern)
 [![Anaconda-Server Badge](https://anaconda.org/bioconda/art_modern/badges/downloads.svg)](https://anaconda.org/bioconda/art_modern)
 
@@ -13,6 +13,8 @@
 ## Introduction
 
 Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster.
+
+`art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that creates ART-compatible profiles out of FASTQ, SAM ad BAM files.
 
 ## Quick Start
 
@@ -24,7 +26,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` or `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
 
-**WARNING** Static builds may lead to compromized security.
+**WARNING** Static builds may lead to compromised security.
 
 **NOTE** The fully static build does **NOT** come with MPI support.
 
@@ -38,13 +40,11 @@ See: <https://quay.io/repository/biocontainers/art_modern>.
 
 #### Using Conda
 
-[Conda](https://docs.conda.io/) (or [Mamba](https://mamba.readthedocs.io/en/latest/)/[micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed Conda >=25.7.0 by `conda --version`. Then:
+[Conda](https://docs.conda.io/) (or [Mamba](https://mamba.readthedocs.io/en/latest/)/[micromamba](https://mamba.readthedocs.io/en/latest/user_guide/micromamba.html)) is a popular open-source package and environment management system that simplifies the installation and management of software packages and their dependencies. Before processing, make sure you've installed Conda >=25.7.0 by `conda --version`. Then, to create an environment named `art_modern_bioconda` with the package installed:
 
 ```shell
 conda create -y -n art_modern_bioconda -c bioconda -c conda-forge art_modern
 ```
-
-to create an environment named `art_modern_bioconda` with the package installed.
 
 #### Compiling the Source Code
 
@@ -63,7 +63,7 @@ unzip art_modern-master.zip
 cd art_modern-master
 ```
 
-Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [Python 3](https://www.python.org/), and minimal HTSLib-dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
+Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [Python 3](https://www.python.org/), and minimal HTSLib dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
 
 Build the project using:
 
@@ -243,7 +243,7 @@ opt/build_release/art_modern \
 
 ### Template-Based Simulation
 
-Template-based simulation is often used to introduce Illumina-specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports the PBSIM3 Transcripts format. For example:
+Template-based simulation is often used to introduce Illumina specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports the PBSIM3 Transcripts format. For example:
 
 ```shell
 opt/build_release/art_modern \
@@ -263,7 +263,7 @@ Please note that the mean and standard deviation of fragment length is not speci
 
 With UNIX pipelines, we can redirect the input and output of `art_modern` from/to another file/processes. Following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, PWA, and sorted BAM files.
 
-This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [xz-utils](https://tukaani.org/xz/).
+This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [XZ Utils](https://tukaani.org/xz/).
 
 ```shell
 zcat opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
@@ -296,7 +296,7 @@ See also:
 
 Documentations from MPI vendors:
 
-- [Open MPI Documentation](https://www.open-mpi.org/doc/), esecially [Launching MPI applications](https://docs.open-mpi.org/en/v5.0.x/launching-apps/index.html) section.
+- [Open MPI Documentation](https://www.open-mpi.org/doc/), especially [Launching MPI applications](https://docs.open-mpi.org/en/v5.0.x/launching-apps/index.html) section.
 - [MPICH Documentation](https://www.mpich.org/documentation/).
 - [Intel MPI Documentation](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html?wapkw=MPI).
 
@@ -314,7 +314,7 @@ env -C opt/build_release-mpi cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo -DWITH_MPI=
 cmake --build opt/build_release-mpi -j40
 ```
 
-Test whether MPI runtime library is correctly linked to the executable. For example:
+Test whether MPI runtime library is correctly linked to the executable. For example, the following indicates that the MPI runtime library are correctly linked. Note that the executable name is now suffixed with `-mpi`.
 
 ```shell
 ldd opt/build_release-mpi/art_modern-mpi | grep mpi
@@ -322,8 +322,6 @@ ldd opt/build_release-mpi/art_modern-mpi | grep mpi
 #         libmpi_cxx.so.40 => /lib/x86_64-linux-gnu/libmpi_cxx.so.40 (0x00007ee9f64b0000)
 #         libmpi.so.40 => /lib/x86_64-linux-gnu/libmpi.so.40 (0x00007ee9f637c000
 ```
-
-indicates that the MPI runtime library are correctly linked. Note that the executable name is now suffixed with `-mpi`.
 
 Test whether the MPI version works:
 
@@ -357,11 +355,11 @@ mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
 
 4 files, namely `e_coli_wgs_se.0.fastq`, `e_coli_wgs_se.1.fastq`, `e_coli_wgs_se.2.fastq`, and `e_coli_wgs_se.3.fastq` will be generated in `opt/build_release-mpi/` directory. Each file corresponds to the output from each MPI process (rank 0 to rank 3). This behavior is the same for other output files (e.g., PWA, SAM/BAM).
 
-**NOTE** In the avove example, the actual number of threads used in simulation will be 16 (4 MPI processes * 4 threads per process) since we've specified `--parallel 4`.
+**NOTE** In the above example, the actual number of threads used in simulation will be 16 (4 MPI processes * 4 threads per process) since we've specified `--parallel 4`.
 
 ### Other Differences Between MPI and Non-MPI Versions
 
-- The simulator will not be able to support UNIX devices and/or redirctions for input/output files. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
+- The simulator will not be able to support UNIX devices and/or redirections for input/output files. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
 - Logging issues: Only log messages from rank 0 process will be printed to standard error. Other ranks' log messages will be written to disk (If environment variable `ART_NO_LOG_DIR` is not set) or discarded (If environment variable `ART_NO_LOG_DIR` is set).
 
 ## What's Next?
@@ -382,6 +380,6 @@ The project provides diverse documentations to satisfy your needs.
 
 This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com) _et al._, under [GNU GPL v3](https://www.gnu.org/licenses/) license. The software is originally distributed [here](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) with the following reference:
 
-- W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, doi: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
+- W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, DOI: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 
 Bundled libraries in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.

@@ -3,7 +3,7 @@
 (v-1.2.1-section)=
 ## 1.2.1 (Ongoing)
 
-- The GNU Science Library (GSL) random generator removed.
+- The GNU Scientific Library (GSL) random generator removed.
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
 - Makefile integration test target `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
 - `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
@@ -17,13 +17,13 @@
 - Main repo slimmed.
   - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
   - Benchmark of other simulators moved to <https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators>.
-- The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
+- The GNU Scientific Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
 - **EXPERIMENTAL** Support over MPI added.
   - Currently tested MPI vendors:
-    - Debian OpenMPI, ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023, std. 3.1.
-    - Intel(R) MPI Library 2021.16 for Linux* OS, std. 4.1.
+    - Debian OpenMPI, `ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023`, std. 3.1.
+    - Intel(R) MPI Library `2021.16 for Linux* OS`, std. 4.1.
   - MPI-related revisions:
-    - Seeding of random number generators revised to advoid seed colission accross different threads and processes.
+    - Seeding of random number generators revised to avoid seed collision across different threads and processes.
     - The number of reads generated from each contig is now calculated using complicated rounding instead of flooring.
     - Makefile quick build targets `debug`, `release` have their MPI counterparts: `debug-mpi` and `release-mpi`.
     - Makefile integration test targets `testsmall`, `testsmall-release`, `testbuild` have their MPI counterparts: `testsmall-mpi`, `testsmall-release-mpi`, and `testbuild-mpi`.
@@ -51,7 +51,7 @@
 - The simulator now supports `/dev/null` or an empty file as input.
 - Static libraries removed from Alpine Linux build to reduce download size.
 - HTSLib lower bound bumped to 1.17.
-- Boost.Thread removed from required dependencies.
+- Boost::Thread removed from required dependencies.
 - Miscellaneous bug fixes.
 
 (v-1.1.8-section)=
@@ -80,7 +80,7 @@
 (v-1.1.6-section)=
 ## 1.1.6 (2025/09/12)
 
-- A severe bug in CMakefiles of `labw_slim_htslib` fixed.
+- A severe bug in CMakefile of `labw_slim_htslib` fixed.
 - **EXPERIMENTAL** Debian DEB package built under Linux Mint 22 Wilma.
 
 (v-1.1.5-section)=
@@ -111,7 +111,7 @@
 (v-1.1.2-section)=
 ## 1.1.2 (2025/02/16)
 
-- The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
+- The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Scientific Library](https://www.gnu.org/software/gsl/).
 - Support over B-Tree was dropped. Its performance was found worse than STL map in corrected benchmarks.
 - The performance of `moodycamel::ConcurrentQueue<T>` was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
 - Miscellaneous bug fixes.
@@ -163,7 +163,7 @@ Changes on software function:
 - Support for sequencers except Illumina dropped.
 - Support for the `aln` output format was dropped.
 - Built-in profiles are no longer supported. Users must specify the path to the existing profile they want to use.
-- Parallelization using Boost ASIO.
+- Parallelization using Boost::ASIO.
 
 Changes in software implementation:
 

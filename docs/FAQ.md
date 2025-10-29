@@ -27,7 +27,7 @@ See the documentation of [`art_profile_builder`](#art_profile_builder-usage-sect
 
 No. Reasons:
 
-- If a seed is passed to different threads, all thread will generate the same results, making the result looked wierd (Batches of reads with identical start, end, and error profiles stacked together).
+- If a seed is passed to different threads, all thread will generate the same results, making the result looked weird (Batches of reads with identical start, end, and error profiles stacked together).
 - Different machines may build the program with different random number generators, making the results non-reproducible even if a seed is provided.
 
 ## Software Engineering
@@ -67,7 +67,7 @@ Where you may find the required information:
   - If your CMake correctly identifies your compiler, you may put the first several lines of CMake output to the bug report.
   - If you use GCC, it will be `g++ --version`.
   - If you use LLVM Clang, it will be `clang++ --version`.
-  - If you use Intel (R) oneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh` (if you installl it in default location using APT), before invoking this command.
+  - If you use Intel (R) OneAPI DPC++/C++ Compiler, it will be `icpx --version`. You may need to set environment variables through e.g., `source /opt/intel/oneapi/setvars.sh` (if you install it in default location using APT), before invoking this command.
   - Consult your compiler's documentation for other compilers.
 
 ## My question is still unanswered

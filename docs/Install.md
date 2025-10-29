@@ -52,11 +52,11 @@ See also:
 - Clang support over [C++17](https://clang.llvm.org/cxx_status.html#cxx17) and [C11](https://clang.llvm.org/c_status.html#c11).
 - `libc++` support over [C++17](https://libcxx.llvm.org/Status/Cxx17.html) if you wish to use libc++ (LLVM Standard C++ library) instead of `libstdc++` (GNU C++ Standard Library).
 
-### Intel oneAPI DPC++/C++ Compiler
+### Intel OneAPI DPC++/C++ Compiler
 
 The compiler ([homepage](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)) can build accelerated binaries on Intel CPUs. Compatibilities on the latest version of this compiler will be tested.
 
-**NOTE** Here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (abbr., ICC, with programs named `icc` and `icpc`).
+**NOTE** Here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (ICC, with programs named `icc` and `icpc`).
 
 **NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
 
@@ -67,7 +67,7 @@ The compiler ([homepage](https://www.intel.com/content/www/us/en/developer/tools
 Although not tested, the following compilers can also theoretically be of use:
 
 - Intel C++ Compiler Classic (ICC) **MAY** work with legacy systems and Boost libraries.
-- [NVidia HPC compilers](https://developer.nvidia.com/hpc-compilers) should work as all versions of this compiler support C++17.
+- [NVIDIA HPC compilers](https://developer.nvidia.com/hpc-compilers) should work as all versions of this compiler support C++17.
   - **NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
 - [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html) should work as all versions of this compiler support C++17. Specifically,
   - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
@@ -86,7 +86,7 @@ Although not tested, the following compilers can also theoretically be of use:
 
 CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` may not work.
 
-This project requires [Python](https://www.python.org/) later than (inclusive) 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not requried at runtime.
+This project requires [Python](https://www.python.org/) later than (inclusive) 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not required at runtime.
 
 This project also requires a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
 
@@ -121,11 +121,11 @@ For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions wit
 - [GNU Make](https://www.gnu.org/software/make) as the BSD variant is known to be incompatible.
   - **NOTE** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
 
-as your original system tools shipped with the operating system/BusyBox may **NOT** work.
+As your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
 ## Required External Libraries
 
-Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [Dnf](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
+Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [DNF](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
 ### Boost C++ Library
 
@@ -133,10 +133,10 @@ Dependencies are those libraries or tools that should be installed on your syste
 
 - Essential header-only modules, including:
   - `boost/version.hpp`.
-  - [Math](https://www.boost.org/doc/libs/latest/libs/math/doc/html/index.html). For calulation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
+  - [Math](https://www.boost.org/doc/libs/latest/libs/math/doc/html/index.html). For calculation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
   - [Exception](https://www.boost.org/doc/libs/latest/libs/exception/doc/boost-exception.html). For better exception handling.
   - [Algorithm](https://www.boost.org/doc/libs/latest/libs/algorithm/doc/html/index.html). For simple string algorithm used in non-performance-critical situations.
-- Essentiual modules that would be linked to the final executable:
+- Essential modules that would be linked to the final executable:
   - [FileSystem](https://www.boost.org/doc/libs/latest/libs/filesystem/). See [this Design section](#filesystem-section) for why this module instead of C++17 `<filesystem>` is required.
   - [Program Options](https://www.boost.org/doc/libs/latest/libs/program_options/). For parsing command-line options.
   - [Log](https://www.boost.org/doc/libs/latest/libs/log/). For logging support.
@@ -149,19 +149,19 @@ Boost modules are found through `find_package(Boost ...)` command of CMake. This
 
 [zlib](https://www.zlib.net/) performs compression and decompression bundled ART error profiles. At least [1.2.0](#v-1.2.0-section) is required. zlib is also required by [bundled HTSLib](#htslib-section).
 
-The project will firstly try to find zlib using `pkgconf`. That usually requires the presence of `zlib.pc` file. If failed, will fallback to `libz.so`/`libz.a` with optional version suffixes.
+The project will firstly try to find zlib using `pkgconf`. That usually requires the presence of `zlib.pc` file. If failed, will fall back to `libz.so`/`libz.a` with optional version suffixes.
 
 ## Optional External Libraries
 
-The following dependencies are optional. You may choose to install them if you want to improve the performance, adaptibility, or user-friendliness of the program.
+The following dependencies are optional. You may choose to install them if you want to improve the performance, adaptability, or user-friendliness of the program.
 
 (optional-boost-components)=
 ### Optional Boost Components
 
 - [StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace.html): For a more developer-friendly stack trace. Can be absent for non-developers.
-  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuratrion instructions for this library.
+  - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuration instructions for this library.
 - [Test](https://www.boost.org/doc/libs/latest/libs/test/): For unit testing only. Can be absent for non-developers.
-- [Timer](https://www.boost.org/doc/libs/latest/libs/timer/): For displaying CPU time, wall-clock time, and average CPU ultilization at the end of the program. Can be absent if you do not care about performance.
+- [Timer](https://www.boost.org/doc/libs/latest/libs/timer/): For displaying CPU time, wall-clock time, and average CPU utilization at the end of the program. Can be absent if you do not care about performance.
 - [Random](https://www.boost.org/doc/libs/latest/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See CMake variable [`USE_RANDOM_GENERATOR`](#use-random-generator-section) below). Can be absent if you do not choose to use Boost random number generators.
 
 If benchmarking (See [CMake flag `BUILD_ART_MODERN_BENCHMARKS`](#build-art-modern-benchmarks-section)) is required, you may also install:
@@ -174,9 +174,9 @@ If benchmarking (See [CMake flag `BUILD_ART_MODERN_BENCHMARKS`](#build-art-moder
 (accelerated-random-number-generators)=
 ### Accelerated Random Number Generators
 
-Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). This requries you to install the Intel oneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
+Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
 
-**NOTE** This library is propertary software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+**NOTE** This library is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
 
 See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) below.
 
@@ -198,7 +198,7 @@ The MPI standard required in this project is MPI 1.0, which is published in 1994
 - [MPICH](https://www.mpich.org/).
 - [Intel MPI](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html).
 
-The system should theoritically support:
+The system should theoretically support:
 
 - [MVAPICH2](https://mvapich.cse.ohio-state.edu/).
 
@@ -208,7 +208,7 @@ See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
 
 ## Required Bundled/External Libraries
 
-The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your sytstem administrator if you do not know whether and where those libraries are installed.
+The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your system administrator if you do not know whether and where those libraries are installed.
 
 **NOTE** Using bundled dependencies may introduce security vulnerabilities.
 
@@ -249,7 +249,7 @@ See [official HTSLib documentation](https://github.com/samtools/samtools/blob/ma
 
 HTSLib later than [1.17](https://github.com/samtools/htslib/releases/tag/1.17) is required due to the use of `sam_flush` (1.14) and `faidx_seq_len64` (1.17).
 
-The project will firstly try to find HTSLib using pkgconf. That usually requires the presence of `htslib.pc` file. If failed, will fallback to `lib[val].so`/`lib[val].a` with optional version suffixes where `[val]` is the value of [CMake variable `USE_HTSLIB`](#use-htslib-section).
+The project will firstly try to find HTSLib using pkgconf. That usually requires the presence of `htslib.pc` file. If failed, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes where `[val]` is the value of [CMake variable `USE_HTSLIB`](#use-htslib-section).
 
 **NOTE** Remote reference file is not supported.
 
@@ -299,7 +299,7 @@ No additional dependency is required.
 (external-libfmt-section)=
 #### External
 
-The project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failefd, will fallback to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
+The project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failefd, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
 
 ## Optional Bundled/External Dependencies
 
@@ -307,7 +307,7 @@ Not any.
 
 ## Required Bundled Dependencies
 
-The required bundled depencencies of this project is `libceu`. No additional dependency is required.
+The required bundled dependencies of this project is `libceu`. No additional dependency is required.
 
 ## Optional Bundled Dependencies
 
@@ -372,7 +372,7 @@ See also: [Official CMake documentation](https://cmake.org/cmake/help/latest/var
 
 Available since [1.1.1](#v-1.1.1-section).
 
-Path to the Python intepreter. Required for bundling bundled error profiles to the executable. Default to `python3`.
+Path to the Python interpreter. Required for adding bundled error profiles to the executable. Default to `python3`.
 
 See also: [Official CMake documentation](https://cmake.org/cmake/help/latest/module/FindPython3.html).
 
@@ -391,7 +391,7 @@ Available since [1.0.0](#v-1.0.0-section).
 
 Whether test should be enabled.
 
-- **unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
+- **Unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
 - `OFF`: Will disable test.
 - `ON`: Will enable test.
 
@@ -402,7 +402,7 @@ Available since [1.0.0](#v-1.0.0-section).
 
 Use which HTSLib implementation.
 
-- **unset (DEFAULT): Will use bundled HTSLib.** See [Bundled HTSLib](#bundled-htslib-section) for requirements.
+- **Unset (DEFAULT): Will use bundled HTSLib.** See [Bundled HTSLib](#bundled-htslib-section) for requirements.
 - `hts`: Will use the HTSLib found in the system. See [External HTSLib](#external-htslib-section) for requirements.
 - Any other value `[val]`: Will use the HTSLib of other names (`lib[val].so`/`lib[val].a`) found in the system. See [External HTSLib](#external-htslib-section) for requirements.
 
@@ -467,7 +467,7 @@ The thread-level parallelism strategy.
 
 Available since [1.1.3](#v-1.1.3-section).
 
-Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost earlier than 1.69 with CMake latter than 3.30.
+Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost earlier than 1.69 with CMake later than 3.30.
 
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
@@ -502,8 +502,8 @@ Available since [1.1.7](#v-1.1.7-section).
 
 Whether to use bundled `{fmt}` library for formatting strings.
 
-- **unset (DEFAULT): Will use bundled `{fmt}`.** See [Bundled `{fmt}`](#bundled-libfmt-section) for requirements.
-- `fmt`  : Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
+- **Unset (DEFAULT): Will use bundled `{fmt}`.** See [Bundled `{fmt}`](#bundled-libfmt-section) for requirements.
+- `fmt`: Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 - Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 
 (use-concurrent-queue-section)=
@@ -513,7 +513,7 @@ Available since [1.1.7](#v-1.1.7-section).
 
 Whether to use bundled `moodycamel::ConcurrentQueue<T>`. Specifically, where `concurrentqueue.h` is located. For example, if you use Debian GNU/Linux and installed [`libconcurrentqueue-dev`](https://packages.debian.org/sid/libconcurrentqueue-dev), you may set this variable to `/usr/include/concurrentqueue/moodycamel/` or `/usr/include/concurrentqueue/`.
 
-- **unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.** See [Bundled `moodycamel::ConcurrentQueue<T>`](#bundled-concurrent-queue-section) for requirements.
+- **Unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.** See [Bundled `moodycamel::ConcurrentQueue<T>`](#bundled-concurrent-queue-section) for requirements.
 - Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. See [External `moodycamel::ConcurrentQueue<T>`](#external-concurrent-queue-section) for requirements.
 
 (use-absl-section)=
@@ -525,7 +525,7 @@ Whether to use bundled Abseil library.
 
 Although the project only uses a small portion of Abseil development header files, the binary `libabsl_base.so` may be linked to the final executable if you use system Abseil.
 
-- **unset (DEFAULT): Will use bundled Abseil.** See [Bundled Abseil](#bundled-absl-section) for requirements.
+- **Unset (DEFAULT): Will use bundled Abseil.** See [Bundled Abseil](#bundled-absl-section) for requirements.
 - Any value `[val]`: Will use system Abseil. See [External Abseil](#external-absl-section) for requirements.
 
 ### `REPRODUCIBLE_BUILDS`
@@ -534,7 +534,7 @@ Available since [1.1.7](#v-1.1.7-section).
 
 Whether to enable reproducible builds. This complies Debian policies.
 
-- **unset (DEFAULT): Will not enable reproducible builds.**
+- **Unset (DEFAULT): Will not enable reproducible builds.**
 - `ON`: Will enable reproducible builds. All used `__DATE__` and `__TIME__` macros will be replaced with fixed values.
 
 See also:
@@ -550,7 +550,7 @@ Available since [1.1.7](#v-1.1.7-section).
 
 Whether to build mini benchmarks executable.
 
-- **unset (DEFAULT): Will not build benchmarks.**
+- **Unset (DEFAULT): Will not build benchmarks.**
 - `ON`: Will build benchmarks.
 
 (with-mpi-section)=
@@ -560,7 +560,7 @@ Available since [1.2.0](#v-1.2.0-section).
 
 Whether to enable MPI-based parallelization.
 
-- **unset (DEFAULT)/OFF: Will not enable MPI-based parallelization.**
+- **Unset (DEFAULT)/OFF: Will not enable MPI-based parallelization.**
 - `ON`: Will enable MPI-based parallelization.
 
 See [MPI Library](#mpi-section) for requirements.

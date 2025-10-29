@@ -124,11 +124,11 @@ The file type of input reference sequences. Currently, FASTA and PBSIM3 Transcri
 
 If the file size larger than 1 GiB or cannot be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode). Otherwise, use `memory`.
 
-#### `memory` for in-memory reference parser.
+#### `memory` for in-memory reference parser
 
 The entire file will be read into the memory. Fast for small reference files.
 
-#### `htslib` for HTSLib FAIDX parser.
+#### `htslib` for HTSLib FAIDX parser
 
 Store FASTA Index in memory and fetch sequences from disk using [HTSLib](https://github.com/samtools/htslib). Memory-efficient for large genome assembly FASTA files with limited number of long contigs, but inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
 
@@ -142,16 +142,17 @@ The FASTA index, usually ends with `.fai` and can be built using `samtools faidx
 
 **NOTE** `htslib` parser can be used on a `.fa.gz` file. However, please note that:
 
-- The GZ file **MUST** be [`bgzip`](https://www.htslib.org/doc/bgzip.html)-compressed. Plain GZip will **NOT** work. If you try to use a GZip-compressed FASTA file, you'll see error messages like:
+- The GZip file **MUST** be [`bgzip`](https://www.htslib.org/doc/bgzip.html)-compressed. Plain GZip will **NOT** work. If you try to use a GZip-compressed FASTA file, you'll see error messages like:
 
   ```text
   [E::fai_build_core] File truncated at line 1
   [E::fai_build3_core] Cannot index files compressed with gzip, please use bgzip
   [E::fai_path] Failed to build index file for reference file [...]
   ```
+
 - Specify `--i-type fasta` to use this parser.
 
-#### `stream` for one-pass streaming parser.
+#### `stream` for one-pass streaming parser
 
 Streamline the input reference as batches and process them one by one. Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
 
@@ -163,13 +164,13 @@ The batch size of each batch is controlled by `--i-batch_size`. Larger batch siz
 
 This option allows you to specify coverage. `art_modern` supports the following coverage mode:
 
-- Unified coverage in `double` data type (e.g., 10.0). Under this scenario, the coverage is identical for all contigs.
+- Unified coverage floating point in `double` data type (e.g., `10.0`). Under this scenario, the coverage is identical for all contigs.
 - Per-contig coverage headless tab-separated value (TSV) without strand information.
 - Per-contig coverage headless TSV with strand information.
 
 **NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`. This format comes with contig-specific coverage information.
 
-**NOTE** We prefer unified coverage over coverage TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
+**NOTE** We prefer unified coverage floating points to TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
 
 ### Compatibility Matrices of Input Parameters
 
@@ -195,7 +196,7 @@ Here introduces diverse output formats supported by `art_modern`. You may specif
 
 If the parent directory does not exist, it will be created using a `mkdir -p`-like manner.
 
-#### Pairwise Alignment Format (`--o-pwa`)
+### Pairwise Alignment Format (`--o-pwa`)
 
 PWA is serialization of the internally used data structure of the simulator. Currently, PWA consists of some metadata lines (Started with `#`) and a list of alignments, each spanning 4 lines.
 
@@ -218,7 +219,7 @@ BCCCCGGGGGGGFGGGGGGGFGGGGG[...]
 [...]
 ```
 
-#### FASTQ Format (`--o-fastq`)
+### FASTQ Format (`--o-fastq`)
 
 The good old FASTQ format. The qualities are Phread encoded in ASCII with an offset of 33.
 
@@ -240,7 +241,7 @@ See also:
 - [Specifications of Common File Formats Used by the ENCODE Consortium at UCSC](https://genome.ucsc.edu/ENCODE/fileFormats.html#FASTQ).
 - [Common File Formats Used by the ENCODE Consortium](https://www.encodeproject.org/help/file-formats/#fastq).
 
-#### FASTA Format (`--o-fasta`)
+### FASTA Format (`--o-fasta`)
 
 Sequence-only output format. Example:
 
@@ -252,7 +253,7 @@ AGCCAAACGGGCAACCAGACTCCGCC[...]
 This simulator generates one-line FASTA files. That is, each sequence occupies only one line.
 
 (out-sam-section)=
-#### SAM/BAM Format (`--o-sam`)
+### SAM/BAM Format (`--o-sam`)
 
 Sequence Alignment/Map (SAM) and Binary Alignment/Map (BAM) format supports storing of ground-truth alignment information and other miscellaneous parameters. They can be parsed using [samtools](https://github.com/samtools/samtools), [`pysam`](https://pysam.readthedocs.io/) and other libraries, and can be used as ground-truth when benchmarking sequence aligners.
 
@@ -281,7 +282,7 @@ Other SAM/BAM formatting parameters includes:
 See also: [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
 
 (out-hl_sam-section)=
-#### Headless SAM/BAM Format (`--o-hl_sam`)
+### Headless SAM/BAM Format (`--o-hl_sam`)
 
 This format is specially designed for the `stream` reference parser that allows handling of numerous contigs. As a side effect, the contig name and length information will not be written to SAM header. Each read will be written as unaligned with coordinate information populated in the `OA` tag.
 

@@ -4,7 +4,7 @@ from typing import Optional, Tuple, List
 
 
 def decode_simple_target(_l: str) -> Optional[Tuple[str, List[str]]]:
-    m = re.match(r"^([a-zA-Z0-9_\-]+)\s*:(.*)$", _l)
+    m = re.match(r"^([a-zA-Z0-9_\-]+)\s*:([^=]*)$", _l)
     if not m:
         return None
     _target = m.group(1)
@@ -77,13 +77,13 @@ if __name__ == "__main__":
     with sys.stdout as out:
         if outfmt == "md":
             out.write("# Toplevel Makefile Documentation\n\n")
-            out.write(f"## Variables:\n\n")
+            out.write(f"## Variables\n\n")
 
             for doc in variable_docs:
                 out.write(f"### `{doc['variable']}`\n\n")
                 out.write(f"**Help:** {doc['help']}\n\n")
 
-            out.write(f"## Targets:\n\n")
+            out.write(f"## Targets\n\n")
             for doc in target_docs:
                 out.write(f"### `{doc['target']}`\n\n")
                 out.write(f"**Depends on:** {', '.join(f'`{d}`' for d in doc['deps']) if doc['deps'] else 'None'}\n\n")

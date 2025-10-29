@@ -22,7 +22,7 @@ MPIEXEC ?= mpiexec
 MPIEXEC_NJOBS ?= 4
 
 # Output directory for build artifacts
-OPT_DIR := $(CURDIR)/opt
+OPT_DIR ?= $(CURDIR)/opt
 
 # Package version, derived from the latest git tag if not set
 export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
@@ -164,6 +164,7 @@ touch:
 .PHONY: testsmall
 # Run small tests with debug build
 # Env. Flags:
+# 
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
@@ -230,7 +231,7 @@ cleandoc:
 	$(MAKE) -C docs/sphinx.d
 
 .PHONY: serve-doc
-# Serve built documentation at http://localhost:8000
+# Serve built documentation at <http://localhost:8000>
 serve-doc:
 	$(PYTHON) -m http.server -d docs/sphinx.d/_build/html
 

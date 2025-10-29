@@ -130,7 +130,7 @@ apk add g++ binutils \
     libdeflate-static libdeflate-dev
 ```
 
-Here, `icu-static` is added to support Boost staic linking.
+Here, `icu-static` is added to support Boost when performing static linking.
 
 **NOTE** Please install the correct version of Boost static library.
 
@@ -156,7 +156,7 @@ You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts
 
 ### Installing Boost from Source
 
-If your system Boost library does not exist (e.g., on brand-new Apple MacOS X), is too old (e.g., older than 1.65.0) or ABI incompatible (e.g., compiled with GCC but you want to use Clang/LLVM), you may install Boost from source. Here is an example of installing Boost 1.89.0 using Clang/LLVM toolchain to `"${HOME}"/opt/boost-1.89.0-clang`:
+If your system Boost library does not exist (e.g., on brand-new Apple Mac OS X), is too old (e.g., older than 1.65.0) or ABI incompatible (e.g., compiled with GCC, but you want to use Clang/LLVM), you may install Boost from source. Here is an example of installing Boost 1.89.0 using Clang/LLVM toolchain to `"${HOME}"/opt/boost-1.89.0-clang`:
 
 ```shell
 # Assume we're using Boost 1.89.0
