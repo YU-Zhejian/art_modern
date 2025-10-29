@@ -1,3 +1,6 @@
+# TODO: Add compile options --rtlib=compiler-rt 
+# TODO: Build clang using -DLIBCXX_USE_COMPILER_RT=YES -DLIBCXXABI_USE_COMPILER_RT=YES -DLIBCXXABI_USE_LLVM_UNWINDER=YES 
+
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 set(CMAKE_LINKER ld.lld)

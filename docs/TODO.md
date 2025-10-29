@@ -54,6 +54,7 @@
   - For debian pack, see <https://salsa.debian.org/med-team/abyss/-/blob/master/debian/control?ref_type=heads>.
 - Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
 - Support `libtcmalloc.pc` and `libtcmalloc_minimal.pc`. Provided by Debian package `libgoogle-perftools-dev` (wierd). Also support Google profilers.
+- Change the PCG random generator to PCG-minimal that allows building under Mac OS X.
 
 ## Performance
 

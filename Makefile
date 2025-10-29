@@ -229,6 +229,11 @@ cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
 
+.PHONY: serve-doc
+# Serve built documentation at http://localhost:8000
+serve-doc:
+	$(PYTHON) -m http.server -d docs/sphinx.d/_build/html
+
 .PHONY: packing
 # Create binary packages
 packing:

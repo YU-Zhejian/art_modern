@@ -37,7 +37,7 @@ For MPI-based parallelization, the strategy is as follows:
 - For `wgs` parser, just divide sequencing depth.
 - For non-`wgs` parser, skip records based on MPI rank and word size.
 
-The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in 1.2.0, where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in [1.2.0](#v-1.2.0-section), where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
 
 - For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
 - In SE mode, 9 reads will be generated on positive and negative strands.
@@ -61,7 +61,7 @@ The current version does not support the specification of seed since it will res
 
 ### Distribution Sampling
 
-The distribution sampling is currently implemented using each library's own implementation. For example; `boost::random::uniform_int_distribution` for Boost random generators, `std::uniform_int_distribution` for STL and PCG, `viRngUniform` for Intel MKL, and `gsl_rng_uniform_int` for GSL. Further decoupling may be needed.
+The distribution sampling is currently implemented using each library's own implementation. For example; `boost::random::uniform_int_distribution` for Boost random generators, `std::uniform_int_distribution` for STL and PCG, and `viRngUniform` for Intel MKL. Further decoupling may be needed.
 
 ## I/O
 
@@ -77,6 +77,7 @@ A majority of time was spent on generation of quality scores, which extensively 
 
 ## Miscellaneous
 
+(filesystem-section)=
 ### Filesystem Support
 
 We use `boost::filesystem` to handle filesystem operations like creating directories since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific filesystem APIs. The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC <= 9.1; `-lc++fs` for Clang <= 9.0; `-lc++experimental` for Clang <= 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.

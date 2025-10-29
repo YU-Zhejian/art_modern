@@ -31,7 +31,7 @@ Affected files:
 
 With CC0 1.0 Universal License.
 
-**NOTE** Added in 1.0.0.
+**NOTE** Added in [1.0.0](#v-1.0.0-section).
 
 ## `libceu` by YU Zhejian
 
@@ -42,7 +42,7 @@ Affected files:
   
 With MIT License.
 
-**NOTE** Added in 1.0.0.
+**NOTE** Added in [1.0.0](#v-1.0.0-section).
 
 **NOTE** This project was dead. New projects should consider [Boost.Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
@@ -56,7 +56,7 @@ Affected files:
 
 Dual-licensed under Simplified BSD License and Boost Software License.
 
-**NOTE** Added in 1.0.0.
+**NOTE** Added in [1.0.0](#v-1.0.0-section).
 
 ## `BS::thread_pool` by Barak Shoshany
 
@@ -68,7 +68,7 @@ Affected files:
   
 Under the MIT License.
 
-**NOTE** Added in 1.1.0.
+**NOTE** Added in [1.1.0](#v-1.1.0-section).
 
 ## Abseil by Abseil Authors
 
@@ -80,7 +80,7 @@ Affected files:
 
 Under the Apache-2.0 license.
 
-**NOTE** Added in 1.1.0.
+**NOTE** Added in [1.1.0](#v-1.1.0-section).
 
 ## `{fmt}` by Victor Zverovich
 
@@ -92,7 +92,7 @@ Affected files:
 
 Under an MIT-like License.
 
-**NOTE** Added in 1.1.1.
+**NOTE** Added in [1.1.1](#v-1.1.1-section).
 
 ## PCG by Melissa O'Neill
 
@@ -104,7 +104,7 @@ Affected files:
 
 Licensed under the Apache 2.0 License.
 
-**NOTE** Added in 1.1.1.
+**NOTE** Added in [1.1.1](#v-1.1.1-section).
 
 ## GNU Science Library by M. Galassi _et al._
 
@@ -116,4 +116,4 @@ Affected files:
 
 Licensed under the GPL 3.0 license.
 
-**NOTE** Added in 1.1.2.
+**NOTE** Added in [1.1.2](#v-1.1.2-section).

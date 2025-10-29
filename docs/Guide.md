@@ -76,11 +76,11 @@ AAAAAATTTTTT
 AAAAAATTTTTT
 ```
 
-Using empty file or `/dev/null` as input is allowed since 1.1.9. It will generate empty FASTA/FASTQ/PWA files as output. Remember to specify `memory` or `stream` as `--i-parser` `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
+Using empty file or `/dev/null` as input is allowed since [1.1.9](#v-1.1.9-section). It will generate empty FASTA/FASTQ/PWA files as output. Remember to specify `memory` or `stream` as `--i-parser` `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
 
 ## Performance Hint
 
-When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [libdeflate](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines or `PCG` on other machines.
+When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [`libdeflate`](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines or `PCG` on other machines.
 
 When executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.
 

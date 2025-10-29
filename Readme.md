@@ -3,6 +3,7 @@
 [![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total.svg)](https://github.com/YU-Zhejian/art_modern/releases/)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
 
+`art_modern` badges:
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Anaconda.org](https://anaconda.org/bioconda/art_modern/badges/version.svg)](https://anaconda.org/bioconda/art_modern)
 [![Anaconda-Server Badge](https://anaconda.org/bioconda/art_modern/badges/downloads.svg)](https://anaconda.org/bioconda/art_modern)
@@ -21,7 +22,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip`/`build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` or `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
 
 **WARNING** Static builds may lead to compromized security.
 
@@ -368,14 +369,14 @@ mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
 The project provides diverse documentations to satisfy your needs.
 
 - If you want to build the software with different options, see [Install](docs/Install.md).
-- For a detailed guide on parameters and their combinations, see [Usage](docs/Usage.md) and [FAQ](docs/FAQ.md).
+- For a detailed guide on parameters and their combinations, see [Usage for `art_modern`](docs/Usage-art_modern.md), [Usage for `art_profile_builder`](docs/Usage-apb.md) and [FAQ](docs/FAQ.md).
 - For developers, please refer to:
   - [Contributing](docs/Contributing.md) for software engineering tasks and contribution guidelines. See also [Code of Conduct](docs/CODE_OF_CONDUCT.md).
   - [Design](docs/Design.md) for the latest design of the software.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
   - [News](docs/News.md) for changes over the project.
 - For a comparison of this project with other simulators, see [Benchmark](https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators).
-- The original ART documentation is copied to [here](docs/original_art_docs).
+- The original ART documentation is copied to [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).
 
 ## Acknowledgements
 
@@ -383,8 +384,4 @@ This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com)
 
 - W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, doi: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 
-The bundled HTSLib library used MIT License with the following reference:
-
-- J. K. Bonfield et al., _HTSlib: C library for reading/writing high-throughput sequencing data_, GigaScience, vol. 10, no. 2, p. giab007, Jan. 2021, doi: [10.1093/gigascience/giab007](https://doi.org/10.1093/gigascience/giab007).
-
-Other libraries used in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.
+Bundled libraries in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.
