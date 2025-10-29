@@ -24,6 +24,9 @@ MPIEXEC_NJOBS ?= 4
 # Output directory for build artifacts
 OPT_DIR ?= $(CURDIR)/opt
 
+# System architecture
+ARCH ?= $(shell uname -m)
+
 # Package version, derived from the latest git tag if not set
 export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
 
@@ -139,7 +142,7 @@ rel_with_dbg_alpine:
 	cmake --build $(OPT_DIR)/build_rel_with_dbg_alpine -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_rel_with_dbg_alpine
 	env -C $(OPT_DIR)/build_rel_with_dbg_alpine_install/bin \
-		tar cvzf $(OPT_DIR)/build_rel_with_dbg_alpine-x86_64.tar.gz \
+		tar cvzf $(OPT_DIR)/build_rel_with_dbg_alpine-$(ARCH).tar.gz \
 		art_modern \
 		art_profile_builder
 

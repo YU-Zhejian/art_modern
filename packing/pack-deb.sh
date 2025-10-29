@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ue
 mkdir -p artifacts/RELEASE
-ARCH=$(dpkg --print-architecture)
+ARCH="$(dpkg --print-architecture)"
 if [ -z "${PACKAGE_VERSION:-}" ]; then
     export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
 fi
