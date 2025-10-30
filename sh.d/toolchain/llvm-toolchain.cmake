@@ -1,5 +1,7 @@
 # TODO: Add compile options --rtlib=compiler-rt 
 # TODO: Build clang using -DLIBCXX_USE_COMPILER_RT=YES -DLIBCXXABI_USE_COMPILER_RT=YES -DLIBCXXABI_USE_LLVM_UNWINDER=YES 
+# See also: https://github.com/tpimh/ngtc/blob/docker/root/configure.sh
+# See also: OSTree
 
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
