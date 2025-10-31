@@ -75,7 +75,7 @@ You may also:
 
 ### Pure LLVM/Clang Toolchain
 
-A LLVM toolchain file is provided in `sh.d/toolchain/llvm-toolchain.cmake` for users who want to use Clang/LLVM toolchain. This toolchain uses LLVM `libc++` as C++ standard library and LLVM `ld.lld` as linker.
+A LLVM toolchain file is provided in `sh.d/toolchain/host-llvm/llvm-toolchain.cmake` for users who want to use Clang/LLVM toolchain. This toolchain uses LLVM `libc++` as C++ standard library and LLVM `ld.lld` as linker.
 
 **NOTE** The Boost library shipped through your system may be compiled with GNU C++ ABI, which is not compatible with LLVM `libc++`. You may need to build Boost from source using Clang/LLVM toolchain. All C libraries do not have this issue since C ABI is generally compatible across different compilers under GNU/Linux.
 
@@ -83,7 +83,7 @@ A LLVM toolchain file is provided in `sh.d/toolchain/llvm-toolchain.cmake` for u
 LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
     LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}"\
     PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
-    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/llvm-toolchain.cmake" \
+    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
     make testbuild testbuild-mpi \
     CMAKE_FLAGS='-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/'
 ```

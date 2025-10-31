@@ -13,7 +13,7 @@
   LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
       LD_RUN_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
       PKG_CONFIG_PATH=${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/ \
-      CMAKE_TOOLCHAIN_FILE=sh.d/toolchain/llvm-toolchain.cmake \
+      CMAKE_TOOLCHAIN_FILE=sh.d/toolchain/host-llvm/llvm-toolchain.cmake \
       /home/yuzj/miniconda3/envs/art_modern/bin/cmake \
       -G Ninja -Wdev -Wdeprecated --warn-uninitialized \
       -DCEU_CM_SHOULD_ENABLE_TEST=ON -DCMAKE_VERBOSE_MAKEFILE=ON \
