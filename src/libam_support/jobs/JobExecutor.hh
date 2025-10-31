@@ -19,15 +19,32 @@
 #include <string>
 
 namespace labw::art_modern {
+/**
+ * Abstract base class for job executors.
+ 
+*/
 class JobExecutor {
 public:
+    /**
+    * Default constructor.
+    */
     JobExecutor() = default;
+    /** Default destructor */
     virtual ~JobExecutor() = default;
     DELETE_COPY(JobExecutor)
     DELETE_MOVE(JobExecutor)
 
+    /** 
+    * Implement the job execution logic here.
+    */
     virtual void operator()() = 0;
+    /**
+     * Implement to check whether the job is still running.
+    */
     [[nodiscard]] virtual bool is_running() const = 0;
+    /**
+     * Implement to provide thread info for logging.
+    */
     [[nodiscard]] virtual std::string thread_info() const = 0;
 };
 

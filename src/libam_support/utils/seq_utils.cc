@@ -15,7 +15,7 @@
 #include "seq_utils.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 // NOLINTBEGIN
 #if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
@@ -265,45 +265,12 @@ std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
 
 std::string qual_to_str(const std::vector<am_qual_t>& qual) { return qual_to_str(qual.data(), qual.size()); }
 
-std::string comp(const std::string& dna)
-{
-    std::string rets;
-    rets.resize(dna.length());
-    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
-        rets[i] = rev_comp_trans_2[dna[i] & 0xFF];
-    }
-    return rets;
-}
-std::string revcomp(const std::string& dna)
-{
-    auto rets = comp(dna);
-    reverse(rets.begin(), rets.end());
-    return rets;
-}
-
-[[maybe_unused]] std::string normalize(const std::string& dna)
-{
-    std::string rets = dna;
-    std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
-    return rets;
-}
-
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
-    return cigar_arr_to_str_optim(cigar_arr.data(), cigar_arr.size());
+    return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
 }
 
-std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
-{
-    std::ostringstream oss;
-    for (size_t i = 0; i < n; i += 1) {
-        oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);
-        oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
-    }
-    return oss.str();
-}
-
-std::string cigar_arr_to_str_optim(const am_cigar_t* cigar_arr, const size_t n)
+std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::string result;
     result.reserve(n << 1); // Rough estimate: each CIGAR op is at least 2 chars

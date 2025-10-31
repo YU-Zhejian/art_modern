@@ -14,10 +14,25 @@
 
 #pragma once
 
+#include "libam_support/Constants.hh"
+
+#include <fmt/format.h>
+
 #include <cstddef> // std::size_t
 #include <string>
 
 namespace labw::art_modern {
 std::string format_with_commas(std::size_t number);
-std::string to_si(double number, int precision = 2, int base = 1024);
+
+template <typename T>
+std::string to_si(T number, int precision = 2, int base = 1024){
+    std::size_t unit_index = 0;
+    auto size_in_unit = number;
+
+    while (size_in_unit >= base && unit_index < SI_UNITS_LENGTH) {
+        size_in_unit /= base;
+        ++unit_index;
+    }
+    return fmt::format("{:.{}f}{}", size_in_unit, precision, SI_UNITS[unit_index]);
+}
 } // namespace labw::art_modern

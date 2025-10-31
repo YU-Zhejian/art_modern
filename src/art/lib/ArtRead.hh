@@ -18,7 +18,7 @@
 #include "art/lib/ArtParams.hh"
 #include "art/lib/Rprob.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 

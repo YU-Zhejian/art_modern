@@ -17,7 +17,7 @@
 #include "libam_support/ds/PairwiseAlignment.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 #include <fmt/format.h>
 

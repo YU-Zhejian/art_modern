@@ -2,7 +2,7 @@
 
 #include "art_profile_builder/lib/IntermediateEmpDistPosition.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <htslib/sam.h>

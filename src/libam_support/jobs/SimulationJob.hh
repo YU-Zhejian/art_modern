@@ -23,13 +23,30 @@
 
 namespace labw::art_modern {
 
+/**
+ * A generic simulation job containing necessary data.
+ * 
+ * The simulation job is move-constructible only.
+ */
 class SimulationJob {
 public:
+    /** Constructor that copies shared pointers.
+     * @param fasta_fetch Fasta fetcher.
+     * @param coverage_info Coverage information.
+     * @param job_id Job ID.
+    */
     SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
         const std::shared_ptr<CoverageInfo>& coverage_info, std::size_t job_id);
-    SimulationJob& operator=(SimulationJob&&) = delete;
+    /** Constructor that moves shared pointers.
+     * @param fasta_fetch Fasta fetcher.
+     * @param coverage_info Coverage information.
+     * @param job_id Job ID.
+     */
+    SimulationJob(std::shared_ptr<BaseFastaFetch>&& fasta_fetch,
+        std::shared_ptr<CoverageInfo>&& coverage_info, std::size_t job_id);
 
     SimulationJob(SimulationJob&& other) noexcept;
+    DELETE_MOVE_ASSIGNMENT(SimulationJob)
     DELETE_COPY(SimulationJob)
     ~SimulationJob() = default;
 

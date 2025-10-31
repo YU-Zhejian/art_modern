@@ -18,7 +18,7 @@
 #include "art/lib/ArtParams.hh"
 #include "art/lib/Rprob.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/jobs/JobExecutor.hh"
 #include "libam_support/jobs/SimulationJob.hh"
 #include "libam_support/out/OutputDispatcher.hh"
@@ -37,7 +37,7 @@ public:
     ~ArtJobExecutor() override;
 
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
-    ArtJobExecutor& operator=(ArtJobExecutor&&) = delete;
+    DELETE_MOVE_ASSIGNMENT(ArtJobExecutor)
     DELETE_COPY(ArtJobExecutor)
     [[nodiscard]] bool is_running() const override;
 

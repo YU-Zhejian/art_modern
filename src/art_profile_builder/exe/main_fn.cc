@@ -4,7 +4,7 @@
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 

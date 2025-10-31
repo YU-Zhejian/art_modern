@@ -14,7 +14,7 @@
 
 #define BOOST_TEST_MODULE test_seq_utils // NOLINT
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/utils/seq_utils.hh"

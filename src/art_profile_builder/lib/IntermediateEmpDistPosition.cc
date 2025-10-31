@@ -1,7 +1,7 @@
 #include "art_profile_builder/lib/IntermediateEmpDistPosition.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 #include <algorithm>
 #include <cstdlib>

@@ -20,7 +20,7 @@
 #include "art/lib/ArtRead.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/depth_utils.hh"
