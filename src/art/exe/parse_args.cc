@@ -525,7 +525,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), read_len,
         art_lib_const_mode, sep_flag, get_param<int>(vm_, ARG_Q_SHIFT_1), get_param<int>(vm_, ARG_Q_SHIFT_2),
         get_param<int>(vm_, ARG_MIN_QUAL), get_param<int>(vm_, ARG_MAX_QUAL));
-    std::array<double, HIGHEST_QUAL> err_prob { };
+    std::array<double, HIGHEST_QUAL> err_prob {};
     for (int i = 0; i < HIGHEST_QUAL; i++) {
         err_prob[i] = std::pow(10, -i / 10.0);
     }

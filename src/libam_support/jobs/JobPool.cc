@@ -123,7 +123,7 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
 JobPool::~JobPool() { stop(); }
 
 #if defined(USE_NOP_PARALLEL)
-JobPool::JobPool([[maybe_unused]] const std::size_t pool_size) { };
+JobPool::JobPool([[maybe_unused]] const std::size_t pool_size) {};
 #else
 JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
     : pool_(pool_size)

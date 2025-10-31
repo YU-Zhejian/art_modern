@@ -96,7 +96,7 @@ std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& 
         return std::make_shared<FastqReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s()), params.n_threads);
     }
-    throw OutputNotSpecifiedException { };
+    throw OutputNotSpecifiedException {};
 }
 
 } // namespace labw::art_modern

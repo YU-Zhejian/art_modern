@@ -1,0 +1,36 @@
+#!/bin/sh
+# The initialization script for BusyBox initramfs
+# shellcheck disable=SC2016
+
+__iflog(){
+    echo "BUSYBOX INITRAMFS LOG: $(/bin/date '+%Y-%m-%d %H:%M:%S'): ${*}"
+}
+
+__iflog "====== INITRAMFS PREPARING ======"
+__iflog "Set PATH environment variable..."
+PATH="/bin:/usr/bin:/sbin:/usr/sbin"
+export PATH
+
+__iflog "1st pass mounting..."
+mkdir -p /dev /run /sys /proc /tmp
+mount -a || true
+
+__iflog "2nd pass mounting..."
+mkdir -p /dev/pts
+mount -a
+
+__iflog "Set up root user..."
+touch /etc/group /etc/passwd /etc/shadow
+addgroup -g 0 -S root
+adduser -h /root -s /bin/sh -u 0 -G root -S root
+passwd root -d
+__iflog "Passwordless root setup success."
+
+__iflog "====== INITRAMFS READY ======"
+__iflog "Init params: ${*}"
+__iflog "Environment Variables:"
+export
+
+__iflog "====== LOOP /bin/sulogin ======"
+__iflog 'In QEMU, exit through `reboot -f`'
+while true; do /bin/sulogin; done

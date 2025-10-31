@@ -34,7 +34,7 @@ class FastaEOFException final : public std::exception { };
 class MalformedFastaException final : public std::runtime_error {
 public:
     explicit MalformedFastaException(const std::string& reason)
-        : std::runtime_error(reason) { };
+        : std::runtime_error(reason) {};
     ~MalformedFastaException() override = default;
     DEFAULT_COPY(MalformedFastaException)
     DEFAULT_MOVE(MalformedFastaException)

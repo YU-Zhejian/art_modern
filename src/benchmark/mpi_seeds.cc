@@ -25,7 +25,7 @@ class GeneratedSeeds {
 public:
     GeneratedSeeds()
         : hostname_(mpi_hostname())
-        , thread_id_(std::hash<std::thread::id> { }(std::this_thread::get_id())) { };
+        , thread_id_(std::hash<std::thread::id> {}(std::this_thread::get_id())) {};
 
     /**
      * Deserialization for MPI communication

@@ -1,0 +1,4 @@
+*/
+!busybox_initramfs
+*.squashfs
+*.qcow2

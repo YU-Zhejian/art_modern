@@ -31,7 +31,7 @@ namespace {
     constexpr int BUFF_SIZE = 4096;
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
-        z_stream zs = { };
+        z_stream zs = {};
 
         // Initialize zlib stream for decompression
         if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {

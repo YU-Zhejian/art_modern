@@ -11,6 +11,6 @@ ALPINE_MASTER_DIR=artifacts/build_alpine_master
 singularity exec \
     --bind "${ALPINE_MASTER_DIR}":/mnt/art_modern-master \
     dockerfiles/alpine-latest.sif \
-sh /build_alpine_tgz.sh
+    sh /build_alpine_tgz.sh
 mv artifacts/build_alpine_master/opt/build_rel_with_dbg_alpine-"${ARCH}".tar.gz \
     artifacts/RELEASE/build_rel_with_dbg_alpine-"${ARCH}".tar.gz
