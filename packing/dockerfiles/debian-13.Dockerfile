@@ -27,6 +27,7 @@ RUN apt-get update && \
     lowdown \
     openmpi-bin \
     libopenmpi-dev \
+    patchelf \
     && apt clean
 
 COPY build_deb.sh /
