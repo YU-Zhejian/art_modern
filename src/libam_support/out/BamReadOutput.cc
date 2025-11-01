@@ -40,6 +40,7 @@
 #include <htslib/sam.h>
 
 #include <cstdint>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>

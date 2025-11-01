@@ -83,7 +83,7 @@ CoverageInfo::CoverageInfo(std::istream& istream)
     }
 }
 
-CoverageInfo CoverageInfo::div(const int num_parts) const
+CoverageInfo CoverageInfo::div(const std::size_t num_parts) const
 {
     if (coverage_positive_.empty()) {
         return CoverageInfo(static_coverage_positive_ / num_parts, static_coverage_negative_ / num_parts);

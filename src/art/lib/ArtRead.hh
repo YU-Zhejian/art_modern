@@ -36,7 +36,7 @@ public:
     // Disable constructors
     DELETE_MOVE(ArtRead)
     DELETE_COPY(ArtRead)
-    ~ArtRead() = default;
+    DEFAULT_DESTRUCTOR(ArtRead)
 
     ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
@@ -74,10 +74,8 @@ private:
     Rprob& rprob_;
     std::string query_;
     std::string ref_;
-    [[
 
-        noreturn]] [[maybe_unused]] void
-    except_() const;
+    [[noreturn]] [[maybe_unused]] void except_() const;
 };
 
 } // namespace labw::art_modern

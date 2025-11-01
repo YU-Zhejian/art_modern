@@ -37,6 +37,7 @@
 #include <htslib/sam.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>

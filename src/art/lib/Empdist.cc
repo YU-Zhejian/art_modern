@@ -186,7 +186,7 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
 #endif
             break;
         default:
-            qual[i] = rprob.rand_quality_less_than_10();
+            qual[i] = static_cast<am_qual_t>(rprob.rand_quality_less_than_10());
         }
     }
 }
@@ -227,7 +227,7 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
 #endif
             break;
         default:
-            qual[i] = rprob.rand_quality_less_than_10();
+            qual[i] = static_cast<am_qual_t>(rprob.rand_quality_less_than_10());
         }
     }
 }

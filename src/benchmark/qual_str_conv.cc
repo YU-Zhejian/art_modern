@@ -18,7 +18,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/seq/qual_to_str.h"
 #include "libam_support/seq/str_to_qual.h"
-#include "libam_support/utils/seq_utils.hh"
 
 #include <algorithm>
 #include <chrono>

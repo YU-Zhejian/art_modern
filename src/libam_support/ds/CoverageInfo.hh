@@ -38,7 +38,7 @@ public:
 
     [[nodiscard]] double coverage_positive(const std::string& contig_name) const;
     [[nodiscard]] double coverage_negative(const std::string& contig_name) const;
-    [[nodiscard]] CoverageInfo div(int num_parts) const;
+    [[nodiscard]] CoverageInfo div(std::size_t num_parts) const;
 
 private:
     double static_coverage_positive_;

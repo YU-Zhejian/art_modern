@@ -121,8 +121,8 @@ private:
     void validate_() const;
     const bool sep_qual_;
     const bool is_pe_;
-    std::size_t read_len_1_;
-    std::size_t read_len_2_;
+    std::size_t read_len_1_ { 0 };
+    std::size_t read_len_2_ { 0 };
 };
 
 } // namespace labw::art_modern

@@ -81,5 +81,5 @@ int main(int argc, char* argv[])
 #endif
     BOOST_LOG_TRIVIAL(info) << "Done.";
     exit_mpi();
-    std::exit(EXIT_SUCCESS);
+    return EXIT_SUCCESS;
 }

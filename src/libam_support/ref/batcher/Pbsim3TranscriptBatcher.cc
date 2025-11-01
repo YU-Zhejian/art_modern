@@ -24,6 +24,7 @@
 #include <boost/log/trivial.hpp>
 
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 #include <limits>
 #include <memory>

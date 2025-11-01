@@ -17,6 +17,7 @@
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/seq_utils.hh"
+#include "libam_support/utils/si_utils.hh"
 
 #include <htslib/sam.h>
 

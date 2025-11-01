@@ -22,7 +22,6 @@
 #include <zlib.h>
 
 #include <cstring>
-#include <stdexcept>
 #include <string>
 
 namespace labw::art_modern {
