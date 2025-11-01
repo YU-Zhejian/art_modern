@@ -15,7 +15,7 @@ mpiexec -n 1 **art_profile_builder-mpi** [options]
 
 # USAGE
 
-See `mpiexec -n 1 art_profile_builder --help`.
+See `mpiexec -n 1 art_profile_builder-mpi --help`.
 
 # NOTE
 

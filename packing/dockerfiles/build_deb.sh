@@ -28,10 +28,11 @@ export LC_IDENTIFICATION=C
 
 # Build the deb
 echo "DEB: Build the deb"
-env -C "${BUILD_DIR}" debuild -us -uc --no-lintian \
+# Not all debuild support --no-lintian
+env -C "${BUILD_DIR}" debuild -us -uc \
     > >(sed --unbuffered 's/^/DEBUILD-INFO: /' | tee /mnt/build_deb/debuild-info.log) \
     2> >(sed --unbuffered 's/^/DEBUILD-ERR: /' | tee /mnt/build_deb/debuild-err.log >&2)
-env -C "${BUILD_DIR}" debuild -- clean &>/dev/null
+env -C "${BUILD_DIR}" debuild -- clean 2>&1 | sed 's/^/DEBUILD-CLEAN: /'
 env -C "${BUILD_DIR}" debc 2>&1 | sed 's/^/DEBCHECK: /' | tee /mnt/build_deb/debcheck.log
 env -C /mnt/build_deb/ \
     lintian art-modern_"${PACKAGE_VERSION}"+dfsg-1_amd64.changes \

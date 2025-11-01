@@ -17,20 +17,19 @@ else
 endif
 $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 
-CONFIGURE_CMAKE_PARAMS = -Wdev -Wdeprecated --warn-uninitialized \
-                             -DCEU_CM_SHOULD_USE_NATIVE=OFF \
-                             -DCEU_CM_SHOULD_ENABLE_TEST=ON \
-                             -DUSE_THREAD_PARALLEL=ASIO \
-                             -DUSE_MALLOC=NOP \
-                             -DUSE_RANDOM_GENERATOR=STL \
-                             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-                             -DCMAKE_INSTALL_LIBDIR=lib/art-modern \
-                             -DCMAKE_INSTALL_INCLUDEDIR=include/art-modern/include \
-                             -DUSE_HTSLIB=hts \
-                             -DUSE_LIBFMT=fmt \
-                             -DUSE_ABSL=SYSTEM \
-                             -DREPRODUCIBLE_BUILDS=ON \
-                             -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)"
+CONFIGURE_CMAKE_PARAMS = \
+	-Wdev -Wdeprecated --warn-uninitialized \
+    -DCEU_CM_SHOULD_USE_NATIVE=OFF \
+    -DCEU_CM_SHOULD_ENABLE_TEST=ON \
+    -DUSE_THREAD_PARALLEL=ASIO \
+    -DUSE_MALLOC=NOP \
+    -DUSE_RANDOM_GENERATOR=STL \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DUSE_HTSLIB=hts \
+    -DUSE_LIBFMT=fmt \
+    -DUSE_ABSL=SYSTEM \
+    -DREPRODUCIBLE_BUILDS=ON \
+    -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)"
 
 %.1: %.1.md
 	# TODO: Supress: art-modern: wrong-manual-section 1 != 7 [usr/share/man/man1/art_modern.1.gz:2]
@@ -43,12 +42,13 @@ CONFIGURE_CMAKE_PARAMS = -Wdev -Wdeprecated --warn-uninitialized \
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step
 
-
 override_dh_auto_configure:
 	dh_auto_configure --builddirectory=build-nompi -- \
-    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=OFF
+    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=OFF \
+    -DCMAKE_INSTALL_LIBDIR=lib/art-modern
 	dh_auto_configure --builddirectory=build-openmpi -- \
-    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=ON
+    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib/art-modern-mpi
 
 override_dh_auto_build:
 	dh_auto_build --builddirectory=build-nompi
@@ -62,5 +62,13 @@ override_dh_auto_clean:
 	dh_clean
 	rm -rf build-*
 
-override_dh_installdocs: debian/art_modern.1 debian/art_profile_builder.1 debian/art_modern-mpi.1 debian/art_profile_builder-mpi.1
+override_dh_installdocs: \
+	debian/art_modern.1 \
+	debian/art_profile_builder.1 \
+	debian/art_modern-mpi.1 \
+	debian/art_profile_builder-mpi.1
 	dh_installdocs
+
+override_dh_auto_test:
+	build-nompi/art_modern --help
+	mpiexec -n 1 build-openmpi/art_modern-mpi --version
