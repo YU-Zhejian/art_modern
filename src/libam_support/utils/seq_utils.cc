@@ -59,38 +59,25 @@ void str_to_qual(std::vector<am_qual_t>& qual, const std::string& str)
 }
 
 void str_to_qual(am_qual_t* qual, const char* str, size_t qlen)
-    {
-#if !defined(IN_COMPILER_WE_TRUST) && (defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__))
-        if (qlen <= 100) {
-            str_to_qual_mmx(qual, str, qlen);
-            return;
-        }
-        if (qlen <= 200) {
-            str_to_qual_sse2(qual, str, qlen);
-            return;
-        }
-        str_to_qual_avx2(qual, str, qlen);
-#else
-        str_to_qual_for_loop(qual, str, qlen);
-#endif
-    }
-
-    void qual_to_str(const am_qual_t* qual,  char* str, size_t qlen)
 {
-#if !defined(IN_COMPILER_WE_TRUST) && (defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__) )
-    if (qlen <= 100) {
-        qual_to_str_mmx(qual,str, qlen);
-    }
-    if (qlen <= 200) {
-        qual_to_str_sse2(qual,str, qlen);
-    }
-    qual_to_str_avx2(qual,str, qlen);
+#if !defined(IN_COMPILER_WE_TRUST)
+    str_to_qual_comb(qual, str, qlen);
+#else
+    str_to_qual_for_loop(qual, str, qlen);
+#endif
+}
+
+void qual_to_str(const am_qual_t* qual, char* str, size_t qlen)
+{
+#if !defined(IN_COMPILER_WE_TRUST)
+    qual_to_str_comb(qual, str, qlen);
 #else
     qual_to_str_for_loop(qual, str, qlen);
 #endif
 }
 
-std::string qual_to_str(const std::vector<am_qual_t>& qual) {
+std::string qual_to_str(const std::vector<am_qual_t>& qual)
+{
     std::string retq;
     retq.resize(qual.size());
     qual_to_str(qual.data(), retq.data(), qual.size());

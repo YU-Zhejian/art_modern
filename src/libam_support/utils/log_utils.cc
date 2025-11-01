@@ -92,8 +92,5 @@ void init_file_logger(const bool auto_flush)
         BOOST_LOG_TRIVIAL(info) << "Log file sink to '" << file_name << "' added.";
     }
 }
-void flush_all_sinks()
-{
-    logging::core::get()->flush();
-}
+void flush_all_sinks() { logging::core::get()->flush(); }
 } // namespace labw::art_modern

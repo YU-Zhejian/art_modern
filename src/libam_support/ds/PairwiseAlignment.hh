@@ -45,8 +45,8 @@ public:
      * @param is_plus_strand Whether the reference is reverse-complemented.
      */
     PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query, std::string&& ref,
-        std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query, std::string&& aligned_ref,
-        hts_pos_t pos_on_contig, bool is_plus_strand);
+        std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query,
+        std::string&& aligned_ref, hts_pos_t pos_on_contig, bool is_plus_strand);
     [[nodiscard]] std::vector<am_cigar_t> generate_cigar_array(bool use_m) const;
     /**
      * Serialize the alignment into a string.

@@ -39,6 +39,7 @@ namespace labw::art_modern {
 #ifdef USE_WALKER_QUALGEN
 class SlimEmpDistGslDiscrete {
     using dist_map_type = std::map<am_qual_count_t, am_qual_t, std::less<>>;
+
 public:
     DEFAULT_COPY(SlimEmpDistGslDiscrete)
     DEFAULT_MOVE(SlimEmpDistGslDiscrete)

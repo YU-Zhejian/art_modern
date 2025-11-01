@@ -2,7 +2,7 @@
  * @brief Utility functions for MPI.
  *
  * Here defines some utility functions that would work under MPI.
- * 
+ *
  * @copyright Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
@@ -24,15 +24,15 @@
 
 namespace labw::art_modern {
 
-	/**
-* Check if MPI is available.
-* @return true if MPI is available. Otherwise, return false.
-	*/
+/**
+ * Check if MPI is available.
+ * @return true if MPI is available. Otherwise, return false.
+ */
 bool have_mpi() noexcept;
 
 /**
-* Check if MPI is finalized. 
-* Abort if MPI is not available.
+ * Check if MPI is finalized.
+ * Abort if MPI is not available.
  * @return true if MPI is finalized. Otherwise, return false.
  */
 bool is_mpi_finalized();

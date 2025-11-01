@@ -6,7 +6,7 @@ uniprot*
 *.out
 *.bed
 *.msgpack
-
+bin/
 
 /.idea/*
 !/.idea/encodings.xml

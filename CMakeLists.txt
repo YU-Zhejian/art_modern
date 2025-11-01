@@ -161,9 +161,15 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with am_support_lib.
 
-file(GLOB AM_SUPPORT_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.cc"
-        "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.cc" "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.cc"  "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.c"
-        "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.c" "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.c")
+file(
+    GLOB
+    AM_SUPPORT_LIB_SOURCE
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.c")
 add_library(am_support_lib ${AM_SUPPORT_LIB_SOURCE})
 target_compile_options(am_support_lib BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(am_support_lib PUBLIC ${ART_MODERN_LINK_LIBS})

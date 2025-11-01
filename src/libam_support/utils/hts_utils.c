@@ -51,4 +51,3 @@ size_t am_hts_tell(htsFile* fp)
     }
     return 0;
 }
-

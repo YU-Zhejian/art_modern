@@ -30,10 +30,10 @@ typedef int8_t am_qual_t;
 
 /** Cigar type. Should be 0b00 to 0b11. */
 typedef uint8_t am_cigar_type_t;
-    /**
+/**
  * Cigar operation and length combined.
  */
-typedef uint32_t am_cigar_t ;
+typedef uint32_t am_cigar_t;
 /**
  * Cigar operation.
  */
@@ -50,7 +50,7 @@ typedef uint64_t am_qual_count_t;
  * This MUST be a signed integer.
  * Otherwise -1 will be reverted to an extraordinarily large number.
  */
-typedef int64_t   am_readnum_t ;
+typedef int64_t am_readnum_t;
 /** Length of files. */
 typedef int64_t am_filelen_t;
 

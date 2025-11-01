@@ -51,6 +51,5 @@
     classname(classname&&) = default;                                                                                  \
     classname& operator=(classname&&) = default;
 
-
 #define DEFAULT_DESTRUCTOR(classname) ~classname() = default;
 // NOLINTEND

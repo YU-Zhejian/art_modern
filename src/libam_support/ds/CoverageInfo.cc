@@ -62,7 +62,7 @@ double CoverageInfo::coverage_negative(const std::string& contig_name) const
 }
 
 CoverageInfo::CoverageInfo(std::istream& istream)
-: static_coverage_positive_(0)
+    : static_coverage_positive_(0)
     , static_coverage_negative_(0)
 {
     std::string buff;
@@ -105,6 +105,5 @@ CoverageInfo::CoverageInfo(const double static_coverage_positive, const double s
     , static_coverage_negative_(static_coverage_negative)
 {
 }
-
 
 } // namespace labw::art_modern

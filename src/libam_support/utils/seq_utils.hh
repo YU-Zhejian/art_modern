@@ -26,7 +26,7 @@ void revcomp_inplace(std::string& dna);
 void normalize_inplace(std::string& dna);
 
 std::string qual_to_str(const std::vector<am_qual_t>& qual);
-void qual_to_str(const am_qual_t* qual,   char* str, size_t qlen);
+void qual_to_str(const am_qual_t* qual, char* str, size_t qlen);
 
 void str_to_qual(std::vector<am_qual_t>& qual, const std::string& str);
 void str_to_qual(am_qual_t* qual, const char* str, size_t qlen);
@@ -46,6 +46,9 @@ bool ends_with(const std::string& str, const std::string& suffix);
  */
 template <typename T> static void reverse(T* ptr, const size_t n)
 {
+    if (n <= 1) {
+        return;
+    }
     T tmp;
     for (size_t i = 0; i < n / 2; ++i) {
         tmp = ptr[i];

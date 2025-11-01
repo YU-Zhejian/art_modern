@@ -16,7 +16,8 @@ void str_to_qual_avx2(am_qual_t* qual, const char* str, size_t qlen);
 void str_to_qual_mmx(am_qual_t* qual, const char* str, size_t qlen);
 void str_to_qual_sse2(am_qual_t* qual, const char* str, size_t qlen);
 void str_to_qual_for_loop(am_qual_t* qual, const char* str, size_t qlen);
+void str_to_qual_comb(am_qual_t* qual, const char* str, size_t qlen);
 
 ART_MODERN_END_C_DECLS
 
-#endif //ART_MODERN_LIBAM_SUPPORT_SEQ_STR_TO_QUAL_H
+#endif // ART_MODERN_LIBAM_SUPPORT_SEQ_STR_TO_QUAL_H

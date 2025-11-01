@@ -117,3 +117,16 @@ Affected files:
 Licensed under the GPL 3.0 license.
 
 **NOTE** Added in [1.1.2](#v-1.1.2-section).
+
+## qreverse by Wunkolo
+
+Available from <https://github.com/Wunkolo/qreverse/>, commit [`fd54e4b`](https://github.com/Wunkolo/qreverse/commit/fd54e4b59e2e0b5051ffcfdab9878f10815bb8cd).
+
+Affected files:
+
+- `src/libam_support/seq/qreverse.c`
+- `src/libam_support/seq/qreverse.h`
+
+Licensed under the MIT license.
+
+**NOTE** Added in [1.2.2](#v-1.2.2-section).

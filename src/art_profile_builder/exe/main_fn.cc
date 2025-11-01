@@ -61,7 +61,8 @@ void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::share
         num_total_reads++;
         if (num_total_reads % REPORT_SIZE == 0) {
             BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id << ": Processed "
-                                    << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " reads, "
+                                    << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000))
+                                    << " reads, "
                                     << to_si(num_valid_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " ("
                                     << static_cast<double>(num_valid_reads) / static_cast<double>(num_total_reads)
                     * 100.0 << ")% valid reads.";
@@ -80,8 +81,8 @@ except:
     abort_mpi();
 destroy:
     BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id << ": Processed "
-                                                      << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " reads, "
-                                                      << to_si(num_valid_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " ("
+                            << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " reads, "
+                            << to_si(num_valid_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " ("
                             << static_cast<double>(num_valid_reads) / static_cast<double>(num_total_reads) * 100.0
                             << ")% valid reads.";
 

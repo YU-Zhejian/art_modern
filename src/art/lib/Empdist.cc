@@ -67,8 +67,8 @@ Empdist::Empdist(const BuiltinProfile& builtin_profile, const bool sep_qual, con
     log();
 }
 
-Empdist::Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual,
-    const bool is_pe)
+Empdist::Empdist(
+    const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual, const bool is_pe)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
 {
@@ -123,7 +123,6 @@ void Empdist::set_read_length(const std::size_t read_len_1, const std::size_t re
         }
     }
 }
-
 
 // generate quality vector from dist of one read from pair-end [default first
 // read]
@@ -376,8 +375,8 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
     read_emp_dist_(distss, is_first);
 }
 
-void Empdist::shift_all_emp(const am_qual_t q_shift_1, const am_qual_t q_shift_2,
-    const am_qual_t min_qual, const am_qual_t max_qual)
+void Empdist::shift_all_emp(
+    const am_qual_t q_shift_1, const am_qual_t q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
 {
     if (!sep_qual_) {
         shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);
@@ -407,7 +406,6 @@ void Empdist::validate_() const
             BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
         }
     }
-
 }
 
 void Empdist::log() const

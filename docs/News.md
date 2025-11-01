@@ -1,5 +1,12 @@
 # News \& Release Notes
 
+(v-1.2.2-section)=
+## 1.2.2 (Ongoing)
+
+- Several low-level C++ features re-done in C to improve compilation speed.
+- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing.
+- Miscellaneous bug fixes.
+
 (v-1.2.1-section)=
 ## 1.2.1 (Ongoing)
 

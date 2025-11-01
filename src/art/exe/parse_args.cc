@@ -148,8 +148,8 @@ namespace {
             + boost::algorithm::join(
                 std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
-        art_opts.add_options()(
-            ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"), arg_builtin_qual_file_desc.c_str());
+        art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"),
+            arg_builtin_qual_file_desc.c_str());
         art_opts.add_options()(
             ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "path to the first-read quality profile");
         art_opts.add_options()(ARG_QUAL_FILE_2, po::value<std::string>()->default_value(""),
@@ -170,9 +170,12 @@ namespace {
         art_opts.add_options()(ARG_MAX_N, po::value<int>()->default_value(DEFAULT_MAX_N),
             "the maximum total number of ambiguous bases (N) per read");
         art_opts.add_options()(ARG_READ_LEN, po::value<int>(),
-            (std::string("read length to be simulated. If the simulation mode is PE or MP, will use this value on both strands. If none of the read-length parameters are specified, will use the longest available read length specified in "
-            "the profile. Cannot be specified together with ")
-                + ARG_READ_LEN_1 + " or " + ARG_READ_LEN_2).c_str());
+            (std::string("read length to be simulated. If the simulation mode is PE or MP, will use this value on both "
+                         "strands. If none of the read-length parameters are specified, will use the longest available "
+                         "read length specified in "
+                         "the profile. Cannot be specified together with ")
+                + ARG_READ_LEN_1 + " or " + ARG_READ_LEN_2)
+                .c_str());
         art_opts.add_options()(ARG_READ_LEN_1, po::value<int>(), "read length of read 1 to be simulated");
         art_opts.add_options()(ARG_READ_LEN_2, po::value<int>(), "read length of read 2 to be simulated");
         art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
@@ -302,8 +305,8 @@ namespace {
         try {
             auto d = std::stod(fcov_arg_str);
             if (d < 0.0) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Input Error: The fold of coverage (--" << ARG_FCOV << ") must be a non-negative number.";
+                BOOST_LOG_TRIVIAL(fatal) << "Input Error: The fold of coverage (--" << ARG_FCOV
+                                         << ") must be a non-negative number.";
                 abort_mpi();
             }
             if (simulation_mode == SIMULATION_MODE::TEMPLATE) {
@@ -328,15 +331,14 @@ namespace {
             abort_mpi();
         }
         if (max_qual <= min_qual || max_qual > MAX_QUAL) {
-            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The maximum quality score must be an integer in [" << min_qual << ", "
-                                     << MAX_QUAL << "]";
+            BOOST_LOG_TRIVIAL(fatal) << "Input Error: The maximum quality score must be an integer in [" << min_qual
+                                     << ", " << MAX_QUAL << "]";
             abort_mpi();
         }
     }
 
     Empdist read_emp(const std::string& builtin_profile_name, const std::string& qual_file_1,
-        const std::string& qual_file_2, const ART_LIB_CONST_MODE art_lib_const_mode,
-        const bool sep_flag)
+        const std::string& qual_file_2, const ART_LIB_CONST_MODE art_lib_const_mode, const bool sep_flag)
     {
         const auto is_pe = art_lib_const_mode != ART_LIB_CONST_MODE::SE;
 
@@ -354,11 +356,11 @@ namespace {
             }
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
             abort_mpi();
-        } 
+        }
         if (qual_file_1.empty()) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
-                                     << ") or first-read "
-                                     << "quality profile (--" << ARG_QUAL_FILE_1 << ") must be specified.";
+                                     << ") or first-read " << "quality profile (--" << ARG_QUAL_FILE_1
+                                     << ") must be specified.";
             abort_mpi();
         }
         validate_input_filename(qual_file_1, ARG_QUAL_FILE_1);
@@ -376,10 +378,9 @@ namespace {
             CExceptionsProxy::assert_not_null(fai_path(fasta_path), USED_HTSLIB_NAME, "Failed to load FAI"));
         // Here FAI should be built by fai_path.
         if (!exists(boost::filesystem::path(seq_file_fai_path))) {
-            BOOST_LOG_TRIVIAL(fatal) << "FAI file '" << seq_file_fai_path
-                                     << " does not exist.";
+            BOOST_LOG_TRIVIAL(fatal) << "FAI file '" << seq_file_fai_path << " does not exist.";
             abort_mpi();
-        } 
+        }
     }
 
     std::vector<double> gen_per_base_mutation_rate(const int read_len, const double p, const int max_indel)
@@ -427,8 +428,8 @@ namespace {
      * @param read_len_1 Read length of read 1
      * @param read_len_2 Read length of read 2
      */
-    void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_len_1,
-        const int read_len_2)
+    void validate_pe_frag_dist(
+        const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_len_1, const int read_len_2)
     {
         if (pe_frag_dist_std_dev <= 0 || pe_frag_dist_mean <= 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Please set pe_frag_dist_std_dev and "
@@ -475,7 +476,7 @@ namespace {
         }
         return err_prob;
     }
-    
+
     void validate_batch_size(am_readnum_t batch_size)
     {
         if (batch_size < 1) {
@@ -483,7 +484,6 @@ namespace {
             abort_mpi();
         }
     }
-
 
 } // namespace
 
@@ -530,11 +530,9 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     const am_qual_t qual_shift_1 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_1));
     const am_qual_t qual_shift_2 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_2));
 
-
-    auto qdist = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE),
-        get_param<std::string>(vm_, ARG_QUAL_FILE_1), get_param<std::string>(vm_, ARG_QUAL_FILE_2), 
-        art_lib_const_mode, sep_flag);
-
+    auto qdist
+        = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
+            get_param<std::string>(vm_, ARG_QUAL_FILE_2), art_lib_const_mode, sep_flag);
 
     // Set read lengths to qdist maximum if not specified
     // TODO: Support read_len_1 and read_len_2
@@ -550,14 +548,15 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     qdist.shift_all_emp(qual_shift_1, qual_shift_2, min_qual, max_qual);
     qdist.index();
 
-
-    
     // Generate per-base mutation rates
-    auto per_base_ins_rate_1 = gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
+    auto per_base_ins_rate_1
+        = gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
     auto per_base_del_rate_1
         = gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel);
-    auto per_base_ins_rate_2 = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
-    auto per_base_del_rate_2 = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel);
+    auto per_base_ins_rate_2
+        = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
+    auto per_base_del_rate_2
+        = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel);
 
     // Validate PE fragment distance parameters
     double pe_frag_dist_mean = 0;
@@ -577,20 +576,14 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         }
         pe_frag_dist_mean = get_param<double>(vm_, ARG_PE_FRAG_DIST_MEAN);
         pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
-        validate_pe_frag_dist(
-            pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
+        validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
         pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
     }
 
-
-
-    ArtParams art_params
-    {
-        art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id), max_n, read_len, pe_frag_dist_mean,
-            pe_frag_dist_std_dev, std::move(per_base_ins_rate_1), std::move(per_base_del_rate_1),
+    ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id), max_n, read_len,
+        pe_frag_dist_mean, pe_frag_dist_std_dev, std::move(per_base_ins_rate_1), std::move(per_base_del_rate_1),
         std::move(per_base_ins_rate_2), std::move(per_base_del_rate_2), gen_err_prob(), pe_dist_mean_minus_2_std,
-            std::move(qdist), report_interval_jp, report_interval_aje
-    };
+        std::move(qdist), report_interval_jp, report_interval_aje };
     ArtIOParams art_io_params { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel,
         batch_size, vm_, std::move(args) };
     return { art_params, art_io_params };

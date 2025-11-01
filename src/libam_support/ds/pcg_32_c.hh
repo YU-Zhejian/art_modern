@@ -17,16 +17,16 @@ class pcg32_c {
 public:
     pcg32_c(uint64_t state, uint64_t inc)
         : state_(state)
-        , inc_(inc) { };
+        , inc_(inc) {};
 
     pcg32_c()
-        : pcg32_c { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL } { };
+        : pcg32_c { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL } {};
     DEFAULT_DESTRUCTOR(pcg32_c)
     DELETE_COPY(pcg32_c)
     DELETE_MOVE(pcg32_c)
     using result_type = uint32_t;
-    constexpr result_type  min() const noexcept { return std::numeric_limits<result_type >::min(); }
-    constexpr result_type max() const noexcept { return std::numeric_limits<result_type >::max(); }
+    constexpr result_type min() const noexcept { return std::numeric_limits<result_type>::min(); }
+    constexpr result_type max() const noexcept { return std::numeric_limits<result_type>::max(); }
 
     uint32_t operator()()
     {

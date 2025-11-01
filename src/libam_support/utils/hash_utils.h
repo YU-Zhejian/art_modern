@@ -27,13 +27,13 @@
 
 ART_MODERN_BEGIN_C_DECLS
 
-inline void am_boost_hash_combine_impl32(uint32_t & seed, uint32_t value)
+inline void am_boost_hash_combine_impl32(uint32_t& seed, uint32_t value)
 {
     seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 // Improved by Tongyi Lingma
-inline void am_boost_hash_combine_impl64(uint64_t & seed, uint64_t value)
+inline void am_boost_hash_combine_impl64(uint64_t& seed, uint64_t value)
 {
     seed ^= value + 0x9e3779b97f4a7c15ULL + (seed << 13) + (seed >> 19);
 }

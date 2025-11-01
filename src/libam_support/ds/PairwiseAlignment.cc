@@ -30,17 +30,17 @@
 #include <vector>
 
 namespace labw::art_modern {
-    class PWAException final : public std::runtime_error {
-    public:
-        explicit PWAException(const std::string& message)
-            : std::runtime_error(message)
-        {}
+class PWAException final : public std::runtime_error {
+public:
+    explicit PWAException(const std::string& message)
+        : std::runtime_error(message)
+    {
+    }
 };
 
-
-PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query, std::string&& ref,
-    std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query, std::string&& aligned_ref,
-    hts_pos_t pos_on_contig, bool is_plus_strand)
+PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query,
+    std::string&& ref, std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query,
+    std::string&& aligned_ref, hts_pos_t pos_on_contig, bool is_plus_strand)
     : aln_query(std::move(aligned_query))
     , aln_ref(std::move(aligned_ref))
     , query(std::move(query))
