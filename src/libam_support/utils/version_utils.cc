@@ -126,7 +126,7 @@ namespace {
     void print_pcg_version()
     {
 #ifdef USE_PCG_RANDOM
-        std::cout << "PCG: " << "0.98" << std::endl;
+        std::cout << "PCG: Really Minimal PCG32 Code" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif

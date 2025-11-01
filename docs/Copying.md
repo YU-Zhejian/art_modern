@@ -94,17 +94,17 @@ Under an MIT-like License.
 
 **NOTE** Added in [1.1.1](#v-1.1.1-section).
 
-## PCG by Melissa O'Neill
+## PCG, Minimal C Implementation by Melissa O'Neill
 
-Available from <https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip>. Currently developed at <https://github.com/imneme/pcg-cpp>.
+Available from <https://www.pcg-random.org/download.html>. Currently developed at <https://github.com/imneme/pcg-c-basic>.
 
 Affected files:
 
-- `/deps/pcg-cpp-0.98/**`
+- `src/libam_support/ds/pcg_32_c.hh`
 
 Licensed under the Apache 2.0 License.
 
-**NOTE** Added in [1.1.1](#v-1.1.1-section).
+**NOTE** Added in [1.2.2](#v-1.2.2-section).
 
 ## GNU Scientific Library by M. Galassi _et al._
 

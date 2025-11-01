@@ -29,7 +29,7 @@
 #elif defined(USE_ONEMKL_RANDOM)
 #include <mkl.h> // NOLINT
 #elif defined(USE_PCG_RANDOM)
-#include <pcg_random.hpp>
+#include "libam_support/ds/pcg_32_c.hh"
 
 #include <random>
 #else
@@ -106,7 +106,7 @@ private:
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
 #else
-    pcg32_fast gen_;
+    pcg32_c gen_;
 #endif
     std::uniform_real_distribution<double> dis_;
     std::normal_distribution<double> insertion_length_gaussian_;

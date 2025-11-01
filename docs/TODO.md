@@ -50,12 +50,10 @@
 ## Packing
 
 - Supress all lintian issues.
-- Pack MPI-enabled Debian packages, BioConda build, etc.
-  - For debian pack, see <https://salsa.debian.org/med-team/abyss/-/blob/master/debian/control?ref_type=heads>.
 - Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
 - Support `libtcmalloc.pc` and `libtcmalloc_minimal.pc`. Provided by Debian package `libgoogle-perftools-dev` (wierd). Also support Google profilers.
-- Change the PCG random generator to PCG-minimal that allows building under Mac OS X.
-- Use <https://github.com/Wunkolo/qreverse> to accelerate array reversing.
+- Add RNG `SYSTEM_PCG` for packing.
+- Add qreverse options to `make testbuild`.
 
 ## Performance
 
