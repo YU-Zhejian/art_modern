@@ -24,15 +24,22 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
-#include <algorithm>
-#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <utility>
 #include <vector>
 
 namespace labw::art_modern {
-PairwiseAlignment::PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
-    std::string qual_str, std::vector<am_qual_t> qual_vec, std::string aligned_query, std::string aligned_ref,
+    class PWAException final : public std::runtime_error {
+    public:
+        explicit PWAException(const std::string& message)
+            : std::runtime_error(message)
+        {}
+};
+
+
+PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query, std::string&& ref,
+    std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query, std::string&& aligned_ref,
     hts_pos_t pos_on_contig, bool is_plus_strand)
     : aln_query(std::move(aligned_query))
     , aln_ref(std::move(aligned_ref))
@@ -101,10 +108,4 @@ std::string PairwiseAlignment::serialize(const int is_read_1_or_2) const
         is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
 }
 
-PWAException::PWAException(const char* msg)
-    : msg(msg)
-{
-}
-
-const char* PWAException::what() const noexcept { return msg; }
 } // namespace labw::art_modern

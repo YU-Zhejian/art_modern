@@ -14,6 +14,8 @@
 
 #include "libam_support/out/PwaReadOutput.hh"
 
+#include "art_modern_config.h"
+
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
@@ -37,6 +39,7 @@ namespace {
     {
         std::ostringstream oss;
         oss << "#PWA\n";
+        oss << "#ART_MODERN_VERSION: " << ART_MODERN_VERSION << "\n";
         oss << "#ARGS: " << boost::algorithm::join(args, " ") << "\n";
         return oss.str();
     }

@@ -32,7 +32,6 @@
 #include <boost/log/utility/setup/file.hpp>
 
 #include <iostream>
-#include <sstream>
 #include <string>
 
 namespace logging = boost::log;
@@ -95,7 +94,6 @@ void init_file_logger(const bool auto_flush)
 }
 void flush_all_sinks()
 {
-    const auto core = logging::core::get();
-    core->flush();
+    logging::core::get()->flush();
 }
 } // namespace labw::art_modern

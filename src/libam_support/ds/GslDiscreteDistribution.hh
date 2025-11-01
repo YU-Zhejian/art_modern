@@ -38,13 +38,14 @@
  */
 #pragma once
 
+#include <cstdlib>
 #include <numeric> // for std::accumulate
 #include <stack>
 #include <vector>
 
 namespace labw::art_modern {
 template <typename FloatType> class GslDiscreteDistribution {
-    size_t K;
+    std::size_t K;
     std::vector<FloatType> F;
     std::vector<size_t> A;
 

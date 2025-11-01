@@ -19,12 +19,25 @@
  * domain. The author hereby disclaims copyright to this source code.
  */
 
-#pragma once
+#ifndef LABW_ART_MODERN_LIBAM_SUPPORT_UTILS_HASH_UTILS_H
+#define LABW_ART_MODERN_LIBAM_SUPPORT_UTILS_HASH_UTILS_H
+#include "libam_support/utils/c_macro_utils.h"
 
-namespace labw::art_modern {
-template <typename SizeT> void boost_hash_combine_impl(SizeT& seed, SizeT value)
+#include <stdint.h>
+
+ART_MODERN_BEGIN_C_DECLS
+
+inline void am_boost_hash_combine_impl32(uint32_t & seed, uint32_t value)
 {
     seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
-} // namespace labw::art_modern
+// Improved by Tongyi Lingma
+inline void am_boost_hash_combine_impl64(uint64_t & seed, uint64_t value)
+{
+    seed ^= value + 0x9e3779b97f4a7c15ULL + (seed << 13) + (seed >> 19);
+}
+
+ART_MODERN_END_C_DECLS
+
+#endif // LABW_ART_MODERN_LIBAM_SUPPORT_UTILS_HASH_UTILS_H

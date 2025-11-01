@@ -19,7 +19,7 @@
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"
-#include "libam_support/utils/hts_utils.hh"
+#include "libam_support/utils/hts_utils.h"
 
 #include <htslib/sam.h>
 
@@ -51,7 +51,7 @@ void BamLFIO::flush_and_close()
     }
     CExceptionsProxy::assert_numeric(sam_flush(fp_), USED_HTSLIB_NAME, "Failed to flush SAM/BAM file", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    num_bytes_out_ = hts_tell(fp_);
+    num_bytes_out_ = am_hts_tell(fp_);
     CExceptionsProxy::assert_numeric(sam_close(fp_), USED_HTSLIB_NAME, "Failed to close SAM/BAM file", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     closed_ = true;

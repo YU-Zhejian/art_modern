@@ -14,8 +14,6 @@
 
 #include "libam_support/utils/si_utils.hh"
 
-#include "libam_support/Constants.hh"
-
 #include <fmt/format.h>
 
 #include <cstddef>

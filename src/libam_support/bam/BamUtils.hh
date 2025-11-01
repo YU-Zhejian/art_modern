@@ -33,7 +33,7 @@ class BamUtils {
 public:
     DELETE_MOVE(BamUtils)
     DELETE_COPY(BamUtils)
-    ~BamUtils() = default;
+    DEFAULT_DESTRUCTOR(BamUtils)
     BamUtils() = delete;
 
     static void assert_correct_cigar(

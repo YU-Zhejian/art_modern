@@ -1,6 +1,8 @@
 /**
  *@brief Basic data types.
  *
+ * THIS FILE IS KEPT COMPATIBLE WITH C.
+ *
  * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
@@ -14,7 +16,8 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#pragma once
+#ifndef ART_MODERN_LIBAM_SUPPORT_DTYPES_H
+#define ART_MODERN_LIBAM_SUPPORT_DTYPES_H
 #include <stdint.h>
 #include <stdlib.h>
 
@@ -53,4 +56,4 @@ typedef int64_t am_filelen_t;
 
 /** Job ID type. */
 typedef size_t am_job_id_t;
-
+#endif // ART_MODERN_LIBAM_SUPPORT_DTYPES_H

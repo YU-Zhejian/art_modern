@@ -48,7 +48,7 @@ public:
     SimulationJob(SimulationJob&& other) noexcept;
     DELETE_MOVE_ASSIGNMENT(SimulationJob)
     DELETE_COPY(SimulationJob)
-    ~SimulationJob() = default;
+    DEFAULT_DESTRUCTOR(SimulationJob)
 
     std::shared_ptr<BaseFastaFetch> fasta_fetch;
     std::shared_ptr<CoverageInfo> coverage_info;

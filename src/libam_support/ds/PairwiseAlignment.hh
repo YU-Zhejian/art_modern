@@ -19,24 +19,16 @@
 
 #include <htslib/hts.h>
 
-#include <array>
-#include <exception>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
-class PWAException final : public std::exception {
-public:
-    [[nodiscard]] const char* what() const noexcept override;
-    const char* msg;
-    explicit PWAException(const char* msg);
-};
 
 class PairwiseAlignment {
 public:
     DELETE_COPY(PairwiseAlignment)
     DELETE_MOVE(PairwiseAlignment)
-    ~PairwiseAlignment() = default;
+    DEFAULT_DESTRUCTOR(PairwiseAlignment)
 
     /**
      *
@@ -52,10 +44,15 @@ public:
      * @param pos_on_contig
      * @param is_plus_strand Whether the reference is reverse-complemented.
      */
-    PairwiseAlignment(std::string read_name, std::string contig_name, std::string query, std::string ref,
-        std::string qual_str, std::vector<am_qual_t> qual_vec, std::string aligned_query, std::string aligned_ref,
+    PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query, std::string&& ref,
+        std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query, std::string&& aligned_ref,
         hts_pos_t pos_on_contig, bool is_plus_strand);
     [[nodiscard]] std::vector<am_cigar_t> generate_cigar_array(bool use_m) const;
+    /**
+     * Serialize the alignment into a string.
+     * @param is_read_1_or_2 0 for single-end, 1 for read 1 of paired-end, 2 for read 2 of paired-end.
+     * @return Serialized string.
+     */
     [[nodiscard]] std::string serialize(int is_read_1_or_2 = 0) const;
 
     /**
