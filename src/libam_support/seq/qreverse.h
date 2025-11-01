@@ -7,6 +7,10 @@
  * @license   MIT
  */
 
+#include "art_modern_config.h" // NOLINT: for AM_NO_Q_REVERSE
+
+#if !defined(AM_NO_Q_REVERSE)
+
 #ifndef ART_MODERN_LIBAM_SUPPORT_SEQ_QREVERSE_H
 #define ART_MODERN_LIBAM_SUPPORT_SEQ_QREVERSE_H
 
@@ -81,4 +85,5 @@ void qReverse_8(void* Array, size_t Count);
 
 ART_MODERN_END_C_DECLS
 
+#endif
 #endif

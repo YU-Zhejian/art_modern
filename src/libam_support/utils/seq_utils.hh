@@ -13,6 +13,13 @@
  **/
 
 #pragma once
+
+#include "art_modern_config.h" // NOLINT: for AM_NO_Q_REVERSE
+
+#if !defined(AM_NO_Q_REVERSE)
+#include "libam_support/seq/qreverse.h"
+#endif
+
 #include "libam_support/Dtypes.h"
 
 #include <cstddef>
@@ -38,7 +45,6 @@ bool ends_with(const std::string& str, const std::string& suffix);
 
 /**
  * Reverse an arbitrary sequence.
- * TODO: AVX-ize this function.
  *
  * @tparam T Sequence type.
  * @param ptr Start of the sequence.
@@ -46,6 +52,24 @@ bool ends_with(const std::string& str, const std::string& suffix);
  */
 template <typename T> static void reverse(T* ptr, const size_t n)
 {
+#if !defined(AM_NO_Q_REVERSE)
+    if constexpr (sizeof(T) == 1) {
+        qReverse_1(static_cast<void*>(ptr), n);
+        return;
+    }
+    if constexpr (sizeof(T) == 2) {
+        qReverse_2(static_cast<void*>(ptr), n);
+        return;
+    }
+    if constexpr (sizeof(T) == 4) {
+        qReverse_4(static_cast<void*>(ptr), n);
+        return;
+    }
+    if constexpr (sizeof(T) == 8) {
+        qReverse_8(static_cast<void*>(ptr), n);
+        return;
+    }
+#endif
     if (n <= 1) {
         return;
     }

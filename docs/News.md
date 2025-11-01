@@ -4,7 +4,7 @@
 ## 1.2.2 (Ongoing)
 
 - Several low-level C++ features re-done in C to improve compilation speed.
-- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing.
+- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to cmake options to disable this feature.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=

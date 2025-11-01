@@ -12,14 +12,16 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include "art_modern_config.h" // NOLINT: for AM_NO_Q_REVERSE
+
+#if !defined(AM_NO_Q_REVERSE)
+
 #include "benchmark_utils.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.h"
 #include "libam_support/seq/qreverse.h"
 #include "libam_support/utils/seq_utils.hh"
 
-#include <algorithm>
 #include <chrono>
 #include <cstdint>
 #include <cstdlib>
@@ -157,3 +159,6 @@ int main()
 
     return 0;
 }
+#else
+int main() { return 0; }
+#endif

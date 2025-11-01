@@ -48,4 +48,7 @@
 #cmakedefine CEU_CM_GIT_COMMIT_HASH "${CEU_CM_GIT_COMMIT_HASH}"
 #cmakedefine CEU_CM_GIT_COMMIT_DATE "${CEU_CM_GIT_COMMIT_DATE}"
 #cmakedefine CEU_CM_GIT_COMMIT_MESSAGE "${CEU_CM_GIT_COMMIT_MESSAGE}"
+
+// Reverse
+#cmakedefine AM_NO_Q_REVERSE
 #endif

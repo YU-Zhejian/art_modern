@@ -6,6 +6,9 @@
  * 			2025 YU Zhejian
  * @license   MIT
  */
+#include "art_modern_config.h" // NOLINT: for AM_NO_Q_REVERSE
+
+#if !defined(AM_NO_Q_REVERSE)
 
 #include "libam_support/seq/qreverse.h"
 
@@ -455,3 +458,6 @@ void qReverse_1(void* Array, size_t Count)
         Array8[Count - i - 1] = Temp;
     }
 }
+#else
+const char* const qreverse_c_not_used = "qreverse_c_not_used not used"; // To avoid empty translation unit warning
+#endif

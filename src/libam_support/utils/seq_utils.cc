@@ -19,8 +19,12 @@
 
 #include "libam_support/Dtypes.h"
 
-// Intel's optimization is better than ours
-#ifdef __INTEL_CLANG_COMPILER
+#include "ceu_check/ceu_check_cc_macro.h"
+
+// Some compiler's -O3 optimization is better than ours
+#if (defined(CEU_COMPILER_IS_INTEL_CLANG) || defined(CEU_COMPILER_IS_ICC) || defined(CEU_COMPILER_IS_CLANG)            \
+    || defined(CEU_COMPILER_IS_GCC))                                                                                   \
+    && !(defined(CEU_CM_IS_DEBUG))
 #define IN_COMPILER_WE_TRUST
 #endif
 
