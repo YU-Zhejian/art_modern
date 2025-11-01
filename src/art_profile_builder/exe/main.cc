@@ -88,11 +88,11 @@ int main(int argc, char** argv)
     const auto wall_time_end = std::chrono::high_resolution_clock ::now();
     const auto wall_time_diff = wall_time_end - wall_time_start;
     const double wall_time_sec = std::chrono::duration_cast<std::chrono::duration<double>>(wall_time_diff).count();
-    BOOST_LOG_TRIVIAL(info) << "Total reads processed: " << to_si(static_cast<double>(total_reads), 2, 1000)
-                            << " speed: " << to_si(static_cast<double>(total_reads) / wall_time_sec, 2, 1000)
+    BOOST_LOG_TRIVIAL(info) << "Total reads processed: " << to_si(total_reads, 2, static_cast<decltype(total_reads)>(1000))
+                            << " speed: " << to_si(static_cast<double>(1.0 * total_reads / wall_time_sec), 2, 1000.0)
                             << " reads/s";
-    BOOST_LOG_TRIVIAL(info) << "Total bases processed: " << to_si(static_cast<double>(total_bases), 2, 1000)
-                            << " speed: " << to_si(static_cast<double>(total_bases) / wall_time_sec, 2, 1000)
+    BOOST_LOG_TRIVIAL(info) << "Total bases processed: " << to_si(total_bases, 2, static_cast<decltype(total_bases)>(1000))
+                            << " speed: " << to_si(static_cast<double>(1.0 * total_bases / wall_time_sec), 2, 1000.0)
                             << " bases/s";
 
 #ifdef WITH_BOOST_TIMER

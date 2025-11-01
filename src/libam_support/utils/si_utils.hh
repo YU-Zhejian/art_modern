@@ -25,7 +25,7 @@ namespace labw::art_modern {
 std::string format_with_commas(std::size_t number);
 
 template <typename T>
-std::string to_si(T number, int precision = 2, int base = 1024){
+std::string to_si(T number, int precision = 2, T base = 1024){
     std::size_t unit_index = 0;
     auto size_in_unit = number;
 

@@ -130,7 +130,7 @@ message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 # -----------------------------------------------------------------------------
 # Dealing with config files.
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.c")
     execute_process(
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/gen_builtin_profiles.py"
                 "${CMAKE_BINARY_DIR}/gen/src/art/"
@@ -174,7 +174,7 @@ install(TARGETS am_support_lib)
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
 
-file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.cc")
+file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.c")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
 target_compile_options(art_modern_lib BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(art_modern_lib PUBLIC am_support_lib)
