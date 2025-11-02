@@ -23,7 +23,7 @@
 #define INCLUDE_INTEL_SIMD <x86intrin.h>
 #endif
 #else
-#define INCLUDE_INTEL_SIMD
+#undef INCLUDE_INTEL_SIMD
 #endif
 
 #endif // ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H

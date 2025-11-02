@@ -19,7 +19,6 @@
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtIOParams.hh"
 #include "art/lib/ArtParams.hh"
-#include "art/lib/BuiltinProfile.hh"
 #include "art/lib/Empdist.hh"
 
 #include "art_modern_config.h"
@@ -344,19 +343,7 @@ namespace {
         const auto is_pe = art_lib_const_mode != ART_LIB_CONST_MODE::SE;
 
         if (!builtin_profile_name.empty()) {
-            for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
-                if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
-                    if (ENCODED_BUILTIN_PROFILES[i][1][0] == '\0' && is_pe) {
-                        BOOST_LOG_TRIVIAL(fatal)
-                            << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
-                    }
-                    BuiltinProfile profile { ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0],
-                        ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1] };
-                    return { profile, sep_flag, is_pe };
-                }
-            }
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
-            abort_mpi();
+            return {builtin_profile_name, sep_flag, is_pe};
         }
         if (qual_file_1.empty()) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE

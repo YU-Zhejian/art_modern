@@ -17,7 +17,6 @@
 
 #include "art_modern_config.h" // NOLINT
 
-#include "art/lib/BuiltinProfile.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Dtypes.h"
@@ -102,7 +101,7 @@ private:
 
 public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);
-    Empdist(const BuiltinProfile& builtin_profile, bool sep_qual, bool is_pe);
+    Empdist(const std::string& builtin_profile_name, bool sep_qual, bool is_pe);
 
     void set_read_length(std::size_t read_len_1, std::size_t read_len_2);
     void shift_all_emp(am_qual_t q_shift_1, am_qual_t q_shift_2, am_qual_t min_qual, am_qual_t max_qual);

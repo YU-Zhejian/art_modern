@@ -16,7 +16,6 @@
 #include "art/lib/Empdist.hh"
 
 #include "art/lib/ArtConstants.hh"
-#include "art/lib/BuiltinProfile.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
@@ -27,19 +26,65 @@
 
 #include <boost/log/trivial.hpp>
 
+#include <zlib.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
+#include <cstring>
 #include <fstream>
 #include <istream>
 #include <limits>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <art/builtin_profiles.h>
 
 namespace labw::art_modern {
 
 namespace {
+    std::string decompress(const unsigned char* src, const std::size_t slen)
+    {
+        constexpr int BUFF_SIZE = 4096;
+        z_stream zs = {};
+
+        // Initialize zlib stream for decompression
+        if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
+            BOOST_LOG_TRIVIAL(fatal) << "Failed to initialize zlib stream";
+            abort_mpi();
+        }
+
+        zs.next_in = const_cast<unsigned char*>(src);
+        zs.avail_in = slen;
+
+        int ret = Z_OK;
+        char outbuffer[BUFF_SIZE];
+        std::string outstring;
+
+        // Decompress the data
+        do {
+            zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+            zs.avail_out = sizeof(outbuffer);
+
+            ret = inflate(&zs, 0);
+
+            if (outstring.size() < zs.total_out) {
+                outstring.append(outbuffer, zs.total_out - outstring.size());
+            }
+        } while (ret == Z_OK);
+
+        // Clean up
+        inflateEnd(&zs);
+
+        // Check for errors
+        if (ret != Z_STREAM_END) {
+            BOOST_LOG_TRIVIAL(fatal) << "Error during zlib decompression: " << zs.msg;
+            abort_mpi();
+        }
+
+        return outstring;
+    }
+
     void shift_emp(
         Empdist::dist_type& map_to_process, const am_qual_t q_shift, const am_qual_t min_qual, const am_qual_t max_qual)
     {
@@ -52,19 +97,36 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const BuiltinProfile& builtin_profile, const bool sep_qual, const bool is_pe)
+Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
 {
-    std::istringstream ss(builtin_profile.r1_profile);
-    read_emp_dist_(ss, true);
-    if (!builtin_profile.r2_profile.empty()) {
-        std::istringstream ss2(builtin_profile.r2_profile);
-        read_emp_dist_(ss2, false);
+    for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
+        if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
+            if (ENCODED_BUILTIN_PROFILES[i][1][0] == '\0' && is_pe) {
+                BOOST_LOG_TRIVIAL(fatal)
+                    << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
+            }
+            std::string builtin_profile_1 = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
+            std::string builtin_profile_2;
+            if (ENCODED_BUILTIN_PROFILES[i][1][0] != '\0') {
+                builtin_profile_2
+                    = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
+            }
+            std::istringstream ss(builtin_profile_1);
+            read_emp_dist_(ss, true);
+            if (!builtin_profile_2.empty()) {
+                std::istringstream ss2(builtin_profile_2);
+                read_emp_dist_(ss2, false);
+            }
+            validate_();
+            BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
+            log();
+        }
     }
-    validate_();
-    BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
-    log();
+    BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
+    abort_mpi();
+
 }
 
 Empdist::Empdist(
