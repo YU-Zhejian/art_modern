@@ -269,22 +269,6 @@ No additional dependency is required.
 
 The library is header-only, so only the path to `concurrentqueue.h` is required. At least [1.0.4](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.4) is required.
 
-### Google Abseil C++ Library
-
-[Abseil](https://github.com/abseil/abseil-cpp) is used for several decorators.
-
-See also: [CMake variable `USE_ABSL`](#use-absl-section) mentioned below.
-
-(bundled-absl-section)=
-#### Bundled
-
-No additional dependency is required.
-
-(external-absl-section)=
-#### External
-
-Make sure that Abseil can be found using CMake. This usually requires the presence of `abslConfig.cmake` file. At least [`20220623.1`](https://github.com/abseil/abseil-cpp/releases/tag/20220623.1) is required.
-
 ### `{fmt}`
 
 [`{fmt}`](https://github.com/fmtlib/fmt) is used for high-speed formatting FASTA and FASTQ output.
@@ -516,18 +500,6 @@ Whether to use bundled `moodycamel::ConcurrentQueue<T>`. Specifically, where `co
 - **Unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.** See [Bundled `moodycamel::ConcurrentQueue<T>`](#bundled-concurrent-queue-section) for requirements.
 - Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. See [External `moodycamel::ConcurrentQueue<T>`](#external-concurrent-queue-section) for requirements.
 
-(use-absl-section)=
-### `USE_ABSL`
-
-Available since [1.1.7](#v-1.1.7-section).
-
-Whether to use bundled Abseil library.
-
-Although the project only uses a small portion of Abseil development header files, the binary `libabsl_base.so` may be linked to the final executable if you use system Abseil.
-
-- **Unset (DEFAULT): Will use bundled Abseil.** See [Bundled Abseil](#bundled-absl-section) for requirements.
-- Any value `[val]`: Will use system Abseil. See [External Abseil](#external-absl-section) for requirements.
-
 ### `REPRODUCIBLE_BUILDS`
 
 Available since [1.1.7](#v-1.1.7-section).
@@ -570,3 +542,4 @@ See [MPI Library](#mpi-section) for requirements.
 - `USE_BTREE_MAP` was deprecated in [1.1.2](#v-1.1.2-section).
 - `USE_CCACHE` was deprecated in [1.1.7](#v-1.1.7-section).
 - `GSL` option of [`USE_RANDOM_GENERATOR`](#use-random-generator-section) was deprecated in [1.2.0](#v-1.2.0-section) and removed in [1.2.1](#v-1.2.1-section).
+- `USE_ABSL` was deprecated in [1.2.2](#v-1.2.2-section).

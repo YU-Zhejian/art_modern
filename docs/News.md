@@ -4,7 +4,8 @@
 ## 1.2.2 (Ongoing)
 
 - Several low-level C++ features re-done in C to improve compilation speed.
-- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to cmake options to disable this feature.
+- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
+- Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=

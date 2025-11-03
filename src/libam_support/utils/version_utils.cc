@@ -23,9 +23,6 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 #include "ceu_check/ceu_check_os.hh"
 
-// Abseil
-#include <absl/base/config.h>
-
 // Boost
 #include <boost/algorithm/string/join.hpp>
 #include <boost/version.hpp>
@@ -112,15 +109,6 @@ namespace {
         constexpr int minor = BOOST_VERSION / 100 % 1000;
         constexpr int major = BOOST_VERSION / 100000;
         std::cout << "BOOST: " << major << "." << minor << "." << patch_level << std::endl;
-    }
-
-    void print_absl_version()
-    {
-#if defined(ABSL_LTS_RELEASE_VERSION) && defined(ABSL_LTS_RELEASE_PATCH_LEVEL)
-        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION << "." << ABSL_LTS_RELEASE_PATCH_LEVEL << std::endl;
-#else
-        std::cout << "Abseil: Not on LTS" << std::endl;
-#endif
     }
 
     void print_pcg_version()
@@ -275,7 +263,6 @@ void print_version()
 #endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
-    print_absl_version();
     print_fmt_version();
     print_boost_version();
     print_onemkl_version();

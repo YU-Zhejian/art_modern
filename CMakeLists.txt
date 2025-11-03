@@ -4,6 +4,10 @@ if(DEFINED USE_CCACHE)
     message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
 endif()
 
+if(DEFINED USE_ABSL)
+    message(WARNING "-DUSE_ABSL is deprecated. Ignored.")
+endif()
+
 if(DEFINED REPRODUCIBLE_BUILD)
     set(CEU_REPRODUCIBLE_BUILDS
         ON
@@ -93,7 +97,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/absl.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")

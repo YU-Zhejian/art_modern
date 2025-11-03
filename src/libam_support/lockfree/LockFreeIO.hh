@@ -21,8 +21,6 @@
 
 #include <boost/log/trivial.hpp>
 
-#include <absl/base/attributes.h>
-
 #include <concurrentqueue.h>
 
 #include <array>
@@ -186,7 +184,7 @@ template <typename T> void LockFreeIO<T>::push(T&& value)
 }
 
 template <typename T>
-ABSL_ATTRIBUTE_ALWAYS_INLINE inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
+inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {
