@@ -118,3 +118,27 @@ Affected files:
 Licensed under the MIT license.
 
 **NOTE** Added in [1.2.2](#v-1.2.2-section).
+
+## `cgranges` by Heng Li
+
+Available from <https://github.com/lh3/cgranges>, commit `b3d5e2c5`.
+
+Affected files:
+
+- `deps/cgranges/*`.
+
+With MIT License.
+
+**NOTE** Added in ???.
+
+## `EWAHBoolArray` by Daniel Lemire
+
+Available from <https://github.com/lemire/EWAHBoolArray>, commit `a6a28d2`.
+
+Affected files:
+
+- `deps/EWAHBoolArray/*`.
+
+With Apache/MIT License.
+
+**NOTE** Added in ???.

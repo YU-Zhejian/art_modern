@@ -112,6 +112,8 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 # -----------------------------------------------------------------------------
 # Dealing with dependency includes.
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cgranges/cpp")
+include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include")
 # Threads is now required since lots of
 # surveillance and reporting routines are implemented using threads.
 find_package(Threads REQUIRED)

@@ -71,3 +71,10 @@
 ## Simulate Allele-Specific Expression
 
 The simulator will accept a genome, a variation VCF file, and a gene annotation GTF file.
+
+## Simulate scRNA-Seq Data
+
+1. Add gene body coverage bias introduced by scRNA-Seq platforms.
+2. Add cell barcode and UMI bias.
+3. Add gene strand bias.
+4. The generated cell barcode and UMIs can be used as input to another ART simulation to add sequencing errors.

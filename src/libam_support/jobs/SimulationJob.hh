@@ -23,11 +23,9 @@
 
 namespace labw::art_modern {
 
-/**
- * A generic simulation job containing necessary data.
- *
- * The simulation job is move-constructible only.
- */
+    /**
+     * Minimal job information for simulation.
+     */
 class SimulationJob {
 public:
     /** Constructor that copies shared pointers.
