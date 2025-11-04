@@ -45,14 +45,13 @@
 #include <boost/program_options/variables_map.hpp>
 
 #include <htslib/faidx.h>
-#include <htslib/hts.h>
 
-#include <array>
 #include <cmath>
 #include <cstddef>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <limits>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -144,8 +143,7 @@ namespace {
             "the prefix identification tag for read ID");
 
         const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
-            + join(
-                std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
+            + join(std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"),
             arg_builtin_qual_file_desc.c_str());
@@ -342,7 +340,7 @@ namespace {
         const auto is_pe = art_lib_const_mode != ART_LIB_CONST_MODE::SE;
 
         if (!builtin_profile_name.empty()) {
-            return {builtin_profile_name, sep_flag, is_pe};
+            return { builtin_profile_name, sep_flag, is_pe };
         }
         if (qual_file_1.empty()) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
@@ -402,10 +400,6 @@ namespace {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
             abort_mpi();
         }
-        if (read_len == 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Read length must be specified.";
-            abort_mpi();
-        }
     }
 
     /** Validate PE fragment distance parameters
@@ -455,14 +449,6 @@ namespace {
             abort_mpi();
         }
     }
-    std::array<double, HIGHEST_QUAL> gen_err_prob()
-    {
-        std::array<double, HIGHEST_QUAL> err_prob {};
-        for (int i = 0; i < HIGHEST_QUAL; i++) {
-            err_prob[i] = std::pow(10, -i / 10.0);
-        }
-        return err_prob;
-    }
 
     void validate_batch_size(am_readnum_t batch_size)
     {
@@ -485,7 +471,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Parse simple options first
     const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));
     const auto& art_lib_const_mode = get_art_lib_const_mode(get_param<std::string>(vm_, ARG_LIB_CONST_MODE));
-    const auto& id = get_param<std::string>(vm_, ARG_ID);
+    auto id = get_param<std::string>(vm_, ARG_ID);
     const auto sep_flag = vm_.count(ARG_SEP_FLAG) > 0;
     const auto max_indel = get_param<int>(vm_, ARG_MAX_INDEL);
     const auto max_n = get_param<int>(vm_, ARG_MAX_N);
@@ -525,30 +511,48 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // TODO: Support read_len_1 and read_len_2
     // TODO: If read_len is provided, ignore read_len_1 and read_len_2
     // TODO: If none of the three is provided, use the longest length in quality profile
-    const auto read_len = get_param<int>(vm_, ARG_READ_LEN);
-    const auto read_len_1 = get_param<int>(vm_, ARG_READ_LEN_1);
-    const auto read_len_2 = get_param<int>(vm_, ARG_READ_LEN_2);
-    validate_read_length(read_len); // TODO
+
+    // Mutal exclusion
+    if (vm_.count(ARG_READ_LEN) > 0 && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
+                                 << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
+        abort_mpi();
+    }
+    // Must specify at least one
+    if (vm_.count(ARG_READ_LEN) == 0 && vm_.count(ARG_READ_LEN_1) == 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: At least one of --" << ARG_READ_LEN << " or --" << ARG_READ_LEN_1
+                                 << " must be specified.";
+        abort_mpi();
+    }
+    // Specify read_len_2 for PE or MP if read_len is not specified
+    if (art_lib_const_mode != ART_LIB_CONST_MODE::SE && vm_.count(ARG_READ_LEN_2) == 0
+        && vm_.count(ARG_READ_LEN) == 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
+                                 << " must be specified for PE or MP library construction mode.";
+        abort_mpi();
+    }
+    int read_len_1 = 0;
+    int read_len_2 = 0;
+    if (vm_.count(ARG_READ_LEN) != 0) {
+        read_len_1 = get_param<int>(vm_, ARG_READ_LEN);
+        read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : read_len_1;
+    } else {
+        read_len_1 = get_param<int>(vm_, ARG_READ_LEN_1);
+        read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : get_param<int>(vm_, ARG_READ_LEN_2);
+    }
+    validate_read_length(read_len_1);
+    if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {
+        validate_read_length(read_len_2);
+    }
 
     // Finalize quality profiles
     qdist.set_read_length(read_len_1, read_len_2);
     qdist.shift_all_emp(qual_shift_1, qual_shift_2, min_qual, max_qual);
     qdist.index();
 
-    // Generate per-base mutation rates
-    auto per_base_ins_rate_1
-        = gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_INS_RATE_1), max_indel);
-    auto per_base_del_rate_1
-        = gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel);
-    auto per_base_ins_rate_2
-        = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_INS_RATE_2), max_indel);
-    auto per_base_del_rate_2
-        = gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel);
-
     // Validate PE fragment distance parameters
     double pe_frag_dist_mean = 0;
     double pe_frag_dist_std_dev = 0;
-    hts_pos_t pe_dist_mean_minus_2_std = 0;
     if (vm_.count(ARG_PE_FRAG_DIST_MEAN) + vm_.count(ARG_PE_FRAG_DIST_STD_DEV) > 0) {
         if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             BOOST_LOG_TRIVIAL(warning) << "PE fragment distance parameters are ignored in single-end mode.";
@@ -564,16 +568,26 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         pe_frag_dist_mean = get_param<double>(vm_, ARG_PE_FRAG_DIST_MEAN);
         pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
         validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
-        pe_dist_mean_minus_2_std = static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev);
     }
 
-    ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id), max_n, read_len,
-        pe_frag_dist_mean, pe_frag_dist_std_dev, std::move(per_base_ins_rate_1), std::move(per_base_del_rate_1),
-        std::move(per_base_ins_rate_2), std::move(per_base_del_rate_2), gen_err_prob(), pe_dist_mean_minus_2_std,
+    ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id),
+        // Read-length related
+        max_n, read_len_1, read_len_2,
+        // PE fragment distance
+        pe_frag_dist_mean, pe_frag_dist_std_dev,
+        // Per-base ins rate 1
+        gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_INS_RATE_1), max_indel),
+        // Per-base del rate 1
+        gen_per_base_mutation_rate(read_len_1, get_param<double>(vm_, ARG_DEL_RATE_1), max_indel),
+        // Per-base ins rate 2
+        gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_INS_RATE_2), max_indel),
+        // Per-base del rate 2
+        gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel),
+        // Others
         std::move(qdist), report_interval_jp, report_interval_aje };
     ArtIOParams art_io_params { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel,
         batch_size, vm_, std::move(args) };
-    return { art_params, art_io_params };
+    return { std::move(art_params), std::move(art_io_params) };
 }
 
 } // namespace labw::art_modern

@@ -29,6 +29,7 @@
 #include <zlib.h>
 
 #include <algorithm>
+#include <art/builtin_profiles.h>
 #include <cmath>
 #include <cstddef>
 #include <cstring>
@@ -38,7 +39,6 @@
 #include <sstream>
 #include <string>
 #include <vector>
-#include <art/builtin_profiles.h>
 
 namespace labw::art_modern {
 
@@ -104,14 +104,13 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
     for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
         if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
             if (ENCODED_BUILTIN_PROFILES[i][1][0] == '\0' && is_pe) {
-                BOOST_LOG_TRIVIAL(fatal)
-                    << "Fatal Error: " << builtin_profile_name << " is not a valid paired-end profile.";
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name
+                                         << " is not a valid paired-end profile.";
             }
             std::string builtin_profile_1 = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
             std::string builtin_profile_2;
             if (ENCODED_BUILTIN_PROFILES[i][1][0] != '\0') {
-                builtin_profile_2
-                    = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
+                builtin_profile_2 = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
             }
             std::istringstream ss(builtin_profile_1);
             read_emp_dist_(ss, true);
@@ -126,7 +125,6 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
     }
     BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
     abort_mpi();
-
 }
 
 Empdist::Empdist(

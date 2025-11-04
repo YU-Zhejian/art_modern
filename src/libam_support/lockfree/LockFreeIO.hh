@@ -183,8 +183,7 @@ template <typename T> void LockFreeIO<T>::push(T&& value)
     ++num_reads_in_;
 }
 
-template <typename T>
-inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
+template <typename T> inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {

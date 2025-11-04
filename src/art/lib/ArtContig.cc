@@ -15,11 +15,13 @@
 
 #include "art/lib/ArtContig.hh"
 
+#include "ArtConstants.hh"
 #include "art/lib/ArtRead.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/utils/arithmetic_utils.hh"
 
 #include <htslib/hts.h>
 
@@ -47,10 +49,10 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
         : rprob_.randint(0, static_cast<int>(valid_region_) + 1);
     auto slen_1 = read_1.generate_indels(true);
     // ensure get a fixed read length
-    if (pos_1 + art_params_.read_len - slen_1 > seq_size) {
+    if (pos_1 + art_params_.read_len_1 - slen_1 > seq_size) {
         slen_1 = read_1.generate_indels_2(true);
     }
-    auto seq_ref = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
+    auto seq_ref = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len_1 - slen_1);
     read_1.ref2read(std::move(seq_ref), is_plus_strand, pos_1);
 }
 
@@ -73,29 +75,30 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
  * @param read_1
  * @param read_2
  */
-void ArtContig::generate_read_pe(const bool is_plus_strand, const bool is_mp, ArtRead& read_1, ArtRead& read_2)
+void ArtContig::generate_read_pe(const bool is_plus_strand, ArtRead& read_1, ArtRead& read_2)
 {
+    const bool is_mp = art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP;
     const hts_pos_t fragment_len = generate_fragment_length();
     const hts_pos_t fragment_start = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
         : rprob_.randint(0, static_cast<int>(seq_size - fragment_len) + 1);
     const hts_pos_t fragment_end = fragment_start + fragment_len;
 
-    const hts_pos_t pos_1 = is_mp == is_plus_strand ? fragment_end - art_params_.read_len : fragment_start;
-    const hts_pos_t pos_2 = is_mp == is_plus_strand ? fragment_start : fragment_end - art_params_.read_len;
+    const hts_pos_t pos_1 = is_mp == is_plus_strand ? fragment_end - art_params_.read_len_1 : fragment_start;
+    const hts_pos_t pos_2 = is_mp == is_plus_strand ? fragment_start : fragment_end - art_params_.read_len_2;
 
     int slen_1 = read_1.generate_indels(true);
     int slen_2 = read_2.generate_indels(false);
 
     // ensure get a fixed read length
-    if (pos_1 + art_params_.read_len - slen_1 > seq_size) {
+    if (pos_1 + art_params_.read_len_1 - slen_1 > seq_size) {
         slen_1 = read_1.generate_indels_2(true);
     }
-    if (pos_2 + art_params_.read_len - slen_2 > seq_size) {
+    if (pos_2 + art_params_.read_len_2 - slen_2 > seq_size) {
         slen_2 = read_2.generate_indels_2(false);
     }
-    auto seq_ref_1 = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len - slen_1);
-    auto seq_ref_2 = fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len - slen_2);
+    auto seq_ref_1 = fasta_fetch_->fetch(seq_id_, pos_1, pos_1 + art_params_.read_len_1 - slen_1);
+    auto seq_ref_2 = fasta_fetch_->fetch(seq_id_, pos_2, pos_2 + art_params_.read_len_2 - slen_2);
 
     read_1.ref2read(std::move(seq_ref_1), is_plus_strand, pos_1);
     read_2.ref2read(std::move(seq_ref_2), !is_plus_strand, pos_2);
@@ -105,11 +108,13 @@ ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const s
     const ArtParams& art_params, Rprob& rprob)
     : seq_name(fasta_fetch->seq_name(seq_id))
     , seq_size(fasta_fetch->seq_len(seq_id))
+    , longer_size_between_r1_r2_(
+                static_cast<hts_pos_t>(am_max(art_params.read_len_1, art_params.read_len_2)))
     , art_params_(art_params)
     , fasta_fetch_(fasta_fetch)
     , rprob_(rprob)
-    , seq_id_(seq_id)
-    , valid_region_(fasta_fetch->seq_len(seq_id) - art_params.read_len)
+        , seq_id_(seq_id)
+    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.read_len_1 + art_params.read_len_2))
 {
 }
 hts_pos_t ArtContig::generate_fragment_length() const
@@ -122,7 +127,7 @@ hts_pos_t ArtContig::generate_fragment_length() const
         fragment_len = seq_size;
     } else {
         fragment_len = 0;
-        while (fragment_len < art_params_.read_len || fragment_len > seq_size) {
+        while (fragment_len < longer_size_between_r1_r2_ || fragment_len > seq_size) {
             // TODO: Allow this to fail after a number of tries
             fragment_len = rprob_.insertion_length();
         }

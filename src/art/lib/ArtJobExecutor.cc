@@ -15,6 +15,7 @@
 
 #include "art/lib/ArtJobExecutor.hh"
 
+#include "Rprob.hh"
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtContig.hh"
 #include "art/lib/ArtRead.hh"
@@ -117,7 +118,7 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
     art_contig.generate_read_pe(
-        is_plus_strand, art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP, read_1, read_2);
+        is_plus_strand, read_1, read_2);
     read_1.generate_snv_on_qual(true);
     read_2.generate_snv_on_qual(false);
     if (require_alignment_) {

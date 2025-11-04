@@ -36,7 +36,7 @@ public:
         Rprob& rprob);
 
     void generate_read_se(bool is_plus_strand, ArtRead& read_1);
-    void generate_read_pe(bool is_plus_strand, bool is_mp, ArtRead& read_1, ArtRead& read_2);
+    void generate_read_pe(bool is_plus_strand,  ArtRead& read_1, ArtRead& read_2);
 
     /** Name of the contig */
     const std::string seq_name;
@@ -45,6 +45,7 @@ public:
 
 private:
     [[nodiscard]] hts_pos_t generate_fragment_length() const;
+    const hts_pos_t longer_size_between_r1_r2_;
     const ArtParams& art_params_;
     const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
     Rprob& rprob_;

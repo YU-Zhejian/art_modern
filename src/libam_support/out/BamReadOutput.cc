@@ -31,7 +31,6 @@
 #include "libam_support/utils/seq_utils.hh"
 
 #include <boost/log/trivial.hpp>
-#include <boost/program_options.hpp> // NOLINT
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
 
