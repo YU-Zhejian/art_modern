@@ -8,8 +8,8 @@
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/param_utils.hh"
+#include "libam_support/utils/seq_utils.hh"
 
-#include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -95,7 +95,7 @@ APBConfig parse_args(int argc, char** argv)
 {
     auto po_desc_ = option_parser();
     std::vector<std::string> const args { argv, argv + argc };
-    BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
+    BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
 

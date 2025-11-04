@@ -34,7 +34,6 @@
 #include "libam_support/utils/param_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
-#include <boost/algorithm/string/join.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/log/trivial.hpp>
@@ -145,7 +144,7 @@ namespace {
             "the prefix identification tag for read ID");
 
         const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
-            + boost::algorithm::join(
+            + join(
                 std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"),
@@ -480,7 +479,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Parse options
     const po::options_description po_desc_ = option_parser();
     std::vector<std::string> args { argv, argv + argc };
-    BOOST_LOG_TRIVIAL(info) << "ARGS: " << boost::algorithm::join(args, " ");
+    BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
 
     // Parse simple options first

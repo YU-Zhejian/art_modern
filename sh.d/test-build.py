@@ -60,10 +60,6 @@ def probe_mkl() -> bool:
     return probe_using_cmake_project("test-mkl.cmake")
 
 
-def probe_absl() -> bool:
-    return probe_using_cmake_project("test-absl.cmake")
-
-
 def probe_mimalloc() -> bool:
     return probe_using_cmake_project("test-mimalloc.cmake")
 
@@ -104,7 +100,6 @@ class BuildConfig:
         self.USE_LIBFMT = "UNSET"
         self.USE_HTSLIB = "UNSET"
         self.USE_CONCURRENT_QUEUE = "UNSET"
-        self.USE_ABSL = "UNSET"
         self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
         self.CMAKE_BUILD_TYPE = "Debug"
@@ -122,8 +117,6 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_HTSLIB={self.USE_HTSLIB}")
         if self.USE_CONCURRENT_QUEUE != "UNSET":
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
-        if self.USE_ABSL != "UNSET":
-            cmake_flags.append(f"-DUSE_ABSL={self.USE_ABSL}")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
         return cmake_flags
@@ -137,7 +130,6 @@ class BuildConfig:
         new_config.USE_LIBFMT = self.USE_LIBFMT
         new_config.USE_HTSLIB = self.USE_HTSLIB
         new_config.USE_CONCURRENT_QUEUE = self.USE_CONCURRENT_QUEUE
-        new_config.USE_ABSL = self.USE_ABSL
         new_config.HELP_VERSION_ONLY = self.HELP_VERSION_ONLY
         return new_config
 
@@ -287,13 +279,6 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print("Probing for Abseil...", end="")
-    is_absl_exist = probe_absl()
-    if is_absl_exist:
-        print("SUCCESS")
-    else:
-        print("FAIL")
-
     print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
@@ -366,12 +351,6 @@ if __name__ == "__main__":
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_CONCURRENT_QUEUE = "UNSET"
-
-            if is_absl_exist:
-                bc.USE_ABSL = "SYS"
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-                bc.USE_ABSL = "UNSET"
 
             bc.HELP_VERSION_ONLY = False
 

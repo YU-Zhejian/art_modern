@@ -24,11 +24,11 @@ namespace labw::art_modern {
 std::string format_with_commas(const std::size_t number)
 {
     std::string num_str = std::to_string(number);
-    int64_t insertPosition = static_cast<int64_t>(num_str.length()) - 3;
+    auto insert_position = static_cast<int64_t>(num_str.length()) - 3;
 
-    while (insertPosition > 0) {
-        num_str.insert(insertPosition, ",");
-        insertPosition -= 3;
+    while (insert_position > 0) {
+        num_str.insert(insert_position, ",");
+        insert_position -= 3;
     }
 
     return num_str;

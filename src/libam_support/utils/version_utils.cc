@@ -16,6 +16,8 @@
 
 #include "libam_support/utils/version_utils.hh"
 
+#include "libam_support/utils/seq_utils.hh"
+
 #include "libam_support/Constants.hh"
 
 #include "ceu_check/ceu_check_c_cxx_std.hh"
@@ -24,7 +26,6 @@
 #include "ceu_check/ceu_check_os.hh"
 
 // Boost
-#include <boost/algorithm/string/join.hpp>
 #include <boost/version.hpp>
 
 // HTSLib
@@ -213,7 +214,7 @@ namespace {
 #ifdef SIMDE_X86_SSE2_NATIVE
         simd_info.emplace_back("SSE2");
 #endif
-        std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
 #else
         std::cout << "SIMDE: N/A" << std::endl;
 #ifdef __MMX__
@@ -225,7 +226,7 @@ namespace {
 #ifdef __AVX2__
         simd_info.emplace_back("AVX2");
 #endif
-        std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
 #endif
     }
 

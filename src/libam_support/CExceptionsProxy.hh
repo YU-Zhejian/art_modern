@@ -17,12 +17,11 @@
 
 #pragma once
 #include "libam_support/utils/class_macros_utils.hh"
-#include "libam_support/utils/exception_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
 
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
-#include <exception>
 #include <sstream>
 #include <string>
 
@@ -33,7 +32,7 @@ static const std::string UNKNOWN_C_EXCEPTION = "UNKNOWN";
  * An exception proxy for C exceptions.
  * The current implementation is stupid. It generates horrific logs.
  */
-class CExceptionsProxy : public std::exception {
+class CExceptionsProxy {
 public:
     /** Expected type of return value of C routines **/
     enum class EXPECTATION : std::uint8_t {
@@ -46,21 +45,12 @@ public:
     };
 
     /**
-     * Constructor.
-     *
-     * @param c_lib_name Name of the C library.
-     * @param details Details about the error.
+     * Default Constructor.
      */
-    CExceptionsProxy(std::string c_lib_name, std::string details);
-    DEFAULT_COPY(CExceptionsProxy)
-    DEFAULT_MOVE(CExceptionsProxy)
-
-    /** Default destructor. */
-    ~CExceptionsProxy() override = default;
-
-    [[nodiscard]] const char* what() const noexcept override;
-    /** Log the exception. */
-    void log() const;
+    CExceptionsProxy() = delete;
+    DELETE_COPY(CExceptionsProxy)
+    DELETE_MOVE(CExceptionsProxy)
+    DELETE_DESTRUCTOR(CExceptionsProxy)
 
     /**
      * Assert a C routine return value.
@@ -93,10 +83,6 @@ public:
     template <typename t>
     static t assert_not_null(t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
         const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false, bool log = true);
-
-private:
-    std::string c_lib_name_ = UNKNOWN_C_EXCEPTION;
-    std::string details_ = UNKNOWN_C_EXCEPTION;
 };
 
 template <typename t>
@@ -115,9 +101,9 @@ t CExceptionsProxy::assert_numeric(const t c_value, const std::string& c_lib_nam
         oss << " returned " << c_value;
         const auto cep = CExceptionsProxy(c_lib_name, oss.str());
         if (log) {
-            cep.log();
+            BOOST_LOG_TRIVIAL(fatal) << "Error occurred in C library '" << c_lib_name << "' due to '" << details << "'";
         }
-        throw_with_trace(cep);
+        abort_mpi();
     }
     return c_value;
 }
@@ -138,9 +124,9 @@ t CExceptionsProxy::assert_not_null(const t c_value, const std::string& c_lib_na
 
         const auto cep = CExceptionsProxy(c_lib_name, oss.str());
         if (log) {
-            cep.log();
+            BOOST_LOG_TRIVIAL(fatal) << "Error occurred in C library '" << c_lib_name << "' due to '" << details << "'";
         }
-        throw_with_trace(cep);
+        abort_mpi();
     }
     return c_value;
 }

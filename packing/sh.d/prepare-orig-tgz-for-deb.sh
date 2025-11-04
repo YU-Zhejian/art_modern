@@ -23,7 +23,6 @@ git ls-files |
     grep -v '^deps/concurrentqueue/' |
     grep -v '^deps/labw_slim_htslib/' |
     grep -v '^deps/slim_fmt/' |
-    grep -v '^deps/slim_abseil/' |
     grep -v '^deps/thread-pool/' |
     grep -v '^explore/' |
     grep -v '^env/' |

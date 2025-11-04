@@ -23,6 +23,7 @@
 #include "libam_support/Dtypes.h"
 
 #include <cstddef>
+#include <iterator>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -93,5 +94,41 @@ template <typename T> std::string vec2str(const std::vector<T>& vec)
     oss << std::to_string(vec[i]) << "]";
     return oss.str();
 }
+
+
+/**
+ * @brief Join a range of elements into a string.
+ * Implemented using Tongyi Lingma.
+ */
+template<typename Iterator>
+std::string join(Iterator begin, Iterator end, const std::string& separator) {
+    std::string result;
+    
+    if (begin == end) {
+        return result;
+    }
+    
+    // Add first element
+    result += *begin;
+    ++begin;
+    
+    // Add remaining elements with separator
+    while (begin != end) {
+        result += separator + *begin;
+        ++begin;
+    }
+    
+    return result;
+}
+
+/**
+ * @brief Convenience overload for containers
+ * Implemented using Tongyi Lingma.
+ */
+template<typename Container>
+std::string join(const Container& container, const std::string& separator) {
+    return join(std::begin(container), std::end(container), separator);
+}
+
 
 } // namespace labw::art_modern
