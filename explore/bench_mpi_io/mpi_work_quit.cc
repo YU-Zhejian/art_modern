@@ -1,12 +1,13 @@
-#include <mpi.h>
-#include <iostream>
-#include <cstring>
-#include <thread>
 #include <chrono>
+#include <cstring>
+#include <iostream>
+#include <mpi.h>
+#include <thread>
 
 enum Signal { WORK = 1, QUIT = 2 };
 
-int main(int argc, char** argv) {
+int main(int argc, char** argv)
+{
     MPI_Init(&argc, &argv);
 
     int rank, size;

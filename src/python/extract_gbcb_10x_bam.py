@@ -10,6 +10,7 @@ Algorithm:
 
 TODO: Get some file from the 10x Genomics website for viewing under the IGV.
 """
+
 import pysam
 import argparse
 
@@ -38,4 +39,3 @@ if __name__ == "__main__":
         transcript_id, match_pos, _ = tx.split(",")
         match_pos = int(match_pos)
         match_end = match_pos + read.query_alignment_length
-

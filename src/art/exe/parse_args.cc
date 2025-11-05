@@ -144,8 +144,7 @@ namespace {
             "the prefix identification tag for read ID");
 
         const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
-            + join(
-                std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
+            + join(std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"),
             arg_builtin_qual_file_desc.c_str());
@@ -342,7 +341,7 @@ namespace {
         const auto is_pe = art_lib_const_mode != ART_LIB_CONST_MODE::SE;
 
         if (!builtin_profile_name.empty()) {
-            return {builtin_profile_name, sep_flag, is_pe};
+            return { builtin_profile_name, sep_flag, is_pe };
         }
         if (qual_file_1.empty()) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE

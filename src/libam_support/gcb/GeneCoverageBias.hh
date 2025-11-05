@@ -16,31 +16,29 @@
 
 #include <cstdint>
 
+namespace labw::art_modern {
+enum class GENE_AMPLIFY_MODE : std::uint8_t {
+    /** No gene coverage bias */
+    NONE,
+    /** 10X Genomics 3' scRNA-Seq protocol */
+    TEN_TIMES_3P,
+    /** 10X Genomics 5' scRNA-Seq protocol */
+    TEN_TIMES_5P
+};
 
-    namespace labw::art_modern {
-        enum class GENE_AMPLIFY_MODE: std::uint8_t {
-            /** No gene coverage bias */
-            NONE,
-            /** 10X Genomics 3' scRNA-Seq protocol */
-            TEN_TIMES_3P,
-            /** 10X Genomics 5' scRNA-Seq protocol */
-            TEN_TIMES_5P
-        };
+class GeneCoverageBias {
+public:
+    /**
+     * Default constructor.
+     */
+    GeneCoverageBias() = default;
 
-        class GeneCoverageBias {
-        public:
-            /**
-             * Default constructor.
-             */
-            GeneCoverageBias() = default;
-        private:
-            /**
-             * Parameters for 2D-KDE model for gene truncation
-             */
-            void* gene_trunc_kde_model_ = nullptr;
-            GENE_AMPLIFY_MODE gene_amplify_mode_ = GENE_AMPLIFY_MODE::NONE;
-        };
+private:
+    /**
+     * Parameters for 2D-KDE model for gene truncation
+     */
+    void* gene_trunc_kde_model_ = nullptr;
+    GENE_AMPLIFY_MODE gene_amplify_mode_ = GENE_AMPLIFY_MODE::NONE;
+};
 
-    } // namespace labw::art_modern
-
-
+} // namespace labw::art_modern

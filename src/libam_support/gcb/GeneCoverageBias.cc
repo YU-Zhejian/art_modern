@@ -14,4 +14,4 @@
 #include "libam_support/gcb/GeneCoverageBias.hh"
 
 namespace labw::art_modern {
-    } // namespace labw::art_modern
+} // namespace labw::art_modern

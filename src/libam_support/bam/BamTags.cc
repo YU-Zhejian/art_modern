@@ -33,8 +33,7 @@ void BamTags::patch(bam1_t* record) const
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
         std::uint8_t* data = std::calloc(tag_data->size(), sizeof(std::uint8_t));
         std::memcpy(data, tag_data->data(), tag_data->size());
-        CExceptionsProxy::assert_numeric(bam_aux_append(record, tag_name.c_str(), tag_type, tag_len,
-            data),
+        CExceptionsProxy::assert_numeric(bam_aux_append(record, tag_name.c_str(), tag_type, tag_len, data),
             USED_HTSLIB_NAME, "Failed to add tag to read", false, CExceptionsProxy::EXPECTATION::ZERO);
         std::free(data);
     }

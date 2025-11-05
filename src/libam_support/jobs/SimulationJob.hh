@@ -23,9 +23,9 @@
 
 namespace labw::art_modern {
 
-    /**
-     * Minimal job information for simulation.
-     */
+/**
+ * Minimal job information for simulation.
+ */
 class SimulationJob {
 public:
     /** Constructor that copies shared pointers.
