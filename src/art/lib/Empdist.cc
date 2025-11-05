@@ -18,6 +18,8 @@
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/Rprob.hh"
 
+#include "art/builtin_profiles.h"
+
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
@@ -29,9 +31,9 @@
 #include <zlib.h>
 
 #include <algorithm>
-#include <art/builtin_profiles.h>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <cstring>
 #include <fstream>
 #include <istream>
@@ -54,7 +56,7 @@ namespace {
             abort_mpi();
         }
 
-        zs.next_in = const_cast<unsigned char*>(src);
+        zs.next_in = const_cast<decltype(zs.next_in)>(src);
         zs.avail_in = slen;
 
         int ret = Z_OK;
@@ -63,7 +65,7 @@ namespace {
 
         // Decompress the data
         do {
-            zs.next_out = reinterpret_cast<Bytef*>(outbuffer);
+            zs.next_out = reinterpret_cast<decltype(zs.next_out)>(outbuffer);
             zs.avail_out = sizeof(outbuffer);
 
             ret = inflate(&zs, 0);
@@ -90,8 +92,15 @@ namespace {
     {
         for (auto& i : map_to_process) {
             for (auto& [fst, snd] : i) {
-                snd += q_shift;
-                snd = am_min(am_max(snd, min_qual), max_qual);
+                // Prevent overflow and underflow
+                auto snd_int = static_cast<int32_t>(snd) + static_cast<int32_t>(q_shift);
+                if (snd_int < static_cast<int32_t>(min_qual)) {
+                    snd = min_qual;
+                } else if (snd_int > static_cast<int32_t>(max_qual)) {
+                    snd = max_qual;
+                } else {
+                    snd = static_cast<am_qual_t>(snd_int);
+                }
             }
         }
     }
@@ -387,7 +396,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         dist.clear();
 
         for (decltype(count.size()) i = 0; i < count.size(); i++) {
-            dist[static_cast<int>(std::ceil(static_cast<double>(count[i]) / denom))] = qual[i];
+            dist[static_cast<std::size_t>(std::ceil(static_cast<double>(count[i]) / denom))] = qual[i];
         }
         n_lines_parsed++;
         if (!sep_qual_) {

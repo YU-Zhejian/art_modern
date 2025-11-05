@@ -30,7 +30,6 @@
 
 #include <htslib/sam.h>
 
-#include <algorithm>
 #include <cstdio>
 #include <cstring>
 #include <string>
@@ -107,7 +106,11 @@ std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 
 void comp_inplace(std::string& dna)
 {
-    std::for_each(dna.begin(), dna.end(), [](char& c) { c = rev_comp_trans_2[c & 0xFF]; });
+    char* data = dna.data();
+    std::size_t const size = dna.size();
+    for (std::size_t i = 0; i < size; ++i) {
+        data[i] = rev_comp_trans_2[data[i] & 0xFF];
+    }
 }
 
 void revcomp_inplace(std::string& dna)
@@ -118,7 +121,11 @@ void revcomp_inplace(std::string& dna)
 
 void normalize_inplace(std::string& dna)
 {
-    std::for_each(dna.begin(), dna.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
+    char* data = dna.data();
+    std::size_t const size = dna.size();
+    for (std::size_t i = 0; i < size; ++i) {
+        data[i] = normalization_matrix[data[i] & 0xFF];
+    }
 }
 
 bool ends_with(const std::string& str, const std::string& suffix)
