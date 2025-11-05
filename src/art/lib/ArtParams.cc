@@ -5,6 +5,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/arithmetic_utils.hh"
 
 #include <htslib/hts.h>
 
@@ -54,6 +55,7 @@ ArtParams::ArtParams(const labw::art_modern::SIMULATION_MODE art_simulation_mode
     , art_job_executor_reporting_interval_seconds(art_job_executor_reporting_interval_seconds)
     , err_prob(gen_err_prob_())
     , pe_dist_mean_minus_2_std(static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev))
+    , read_len_max(am_max(read_len_1, read_len_2))
 {
 }
 

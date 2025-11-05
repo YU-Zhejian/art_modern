@@ -163,9 +163,6 @@ am_read_len_t Empdist::get_read_2_max_length() const
 void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_t read_len_2)
 {
     read_len_1_ = read_len_1;
-    read_len_2_ = read_len_2;
-    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first : qual_dist_first;
-    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second : qual_dist_second;
     if (get_read_1_max_length() < read_len_1_) {
         BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
                                  << ") exceeds the "
@@ -173,6 +170,10 @@ void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_
         log();
         abort_mpi();
     }
+    if (!is_pe_) {
+        return;
+    }
+    read_len_2_ = read_len_2;
     if (get_read_2_max_length() < read_len_2_) {
         BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
                                  << ") exceeds the "
@@ -187,64 +188,34 @@ void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
     const auto read_len = first ? read_len_1_ : read_len_2_;
-#ifdef USE_WALKER_QUALGEN
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
-    rprob.r_probs();
+    rprob.r_probs(read_len);
     for (am_read_len_t i = 0; i < read_len; i++) {
         // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
     }
-#else
-    const auto& qual_dist = first ? qual_dist_first : qual_dist_second;
-    rprob.rand_quality_dist();
-    for (std::size_t i = 0; i < read_len; i++) {
-        // TODO: This line of code have catastrophic locality.
-        qual[i] = qual_dist[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-    }
-#endif
 }
 
 void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
-
-#ifdef USE_WALKER_QUALGEN
-    rprob.r_probs();
-#else
-    rprob.rand_quality_dist();
-#endif
+    rprob.r_probs(len);
     for (decltype(seq.size()) i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = a_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = a_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'C':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = c_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = c_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'G':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = g_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = g_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'T':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = t_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = t_qual_dist_first[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         default:
-            qual[i] = static_cast<am_qual_t>(rprob.rand_quality_less_than_10());
+            qual[i] = rprob.rand_quality_less_than_10();
         }
     }
 }
@@ -252,40 +223,23 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
 void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const
 {
     const auto len = seq.size();
-
-    rprob.rand_quality_dist();
+    rprob.r_probs(len);
     for (size_t i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = a_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = a_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'C':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = c_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = c_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'G':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = g_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = g_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         case 'T':
-#ifdef USE_WALKER_QUALGEN
             qual[i] = t_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
-#else
-            qual[i] = t_qual_dist_second[i].lower_bound(rprob.tmp_qual_dists_[i])->second;
-#endif
             break;
         default:
-            qual[i] = static_cast<am_qual_t>(rprob.rand_quality_less_than_10());
+            qual[i] = rprob.rand_quality_less_than_10();
         }
     }
 }
@@ -483,7 +437,6 @@ void Empdist::log() const
 
 void Empdist::index()
 {
-#ifdef USE_WALKER_QUALGEN
     if (sep_qual_) {
         for (const auto& dist : a_qual_dist_first) {
             a_qual_dist_first_idx.emplace_back(dist);
@@ -517,8 +470,6 @@ void Empdist::index()
             qual_dist_second_idx.emplace_back(dist);
         }
     }
-
-#endif
 }
 
 } // namespace labw::art_modern

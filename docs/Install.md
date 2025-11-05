@@ -454,15 +454,6 @@ Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
 
-### `USE_QUAL_GEN`
-
-Available since [1.1.2](#v-1.1.2-section).
-
-The quality generation algorithm. Theoretically, different algorithms should generate identical results, with the Walker's algorithm considerably faster.
-
-- **`WALKER` (DEFAULT): Use [Walker's Algorithm](https://doi.org/10.1145/355744.355749) to accelerate quality synthesis.**
-- `STL`: Use binary search algorithm implemented in `std::map`. This is identical to the original ART.
-
 (use-malloc-section)=
 ### `USE_MALLOC`
 
@@ -541,3 +532,4 @@ See [MPI Library](#mpi-section) for requirements.
 - `USE_CCACHE` was deprecated in [1.1.7](#v-1.1.7-section).
 - `GSL` option of [`USE_RANDOM_GENERATOR`](#use-random-generator-section) was deprecated in [1.2.0](#v-1.2.0-section) and removed in [1.2.1](#v-1.2.1-section).
 - `USE_ABSL` was deprecated in [1.2.2](#v-1.2.2-section).
+- `USE_QUAL_GEN` was deprecated in [1.2.2](#v-1.2.2-section).

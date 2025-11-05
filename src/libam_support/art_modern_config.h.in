@@ -28,10 +28,6 @@
 #cmakedefine USE_BS_PARALLEL
 #cmakedefine USE_NOP_PARALLEL
 
-// std::map alternatives
-#cmakedefine USE_WALKER_QUALGEN
-#cmakedefine USE_STL_QUALGEN
-
 // Malloc
 #cmakedefine WITH_MIMALLOC
 #cmakedefine WITH_JEMALLOC

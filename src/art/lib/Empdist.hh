@@ -22,9 +22,7 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/class_macros_utils.hh"
 
-#if defined(USE_WALKER_QUALGEN)
 #include "libam_support/ds/GslDiscreteDistribution.hh"
-#endif
 
 #include <cstddef>
 #include <functional>
@@ -35,7 +33,6 @@
 
 namespace labw::art_modern {
 
-#ifdef USE_WALKER_QUALGEN
 class SlimEmpDistGslDiscrete {
     using dist_map_type = std::map<am_qual_count_t, am_qual_t, std::less<>>;
 
@@ -65,7 +62,6 @@ private:
     std::vector<am_qual_t> qual_;
     GslDiscreteDistribution<double> rd_;
 };
-#endif
 
 class Empdist {
 public:
@@ -85,7 +81,6 @@ private:
     dist_type t_qual_dist_second;
     dist_type g_qual_dist_second;
     dist_type c_qual_dist_second;
-#ifdef USE_WALKER_QUALGEN
     using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;
     dist_idx_type qual_dist_first_idx;
     dist_idx_type qual_dist_second_idx;
@@ -97,7 +92,6 @@ private:
     dist_idx_type t_qual_dist_second_idx;
     dist_idx_type g_qual_dist_second_idx;
     dist_idx_type c_qual_dist_second_idx;
-#endif
 
 public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);
@@ -105,7 +99,7 @@ public:
 
     void set_read_length(am_read_len_t read_len_1, am_read_len_t read_len_2);
     void shift_all_emp(am_qual_t q_shift_1, am_qual_t q_shift_2, am_qual_t min_qual, am_qual_t max_qual);
-    /** Prepare the WALKER indices if USE_WALKER_QUALGEN is defined **/
+    /** Prepare the WALKER indices **/
     void index();
     /** Log the loaded profile **/
     void log() const;

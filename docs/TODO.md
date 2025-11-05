@@ -20,7 +20,6 @@
       -DBoost_DIR=/home/yuzj/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/ \
       -DCMAKE_BUILD_TYPE=Debug \
       -DUSE_RANDOM_GENERATOR=STL \
-      -DUSE_QUAL_GEN=WALKER \
       -DUSE_MALLOC=AUTO \
       -DUSE_THREAD_PARALLEL=ASIO \
       -DCMAKE_INSTALL_PREFIX=/tmp/art_modern-test-build-install-8faz6gpf \
