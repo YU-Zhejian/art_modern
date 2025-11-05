@@ -78,7 +78,7 @@ namespace {
     };
 
 } // namespace
-void ArtJobExecutor::generate(
+void ArtJobExecutor::generate_(
     const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig, am_readnum_t& read_id)
 {
     current_contig_ = art_contig.seq_name;
@@ -90,9 +90,9 @@ void ArtJobExecutor::generate(
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            retv = generate_se(art_contig, is_positive, read_id);
+            retv = generate_se_(art_contig, is_positive, read_id);
         } else {
-            retv = generate_pe(art_contig, is_positive, read_id);
+            retv = generate_pe_(art_contig, is_positive, read_id);
         }
         if (retv) {
             current_n_reads_left_ -= num_reads_to_reduce_;
@@ -110,17 +110,16 @@ void ArtJobExecutor::generate(
     }
 }
 
-bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
+bool ArtJobExecutor::generate_pe_(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     const std::string read_name
         = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
 
-    ArtRead read_1(art_params_, art_contig.seq_name, read_name, rprob_);
-    ArtRead read_2(art_params_, art_contig.seq_name, read_name, rprob_);
-    art_contig.generate_read_pe(
-        is_plus_strand, read_1, read_2);
-    read_1.generate_snv_on_qual(true);
-    read_2.generate_snv_on_qual(false);
+    ArtRead read_1(art_params_, art_contig.seq_name, read_name, true, rprob_);
+    ArtRead read_2(art_params_, art_contig.seq_name, read_name, false, rprob_);
+    art_contig.generate_read_pe(is_plus_strand, read_1, read_2);
+    read_1.generate_snv_on_qual();
+    read_2.generate_snv_on_qual();
     if (require_alignment_) {
         read_1.generate_pairwise_aln();
         read_2.generate_pairwise_aln();
@@ -134,13 +133,13 @@ bool ArtJobExecutor::generate_pe(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
+bool ArtJobExecutor::generate_se_(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     auto read_id
         = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
-    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), rprob_);
+    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), true, rprob_);
     art_contig.generate_read_se(is_plus_strand, art_read);
-    art_read.generate_snv_on_qual(true);
+    art_read.generate_snv_on_qual();
     if (require_alignment_) {
         art_read.generate_pairwise_aln();
     }
@@ -151,7 +150,7 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-ArtJobExecutor::~ArtJobExecutor() = default;
+
 ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
     const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
     : art_params_(art_params)
@@ -217,8 +216,8 @@ void ArtJobExecutor::operator()()
             continue;
         }
         am_readnum_t read_id = 0;
-        generate(num_pos_reads, true, art_contig, read_id);
-        generate(num_neg_reads, false, art_contig, read_id);
+        generate_(num_pos_reads, true, art_contig, read_id);
+        generate_(num_neg_reads, false, art_contig, read_id);
     }
     if (accumulated_contig_len == 0) {
         // Happens when all contigs are shorter than read length

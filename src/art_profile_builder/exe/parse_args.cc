@@ -29,7 +29,7 @@ namespace labw::art_modern {
 namespace {
     constexpr char ARG_INPUT_FILE_NAME[] = "i-file";
     constexpr char ARG_PARALLEL[] = "parallel";
-    constexpr char ARG_READ_LEN[] = "read_len";
+    constexpr char ARG_READ_LEN[] = "read_len"; // FIXME: Separate to read_len_1 and read_len_2.
     constexpr char ARG_NUM_IO_THREADS[] = "i-num_threads";
     constexpr char ARG_IS_PE[] = "is_pe";
     constexpr char ARG_OUT1[] = "o-file1";

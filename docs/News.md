@@ -6,6 +6,7 @@
 - Several low-level C++ features re-done in C to improve compilation speed.
 - **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
 - Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
+- `art_modern` and `art_profile_builder` now supports different length of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options, a useful feature for simulating 10X Genomics reads.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=

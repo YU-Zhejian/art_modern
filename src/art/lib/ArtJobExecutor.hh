@@ -34,20 +34,21 @@ class ArtJobExecutor final : public JobExecutor {
 public:
     ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
         const std::shared_ptr<OutputDispatcher>& output_dispatcher, bool clear_after_use);
-    ~ArtJobExecutor() override;
 
+    // Move constructor
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
     DELETE_MOVE_ASSIGNMENT(ArtJobExecutor)
     DELETE_COPY(ArtJobExecutor)
-    [[nodiscard]] bool is_running() const override;
+    DEFAULT_DESTRUCTOR(ArtJobExecutor)
 
+    [[nodiscard]] bool is_running() const override;
     void operator()() override;
     [[nodiscard]] std::string thread_info() const override;
 
 private:
-    bool generate_pe(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
-    bool generate_se(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
-    void generate(am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig, am_readnum_t& read_id);
+    bool generate_pe_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
+    bool generate_se_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
+    void generate_(am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig, am_readnum_t& read_id);
 
     const ArtParams& art_params_;
     SimulationJob job_;

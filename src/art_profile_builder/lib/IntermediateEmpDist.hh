@@ -13,6 +13,9 @@
 #include <vector>
 
 namespace labw::art_modern {
+/**
+ * An intermediate empirical distribution for a set of reads.
+ */
 class IntermediateEmpDist {
 public:
     explicit IntermediateEmpDist(std::size_t read_length);

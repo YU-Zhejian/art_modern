@@ -146,41 +146,21 @@ void Empdist::set_read_length(const std::size_t read_len_1, const std::size_t re
 {
     read_len_1_ = read_len_1;
     read_len_2_ = read_len_2;
-    if (sep_qual_) {
-        if (a_qual_dist_first.size() < read_len_1_) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
+    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first : qual_dist_first;
+    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second : qual_dist_second;
+    if (qual_dist_to_check_first.size() < read_len_1_) {
+        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
+                                 << ") exceeds the "
+                                    "length of the read quality profile.";
+        log();
+        abort_mpi();
+    }
+    if (is_pe_ &&qual_dist_to_check_second.size() < read_len_2_) {
+            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
                                      << ") exceeds the "
                                         "length of the read quality profile.";
             log();
             abort_mpi();
-        }
-        if (is_pe_) {
-            if (a_qual_dist_second.size() < read_len_2_) {
-                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
-                                         << ") exceeds the "
-                                            "length of the read quality profile.";
-                log();
-                abort_mpi();
-            }
-        }
-    } else {
-        if (qual_dist_first.size() < read_len_1_) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
-                                     << ") exceeds the "
-                                        "length of the read quality profile.";
-            log();
-            abort_mpi();
-        }
-        if (is_pe_) {
-            if (qual_dist_second.size() < read_len_2_) {
-                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
-                                         << ") exceeds the "
-                                            "length of the read quality profile ("
-                                         << qual_dist_second.size() << ")";
-                log();
-                abort_mpi();
-            }
-        }
     }
 }
 
