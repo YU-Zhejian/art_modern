@@ -18,6 +18,8 @@
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/Rprob.hh"
 
+#include "art/builtin_profiles.h"
+
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
@@ -29,7 +31,6 @@
 #include <zlib.h>
 
 #include <algorithm>
-#include <art/builtin_profiles.h>
 #include <cmath>
 #include <cstddef>
 #include <cstring>
