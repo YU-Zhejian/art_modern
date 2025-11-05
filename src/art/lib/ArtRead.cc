@@ -349,8 +349,9 @@ void ArtRead::except_() const
     abort_mpi();
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, bool is_read_1, Rprob& rprob)
-: is_read_1_(is_read_1)
+ArtRead::ArtRead(
+    const ArtParams& art_params, std::string contig_name, std::string read_name, bool is_read_1, Rprob& rprob)
+    : is_read_1_(is_read_1)
     , art_params_(art_params)
     , contig_name_(std::move(contig_name))
     , read_name_(std::move(read_name))

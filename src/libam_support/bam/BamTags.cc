@@ -22,6 +22,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstring>
 #include <memory>
 #include <string>
@@ -31,7 +32,7 @@ BamTags::BamTags(const int est_num_tags) { tags_.reserve(est_num_tags); }
 void BamTags::patch(bam1_t* record) const
 {
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
-        std::uint8_t* data = std::calloc(tag_data->size(), sizeof(std::uint8_t));
+        auto* data = static_cast<std::uint8_t*>(std::calloc(tag_data->size(), sizeof(std::uint8_t)));
         std::memcpy(data, tag_data->data(), tag_data->size());
         CExceptionsProxy::assert_numeric(bam_aux_append(record, tag_name.c_str(), tag_type, tag_len, data),
             USED_HTSLIB_NAME, "Failed to add tag to read", false, CExceptionsProxy::EXPECTATION::ZERO);

@@ -47,7 +47,7 @@ public:
         N_IDX, N_IDX, N_IDX, N_IDX, N_IDX, N_IDX, N_IDX };
 
     IntermediateEmpDistPosition();
-    ~IntermediateEmpDistPosition() = default;
+    DEFAULT_DESTRUCTOR(IntermediateEmpDistPosition)
     DEFAULT_COPY(IntermediateEmpDistPosition)
     DEFAULT_MOVE(IntermediateEmpDistPosition)
 

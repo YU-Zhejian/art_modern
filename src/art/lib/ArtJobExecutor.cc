@@ -110,7 +110,8 @@ void ArtJobExecutor::generate_(
     }
 }
 
-bool ArtJobExecutor::generate_pe_(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
+bool ArtJobExecutor::generate_pe_(
+    ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     const std::string read_name
         = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
@@ -133,7 +134,8 @@ bool ArtJobExecutor::generate_pe_(ArtContig& art_contig, const bool is_plus_stra
     return true;
 }
 
-bool ArtJobExecutor::generate_se_(ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
+bool ArtJobExecutor::generate_se_(
+    ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads)
 {
     auto read_id
         = fmt::format("{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_, current_num_reads);
@@ -149,7 +151,6 @@ bool ArtJobExecutor::generate_se_(ArtContig& art_contig, const bool is_plus_stra
     output_dispatcher_->writeSE(token_ring_, art_read.to_pwa());
     return true;
 }
-
 
 ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
     const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)

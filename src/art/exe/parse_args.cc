@@ -97,6 +97,8 @@ namespace {
     constexpr char ARG_REPORTING_INTERVAL_AJE[] = "reporting_interval-job_executor";
     constexpr char ARG_REPORTING_INTERVAL_JP[] = "reporting_interval-job_pool";
 
+    constexpr char DEFAULT_ERR_PROFILE[] = "HiSeq2500_150bp";
+
     po::options_description option_parser() noexcept
     {
         const OutputDispatcherFactory out_dispatcher_factory_;
@@ -145,7 +147,7 @@ namespace {
         const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
             + join(std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
             + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
-        art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value("HiSeq2500_125bp"),
+        art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(DEFAULT_ERR_PROFILE),
             arg_builtin_qual_file_desc.c_str());
         art_opts.add_options()(
             ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "path to the first-read quality profile");
@@ -166,15 +168,15 @@ namespace {
             "the maximum total number of insertion and deletion per read");
         art_opts.add_options()(ARG_MAX_N, po::value<int>()->default_value(DEFAULT_MAX_N),
             "the maximum total number of ambiguous bases (N) per read");
-        art_opts.add_options()(ARG_READ_LEN, po::value<int>(),
+        art_opts.add_options()(ARG_READ_LEN, po::value<am_read_len_t>(),
             (std::string("read length to be simulated. If the simulation mode is PE or MP, will use this value on both "
-                         "strands. If none of the read-length parameters are specified, will use the longest available "
+                         "reads. If none of the read-length parameters are specified, will use the longest available "
                          "read length specified in "
                          "the profile. Cannot be specified together with ")
                 + ARG_READ_LEN_1 + " or " + ARG_READ_LEN_2)
                 .c_str());
-        art_opts.add_options()(ARG_READ_LEN_1, po::value<int>(), "read length of read 1 to be simulated");
-        art_opts.add_options()(ARG_READ_LEN_2, po::value<int>(), "read length of read 2 to be simulated");
+        art_opts.add_options()(ARG_READ_LEN_1, po::value<am_read_len_t>(), "read length of read 1 to be simulated");
+        art_opts.add_options()(ARG_READ_LEN_2, po::value<am_read_len_t>(), "read length of read 2 to be simulated");
         art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
             "Mean distance between DNA/RNA fragments for paired-end simulations");
         art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>()->default_value(0),
@@ -394,7 +396,7 @@ namespace {
         return rate;
     }
 
-    void validate_read_length(const int read_len)
+    void validate_read_length(const am_read_len_t read_len)
     {
         if (read_len < 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
@@ -409,8 +411,8 @@ namespace {
      * @param read_len_1 Read length of read 1
      * @param read_len_2 Read length of read 2
      */
-    void validate_pe_frag_dist(
-        const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_len_1, const int read_len_2)
+    void validate_pe_frag_dist(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev,
+        const am_read_len_t read_len_1, const am_read_len_t read_len_2)
     {
         if (pe_frag_dist_std_dev <= 0 || pe_frag_dist_mean <= 0) {
             BOOST_LOG_TRIVIAL(fatal) << "Please set pe_frag_dist_std_dev and "
@@ -507,38 +509,36 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
             get_param<std::string>(vm_, ARG_QUAL_FILE_2), art_lib_const_mode, sep_flag);
 
-    // Set read lengths to qdist maximum if not specified
-    // TODO: Support read_len_1 and read_len_2
-    // TODO: If read_len is provided, ignore read_len_1 and read_len_2
-    // TODO: If none of the three is provided, use the longest length in quality profile
-
     // Mutal exclusion
     if (vm_.count(ARG_READ_LEN) > 0 && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
         BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
                                  << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
         abort_mpi();
     }
-    // Must specify at least one
-    if (vm_.count(ARG_READ_LEN) == 0 && vm_.count(ARG_READ_LEN_1) == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: At least one of --" << ARG_READ_LEN << " or --" << ARG_READ_LEN_1
-                                 << " must be specified.";
-        abort_mpi();
-    }
-    // Specify read_len_2 for PE or MP if read_len is not specified
-    if (art_lib_const_mode != ART_LIB_CONST_MODE::SE && vm_.count(ARG_READ_LEN_2) == 0
-        && vm_.count(ARG_READ_LEN) == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
-                                 << " must be specified for PE or MP library construction mode.";
-        abort_mpi();
-    }
-    int read_len_1 = 0;
-    int read_len_2 = 0;
-    if (vm_.count(ARG_READ_LEN) != 0) {
-        read_len_1 = get_param<int>(vm_, ARG_READ_LEN);
-        read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : read_len_1;
+    am_read_len_t read_len_1 = 0;
+    am_read_len_t read_len_2 = 0;
+    // If none of the three is specified, use longest length in quality profile
+    if (vm_.count(ARG_READ_LEN) == 0 && vm_.count(ARG_READ_LEN_1) == 0 && vm_.count(ARG_READ_LEN_2) == 0) {
+        read_len_1 = qdist.get_read_1_max_length();
+        read_len_2 = qdist.get_read_2_max_length();
+        BOOST_LOG_TRIVIAL(info)
+            << "No read length parameter is specified. Using the longest read length in quality profile: " << read_len_1
+            << " for read 1, " << read_len_2 << " for read 2.";
     } else {
-        read_len_1 = get_param<int>(vm_, ARG_READ_LEN_1);
-        read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : get_param<int>(vm_, ARG_READ_LEN_2);
+        // Specify read_len_2 for PE or MP if read_len is not specified
+        if (art_lib_const_mode != ART_LIB_CONST_MODE::SE && vm_.count(ARG_READ_LEN_2) == 0
+            && vm_.count(ARG_READ_LEN) == 0) {
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
+                                     << " must be specified for PE or MP library construction mode.";
+            abort_mpi();
+        }
+        if (vm_.count(ARG_READ_LEN) != 0) {
+            read_len_1 = get_param<am_read_len_t>(vm_, ARG_READ_LEN);
+            read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : read_len_1;
+        } else {
+            read_len_1 = get_param<am_read_len_t>(vm_, ARG_READ_LEN_1);
+            read_len_2 = art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 0 : get_param<int>(vm_, ARG_READ_LEN_2);
+        }
     }
     validate_read_length(read_len_1);
     if (art_lib_const_mode != ART_LIB_CONST_MODE::SE) {

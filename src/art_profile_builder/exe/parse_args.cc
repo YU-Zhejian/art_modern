@@ -29,7 +29,9 @@ namespace labw::art_modern {
 namespace {
     constexpr char ARG_INPUT_FILE_NAME[] = "i-file";
     constexpr char ARG_PARALLEL[] = "parallel";
-    constexpr char ARG_READ_LEN[] = "read_len"; // FIXME: Separate to read_len_1 and read_len_2.
+    constexpr char ARG_READ_LEN[] = "read_len";
+    constexpr char ARG_READ_LEN_1[] = "read_len_1";
+    constexpr char ARG_READ_LEN_2[] = "read_len_2";
     constexpr char ARG_NUM_IO_THREADS[] = "i-num_threads";
     constexpr char ARG_IS_PE[] = "is_pe";
     constexpr char ARG_OUT1[] = "o-file1";
@@ -65,7 +67,13 @@ namespace {
         po::options_description required_opts("Required Options");
         required_opts.add_options()(
             ARG_INPUT_FILE_NAME, po::value<std::string>(), "the filename of the input FASTQ/SAM/BAM file.");
-        required_opts.add_options()(ARG_READ_LEN, po::value<std::size_t>(), "the read length of the input reads.");
+        required_opts.add_options()(ARG_READ_LEN, po::value<am_read_len_t>(),
+            (std::string("maximum read length to be learnt. If the file mode is PE or MP, will use this value on both "
+                         "reads. Cannot be specified together with ")
+                + ARG_READ_LEN_1 + " or " + ARG_READ_LEN_2)
+                .c_str());
+        required_opts.add_options()(ARG_READ_LEN_1, po::value<am_read_len_t>(), "read length of read 1 to be learnt");
+        required_opts.add_options()(ARG_READ_LEN_2, po::value<am_read_len_t>(), "read length of read 2 to be learnt");
 
         po::options_description input_flags("Input Flags");
         input_flags.add_options()(ARG_IS_PE, "Whether the input is paired-end. Default: single-end.");
@@ -101,7 +109,34 @@ APBConfig parse_args(int argc, char** argv)
 
     const auto is_pe = vm_.count(ARG_IS_PE) > 0;
     const auto is_ob = vm_.count(ARG_OB) > 0;
-    const auto read_length = get_param<std::size_t>(vm_, ARG_READ_LEN);
+    am_read_len_t read_len_1 = 0;
+    am_read_len_t read_len_2 = 0;
+    // Mutal exclusion
+    if ((vm_.count(ARG_READ_LEN) > 0) && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
+                                 << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
+        abort_mpi();
+    }
+    // At least one
+    if (vm_.count(ARG_READ_LEN) == 0 && vm_.count(ARG_READ_LEN_1) == 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " or --" << ARG_READ_LEN_1
+                                 << " must be specified.";
+        abort_mpi();
+    }
+    // For PE or MP, both read lengths must be specified
+    if (is_pe && vm_.count(ARG_READ_LEN_1) > 0 && vm_.count(ARG_READ_LEN_2) == 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
+                                 << " must be specified for PE library construction mode.";
+        abort_mpi();
+    }
+    if (vm_.count(ARG_READ_LEN) != 0) {
+        read_len_1 = get_param<am_read_len_t>(vm_, ARG_READ_LEN);
+        read_len_2 = is_pe ? read_len_1 : 0;
+    } else {
+        read_len_1 = get_param<am_read_len_t>(vm_, ARG_READ_LEN_1);
+        read_len_2 = is_pe ? get_param<am_read_len_t>(vm_, ARG_READ_LEN_2) : 0;
+    }
+
     const auto input_file_name = get_param<std::string>(vm_, ARG_INPUT_FILE_NAME);
     const auto num_io_threads = get_param<std::size_t>(vm_, ARG_NUM_IO_THREADS);
     const auto num_threads = n_threads_from_parallel(get_param<int>(vm_, ARG_PARALLEL));
@@ -114,6 +149,6 @@ APBConfig parse_args(int argc, char** argv)
         prepare_writer(out2);
     }
 
-    return { input_file_name, read_length, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format };
+    return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format };
 }
 } // namespace labw::art_modern

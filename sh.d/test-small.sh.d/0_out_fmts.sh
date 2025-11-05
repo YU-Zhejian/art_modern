@@ -1,10 +1,8 @@
 # shellcheck shell=bash
 
 AM_EXEC \
-    --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file data/raw_data/ce11_chr1.fa \
-    --read_len 150 \
     --mode wgs \
     --lc se \
     --i-parser memory \
@@ -62,10 +60,8 @@ rm -fr \
 assert_cleandir
 
 AM_EXEC \
-    --builtin_qual_file HiSeq2500_150bp \
     --sep_flag \
     --i-file "${LAMBDA_PHAGE}" \
-    --read_len 150 \
     --mode wgs \
     --lc pe \
     --i-parser memory \

@@ -5,9 +5,7 @@ err_file="data/raw_data/err.fa"
 for lc in se pe mp; do
     for mode in wgs trans template; do
         AM_EXEC \
-            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
-            --read_len 125 \
             --mode "${mode}" \
             --lc "${lc}" \
             --i-parser "${parser}" \
@@ -37,9 +35,7 @@ parser=htslib
 mode=wgs
 for lc in se pe mp; do
     AM_EXEC \
-        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${err_file}" \
-        --read_len 125 \
         --mode "${mode}" \
         --lc "${lc}" \
         --i-parser "${parser}" \
@@ -68,9 +64,7 @@ parser=stream
 for lc in se pe mp; do
     for mode in trans template; do
         AM_EXEC \
-            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
-            --read_len 125 \
             --mode "${mode}" \
             --lc "${lc}" \
             --i-parser "${parser}" \
@@ -104,9 +98,7 @@ for lc in se pe mp; do
             for i_type in fasta pbsim3_transcripts; do
                 touch "${err_file}"
                 AM_EXEC \
-                    --builtin_qual_file HiSeq2500_125bp \
                     --i-file "${err_file}" \
-                    --read_len 125 \
                     --mode "${mode}" \
                     --lc "${lc}" \
                     --i-parser "${parser}" \
@@ -142,9 +134,7 @@ for lc in se pe mp; do
         # No, do not use SAM output.
         touch "${err_file}"
         AM_EXEC \
-            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${err_file}" \
-            --read_len 125 \
             --mode "${mode}" \
             --lc "${lc}" \
             --i-parser "${parser}" \
