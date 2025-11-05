@@ -7,7 +7,10 @@
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
 - Makefile integration test target `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
 - `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
-- `art_modern`: Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status. Memory performance of `stream` FASTA parser largely improved.
+- `art_modern`: 
+  - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
+  - Memory performance of `stream` FASTA parser largely improved.
+- Packing: DEB package variant using OpenMPI added.
 - Documentation largely revised.
 - Miscellaneous bug fixes.
 
