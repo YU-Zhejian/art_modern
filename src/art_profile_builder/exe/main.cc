@@ -8,7 +8,6 @@
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
-#include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 
 #ifdef WITH_BOOST_TIMER
@@ -48,9 +47,9 @@ int main(int argc, char** argv)
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r2;
 
     for (std::size_t thread_id = 0; thread_id < config.num_threads; ++thread_id) {
-        auto this_ied1 = std::make_shared<IntermediateEmpDist>(config.read_length);
+        auto this_ied1 = std::make_shared<IntermediateEmpDist>(config.read_length_1);
         ieds_r1.emplace_back(this_ied1);
-        auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length);
+        auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length_2);
         ieds_r2.emplace_back(this_ied2);
         threads.emplace_back(view_sam, this_ied1, this_ied2, thread_id, config);
     }
@@ -60,7 +59,7 @@ int main(int argc, char** argv)
     std::size_t total_reads = 0;
     std::size_t total_bases = 0;
 
-    IntermediateEmpDist ied1(config.read_length);
+    IntermediateEmpDist ied1(config.read_length_1);
     for (const auto& other_ied : ieds_r1) {
         ied1.add(*other_ied);
     }
@@ -72,7 +71,7 @@ int main(int argc, char** argv)
     out1_s.close();
 
     if (config.is_pe) {
-        IntermediateEmpDist ied2(config.read_length);
+        IntermediateEmpDist ied2(config.read_length_2);
         for (const auto& other_ied : ieds_r2) {
             ied2.add(*other_ied);
         }

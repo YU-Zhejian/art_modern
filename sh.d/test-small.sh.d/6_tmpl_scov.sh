@@ -4,9 +4,7 @@ for coverage in stranded strandless; do
     parser=memory
     for lc in se pe mp; do
         AM_EXEC \
-            --builtin_qual_file HiSeq2500_125bp \
             --i-file "${MRNA_HEAD}" \
-            --read_len 125 \
             --mode template \
             --lc "${lc}" \
             --i-parser "${parser}" \

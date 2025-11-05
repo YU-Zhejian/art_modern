@@ -56,4 +56,7 @@ typedef int64_t am_filelen_t;
 
 /** Job ID type. */
 typedef size_t am_job_id_t;
+
+/** Length of reads. */
+typedef int32_t am_read_len_t;
 #endif // ART_MODERN_LIBAM_SUPPORT_DTYPES_H

@@ -103,7 +103,7 @@ public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);
     Empdist(const std::string& builtin_profile_name, bool sep_qual, bool is_pe);
 
-    void set_read_length(std::size_t read_len_1, std::size_t read_len_2);
+    void set_read_length(am_read_len_t read_len_1, am_read_len_t read_len_2);
     void shift_all_emp(am_qual_t q_shift_1, am_qual_t q_shift_2, am_qual_t min_qual, am_qual_t max_qual);
     /** Prepare the WALKER indices if USE_WALKER_QUALGEN is defined **/
     void index();
@@ -113,6 +113,8 @@ public:
     void get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, bool first = true) const;
     void get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;
     void get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::string& seq, Rprob& rprob) const;
+    [[nodiscard]] am_read_len_t get_read_1_max_length() const;
+    [[nodiscard]] am_read_len_t get_read_2_max_length() const;
 
 private:
     void read_emp_dist_(const std::string& infile, bool is_first);
@@ -120,8 +122,8 @@ private:
     void validate_() const;
     const bool sep_qual_;
     const bool is_pe_;
-    std::size_t read_len_1_ { 0 };
-    std::size_t read_len_2_ { 0 };
+    am_read_len_t read_len_1_ { 0 };
+    am_read_len_t read_len_2_ { 0 };
 };
 
 } // namespace labw::art_modern

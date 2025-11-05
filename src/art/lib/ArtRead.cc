@@ -33,6 +33,8 @@
 #include <sstream>
 #include <utility>
 
+#define USE_NEW_INDEL_GEN_METHOD 1
+
 namespace labw::art_modern {
 
 void ArtRead::generate_pairwise_aln()
@@ -40,10 +42,10 @@ void ArtRead::generate_pairwise_aln()
     hts_pos_t pos_on_aln_str = 0;
     hts_pos_t pos_on_query = 0;
     hts_pos_t pos_on_ref = 0;
-    const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
+    const std::size_t maxk = read_len_ + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
-#if (1)
+#if (USE_NEW_INDEL_GEN_METHOD)
     hts_pos_t num_match = 0;
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
@@ -127,11 +129,11 @@ void ArtRead::generate_pairwise_aln()
 #endif
 }
 
-void ArtRead::generate_snv_on_qual(const bool is_first_read)
+void ArtRead::generate_snv_on_qual()
 {
     if (!art_params_.sep_flag) {
-        art_params_.qdist.get_read_qual(qual_, rprob_, is_first_read);
-    } else if (is_first_read) {
+        art_params_.qdist.get_read_qual(qual_, rprob_, is_read_1_);
+    } else if (is_read_1_) {
         art_params_.qdist.get_read_qual_sep_1(qual_, query_, rprob_);
     } else {
         art_params_.qdist.get_read_qual_sep_2(qual_, query_, rprob_);
@@ -152,7 +154,7 @@ void ArtRead::generate_snv_on_qual(const bool is_first_read)
     }
 }
 
-int ArtRead::generate_indels(const bool is_read_1)
+int ArtRead::generate_indels()
 {
     indel_.clear();
     int ins_len = 0;
@@ -160,8 +162,8 @@ int ArtRead::generate_indels(const bool is_read_1)
     int i = 0;
     int j = 0;
     int pos = 0;
-    const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
-    const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
+    const auto& per_base_del_rate = is_read_1_ ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
+    const auto& per_base_ins_rate = is_read_1_ ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
     // deletion
     rprob_.r_probs(per_base_del_rate.size());
     for (i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
@@ -180,7 +182,7 @@ int ArtRead::generate_indels(const bool is_read_1)
     }
     rprob_.r_probs(per_base_ins_rate.size());
     for (i = static_cast<int>(per_base_ins_rate.size() - 1); i >= 0; i--) {
-        if (art_params_.read_len - del_len - ins_len < i + 1) {
+        if (read_len_ - del_len - ins_len < i + 1) {
             continue; // ensure that there are stil enough unchanged position for mutation
         }
         if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
@@ -199,14 +201,14 @@ int ArtRead::generate_indels(const bool is_read_1)
     return ins_len - del_len;
 }
 
-int ArtRead::generate_indels_2(const bool is_read_1)
+int ArtRead::generate_indels_2()
 {
     indel_.clear();
     int ins_len = 0;
     int del_len = 0;
     int pos = 0;
-    const auto& per_base_del_rate = is_read_1 ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
-    const auto& per_base_ins_rate = is_read_1 ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
+    const auto& per_base_del_rate = is_read_1_ ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
+    const auto& per_base_ins_rate = is_read_1_ ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
     rprob_.r_probs(per_base_ins_rate.size());
     for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
@@ -230,7 +232,7 @@ int ArtRead::generate_indels_2(const bool is_read_1)
             break;
         }
 
-        if (art_params_.read_len - del_len - ins_len < i + 1) {
+        if (read_len_ - del_len - ins_len < i + 1) {
             continue; // ensure that enough unchanged position for mutation
         }
 
@@ -264,10 +266,10 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     hts_pos_t pos_on_aln_str = 0;
     hts_pos_t pos_on_read = 0;
     hts_pos_t pos_on_ref = 0;
-    const std::size_t maxk = art_params_.read_len + 1 + 1 + indel_.size();
+    const std::size_t maxk = read_len_ + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
-#if (1)
+#if (USE_NEW_INDEL_GEN_METHOD)
     hts_pos_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
@@ -319,9 +321,9 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     }
 #endif
 #ifdef CEU_CM_IS_DEBUG
-    if (static_cast<int>(query_.size()) != art_params_.read_len) {
+    if (static_cast<int>(query_.size()) != read_len_) {
         BOOST_LOG_TRIVIAL(error) << "Generated read length (" << query_.size()
-                                 << ") is not equal to designed read length (" << art_params_.read_len << ")";
+                                 << ") is not equal to designed read length (" << read_len_ << ")";
         except_();
     }
 #endif
@@ -347,14 +349,17 @@ void ArtRead::except_() const
     abort_mpi();
 }
 
-ArtRead::ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob)
-    : art_params_(art_params)
+ArtRead::ArtRead(
+    const ArtParams& art_params, std::string contig_name, std::string read_name, bool is_read_1, Rprob& rprob)
+    : is_read_1_(is_read_1)
+    , art_params_(art_params)
     , contig_name_(std::move(contig_name))
     , read_name_(std::move(read_name))
     , rprob_(rprob)
 {
-    query_.resize(art_params_.read_len);
-    qual_.resize(art_params_.read_len);
+    read_len_ = is_read_1_ ? art_params_.read_len_1 : art_params_.read_len_2;
+    query_.resize(read_len_);
+    qual_.resize(read_len_);
 }
 
 PairwiseAlignment ArtRead::to_pwa()

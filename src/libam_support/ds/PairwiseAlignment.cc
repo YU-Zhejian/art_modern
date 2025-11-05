@@ -52,17 +52,25 @@ PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& cont
     , pos_on_contig(pos_on_contig)
     , is_plus_strand(is_plus_strand)
 {
-#ifdef CEU_CM_IS_DEBUG
-    if (this->aln_ref.length() != this->aln_query.length()) {
-        throw PWAException("Length of aligned query and ref inequal!");
-    }
-    if (this->qual_str.length() != this->query.length()) {
-        throw PWAException("Length of query and qual_ inequal!");
-    }
-    if (this->qual_vec.size() != this->query.length()) {
-        throw PWAException("Length of query and qual_ inequal!");
-    }
-#endif
+    check_();
+}
+
+PairwiseAlignment::PairwiseAlignment(const std::string& read_name, const std::string& contig_name,
+    const std::string& query, const std::string& ref, const std::string& qual_str,
+    const std::vector<am_qual_t>& qual_vec, const std::string& aligned_query, const std::string& aligned_ref,
+    hts_pos_t pos_on_contig, bool is_plus_strand)
+    : aln_query(aligned_query)
+    , aln_ref(aligned_ref)
+    , query(query)
+    , ref(ref)
+    , qual_str(qual_str)
+    , qual_vec(qual_vec)
+    , read_name(read_name)
+    , contig_name(contig_name)
+    , pos_on_contig(pos_on_contig)
+    , is_plus_strand(is_plus_strand)
+{
+    check_();
 }
 
 std::vector<am_cigar_t> PairwiseAlignment::generate_cigar_array(const bool use_m) const
@@ -106,6 +114,20 @@ std::string PairwiseAlignment::serialize(const int is_read_1_or_2) const
     }
     return fmt::format(">{}/{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, is_read_1_or_2, contig_name, pos_on_contig,
         is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
+}
+void PairwiseAlignment::check_() const
+{
+#ifdef CEU_CM_IS_DEBUG
+    if (this->aln_ref.length() != this->aln_query.length()) {
+        throw PWAException("Length of aligned query and ref inequal!");
+    }
+    if (this->qual_str.length() != this->query.length()) {
+        throw PWAException("Length of query and qual_ inequal!");
+    }
+    if (this->qual_vec.size() != this->query.length()) {
+        throw PWAException("Length of query and qual_ inequal!");
+    }
+#endif
 }
 
 } // namespace labw::art_modern

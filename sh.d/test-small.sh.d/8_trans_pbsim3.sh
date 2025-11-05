@@ -5,9 +5,7 @@ coverage=pbsim3
 parser=memory
 for lc in se pe mp; do
     AM_EXEC \
-        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_PBSIM3_TRANSCRIPT}" \
-        --read_len 125 \
         --i-type pbsim3_transcripts \
         --mode trans \
         --lc "${lc}" \

@@ -299,11 +299,28 @@ This output writer supports other BAM formatting parameters.
 
 ## Miscellaneous Parameters
 
-- `--id`: Read ID Prefix. Used to distinguish between different runs.
-- `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
+### Read Length Parameters
+
+`--read_len`, `--read_len_1`, and `--read_len_2` controls read length. Specifically:
+
+- If none of the 3 parameters are set, will use the longest read length supported by the quality distribution file(s).
+- If only `--read_len` is set, will use the specified read length for both read 1 and read 2.
+- `--read_len` cannot be used together with `--read_len_1` or `--read_len_2`.
+- If `--read_len_1` and/or `--read_len_2` is set, will use the specified read lengths for read 1 and/or read 2 respectively.
+- For paired-end or mate-pair library construction mode, both read lengths must be set either using `--read_len` **OR** `--read_len_1` and `--read_len_2`.
+
+### Indel Error Parameters
+
 - `--ins_rate_1`, `--ins_rate_2`, `--del_rate_1`, and `--del_rate_2`: Targeted insertion and deletion rate for read 1 and 2.
 - `--max_indel`: The maximum total number of insertions and deletions per read.
+
+### Ambiguous Base Parameters
+
 - `--max_n`: The maximum total number of ambiguous bases (N) per read.
+
+### Others
+
+- `--id`: Read ID Prefix. Used to distinguish between different runs.
 
 ## Logging Parameters
 

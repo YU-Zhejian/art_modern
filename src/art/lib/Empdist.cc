@@ -107,14 +107,13 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
                 BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name
                                          << " is not a valid paired-end profile.";
             }
-            std::string builtin_profile_1 = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
-            std::string builtin_profile_2;
-            if (ENCODED_BUILTIN_PROFILES[i][1][0] != '\0') {
-                builtin_profile_2 = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
-            }
+            std::string const builtin_profile_1
+                = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
             std::istringstream ss(builtin_profile_1);
             read_emp_dist_(ss, true);
-            if (!builtin_profile_2.empty()) {
+            if (ENCODED_BUILTIN_PROFILES[i][1][0] != '\0') {
+                std::string const builtin_profile_2
+                    = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
                 std::istringstream ss2(builtin_profile_2);
                 read_emp_dist_(ss2, false);
             }
@@ -141,46 +140,36 @@ Empdist::Empdist(
     log();
 }
 
-void Empdist::set_read_length(const std::size_t read_len_1, const std::size_t read_len_2)
+am_read_len_t Empdist::get_read_1_max_length() const
+{
+    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first : qual_dist_first;
+    return static_cast<am_read_len_t>(qual_dist_to_check_first.size());
+}
+am_read_len_t Empdist::get_read_2_max_length() const
+{
+    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second : qual_dist_second;
+    return static_cast<am_read_len_t>(qual_dist_to_check_second.size());
+}
 
+void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_t read_len_2)
 {
     read_len_1_ = read_len_1;
     read_len_2_ = read_len_2;
-    if (sep_qual_) {
-        if (a_qual_dist_first.size() < read_len_1_) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
-                                     << ") exceeds the "
-                                        "length of the read quality profile.";
-            log();
-            abort_mpi();
-        }
-        if (is_pe_) {
-            if (a_qual_dist_second.size() < read_len_2_) {
-                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
-                                         << ") exceeds the "
-                                            "length of the read quality profile.";
-                log();
-                abort_mpi();
-            }
-        }
-    } else {
-        if (qual_dist_first.size() < read_len_1_) {
-            BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
-                                     << ") exceeds the "
-                                        "length of the read quality profile.";
-            log();
-            abort_mpi();
-        }
-        if (is_pe_) {
-            if (qual_dist_second.size() < read_len_2_) {
-                BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
-                                         << ") exceeds the "
-                                            "length of the read quality profile ("
-                                         << qual_dist_second.size() << ")";
-                log();
-                abort_mpi();
-            }
-        }
+    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first : qual_dist_first;
+    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second : qual_dist_second;
+    if (get_read_1_max_length() < read_len_1_) {
+        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 1st read (" << read_len_1_
+                                 << ") exceeds the "
+                                    "length of the read quality profile.";
+        log();
+        abort_mpi();
+    }
+    if (get_read_2_max_length() < read_len_2_) {
+        BOOST_LOG_TRIVIAL(fatal) << "Error: The required read length of 2nd read (" << read_len_2_
+                                 << ") exceeds the "
+                                    "length of the read quality profile.";
+        log();
+        abort_mpi();
     }
 }
 
@@ -192,7 +181,7 @@ void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bo
 #ifdef USE_WALKER_QUALGEN
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
     rprob.r_probs();
-    for (std::size_t i = 0; i < read_len; i++) {
+    for (am_read_len_t i = 0; i < read_len; i++) {
         // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
     }
