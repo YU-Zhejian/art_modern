@@ -140,3 +140,4 @@ perf.data*
 /.intel/
 *.f[axq]i
 *.gzi
+/bin/

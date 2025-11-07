@@ -11,7 +11,7 @@
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=
-## 1.2.1 (Ongoing)
+## 1.2.1 (2025/11/06)
 
 - The GNU Scientific Library (GSL) random generator removed.
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
@@ -20,7 +20,7 @@
 - `art_modern`: 
   - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
   - Memory performance of `stream` FASTA parser largely improved.
-- Packing: DEB package variant using OpenMPI added.
+- **EXPERIMENTAL** Packing: DEB package variant using OpenMPI added.
 - Documentation largely revised.
 - Miscellaneous bug fixes.
 
