@@ -63,7 +63,7 @@ public:
 
 private:
     bool is_read_1_;
-    int read_len_;
+    am_read_len_t read_len_;
     std::string aln_query_;
     std::string aln_ref_;
     const ArtParams& art_params_;

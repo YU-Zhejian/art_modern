@@ -139,7 +139,7 @@ void ArtRead::generate_snv_on_qual()
         art_params_.qdist.get_read_qual_sep_2(qual_, query_, rprob_);
     }
     char achar = 0;
-    rprob_.r_probs();
+    rprob_.r_probs(read_len_);
     for (decltype(qual_.size()) i = 0; i < qual_.size(); i++) {
         if (query_[i] == 'N') {
             qual_[i] = MIN_QUAL;
@@ -171,7 +171,7 @@ int ArtRead::generate_indels()
             del_len = i + 1;
             j = i;
             while (j >= 0) {
-                pos = rprob_.rand_pos_on_read_not_head_and_tail();
+                pos = rprob_.rand_pos_on_read_not_head_and_tail(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = ALN_GAP;
                     j--;
@@ -189,7 +189,7 @@ int ArtRead::generate_indels()
             ins_len = i + 1;
             j = i;
             while (j >= 0) {
-                pos = rprob_.rand_pos_on_read();
+                pos = rprob_.rand_pos_on_read(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
@@ -215,7 +215,7 @@ int ArtRead::generate_indels_2()
         if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
             ins_len = i + 1;
             for (int j = i; j >= 0;) {
-                pos = rprob_.rand_pos_on_read();
+                pos = rprob_.rand_pos_on_read(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
@@ -239,7 +239,7 @@ int ArtRead::generate_indels_2()
         if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
             del_len = i + 1;
             for (int j = i; j >= 0;) {
-                pos = rprob_.rand_pos_on_read_not_head_and_tail();
+                pos = rprob_.rand_pos_on_read_not_head_and_tail(is_read_1_);
                 if (pos == 0) {
                     continue;
                 }

@@ -94,7 +94,6 @@ def probe_concurrent_queue() -> Optional[str]:
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
         self.USE_RANDOM_GENERATOR = "PCG"
-        self.USE_QUAL_GEN = "WALKER"
         self.USE_MALLOC = "AUTO"
         self.USE_THREAD_PARALLEL = "ASIO"
         self.USE_LIBFMT = "UNSET"
@@ -108,7 +107,6 @@ class BuildConfig:
         cmake_flags = self.old_cmake_flags
         cmake_flags.append(f"-DCMAKE_BUILD_TYPE={self.CMAKE_BUILD_TYPE}")
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
-        cmake_flags.append(f"-DUSE_QUAL_GEN={self.USE_QUAL_GEN}")
         cmake_flags.append(f"-DUSE_MALLOC={self.USE_MALLOC}")
         cmake_flags.append(f"-DUSE_THREAD_PARALLEL={self.USE_THREAD_PARALLEL}")
         if self.USE_LIBFMT != "UNSET":
@@ -124,7 +122,6 @@ class BuildConfig:
     def copy(self) -> BuildConfig:
         new_config = BuildConfig(self.old_cmake_flags.copy())
         new_config.USE_RANDOM_GENERATOR = self.USE_RANDOM_GENERATOR
-        new_config.USE_QUAL_GEN = self.USE_QUAL_GEN
         new_config.USE_MALLOC = self.USE_MALLOC
         new_config.USE_THREAD_PARALLEL = self.USE_THREAD_PARALLEL
         new_config.USE_LIBFMT = self.USE_LIBFMT
@@ -359,9 +356,4 @@ if __name__ == "__main__":
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_RANDOM_GENERATOR = "PCG"
-
-            bc.USE_QUAL_GEN = "STL"
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.USE_QUAL_GEN = "WALKER"
     executor.shutdown()

@@ -32,8 +32,8 @@ namespace labw::art_modern {
 
 class ArtJobExecutor final : public JobExecutor {
 public:
-    ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
-        const std::shared_ptr<OutputDispatcher>& output_dispatcher, bool clear_after_use);
+    ArtJobExecutor(
+        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher);
 
     // Move constructor
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
@@ -46,29 +46,28 @@ public:
     [[nodiscard]] std::string thread_info() const override;
 
 private:
-    bool generate_pe_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
-    bool generate_se_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads);
-    void generate_(am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig, am_readnum_t& read_id);
+    bool generate_pe_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads, Rprob& rprob_);
+    bool generate_se_(ArtContig& art_contig, bool is_plus_strand, am_readnum_t current_num_reads, Rprob& rprob_);
+    void generate_(
+        am_readnum_t targeted_num_reads, bool is_positive, ArtContig& art_contig, am_readnum_t& read_id, Rprob& rprob_);
 
     const ArtParams& art_params_;
     SimulationJob job_;
     /**
      * Cached MPI rank in string.
      */
-    const std::string mpi_rank_;
+    const std::string mpi_rank_str_;
     am_readnum_t total_num_reads_generated_ = 0;
     std::shared_ptr<OutputDispatcher> output_dispatcher_;
-    Rprob rprob_;
     const am_readnum_t num_reads_to_reduce_;
     const bool require_alignment_;
     std::atomic<bool> is_running_ = false;
-    std::string current_contig_;
+    std::string current_contig_name_;
     am_readnum_t current_n_reads_left_ = 0;
     am_readnum_t current_n_fails_ = 0;
     am_readnum_t current_max_tolerence_ = 0;
     am_readnum_t current_n_reads_generated_ = 0;
     OutputDispatcher::TokenRing token_ring_;
-    bool clear_after_use_ = true;
 };
 
 } // namespace labw::art_modern
