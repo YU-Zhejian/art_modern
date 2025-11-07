@@ -20,10 +20,6 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/rand_utils.hh"
 
-#if defined(USE_GSL_RANDOM)
-#include <gsl/gsl_randist.h>
-#endif
-
 #if defined(USE_STL_RNDOM)
 #include <random>
 #endif
@@ -36,7 +32,7 @@
 #include <mkl.h>
 #endif
 
-#include <algorithm> // NOLINT
+#include <algorithm> // NOLINT for std::generate_n
 #include <cstddef>
 #include <cstdint>
 #include <vector>
@@ -91,42 +87,20 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_length_(read_length)
 {
-    // FIXME: Why are we using VSL_BRNG_MT19937 instead of VSL_BRNG_SFMT19937?
-    // Hypothesis: Involking VSL_BRNG_MT19937 with lots of short vectors is faster than using VSL_BRNG_SFMT19937.
-    // Check through Intel profiler and see if there's any performance difference.
-    vslNewStream(&stream_, VSL_BRNG_MT19937, seed());
+    vslNewStream(&stream_, VSL_BRNG_SFMT19937, seed());
+    cached_rand_pos_on_read_.resize(CACHE_SIZE_);
+    cached_rand_pos_on_read_not_head_and_tail_.resize(CACHE_SIZE_);
+    cached_insertion_lengths_.resize(CACHE_SIZE_);
+    cached_rand_base_indices_.resize(CACHE_SIZE_);
+    cached_rand_quality_less_than_10_.resize(CACHE_SIZE_);
     public_init_();
 }
-#elif defined(USE_GSL_RANDOM)
-Rprob::Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, int read_length)
-    : pe_frag_dist_mean_(pe_frag_dist_mean)
-    , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
-    , read_length_(read_length)
-{
-    r = gsl_rng_alloc(gsl_rng_mt19937);
-    gsl_rng_set(r, seed());
-    public_init_();
-}
-Rprob::~Rprob() { gsl_rng_free(r); }
 #endif
-
-double Rprob::r_prob()
-{
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
-    return dis_(gen_);
-#elif defined(USE_ONEMKL_RANDOM)
-    double result = 0.0;
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 0.0, 1.0);
-    return result;
-#elif defined(USE_GSL_RANDOM)
-    return gsl_rng_uniform(r);
-#endif
-}
 
 void Rprob::r_probs(const std::size_t n)
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_GSL_RANDOM) || defined(USE_PCG_RANDOM)
-    std::generate_n(tmp_probs_.begin(), n, [this]() { return r_prob(); });
+#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
+    std::generate_n(tmp_probs_.begin(), n, [this]() { return dis_(gen_); });
 #elif defined(USE_ONEMKL_RANDOM)
     vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<MKL_INT>(n), tmp_probs_.data(), 0.0, 1.0);
 #endif
@@ -137,11 +111,12 @@ int Rprob::insertion_length()
 #if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
     return static_cast<int>(insertion_length_gaussian_(gen_));
 #elif defined(USE_ONEMKL_RANDOM)
-    double result = 0.0;
-    vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_ICDF, stream_, 1, &result, pe_frag_dist_mean_, pe_frag_dist_std_dev_);
-    return static_cast<int>(result);
-#elif defined(USE_GSL_RANDOM)
-    return static_cast<int>(gsl_ran_gaussian(r, pe_frag_dist_std_dev_) + pe_frag_dist_mean_);
+    if (cached_insertion_lengths_index_ == 0) {
+        vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_ICDF, stream_, CACHE_SIZE_, cached_insertion_lengths_.data(),
+            pe_frag_dist_mean_, pe_frag_dist_std_dev_);
+        cached_insertion_lengths_index_ = CACHE_SIZE_;
+    }
+    return static_cast<int>(cached_insertion_lengths_[--cached_insertion_lengths_index_]);
 #endif
 }
 
@@ -150,11 +125,11 @@ char Rprob::rand_base()
 #if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
     return ART_ACGT[base_(gen_)];
 #elif defined(USE_ONEMKL_RANDOM)
-    int index = 0;
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &index, 0, 4);
-    return ART_ACGT[index];
-#elif defined(USE_GSL_RANDOM)
-    return ART_ACGT[gsl_rng_uniform_int(r, 4)];
+    if (cached_rand_base_indices_index_ == 0) {
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_base_indices_.data(), 0, 4);
+        cached_rand_base_indices_index_ = CACHE_SIZE_;
+    }
+    return ART_ACGT[cached_rand_base_indices_[--cached_rand_base_indices_index_]];
 #endif
 }
 
@@ -164,9 +139,6 @@ void Rprob::rand_quality_dist()
     std::generate_n(tmp_qual_dists_.begin(), read_length_, [this]() { return quality_(gen_); });
 #elif defined(USE_ONEMKL_RANDOM)
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, tmp_qual_dists_.data(), 1, MAX_DIST_NUMBER);
-#elif defined(USE_GSL_RANDOM)
-    std::generate_n(tmp_qual_dists_.begin(), read_length_,
-        [this]() { return static_cast<int>(gsl_rng_uniform_int(r, MAX_DIST_NUMBER - 1) + 1); });
 #endif
 }
 
@@ -175,11 +147,11 @@ int Rprob::rand_quality_less_than_10()
 #if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
     return quality_less_than_10_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
-    int result = 0;
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 1, 10);
-    return result;
-#elif defined(USE_GSL_RANDOM)
-    return static_cast<int>(gsl_rng_uniform_int(r, 9) + 1);
+    if (cached_rand_quality_less_than_10_index_ == 0) {
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
+        cached_rand_quality_less_than_10_index_ = CACHE_SIZE_;
+    }
+    return cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_];
 #endif
 }
 
@@ -188,11 +160,12 @@ int Rprob::rand_pos_on_read()
 #if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
     return pos_on_read_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
-    int result = 0;
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 0, read_length_);
-    return result;
-#elif defined(USE_GSL_RANDOM)
-    return static_cast<int>(gsl_rng_uniform_int(r, read_length_));
+    if (cached_rand_pos_on_read_index_ == 0) {
+        viRngUniform(
+            VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_pos_on_read_.data(), 0, read_length_);
+        cached_rand_pos_on_read_index_ = CACHE_SIZE_;
+    }
+    return cached_rand_pos_on_read_[--cached_rand_pos_on_read_index_];
 #endif
 }
 int Rprob::rand_pos_on_read_not_head_and_tail()
@@ -200,11 +173,12 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
 #if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
     return pos_on_read_not_head_and_tail_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
-    int result = 0;
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, 1, read_length_ - 1);
-    return result;
-#elif defined(USE_GSL_RANDOM)
-    return static_cast<int>(gsl_rng_uniform_int(r, read_length_ - 2) + 1);
+    if (cached_rand_pos_on_read_not_head_and_tail_index_ == 0) {
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_,
+            cached_rand_pos_on_read_not_head_and_tail_.data(), 1, read_length_ - 1);
+        cached_rand_pos_on_read_not_head_and_tail_index_ = CACHE_SIZE_;
+    }
+    return cached_rand_pos_on_read_not_head_and_tail_[--cached_rand_pos_on_read_not_head_and_tail_index_];
 #endif
 }
 int Rprob::randint(const int min, const int max)
@@ -217,8 +191,6 @@ int Rprob::randint(const int min, const int max)
     int result = 0;
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, min, max);
     return result;
-#elif defined(USE_GSL_RANDOM)
-    return static_cast<int>(gsl_rng_uniform_int(r, max - min) + min);
 #endif
 }
 

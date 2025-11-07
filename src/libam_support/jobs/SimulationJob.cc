@@ -17,13 +17,14 @@
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 
+#include <cstdlib>
 #include <memory>
 #include <utility>
 
 namespace labw::art_modern {
 
 SimulationJob::SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-    const std::shared_ptr<CoverageInfo>& coverage_info, const int job_id)
+    const std::shared_ptr<CoverageInfo>& coverage_info, const std::size_t job_id)
     : fasta_fetch(fasta_fetch)
     , coverage_info(coverage_info)
     , job_id(job_id)

@@ -37,7 +37,7 @@ For MPI-based parallelization, the strategy is as follows:
 - For `wgs` parser, just divide sequencing depth.
 - For non-`wgs` parser, skip records based on MPI rank and word size.
 
-The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in 1.2.0, where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
+The coverage based parallelization strategy may generate slightly different number of reads compared to single-threaded execution due to rounding errors. This is adjusted in [1.2.0](#v-1.2.0-section), where the number of reads generated at positive and negative strands will be adjusted by 1 (SE) or 2 (PE/MP) to make the number of generated bases and the number of required bases as close as possible.
 
 - For example, consider generating 125-nt reads 5.0 positive and 5.0 negative depth for a contig of length 225.
 - In SE mode, 9 reads will be generated on positive and negative strands.
@@ -47,19 +47,21 @@ The coverage based parallelization strategy may generate slightly different numb
 
 ### Bits Generation
 
-The current random number generation function in each library is [MT19937](https://doi.org/10.1145/272991.272995), which may not be the best choice for performance-critical applications. However, it is the most widely used, well-known, of moderate performance and cycle, and is implemented in all random number generator libraries (namely, Boost, GSL, STL, and Intel OneAPI MKL).
+The current random number generation function in each library is [MT19937](https://doi.org/10.1145/272991.272995), which may not be the best choice for performance-critical applications. However, it is the most widely used, well-known, of moderate performance and cycle, and is implemented in all random number generator libraries (namely, Boost, STL, and Intel OneAPI MKL).
 
 We choose not to use [Abseil Random](https://abseil.io/docs/cpp/guides/random) since (1) It is hard to bundle the entire Abseil random library with the project and (2) Its performance is not satisfying. Using Intel compiler, even absl::InsecureBitGen is slower than either boost::random::mt19937 or std::mt19937.
 
 We choose not to use [cuRAND](https://docs.nvidia.com/cuda/curand/index.html) since it is hard to configure and its performance is not satisfying, which may be due to the time spent on copying data from GPU as the majority of our computation happens on CPU.
 
+We choose not to use [GSL](https://www.gnu.org/software/gsl/) random generator since its performance is not satisfying.
+
 The current implementation also supports [PCG](https://www.pcg-random.org/) random generator experimentally. This random generator should be faster than STL random generators.
 
-The current version does not support the specification of seed since it will result in reads with identical position and error profile in each thread. The current seed is set by the product of nanoseconds since epoch and hash of the current thread ID to allow each thread to generate different data.
+The current version does not support the specification of seed since it will result in reads with identical position and error profile in each thread. The current seed is set by the combined hash of nanoseconds since epoch, hash of the current thread ID, and the MPI rank to allow each thread to generate different data.
 
 ### Distribution Sampling
 
-The distribution sampling is currently implemented using each library's own implementation. For example; `boost::random::uniform_int_distribution` for Boost random generators, `std::uniform_int_distribution` for STL and PCG, `viRngUniform` for Intel MKL, and `gsl_rng_uniform_int` for GSL. Further decoupling may be needed.
+The distribution sampling is currently implemented using each library's own implementation. For example; `boost::random::uniform_int_distribution` for Boost random generators, `std::uniform_int_distribution` for STL and PCG, and `viRngUniform` for Intel MKL. Further decoupling may be needed.
 
 ## I/O
 
@@ -72,3 +74,16 @@ We choose not to support [UCSC 2-bit](http://genome.ucsc.edu/FAQ/FAQformat.html#
 ## Other Performance Bottlenecks
 
 A majority of time was spent on generation of quality scores, which extensively calls `map::lower_bound()` function. This was addressed by using Walker's algorithm.
+
+## Miscellaneous
+
+(filesystem-section)=
+### File System Support
+
+We use `boost::filesystem` to handle file system operations like creating directories since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific file system APIs. The `std::filesystem` implementation in different compilers is not consistent. Some may require additional linker flags (`-lstdc++fs` for GCC prior or equal to 9.1; `-lc++fs` for Clang prior or equal to 9.0; `-lc++experimental` for Clang prior or equal to 7.0). There are also various reports in how those implementations deal with the terminating `/` when invoking `std::filesystem::creare_directories()`. So for the sake of simplicity, we use `boost::filesystem` instead.
+
+See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem) and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
+
+### Thread Pool Implementation
+
+Intel TBB is an excellent library that supports diverse parallel programming models and data structures. However, this library loads into the memory in run-time, which would consume a lot of time in short-running applications. This also makes the project incapable of being distributed in a fully static form (See [Design.md](Design.md)).

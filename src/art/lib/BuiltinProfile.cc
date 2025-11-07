@@ -15,6 +15,10 @@
 
 #include "art/lib/BuiltinProfile.hh"
 
+#include "libam_support/utils/mpi_utils.hh"
+
+#include <boost/log/trivial.hpp>
+
 #include <zlib.h>
 
 #include <cstring>
@@ -27,11 +31,12 @@ namespace {
     constexpr int BUFF_SIZE = 4096;
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
-        z_stream zs = { };
+        z_stream zs = {};
 
         // Initialize zlib stream for decompression
         if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
-            throw std::runtime_error("Failed to initialize zlib stream");
+            BOOST_LOG_TRIVIAL(fatal) << "Failed to initialize zlib stream";
+            abort_mpi();
         }
 
         zs.next_in = const_cast<unsigned char*>(src);
@@ -58,7 +63,8 @@ namespace {
 
         // Check for errors
         if (ret != Z_STREAM_END) {
-            throw std::runtime_error("Error during zlib decompression: " + std::string(zs.msg));
+            BOOST_LOG_TRIVIAL(fatal) << "Error during zlib decompression: " << zs.msg;
+            abort_mpi();
         }
 
         return outstring;

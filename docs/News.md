@@ -1,17 +1,32 @@
 # News \& Release Notes
 
-## 1.2.0 (Ongoing)
+(v-1.2.1-section)=
+## 1.2.1 (2025/11/06)
+
+- The GNU Scientific Library (GSL) random generator removed.
+- For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
+- Makefile integration test target `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
+- `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
+- `art_modern`: 
+  - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
+  - Memory performance of `stream` FASTA parser largely improved.
+- **EXPERIMENTAL** Packing: DEB package variant using OpenMPI added.
+- Documentation largely revised.
+- Miscellaneous bug fixes.
+
+(v-1.2.0-section)=
+## 1.2.0 (2025/10/21)
 
 - Main repo slimmed.
   - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
   - Benchmark of other simulators moved to <https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators>.
-- The GNU Science Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
+- The GNU Scientific Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
 - **EXPERIMENTAL** Support over MPI added.
   - Currently tested MPI vendors:
-    - Debian OpenMPI, ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023, std. 3.1.
-    - Intel(R) MPI Library 2021.16 for Linux* OS, std. 4.1.
+    - Debian OpenMPI, `ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023`, std. 3.1.
+    - Intel(R) MPI Library `2021.16 for Linux* OS`, std. 4.1.
   - MPI-related revisions:
-    - Seeding of random number generators revised to advoid seed colission accross different threads and processes.
+    - Seeding of random number generators revised to avoid seed collision across different threads and processes.
     - The number of reads generated from each contig is now calculated using complicated rounding instead of flooring.
     - Makefile quick build targets `debug`, `release` have their MPI counterparts: `debug-mpi` and `release-mpi`.
     - Makefile integration test targets `testsmall`, `testsmall-release`, `testbuild` have their MPI counterparts: `testsmall-mpi`, `testsmall-release-mpi`, and `testbuild-mpi`.
@@ -20,6 +35,7 @@
   - **NOTE** The author currently have no access to computing clusters with MPI, so the MPI parallelization on an actual multi-node cluster may be problematic and suboptimal. Users are welcomed to report bugs or tell the author how to simulate MPI-enabled cluster using a laptop to improve the MPI support.
 - Miscellaneous bug fixes.
 
+(v-1.1.10-section)=
 ## 1.1.10 (2025/10/12)
 
 - Fixed #7. In details:
@@ -29,6 +45,7 @@
 - Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
 - Debian/Ubuntu/Alpine builder container updated to the latest versions.
 
+(v-1.1.9-section)=
 ## 1.1.9 (2025/10/11)
 
 - BAM output routines are largely accelerated by replacing string streams with pre-allocated strings.
@@ -37,9 +54,10 @@
 - The simulator now supports `/dev/null` or an empty file as input.
 - Static libraries removed from Alpine Linux build to reduce download size.
 - HTSLib lower bound bumped to 1.17.
-- Boost.Thread removed from required dependencies.
+- Boost::Thread removed from required dependencies.
 - Miscellaneous bug fixes.
 
+(v-1.1.8-section)=
 ## 1.1.8 (2025/09/29)
 
 - Fixed issue #5. In details:
@@ -50,9 +68,10 @@
 - Documentation largely revised.
 - Miscellaneous bug fixes.
 
+(v-1.1.7-section)=
 ## 1.1.7 (2025/09/18)
 
-- Support over `ccache` deprecated, which also deprecated CMake option `USE_CCACHE`.
+- Support over `ccache` deprecated and removed, which also deprecated CMake option `USE_CCACHE`.
 - Update bundled Abseil to [20250814.0](https://github.com/abseil/abseil-cpp/releases/tag/20250814.0).
 - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03)).
 - Updated bundled `{fmt}` to [11.2.0](https://github.com/fmtlib/fmt/releases/tag/11.2.0).
@@ -61,16 +80,19 @@
 - Separated CMake flag that controls building of mini benchmarks to `BUILD_ART_MODERN_BENCHMARKS`.
 - Miscellaneous bug fixes.
 
+(v-1.1.6-section)=
 ## 1.1.6 (2025/09/12)
 
-- A severe bug in CMakefiles of `labw_slim_htslib` fixed.
+- A severe bug in CMakefile of `labw_slim_htslib` fixed.
 - **EXPERIMENTAL** Debian DEB package built under Linux Mint 22 Wilma.
 
+(v-1.1.5-section)=
 ## 1.1.5 (2025/09/12)
 
 - Bumped bundled HTSLib to 1.22.1.
 - Miscellaneous bug fixes.
 
+(v-1.1.4-section)=
 ## 1.1.4 (2025/08/31)
 
 - 2 environment variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR` now controllers the behavior of log directory creation.
@@ -79,6 +101,7 @@
 - The package is published at BioConda. See [here](https://bioconda.github.io/recipes/art_modern/README.html) for details.
 - Miscellaneous bug fixes.
 
+(v-1.1.3-section)=
 ## 1.1.3 (2025/03/05)
 
 - A severe bug in builtin profiles fixed. Now all builtin profiles should be usable without problems. Also eliminated [-Woverlength-strings](https://gcc.gnu.org/onlinedocs/gcc/Warning-Options.html#index-Woverlength-strings) warning.
@@ -88,13 +111,15 @@
 - CMake option `BOOST_CONFIG_PROVIDED_BY_BOOST` added to address newer mechanisms of Boost configuration.
 - Miscellaneous bug fixes.
 
+(v-1.1.2-section)=
 ## 1.1.2 (2025/02/16)
 
-- The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Science Library](https://www.gnu.org/software/gsl/).
+- The performance of the core simulation algorithm was improved using [Walker's Algorithm](https://doi.org/10.1145/355744.355749) on generating discrete distributions. The implementation was adapted from the C version of [GNU Scientific Library](https://www.gnu.org/software/gsl/).
 - Support over B-Tree was dropped. Its performance was found worse than STL map in corrected benchmarks.
 - The performance of `moodycamel::ConcurrentQueue<T>` was improved using producer and consumer tokens. However, since the queue is sufficiently fast without tokens, this improvement may not be significant.
 - Miscellaneous bug fixes.
 
+(v-1.1.1-section)=
 ## 1.1.1 (2025/02/02)
 
 - ~~Possible build acceleration using [ccache](https://ccache.dev/) supported.~~
@@ -106,6 +131,7 @@
 - [PCG](https://www.pcg-random.org/) added as an alternative random number generator. **THIS GENERATOR MAY NOT WORK UNDER MAC OS X.**
 - ~~[C++ B+ Tree](https://github.com/Kronuz/cpp-btree) added for accelerated map implementation.~~
 
+(v-1.1.0-section)=
 ## 1.1.0 (2025/01/23)
 
 - `--builtin_qual_file` option added back. Python 3 needed as build dependencies.
@@ -115,6 +141,7 @@
 - Bumped bundled HTSLib to 1.21.
 - Miscellaneous bug fixes.
 
+(v-1.0.1-section)=
 ## 1.0.1 (2025/01/17)
 
 Fixed miscellaneous bugs.
@@ -122,6 +149,7 @@ Fixed miscellaneous bugs.
 - Further fixed issue #2.
 - More compiler versions tested; The software now supports Clang 10.0.0+, GCC 9.5.0+, and AOCC 3.2.0+.
 
+(v-1.0.0-section)=
 ## 1.0.0 (2025/01/17)
 
 The first release of `art_modern`.
@@ -138,7 +166,7 @@ Changes on software function:
 - Support for sequencers except Illumina dropped.
 - Support for the `aln` output format was dropped.
 - Built-in profiles are no longer supported. Users must specify the path to the existing profile they want to use.
-- Parallelization using Boost ASIO.
+- Parallelization using Boost::ASIO.
 
 Changes in software implementation:
 

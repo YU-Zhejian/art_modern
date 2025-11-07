@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 set -ue
 mkdir -p artifacts/RELEASE
-ARCH=$(dpkg --print-architecture)
+ARCH="$(dpkg --print-architecture)"
 if [ -z "${PACKAGE_VERSION:-}" ]; then
     export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
 fi
 export PACKAGE_FULL_NAME="art-modern_${PACKAGE_VERSION}+dfsg"
+export OPENMPI_PACKAGE_FULL_NAME="art-modern-openmpi_${PACKAGE_VERSION}+dfsg"
 
 ./sh.d/prepare-orig-tgz-for-deb.sh
 for name in debian-13 ubuntu-2404; do
@@ -21,4 +22,7 @@ for name in debian-13 ubuntu-2404; do
     mv -v \
         artifacts/build_deb-"${name}"/"${PACKAGE_FULL_NAME}-1_${ARCH}.deb" \
         artifacts/RELEASE/"${PACKAGE_FULL_NAME}-1_${ARCH}-${name}.deb"
+    mv -v \
+        artifacts/build_deb-"${name}"/"${OPENMPI_PACKAGE_FULL_NAME}-1_${ARCH}.deb" \
+        artifacts/RELEASE/"${OPENMPI_PACKAGE_FULL_NAME}-1_${ARCH}-${name}.deb"
 done

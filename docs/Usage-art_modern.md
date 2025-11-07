@@ -1,0 +1,321 @@
+# Usage of `art_modern`
+
+This is the detailed usage of `art_modern`. Every parameter and their combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
+
+## Parameter Controlling Simulation Behavior
+
+### Simulation Modes (`--mode`)
+
+The simulator currently supports 3 simulation modes:
+
+- **`wgs` (DEFAULT) for whole-genome sequencing.** For scenarios with constant coverage over a limited number of sized contigs.
+- `trans` for transcriptome simulation. For scenarios with many short contigs and/or contig-specific coverage.
+- `template` for template simulation. Often being used with a high-level simulator that produces read fragments.
+
+### Library Construction Methods (`--lc`)
+
+The simulator currently supports 3 library construction methods:
+
+#### **`se` (DEFAULT) for single-end reads**
+
+- **For `wgs` and `trans` mode:** A read may start from any position in the reference contig that is long enough to contain the read.
+- **For `template` mode:** A read will start from position 0 in the reference contig.
+
+A diagram for single-end read extraction:
+
+```text
+FRAGMENT:  |==============================|
+SE READ:   |------->
+```
+
+#### `pe` for paired-end reads
+
+- **For `wgs` and `trans` mode:** A fragment (called insert in some other simulators), whose length is drawn from a Gaussian distribution specified by `--pe_frag_dist_mean` and `--pe_frag_dist_std_dev`, is created from any position in the reference contig that is long enough to contain the fragment.
+- **For `template` mode:** A fragment that spans the entire length of the reference contig is created.
+- Paired-end reads facing inward of the fragment are then created from both ends of the fragment.
+
+A diagram for paired-end read extraction:
+
+```text
+FRAGMENT:  |==============================|
+PE READ 1: |------->
+PE READ 2:                        |<------|
+```
+
+#### `mp` for mate-paired reads
+
+- Extraction of the fragment as-is in `pe` mode.
+- Mate-paired reads facing outward of the fragment are created from both ends of the fragment.
+
+A diagram for mate-pair extraction:
+
+```text
+FRAGMENT:  |==============================|
+MP READ 1: <-------|
+MP READ 2:                        |------->
+```
+
+#### See also
+
+- [Illumina paired vs. single end blog](https://www.illumina.com/science/technology/next-generation-sequencing/plan-experiments/paired-end-vs-single-read.html).
+- [Illumina explaination of mate-pair simulation](https://www.illumina.com/science/technology/next-generation-sequencing/mate-pair-sequencing.html).
+
+(parallelism-section)=
+### Thread-Level Parallelism (`--parallel`)
+
+Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to use all available cores. Oversubscription is allowed but not recommended.
+
+**NOTE** If MPI is enabled, each MPI process will use the specified number of threads. For example, if you run `mpiexec -n 4 art_modern --parallel 2 ...`, there will be 8 threads in total.
+
+**NOTE** SAM/BAM output writer is parallelized using its own thread pool. See parameter [`--o-sam-num_threads`](#out-sam-section) and [`--o-hl_sam-num_threads`](#out-hl_sam-section) for more information. For example, if you run `art_modern --parallel 4 --o-sam-num_threads 2 --o-hl_sam-num_threads 3 ...`, there will be 9 threads in total.
+
+### Error-Profile Related Parameters
+
+#### Which Quality Distribution File to Use
+
+Quality distribution files specify the base quality distribution at each position of the read. They are used to simulate sequencing errors.
+
+Users may supply self-trained quality distribution files using `--qual_file_1` and `--qual_file_2` for read 1 and read 2 respectively. The format of quality distribution files is compatible with the original ART. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode.
+
+Users may also use built-in quality distribution files using `--builtin_qual_file` (added in [1.1.0](#v-1.1.0-section).). The built-in quality distribution files are bundled with the simulator. Note that the built-in quality distribution files comes with different maximum read-length and different support over paired-end reads. So please make sure that the read length specified by `--read_len` is compatible with the built-in quality distribution file.
+
+Quality distributions bundled with the original ART can be found [here](https://github.com/YU-Zhejian/art_modern/tree/master/data/Illumina_profiles).
+
+#### Shift and Clip Parameters
+
+`--q_shift_1` and `--q_shift_2`: Shift the base quality of the quality distribution by the specified value. Please note that the shifted quality distribution will be bounded to `--min_qual` and `--max_qual`.
+
+`--min_qual` and `--max_qual`: Clip the quality distribution to the specified range.
+
+#### Separate Quality Distributions for Different Bases (`--sep_flag`)
+
+This flag can separate quality distributions for different bases in the same position.
+
+- **unset (DEFAULT)**: Use the same quality distribution for different bases in the same position. For example, the quality distribution of pos 10 will be the same regardless whether the incoming base is `A` or `T`.
+- set: Use different quality distributions for different bases in the same position. For example, the quality distribution of pos 10 may **NOT** be the same regardless whether the incoming base is `A` or `T`.
+
+## Parameters Controlling Input
+
+### Input File Path (`--i-file`)
+
+The input reference file path. It must exist in the filesystem. Device paths like `/dev/stdin` is supported for non-MPI builds.
+
+Currently, we support input in FASTA and PBSIM3 Transcripts format. An additional parameter [`--i-type`](#input-file-type-section) is used to specify the file type.
+
+**NOTE** Some parser may support compressed FASTAs. See [`--i-parser`](#input-parser-section) for more detils.
+
+(input-file-type-section)=
+### Input File Type (`--i-type`)
+
+The file type of input reference sequences. Currently, FASTA and PBSIM3 Transcripts format are supported.
+
+- **`auto` (DEFAULT) for extension-based decision.**
+  - If the file ends with `.fna`, `.fsa`, `.fa`, `.fasta`, resolve to `fasta`.
+  - Otherwise, an error will be raised.
+- `fasta` for FASTA files.
+- `pbsim3_transcripts` for PBSIM3 Transcripts format.
+
+**NOTE** If you're using UNIX devices like `/dev/stdin` as input, please make sure that this option is specified.
+
+(input-parser-section)=
+### Input Parser (`--i-parser`)
+
+#### **`auto` (DEFAULT) for size-based determination.**
+
+If the file size larger than 1 GiB or cannot be told (which is quite common if the input was redirected from stdin or other devices), resolve to `htslib` (`wgs` mode) or `stream` (`trans` or `template` mode). Otherwise, use `memory`.
+
+#### `memory` for in-memory reference parser
+
+The entire file will be read into the memory. Fast for small reference files.
+
+#### `htslib` for HTSLib FAIDX parser
+
+Store FASTA Index in memory and fetch sequences from disk using [HTSLib](https://github.com/samtools/htslib). Memory-efficient for large genome assembly FASTA files with limited number of long contigs, but inefficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+
+The FASTA index, usually ends with `.fai` and can be built using `samtools faidx`, will be created automatically if not exist.
+
+**NOTE** For `wgs` mode only.
+
+**NOTE** Do not support PBSIM3 Transcripts format.
+
+**NOTE** Do not support UNIX devices for input.
+
+**NOTE** `htslib` parser can be used on a `.fa.gz` file. However, please note that:
+
+- The GZip file **MUST** be [`bgzip`](https://www.htslib.org/doc/bgzip.html)-compressed. Plain GZip will **NOT** work. If you try to use a GZip-compressed FASTA file, you'll see error messages like:
+
+  ```text
+  [E::fai_build_core] File truncated at line 1
+  [E::fai_build3_core] Cannot index files compressed with gzip, please use bgzip
+  [E::fai_path] Failed to build index file for reference file [...]
+  ```
+
+- Specify `--i-type fasta` to use this parser.
+
+#### `stream` for one-pass streaming parser
+
+Streamline the input reference as batches and process them one by one. Efficient for transcriptome/template FASTAs with large number of (relatively) short contigs.
+
+Please note that here, the contig number and length are not accessible to the output dispatcher. So use [headless SAM/BAM output](#out-hl_sam-section) if a SAM/BAM output is needed.
+
+The batch size of each batch is controlled by `--i-batch_size`. Larger batch size may improve performance but requires more memory. Use larger batch size if the targeted sequencing depth is relatively shallow.
+
+### Coverage (`--i-fcov`)
+
+This option allows you to specify coverage. `art_modern` supports the following coverage mode:
+
+- Unified coverage floating point in `double` data type (e.g., `10.0`). Under this scenario, the coverage is identical for all contigs.
+- Per-contig coverage headless tab-separated value (TSV) without strand information.
+- Per-contig coverage headless TSV with strand information.
+
+**NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`. This format comes with contig-specific coverage information.
+
+**NOTE** We prefer unified coverage floating points to TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
+
+### Compatibility Matrices of Input Parameters
+
+Compatibility matrix of file type, simulation mode, and parser:
+
+| Parser \ Mode | `wgs`     | `trans`                        | `template`                     |
+|---------------|-----------|--------------------------------|--------------------------------|
+| `memory`      | `fasta`   | `fasta` / `pbsim3_transcripts` | `fasta` / `pbsim3_transcripts` |
+| `htslib`      | `fasta`   | **ERROR**                      | **ERROR**                      |
+| `stream`      | **ERROR** | `fasta` / `pbsim3_transcripts` | `fasta` / `pbsim3_transcripts` |
+
+Compatibility matrix of coverage mode, simulation mode, and file type:
+
+| Mode \ File Type | `fasta`                        | `pbsim3_transcripts` |
+|------------------|--------------------------------|----------------------|
+| `wgs`            | Unified                        | **ERROR**            |
+| `trans`          | Unified / Unstraded / Stranded | **IGNORED**          |
+| `template`       | Unified / Unstraded / Stranded | **IGNORED**          |
+
+## Parameters Controlling Output
+
+Here introduces diverse output formats supported by `art_modern`. You may specify none of them to perform simulation without any output for benchmarking purposes.
+
+If the parent directory does not exist, it will be created using a `mkdir -p`-like manner.
+
+### Pairwise Alignment Format (`--o-pwa`)
+
+PWA is serialization of the internally used data structure of the simulator. Currently, PWA consists of some metadata lines (Started with `#`) and a list of alignments, each spanning 4 lines.
+
+The alignment lines are as follows:
+
+1. `>`, read name, a blank, and the leftmost position of the alignment.
+2. The aligned read sequence, gapped with `-`.
+3. The aligned reference sequence, gapped with `-`.
+4. The gapless quality string.
+
+Example:
+
+```text
+#PWA
+#ARGS: opt/build_debug/art_modern [...]
+>NM_069135:art_modern:1:nompi:0	NM_069135:0:+
+AGC-CAAACGGGCAACCAGACTCCGC[...]
+AGCACAAA-GGGCAACCAGACTCCGC[...]
+BCCCCGGGGGGGFGGGGGGGFGGGGG[...]
+[...]
+```
+
+### FASTQ Format (`--o-fastq`)
+
+The good old FASTQ format. The qualities are Phread encoded in ASCII with an offset of 33.
+
+```text
+@NM_069135:art_modern:1:nompi:0
+AGCCAAACGGGCAACCAGACTCCGCC[...]
++
+BCCCCGGGGGGGFGGGGGGGFGGGGG[...]
+```
+
+FASTQ files can be easily converted to FASTA using [`seqtk`](https://github.com/lh3/seqtk):
+
+```shell
+cat in.fq | seqtk seq -A > out.fa
+```
+
+See also:
+
+- [Specifications of Common File Formats Used by the ENCODE Consortium at UCSC](https://genome.ucsc.edu/ENCODE/fileFormats.html#FASTQ).
+- [Common File Formats Used by the ENCODE Consortium](https://www.encodeproject.org/help/file-formats/#fastq).
+
+### FASTA Format (`--o-fasta`)
+
+Sequence-only output format. Example:
+
+```text
+>NM_069135:art_modern:1:nompi:0
+AGCCAAACGGGCAACCAGACTCCGCC[...]
+```
+
+This simulator generates one-line FASTA files. That is, each sequence occupies only one line.
+
+(out-sam-section)=
+### SAM/BAM Format (`--o-sam`)
+
+Sequence Alignment/Map (SAM) and Binary Alignment/Map (BAM) format supports storing of ground-truth alignment information and other miscellaneous parameters. They can be parsed using [samtools](https://github.com/samtools/samtools), [`pysam`](https://pysam.readthedocs.io/) and other libraries, and can be used as ground-truth when benchmarking sequence aligners.
+
+This writes canonical SAM/BAM format using [HTSLib](https://github.com/samtools/htslib). This output writer supports computing `NM` and `MD` tag. The mapping qualities for all reads are set to 255.
+
+Example:
+
+```text
+@HD	VN:1.4	SO:unsorted
+@PG	ID:01	PN:art_modern	CL:opt/build_debug/art_modern [...]
+@SQ	SN:NM_069135	LN:1718
+[...]
+NM_069135:art_modern:1:nompi:0	0	NM_069135	1	255	3=1D4=1I41=1X27=1I5=1X36=1D5=	=	1	0	AGCCAAACGGGCAACCAGACTCCGCC[...]	BCCCCGGGGGGGFGGGGGGGFGGGGG[...]	MD:Z:3^A45T32G36^T5	NM:i:6
+[...]
+```
+
+Other SAM/BAM formatting parameters includes:
+
+- `--o-sam-use_m`: Computing CIGAR string using `M` (`BAM_CMATCH`) instead of `=`/`X` (`BAM_CEQUAL`/`BAM_CDIFF`). Rarely used in next-generation sequencing but common for long-read sequencing alignments.
+- `--o-sam-write_bam`: Write BAM instead of SAM.
+- `--o-sam-num_threads`: Number of threads used to compress BAM output.
+- `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream, 0 for uncompressed stream with `zlib` wrapping, and 1--9 for fastest to best compression ratio. Defaults to `4`.
+
+  Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
+
+See also: [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
+
+(out-hl_sam-section)=
+### Headless SAM/BAM Format (`--o-hl_sam`)
+
+This format is specially designed for the `stream` reference parser that allows handling of numerous contigs. As a side effect, the contig name and length information will not be written to SAM header. Each read will be written as unaligned with coordinate information populated in the `OA` tag.
+
+Example:
+
+```text
+@HD	VN:1.4	SO:unsorted
+@PG	ID:01	PN:art_modern	CL:opt/build_debug/art_modern [...]
+NM_069135:art_modern:1:nompi:0	4	*	1	0	*	*	1	0	AGCCAAACGGGCAACCAGACTCCGCC[...]	BCCCCGGGGGGGFGGGGGGGFGGGGG[...]	OA:Z:NM_069135,1,+,3=1D4=1I41=1X27=1I5=1X36=1D5=,255,6;	MD:Z:3^A45T32G36^T5	NM:i:6
+[...]
+```
+
+This output writer supports other BAM formatting parameters.
+
+## Miscellaneous Parameters
+
+- `--id`: Read ID Prefix. Used to distinguish between different runs.
+- `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
+- `--ins_rate_1`, `--ins_rate_2`, `--del_rate_1`, and `--del_rate_2`: Targeted insertion and deletion rate for read 1 and 2.
+- `--max_indel`: The maximum total number of insertions and deletions per read.
+- `--max_n`: The maximum total number of ambiguous bases (N) per read.
+
+## Logging Parameters
+
+- `--reporting_interval-job_executor`: The reporting interval (in seconds) for individual `art_modern` job. Added in [1.2.1](#v-1.2.1-section).
+- `--reporting_interval-thread_pool`: The reporting interval (in seconds) for ThreadPool. Added in [1.2.1](#v-1.2.1-section).
+
+Those logs are designed for observation of long-running jobs. Increase the interval to reduce log size.
+
+(am-environment-variables-section)=
+## Environment Variables
+
+- `ART_NO_LOG_DIR`: If set (to any value), disables creation of a log directory. Logging to files is skipped, and a warning is printed. Added in [1.1.4](#v-1.1.4-section).
+  - **NOTE** If you're using `art_modern` with MPI, this discards all logs generated from rank 1, 2, 3....
+- `ART_LOG_DIR`: If set, specifies the directory where log files will be written. If not set, defaults to `log.d` and a warning is printed. Ignored if `ART_NO_LOG_DIR` is set. Added in [1.1.4](#v-1.1.4-section).
+  - **NOTE** If you're running 2 `art_modern` processes simultaneously, please make sure that they are using different log directories.

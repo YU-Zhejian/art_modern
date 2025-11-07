@@ -17,7 +17,15 @@ PYTHON ?= python3
 # MPI run command. Used in MPI-related tests only
 # NOTE: Setting this target does NOT enable MPI build!
 # Use release-mpi or debug-mpi targets to build with MPI support.
-MPIRUN ?= mpirun
+MPIEXEC ?= mpiexec
+
+MPIEXEC_NJOBS ?= 4
+
+# Output directory for build artifacts
+OPT_DIR ?= $(CURDIR)/opt
+
+# System architecture
+ARCH ?= $(shell uname -m)
 
 # Package version, derived from the latest git tag if not set
 export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
@@ -37,99 +45,104 @@ build: debug
 .PHONY: debug
 # Generates debug build with tests enabled
 debug:
-	mkdir -p opt/build_debug
-	env -C opt/build_debug cmake \
+	mkdir -p $(OPT_DIR)/build_debug
+	env -C $(OPT_DIR)/build_debug cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_debug_install/ \
+		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_debug_install/ \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_debug -j$(JOBS)
-	cmake --install opt/build_debug
-	env -C opt/build_debug ctest --output-on-failure
-	opt/build_debug_install/bin/art_modern --help
-	opt/build_debug_install/bin/art_modern --version
+	cmake --build $(OPT_DIR)/build_debug -j$(JOBS)
+	cmake --install $(OPT_DIR)/build_debug
+	env -C $(OPT_DIR)/build_debug ctest --output-on-failure
+	$(OPT_DIR)/build_debug_install/bin/art_modern --help
+	$(OPT_DIR)/build_debug_install/bin/art_modern --version
 
 .PHONY: debug-mpi
 # debug with MPI
 debug-mpi:
-	mkdir -p opt/build_debug-mpi
-	env -C opt/build_debug-mpi cmake \
+	mkdir -p $(OPT_DIR)/build_debug-mpi
+	env -C $(OPT_DIR)/build_debug-mpi cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
 		-DCMAKE_BUILD_TYPE=Debug \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_debug_install-mpi/ \
+		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_debug_install-mpi/ \
 		-DWITH_MPI=ON \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_debug-mpi -j$(JOBS)
-	cmake --install opt/build_debug-mpi
-	env -C opt/build_debug-mpi ctest --output-on-failure
-	$(MPIRUN) -np 4 opt/build_debug_install-mpi/bin/art_modern-mpi --help
-	$(MPIRUN) -np 4 opt/build_debug_install-mpi/bin/art_modern-mpi --version
+	cmake --build $(OPT_DIR)/build_debug-mpi -j$(JOBS)
+	cmake --install $(OPT_DIR)/build_debug-mpi
+	env -C $(OPT_DIR)/build_debug-mpi ctest --output-on-failure
+	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --help
+	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: release
 # Generates release build with native optimizations
 release:
-	mkdir -p opt/build_release
-	env -C opt/build_release cmake \
+	mkdir -p $(OPT_DIR)/build_release
+	env -C $(OPT_DIR)/build_release cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_release_install/ \
+		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_release_install/ \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_release -j$(JOBS)
-	cmake --install opt/build_release
-	opt/build_release_install/bin/art_modern --help
-	opt/build_release_install/bin/art_modern --version
+	cmake --build $(OPT_DIR)/build_release -j$(JOBS)
+	cmake --install $(OPT_DIR)/build_release
+	$(OPT_DIR)/build_release_install/bin/art_modern --help
+	$(OPT_DIR)/build_release_install/bin/art_modern --version
 
 .PHONY: release-mpi
 # release with MPI
 release-mpi:
-	mkdir -p opt/build_release-mpi
-	env -C opt/build_release-mpi cmake \
+	mkdir -p $(OPT_DIR)/build_release-mpi
+	env -C $(OPT_DIR)/build_release-mpi cmake \
 		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCMAKE_BUILD_TYPE=Release \
+		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_release_install-mpi/ \
+		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_release_install-mpi/ \
 		-DWITH_MPI=ON \
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_release-mpi -j$(JOBS)
-	cmake --install opt/build_release-mpi
-	$(MPIRUN) -np 4 opt/build_release_install-mpi/bin/art_modern-mpi --help
-	$(MPIRUN) -np 4 opt/build_release_install-mpi/bin/art_modern-mpi --version
+	cmake --build $(OPT_DIR)/build_release-mpi -j$(JOBS)
+	cmake --install $(OPT_DIR)/build_release-mpi
+	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --help
+	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: rel_with_dbg_alpine
 # Generates RelWithDebInfo build without native optimizations
 # for fully-static-linked build on Alpine Linux
 rel_with_dbg_alpine:
-	mkdir -p opt/build_rel_with_dbg_alpine
-	env -C opt/build_rel_with_dbg_alpine cmake \
+	mkdir -p $(OPT_DIR)/build_rel_with_dbg_alpine
+	env -C $(OPT_DIR)/build_rel_with_dbg_alpine cmake \
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCEU_CM_SHOULD_ENABLE_TEST=OFF \
 		-DCEU_CM_SHOULD_USE_NATIVE=OFF \
+		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DBUILD_SHARED_LIBS=OFF \
 		-DUSE_MALLOC=NOP \
 		-DCMAKE_INSTALL_LIBDIR=bin \
 		-DCMAKE_INSTALL_INCLUDEDIR=bin \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/build_rel_with_dbg_alpine_install/ \
+		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_rel_with_dbg_alpine_install/ \
         $(CMAKE_FLAGS) \
 		$(CURDIR)
-	cmake --build opt/build_rel_with_dbg_alpine -j$(JOBS)
-	cmake --install opt/build_rel_with_dbg_alpine
-	env -C opt/build_rel_with_dbg_alpine_install/bin \
-		tar cvzf $(CURDIR)/opt/build_rel_with_dbg_alpine-x86_64.tar.gz \
+	cmake --build $(OPT_DIR)/build_rel_with_dbg_alpine -j$(JOBS)
+	cmake --install $(OPT_DIR)/build_rel_with_dbg_alpine
+	env -C $(OPT_DIR)/build_rel_with_dbg_alpine_install/bin \
+		tar cvzf $(OPT_DIR)/build_rel_with_dbg_alpine-$(ARCH).tar.gz \
 		art_modern \
 		art_profile_builder
 
@@ -154,31 +167,32 @@ touch:
 .PHONY: testsmall
 # Run small tests with debug build
 # Env. Flags:
+# 
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
-	env ART=opt/build_debug_install/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh
+	env ART=$(OPT_DIR)/build_debug_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-mpi
 # testsmall with MPI
 testsmall-mpi: debug-mpi raw_data
-	env ART=opt/build_debug_install-mpi/bin/art_modern-mpi MPIRUN=$(MPIRUN) $(BASH) sh.d/test-small.sh
+	env ART=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
 
 .PHONY: test-art_profile_builder
 # Run tests for art_profile_builder with release builds
 test-art_profile_builder: raw_data release
-	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
-	env ART_MODERN_PATH=opt/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
+	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
+	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
 
 .PHONY: testsmall-release
 # Run small tests with release build
 testsmall-release: release raw_data
-	env ART=opt/build_release_install/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh
+	env ART=$(OPT_DIR)/build_release_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release-mpi
 # testsmall-release with MPI
 testsmall-release-mpi: release-mpi raw_data
-	env ART=opt/build_release_install-mpi/bin/art_modern-mpi MPIRUN=$(MPIRUN) $(BASH) sh.d/test-small.sh
+	env ART=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
@@ -195,64 +209,17 @@ raw_data:
 .PHONY: clean
 # Clean all build artifacts
 clean:
-	rm -fr opt tmp build
-
-.PHONY: testbuild-child
-testbuild-child:
-	rm -fr opt/testbuild
-	mkdir -p opt/testbuild
-	# Ninja is required here for acceleration
-	env -C opt/testbuild cmake -G Ninja \
-		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		$(CMAKE_FLAGS) \
-		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
-		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/testbuild_install/ \
-		$(CURDIR)
-	cmake --build opt/testbuild -j$(JOBS)
-	cmake --install opt/testbuild
-	env -C opt/testbuild ctest --output-on-failure
-	opt/testbuild_install/bin/art_modern --help
-	opt/testbuild_install/bin/art_modern --version
-	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=opt/testbuild_install/bin/art_modern MPIRUN="" $(BASH) sh.d/test-small.sh; \
-	fi
-
-.PHONY: testbuild-child-mpi
-testbuild-child-mpi:
-	rm -fr opt/testbuild-mpi
-	mkdir -p opt/testbuild-mpi
-	# Ninja is required here for acceleration
-	env -C opt/testbuild-mpi cmake -G Ninja \
-		-Wdev -Wdeprecated --warn-uninitialized \
-		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
-		-DWITH_MPI=ON \
-		$(CMAKE_FLAGS) \
-		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
-		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
-		-DCMAKE_INSTALL_PREFIX=$(CURDIR)/opt/testbuild_install-mpi/ \
-		$(CURDIR)
-	cmake --build opt/testbuild-mpi -j$(JOBS)
-	cmake --install opt/testbuild-mpi
-	env -C opt/testbuild-mpi ctest --output-on-failure
-	$(MPIRUN) -np 4 opt/testbuild_install-mpi/bin/art_modern-mpi --help
-	$(MPIRUN) -np 4 opt/testbuild_install-mpi/bin/art_modern-mpi --version
-	if [ ! $(BUILD_ONLY_TEST) -eq "1" ] ; then \
-		env ART=opt/testbuild_install-mpi/bin/art_modern-mpi MPIRUN="$(MPIRUN)" $(BASH) sh.d/test-small.sh; \
-	fi
+	rm -fr $(OPT_DIR) tmp build
 
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	mkdir -p opt/testbuild
-	env MPIRUN="" $(BASH) sh.d/test-build.sh
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
-	mkdir -p opt/testbuild
-	env MPIRUN="$(MPIRUN)" $(BASH) sh.d/test-build.sh
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation
@@ -265,6 +232,11 @@ doc:
 cleandoc:
 	$(MAKE) -C docs/sphinx.d clean
 	$(MAKE) -C docs/sphinx.d
+
+.PHONY: serve-doc
+# Serve built documentation at <http://localhost:8000>
+serve-doc:
+	$(PYTHON) -m http.server -d docs/sphinx.d/_build/html
 
 .PHONY: packing
 # Create binary packages

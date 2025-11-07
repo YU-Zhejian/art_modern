@@ -18,7 +18,7 @@ env -C "${PROFILE_DIR}" PATH="${NVIDIA_HPC_SDK_PATH}/compilers/bin/:${PATH:-}" c
     -DCEU_CM_SHOULD_USE_NATIVE=ON \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
-    -DUSE_RANDOM_GENERATOR=GSL \
+    -DUSE_RANDOM_GENERATOR=PCG \
     -G Ninja "$(pwd)"
 
 env -C "${PROFILE_DIR}" PATH="${NVIDIA_HPC_SDK_PATH}/compilers/bin/:${PATH:-}" ninja -j120

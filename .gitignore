@@ -123,6 +123,8 @@ CMakeLists.txt.user
 *.tar.[gx]z
 *.tar.bz2
 *.t[gxb]z
+*.[gxb]z
+*.bz2
 
 /.vscode/*
 !/.vscode/ltex.dictionary.en-US.txt
@@ -132,3 +134,10 @@ perf.data*
 *.f[aq]
 *.pm
 *.dump
+*.log.d
+*.heap
+/intel/
+/.intel/
+*.f[axq]i
+*.gzi
+/bin/

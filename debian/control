@@ -15,16 +15,18 @@ Build-Depends: debhelper-compat (= 13),
                libconcurrentqueue-dev,
                libabsl-dev,
                lowdown,
-Standards-Version: 4.6.2
+               libopenmpi-dev,
+Standards-Version: 4.7.0
 Homepage: https://github.com/YU-Zhejian/art_modern
 
 Package: art-modern
-Architecture: any
-Multi-Arch: foreign
+Architecture: amd64 arm64
+Multi-Arch: same
 Depends:
  ${shlibs:Depends},
  ${misc:Depends},
 Enhances: art-nextgen-simulation-tools
+Conflicts: art-modern-openmpi
 Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Reads
  High-performance simulation of realistic next-generation sequencing (NGS)
  data is a must for various algorithm development and benchmarking tasks.
@@ -41,3 +43,32 @@ Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Read
  clusters (HPCs) with only one node. With such simulators, the
  testing and benchmarking of NGS-related bioinformatics algorithms can be
  largely accelerated.
+
+Package: art-modern-openmpi
+Architecture: amd64 arm64
+Multi-Arch: same
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends},
+ openmpi-common,
+ openmpi-bin,
+Enhances: art-nextgen-simulation-tools
+Conflicts: art-modern
+Description: Modernized ART Simulator of Diverse Next-Generation Sequencing Reads with MPI Support
+ High-performance simulation of realistic next-generation sequencing (NGS)
+ data is a must for various algorithm development and benchmarking tasks.
+ However, most existing simulators are either slow or generate data that
+ does not reflect the real-world error profile of simulators. Here
+ introduces `art_modern`, a modern re-implementation of the popular ART
+ simulator with enhanced performance and functionality. It can be used for
+ anyone who wants to simulate sequencing data for their own research, like
+ benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the
+ RNA-Seq pipeline built by your lab performs well or perform pressure
+ testing of pipelines on a cluster. This simulator would be best suited
+ for GNU/Linux-based High-End Desktops (HEDTs) with multiple cores and a
+ fast SSD. However, it can also work on laptops or high-performance
+ clusters (HPCs) with only one node. With such simulators, the
+ testing and benchmarking of NGS-related bioinformatics algorithms can be
+ largely accelerated. This package includes the MPI-enabled version of
+ art-modern, which can leverage multiple nodes in a cluster to further
+ speed up the simulation process.

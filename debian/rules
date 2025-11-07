@@ -1,15 +1,35 @@
 #!/usr/bin/make -f
-export DEB_BUILD_MAINT_OPTIONS = hardening=+all
-include /usr/share/dpkg/default.mk
 
-ifeq ($(wildcard /usr/include/concurrentqueue/moodycamel/concurrentqueue.h),/usr/include/concurrentqueue/moodycamel/concurrentqueue.h)
+export DH_VERBOSE=1
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+include /usr/share/dpkg/default.mk
+include /usr/share/mpi-default-dev/debian_defaults
+
+# Detect Moodycamel concurrentqueue path
+# The path may differ in Ubuntu and Debian, so probing both.
+ifneq (,$(wildcard /usr/include/concurrentqueue/moodycamel/concurrentqueue.h))
     USE_CONCURRENT_QUEUE_PATH := /usr/include/concurrentqueue/moodycamel/
-else ifeq ($(wildcard /usr/include/concurrentqueue/concurrentqueue.h),/usr/include/concurrentqueue/concurrentqueue.h)
+else ifneq (,$(wildcard /usr/include/concurrentqueue/concurrentqueue.h))
     USE_CONCURRENT_QUEUE_PATH := /usr/include/concurrentqueue/
 else
     $(error concurrentqueue.h not found in expected locations.)
 endif
 $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
+
+CONFIGURE_CMAKE_PARAMS = \
+	-Wdev -Wdeprecated --warn-uninitialized \
+    -DCEU_CM_SHOULD_USE_NATIVE=OFF \
+    -DCEU_CM_SHOULD_ENABLE_TEST=ON \
+    -DUSE_THREAD_PARALLEL=ASIO \
+    -DUSE_MALLOC=NOP \
+    -DUSE_RANDOM_GENERATOR=STL \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DUSE_HTSLIB=hts \
+    -DUSE_LIBFMT=fmt \
+    -DUSE_ABSL=SYSTEM \
+    -DREPRODUCIBLE_BUILDS=ON \
+    -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)"
 
 %.1: %.1.md
 	# TODO: Supress: art-modern: wrong-manual-section 1 != 7 [usr/share/man/man1/art_modern.1.gz:2]
@@ -19,25 +39,36 @@ $(info Using moodycamel path: $(USE_CONCURRENT_QUEUE_PATH))
 %:
 	dh $@ --buildsystem=cmake
 
-override_dh_auto_configure:
-	dh_auto_configure -- \
-    -Wdev -Wdeprecated --warn-uninitialized \
-    -DCEU_CM_SHOULD_USE_NATIVE=OFF \
-    -DCEU_CM_SHOULD_ENABLE_TEST=ON \
-    -DUSE_THREAD_PARALLEL=ASIO \
-    -DUSE_MALLOC=NOP \
-    -DUSE_RANDOM_GENERATOR=STL \
-    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-    -DCMAKE_INSTALL_LIBDIR=lib/art-modern \
-    -DCMAKE_INSTALL_INCLUDEDIR=include/art-modern/include \
-    -DUSE_HTSLIB=hts \
-    -DUSE_LIBFMT=fmt \
-    -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)" \
-    -DUSE_ABSL=SYSTEM \
-    -DREPRODUCIBLE_BUILDS=ON
-
 override_dh_makeshlibs:
 # We do not install libraries in standard locations, so we skip this step
 
-override_dh_installdocs: debian/art_modern.1 debian/art_profile_builder.1
+override_dh_auto_configure:
+	dh_auto_configure --builddirectory=build-nompi -- \
+    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=OFF \
+    -DCMAKE_INSTALL_LIBDIR=lib/art-modern
+	dh_auto_configure --builddirectory=build-openmpi -- \
+    $(CONFIGURE_CMAKE_PARAMS) -DWITH_MPI=ON \
+    -DCMAKE_INSTALL_LIBDIR=lib/art-modern-mpi
+
+override_dh_auto_build:
+	dh_auto_build --builddirectory=build-nompi
+	dh_auto_build --builddirectory=build-openmpi
+
+override_dh_auto_install:
+	dh_auto_install --builddirectory=build-nompi
+	dh_auto_install --builddirectory=build-openmpi
+
+override_dh_auto_clean:
+	dh_clean
+	rm -rf build-*
+
+override_dh_installdocs: \
+	debian/art_modern.1 \
+	debian/art_profile_builder.1 \
+	debian/art_modern-mpi.1 \
+	debian/art_profile_builder-mpi.1
 	dh_installdocs
+
+override_dh_auto_test:
+	build-nompi/art_modern --help
+	mpiexec -n 1 build-openmpi/art_modern-mpi --version

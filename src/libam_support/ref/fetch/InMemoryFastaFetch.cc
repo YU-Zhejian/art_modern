@@ -52,7 +52,7 @@ namespace {
                 auto [id, sequence] = fai.next();
                 seq_names.emplace_back(std::move(id));
                 seqs.emplace_back(std::move(sequence));
-            } catch (EOFException&) {
+            } catch (FastaEOFException&) {
                 break;
             } catch (MalformedFastaException& e) {
                 BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
@@ -103,6 +103,13 @@ InMemoryFastaFetch::InMemoryFastaFetch(
     : InMemoryFastaFetch({ other.seq_names_.begin() + from, other.seq_names_.begin() + to },
           { other.seqs_.begin() + from, other.seqs_.begin() + to })
 {
+}
+
+void InMemoryFastaFetch::clear()
+{
+    seqs_.clear();
+    seqs_.shrink_to_fit();
+    BaseFastaFetch::clear();
 }
 
 } // namespace labw::art_modern

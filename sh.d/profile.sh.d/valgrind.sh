@@ -6,32 +6,39 @@ mkdir -p "${PROFILE_DIR}"
 env -C "${PROFILE_DIR}" cmake \
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
-    -DCEU_CM_SHOULD_USE_NATIVE=OFF \
-    -DCMAKE_BUILD_TYPE=Debug \
+    -Wdev -Wdeprecated --warn-uninitialized \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+    -DCMAKE_VERBOSE_MAKEFILE=ON \
+    -DCEU_CM_SHOULD_USE_NATIVE=ON \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
-    -DUSE_RANDOM_GENERATOR=STL \
+    -DUSE_RANDOM_GENERATOR=PCG \
+    -DUSE_MALLOC=JEMALLOC \
     -G Ninja "$(pwd)"
 
 env -C "${PROFILE_DIR}" ninja -j120
 
-"${PROFILE_DIR}"/art_modern --version
-ldd "${PROFILE_DIR}"/art_modern
+VALGRIND_LOG="${PROFILE_DIR}/valgrind.log"
 
 valgrind \
-    --tool=callgrind \
-    --dump-instr=yes \
-    --simulate-cache=yes \
-    --collect-jumps=yes \
-    --callgrind-out-file="${PROFILE_DIR}"/callgrind.out \
+    --tool=memcheck \
+    --leak-check=full \
+    --show-leak-kinds=all \
+    --track-origins=yes \
+    --errors-for-leak-kinds=definite,possible \
+    --num-callers=40 \
+    --malloc-fill=0xAA \
+    --free-fill=0xDA \
+    --gen-suppressions=all \
+    --log-file="${VALGRIND_LOG}" \
     "${PROFILE_DIR}"/art_modern \
     --builtin_qual_file HiSeq2500_125bp \
-    --i-file data/raw_data/ce11_chr1.fa \
+    --i-file data/raw_data/lambda_phage.fa \
     --read_len 125 \
     --mode wgs \
     --lc pe \
     --i-parser memory \
     --i-fcov 4 \
-    --parallel 0 \
+    --parallel 2 \
     --ins_rate_1 0.1 \
     --del_rate_1 0.1 \
     --pe_frag_dist_std_dev 20 \

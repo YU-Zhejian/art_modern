@@ -88,8 +88,7 @@ void init_file_logger(const bool auto_flush)
         const auto sink = logging::add_file_log(logging::keywords::file_name = file_name,
             logging::keywords::format
             = "[%TimeStamp%] [T=%ThreadID%@MPI=%MPIRank%:%MPIHostName%] %Severity%: %Message%",
-            logging::keywords::auto_flush = auto_flush
-                    );
+            logging::keywords::auto_flush = auto_flush);
         core->add_sink(sink);
         BOOST_LOG_TRIVIAL(info) << "Log file sink to '" << file_name << "' added.";
     }

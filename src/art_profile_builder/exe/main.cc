@@ -6,13 +6,18 @@
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/utils/si_utils.hh"
 
+#include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 
 #ifdef WITH_BOOST_TIMER
 #include <boost/timer/timer.hpp>
 #endif
 
+#include <htslib/hts.h>
+
+#include <chrono>
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
@@ -24,6 +29,7 @@ using namespace labw::art_modern;
 
 int main(int argc, char** argv)
 {
+    const auto wall_time_start = std::chrono::high_resolution_clock ::now();
     init_mpi(&argc, &argv);
 
     if (!is_on_mpi_main_process_or_nompi()) {
@@ -46,15 +52,15 @@ int main(int argc, char** argv)
     for (std::size_t thread_id = 0; thread_id < config.num_threads; ++thread_id) {
         auto this_ied1 = std::make_shared<IntermediateEmpDist>(config.read_length);
         ieds_r1.emplace_back(this_ied1);
-
         auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length);
         ieds_r2.emplace_back(this_ied2);
-
         threads.emplace_back(view_sam, this_ied1, this_ied2, thread_id, config);
     }
     for (auto& t : threads) {
         t.join();
     }
+    std::size_t total_reads = 0;
+    std::size_t total_bases = 0;
 
     IntermediateEmpDist ied1(config.read_length);
     for (const auto& other_ied : ieds_r1) {
@@ -63,6 +69,8 @@ int main(int argc, char** argv)
     ied1.accumulate();
     std::ofstream out1_s { config.output_1_file_path, std::ios::out };
     ied1.write(out1_s, config.is_ob);
+    total_reads += ied1.get_total_reads();
+    total_bases += ied1.get_total_bases();
     out1_s.close();
 
     if (config.is_pe) {
@@ -73,15 +81,25 @@ int main(int argc, char** argv)
         ied2.accumulate();
         std::ofstream out2_s { config.output_2_file_path, std::ios::out };
         ied2.write(out2_s, config.is_ob);
+        total_reads += ied2.get_total_reads();
+        total_bases += ied2.get_total_bases();
         out2_s.close();
     }
-
-    BOOST_LOG_TRIVIAL(info) << "Done.";
+    const auto wall_time_end = std::chrono::high_resolution_clock ::now();
+    const auto wall_time_diff = wall_time_end - wall_time_start;
+    const double wall_time_sec = std::chrono::duration_cast<std::chrono::duration<double>>(wall_time_diff).count();
+    BOOST_LOG_TRIVIAL(info) << "Total reads processed: " << to_si(static_cast<double>(total_reads), 2, 1000)
+                            << " speed: " << to_si(static_cast<double>(total_reads) / wall_time_sec, 2, 1000)
+                            << " reads/s";
+    BOOST_LOG_TRIVIAL(info) << "Total bases processed: " << to_si(static_cast<double>(total_bases), 2, 1000)
+                            << " speed: " << to_si(static_cast<double>(total_bases) / wall_time_sec, 2, 1000)
+                            << " bases/s";
 
 #ifdef WITH_BOOST_TIMER
     timer.stop();
     BOOST_LOG_TRIVIAL(info) << "Time elapsed: " << timer.format();
 #endif
+    BOOST_LOG_TRIVIAL(info) << "Done.";
     exit_mpi();
     return EXIT_SUCCESS;
 }

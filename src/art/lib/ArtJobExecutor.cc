@@ -33,12 +33,10 @@
 
 #include <htslib/hts.h>
 
-#include <array>
 #include <atomic>
 #include <chrono>
 #include <cmath>
 #include <cstdlib>
-#include <limits>
 #include <memory>
 #include <string>
 #include <thread>
@@ -49,8 +47,9 @@ namespace {
 
     class AJEReporter {
     public:
-        explicit AJEReporter(ArtJobExecutor& aje)
+        explicit AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
             : aje_(aje)
+            , reporting_interval_seconds_(reporting_interval_seconds)
         {
         }
 
@@ -64,16 +63,17 @@ namespace {
     private:
         void job_() const
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
             while (!should_stop_) {
                 BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
             }
         }
 
         ArtJobExecutor& aje_;
         std::atomic<bool> should_stop_ { false };
         std::thread thread_;
+        std::size_t reporting_interval_seconds_;
     };
 
 } // namespace
@@ -150,8 +150,9 @@ bool ArtJobExecutor::generate_se(ArtContig& art_contig, const bool is_plus_stran
     return true;
 }
 
-ArtJobExecutor::ArtJobExecutor(
-    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
+ArtJobExecutor::~ArtJobExecutor() = default;
+ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
+    const std::shared_ptr<OutputDispatcher>& output_dispatcher, const bool clear_after_use)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_(mpi_rank_s())
@@ -160,6 +161,7 @@ ArtJobExecutor::ArtJobExecutor(
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(output_dispatcher->require_alignment())
     , token_ring_(output_dispatcher->get_producer_tokens())
+    , clear_after_use_(clear_after_use)
 {
 }
 
@@ -174,7 +176,7 @@ void ArtJobExecutor::operator()()
         return;
     }
 
-    AJEReporter reporter(*this);
+    AJEReporter reporter(*this, art_params_.art_job_executor_reporting_interval_seconds);
     reporter.start();
     hts_pos_t accumulated_contig_len = 0;
 
@@ -228,8 +230,10 @@ void ArtJobExecutor::operator()()
                 / static_cast<double>(accumulated_contig_len)
                                 << ") generated.";
     }
-
     reporter.stop();
+    if (clear_after_use_) {
+        job_.fasta_fetch->clear();
+    }
     is_running_ = false;
 }
 ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
@@ -241,6 +245,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(other.require_alignment_)
     , token_ring_(std::move(other.token_ring_))
+    , clear_after_use_(other.clear_after_use_)
 {
 }
 std::string ArtJobExecutor::thread_info() const

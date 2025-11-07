@@ -40,7 +40,7 @@ EOF
 # Inflation Detection
 echo "Detecting external C/C++ code ..."
 
-for dir in deps/* explore/*; do
+for dir in deps/*; do
     if [ ! -d "${dir}" ]; then
         continue
     fi
@@ -48,7 +48,7 @@ for dir in deps/* explore/*; do
     "${SCC}" --include-ext c,cc,h,hh,cpp,hpp,cxx,hxx --format json ${SOURCES} >deps_code_count.json
     COUNTS=$(jq 'reduce .[] as $item (0; . + $item.Count)' deps_code_count.json)
     LINES=$(jq 'reduce .[] as $item (0; . + $item.Lines)' deps_code_count.json)
-    printf "Directory: %-48s has %-10d files with %-6d lines of C/C++ code\n" "${dir}" "${COUNTS}" "${LINES}"
+    printf "Directory: %-32s has %-10d files with %-6d lines of C/C++ code\n" "${dir}" "${COUNTS}" "${LINES}"
     rm -f deps_code_count.json
 done
 builtin exit 0

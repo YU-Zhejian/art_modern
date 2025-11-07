@@ -22,6 +22,7 @@
 #include <htslib/hts.h>
 
 #include <array>
+#include <cstdlib>
 #include <string>
 #include <vector>
 
@@ -43,6 +44,8 @@ struct ArtParams {
     const std::array<double, HIGHEST_QUAL> err_prob;
     const hts_pos_t pe_dist_mean_minus_2_std;
     const Empdist qdist;
+    const std::size_t job_pool_reporting_interval_seconds;
+    const std::size_t art_job_executor_reporting_interval_seconds;
 };
 
 } // namespace labw::art_modern

@@ -28,15 +28,12 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #elif defined(USE_ONEMKL_RANDOM)
 #include <mkl.h> // NOLINT
-#elif defined(USE_GSL_RANDOM)
-#include <gsl/gsl_rng.h>
 #elif defined(USE_PCG_RANDOM)
 #include <pcg_random.hpp>
 
 #include <random>
 #else
-#error                                                                                                                 \
-    "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM or USE_GSL_RANDOM for random generators!"
+#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM for random generators!"
 #endif
 
 #include <cstddef>
@@ -53,22 +50,27 @@ public:
     ~Rprob();
 
     /**
-     * Generate uniform [0, 1)
-     */
-    double r_prob();
-    /**
      * Populate tmp_probs_ with n random values using r_prob().
+     *
+     * n must be less than or equal to read_length_.
      */
     void r_probs(std::size_t n);
     /**
      * Populate tmp_probs_ with read_len random values using r_prob().
      */
     void r_probs();
+    /**
+     * Generate an insertion length based on Gaussian distribution.
+     * @return
+     */
     int insertion_length();
     /**
      * Generate one of A, C, G, T.
      */
     char rand_base();
+    /**
+     * Refill tmp_qual_dists_.
+     */
     void rand_quality_dist();
     int rand_quality_less_than_10();
     int rand_pos_on_read();
@@ -80,6 +82,26 @@ public:
 private:
     static std::uint64_t seed();
     void public_init_();
+
+#if defined(USE_ONEMKL_RANDOM)
+    std::vector<int> cached_rand_pos_on_read_;
+    std::size_t cached_rand_pos_on_read_index_ = 0;
+
+    std::vector<int> cached_rand_pos_on_read_not_head_and_tail_;
+    std::size_t cached_rand_pos_on_read_not_head_and_tail_index_ = 0;
+
+    std::vector<double> cached_insertion_lengths_;
+    std::size_t cached_insertion_lengths_index_ = 0;
+
+    std::vector<int> cached_rand_base_indices_;
+    std::size_t cached_rand_base_indices_index_ = 0;
+
+    std::vector<int> cached_rand_quality_less_than_10_;
+    std::size_t cached_rand_quality_less_than_10_index_ = 0;
+
+    constexpr static std::size_t CACHE_SIZE_ = 4096;
+#endif
+
 #if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
@@ -106,10 +128,6 @@ private:
     boost::random::uniform_int_distribution<int> pos_on_read_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
-    double pe_frag_dist_mean_;
-    double pe_frag_dist_std_dev_;
-#elif defined(USE_GSL_RANDOM)
-    gsl_rng* r;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
 #endif

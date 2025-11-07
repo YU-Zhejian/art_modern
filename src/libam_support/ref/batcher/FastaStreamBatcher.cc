@@ -40,7 +40,7 @@ FastaStreamBatcher::FastaStreamBatcher(
     for (std::size_t i = 0; i < sls_.skip_first(); ++i) {
         try {
             fasta_iterator_.next();
-        } catch (EOFException&) {
+        } catch (FastaEOFException&) {
             break;
         } catch (MalformedFastaException& e) {
             BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
@@ -69,7 +69,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
             fetch_e = id;
             seq_names.emplace_back(std::move(id));
             seqs.emplace_back(std::move(sequence));
-        } catch (EOFException&) {
+        } catch (FastaEOFException&) {
             break;
         } catch (MalformedFastaException& e) {
             BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";
@@ -79,7 +79,7 @@ InMemoryFastaFetch FastaStreamBatcher::fetch()
         for (std::size_t i = 0; i < sls_.skip_others(); ++i) {
             try {
                 fasta_iterator_.next();
-            } catch (EOFException&) {
+            } catch (FastaEOFException&) {
                 break;
             } catch (MalformedFastaException& e) {
                 BOOST_LOG_TRIVIAL(fatal) << "Malformed FASTA file with error '" << e.what() << "'.";

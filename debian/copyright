@@ -13,6 +13,12 @@ Files-Excluded:
  deps/thread-pool/*
  deps/pcg-cpp-0.98/*
  deps/slim_abseil/*
+ sh.d/test-am-large-contigs.d/*
+ sh.d/test-am-many-contigs.d/*
+ sh.d/test-am-ultra-deep.d/*
+ sh.d/bench-art_profile_builder-se.sh
+ sh.d/test-am-large-contigs.sh
+ sh.d/test-am-many-contigs.sh
 Comment: Source files that are not used in this build are excluded.
 
 Files: *

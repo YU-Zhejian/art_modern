@@ -123,6 +123,7 @@ hts_pos_t ArtContig::generate_fragment_length() const
     } else {
         fragment_len = 0;
         while (fragment_len < art_params_.read_len || fragment_len > seq_size) {
+            // TODO: Allow this to fail after a number of tries
             fragment_len = rprob_.insertion_length();
         }
     }
