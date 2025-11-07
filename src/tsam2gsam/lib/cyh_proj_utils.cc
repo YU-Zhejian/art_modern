@@ -1,11 +1,9 @@
-#include "cyh_proj_utils.hh"
+#include "tsam2gsam/lib/cyh_proj_utils.hh"
 
 #include "libam_support/Dtypes.h"
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>
-
-#include <ewah/ewah.h>
 
 #include <cstddef>
 #include <cstdint>
@@ -78,7 +76,7 @@ std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
         this_cigar_op = bam_cigar_op(g_cigar_cp[cigar_id]);
         if (this_cigar_length == 0) {
             continue; // Skip CIGAR of zero length.
-        } else if (this_cigar_op == prev_cigar_op) {
+        } if (this_cigar_op == prev_cigar_op) {
             prev_cigar_length += this_cigar_length;
         } else {
             g_cigar_merged.emplace_back(bam_cigar_gen(prev_cigar_length, prev_cigar_op));
@@ -170,7 +168,7 @@ const char* get_sam_mode(const char* file_name, const bool write)
 
 void print_version(const std::string& prog_name)
 {
-    std::cout << prog_name << " ver. " << VERSION << " with HTSLib " << hts_version()
+    std::cout << prog_name << " ver. " << TSAM2GSAM_VERSION << " with HTSLib " << hts_version()
               << ", EWAHBoolArray, cgranges, compiled at " << __DATE__ << ", " << __TIME__ << "." << std::endl;
 }
 } // namespace labw::art_modern

@@ -15,8 +15,9 @@
 #include "tsam2gsam/lib/cyh_proj_utils.hh"
 #include "tsam2gsam/lib/gffread_bed_utils.hh"
 
-#include <libam_support/Constants.hh>
-#include <libam_support/utils/seq_utils.hh>
+#include "libam_support/Constants.hh"
+#include "libam_support/utils/seq_utils.hh"
+#include "libam_support/utils/dump_utils.hh"
 
 #include <htslib/faidx.h>
 #include <htslib/hts.h>
@@ -281,13 +282,14 @@ void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char const* argv[]
     args_ss << argv[argc - 1];
     require_zero(sam_hdr_change_HD(ghdr, "SO", "unknown"));
     require_zero(sam_hdr_add_line(
-        ghdr, "PG", "ID", "tsam2gsam", "PN", "tsam2gsam", "VN", VERSION, "CL", args_ss.str().c_str(), nullptr));
+            ghdr, "PG", "ID", "tsam2gsam", "PN", "tsam2gsam", "VN", TSAM2GSAM_VERSION, "CL", args_ss.str().c_str(), nullptr));
 }
 
 }; // namespace
 int main(int argc, char const* argv[])
 {
     print_version("tsam2gsam");
+    handle_dumps();
     std::cout << "SYNOPSIS: " << argv[0]
               << " taln.bam galn.bam reference_annotation.gtf.gffread.bed reference_assembly.fa" << std::endl;
     if (argc != 5) {
@@ -331,6 +333,11 @@ int main(int argc, char const* argv[])
             require_not_negative(sam_write1(gsam, ghdr, t_aln)); // Write unmapped reads as-is.
         }
         auto transcript_name = std::string(require_not_null(sam_hdr_tid2name(thdr, t_aln->core.tid)));
+        if (transcript_id_to_transcript_map.find(transcript_name)
+            == transcript_id_to_transcript_map.end()) {
+            std::cerr << "ERROR: Transcript " << transcript_name << " not found in GTF." << std::endl;
+            return EXIT_FAILURE;
+        }
         convert_transcript_to_genome_alignment(t_aln, g_aln, transcript_id_to_transcript_map.at(transcript_name)
 #ifdef CEU_CM_IS_DEBUG
                                                                  ,

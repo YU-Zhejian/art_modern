@@ -126,7 +126,7 @@ CMakeLists.txt.user
 *.[gxb]z
 *.bz2
 
-/.vscode/*
+.vscode/*
 !/.vscode/ltex.dictionary.en-US.txt
 !/.vscode/ltex.disabledRules.en-US.txt
 perf.data*

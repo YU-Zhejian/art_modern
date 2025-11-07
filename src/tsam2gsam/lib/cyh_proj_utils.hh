@@ -15,13 +15,14 @@ namespace labw::art_modern {
 /**
  * Version of the current programs.
  */
-constexpr char VERSION[] = "2025-03-05";
+constexpr char TSAM2GSAM_VERSION[] = "2025-11-06";
 
 /**
  * Number of exons expected when initializing the list.
  */
 constexpr int NUM_EXONS_EXPECTED = 10;
 
+// GFFUtils BED are bed12 format with 12 fields.
 constexpr int NUM_GFFUTILS_BED_FIELDS = 12;
 
 /**

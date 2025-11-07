@@ -1,9 +1,9 @@
-#include "gffread_bed_utils.hh"
+#include "tsam2gsam/lib/Transcript.hh"
 
-#include "TidNotFound.hh"
-#include "cyh_proj_utils.hh"
+#include "tsam2gsam/lib/TidNotFound.hh"
+#include "tsam2gsam/lib/cyh_proj_utils.hh"
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 
 #include <htslib/sam.h>
 
@@ -13,6 +13,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+
 namespace labw::art_modern {
 Transcript Transcript::from_gffread_bed_line(const std::string& line, sam_hdr_t* thdr, sam_hdr_t* ghdr)
 {

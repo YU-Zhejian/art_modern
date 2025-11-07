@@ -1,6 +1,7 @@
-#include "gffread_bed_utils.hh"
+#include "tsam2gsam/lib/gffread_bed_utils.hh"
 
-#include "TidNotFound.hh"
+#include "tsam2gsam/lib/TidNotFound.hh"
+#include "tsam2gsam/lib/Transcript.hh"
 
 #include <htslib/sam.h>
 
