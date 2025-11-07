@@ -14,6 +14,7 @@
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
 
+#include <art_modern_config.h>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -37,12 +38,12 @@ void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::share
 
     htsThreadPool tpool = { nullptr, 0 };
     tpool.pool = CExceptionsProxy::assert_not_null(
-        hts_tpool_init(static_cast<int>(config.num_io_threads)), "HTSLib", "Failed to init HTS thread pool.");
+        hts_tpool_init(static_cast<int>(config.num_io_threads)), USED_HTSLIB_NAME, "Failed to init HTS thread pool.");
 
     auto* in = CExceptionsProxy::assert_not_null(
-        hts_open(config.input_file_path.c_str(), "r"), "HTSLib", "Failed to open HTS file.");
-    auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), "HTSLib", "Failed to read SAM header.");
-    auto* b = CExceptionsProxy::assert_not_null(bam_init1(), "HTSLib", "Failed to init BAM record.");
+        hts_open(config.input_file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");
+    auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
+    auto* b = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     am_readnum_t num_valid_reads = 0;
     am_readnum_t num_total_reads = 0;
     am_readnum_t num_parsed_reads = 0;

@@ -1,75 +1,51 @@
-/**
- * @file tsam2gsam.cc
- * @author YU Zhejian (zhejianyu@intl.zju.edu.cn)
- * @brief Convert transcriptome-aligned SAM to genome-aligned SAM
- * @version 0.1
- * @date 2024-11-09
- *
- * @copyright Copyright (c) 2024 YU Zhejian
- *
- */
+#include "tsam2gsam/exe/main_fn.hh"
 
 #include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 
 #include "tsam2gsam/lib/Transcript.hh"
 #include "tsam2gsam/lib/cyh_proj_utils.hh"
-#include "tsam2gsam/lib/gffread_bed_utils.hh"
 
+#include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
-#include "libam_support/utils/dump_utils.hh"
+
+#include <fmt/format.h>
+
+#include <boost/log/trivial.hpp>
 
 #include <htslib/faidx.h>
-#include <htslib/hts.h>
 #include <htslib/sam.h>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
-#include <iostream>
-#include <sstream>
+#ifdef CEU_CM_IS_DEBUG
+#include <ostream>
+#endif
 #include <string>
 #include <vector>
 
-using namespace labw::art_modern;
-namespace {
-
-/**
- * @brief Convert transcript-aligned read to genome-aligned read.
- *
- * @code
- *
- *          Exon 0         Exon 1                    Exon 2
- *
- *  TALN   |<====|--------|====|--------------------|=============|
- *  GALN       |=|--------|====|--------------------|==>|
- *
- * @endcode
- *
- * @param t_aln Input transcript-aligned read.
- * @param g_aln Output genome-aligned read.
- * @param transcript The transcript.
- * @return true if there's no error; false otherwise
- */
+namespace labw::art_modern {
 #ifdef CEU_CM_IS_DEBUG
+
 void convert_transcript_to_genome_alignment(
     bam1_t* t_aln, bam1_t* g_aln, const Transcript& transcript, std::ostream& cigar_trace)
 #else
 void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const Transcript& transcript)
 #endif
 {
+    std::string const qname = bam_get_qname(t_aln);
     // Generate OA tag
-    std::ostringstream oa_ss;
-    oa_ss << /** Contig **/ transcript.transcript_id << ',' << /** Pos **/ t_aln->core.pos << ','
-          << /** Strand **/ ((t_aln->core.flag & BAM_FREVERSE) != 0 ? '-' : '+') << ','
-          << /** CIGAR **/ cigar_arr_to_str(bam_get_cigar(t_aln), t_aln->core.n_cigar) << ','
-          << /** MAPQ **/ std::to_string(t_aln->core.qual) << ',' << /** NM **/ "" << ';';
-    auto const oa_tag = oa_ss.str();
+    auto const oa_tag = fmt::format("{},{},{},{},{},{};", transcript.transcript_id, t_aln->core.pos,
+        ((t_aln->core.flag & BAM_FREVERSE) != 0 ? '-' : '+'),
+        cigar_arr_to_str(bam_get_cigar(t_aln), t_aln->core.n_cigar), t_aln->core.qual, "");
 
     if (transcript.is_reverse) {
-        reverse(bam_get_qual(t_aln), t_aln->core.l_qseq);
+        if (bam_get_qual(t_aln)[0] != 0xff) {
+            reverse(bam_get_qual(t_aln), t_aln->core.l_qseq);
+        }
         reverse(bam_get_cigar(t_aln), t_aln->core.n_cigar);
 
         auto seq_str = bam_seq_to_str(t_aln);
@@ -124,7 +100,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
     int32_t remaining_cigar_length = 0;
 
 #ifdef CEU_CM_IS_DEBUG
-    cigar_trace << ">" << bam_get_qname(t_aln) << "\n";
+    cigar_trace << ">" << qname << "\n";
 #endif
 
     /** Position on unspliced transcript 5' to 3' **/
@@ -222,147 +198,75 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
             // No advancement on pos_of_read
             break;
         default: // Error
-            std::abort();
+            abort_mpi();
         }
 #ifdef CEU_CM_IS_DEBUG
         cigar_trace << "\n";
 #endif
     }
     if (pos_on_read != t_aln->core.l_qseq) {
-        std::cerr << "Error: pos_on_read (" << pos_on_read << ") != t_aln->core.l_qseq (" << t_aln->core.l_qseq << ")"
-                  << std::endl;
-        std::abort();
+        BOOST_LOG_TRIVIAL(fatal) << "Error: pos_on_read (" << pos_on_read << ") != t_aln->core.l_qseq ("
+                                 << t_aln->core.l_qseq << ")" << std::endl;
+        abort_mpi();
     }
     g_cigar = merge_cigars(g_cigar);
 
     // Replace g_cigar
-    require_not_negative(bam_set1(
-                             /** bam **/ g_aln,
-                             /** l_qname **/ std::strlen(bam_get_qname(t_aln)),
-                             /** qname **/ bam_get_qname(t_aln),
-                             /** flag **/ g_aln_flag,
-                             /** tid **/ transcript.tid_on_genome,
-                             /** pos **/ g_aln_start,
-                             /** mapq **/ t_aln->core.qual, // Ridiculous
-                             /** n_cigar **/ static_cast<uint32_t>(g_cigar.size()),
-                             /** cigar **/ g_cigar.data(),
-                             /** mtid **/ 0,
-                             /** mpos **/ 0,
-                             /** isize **/ 0,
-                             /** l_seq **/ t_aln->core.l_qseq,
-                             /** seq **/ seq_str.c_str(),
-                             /** qual **/ qual_str.c_str(),
-                             /** l_aux **/ bam_get_l_aux(t_aln)
-                                 + (/** XT **/ 2 + 1 + transcript.transcript_id.size() + 1) + (/** XI **/ 2 + 1 + 4))
-        + (/** OA **/ 2 + 1 + oa_tag.size() + 1));
+    CExceptionsProxy::assert_numeric(
+        bam_set1(
+            /** bam **/ g_aln,
+            /** l_qname **/ qname.length(),
+            /** qname **/ qname.c_str(),
+            /** flag **/ g_aln_flag,
+            /** tid **/ transcript.tid_on_genome,
+            /** pos **/ g_aln_start,
+            /** mapq **/ t_aln->core.qual, // Ridiculous
+            /** n_cigar **/ static_cast<uint32_t>(g_cigar.size()),
+            /** cigar **/ g_cigar.data(),
+            /** mtid **/ 0,
+            /** mpos **/ 0,
+            /** isize **/ 0,
+            /** l_seq **/ t_aln->core.l_qseq,
+            /** seq **/ seq_str.c_str(),
+            /** qual **/ qual_str.c_str(),
+            /** l_aux **/ bam_get_l_aux(t_aln) + (/** XT **/ 2 + 1 + transcript.transcript_id.size() + 1)
+                + (/** XI **/ 2 + 1 + 4))
+            + (/** OA **/ 2 + 1 + oa_tag.size() + 1),
+        USED_HTSLIB_NAME, "Failed to populate SAM/BAM record for " + qname, false,
+        CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     // Copy existing tags
     std::memcpy(bam_get_aux(g_aln), bam_get_aux(t_aln), bam_get_l_aux(t_aln));
     // Add XT tag
-    require_zero(bam_aux_update_str(
-        g_aln, "XT", static_cast<int>(transcript.transcript_id.size()), transcript.transcript_id.c_str()));
+    CExceptionsProxy::assert_numeric(bam_aux_update_str(g_aln, "XT", static_cast<int>(transcript.transcript_id.size()),
+                                         transcript.transcript_id.c_str()),
+        USED_HTSLIB_NAME, "Failed to add XT tag for " + qname, false, CExceptionsProxy::EXPECTATION::ZERO);
     // Add XI tag
-    require_zero(bam_aux_update_int(g_aln, "XI", transcript.tid_on_transcriptome));
+    CExceptionsProxy::assert_numeric(bam_aux_update_int(g_aln, "XI", transcript.tid_on_transcriptome), USED_HTSLIB_NAME,
+        "Failed to add XI tag for " + qname, false, CExceptionsProxy::EXPECTATION::ZERO);
     // Add OA tag
-    require_zero(bam_aux_update_str(g_aln, "OA", static_cast<int>(oa_tag.size()), oa_tag.c_str()));
+    CExceptionsProxy::assert_numeric(bam_aux_update_str(g_aln, "OA", static_cast<int>(oa_tag.size()), oa_tag.c_str()),
+        USED_HTSLIB_NAME, "Failed to add OA tag for " + qname, false, CExceptionsProxy::EXPECTATION::ZERO);
 }
 
-void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char const* argv[])
+void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char ** argv)
 {
-    require_zero(sam_hdr_remove_lines(ghdr, "SQ", nullptr, nullptr));
+    CExceptionsProxy::assert_numeric(sam_hdr_remove_lines(ghdr, "SQ", nullptr, nullptr), USED_HTSLIB_NAME,
+        "Failed to remove existing SQ lines from SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
     for (int i = 0; i < faidx_nseq(faidx); ++i) {
-        const auto* name = require_not_null(faidx_iseq(faidx, i));
-        int const len = faidx_seq_len(faidx, name);
-        require_zero(sam_hdr_add_line(ghdr, "SQ", "SN", name, "LN", std::to_string(len).c_str(), nullptr));
+        const auto* name = CExceptionsProxy::assert_not_null(faidx_iseq(faidx, i), USED_HTSLIB_NAME,
+            fmt::format("Failed to get sequence name for index {} from FASTA index.", i));
+        auto const len = faidx_seq_len64(faidx, name);
+        CExceptionsProxy::assert_numeric(
+            sam_hdr_add_line(ghdr, "SQ", "SN", name, "LN", std::to_string(len).c_str(), nullptr), USED_HTSLIB_NAME,
+            std::string("Failed to populate SQ tag to SAM header for seq ") + name, false,
+            CExceptionsProxy::EXPECTATION::ZERO);
     }
-    std::stringstream args_ss;
-    for (int i = 0; i < argc - 1; ++i) {
-        args_ss << argv[i] << " ";
-    }
-    args_ss << argv[argc - 1];
-    require_zero(sam_hdr_change_HD(ghdr, "SO", "unknown"));
-    require_zero(sam_hdr_add_line(
-            ghdr, "PG", "ID", "tsam2gsam", "PN", "tsam2gsam", "VN", TSAM2GSAM_VERSION, "CL", args_ss.str().c_str(), nullptr));
+    std::string const args = join(std::vector<std::string>(argv, argv + argc), " ");
+    CExceptionsProxy::assert_numeric(sam_hdr_change_HD(ghdr, "SO", "unknown"), USED_HTSLIB_NAME,
+        "Failed to populate SO tag to SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
+    CExceptionsProxy::assert_numeric(sam_hdr_add_line(ghdr, "PG", "ID", "tsam2gsam", "PN", "tsam2gsam", "VN",
+                                         TSAM2GSAM_VERSION, "CL", args.c_str(), nullptr),
+        USED_HTSLIB_NAME, "Failed to populate PG tag to SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
 }
-
-}; // namespace
-int main(int argc, char const* argv[])
-{
-    print_version("tsam2gsam");
-    handle_dumps();
-    std::cout << "SYNOPSIS: " << argv[0]
-              << " taln.bam galn.bam reference_annotation.gtf.gffread.bed reference_assembly.fa" << std::endl;
-    if (argc != 5) {
-        std::cerr << "ERROR: Invalid arguments." << std::endl;
-        return EXIT_FAILURE;
-    }
-    samFile* tsam = require_not_null(sam_open(argv[1], get_sam_mode(argv[1], false)));
-    sam_hdr_t* thdr = require_not_null(sam_hdr_read(tsam));
-    samFile* gsam = require_not_null(sam_open(argv[2], get_sam_mode(argv[1], true)));
-    hts_set_threads(gsam, N_THREADS_FOR_HTSLIB); // 10 concurrent threads for compression
-#ifdef CEU_CM_IS_DEBUG
-    std::ofstream cigar_trace(std::string(argv[2]) + ".ctrace");
-#endif
-
-    // Formulate SAM header for GSAM
-    std::cerr << "INFO: Formulating SAM header..." << std::endl;
-    faidx_t* faidx = require_not_null(fai_load(argv[4]));
-    sam_hdr_t* ghdr = require_not_null(sam_hdr_dup(thdr));
-    populate_ghdr(ghdr, faidx, argc, argv);
-    require_zero(sam_hdr_write(gsam, ghdr));
-    fai_destroy(faidx);
-    std::cerr << "INFO: SAM header written." << std::endl;
-
-    // Read GTF
-    std::cerr << "INFO: Reading GTF..." << std::endl;
-    std::ifstream gtf_stream(argv[3]);
-    auto transcript_id_to_transcript_map = read_gffutils_bed(thdr, ghdr, gtf_stream);
-    gtf_stream.close();
-    std::cerr << "INFO: " << transcript_id_to_transcript_map.size() << " transcripts read." << std::endl;
-
-    // Start the main loop
-    std::cerr << "INFO: Start main loop..." << std::endl;
-    bam1_t* t_aln = require_not_null(bam_init1());
-    bam1_t* g_aln = require_not_null(bam_init1());
-    std::size_t num_correct_transcripts = 0;
-
-    while (sam_read1(tsam, thdr, t_aln) >= 0) {
-        // Passthrough of unmapped transcripts
-        if ((t_aln->core.flag & BAM_FUNMAP) != 0) {
-            num_correct_transcripts++;
-            require_not_negative(sam_write1(gsam, ghdr, t_aln)); // Write unmapped reads as-is.
-        }
-        auto transcript_name = std::string(require_not_null(sam_hdr_tid2name(thdr, t_aln->core.tid)));
-        if (transcript_id_to_transcript_map.find(transcript_name)
-            == transcript_id_to_transcript_map.end()) {
-            std::cerr << "ERROR: Transcript " << transcript_name << " not found in GTF." << std::endl;
-            return EXIT_FAILURE;
-        }
-        convert_transcript_to_genome_alignment(t_aln, g_aln, transcript_id_to_transcript_map.at(transcript_name)
-#ifdef CEU_CM_IS_DEBUG
-                                                                 ,
-            cigar_trace
-#endif
-        );
-        require_not_negative(sam_write1(gsam, ghdr, g_aln));
-        num_correct_transcripts++;
-        if (num_correct_transcripts % 10000 == 0) {
-            std::cerr << "INFO: " << num_correct_transcripts << " transcripts processed." << std::endl;
-        }
-    }
-    bam_destroy1(t_aln);
-    bam_destroy1(g_aln);
-    std::cerr << "INFO: " << num_correct_transcripts << " transcripts were mapped correctly." << std::endl;
-
-    // Cleanup
-    std::cerr << "INFO: Cleaning up..." << std::endl;
-    sam_hdr_destroy(thdr);
-    sam_hdr_destroy(ghdr);
-    require_zero(sam_close(tsam));
-    require_zero(sam_close(gsam));
-#ifdef CEU_CM_IS_DEBUG
-    cigar_trace.close();
-#endif
-    std::cerr << "INFO: Done." << std::endl;
-    return EXIT_SUCCESS;
-}
+} // namespace labw::art_modern

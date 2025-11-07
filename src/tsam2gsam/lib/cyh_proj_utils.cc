@@ -1,5 +1,6 @@
 #include "tsam2gsam/lib/cyh_proj_utils.hh"
 
+#include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 
 #include <htslib/hts.h>
@@ -13,24 +14,55 @@
 #include <vector>
 
 namespace labw::art_modern {
+namespace {
 
-static constexpr char code2base[] = "===A=C=M=G=R=S=V=T=W=Y=H=K=D=B=N"
-                                    "A=AAACAMAGARASAVATAWAYAHAKADABAN"
-                                    "C=CACCCMCGCRCSCVCTCWCYCHCKCDCBCN"
-                                    "M=MAMCMMMGMRMSMVMTMWMYMHMKMDMBMN"
-                                    "G=GAGCGMGGGRGSGVGTGWGYGHGKGDGBGN"
-                                    "R=RARCRMRGRRRSRVRTRWRYRHRKRDRBRN"
-                                    "S=SASCSMSGSRSSSVSTSWSYSHSKSDSBSN"
-                                    "V=VAVCVMVGVRVSVVVTVWVYVHVKVDVBVN"
-                                    "T=TATCTMTGTRTSTVTTTWTYTHTKTDTBTN"
-                                    "W=WAWCWMWGWRWSWVWTWWWYWHWKWDWBWN"
-                                    "Y=YAYCYMYGYRYSYVYTYWYYYHYKYDYBYN"
-                                    "H=HAHCHMHGHRHSHVHTHWHYHHHKHDHBHN"
-                                    "K=KAKCKMKGKRKSKVKTKWKYKHKKKDKBKN"
-                                    "D=DADCDMDGDRDSDVDTDWDYDHDKDDDBDN"
-                                    "B=BABCBMBGBRBSBVBTBWBYBHBKBDBBBN"
-                                    "N=NANCNMNGNRNSNVNTNWNYNHNKNDNBNN";
+    static constexpr char code2base[] = "===A=C=M=G=R=S=V=T=W=Y=H=K=D=B=N"
+                                        "A=AAACAMAGARASAVATAWAYAHAKADABAN"
+                                        "C=CACCCMCGCRCSCVCTCWCYCHCKCDCBCN"
+                                        "M=MAMCMMMGMRMSMVMTMWMYMHMKMDMBMN"
+                                        "G=GAGCGMGGGRGSGVGTGWGYGHGKGDGBGN"
+                                        "R=RARCRMRGRRRSRVRTRWRYRHRKRDRBRN"
+                                        "S=SASCSMSGSRSSSVSTSWSYSHSKSDSBSN"
+                                        "V=VAVCVMVGVRVSVVVTVWVYVHVKVDVBVN"
+                                        "T=TATCTMTGTRTSTVTTTWTYTHTKTDTBTN"
+                                        "W=WAWCWMWGWRWSWVWTWWWYWHWKWDWBWN"
+                                        "Y=YAYCYMYGYRYSYVYTYWYYYHYKYDYBYN"
+                                        "H=HAHCHMHGHRHSHVHTHWHYHHHKHDHBHN"
+                                        "K=KAKCKMKGKRKSKVKTKWKYKHKKKDKBKN"
+                                        "D=DADCDMDGDRDSDVDTDWDYDHDKDDDBDN"
+                                        "B=BABCBMBGBRBSBVBTBWBYBHBKBDBBBN"
+                                        "N=NANCNMNGNRNSNVNTNWNYNHNKNDNBNN";
 
+    /**
+     * From HTSLib 1.22 sam_internals.h.
+     *
+     * Convert a nibble encoded BAM sequence to a string of bases.
+     *
+     * We do this 2 bp at a time for speed. Equiv to:
+     *
+     * @code
+     * for (i = 0; i < len; i++)
+     *     seq[i] = seq_nt16_str[bam_seqi(nib, i)];
+     * @endcode
+     *
+     * @param nib nibble encoded BAM sequence
+     * @param seq destination string of bases.
+     * @param len length of the sequence.
+     */
+    void nibble2base_default(const uint8_t* nib, std::string& seq, const int len)
+    {
+        int i = len / 2;
+        const int len2 = i;
+        seq[0] = 0;
+        for (i = 0; i < len2; i++) {
+            // Note size_t cast helps gcc optimiser.
+            std::memcpy(&seq[i << 1], &code2base[static_cast<size_t>(nib[i]) * 2], 2);
+        }
+        if ((i *= 2) < len) {
+            seq[i] = seq_nt16_str[bam_seqi(nib, i)];
+        }
+    }
+} // namespace
 std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
 {
     std::vector<am_cigar_t> g_cigar_cp = g_cigar;
@@ -76,7 +108,8 @@ std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
         this_cigar_op = bam_cigar_op(g_cigar_cp[cigar_id]);
         if (this_cigar_length == 0) {
             continue; // Skip CIGAR of zero length.
-        } if (this_cigar_op == prev_cigar_op) {
+        }
+        if (this_cigar_op == prev_cigar_op) {
             prev_cigar_length += this_cigar_length;
         } else {
             g_cigar_merged.emplace_back(bam_cigar_gen(prev_cigar_length, prev_cigar_op));
@@ -96,18 +129,17 @@ std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
 
 std::string bam_qual_to_str(const bam1_t* aln)
 {
-    return std::string(aln->core.l_qseq, '!');
-#if (0)
-    // FIXME: How to check whether qualities present?
-    const auto* quals = bam_get_qual(aln);
-    std::string retq;
-    retq.resize(aln->core.l_qseq);
-    for (decltype(aln->core.l_qseq) k = 0; k < aln->core.l_qseq; k++) {
-        retq[k] = static_cast<char>(quals[k] + PHRED_OFFSET);
+    if (bam_get_qual(aln)[0] != 0xff) {
+        const auto* quals = bam_get_qual(aln);
+        std::string retq;
+        retq.resize(aln->core.l_qseq);
+        for (decltype(aln->core.l_qseq) k = 0; k < aln->core.l_qseq; k++) {
+            retq[k] = static_cast<char>(quals[k] + PHRED_OFFSET);
+        }
+        std::cerr << retq << std::endl;
+        return retq;
     }
-    std::cerr << retq << std::endl;
-    return retq;
-#endif
+    return "*";
 }
 
 void clear_pe_flag(uint16_t& flag)
@@ -118,20 +150,6 @@ void clear_pe_flag(uint16_t& flag)
     flag &= ~BAM_FMUNMAP;
     flag &= ~BAM_FPAIRED;
     flag &= ~BAM_FPROPER_PAIR;
-}
-
-void nibble2base_default(const uint8_t* nib, std::string& seq, const int len)
-{
-    int i = len / 2;
-    const int len2 = i;
-    seq[0] = 0;
-    for (i = 0; i < len2; i++) {
-        // Note size_t cast helps gcc optimiser.
-        std::memcpy(&seq[i << 1], &code2base[static_cast<size_t>(nib[i]) * 2], 2);
-    }
-    if ((i *= 2) < len) {
-        seq[i] = seq_nt16_str[bam_seqi(nib, i)];
-    }
 }
 
 std::string bam_seq_to_str(const bam1_t* aln)

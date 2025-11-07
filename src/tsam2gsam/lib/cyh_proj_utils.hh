@@ -6,7 +6,6 @@
 
 #include <cstdint>
 #include <cstdlib>
-#include <iostream>
 #include <string>
 #include <vector>
 
@@ -34,31 +33,6 @@ constexpr int SAM_READ_EOF = -1;
 constexpr int ALLOWED_ERROR_BASES = 5;
 
 constexpr int N_THREADS_FOR_HTSLIB = 10;
-
-template <typename t> t require_not_null(t ptr)
-{
-    if (ptr == nullptr) {
-        std::cerr << "ERROR: Null pointer." << std::endl;
-        std::abort();
-    }
-    return ptr;
-}
-
-template <typename t> void require_zero(t ptr)
-{
-    if (ptr != 0) {
-        std::cerr << "ERROR: Null pointer." << std::endl;
-        std::abort();
-    }
-}
-
-template <typename t> void require_not_negative(t ptr)
-{
-    if (ptr < 0) {
-        std::cerr << "ERROR: Null pointer." << std::endl;
-        std::abort();
-    }
-}
 
 /*!
  * Merge CIGARs using the following rules:
@@ -89,24 +63,6 @@ std::string bam_qual_to_str(const bam1_t* aln);
  * @param flag Mutable reference to BAM alignment flag.
  */
 void clear_pe_flag(uint16_t& flag);
-
-/**
- * From HTSLib 1.22 sam_internals.h.
- *
- * Convert a nibble encoded BAM sequence to a string of bases.
- *
- * We do this 2 bp at a time for speed. Equiv to:
- *
- * @code
- * for (i = 0; i < len; i++)
- *     seq[i] = seq_nt16_str[bam_seqi(nib, i)];
- * @endcode
- *
- * @param nib nibble encoded BAM sequence
- * @param seq destination string of bases.
- * @param len length of the sequence.
- */
-void nibble2base_default(const uint8_t* nib, std::string& seq, int len);
 
 /**
  * Convert query sequence inside BAM record to string.

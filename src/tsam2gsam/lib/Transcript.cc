@@ -86,7 +86,7 @@ Transcript Transcript::from_gffread_bed_line(const std::string& line, sam_hdr_t*
     }
 #ifdef CEU_CM_IS_DEBUG
     if (t_end - t_start != accumulated_exon_length + accumulated_intron_length) {
-        std::abort();
+        abort_mpi();
     }
 #endif
     return { splice_site_positions, splice_site_lengths, is_reverse, t_start, t_end, tid_on_genome,
