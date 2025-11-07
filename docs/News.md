@@ -10,7 +10,7 @@
 - `art_modern`: 
   - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
   - Memory performance of `stream` FASTA parser largely improved.
-- Packing: DEB package variant using OpenMPI added.
+- **EXPERIMENTAL** Packing: DEB package variant using OpenMPI added.
 - Documentation largely revised.
 - Miscellaneous bug fixes.
 
