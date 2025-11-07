@@ -57,6 +57,7 @@ std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads(const std::size_t con
     const am_read_len_t read_len_1, const am_read_len_t read_len_2, const double cov_pos, const double cov_neg,
     const am_readnum_t num_reads_to_reduce)
 {
+#ifdef STILL_CONSTRUCTING // FIXME
     const double cov_ratio = static_cast<double>(contig_size) / read_len;
     const auto joint_cov = cov_pos + cov_neg;
 
@@ -97,5 +98,8 @@ std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads(const std::size_t con
     const auto num_pos_reads = num_pos_reads_candidates[final_selected_pos_idx];
     const auto num_neg_reads = num_neg_reads_candidates[final_selected_neg_idx];
     return { num_pos_reads, num_neg_reads };
+#else
+    return { 0, 0 };
+#endif
 }
 } // namespace labw::art_modern

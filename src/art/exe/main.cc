@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     // 1st round initialization of a working console logger
     init_logger();
     print_banner();
-    init_file_logger();
+    init_file_logger("art_modern");
     handle_mpi_child();
     handle_dumps();
 

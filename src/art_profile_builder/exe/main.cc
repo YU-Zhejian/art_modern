@@ -5,6 +5,8 @@
 #include "art_profile_builder/lib/APBConfig.hh"
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
+#include "libam_support/utils/dump_utils.hh"
+#include "libam_support/utils/log_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
@@ -34,11 +36,18 @@ int main(int argc, char** argv)
         exit_mpi();
         return EXIT_SUCCESS;
     }
+    init_logger();
+    init_file_logger("art_profile_builder");
+    handle_dumps();
 
     const APBConfig config = parse_args(argc, argv);
 
 #ifdef WITH_BOOST_TIMER
-    boost::timer::cpu_timer timer;
+    BOOST_LOG_TRIVIAL(info) << "Boost::timer started.";
+    boost::timer::cpu_timer t;
+    t.start();
+#else
+    BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
 
     std::vector<std::thread> threads;
@@ -53,8 +62,8 @@ int main(int argc, char** argv)
         ieds_r2.emplace_back(this_ied2);
         threads.emplace_back(view_sam, this_ied1, this_ied2, thread_id, config);
     }
-    for (auto& t : threads) {
-        t.join();
+    for (auto& thread : threads) {
+        thread.join();
     }
     std::size_t total_reads = 0;
     std::size_t total_bases = 0;
@@ -95,8 +104,8 @@ int main(int argc, char** argv)
                             << " bases/s";
 
 #ifdef WITH_BOOST_TIMER
-    timer.stop();
-    BOOST_LOG_TRIVIAL(info) << "Time elapsed: " << timer.format();
+    t.stop();
+    BOOST_LOG_TRIVIAL(info) << "Time elapsed: " << t.format();
 #endif
     BOOST_LOG_TRIVIAL(info) << "Done.";
     exit_mpi();

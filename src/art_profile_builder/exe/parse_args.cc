@@ -48,8 +48,8 @@ namespace {
             BOOST_LOG_TRIVIAL(error) << "Input file does not exist: " << file_path;
             abort_mpi();
         }
-        htsFile* file
-            = CExceptionsProxy::assert_not_null(hts_open(file_path.c_str(), "r"), "HTSLib", "Failed to open HTS file.");
+        htsFile* file = CExceptionsProxy::assert_not_null(
+            hts_open(file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");
 
         const auto* format = hts_get_format(file);
         if (format->category != sequence_data || format->format == cram || format->format == fasta_format) {
