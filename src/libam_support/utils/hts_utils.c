@@ -12,20 +12,18 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "libam_support/utils/hts_utils.hh"
+#include "libam_support/utils/hts_utils.h"
 
 #include <htslib/bgzf.h> // NOLINT
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
 #include <htslib/sam.h> // NOLINT
 
-#include <cstddef>
+#include <stddef.h>
 
-namespace labw::art_modern {
-
-std::size_t hts_tell(htsFile* fp)
+size_t am_hts_tell(htsFile* fp)
 {
-    if (fp == nullptr) {
+    if (fp == NULL) {
         return 0;
     }
     switch (fp->format.format) {
@@ -53,4 +51,3 @@ std::size_t hts_tell(htsFile* fp)
     }
     return 0;
 }
-} // namespace labw::art_modern

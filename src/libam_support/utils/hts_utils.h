@@ -12,13 +12,17 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#pragma once
+#ifndef ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H
+#define ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H
+
+#include "libam_support/utils/c_macro_utils.h"
 
 #include <htslib/hts.h>
 
-#include <cstddef>
+#include <stdlib.h>
 
-namespace labw::art_modern {
+ART_MODERN_BEGIN_C_DECLS
+
 /**
  * @brief Know where we are.
  *
@@ -27,5 +31,8 @@ namespace labw::art_modern {
  * @param fp HTS file pointer
  * @return Where we are.
  */
-std::size_t hts_tell(htsFile* fp);
-} // namespace labw::art_modern
+size_t am_hts_tell(htsFile* fp);
+
+ART_MODERN_END_C_DECLS
+
+#endif // ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H

@@ -15,7 +15,9 @@
  **/
 
 #pragma once
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
+
+#include "libam_support/Constants.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -57,7 +59,8 @@ constexpr char ART_VERSION[] = "2.5.8";
 /** Maximum mapping quality */
 constexpr int MAPQ_MAX = (1 << 8) - 1; // 255
 
-constexpr am_qual_t PHRED_OFFSET = 33;
+constexpr am_qual_t PHRED_OFFSET = AM_PHRED_OFFSET;
+#undef AM_PHRED_OFFSET
 
 enum class SIMULATION_MODE : std::int8_t { WGS, TRANS, TEMPLATE };
 

@@ -1,6 +1,6 @@
 #include "libam_support/utils/rand_utils.hh"
 
-#include "libam_support/utils/hash_utils.hh"
+#include "libam_support/utils/hash_utils.h"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <chrono>
@@ -19,10 +19,10 @@ std::uint64_t rand_seed()
     std::random_device rd;
     const std::uint64_t entropy = rd();
     std::uint64_t seed = 0;
-    boost_hash_combine_impl(seed, now);
-    boost_hash_combine_impl(seed, thread_id);
-    boost_hash_combine_impl(seed, rank);
-    boost_hash_combine_impl(seed, entropy);
+    am_boost_hash_combine_impl64(seed, now);
+    am_boost_hash_combine_impl64(seed, thread_id);
+    am_boost_hash_combine_impl64(seed, rank);
+    am_boost_hash_combine_impl64(seed, entropy);
     return seed;
 }
 } // namespace labw::art_modern

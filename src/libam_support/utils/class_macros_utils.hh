@@ -21,6 +21,12 @@
 #define DELETE_COPY_CONSTRUCTOR(classname) classname(const classname&) = delete;
 #define DELETE_MOVE_CONSTRUCTOR(classname) classname(classname&&) = delete;
 
+#define DEFAULT_COPY_ASSIGNMENT(classname) classname& operator=(const classname&) = default;
+#define DEFAULT_MOVE_ASSIGNMENT(classname) classname& operator=(classname&&) = default;
+
+#define DEFAULT_COPY_CONSTRUCTOR(classname) classname(const classname&) = default;
+#define DEFAULT_MOVE_CONSTRUCTOR(classname) classname(classname&&) = default;
+
 /**
  * @brief Macro to delete copy constructor and copy assignment operator for a class.
  * @param classname  The name of the class for which to delete copy operations.
@@ -50,4 +56,7 @@
 #define DEFAULT_MOVE(classname)                                                                                        \
     classname(classname&&) = default;                                                                                  \
     classname& operator=(classname&&) = default;
+
+#define DEFAULT_DESTRUCTOR(classname) ~classname() = default;
+#define DELETE_DESTRUCTOR(classname) ~classname() = delete;
 // NOLINTEND

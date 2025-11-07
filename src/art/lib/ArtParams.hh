@@ -18,34 +18,46 @@
 #include "art/lib/Empdist.hh"
 
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
 
 #include <htslib/hts.h>
 
 #include <array>
+#include <cmath>
 #include <cstdlib>
 #include <string>
 #include <vector>
 
 namespace labw::art_modern {
 
-struct ArtParams {
+class ArtParams {
+public:
     const SIMULATION_MODE art_simulation_mode;
     const ART_LIB_CONST_MODE art_lib_const_mode;
     const bool sep_flag;
     const std::string id;
     const int max_n;
-    const int read_len;
+    const am_read_len_t read_len_1;
+    const am_read_len_t read_len_2;
     const double pe_frag_dist_mean;
     const double pe_frag_dist_std_dev;
     const std::vector<double> per_base_ins_rate_1;
     const std::vector<double> per_base_del_rate_1;
     const std::vector<double> per_base_ins_rate_2;
     const std::vector<double> per_base_del_rate_2;
-    const std::array<double, HIGHEST_QUAL> err_prob;
-    const hts_pos_t pe_dist_mean_minus_2_std;
     const Empdist qdist;
     const std::size_t job_pool_reporting_interval_seconds;
     const std::size_t art_job_executor_reporting_interval_seconds;
+    const std::array<double, HIGHEST_QUAL> err_prob;
+    const hts_pos_t pe_dist_mean_minus_2_std;
+    const am_read_len_t read_len_max;
+
+    ArtParams(SIMULATION_MODE art_simulation_mode, ART_LIB_CONST_MODE art_lib_const_mode, bool sep_flag,
+        std::string&& id, int max_n, am_read_len_t read_len_1, am_read_len_t read_len_2, double pe_frag_dist_mean,
+        double pe_frag_dist_std_dev, std::vector<double>&& per_base_ins_rate_1,
+        std::vector<double>&& per_base_del_rate_1, std::vector<double>&& per_base_ins_rate_2,
+        std::vector<double>&& per_base_del_rate_2, Empdist&& qdist, std::size_t job_pool_reporting_interval_seconds,
+        std::size_t art_job_executor_reporting_interval_seconds);
 };
 
 } // namespace labw::art_modern

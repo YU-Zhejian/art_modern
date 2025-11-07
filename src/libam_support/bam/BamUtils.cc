@@ -18,7 +18,7 @@
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"

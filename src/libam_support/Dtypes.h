@@ -1,6 +1,8 @@
 /**
  *@brief Basic data types.
  *
+ * THIS FILE IS KEPT COMPATIBLE WITH C.
+ *
  * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
@@ -14,39 +16,47 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#pragma once
-#include <cstdint>
+#ifndef ART_MODERN_LIBAM_SUPPORT_DTYPES_H
+#define ART_MODERN_LIBAM_SUPPORT_DTYPES_H
+#include <stdint.h>
+#include <stdlib.h>
 
-namespace labw::art_modern {
 /**
  * Phred quality score.
  *
  * This score will be involved in +/- operations so it must be signed.
  */
-using am_qual_t = int8_t;
+typedef int8_t am_qual_t;
+
 /** Cigar type. Should be 0b00 to 0b11. */
-using am_cigar_type_t = uint8_t;
+typedef uint8_t am_cigar_type_t;
 /**
  * Cigar operation and length combined.
  */
-using am_cigar_t = uint32_t;
+typedef uint32_t am_cigar_t;
 /**
  * Cigar operation.
  */
-using am_cigar_ops_t = uint32_t;
+typedef uint32_t am_cigar_ops_t;
 /**
  * Cigar length.
  */
-using am_cigar_len_t = int32_t;
+typedef int32_t am_cigar_len_t;
 /** ART quality distribution. */
-using am_qual_count_t = uint64_t;
+typedef uint64_t am_qual_count_t;
 /**
  * Number of reads.
  *
  * This MUST be a signed integer.
  * Otherwise -1 will be reverted to an extraordinarily large number.
  */
-using am_readnum_t = int64_t;
+typedef int64_t am_readnum_t;
 /** Length of files. */
-using am_filelen_t = int64_t;
-} // namespace labw::art_modern
+typedef int64_t am_filelen_t;
+
+/** Job ID type. */
+typedef size_t am_job_id_t;
+
+/** Length of reads. */
+typedef int32_t am_read_len_t;
+#endif // ART_MODERN_LIBAM_SUPPORT_DTYPES_H

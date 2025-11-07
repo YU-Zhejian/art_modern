@@ -4,6 +4,7 @@
 
 #include <boost/log/trivial.hpp>
 
+#include <chrono>
 #include <cstdlib>
 #include <thread>
 
@@ -21,7 +22,6 @@ void JobPoolReporter::stop()
     thread_.join();
 }
 void JobPoolReporter::job_() const
-
 {
     std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
     while (!should_stop_) {

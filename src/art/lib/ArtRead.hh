@@ -18,7 +18,7 @@
 #include "art/lib/ArtParams.hh"
 #include "art/lib/Rprob.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
@@ -36,14 +36,14 @@ public:
     // Disable constructors
     DELETE_MOVE(ArtRead)
     DELETE_COPY(ArtRead)
-    ~ArtRead() = default;
+    DEFAULT_DESTRUCTOR(ArtRead)
 
-    ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, Rprob& rprob);
+    ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, bool is_read_1, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
-    int generate_indels(bool is_read_1);
+    int generate_indels();
     // number of deletions <= number of insertions
-    int generate_indels_2(bool is_read_1);
+    int generate_indels_2();
 
     /**
      * Populate the read while adding insertions and deletions.
@@ -58,10 +58,12 @@ public:
     /**
      * Add point mutations to random bases based on empirical dist of quali scores
      */
-    void generate_snv_on_qual(bool is_first_read);
+    void generate_snv_on_qual();
     [[nodiscard]] bool is_good() const;
 
 private:
+    bool is_read_1_;
+    am_read_len_t read_len_;
     std::string aln_query_;
     std::string aln_ref_;
     const ArtParams& art_params_;
@@ -74,10 +76,8 @@ private:
     Rprob& rprob_;
     std::string query_;
     std::string ref_;
-    [[
 
-        noreturn]] [[maybe_unused]] void
-    except_() const;
+    [[noreturn]] [[maybe_unused]] void except_() const;
 };
 
 } // namespace labw::art_modern

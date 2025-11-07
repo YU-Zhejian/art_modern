@@ -4,7 +4,7 @@
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
@@ -14,6 +14,7 @@
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
 
+#include <art_modern_config.h>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -37,12 +38,12 @@ void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::share
 
     htsThreadPool tpool = { nullptr, 0 };
     tpool.pool = CExceptionsProxy::assert_not_null(
-        hts_tpool_init(static_cast<int>(config.num_io_threads)), "HTSLib", "Failed to init HTS thread pool.");
+        hts_tpool_init(static_cast<int>(config.num_io_threads)), USED_HTSLIB_NAME, "Failed to init HTS thread pool.");
 
     auto* in = CExceptionsProxy::assert_not_null(
-        hts_open(config.input_file_path.c_str(), "r"), "HTSLib", "Failed to open HTS file.");
-    auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), "HTSLib", "Failed to read SAM header.");
-    auto* b = CExceptionsProxy::assert_not_null(bam_init1(), "HTSLib", "Failed to init BAM record.");
+        hts_open(config.input_file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");
+    auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
+    auto* b = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     am_readnum_t num_valid_reads = 0;
     am_readnum_t num_total_reads = 0;
     am_readnum_t num_parsed_reads = 0;
@@ -61,8 +62,9 @@ void view_sam(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::share
         num_total_reads++;
         if (num_total_reads % REPORT_SIZE == 0) {
             BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id << ": Processed "
-                                    << to_si(static_cast<double>(num_total_reads), 2, 1000) << " reads, "
-                                    << to_si(static_cast<double>(num_valid_reads), 2, 1000) << " ("
+                                    << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000))
+                                    << " reads, "
+                                    << to_si(num_valid_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " ("
                                     << static_cast<double>(num_valid_reads) / static_cast<double>(num_total_reads)
                     * 100.0 << ")% valid reads.";
         }
@@ -80,8 +82,8 @@ except:
     abort_mpi();
 destroy:
     BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id << ": Processed "
-                            << to_si(static_cast<double>(num_total_reads), 2, 1000) << " reads, "
-                            << to_si(static_cast<double>(num_valid_reads), 2, 1000) << " ("
+                            << to_si(num_total_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " reads, "
+                            << to_si(num_valid_reads, 2, static_cast<decltype(num_total_reads)>(1000)) << " ("
                             << static_cast<double>(num_valid_reads) / static_cast<double>(num_total_reads) * 100.0
                             << ")% valid reads.";
 

@@ -23,7 +23,6 @@ RUN apt-get update && \
     libbz2-dev \
     libfmt-dev \
     libconcurrentqueue-dev \
-    libabsl-dev \
     lowdown \
     openmpi-bin \
     libopenmpi-dev \

@@ -5,8 +5,8 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
-- Add `--builtin_qual_file` to error description when none of the quality profile options are specified.
-- WGS by default? `HiSeq2500_125bp` by default? Use longest available read length by default?
+- Support different read length for R1 and R2.
+  - Update APB docs to R1 and R2.
 - Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE:
 
   ```shell
@@ -20,7 +20,6 @@
       -DBoost_DIR=/home/yuzj/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/ \
       -DCMAKE_BUILD_TYPE=Debug \
       -DUSE_RANDOM_GENERATOR=STL \
-      -DUSE_QUAL_GEN=WALKER \
       -DUSE_MALLOC=AUTO \
       -DUSE_THREAD_PARALLEL=ASIO \
       -DCMAKE_INSTALL_PREFIX=/tmp/art_modern-test-build-install-8faz6gpf \
@@ -50,12 +49,10 @@
 ## Packing
 
 - Supress all lintian issues.
-- Pack MPI-enabled Debian packages, BioConda build, etc.
-  - For debian pack, see <https://salsa.debian.org/med-team/abyss/-/blob/master/debian/control?ref_type=heads>.
 - Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
 - Support `libtcmalloc.pc` and `libtcmalloc_minimal.pc`. Provided by Debian package `libgoogle-perftools-dev` (wierd). Also support Google profilers.
-- Change the PCG random generator to PCG-minimal that allows building under Mac OS X.
-- Re-implement several functions in C to accelerate compilation.
+- Add RNG `SYSTEM_PCG` for packing.
+- Add qreverse options to `make testbuild`.
 
 ## Performance
 

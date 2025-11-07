@@ -54,7 +54,6 @@ zlib
 HTSCodecs
 Autotools
 pkgconf
-absl
 GiB
 FAIDX
 GZip

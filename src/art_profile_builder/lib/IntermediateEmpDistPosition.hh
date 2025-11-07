@@ -1,7 +1,7 @@
 #pragma once
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <cstdlib>
@@ -47,7 +47,7 @@ public:
         N_IDX, N_IDX, N_IDX, N_IDX, N_IDX, N_IDX, N_IDX };
 
     IntermediateEmpDistPosition();
-    ~IntermediateEmpDistPosition() = default;
+    DEFAULT_DESTRUCTOR(IntermediateEmpDistPosition)
     DEFAULT_COPY(IntermediateEmpDistPosition)
     DEFAULT_MOVE(IntermediateEmpDistPosition)
 

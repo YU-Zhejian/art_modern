@@ -29,7 +29,6 @@
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
-#include <boost/algorithm/string/join.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options/options_description.hpp>
 #include <boost/program_options/value_semantic.hpp>
@@ -37,6 +36,7 @@
 #include <htslib/sam.h>
 
 #include <algorithm>
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <utility>
@@ -219,7 +219,7 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
         auto so = BamOptions();
         so.use_m = params.vm.count("o-hl_sam-use_m") > 0;
         so.write_bam = params.vm.count("o-hl_sam-write_bam") > 0;
-        so.PG_CL = boost::algorithm::join(params.args, " ");
+        so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-hl_sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-hl_sam-compress_level"].as<char>();
         if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {

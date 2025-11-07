@@ -13,7 +13,6 @@ Build-Depends: debhelper-compat (= 13),
                python3,
                libfmt-dev (>= 7.1.3),
                libconcurrentqueue-dev,
-               libabsl-dev,
                lowdown,
                libopenmpi-dev,
 Standards-Version: 4.7.0

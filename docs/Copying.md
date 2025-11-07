@@ -70,18 +70,6 @@ Under the MIT License.
 
 **NOTE** Added in [1.1.0](#v-1.1.0-section).
 
-## Abseil by Abseil Authors
-
-Available from <https://github.com/abseil/abseil-cpp>, release [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1). The bundled source code is tailored from the [release tarball](https://github.com/abseil/abseil-cpp/releases/download/20250814.0/abseil-cpp-20250814.0.tar.gz).
-
-Affected files:
-
-- `/deps/slim_abseil/**`
-
-Under the Apache-2.0 license.
-
-**NOTE** Added in [1.1.0](#v-1.1.0-section).
-
 ## `{fmt}` by Victor Zverovich
 
 Available from <https://github.com/fmtlib/fmt>, release [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
@@ -94,17 +82,17 @@ Under an MIT-like License.
 
 **NOTE** Added in [1.1.1](#v-1.1.1-section).
 
-## PCG by Melissa O'Neill
+## PCG, Minimal C Implementation by Melissa O'Neill
 
-Available from <https://www.pcg-random.org/downloads/pcg-cpp-0.98.zip>. Currently developed at <https://github.com/imneme/pcg-cpp>.
+Available from <https://www.pcg-random.org/download.html>. Currently developed at <https://github.com/imneme/pcg-c-basic>.
 
 Affected files:
 
-- `/deps/pcg-cpp-0.98/**`
+- `src/libam_support/ds/pcg_32_c.hh`
 
 Licensed under the Apache 2.0 License.
 
-**NOTE** Added in [1.1.1](#v-1.1.1-section).
+**NOTE** Added in [1.2.2](#v-1.2.2-section).
 
 ## GNU Scientific Library by M. Galassi _et al._
 
@@ -117,3 +105,16 @@ Affected files:
 Licensed under the GPL 3.0 license.
 
 **NOTE** Added in [1.1.2](#v-1.1.2-section).
+
+## qreverse by Wunkolo
+
+Available from <https://github.com/Wunkolo/qreverse/>, commit [`fd54e4b`](https://github.com/Wunkolo/qreverse/commit/fd54e4b59e2e0b5051ffcfdab9878f10815bb8cd).
+
+Affected files:
+
+- `src/libam_support/seq/qreverse.c`
+- `src/libam_support/seq/qreverse.h`
+
+Licensed under the MIT license.
+
+**NOTE** Added in [1.2.2](#v-1.2.2-section).

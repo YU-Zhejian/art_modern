@@ -29,20 +29,17 @@ DTYPE = "unsigned char"
 AUTOGEN_HEADER = (
     f"// This file is auto-generated " f"by {os.path.basename(__file__)} " f"at {datetime.datetime.now().isoformat()}\n"
 )
-NAMESPACE_HEADER = "namespace labw::art_modern {\n"
-NAMESPACE_FOOTER = "}\n // namespace labw::art_modern\n"
 
 if __name__ == "__main__":
     os.makedirs(sys.argv[1], exist_ok=True)
-    with open(os.path.join(sys.argv[1], "builtin_profiles.cc"), "w", encoding="US-ASCII") as wc:
-        with open(os.path.join(sys.argv[1], "builtin_profiles.hh"), "w", encoding="US-ASCII") as wh:
+    with open(os.path.join(sys.argv[1], "builtin_profiles.c"), "w", encoding="US-ASCII") as wc:
+        with open(os.path.join(sys.argv[1], "builtin_profiles.h"), "w", encoding="US-ASCII") as wh:
             wh.write(AUTOGEN_HEADER)
             wc.write(AUTOGEN_HEADER)
 
-            wh.write("#pragma once\n")
-            wh.write("#include <cstddef>\n")
-            wh.write(NAMESPACE_HEADER)
-            wc.write(NAMESPACE_HEADER)
+            wh.write("#ifndef ART_MODERN_BUILTIN_PROFILES_H\n")
+            wh.write("#define ART_MODERN_BUILTIN_PROFILES_H\n")
+            wh.write("#include <stddef.h>\n")
 
             wh.write(f"extern {DTYPE} NULL_PROFILE[1];\n")
             wc.write(DTYPE + " NULL_PROFILE[1] = {0};\n")
@@ -57,9 +54,8 @@ if __name__ == "__main__":
                     with open(os.path.join("data", "Illumina_profiles", file), "rb") as r:
                         data = gzip.compress(r.read(), 9)
 
-                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.cc"), "w", encoding="US-ASCII") as sw:
+                    with open(os.path.join(sys.argv[1], f"{sname}_{i}.c"), "w", encoding="US-ASCII") as sw:
                         sw.write(AUTOGEN_HEADER)
-                        sw.write(NAMESPACE_HEADER)
 
                         sw.write(f"{DTYPE} {sname}_{i}[{len(data)}]" + " = {\n")
                         cw = 0
@@ -72,7 +68,6 @@ if __name__ == "__main__":
                         sw.write(hex(data[-1]))
                         sw.write("\n")
                         sw.write("};\n")
-                        sw.write(NAMESPACE_FOOTER)
                     slengths.append(len(data))
 
                     wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
@@ -90,10 +85,9 @@ if __name__ == "__main__":
                 wh.write(f'    "{sname}",\n')
             wh.write("};\n")
 
-            wh.write("const std::size_t BUILTIN_PROFILE_LENGTHS[N_BUILTIN_PROFILE][2] = {\n")
+            wh.write("const size_t BUILTIN_PROFILE_LENGTHS[N_BUILTIN_PROFILE][2] = {\n")
             for slength_constructed in slengths_constructed:
                 wh.write("    " + slength_constructed + ",\n")
             wh.write("};\n")
 
-            wh.write(NAMESPACE_FOOTER)
-            wc.write(NAMESPACE_FOOTER)
+            wh.write("#endif // ART_MODERN_BUILTIN_PROFILES_H\n")

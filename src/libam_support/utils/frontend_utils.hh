@@ -91,4 +91,4 @@ static std::size_t n_threads_from_parallel(const int parallel_arg)
     }
     return parallel;
 }
-}
+} // namespace labw::art_modern

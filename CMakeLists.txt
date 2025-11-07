@@ -4,6 +4,10 @@ if(DEFINED USE_CCACHE)
     message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
 endif()
 
+if(DEFINED USE_ABSL)
+    message(WARNING "-DUSE_ABSL is deprecated. Ignored.")
+endif()
+
 if(DEFINED REPRODUCIBLE_BUILD)
     set(CEU_REPRODUCIBLE_BUILDS
         ON
@@ -42,6 +46,10 @@ endif()
 
 if(NOT DEFINED CEU_CM_SHOULD_USE_NATIVE)
     set(CEU_CM_SHOULD_USE_NATIVE OFF)
+endif()
+
+if(NOT DEFINED AM_NO_Q_REVERSE)
+    set(AM_NO_Q_REVERSE OFF)
 endif()
 
 if(NOT DEFINED WITH_MPI)
@@ -89,7 +97,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/boost.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/absl.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
@@ -130,7 +137,7 @@ message(STATUS "art_modern compiler flags: ${AM_CC_FLAGS}")
 # -----------------------------------------------------------------------------
 # Dealing with config files.
 
-if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.cc")
+if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.c")
     execute_process(
         COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/gen_builtin_profiles.py"
                 "${CMAKE_BINARY_DIR}/gen/src/art/"
@@ -161,8 +168,15 @@ endif()
 # -----------------------------------------------------------------------------
 # Dealing with am_support_lib.
 
-file(GLOB AM_SUPPORT_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.cc"
-     "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.cc" "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.cc")
+file(
+    GLOB
+    AM_SUPPORT_LIB_SOURCE
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.cc"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.c"
+    "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.c")
 add_library(am_support_lib ${AM_SUPPORT_LIB_SOURCE})
 target_compile_options(am_support_lib BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(am_support_lib PUBLIC ${ART_MODERN_LINK_LIBS})
@@ -174,7 +188,7 @@ install(TARGETS am_support_lib)
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
 
-file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.cc")
+file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.c")
 add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
 target_compile_options(art_modern_lib BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(art_modern_lib PUBLIC am_support_lib)

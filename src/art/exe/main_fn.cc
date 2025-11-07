@@ -148,7 +148,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     }
                     generator.add(fa_view, coverage_info);
                 }
-            } else {
+            } else { // Stream
                 FastaStreamBatcher fsb_f(art_io_params.batch_size, fasta_stream, sls);
                 generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>(), true);
                 while (true) {

@@ -2,7 +2,7 @@
 
 #include "IntermediateEmpDistPosition.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 

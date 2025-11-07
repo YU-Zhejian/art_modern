@@ -60,10 +60,6 @@ def probe_mkl() -> bool:
     return probe_using_cmake_project("test-mkl.cmake")
 
 
-def probe_absl() -> bool:
-    return probe_using_cmake_project("test-absl.cmake")
-
-
 def probe_mimalloc() -> bool:
     return probe_using_cmake_project("test-mimalloc.cmake")
 
@@ -98,13 +94,11 @@ def probe_concurrent_queue() -> Optional[str]:
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
         self.USE_RANDOM_GENERATOR = "PCG"
-        self.USE_QUAL_GEN = "WALKER"
         self.USE_MALLOC = "AUTO"
         self.USE_THREAD_PARALLEL = "ASIO"
         self.USE_LIBFMT = "UNSET"
         self.USE_HTSLIB = "UNSET"
         self.USE_CONCURRENT_QUEUE = "UNSET"
-        self.USE_ABSL = "UNSET"
         self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
         self.CMAKE_BUILD_TYPE = "Debug"
@@ -113,7 +107,6 @@ class BuildConfig:
         cmake_flags = self.old_cmake_flags
         cmake_flags.append(f"-DCMAKE_BUILD_TYPE={self.CMAKE_BUILD_TYPE}")
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
-        cmake_flags.append(f"-DUSE_QUAL_GEN={self.USE_QUAL_GEN}")
         cmake_flags.append(f"-DUSE_MALLOC={self.USE_MALLOC}")
         cmake_flags.append(f"-DUSE_THREAD_PARALLEL={self.USE_THREAD_PARALLEL}")
         if self.USE_LIBFMT != "UNSET":
@@ -122,8 +115,6 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_HTSLIB={self.USE_HTSLIB}")
         if self.USE_CONCURRENT_QUEUE != "UNSET":
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
-        if self.USE_ABSL != "UNSET":
-            cmake_flags.append(f"-DUSE_ABSL={self.USE_ABSL}")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
         return cmake_flags
@@ -131,13 +122,11 @@ class BuildConfig:
     def copy(self) -> BuildConfig:
         new_config = BuildConfig(self.old_cmake_flags.copy())
         new_config.USE_RANDOM_GENERATOR = self.USE_RANDOM_GENERATOR
-        new_config.USE_QUAL_GEN = self.USE_QUAL_GEN
         new_config.USE_MALLOC = self.USE_MALLOC
         new_config.USE_THREAD_PARALLEL = self.USE_THREAD_PARALLEL
         new_config.USE_LIBFMT = self.USE_LIBFMT
         new_config.USE_HTSLIB = self.USE_HTSLIB
         new_config.USE_CONCURRENT_QUEUE = self.USE_CONCURRENT_QUEUE
-        new_config.USE_ABSL = self.USE_ABSL
         new_config.HELP_VERSION_ONLY = self.HELP_VERSION_ONLY
         return new_config
 
@@ -287,13 +276,6 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print("Probing for Abseil...", end="")
-    is_absl_exist = probe_absl()
-    if is_absl_exist:
-        print("SUCCESS")
-    else:
-        print("FAIL")
-
     print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
@@ -367,12 +349,6 @@ if __name__ == "__main__":
                 job_id += 1
             bc.USE_CONCURRENT_QUEUE = "UNSET"
 
-            if is_absl_exist:
-                bc.USE_ABSL = "SYS"
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-                bc.USE_ABSL = "UNSET"
-
             bc.HELP_VERSION_ONLY = False
 
             for use_random_generator in RANDOM_GENERATORS:
@@ -380,9 +356,4 @@ if __name__ == "__main__":
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_RANDOM_GENERATOR = "PCG"
-
-            bc.USE_QUAL_GEN = "STL"
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.USE_QUAL_GEN = "WALKER"
     executor.shutdown()

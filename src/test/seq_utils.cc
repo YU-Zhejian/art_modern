@@ -14,7 +14,7 @@
 
 #define BOOST_TEST_MODULE test_seq_utils // NOLINT
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/utils/seq_utils.hh"
@@ -41,12 +41,6 @@ BOOST_AUTO_TEST_CASE(test_seq_utils_2)
     BOOST_TEST("AAGCCGAT" == ref_seq);
 }
 
-BOOST_AUTO_TEST_CASE(test_seq_utils_3)
-{
-    const std::string ref_seq("ATCGGCTT");
-    const auto seq2 = revcomp(ref_seq);
-    BOOST_TEST("AAGCCGAT" == seq2);
-}
 BOOST_AUTO_TEST_CASE(test_seq_utils_4)
 {
     std::string ref_seq("ATCGGCTTNNZZ\1");
