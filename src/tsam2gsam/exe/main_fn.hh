@@ -32,5 +32,5 @@ void convert_transcript_to_genome_alignment(
 #else
 void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const Transcript& transcript);
 #endif
-void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char ** argv);
+void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char** argv);
 } // namespace labw::art_modern

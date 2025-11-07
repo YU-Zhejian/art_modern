@@ -1,5 +1,6 @@
 #include "tsam2gsam/lib/cyh_proj_utils.hh"
 
+#include "art_modern_config.h"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 
@@ -16,22 +17,22 @@
 namespace labw::art_modern {
 namespace {
 
-    static constexpr char code2base[] = "===A=C=M=G=R=S=V=T=W=Y=H=K=D=B=N"
-                                        "A=AAACAMAGARASAVATAWAYAHAKADABAN"
-                                        "C=CACCCMCGCRCSCVCTCWCYCHCKCDCBCN"
-                                        "M=MAMCMMMGMRMSMVMTMWMYMHMKMDMBMN"
-                                        "G=GAGCGMGGGRGSGVGTGWGYGHGKGDGBGN"
-                                        "R=RARCRMRGRRRSRVRTRWRYRHRKRDRBRN"
-                                        "S=SASCSMSGSRSSSVSTSWSYSHSKSDSBSN"
-                                        "V=VAVCVMVGVRVSVVVTVWVYVHVKVDVBVN"
-                                        "T=TATCTMTGTRTSTVTTTWTYTHTKTDTBTN"
-                                        "W=WAWCWMWGWRWSWVWTWWWYWHWKWDWBWN"
-                                        "Y=YAYCYMYGYRYSYVYTYWYYYHYKYDYBYN"
-                                        "H=HAHCHMHGHRHSHVHTHWHYHHHKHDHBHN"
-                                        "K=KAKCKMKGKRKSKVKTKWKYKHKKKDKBKN"
-                                        "D=DADCDMDGDRDSDVDTDWDYDHDKDDDBDN"
-                                        "B=BABCBMBGBRBSBVBTBWBYBHBKBDBBBN"
-                                        "N=NANCNMNGNRNSNVNTNWNYNHNKNDNBNN";
+    constexpr char code2base[] = "===A=C=M=G=R=S=V=T=W=Y=H=K=D=B=N"
+                                 "A=AAACAMAGARASAVATAWAYAHAKADABAN"
+                                 "C=CACCCMCGCRCSCVCTCWCYCHCKCDCBCN"
+                                 "M=MAMCMMMGMRMSMVMTMWMYMHMKMDMBMN"
+                                 "G=GAGCGMGGGRGSGVGTGWGYGHGKGDGBGN"
+                                 "R=RARCRMRGRRRSRVRTRWRYRHRKRDRBRN"
+                                 "S=SASCSMSGSRSSSVSTSWSYSHSKSDSBSN"
+                                 "V=VAVCVMVGVRVSVVVTVWVYVHVKVDVBVN"
+                                 "T=TATCTMTGTRTSTVTTTWTYTHTKTDTBTN"
+                                 "W=WAWCWMWGWRWSWVWTWWWYWHWKWDWBWN"
+                                 "Y=YAYCYMYGYRYSYVYTYWYYYHYKYDYBYN"
+                                 "H=HAHCHMHGHRHSHVHTHWHYHHHKHDHBHN"
+                                 "K=KAKCKMKGKRKSKVKTKWKYKHKKKDKBKN"
+                                 "D=DADCDMDGDRDSDVDTDWDYDHDKDDDBDN"
+                                 "B=BABCBMBGBRBSBVBTBWBYBHBKBDBBBN"
+                                 "N=NANCNMNGNRNSNVNTNWNYNHNKNDNBNN";
 
     /**
      * From HTSLib 1.22 sam_internals.h.
@@ -186,7 +187,7 @@ const char* get_sam_mode(const char* file_name, const bool write)
 
 void print_version(const std::string& prog_name)
 {
-    std::cout << prog_name << " ver. " << TSAM2GSAM_VERSION << " with HTSLib " << hts_version()
+    std::cout << prog_name << " ver. " << TSAM2GSAM_VERSION << " with " << USED_HTSLIB_NAME << " " << hts_version()
               << ", EWAHBoolArray, cgranges, compiled at " << __DATE__ << ", " << __TIME__ << "." << std::endl;
 }
 } // namespace labw::art_modern

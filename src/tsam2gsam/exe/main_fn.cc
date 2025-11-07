@@ -249,7 +249,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
         USED_HTSLIB_NAME, "Failed to add OA tag for " + qname, false, CExceptionsProxy::EXPECTATION::ZERO);
 }
 
-void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char ** argv)
+void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char** argv)
 {
     CExceptionsProxy::assert_numeric(sam_hdr_remove_lines(ghdr, "SQ", nullptr, nullptr), USED_HTSLIB_NAME,
         "Failed to remove existing SQ lines from SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
