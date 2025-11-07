@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.2.1-section)=
-## 1.2.1 (Ongoing)
+## 1.2.1 (2025/11/06)
 
 - The GNU Scientific Library (GSL) random generator removed.
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
