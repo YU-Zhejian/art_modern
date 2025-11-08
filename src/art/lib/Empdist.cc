@@ -129,6 +129,7 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
             validate_();
             BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
             log();
+            return;
         }
     }
     BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";

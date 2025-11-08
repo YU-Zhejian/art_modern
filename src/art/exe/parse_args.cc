@@ -15,7 +15,7 @@
 
 #include "art/exe/parse_args.hh"
 
-#include "art/builtin_profiles.hh"
+#include "art/builtin_profiles.h"
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtIOParams.hh"
 #include "art/lib/ArtParams.hh"
