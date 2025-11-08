@@ -204,6 +204,15 @@ The MPI installation with MPI C API should be locatable using CMake module [`Fin
 
 See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
 
+(pcg-random-generator-section)=
+### PCG Random Number Generator
+
+[PCG](https://www.pcg-random.org/) is used as an alternative to `std::mt19937` for random number generation. File `<pcg_random.hpp>` is required. Usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev).
+
+No additional dependency is required.
+
+See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) mentioned below.
+
 ## Required Bundled/External Libraries
 
 The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your system administrator if you do not know whether and where those libraries are installed.
@@ -302,15 +311,6 @@ No additional dependency is required.
 
 See also: [CMake variable `USE_THREAD_PARALLEL`](#use-thread-parallel-section) mentioned below.
 
-(pcg-random-generator-section)=
-### PCG Random Number Generator
-
-[PCG](https://www.pcg-random.org/) is used as an alternative to `std::mt19937` for random number generation.
-
-No additional dependency is required.
-
-See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) mentioned below.
-
 ## CMake Variables
 
 This project relies on diverse CMake variables that control the build behavior. If you want a specific build (e.g., with accelerated random number generation, with or without debugging information), you should set them accordingly. They should be set when invoking `cmake`. For example,
@@ -396,7 +396,8 @@ Available since [1.0.0](#v-1.0.0-section).
 The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
-- `PCG`: PCG random generators. Available since [1.1.1](#v-1.1.1-section). See [PCG Random Number Generator](#pcg-random-generator-section) for requirements.
+- `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
+- `SYSTEM_PCG`: Use PCG random generators found in the system. See [PCG Random Number Generator](#pcg-random-generator-section) for requirements. Available since [1.2.2](#v-1.2.2-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
 - `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements.
 

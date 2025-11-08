@@ -5,8 +5,7 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
-- Support different read length for R1 and R2. Add testings.
-  - Update docs to R1 and R2.
+- Support different read length for R1 and R2. Add testings. Update docs.
 - Some non-reproducible SEGFAULTs occurred in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE:
 
   ```shell

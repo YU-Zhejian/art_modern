@@ -314,8 +314,6 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    # TODO: Find SYSTEM_PCG.
-
     print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
@@ -354,6 +352,7 @@ if __name__ == "__main__":
     print("Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
+        RANDOM_GENERATORS.append("SYSTEM_PCG")
         print("SUCCESS")
     else:
         print("FAIL")
