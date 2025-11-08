@@ -207,7 +207,7 @@ See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
 (pcg-random-generator-section)=
 ### PCG Random Number Generator
 
-[PCG](https://www.pcg-random.org/) is used as an alternative to `std::mt19937` for random number generation. File `<pcg_random.hpp>` is required. Usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev).
+[PCG](https://www.pcg-random.org/) is used as an alternative to [`std::mt19937`](https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine.html) for random number generation. File `<pcg_random.hpp>` is required. Usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev).
 
 No additional dependency is required.
 

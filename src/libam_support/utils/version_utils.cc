@@ -134,8 +134,13 @@ namespace {
     void print_onemkl_version()
     {
 #ifdef USE_ONEMKL_RANDOM
+#ifdef __INTEL_MKL_PATCH__
         std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
                   << "." << __INTEL_MKL_PATCH__ << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#else // Not present in Debian MKL.
+        std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
+                  << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#endif
 #else
         std::cout << "MKL: not used" << std::endl;
 #endif

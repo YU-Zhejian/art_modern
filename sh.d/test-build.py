@@ -21,6 +21,12 @@ BASH = shutil.which("bash")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
 SHDIR = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d"))
+PKG_CONFIG_PATH = shutil.which("pkg-config")
+if PKG_CONFIG_PATH is None:
+    PKG_CONFIG_PATH = shutil.which("pkgconf")
+if PKG_CONFIG_PATH is None:
+    # Except
+    raise RuntimeError("pkg-config or pkgconf not found in PATH")
 
 IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
@@ -58,7 +64,16 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
         return result.returncode == 0
 
 
-def probe_mkl() -> bool:
+def probe_pkg_config(package_name: str) -> bool:
+    result = subprocess.run(
+        [PKG_CONFIG_PATH, "--exists", package_name],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return result.returncode == 0
+
+
+def probe_mkl_cmake() -> bool:
     return probe_using_cmake_project("test-mkl.cmake")
 
 
@@ -67,15 +82,15 @@ def probe_mimalloc() -> bool:
 
 
 def probe_jemalloc() -> bool:
-    return probe_using_cmake_script("test-jemalloc.cmake")
+    return probe_pkg_config("jemalloc")
 
 
 def probe_htshtslib() -> bool:
-    return probe_using_cmake_script("test-htslib.cmake")
+    return probe_pkg_config("htslib")
 
 
 def probe_libfmt() -> bool:
-    return probe_using_cmake_script("test-libfmt.cmake")
+    return probe_pkg_config("fmt")
 
 
 def probe_concurrent_queue() -> Optional[str]:
@@ -92,6 +107,7 @@ def probe_concurrent_queue() -> Optional[str]:
             return os.path.dirname(p)
     return None
 
+
 def probe_pcg_random_hpp() -> Optional[str]:
     """
     Probes for the presence of the pcg_random.hpp header file.
@@ -106,18 +122,27 @@ def probe_pcg_random_hpp() -> Optional[str]:
             return os.path.dirname(p)
     return None
 
+
+def peobe_mkl_using_pkgconf() -> Optional[str]:
+    for p in ["mkl-sdl", "mkl-sdl-lp64"]:
+        if probe_pkg_config(p):
+            return p
+    return None
+
+
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
         self.USE_RANDOM_GENERATOR = "PCG"
         self.USE_MALLOC = "AUTO"
         self.USE_THREAD_PARALLEL = "ASIO"
-        self.USE_LIBFMT = "UNSET"
-        self.USE_HTSLIB = "UNSET"
-        self.USE_CONCURRENT_QUEUE = "UNSET"
+        self.USE_LIBFMT = None
+        self.USE_HTSLIB = None
+        self.USE_CONCURRENT_QUEUE = None
         self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
         self.CMAKE_BUILD_TYPE = "Debug"
         self.AM_NO_Q_REVERSE = False
+        self.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
@@ -125,11 +150,11 @@ class BuildConfig:
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
         cmake_flags.append(f"-DUSE_MALLOC={self.USE_MALLOC}")
         cmake_flags.append(f"-DUSE_THREAD_PARALLEL={self.USE_THREAD_PARALLEL}")
-        if self.USE_LIBFMT != "UNSET":
+        if self.USE_LIBFMT is not None:
             cmake_flags.append(f"-DUSE_LIBFMT={self.USE_LIBFMT}")
-        if self.USE_HTSLIB != "UNSET":
+        if self.USE_HTSLIB is not None:
             cmake_flags.append(f"-DUSE_HTSLIB={self.USE_HTSLIB}")
-        if self.USE_CONCURRENT_QUEUE != "UNSET":
+        if self.USE_CONCURRENT_QUEUE is not None:
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
         if self.AM_NO_Q_REVERSE:
             cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
@@ -137,6 +162,8 @@ class BuildConfig:
             cmake_flags.append("-DWITH_MPI=ON")
         if self.AM_NO_Q_REVERSE:
             cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
+        if self.FIND_RANDOM_MKL_THROUGH_PKGCONF:
+            cmake_flags.append(f"-DFIND_RANDOM_MKL_THROUGH_PKGCONF={self.FIND_RANDOM_MKL_THROUGH_PKGCONF}")
         return cmake_flags
 
     def copy(self) -> BuildConfig:
@@ -150,6 +177,7 @@ class BuildConfig:
         new_config.HELP_VERSION_ONLY = self.HELP_VERSION_ONLY
         new_config.AM_NO_Q_REVERSE = self.AM_NO_Q_REVERSE
         new_config.CMAKE_BUILD_TYPE = self.CMAKE_BUILD_TYPE
+        new_config.FIND_RANDOM_MKL_THROUGH_PKGCONF = self.FIND_RANDOM_MKL_THROUGH_PKGCONF
         return new_config
 
 
@@ -307,8 +335,8 @@ if __name__ == "__main__":
     os.makedirs(LOG_DIR)
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
-    print("Probing for MKL...", end="")
-    if probe_mkl():
+    print("Probing for MKL through CMake...", end="")
+    if probe_mkl_cmake():
         RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
@@ -317,7 +345,7 @@ if __name__ == "__main__":
     print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
-        print("SUCCESS")
+        print(concurrent_queue_path)
     else:
         print("FAIL")
 
@@ -353,7 +381,15 @@ if __name__ == "__main__":
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
         RANDOM_GENERATORS.append("SYSTEM_PCG")
-        print("SUCCESS")
+        print(pcg_random_hpp_exist_path)
+    else:
+        print("FAIL")
+
+    print("Probing for MKL found through pkg-config...", end="")
+    mkl_pc = peobe_mkl_using_pkgconf()
+    if mkl_pc is not None:
+        print(mkl_pc)
+        # TODO
     else:
         print("FAIL")
 
@@ -381,19 +417,19 @@ if __name__ == "__main__":
                 bc.USE_LIBFMT = "fmt"
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
-                bc.USE_LIBFMT = "UNSET"
+                bc.USE_LIBFMT = None
 
             if is_htslib_exist:
                 bc.USE_HTSLIB = "hts"
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
-                bc.USE_HTSLIB = "UNSET"
+                bc.USE_HTSLIB = None
 
             if concurrent_queue_path is not None:
                 bc.USE_CONCURRENT_QUEUE = concurrent_queue_path
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
-            bc.USE_CONCURRENT_QUEUE = "UNSET"
+            bc.USE_CONCURRENT_QUEUE = None
 
             bc.AM_NO_Q_REVERSE = True
             executor.submit(do_build, bc.copy(), job_id)
@@ -406,11 +442,17 @@ if __name__ == "__main__":
                 bc.USE_RANDOM_GENERATOR = use_random_generator
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
+            if mkl_pc:
+                bc.USE_RANDOM_GENERATOR = "ONEMKL"
+                bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = mkl_pc
+                executor.submit(do_build, bc.copy(), job_id)
+                job_id += 1
+                bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
+
             bc.USE_RANDOM_GENERATOR = "PCG"
     executor.shutdown()
-    print(f"Successful builds: {', '.join(SUCCESS_ID)}")
-    print(f"Failed builds: {', '.join(FAILED_ID)}")
-    if FAILED_ID:
-        exit(1)
-    else:
-        exit(0)
+    SUCCESS_ID = sorted(SUCCESS_ID)
+    FAILED_ID = sorted(FAILED_ID)
+    print(f"Successful builds: {', '.join(map(str, SUCCESS_ID))}")
+    print(f"Failed builds: {', '.join(map(str,FAILED_ID))}")
+    exit(1 if FAILED_ID else 0)

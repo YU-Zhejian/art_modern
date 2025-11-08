@@ -36,7 +36,8 @@
 #include <pcg_random.hpp>
 #define PCG_CLASS_NAME pcg32_fast
 #else
-#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM, USE_SYSTEM_PCG_RANDOM for random generators!"
+#error                                                                                                                 \
+    "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM, USE_SYSTEM_PCG_RANDOM for random generators!"
 #endif
 
 // Include C++ stdlibs
@@ -44,7 +45,7 @@
 #include <array> // Cache uses std::array
 #endif
 #include <cstddef>
-#if defined(USE_STL_RANDOM)|| defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
+#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
 #include <random>
 #endif
 #include <vector>

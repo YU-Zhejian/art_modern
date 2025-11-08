@@ -551,7 +551,8 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     qdist.index();
 
     // Assess whether different read length is legal
-    if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE && read_len_1 != read_len_2) {
+    if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE
+        && read_len_1 != read_len_2) {
         BOOST_LOG_TRIVIAL(fatal)
             << "Fatal Error: Different read lengths for read 1 and read 2 are only supported in template mode.";
         abort_mpi();

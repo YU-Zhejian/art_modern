@@ -102,9 +102,9 @@ std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const 
                                  << " is out of bounds for total sequences of " << seq_names_.size() << ".";
         abort_mpi();
     }
-    const hts_pos_t  max_len = faidx_seq_len64(faidx_, seq_names_[seq_id].c_str());
+    const hts_pos_t max_len = faidx_seq_len64(faidx_, seq_names_[seq_id].c_str());
 
-    if (end > max_len || start >  max_len || start < 0 || end < 0 || start > end) {
+    if (end > max_len || start > max_len || start < 0 || end < 0 || start > end) {
         BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested range [" << start << ", " << end
                                  << ") is out of bounds for sequence of length " << max_len << ".";
         abort_mpi();
