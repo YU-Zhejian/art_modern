@@ -23,6 +23,8 @@ SHDIR = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d"))
 
 IO_MUTEX = threading.Lock()
+SUCCESS_ID = []
+FAILED_ID = []
 
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
@@ -145,7 +147,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         log_file.write(f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
         # Invoke CMake to configure the build
 
-        def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs):
+        def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs) -> bool:
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} START")
             log_file.write(f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
@@ -163,13 +165,13 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                     with IO_MUTEX:
                         print(f"{this_job_id} {step_name} FAILED")
                     log_file.write(f"{this_job_id} {step_name} FAILED\n".encode("utf-8"))
-
-                    raise RuntimeError(f"Step {step_name} failed for job {this_job_id}")
+                    return False
             with IO_MUTEX:
                 print(f"{this_job_id} {step_name} DONE")
             log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
+            return True
 
-        run_wrapper(
+        if not run_wrapper(
             "CONFIG",
             [
                 CMAKE,
@@ -187,9 +189,12 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             cwd=build_dir,
             stdout=log_file,
             stderr=log_file,
-        )
+        ):
+            with IO_MUTEX:
+                FAILED_ID.append(this_job_id)
+            return
 
-        run_wrapper(
+        if not run_wrapper(
             "BUILD",
             [
                 CMAKE,
@@ -200,23 +205,32 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             ],
             stdout=log_file,
             stderr=log_file,
-        )
-        run_wrapper(
+        ):
+            with IO_MUTEX:
+                FAILED_ID.append(this_job_id)
+                return
+        if not run_wrapper(
             "CTEST",
             [CTEST, "--output-on-failure"],
             cwd=build_dir,
             stdout=log_file,
             stderr=log_file,
-        )
+        ):
+            with IO_MUTEX:
+                FAILED_ID.append(this_job_id)
+                return
 
-        run_wrapper(
+        if not run_wrapper(
             "INSTALL",
             [CMAKE, "--install", build_dir],
             stdout=log_file,
             stderr=log_file,
-        )
+        ):
+            with IO_MUTEX:
+                FAILED_ID.append(this_job_id)
+                return
 
-        run_wrapper(
+        if not run_wrapper(
             "TESTSMALL",
             [BASH, os.path.join(SHDIR, "test-small.sh")],
             stdout=log_file,
@@ -230,10 +244,14 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "MPI_PARALLEL": "4",
                 "PARALLEL": "2",
             },
-        )
+        ):
+            with IO_MUTEX:
+                FAILED_ID.append(this_job_id)
+                return
 
         shutil.rmtree(build_dir)
     os.remove(log_path)  # Remove log if successful.
+    SUCCESS_ID.append(this_job_id)
 
 
 if __name__ == "__main__":
@@ -357,3 +375,9 @@ if __name__ == "__main__":
                 job_id += 1
             bc.USE_RANDOM_GENERATOR = "PCG"
     executor.shutdown()
+    print(f"Successful builds: {', '.join(SUCCESS_ID)}")
+    print(f"Failed builds: {', '.join(FAILED_ID)}")
+    if FAILED_ID:
+        exit(1)
+    else:
+        exit(0)
