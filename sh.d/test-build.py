@@ -92,6 +92,19 @@ def probe_concurrent_queue() -> Optional[str]:
             return os.path.dirname(p)
     return None
 
+def probe_pcg_random_hpp() -> Optional[str]:
+    """
+    Probes for the presence of the pcg_random.hpp header file.
+
+    :return: The path to the pcg_random.hpp header file if found, else None.
+    """
+    for p in [
+        "/usr/include/pcg_random.hpp",
+        "/usr/local/include/pcg_random.hpp",
+    ]:
+        if os.path.exists(p):
+            return os.path.dirname(p)
+    return None
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
@@ -104,6 +117,7 @@ class BuildConfig:
         self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
         self.CMAKE_BUILD_TYPE = "Debug"
+        self.AM_NO_Q_REVERSE = False
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
@@ -119,6 +133,8 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
+        if self.AM_NO_Q_REVERSE:
+            cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
         return cmake_flags
 
     def copy(self) -> BuildConfig:
@@ -130,6 +146,8 @@ class BuildConfig:
         new_config.USE_HTSLIB = self.USE_HTSLIB
         new_config.USE_CONCURRENT_QUEUE = self.USE_CONCURRENT_QUEUE
         new_config.HELP_VERSION_ONLY = self.HELP_VERSION_ONLY
+        new_config.AM_NO_Q_REVERSE = self.AM_NO_Q_REVERSE
+        new_config.CMAKE_BUILD_TYPE = self.CMAKE_BUILD_TYPE
         return new_config
 
 
@@ -329,6 +347,13 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
+    print("Probing for <pcg_random.hpp>...", end="")
+    pcg_random_hpp_exist_path = probe_pcg_random_hpp()
+    if pcg_random_hpp_exist_path:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
     job_id = 0
     max_workers = min(5, os.cpu_count() // 4)
@@ -366,6 +391,11 @@ if __name__ == "__main__":
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_CONCURRENT_QUEUE = "UNSET"
+
+            bc.AM_NO_Q_REVERSE = True
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.AM_NO_Q_REVERSE = False
 
             bc.HELP_VERSION_ONLY = False
 
