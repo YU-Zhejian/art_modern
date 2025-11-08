@@ -102,6 +102,7 @@ class BuildConfig:
         self.HELP_VERSION_ONLY = True
         self.old_cmake_flags = old_cmake_flags
         self.CMAKE_BUILD_TYPE = "Debug"
+        self.AM_NO_Q_REVERSE = False
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
@@ -115,6 +116,8 @@ class BuildConfig:
             cmake_flags.append(f"-DUSE_HTSLIB={self.USE_HTSLIB}")
         if self.USE_CONCURRENT_QUEUE != "UNSET":
             cmake_flags.append(f"-DUSE_CONCURRENT_QUEUE={self.USE_CONCURRENT_QUEUE}")
+        if self.AM_NO_Q_REVERSE:
+            cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
         return cmake_flags
@@ -249,9 +252,9 @@ if __name__ == "__main__":
         help="Use MPI for builds and tests.",
     )
 
-    args, old_cmake_flags = parser.parse_known_args()
-    DRY_RUN = args.dry_run
-    WITH_MPI = args.mpi
+    _args, _old_cmake_flags = parser.parse_known_args()
+    DRY_RUN = _args.dry_run
+    WITH_MPI = _args.mpi
 
     if WITH_MPI:
         if MPIEXEC is None:
@@ -275,6 +278,8 @@ if __name__ == "__main__":
         print("SUCCESS")
     else:
         print("FAIL")
+
+    # TODO: Find SYSTEM_PCG.
 
     print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
@@ -316,7 +321,7 @@ if __name__ == "__main__":
     max_workers = min(5, os.cpu_count() // 4)
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for cmake_build_type in cmake_build_types:
-            bc = BuildConfig(old_cmake_flags)
+            bc = BuildConfig(_old_cmake_flags)
             bc.CMAKE_BUILD_TYPE = cmake_build_type
 
             for use_thread_parallel in ["BS", "NOP"]:
@@ -348,6 +353,11 @@ if __name__ == "__main__":
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             bc.USE_CONCURRENT_QUEUE = "UNSET"
+
+            bc.AM_NO_Q_REVERSE = True
+            executor.submit(do_build, bc.copy(), job_id)
+            job_id += 1
+            bc.AM_NO_Q_REVERSE = False
 
             bc.HELP_VERSION_ONLY = False
 

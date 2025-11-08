@@ -7,7 +7,7 @@
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
 - Support different read length for R1 and R2.
   - Update APB docs to R1 and R2.
-- Some non-reproducible SEGFAULTs occured in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE:
+- Some non-reproducible SEGFAULTs occurred in `make testbuild` with pure-LLVM toolchain. CONFIG CMDLINE:
 
   ```shell
   LD_LIBRARY_PATH=${HOME}/opt/boost-1.89.0-clang/lib/ \
@@ -51,8 +51,6 @@
 - Supress all lintian issues.
 - Link MKL using pkgconfig using `mkl-sdl.pc` (Shipped with Intel) or `mkl-sdl-lp64.pc` (Shipped with Debian).
 - Support `libtcmalloc.pc` and `libtcmalloc_minimal.pc`. Provided by Debian package `libgoogle-perftools-dev` (wierd). Also support Google profilers.
-- Add RNG `SYSTEM_PCG` for packing.
-- Add qreverse options to `make testbuild`.
 
 ## Performance
 
