@@ -13,8 +13,7 @@ pcg32_c::pcg32_c(uint64_t state, uint64_t inc)
     , inc_(inc) {};
 pcg32_c::pcg32_c()
     : pcg32_c { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL } {};
-constexpr pcg32_c::result_type pcg32_c::min() noexcept { return std::numeric_limits<result_type>::min(); }
-constexpr pcg32_c::result_type pcg32_c::max() noexcept { return std::numeric_limits<result_type>::max(); }
+
 pcg32_c::result_type pcg32_c::operator()()
 {
     uint64_t const oldstate = state_;

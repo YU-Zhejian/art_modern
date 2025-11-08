@@ -550,6 +550,13 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     qdist.shift_all_emp(qual_shift_1, qual_shift_2, min_qual, max_qual);
     qdist.index();
 
+    // Assess whether different read length is legal
+    if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE && read_len_1 != read_len_2) {
+        BOOST_LOG_TRIVIAL(fatal)
+            << "Fatal Error: Different read lengths for read 1 and read 2 are only supported in template mode.";
+        abort_mpi();
+    }
+
     // Validate PE fragment distance parameters
     double pe_frag_dist_mean = 0;
     double pe_frag_dist_std_dev = 0;

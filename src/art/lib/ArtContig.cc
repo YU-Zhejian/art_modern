@@ -112,7 +112,7 @@ ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const s
     , fasta_fetch_(fasta_fetch)
     , rprob_(rprob)
     , seq_id_(seq_id)
-    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.read_len_1 + art_params.read_len_2))
+    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.read_len_max))
 {
 }
 hts_pos_t ArtContig::generate_fragment_length() const

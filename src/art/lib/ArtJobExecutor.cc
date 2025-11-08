@@ -24,6 +24,7 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/depth_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -54,10 +55,18 @@ namespace {
         {
         }
 
+        DELETE_COPY(AJEReporter)
+        DELETE_MOVE(AJEReporter)
+        ~AJEReporter(){
+            stop();
+        }
+
         void stop()
         {
             should_stop_ = true;
-            thread_.join();
+            if (thread_.joinable()){
+                thread_.join();
+            }
         }
         void start() { thread_ = std::thread(&AJEReporter::job_, this); }
 
@@ -206,24 +215,9 @@ void ArtJobExecutor::operator()()
             num_pos_reads = npr;
             num_neg_reads = nnr;
         } else {
-
-            if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-                const auto [npr, nnr] = calculate_num_reads_se(contig_size, art_params_.read_len_1, cov_pos, cov_neg);
-                num_pos_reads = npr;
-                num_neg_reads = nnr;
-            } else {
-                if (art_params_.read_len_1 == art_params_.read_len_2) {
-                    const auto [npr, nnr] = calculate_num_reads_old(
-                        contig_size, art_params_.read_len_1, cov_pos, cov_neg, num_reads_to_reduce_);
-                    num_pos_reads = npr;
-                    num_neg_reads = nnr;
-                } else {
-                    const auto [npr, nnr] = calculate_num_reads_pe(
-                        contig_size, art_params_.read_len_1, art_params_.read_len_2, cov_pos, cov_neg);
-                    num_pos_reads = npr;
-                    num_neg_reads = nnr;
-                }
-            }
+            const auto [npr, nnr] = calculate_num_reads_old(contig_size, art_params_.read_len_1, cov_pos, cov_neg, num_reads_to_reduce_);
+            num_pos_reads = npr;
+            num_neg_reads = nnr;
         }
 
         if (num_pos_reads + num_neg_reads == 0) {
