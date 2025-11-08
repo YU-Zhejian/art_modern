@@ -20,4 +20,9 @@ std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_se(
  */
 std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_pe(
     std::size_t contig_size, am_read_len_t read_len_1, am_read_len_t read_len_2, double cov_pos, double cov_neg);
+/**
+ * The old algoithm that would work when read lengths are the same.
+ */
+std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_old(
+    std::size_t contig_size, int read_len, double cov_pos, double cov_neg, am_readnum_t num_reads_to_reduce);
 } // namespace labw::art_modern
