@@ -15,13 +15,13 @@
 
 #pragma once
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT: For USE_STL_RANDOM, etc.
 
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/class_macros_utils.hh"
 
 #if defined(USE_STL_RANDOM)
-#include <random>
+// Do nothing, included below
 #elif defined(USE_BOOST_RANDOM)
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/normal_distribution.hpp>
@@ -29,20 +29,27 @@
 #include <boost/random/uniform_int_distribution.hpp>
 #elif defined(USE_ONEMKL_RANDOM)
 #include <mkl.h> // NOLINT
-
-#include <array>
 #elif defined(USE_PCG_RANDOM)
 #include "libam_support/ds/pcg_32_c.hh"
-
-#include <random>
+#define PCG_CLASS_NAME pcg_32_c
+#elif defined(USE_SYSTEM_PCG_RANDOM)
+#include <pcg_random.hpp>
+#define PCG_CLASS_NAME pcg32_fast
 #else
-#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM for random generators!"
+#error "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM, USE_SYSTEM_PCG_RANDOM for random generators!"
 #endif
 
+// Include C++ stdlibs
+#if defined(USE_ONEMKL_RANDOM)
+#include <array> // Cache uses std::array
+#endif
 #include <cstddef>
+#if defined(USE_STL_RANDOM)|| defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
+#include <random>
+#endif
 #include <vector>
 
-#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
+#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
 #define REAL_DIST std::uniform_real_distribution
 #define NORM_DIST std::normal_distribution
 #define INT_DIST std::uniform_int_distribution
@@ -87,6 +94,7 @@ private:
     void public_init_();
 
 #if defined(USE_ONEMKL_RANDOM)
+    // OneMKL bulk random number generation cache
     constexpr static std::size_t CACHE_SIZE_ = 4096;
 
     std::array<int, CACHE_SIZE_> cached_rand_pos_on_read_1_ {};
@@ -111,11 +119,11 @@ private:
     std::size_t cached_rand_quality_less_than_10_index_ = 0;
 #endif
 
-#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_BOOST_RANDOM)
+#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
-#elif defined(USE_PCG_RANDOM)
-    pcg32_c gen_;
+#elif defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
+    PCG_CLASS_NAME gen_;
 #else
     boost::mt19937 gen_;
 #endif
