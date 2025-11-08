@@ -16,6 +16,7 @@
 
 #include "libam_support/utils/class_macros_utils.hh"
 
+#include <cstdlib>
 #include <istream>
 #include <string>
 #include <unordered_map>

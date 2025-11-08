@@ -1,15 +1,12 @@
-
-
 #include "libam_support/seq/str_to_qual.h"
+#include "libam_support/utils/c_macro_utils.h" // NOLINT: For INCLUDE_INTEL_SIMD
 
 #include "libam_support/Constants.h"
 #include "libam_support/Dtypes.h"
 
-// NOLINTBEGIN
-#if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
-#include <immintrin.h> // FIXME: Change to <x86intrin.h> or <intrin.h> (MSVC) to improve portability
+#if defined(INCLUDE_INTEL_SIMD)
+#include INCLUDE_INTEL_SIMD
 #endif
-// NOLINTEND
 
 #include <stdlib.h>
 

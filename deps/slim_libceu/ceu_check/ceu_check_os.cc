@@ -1,6 +1,7 @@
 #include "ceu_check/ceu_check_os.hh"
 #include "libceu_stddef.h"
 
+
 #ifdef CEU_ON_POSIX
 // Should NOT be removed
 #include <unistd.h> // NOLINT
@@ -22,6 +23,7 @@
 #include <windows.h>
 #endif
 
+#include <ostream>
 #include <sstream>
 #include <string>
 

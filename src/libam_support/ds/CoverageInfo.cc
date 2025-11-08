@@ -17,6 +17,7 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+#include <cstdlib>
 #include <istream>
 #include <string>
 #include <utility>
@@ -85,17 +86,18 @@ CoverageInfo::CoverageInfo(std::istream& istream)
 
 CoverageInfo CoverageInfo::div(const std::size_t num_parts) const
 {
+    const auto num_parts_dbl = static_cast<double>(num_parts);
     if (coverage_positive_.empty()) {
-        return CoverageInfo(static_coverage_positive_ / num_parts, static_coverage_negative_ / num_parts);
+        return CoverageInfo(static_coverage_positive_ / num_parts_dbl, static_coverage_negative_ / num_parts_dbl);
     }
 
     coverage_map coverage_positive_new;
     for (auto const& [contig_name, contig_cov] : coverage_positive_) {
-        coverage_positive_new.try_emplace(contig_name, contig_cov / num_parts);
+        coverage_positive_new.try_emplace(contig_name, contig_cov / num_parts_dbl);
     }
     coverage_map coverage_negative_new;
     for (auto const& [contig_name, contig_cov] : coverage_positive_) {
-        coverage_negative_new.try_emplace(contig_name, contig_cov / num_parts);
+        coverage_negative_new.try_emplace(contig_name, contig_cov / num_parts_dbl);
     }
     return { std::move(coverage_positive_new), std::move(coverage_negative_new) };
 }

@@ -191,7 +191,6 @@ void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bo
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
     rprob.r_probs(read_len);
     for (am_read_len_t i = 0; i < read_len; i++) {
-        // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
     }
 }

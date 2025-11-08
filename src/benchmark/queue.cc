@@ -10,9 +10,9 @@
  *
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
- *
- * TODO: Use Geometric mean to better represent the performance
  **/
+
+#include "benchmark_utils.hh"
 
 #include <boost/lockfree/queue.hpp> // NOLINT
 #include <boost/log/trivial.hpp> // NOLINT
@@ -198,17 +198,27 @@ void bench_moody_camel_implicit()
 }
 
 } // namespace
+
+using namespace labw::art_modern; // NOLINT
 int main()
 {
-    auto start = std::chrono::high_resolution_clock::now();
-    bench_moody_camel_implicit();
-    auto end = std::chrono::high_resolution_clock::now();
-    BOOST_LOG_TRIVIAL(info) << "Moody Camel (Implicit): "
-                            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms";
-    start = std::chrono::high_resolution_clock::now();
-    bench_moody_camel_explicit();
-    end = std::chrono::high_resolution_clock::now();
-    BOOST_LOG_TRIVIAL(info) << "Moody Camel (Explicit): "
-                            << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << " ms";
+    constexpr std::size_t NUM_TRIALS = 20;
+    std::vector<std::size_t> times;
+    for (std::size_t i = 0; i < NUM_TRIALS; ++i) {
+        auto start = std::chrono::high_resolution_clock::now();
+        bench_moody_camel_implicit();
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+    }
+    BOOST_LOG_TRIVIAL(info) << "Moody Camel (Implicit): " << describe(times) << " ms";
+    times.clear();
+    for (std::size_t i = 0; i < NUM_TRIALS; ++i) {
+        auto start = std::chrono::high_resolution_clock::now();
+        bench_moody_camel_explicit();
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
+    }
+    BOOST_LOG_TRIVIAL(info) << "Moody Camel (Explicit): " << describe(times) << " ms";
+
     return EXIT_SUCCESS;
 }

@@ -206,7 +206,7 @@ void ArtJobExecutor::operator()()
             num_pos_reads = npr;
             num_neg_reads = nnr;
         } else {
-            const auto [npr, nnr] = calculate_num_reads(
+            const auto [npr, nnr] = calculate_num_reads_se(
                 contig_size, art_params_.read_len_1, art_params_.read_len_2, cov_pos, cov_neg, num_reads_to_reduce_);
             num_pos_reads = npr;
             num_neg_reads = nnr;
