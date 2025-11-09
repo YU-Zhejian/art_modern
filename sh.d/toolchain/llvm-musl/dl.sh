@@ -23,3 +23,6 @@ env -C "${SRC_DIR}" tar -xf coreutils-8.28.tar.xz
 
 wget -4 "https://ftpmirror.gnu.org/gnu/bash/bash-5.3.tar.gz" -O "${SRC_DIR}/bash-5.3.tar.gz"
 env -C "${SRC_DIR}" tar -xf bash-5.3.tar.gz
+
+wget -4 http://deb.debian.org/debian/pool/main/u/util-linux/util-linux_2.41.orig.tar.xz -O "${SRC_DIR}/util-linux_2.41.orig.tar.xz"
+env -C "${SRC_DIR}" tar -xf util-linux_2.41.orig.tar.xz

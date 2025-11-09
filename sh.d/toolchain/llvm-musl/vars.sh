@@ -12,6 +12,7 @@ BUSYBOX_SRC_DIR="${SRC_DIR}/busybox-upstream-1.37.0"
 COREUTILS_SRC_DIR="${SRC_DIR}/coreutils-8.28"
 BASH_SRC_DIR="${SRC_DIR}/bash-5.3"
 LIBEXECINFO_SRC_DIR="${SRC_DIR}/libexecinfo-d15ae4ca2e5e3b56d9abb2c7de03cb38078db474"
+UTIL_LINUX_SRC_DIR="${SRC_DIR}/util-linux-2.41"
 
 SYSROOT="${PROJ_DIR}/sysroot"
 KERNEL_PARAMS="nokaslr console=tty0 console=ttyS0,115200"

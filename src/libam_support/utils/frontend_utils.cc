@@ -15,13 +15,10 @@
 #include <string>
 #include <thread>
 
-namespace po =  boost::program_options;
+namespace po = boost::program_options;
 
 namespace labw::art_modern {
-void print_help(
-        const po::options_description& po_desc,
-        const std::string& prefix,
-        const std::string& suffix)
+void print_help(const po::options_description& po_desc, const std::string& prefix, const std::string& suffix)
 {
     if (!prefix.empty()) {
         std::cout << prefix << std::endl;
@@ -32,9 +29,8 @@ void print_help(
     }
 }
 
-
-po::variables_map generate_vm_while_handling_help_version(
-    const po::options_description& po_desc, const int argc, char** argv, const std::string& prefix , const std::string& suffix)
+po::variables_map generate_vm_while_handling_help_version(const po::options_description& po_desc, const int argc,
+    char** argv, const std::string& prefix, const std::string& suffix)
 {
     if (argc == 1) {
         // No command line arguments.

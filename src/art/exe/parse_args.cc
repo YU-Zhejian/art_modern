@@ -145,7 +145,9 @@ namespace {
         art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
             "the prefix identification tag for read ID");
 
-        const std::string arg_builtin_qual_file_desc = std::string("name of some built-in quality profile. See below for valid values. Set this to avoid ") + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
+        const std::string arg_builtin_qual_file_desc
+            = std::string("name of some built-in quality profile. See below for valid values. Set this to avoid ")
+            + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(DEFAULT_ERR_PROFILE),
             arg_builtin_qual_file_desc.c_str());
         art_opts.add_options()(
@@ -468,15 +470,16 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     std::vector<std::string> args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
     // Generate suffix docs for builtin profiles
-    std::stringstream  ss;
+    std::stringstream ss;
     ss << "Builtin profiles:\n";
     for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
         const auto& profile = Empdist(BUILTIN_PROFILE_NAMES[i], false, false, true);
         const bool supports_pe = profile.get_read_2_max_length() > 0;
         const auto r1_max_rlen = profile.get_read_1_max_length();
         const auto r2_max_rlen = profile.get_read_2_max_length();
-        ss << "\t" << BUILTIN_PROFILE_NAMES[i] << ": " << (supports_pe ? "PE" : "SE") << ", max read length :"
-           << r1_max_rlen << (supports_pe ? (std::string(", ") + std::to_string(r2_max_rlen)) : "") << "\n";
+        ss << "\t" << BUILTIN_PROFILE_NAMES[i] << ": " << (supports_pe ? "PE" : "SE")
+           << ", max read length :" << r1_max_rlen
+           << (supports_pe ? (std::string(", ") + std::to_string(r2_max_rlen)) : "") << "\n";
     }
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv, "", ss.str());

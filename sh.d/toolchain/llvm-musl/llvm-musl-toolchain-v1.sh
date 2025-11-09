@@ -187,7 +187,7 @@ env -C "${COREUTILS_SRC_DIR}" ./configure \
     --with-linux-crypto \
     --without-selinux \
     --without-libgmp \
-    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${COREUTILS_SRC_DIR}" make -j"$(nproc)" install
@@ -200,12 +200,43 @@ env -C "${BASH_SRC_DIR}" ./configure \
     --prefix="${SYSROOT}/usr" \
     --host="${TARGET}" \
     --without-bash-malloc \
-    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${BASH_SRC_DIR}" make -j"$(nproc)" install
 sudo env -i "$(which chroot)" "${SYSROOT}" /usr/bin/bash -li
 pack s8
+
+# Step 9: Build util-linux
+env -C "${UTIL_LINUX_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --disable-nls \
+    --disable-shared \
+    --disable-pylibmount \
+    --disable-liblastlog2 \
+    --disable-rfkill \
+    --disable-bash-completion \
+    --disable-makeinstall-chown \
+    --disable-makeinstall-setuid \
+    --disable-makeinstall-tty-setgid \
+    --without-python \
+    --without-util \
+    --without-tinfo \
+    --without-udev \
+    --without-ncursesw \
+    --without-ncurses \
+    --without-btrfs \
+    --without-systemd \
+    --disable-asciidoc \
+    --disable-poman \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CC="${HOSTCC}" \
+    CXX="${HOSTCXX}" \
+    CXXFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc++ -Wl,-lc++abi -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -nostdinc++ -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -stdlib=libc++ -w -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld"
+env -C "${UTIL_LINUX_SRC_DIR}" make -j"$(nproc)" AM_DEFAULT_VERBOSITY=1 install
+sudo env -i "$(which chroot)" "${SYSROOT}" /usr/bin/bash -li
+pack s9
 
 mksquashfs "${SYSROOT}" rootfs.squashfs -comp zstd -noappend
 # Create data qcow2 image

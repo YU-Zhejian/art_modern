@@ -33,4 +33,3 @@ BOOST_AUTO_TEST_CASE(test_depth_utils_se_2)
     BOOST_TEST(18 == npr);
     BOOST_TEST(0 == nnr);
 }
-
