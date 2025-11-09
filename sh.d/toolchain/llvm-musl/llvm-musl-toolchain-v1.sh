@@ -204,10 +204,10 @@ env -C "${BASH_SRC_DIR}" ./configure \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${BASH_SRC_DIR}" make -j"$(nproc)" install
-sudo chroot "${SYSROOT}" /usr/bin/bash -li
+sudo env -i "$(which chroot)" "${SYSROOT}" /usr/bin/bash -li
 pack s8
 
-mksquashfs "${SYSROOT}" rootfs.squashfs -comp zstd
+mksquashfs "${SYSROOT}" rootfs.squashfs -comp zstd -noappend
 # Create data qcow2 image
 qemu-img create -f qcow2 data.qcow2 40G
 

@@ -2,3 +2,4 @@
 !busybox_initramfs
 *.squashfs
 *.qcow2
+!/*.ini

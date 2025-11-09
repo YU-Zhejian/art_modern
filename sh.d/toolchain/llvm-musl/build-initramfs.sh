@@ -27,7 +27,7 @@ make -j"$(nproc)" -C "${BUSYBOX_SRC_DIR}" \
     OBJCOPY="${HOSTOBJCOPY}" \
     OBJDUMP="${HOSTOBJDUMP}" \
     NM="${HOSTNM}"
-llvm-strip "${BUSYBOX_SRC_DIR}"/busybox_unstripped -o "${BUSYBOX_INSTALL_DIR}"/busybox
+"${HOSTSTRIP}" "${BUSYBOX_SRC_DIR}"/busybox_unstripped -o "${BUSYBOX_INSTALL_DIR}"/busybox
 mkdir -p "${BUSYBOX_INSTALL_DIR}"/bin
 for applet in $(env -C "${BUSYBOX_INSTALL_DIR}" ./busybox --list); do
     env -C "${BUSYBOX_INSTALL_DIR}" ln -sf ../busybox "bin/${applet}"
