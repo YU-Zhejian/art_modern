@@ -3,14 +3,18 @@
 (v-1.2.2-section)=
 ## 1.2.2 (Ongoing)
 
-- Several low-level C++ features re-done in C to improve compilation speed.
-- **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
-- Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
-- `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.
-- **EXPERIMENTAL** `art_modern` and `art_profile_builder` now supports different length of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options.
-  - **NOTE** For `art_modern`: Currently, this feature works for PE Template mode only.
-- **EXPERIMENTAL** Packing: `-DFIND_RANDOM_MKL_THROUGH_PKGCONF` added to CMake options to find Intel OneMKL through `pkg-config`.
-- `libtcmalloc` and `libtcmalloc_minimal` supported as an alternative `malloc`/`free` implementation.
+- Algorithm:
+  - **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
+  - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.
+  - Several low-level C++ features re-done in C to improve compilation speed.
+- Interface:
+  - **EXPERIMENTAL** `art_modern` and `art_profile_builder` now supports different length of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options.
+    - **NOTE** For `art_modern`: Currently, this feature works for PE Template mode only.
+  - `art_modern`: Some defaults added to options. `--builtin_qual_file` now default to `HiSeq2500_150bp`; `--lc` now default to `se`; `--mode` now default to `wgs`.
+- Packing:
+  - **EXPERIMENTAL** `-DFIND_RANDOM_MKL_THROUGH_PKGCONF` added to CMake options to find Intel OneMKL through `pkg-config`.
+  - `libtcmalloc` and `libtcmalloc_minimal` supported as an alternative `malloc`/`free` implementation.
+  - Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=

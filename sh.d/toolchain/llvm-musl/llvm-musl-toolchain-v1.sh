@@ -41,9 +41,7 @@ LLVM_PHASE1_BUILD_DIR="${PROJ_DIR}/build/llvm-phase-1"
 rm -fr "${LLVM_PHASE1_BUILD_DIR}"
 mkdir -p "${LLVM_PHASE1_BUILD_DIR}"
 
-cmake -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${SYSROOT}" \
+cmake -G Ninja "${COMMON_LLVM_CMAKE[@]}" \
     -DCOMPILER_RT_BAREMETAL_BUILD=ON \
     -DCOMPILER_RT_BUILD_BUILTINS=ON \
     -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
@@ -52,12 +50,6 @@ cmake -G Ninja \
     -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
     -DCOMPILER_RT_BUILD_XRAY=OFF \
     -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
-    -DCMAKE_ASM_COMPILER_TARGET="${TARGET}" \
-    -DCMAKE_C_COMPILER_TARGET="${TARGET}" \
-    -DCMAKE_C_COMPILER="${HOSTCC}" \
-    -DCMAKE_CXX_COMPILER="${HOSTCXX}" \
-    -DCMAKE_SYSTEM_NAME=Linux \
-    -DCMAKE_SYSROOT="${SYSROOT}" \
     -DCMAKE_CXX_COMPILER_WORKS=ON \
     -DCMAKE_C_COMPILER_WORKS=ON \
     -S "${LLVM_COMPILER_RT_SRC_DIR}" \
@@ -77,7 +69,6 @@ env -C \
     ./configure --prefix="${SYSROOT}" \
     CFLAGS="--sysroot=${SYSROOT}"
 env -C "${MUSL_SRC_DIR}" make -j"$(nproc)" install
-# TODO: Should use links instead of copying
 env -C "${SYSROOT}/lib/" ln -sfv libc.so ld-musl-x86_64.so.1
 env -C "${SYSROOT}/bin/" ln -sfv ../lib/libc.so ldd
 # Back up the musl-installed sysroot
@@ -90,21 +81,11 @@ rm -fr "${LLVM_PHASE4_BUILD_DIR}"
 mkdir -p "${LLVM_PHASE4_BUILD_DIR}"
 
 CFLAGS="-nostdinc++ -rtlib=compiler-rt -Qunused-arguments -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -fuse-ld=lld -w"
-cmake -G "Ninja" \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${SYSROOT}/usr" \
-    -DCMAKE_C_COMPILER="${HOSTCC}" \
-    -DCMAKE_C_COMPILER_TARGET="${TARGET}" \
+cmake -G "Ninja" "${COMMON_LLVM_CMAKE[@]}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_C_COMPILER_WORKS=ON \
     -DCMAKE_CXX_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_COMPILER="${HOSTCXX}" \
-    -DCMAKE_CXX_COMPILER_TARGET="${TARGET}" \
     -DCMAKE_CXX_COMPILER_WORKS=ON \
-    -DCMAKE_CXX_STANDARD=17 \
-    -DCMAKE_CXX_STANDARD_REQUIRED=ON \
-    -DCMAKE_SYSTEM_NAME=Linux \
-    -DLLVM_TARGETS_TO_BUILD=X86 \
     -DLLVM_ENABLE_RUNTIMES="libunwind;libcxxabi;libcxx" \
     -DLIBUNWIND_USE_COMPILER_RT=ON \
     -DLIBUNWIND_ENABLE_SHARED=OFF \
@@ -113,8 +94,6 @@ cmake -G "Ninja" \
     -DLIBCXX_HAS_ATOMIC_LIB=NO \
     -DLIBCXXABI_USE_LLVM_UNWINDER=ON \
     -DLIBCXXABI_USE_COMPILER_RT=ON \
-    -DLIBCXXABI_ENABLE_STATIC_UNWINDER=ON \
-    -DCMAKE_SYSROOT="${SYSROOT}" \
     -S "${LLVM_RUNTIME_SRC_DIR}" \
     -B "${LLVM_PHASE4_BUILD_DIR}"
 cmake --build "${LLVM_PHASE4_BUILD_DIR}" -j"$(nproc)"
@@ -141,9 +120,7 @@ LLVM_PHASE5_BUILD_DIR="${PROJ_DIR}/build/llvm-phase-5"
 rm -fr "${LLVM_PHASE5_BUILD_DIR}"
 mkdir -p "${LLVM_PHASE5_BUILD_DIR}"
 
-cmake -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${SYSROOT}" \
+cmake -G Ninja "${COMMON_LLVM_CMAKE[@]}" \
     -DCOMPILER_RT_BAREMETAL_BUILD=ON \
     -DCOMPILER_RT_BUILD_BUILTINS=ON \
     -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
@@ -153,16 +130,10 @@ cmake -G Ninja \
     -DCOMPILER_RT_BUILD_XRAY=ON \
     -DCOMPILER_RT_USE_BUILTINS_LIBRARY=ON \
     -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
-    -DCMAKE_ASM_COMPILER_TARGET="${TARGET}" \
-    -DCMAKE_C_COMPILER_TARGET="${TARGET}" \
-    -DCMAKE_C_COMPILER="${HOSTCC}" \
     -DCMAKE_C_COMPILER_WORKS=ON \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
-    -DCMAKE_CXX_COMPILER="${HOSTCXX}" \
     -DCMAKE_CXX_COMPILER_WORKS=ON \
     -DCMAKE_CXX_FLAGS="${CFLAGS}" \
-    -DCMAKE_SYSTEM_NAME=Linux \
-    -DCMAKE_SYSROOT="${SYSROOT}" \
     -DCMAKE_LIBRARY_PATH="${SYSROOT}/usr/lib" \
     -S "${LLVM_COMPILER_RT_SRC_DIR}" \
     -B "${LLVM_PHASE5_BUILD_DIR}"
@@ -172,51 +143,37 @@ env -C "${LLVM_PHASE5_BUILD_DIR}" ninja install
 pack s5
 
 # Step 6: Build clang with LLVM runtimes linked in
-CFLAGS="-nodefaultlibs -nostdinc++ -Qunused-arguments -Wl,-lc++ -Wl,-lc++abi -Wl,-lexecinfo -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -fuse-ld=lld -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -rtlib=compiler-rt"
+CFLAGS="-nodefaultlibs -nostdinc++ -Qunused-arguments -Wl,-lc++ -Wl,-lc++abi -Wl,-lexecinfo -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -fuse-ld=lld -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -rtlib=compiler-rt -unwindlib=libunwind"
 LLVM_PHASE6_BUILD_DIR="${PROJ_DIR}/build/llvm-phase-6"
 rm -fr "${LLVM_PHASE6_BUILD_DIR}"
 mkdir -p "${LLVM_PHASE6_BUILD_DIR}"
 
-cmake -G Ninja \
-    -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="${SYSROOT}/usr" \
+cmake -G Ninja "${COMMON_LLVM_CMAKE[@]}" \
     -DLLVM_ENABLE_LIBCXX=ON \
-    -DLLVM_ENABLE_LLD=ON \
-    -DCMAKE_SYSTEM_NAME=Linux \
-    -DLLVM_ENABLE_ZSTD=OFF \
-    -DLLVM_ENABLE_ZLIB=OFF \
     -DCXX_SUPPORTS_CUSTOM_LINKER=true \
-    -DLLVM_ENABLE_LIBXML2=OFF \
-    -DCMAKE_SYSROOT="${SYSROOT}" \
     -DLLVM_ENABLE_PROJECTS="clang;lld" \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
-    -DCMAKE_FIND_ROOT_PATH_MODE_PROGRAM=NEVER \
-    -DCMAKE_FIND_ROOT_PATH_MODE_LIBRARY=ONLY \
-    -DCMAKE_FIND_ROOT_PATH_MODE_INCLUDE=ONLY \
-    -DCMAKE_FIND_ROOT_PATH_MODE_PACKAGE=ONLY \
-    -DCMAKE_C_COMPILER="${HOSTCC}" \
-    -DCMAKE_CXX_COMPILER="${HOSTCXX}" \
-    -DCMAKE_C_COMPILER_TARGET="${TARGET}" \
-    -DCMAKE_CXX_COMPILER_TARGET="${TARGET}" \
-    -DLLVM_HOST_TRIPLE="${TARGET}" \
     -DCMAKE_C_FLAGS="${CFLAGS}" \
     -DCMAKE_CXX_FLAGS="${CFLAGS}" \
-    -DCMAKE_SYSROOT="${SYSROOT}" \
+    -DCLANG_DEFAULT_CXX_STDLIB=libc++ \
+    -DCLANG_DEFAULT_OBJCOPY=llvm-objcopy \
+    -DCLANG_DEFAULT_LINKER=lld \
+    -DCLANG_DEFAULT_RTLIB=compiler-rt \
+    -DCLANG_DEFAULT_UNWINDLIB=libunwind \
     -S "${LLVM_CMAKE_SRC_DIR}" \
     -B "${LLVM_PHASE6_BUILD_DIR}"
 env -C "${LLVM_PHASE6_BUILD_DIR}" ninja -j"$(nproc)"
 env -C "${LLVM_PHASE6_BUILD_DIR}" ninja install
 
 mkdir -pv "${SYSROOT}/lib/clang/18/lib"
-mv "${SYSROOT}/lib/linux" "${SYSROOT}/lib/clang/18/lib/"
-mv "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtbegin-x86_64.o" "${SYSROOT}/lib/clang/18/lib/linux/crtbeginS.o"
-mv "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtend-x86_64.o" "${SYSROOT}/lib/clang/18/lib/linux/crtendS.o"
+mv -v "${SYSROOT}/lib/linux" "${SYSROOT}/lib/clang/18/lib/"
+mv -v "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtbegin-x86_64.o" "${SYSROOT}/lib/clang/18/lib/linux/crtbeginS.o"
+mv -v "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtend-x86_64.o" "${SYSROOT}/lib/clang/18/lib/linux/crtendS.o"
 
 # Test the final toolchain
-echo "int main() { return 0; }" | sudo chroot "${SYSROOT}" /bin/clang -x c -o a.out - -fuse-ld=lld -rtlib=compiler-rt
+echo "int main() { return 0; }" | sudo chroot "${SYSROOT}" /bin/clang -x c -o a.out -
 sudo chroot "${SYSROOT}" /bin/ldd a.out
 printf '#include <stdio.h>\nint main() { printf("Hello, World!\\n"); return 0; }\n' |
-    sudo chroot "${SYSROOT}" /bin/clang -x c -o hello - -fuse-ld=lld -rtlib=compiler-rt -stdlib=libc++
+    sudo chroot "${SYSROOT}" /bin/clang -x c -o hello -
 sudo chroot "${SYSROOT}" ./hello
 rm -fr "${SYSROOT}"/hello "${SYSROOT}"/a.out
 # Backup the step 6 sysroot
@@ -230,7 +187,7 @@ env -C "${COREUTILS_SRC_DIR}" ./configure \
     --with-linux-crypto \
     --without-selinux \
     --without-libgmp \
-    CFLAGS="--sysroot=${SYSROOT} --rtlib=compiler-rt -Qunused-arguments -fuse-ld=lld -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${COREUTILS_SRC_DIR}" make -j"$(nproc)" install
@@ -243,7 +200,7 @@ env -C "${BASH_SRC_DIR}" ./configure \
     --prefix="${SYSROOT}/usr" \
     --host="${TARGET}" \
     --without-bash-malloc \
-    CFLAGS="--sysroot=${SYSROOT} --rtlib=compiler-rt -Qunused-arguments -fuse-ld=lld -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${BASH_SRC_DIR}" make -j"$(nproc)" install

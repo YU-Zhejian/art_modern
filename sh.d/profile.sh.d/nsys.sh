@@ -31,9 +31,7 @@ sudo nsys profile \
     --force-overwrite=true \
     --output="${PROFILE_DIR}"/report1.nsys-rep \
     ./art_modern \
-    --builtin_qual_file HiSeq2500_125bp \
     --i-file data/raw_data/ce11_chr1.fa \
-    --read_len 125 \
     --mode wgs \
     --lc pe \
     --i-parser memory \

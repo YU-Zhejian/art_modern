@@ -19,9 +19,7 @@ env -C "${PROFILE_DIR}" ninja -j120
 
 MALLOC_CONF=prof_leak:true,lg_prof_sample:0,prof_final:true \
     "${PROFILE_DIR}"/art_modern \
-    --builtin_qual_file HiSeq2500_125bp \
     --i-file data/raw_data/lambda_phage.fa \
-    --read_len 125 \
     --mode wgs \
     --lc pe \
     --i-parser memory \

@@ -92,7 +92,7 @@ wget \
 gunzip -k opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
 ```
 
-Now we can simulate WGS data using E. coli reference genome. Let's start with single-end sequencing using HiSeq 2500 with 125 bp read length and 10X coverage.
+Now we can simulate WGS data using E. coli reference genome. Let's start with single-end sequencing using HiSeq 2500 (can be set explicitly through `--builtin_qual_file HiSeq2500_150bp`) with 250 bp read length (can be set explicitly through `--read_len 250`) and 10X coverage.
 
 ```shell
 opt/build_release/art_modern \
@@ -100,8 +100,6 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov 10
 ```
@@ -116,8 +114,6 @@ opt/build_release/art_modern \
     --lc pe \
     --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release/e_coli_wgs_pe.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov 10 \
     --pe_frag_dist_mean 300 \
@@ -146,8 +142,6 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unified_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov 10
 ```
@@ -176,8 +170,6 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_unstranded_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.unstranded_cov.tsv
 ```
@@ -205,8 +197,6 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa \
     --o-fastq opt/build_release/c_elegans_trans_stranded_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov opt/build_release/ce11_mrna_1000.fa.stranded_cov.tsv
 ```
@@ -235,8 +225,6 @@ opt/build_release/art_modern \
     --lc se \
     --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
     --o-fastq opt/build_release/c_elegans_trans_pbsim3_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-type pbsim3_transcripts
 ```
@@ -251,8 +239,6 @@ opt/build_release/art_modern \
    --lc pe \
    --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
    --o-fastq opt/build_release/c_elegans_template_pbsim3_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-   --read_len 125 \
    --parallel 4 \
    --i-type pbsim3_transcripts
 ```
@@ -276,8 +262,6 @@ zcat opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
     --o-fastq >(pigz -p8 -9 -v -cf - > opt/build_release/e_coli_wgs_se.fastq.gz) \
     --o-pwa >(xz -9 -T5 -vv -cf - > opt/build_release/e_coli_wgs_se.pwa.xz) \
     --o-sam >(samtools sort -@9 --write-index -o opt/build_release/e_coli_wgs_se.sorted.bam) \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov 5
 ```
@@ -347,8 +331,6 @@ mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
     --lc se \
     --i-file opt/data/GCF_000005845.2_ASM584v2_genomic.fna \
     --o-fastq opt/build_release-mpi/e_coli_wgs_se.fastq \
-    --builtin_qual_file HiSeq2500_125bp \
-    --read_len 125 \
     --parallel 4 \
     --i-fcov 20
 ```

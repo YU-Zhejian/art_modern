@@ -30,9 +30,7 @@ done
 parser=stream
 for lc in se pe mp; do
     AM_EXEC \
-        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_PBSIM3_TRANSCRIPT}" \
-        --read_len 125 \
         --i-type pbsim3_transcripts \
         --i-batch_size 100 \
         --mode template \
@@ -58,3 +56,5 @@ for lc in se pe mp; do
     assert_cleandir
 done
 rm -fr "${OUT_DIR}"/test_small_??_template_"${parser}"_"${coverage}".hl.sam
+
+# We would now test whether our separated --read_len_1 and --read_len_2 is working.
