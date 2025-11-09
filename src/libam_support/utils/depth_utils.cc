@@ -103,6 +103,7 @@ std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_se(
     return { num_pos_reads, num_neg_reads };
 }
 
+#if (0) // TODO: Not working!
 std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_pe(const std::size_t contig_size,
     const am_read_len_t read_len_1, const am_read_len_t read_len_2, const double cov_pos, const double cov_neg)
 {
@@ -146,6 +147,7 @@ std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_pe(const std::size_t 
     const auto num_neg_reads = num_neg_reads_candidates[final_selected_neg_idx];
     return { num_pos_reads, num_neg_reads };
 }
+#endif
 
 std::tuple<am_readnum_t, am_readnum_t> calculate_num_reads_old(const std::size_t contig_size, const int read_len,
     const double cov_pos, const double cov_neg, const am_readnum_t num_reads_to_reduce)

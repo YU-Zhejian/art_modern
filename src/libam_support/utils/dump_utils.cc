@@ -33,6 +33,7 @@
 #endif
 
 #include <csignal>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -56,9 +57,12 @@ namespace {
         pthread_kill(pthread_self(), SIGABRT);
 #else
         std::signal(signum, SIG_DFL);
+        boost::stacktrace::safe_dump_to(dump_filename.c_str());
         std::raise(SIGABRT);
 #endif
     }
+
+    void my_signal_handler() noexcept { my_signal_handler(SIGABRT); }
 
 } // namespace
 #endif
@@ -78,6 +82,7 @@ void handle_dumps()
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
 #endif
+    std::set_terminate(&my_signal_handler);
 
     std::string const possible_dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, "0");
     if (boost::filesystem::exists(possible_dump_filename)) {
