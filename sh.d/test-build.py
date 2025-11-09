@@ -73,26 +73,6 @@ def probe_pkg_config(package_name: str) -> bool:
     return result.returncode == 0
 
 
-def probe_mkl_cmake() -> bool:
-    return probe_using_cmake_project("test-mkl.cmake")
-
-
-def probe_mimalloc() -> bool:
-    return probe_using_cmake_project("test-mimalloc.cmake")
-
-
-def probe_jemalloc() -> bool:
-    return probe_pkg_config("jemalloc")
-
-
-def probe_htshtslib() -> bool:
-    return probe_pkg_config("htslib")
-
-
-def probe_libfmt() -> bool:
-    return probe_pkg_config("fmt")
-
-
 def probe_concurrent_queue() -> Optional[str]:
     """
     Probes for the presence of the concurrentqueue library.
@@ -336,7 +316,7 @@ if __name__ == "__main__":
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
     print("Probing for MKL through CMake...", end="")
-    if probe_mkl_cmake():
+    if probe_using_cmake_project("test-mkl.cmake"):
         RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
@@ -351,27 +331,39 @@ if __name__ == "__main__":
 
     MALLOCS = ["NOP"]
     print("Probing for jemalloc...", end="")
-    if probe_jemalloc():
+    if probe_pkg_config("jemalloc"):
         MALLOCS.append("JEMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
     print("Probing for mimalloc...", end="")
-    if probe_mimalloc():
+    if probe_using_cmake_project("test-mimalloc.cmake"):
         MALLOCS.append("MIMALLOC")
+        print("SUCCESS")
+    else:
+        print("FAIL")
+    print("Probing for tcmalloc...", end="")
+    if probe_pkg_config("libtcmalloc"):
+        MALLOCS.append("TCMALLOC")
+        print("SUCCESS")
+    else:
+        print("FAIL")
+    print("Probing for tcmalloc_minimal...", end="")
+    if probe_pkg_config("libtcmalloc_minimal"):
+        MALLOCS.append("TCMALLOC_MINIMAL")
         print("SUCCESS")
     else:
         print("FAIL")
 
     print("Probing for HTSLib...", end="")
-    is_htslib_exist = probe_htshtslib()
+    is_htslib_exist = probe_pkg_config("htslib")
     if is_htslib_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
     print("Probing for {fmt}...", end="")
-    is_libfmt_exist = probe_libfmt()
+    is_libfmt_exist = probe_pkg_config("fmt")
     if is_libfmt_exist:
         print("SUCCESS")
     else:

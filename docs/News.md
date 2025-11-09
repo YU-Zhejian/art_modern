@@ -10,6 +10,7 @@
 - **EXPERIMENTAL** `art_modern` and `art_profile_builder` now supports different length of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options.
   - **NOTE** For `art_modern`: Currently, this feature works for PE Template mode only.
 - **EXPERIMENTAL** Packing: `-DFIND_RANDOM_MKL_THROUGH_PKGCONF` added to CMake options to find Intel OneMKL through `pkg-config`.
+- `libtcmalloc` and `libtcmalloc_minimal` supported as an alternative `malloc`/`free` implementation.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=

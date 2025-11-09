@@ -19,12 +19,21 @@ elseif("${USE_RANDOM_GENERATOR}" STREQUAL "PCG")
     set(USE_PCG_RANDOM ON)
 elseif("${USE_RANDOM_GENERATOR}" STREQUAL "SYSTEM_PCG")
     set(USE_SYSTEM_PCG_RANDOM ON)
-    # TODO: Find <pcg_random.hpp>
 elseif("${USE_RANDOM_GENERATOR}" STREQUAL "ONEMKL")
     if(DEFINED FIND_RANDOM_MKL_THROUGH_PKGCONF)
-        ceu_cm_enhanced_find_library(OUTPUT_VARIABLE mkl LINKER_FLAG "${FIND_RANDOM_MKL_THROUGH_PKGCONF}" PKGCONF_NAME
-                                     "${FIND_RANDOM_MKL_THROUGH_PKGCONF}")
-
+        if(BUILD_SHARED_LIBS)
+            ceu_cm_enhanced_find_library(OUTPUT_VARIABLE mkl LINKER_FLAG "${FIND_RANDOM_MKL_THROUGH_PKGCONF}"
+                                         PKGCONF_NAME "${FIND_RANDOM_MKL_THROUGH_PKGCONF}")
+        else()
+            ceu_cm_enhanced_find_library(
+                OUTPUT_VARIABLE
+                mkl
+                STATIC
+                LINKER_FLAG
+                "${FIND_RANDOM_MKL_THROUGH_PKGCONF}"
+                PKGCONF_NAME
+                "${FIND_RANDOM_MKL_THROUGH_PKGCONF}")
+        endif()
         if(NOT TARGET CEU_CM_EFL::mkl)
             message(FATAL_ERROR "mkl (${FIND_RANDOM_MKL_THROUGH_PKGCONF}) not found!")
         endif()

@@ -55,6 +55,8 @@
 #include <mimalloc.h>
 #elif defined(WITH_JEMALLOC)
 #include <jemalloc/jemalloc.h>
+#elif defined(WITH_TCMALLOC)
+#include <gperftools/tcmalloc.h>
 #endif
 
 // In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
@@ -246,6 +248,9 @@ namespace {
         std::cout << "jemalloc: " << JEMALLOC_VERSION_MAJOR << "." << JEMALLOC_VERSION_MINOR << "."
                   << JEMALLOC_VERSION_BUGFIX << std::endl;
 #endif
+#elif defined(WITH_TCMALLOC)
+        std::cout << "tcmalloc: " << TC_VERSION_MAJOR << "." << TC_VERSION_MINOR << "." << TC_VERSION_PATCH
+                  << std::endl;
 #else
         std::cout << "*malloc: not used" << std::endl;
 #endif

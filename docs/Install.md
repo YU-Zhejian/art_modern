@@ -172,18 +172,24 @@ If benchmarking (See [CMake flag `BUILD_ART_MODERN_BENCHMARKS`](#build-art-moder
 (accelerated-random-number-generators)=
 ### Accelerated Random Number Generators
 
-Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
+Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). To use this option, set [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL`.
 
-**NOTE** This library is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+OneMKL can be found through CMake. This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
 
-See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) below.
+OneMKL can also be found through pkgconfig. For example, Debian packing of Intel MKL [`libmkl-dev`](https://packages.debian.org/sid/libmkl-dev) provides `mkl-sdl-lp64.pc`. Intel OneAPI MKL installation provides `mkl-sdl.pc`. To use MKL specified using pkgconfig instead of CMake, see [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
+
+**NOTE** OneMKL is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+
+[PCG](https://www.pcg-random.org/) is used as an alternative to [`std::mt19937`](https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine.html) for random number generation. File `<pcg_random.hpp>` is required. This file usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev). To use this option, set [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) to `SYSTEM_PCG`. Note that we also provide a bundled minified version of PCG random number generators under the name of `PCG`.
 
 (alt-malloc-section)=
 ### Alternate `malloc`/`free` Implementations
 
-Users may use either [mi-malloc](https://github.com/microsoft/mimalloc) or [jemalloc](https://github.com/jemalloc/jemalloc) to slightly improve the performance of memory allocation and deallocation.
+Users may use either [mi-malloc](https://github.com/microsoft/mimalloc), [jemalloc](https://github.com/jemalloc/jemalloc), or [tcmalloc](https://github.com/gperftools/gperftools) to slightly improve the performance of memory allocation and deallocation.
 
 For jemalloc, `jemalloc.pc` file is required. For mi-malloc, `mimalloc-config.cmake` file is required.
+
+For tcmalloc, `libtcmalloc.pc` or `libtcmalloc_minimal.pc` is required. Under Debian GNU/Linux, this file is provided by [`libgoogle-perftools-dev`](https://packages.debian.org/sid/libgoogle-perftools-dev) package.
 
 See also: [CMake variable `USE_MALLOC`](#use-malloc-section) below.
 
@@ -203,15 +209,6 @@ The system should theoretically support:
 The MPI installation with MPI C API should be locatable using CMake module [`FindMPI.cmake`](https://cmake.org/cmake/help/latest/module/FindMPI.html), which is shipped with CMake. We do **NOT** need the MPI C++ API, which is deprecated in later MPI standards.
 
 See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
-
-(pcg-random-generator-section)=
-### PCG Random Number Generator
-
-[PCG](https://www.pcg-random.org/) is used as an alternative to [`std::mt19937`](https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine.html) for random number generation. File `<pcg_random.hpp>` is required. Usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev).
-
-No additional dependency is required.
-
-See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) mentioned below.
 
 ## Required Bundled/External Libraries
 
@@ -397,9 +394,9 @@ The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
-- `SYSTEM_PCG`: Use PCG random generators found in the system. See [PCG Random Number Generator](#pcg-random-generator-section) for requirements. Available since [1.2.2](#v-1.2.2-section).
+- `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.2.2](#v-1.2.2-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
-- `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements.
+- `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. See also [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
 
 On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
@@ -460,11 +457,13 @@ Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help
 
 Available since [1.1.1](#v-1.1.1-section).
 
-Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc (see above). Using those implementations can improve the performance of the program but slightly increase memory consumption.
+Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc, jemalloc, or tcmalloc (see above). Using those implementations can improve the performance of the program but slightly increase memory consumption.
 
-- **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc if possible.**
+- **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc, then tcmalloc, finally minimal tcmalloc if possible.**
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
+- `TCMALLOC`: Find and use tcmalloc, and fail if not found.
+- `TCMALLOC_MINIMAL`: Find and use minimal version of tcmalloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
 See [Alternate `malloc`/`free` Implementations](#alt-malloc-section) for requirements.
@@ -526,6 +525,16 @@ Whether to enable MPI-based parallelization.
 - `ON`: Will enable MPI-based parallelization.
 
 See [MPI Library](#mpi-section) for requirements.
+
+(find-random-mkl-through-pkgconf-section)=
+### `FIND_RANDOM_MKL_THROUGH_PKGCONF`
+
+Available since [1.2.2](#v-1.2.2-section).
+
+Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) set to `ONEMKL`.
+
+- **Unset (DEFAULT): Will not find Intel OneAPI MKL through pkgconf.**
+- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file. 
 
 ### Deprecated Options
 
