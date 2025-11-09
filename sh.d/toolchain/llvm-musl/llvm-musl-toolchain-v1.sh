@@ -99,7 +99,7 @@ cmake -G "Ninja" "${COMMON_LLVM_CMAKE[@]}" \
 cmake --build "${LLVM_PHASE4_BUILD_DIR}" -j"$(nproc)"
 cmake --install "${LLVM_PHASE4_BUILD_DIR}"
 # Test whether the installed libc++ works
-sudo chroot sysroot /bin/ldd /usr/lib/libc++.so.1.0
+sudo chroot --userspec="$(id -u):$(id -g)" sysroot /bin/ldd /usr/lib/libc++.so.1.0
 # Backup the stage 4 sysroot
 pack s4
 
@@ -113,7 +113,7 @@ env -C "${LIBEXECINFO_SRC_DIR}" \
     CFLAGS="${CFLAGS}" \
     LDFLAGS="${LDFLAGS}" \
     PREFIX="${SYSROOT}/usr"
-sudo chroot sysroot /bin/ldd /usr/lib/libexecinfo.so.1
+sudo chroot --userspec="$(id -u):$(id -g)" sysroot /bin/ldd /usr/lib/libexecinfo.so.1
 
 CFLAGS="-nodefaultlibs -nostdinc++ -Qunused-arguments -Wl,-lexecinfo -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -fuse-ld=lld -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -stdlib=libc++ -w"
 LLVM_PHASE5_BUILD_DIR="${PROJ_DIR}/build/llvm-phase-5"
@@ -170,11 +170,11 @@ mv -v "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtbegin-x86_64.o" "${SYSROOT}
 mv -v "${SYSROOT}/lib/clang/18/lib/linux/clang_rt.crtend-x86_64.o" "${SYSROOT}/lib/clang/18/lib/linux/crtendS.o"
 
 # Test the final toolchain
-echo "int main() { return 0; }" | sudo chroot "${SYSROOT}" /bin/clang -x c -o a.out -
-sudo chroot "${SYSROOT}" /bin/ldd a.out
+echo "int main() { return 0; }" | sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /bin/clang -x c -o a.out -
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /bin/ldd a.out
 printf '#include <stdio.h>\nint main() { printf("Hello, World!\\n"); return 0; }\n' |
-    sudo chroot "${SYSROOT}" /bin/clang -x c -o hello -
-sudo chroot "${SYSROOT}" ./hello
+    sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /bin/clang -x c -o hello -
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" ./hello
 rm -fr "${SYSROOT}"/hello "${SYSROOT}"/a.out
 # Backup the step 6 sysroot
 pack s6
@@ -191,8 +191,8 @@ env -C "${COREUTILS_SRC_DIR}" ./configure \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${COREUTILS_SRC_DIR}" make -j"$(nproc)" install
-sudo chroot "${SYSROOT}" /usr/bin/ldd /usr/bin/ls
-sudo chroot "${SYSROOT}" /usr/bin/ls -lFh
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/ldd /usr/bin/ls
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/ls -lFh
 pack s7
 
 # Step 8: Build Bash
@@ -204,7 +204,8 @@ env -C "${BASH_SRC_DIR}" ./configure \
     CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
     CC="${HOSTCC}"
 env -C "${BASH_SRC_DIR}" make -j"$(nproc)" install
-sudo env -i "$(which chroot)" "${SYSROOT}" /usr/bin/bash -li
+cp -v "${SYSROOT}/usr/bin/bash" "${SYSROOT}/usr/bin/sh"
+sudo env -i "$(which chroot)" --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/bash -li
 pack s8
 
 # Step 9: Build util-linux
@@ -212,7 +213,6 @@ env -C "${UTIL_LINUX_SRC_DIR}" ./configure \
     --prefix="${SYSROOT}/usr" \
     --host="${TARGET}" \
     --disable-nls \
-    --disable-shared \
     --disable-pylibmount \
     --disable-liblastlog2 \
     --disable-rfkill \
@@ -230,13 +230,151 @@ env -C "${UTIL_LINUX_SRC_DIR}" ./configure \
     --without-systemd \
     --disable-asciidoc \
     --disable-poman \
-    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld -Wl,-nodefaultlibs" \
     CC="${HOSTCC}" \
     CXX="${HOSTCXX}" \
     CXXFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc++ -Wl,-lc++abi -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -nostdinc++ -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -stdlib=libc++ -w -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld"
-env -C "${UTIL_LINUX_SRC_DIR}" make -j"$(nproc)" AM_DEFAULT_VERBOSITY=1 install
-sudo env -i "$(which chroot)" "${SYSROOT}" /usr/bin/bash -li
+env -C "${UTIL_LINUX_SRC_DIR}" \
+    make -j"$(nproc)" AM_DEFAULT_VERBOSITY=1 \
+    LIBS="-XCClinker -nodefaultlibs" \
+    install
+sudo env -i "$(which chroot)" --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/mount --help
 pack s9
+
+# Step 10: Build grep
+# AWK not build since not required in the minimal toolchain
+env -C "${GREP_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --disable-threads \
+    --disable-nls \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CC="${HOSTCC}"
+env -C "${GREP_SRC_DIR}" make -j"$(nproc)"
+env -C "${GREP_SRC_DIR}" make install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/grep --version
+
+env -C "${SED_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --disable-threads \
+    --disable-nls \
+    --without-selinux \
+    --disable-i18n \
+    --disable-acl \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CC="${HOSTCC}"
+env -C "${SED_SRC_DIR}" make -j"$(nproc)"
+env -C "${SED_SRC_DIR}" make install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/sed --version
+pack s10
+
+# Stage 11: Add zlib, xz, make, pkgconf
+env -C "${MAKE_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --disable-nls \
+    --without-guile \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld  -D_XOPEN_SOURCE=500" \
+    CC="${HOSTCC}"
+env -C "${MAKE_SRC_DIR}" make -j"$(nproc)" install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/make --version
+
+env -C "${ZLIB_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr"
+env -C "${ZLIB_SRC_DIR}" make -j"$(nproc)" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind" \
+    CC="${HOSTCC}" \
+    install
+
+env -C "${PKGCONF_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99" \
+    CC="${HOSTCC}"
+env -C "${PKGCONF_SRC_DIR}" make -j"$(nproc)" \
+    AM_DEFAULT_VERBOSITY=1 \
+    LIBS='-XCClinker -nodefaultlibs -XCClinker -fuse-ld=lld -XCClinker -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1' \
+    install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" \
+    /usr/bin/env PKG_CONFIG_LIBDIR=/usr/lib/pkgconfig \
+    /usr/bin/pkgconf --list-all
+
+env -C "${XZ_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --disable-nls \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CC="${HOSTCC}"
+env -C "${XZ_SRC_DIR}" make -j"$(nproc)" \
+    LIBS='-XCClinker -nodefaultlibs -XCClinker -fuse-ld=lld -XCClinker -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1' install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/xz --version
+
+env -C "${LIBFFI_SRC_DIR}" ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --with-sysroot="${SYSROOT}" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -Wc,-nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld" \
+    CC="${HOSTCC}" \
+    CXX="${HOSTCXX}" \
+    CXXFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -Wc,-nodefaultlibs -Wl,-lc++ -Wl,-lc++abi -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -nostdinc++ -isystem ${SYSROOT}/usr/include/c++/v1 -isystem ${SYSROOT}/usr/include/ -stdlib=libc++ -w -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld"
+
+env -C "${LIBFFI_SRC_DIR}" make -j"$(nproc)"
+env -C "${LIBFFI_SRC_DIR}" make install
+
+env -C "${BZIP2_SRC_DIR}" make \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind" \
+    CC="${HOSTCC}" \
+    PREFIX="${SYSROOT}/usr" \
+    install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/bzip2 --version
+pack s11
+
+# Step 12: Build Python
+env -C "${PYTHON_SRC_DIR}" CONFIG_SITE="${PROJ_DIR}"/py.config.site \
+    ./configure \
+    --prefix="${SYSROOT}/usr" \
+    --host="${TARGET}" \
+    --build="x86_64-pc-linux-gnu" \
+    --disable-ipv6 \
+    --disable-static \
+    --enable-big-digits \
+    --without-pydebug \
+    --without-pymalloc \
+    --without-doc-strings \
+    --without-c-locale-coercion \
+    --without-readline \
+    --without-ensurepip \
+    --with-build-python="${HOST_PYTHON}" \
+    CC="${HOSTCC}" \
+    CFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -w -std=gnu99 -rtlib=compiler-rt -unwindlib=libunwind -fuse-ld=lld -fPIC" \
+    CPPFLAGS="--sysroot=${SYSROOT} -isystem ${SYSROOT}/usr/include" \
+    LDFLAGS="--sysroot=${SYSROOT} -Qunused-arguments -nodefaultlibs -Wl,-lc -Wl,--dynamic-linker=/lib/ld-musl-x86_64.so.1 -fuse-ld=lld"
+env -C "${PYTHON_SRC_DIR}" make -j"$(nproc)" install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/python3 --version
+pack s12
+
+# Step 13: Build CMake
+mkdir -p "${SYSROOT}/usr/src"
+cp -r "${CMAKE_SRC_DIR}" "${SYSROOT}/usr/src/cmake"
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" \
+    env -C /usr/src/cmake PATH="/usr/bin" MAKE="/usr/bin/make" \
+    bash ./bootstrap \
+    --no-system-libs \
+    --prefix="/usr" \
+    --no-qt-gui \
+    --parallel="$(nproc)" \
+    -- -DCMAKE_USE_OPENSSL=OFF
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" \
+    env -C /usr/src/cmake PATH="/usr/bin" MAKE="/usr/bin/make" \
+    /usr/bin/make -j"$(nproc)"
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" \
+    env -C /usr/src/cmake PATH="/usr/bin" MAKE="/usr/bin/make" \
+    /usr/bin/make install
+sudo chroot --userspec="$(id -u):$(id -g)" "${SYSROOT}" /usr/bin/cmake --version
+pack s13
+
+# Step 14: TODO: Build Boost
 
 mksquashfs "${SYSROOT}" rootfs.squashfs -comp zstd -noappend
 # Create data qcow2 image
@@ -253,5 +391,3 @@ qemu-system-x86_64 \
     -append "${KERNEL_PARAMS}" \
     -nographic \
     -no-reboot
-
-# TODO: Add grep, sed, pkgconf, zlib, make, python, cmake, boost, etc. into the sysroot
