@@ -21,19 +21,18 @@ env -C "${PROFILE_DIR}" ninja -j120
 "${PROFILE_DIR}"/art_modern --version
 ldd "${PROFILE_DIR}"/art_modern
 
+item=roofline
 advisor \
-    --collect=roofline \
-    --project-dir="${PROFILE_DIR}"/advi_results -- \
+    --collect="${item}" \
+    --enable-cache-simulation \
+    --select 'has-source' \
+    --project-dir="${PROFILE_DIR}"/advi_results-"${item}" -- \
     "${PROFILE_DIR}"/art_modern \
     --i-file data/raw_data/ce11_chr1.fa \
     --mode wgs \
-    --lc pe \
+    --lc se \
     --i-parser memory \
-    --i-fcov 200 \
-    --parallel 20 \
-    --ins_rate_1 0.1 \
-    --del_rate_1 0.1 \
-    --pe_frag_dist_std_dev 20 \
-    --pe_frag_dist_mean 500
+    --i-fcov 2 \
+    --parallel 20
 
-advisor-gui "${PROFILE_DIR}"/advi_results
+advisor-gui "${PROFILE_DIR}"/advi_results-"${item}"

@@ -325,7 +325,7 @@ This output writer supports other BAM formatting parameters.
 ## Logging Parameters
 
 - `--reporting_interval-job_executor`: The reporting interval (in seconds) for individual `art_modern` job. Added in [1.2.1](#v-1.2.1-section).
-- `--reporting_interval-thread_pool`: The reporting interval (in seconds) for ThreadPool. Added in [1.2.1](#v-1.2.1-section).
+- `--reporting_interval-job_pool`: The reporting interval (in seconds) for ThreadPool. Added in [1.2.1](#v-1.2.1-section).
 
 Those logs are designed for observation of long-running jobs. Increase the interval to reduce log size.
 

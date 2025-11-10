@@ -287,7 +287,6 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
         pos_on_aln_str++;
     }
     num_match = static_cast<hts_pos_t>(ref_.size() - pos_on_ref);
-
 #ifdef CEU_CM_IS_DEBUG
     if (num_match < 0) {
         BOOST_LOG_TRIVIAL(fatal) << "num_match < 0: " << num_match;
