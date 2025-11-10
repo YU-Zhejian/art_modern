@@ -390,7 +390,7 @@ struct MyObjectMover {
     inline void operator=(MyObject&& obj) {
         std::memcpy(data, &obj, sizeof(MyObject));
         
-        // TODO: Cleanup obj so that when it's destructed by the queue
+        // T_O_D_O: Cleanup obj so that when it's destructed by the queue
         // it doesn't corrupt the data of the object we just moved it into
     }
 

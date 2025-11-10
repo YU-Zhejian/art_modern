@@ -381,7 +381,6 @@ if __name__ == "__main__":
     mkl_pc = peobe_mkl_using_pkgconf()
     if mkl_pc is not None:
         print(mkl_pc)
-        # TODO
     else:
         print("FAIL")
 

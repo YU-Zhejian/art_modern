@@ -75,17 +75,17 @@ if __name__ == "__main__":
                 slengths_constructed.append("{" + f"{slengths[0]}, " + ("0" if i == 0 else f"{slengths[1]}") + "}")
 
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
-            wh.write(DTYPE + "* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
+            wh.write("static " + DTYPE + "* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")
             for sname_constructed in snames_constructed:
                 wh.write(f"    {sname_constructed},\n")
             wh.write("};\n")
 
-            wh.write("const char* const BUILTIN_PROFILE_NAMES[N_BUILTIN_PROFILE] = {\n")
+            wh.write("static const char* const BUILTIN_PROFILE_NAMES[N_BUILTIN_PROFILE] = {\n")
             for sname in snames:
                 wh.write(f'    "{sname}",\n')
             wh.write("};\n")
 
-            wh.write("const size_t BUILTIN_PROFILE_LENGTHS[N_BUILTIN_PROFILE][2] = {\n")
+            wh.write("static const size_t BUILTIN_PROFILE_LENGTHS[N_BUILTIN_PROFILE][2] = {\n")
             for slength_constructed in slengths_constructed:
                 wh.write("    " + slength_constructed + ",\n")
             wh.write("};\n")

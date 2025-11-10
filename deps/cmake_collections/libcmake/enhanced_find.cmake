@@ -193,6 +193,26 @@ function(ceu_cm_get_library_abspath_from_pkg_config OUTPUT_VARIABLE PKGCONF_NAME
     return()
 endfunction()
 
+function(filter_existing_paths PATH_LIST_VAR)
+    set(existing_paths "")
+    set(non_existing_paths "")
+    
+    foreach(path ${${PATH_LIST_VAR}})
+        if(EXISTS "${path}")
+            list(APPEND existing_paths "${path}")
+        else()
+            list(APPEND non_existing_paths "${path}")
+        endif()
+    endforeach()
+    
+    if(non_existing_paths)
+        message(WARNING "The following paths do not exist and will be excluded: ${non_existing_paths}")
+    endif()
+    
+    # Update the original list with only existing paths
+    set(${PATH_LIST_VAR} ${existing_paths} PARENT_SCOPE)
+endfunction()
+
 #[=======================================================================[
 ceu_cm_enhanced_find_library -- Get library absolute paths from pkgconfig (*.pc) files (piortized, recommended) or linker flags.
 
@@ -242,6 +262,8 @@ function(ceu_cm_enhanced_find_library)
             set(THIS_LIBDIRS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_LIBRARY_DIRS})
             set(THIS_INCDIRS ${CEU_CM_PKGCONF_LIB_${CEU_CM_EFL_PKGCONF_NAME}_INCLUDE_DIRS})
         endif()
+        filter_existing_paths(THIS_LIBDIRS)
+        filter_existing_paths(THIS_INCDIRS)
         message(
             STATUS
                 "CEU_CM_EFL: Exporting target CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE} (${CEU_CM_EFL_OUTPUT_TYPE}): LIBS=${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS} CFLAGS=${THIS_CFLAGS} LDFLAGS=${THIS_LDFLAGS} LIBDIRS=${THIS_LIBDIRS} INCDIRS=${THIS_INCDIRS}"
