@@ -11,7 +11,7 @@ env -C "${PROFILE_DIR}" cmake \
     -DCMAKE_C_COMPILER=icx \
     -DCMAKE_CXX_COMPILER=icpx \
     -DCEU_CM_SHOULD_USE_NATIVE=ON \
-    -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
+    -DCEU_CM_SHOULD_ENABLE_TEST=ON \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DUSE_RANDOM_GENERATOR=ONEMKL \
     -G Ninja "$(pwd)"
@@ -29,8 +29,8 @@ advisor \
     --mode wgs \
     --lc pe \
     --i-parser memory \
-    --i-fcov 10 \
-    --parallel 0 \
+    --i-fcov 200 \
+    --parallel 20 \
     --ins_rate_1 0.1 \
     --del_rate_1 0.1 \
     --pe_frag_dist_std_dev 20 \

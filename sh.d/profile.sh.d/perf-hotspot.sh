@@ -4,7 +4,7 @@
 set -ue
 PROFILE_DIR=opt/build_release
 
-# make release
+make release
 
 "${PROFILE_DIR}"/art_modern --version
 ldd "${PROFILE_DIR}"/art_modern
