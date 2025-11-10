@@ -40,11 +40,13 @@ export MRNA_PBSIM3_TRANSCRIPT
 # If MPIEXEC is set, use it to run ART in parallel using MPI
 if [ -z "${MPIEXEC:-}" ]; then
     ART_CMD_ASSEMBLED=("${ART_MODERN_PATH}")
+    APB_CMD_ASSEMBLED=("${APB_PATH}")
     export PARALLEL="${PARALLEL:-4}" # Reduce parallelism overhead for small tests
 else
     export MPIEXEC
     export PARALLEL="${PARALLEL:-2}"
     ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART_MODERN_PATH}")
+    APB_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${APB_PATH}")
 fi
 
 echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
@@ -123,6 +125,23 @@ function AM_EXEC() {
     EXEC_ORDER=$((EXEC_ORDER + 1))
     return ${retval}
 }
+function ABP_EXEC(){
+    echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
+    env \
+        "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
+        "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
+    retval=${?}
+    if [ ${retval} -ne 0 ]; then
+        echo "ABP_EXEC failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
+        exit 1
+    else
+        echo "ABP_EXEC succeeded."
+        rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
+    fi
+    EXEC_ORDER=$((EXEC_ORDER + 1))
+    return ${retval}
+}
 
 rm -fr "${OUT_DIR}" # Remove previous runs
 mkdir "${OUT_DIR}"
@@ -141,4 +160,6 @@ fi
 . "${SHDIR}"/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
 . "${SHDIR}"/test-small.sh.d/7_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
 . "${SHDIR}"/test-small.sh.d/8_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh        # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh        # APB paired-end test
 rm -d "${OUT_DIR}"                               # Which should now be empty
