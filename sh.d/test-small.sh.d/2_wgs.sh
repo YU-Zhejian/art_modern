@@ -26,13 +26,14 @@ for parser in memory htslib; do
             "${FCOV}" \
             CONST_COV \
             NOT_TEMPLATE
-        python sh.d/test-small.sh.d/test_rlen.py \
+        python sh.d/test-small.sh.d/validate_rlen.py \
             "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
             150
         rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
         assert_cleandir
     done
 done
+
 # We now test whether equal --read_len_1 and --read_len_2 is working.
 parser=memory
 for lc in pe mp; do
@@ -51,14 +52,12 @@ for lc in pe mp; do
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500
     merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-    python sh.d/test-small.sh.d/test_rlen.py \
+    python sh.d/test-small.sh.d/validate_rlen.py \
         "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
         100
     rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
     assert_cleandir
-done
 
-for lc in pe mp; do
     AM_EXEC \
         --i-file "${CE11_CHR1}" \
         --i-batch_size 100 \
@@ -75,7 +74,7 @@ for lc in pe mp; do
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500
     merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-    python sh.d/test-small.sh.d/test_rlen.py \
+    python sh.d/test-small.sh.d/validate_rlen.py \
         "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
         100
     rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
@@ -98,11 +97,12 @@ AM_EXEC \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
 merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-python sh.d/test-small.sh.d/test_rlen.py \
+python sh.d/test-small.sh.d/validate_rlen.py \
     "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
     100
 rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
 assert_cleandir
+
 AM_EXEC \
     --i-file "${CE11_CHR1}" \
     --i-batch_size 100 \
@@ -118,9 +118,10 @@ AM_EXEC \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
 merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-python sh.d/test-small.sh.d/test_rlen.py \
+python sh.d/test-small.sh.d/validate_rlen.py \
     "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
     100
 rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
 assert_cleandir
+
 unset FCOV

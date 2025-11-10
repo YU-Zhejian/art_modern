@@ -5,8 +5,9 @@
 # Additional CMake flags for CMake-related tasks
 CMAKE_FLAGS ?=
 
-# Number of parallel jobs for building
-JOBS ?= $(shell cat /proc/cpuinfo | grep processor | wc -l)
+# Number of parallel jobs for building.
+# Defaults to number of CPU cores detected using `nproc`.
+JOBS ?= $(shell nproc)
 
 # Shell to use for shell scripts
 BASH ?= bash
@@ -14,12 +15,10 @@ BASH ?= bash
 # Python interpreter to use for Python scripts
 PYTHON ?= python3
 
-# MPI run command. Used in MPI-related tests only
+# MPI launcher command. Used in MPI-related tests only
 # NOTE: Setting this target does NOT enable MPI build!
 # Use release-mpi or debug-mpi targets to build with MPI support.
 MPIEXEC ?= mpiexec
-
-MPIEXEC_NJOBS ?= 4
 
 # Output directory for build artifacts
 OPT_DIR ?= $(CURDIR)/opt
@@ -58,9 +57,6 @@ debug:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_debug
-	env -C $(OPT_DIR)/build_debug ctest --output-on-failure
-	$(OPT_DIR)/build_debug_install/bin/art_modern --help
-	$(OPT_DIR)/build_debug_install/bin/art_modern --version
 
 .PHONY: debug-mpi
 # debug with MPI
@@ -79,9 +75,6 @@ debug-mpi:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug-mpi -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_debug-mpi
-	env -C $(OPT_DIR)/build_debug-mpi ctest --output-on-failure
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --help
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: release
 # Generates release build with native optimizations
@@ -99,8 +92,6 @@ release:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_release
-	$(OPT_DIR)/build_release_install/bin/art_modern --help
-	$(OPT_DIR)/build_release_install/bin/art_modern --version
 
 .PHONY: release-mpi
 # release with MPI
@@ -119,8 +110,6 @@ release-mpi:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release-mpi -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_release-mpi
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --help
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: rel_with_dbg_alpine
 # Generates RelWithDebInfo build without native optimizations
@@ -165,21 +154,29 @@ touch:
 	$(BASH) sh.d/touch-all.sh
 
 .PHONY: testsmall
+# Alias to testsmall-debug
+testsmall: testsmall-debug
+
+.PHONY: testsmall-mpi
+# Alias to testsmall-debug-mpi
+testsmall-mpi: testsmall-debug-mpi
+
+.PHONY: testsmall-debug
 # Run (not necessiarily) small integration tests with debug build. Also tests `art_profile_builder`.
 # Env. Flags:
 # 
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
-testsmall: debug raw_data
+testsmall-debug: debug raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
 		MPIEXEC="" \
 		$(BASH) sh.d/test-small.sh
 
-.PHONY: testsmall-mpi
+.PHONY: testsmall-debug-mpi
 # testsmall with MPI
-testsmall-mpi: debug-mpi raw_data
+testsmall-debug-mpi: debug-mpi raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \

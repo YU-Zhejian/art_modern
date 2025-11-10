@@ -87,10 +87,10 @@ seqtk seq -1 \
 seqtk seq -2 \
     <"${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
     >"${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}"_2.fq
-python sh.d/test-small.sh.d/test_rlen.py \
+python sh.d/test-small.sh.d/validate_rlen.py \
     "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}"_1.fq \
     10
-python sh.d/test-small.sh.d/test_rlen.py \
+python sh.d/test-small.sh.d/validate_rlen.py \
     "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}"_2.fq \
     150
 rm -fr \

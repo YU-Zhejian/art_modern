@@ -35,3 +35,4 @@ cmp "${OUT_DIR}"/out_se_art_cxx_sam.txt "${OUT_DIR}"/out_se_art_perl.txt
 
 rm -fr "${OUT_DIR}"/*
 assert_cleandir
+unset RLEN

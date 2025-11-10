@@ -3,7 +3,7 @@ import pyfastx
 import sys
 
 if __name__ == "__main__":
-    in_fq_,targeted_rlen_str_ = sys.argv[1:]
+    in_fq_, targeted_rlen_str_ = sys.argv[1:]
     targeted_rlen_ = int(targeted_rlen_str_)
     for s in pyfastx.Fasta(in_fq_):
         if len(s) != targeted_rlen_:

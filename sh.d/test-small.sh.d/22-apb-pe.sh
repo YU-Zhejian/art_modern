@@ -52,3 +52,4 @@ cmp "${OUT_DIR}"/out_pe_art_cxx_sam_R2.txt "${OUT_DIR}"/out_pe_art_perl_R2.txt
 
 rm -fr "${OUT_DIR}"/*
 assert_cleandir
+unset RLEN

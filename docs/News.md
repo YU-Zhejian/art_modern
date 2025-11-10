@@ -15,6 +15,7 @@
   - **EXPERIMENTAL** `-DFIND_RANDOM_MKL_THROUGH_PKGCONF` added to CMake options to find Intel OneMKL through `pkg-config`.
   - `libtcmalloc` and `libtcmalloc_minimal` supported as an alternative `malloc`/`free` implementation.
   - Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
+  - `--help`, `--version` and ctest minitests removed from `debug`/`release` Makefile quick build targets and their MPI-enabled variant.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=
