@@ -201,7 +201,7 @@ public:
     DELETE_MOVE(SlimEmpDistGslDiscreteFlt)
     DELETE_COPY(SlimEmpDistGslDiscreteFlt)
     SlimEmpDistGslDiscreteFlt(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
-            : qual_(qual)
+        : qual_(qual)
     {
         std::vector<float> init_list;
         double prev = 0;
@@ -358,7 +358,8 @@ void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
     }
 
     // Extract the mean and standard deviation
-    BOOST_LOG_TRIVIAL(info) << std::setw(16) << name << ": " << describe(times) << "ns Q: values=" << describe(acc, false);
+    BOOST_LOG_TRIVIAL(info) << std::setw(16) << name << ": " << describe(times)
+                            << "ns Q: values=" << describe(acc, false);
 }
 } // namespace
 

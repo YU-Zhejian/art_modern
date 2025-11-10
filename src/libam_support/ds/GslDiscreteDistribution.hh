@@ -60,7 +60,6 @@ public:
     std::size_t operator()(FloatType u) const;
 };
 
-
 template <typename FloatType>
 GslDiscreteDistribution<FloatType>::GslDiscreteDistribution()
     : K(0)

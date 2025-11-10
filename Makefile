@@ -165,7 +165,7 @@ touch:
 	$(BASH) sh.d/touch-all.sh
 
 .PHONY: testsmall
-# Run small tests with debug build
+# Run (not necessiarily) small integration tests with debug build. Also tests `art_profile_builder`.
 # Env. Flags:
 # 
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
@@ -185,13 +185,6 @@ testsmall-mpi: debug-mpi raw_data
 		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
-
-.PHONY: test-art_profile_builder
-# Run tests for art_profile_builder with release builds
-# TODO: Refactor into testsmall.
-test-art_profile_builder: raw_data release
-	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
-	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
 
 .PHONY: testsmall-release
 # Run small tests with release build

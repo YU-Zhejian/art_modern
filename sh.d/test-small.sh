@@ -125,7 +125,7 @@ function AM_EXEC() {
     EXEC_ORDER=$((EXEC_ORDER + 1))
     return ${retval}
 }
-function ABP_EXEC(){
+function ABP_EXEC() {
     echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
     env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
