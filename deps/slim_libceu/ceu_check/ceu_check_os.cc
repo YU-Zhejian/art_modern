@@ -18,7 +18,7 @@
 #include <_mingw.h>
 #endif
 
-#if defined(CEU_ON_WINDOWS)
+#if defined(CEU_ON_WINDOWS) || defined(CEU_ON_CYGWIN)
 #include <windows.h>
 #endif
 
@@ -109,7 +109,7 @@ std::string ceu_check_get_run_time_os_info()
     oss << "\tPOSIX UTSINFO: undefined" << std::endl;
 #endif
 #endif
-#if defined(CEU_ON_WINDOWS) && !defined(CEU_ON_CYGWIN)
+#if defined(CEU_ON_WINDOWS) || defined(CEU_ON_CYGWIN)
 
     oss << "\tWindows OS Version Info: " << std::endl;
     OSVERSIONINFOEX osvi;
