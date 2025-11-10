@@ -5,7 +5,7 @@
 #include "libam_support/Dtypes.h"
 
 #if defined(INCLUDE_INTEL_SIMD)
-#include INCLUDE_INTEL_SIMD
+#include INCLUDE_INTEL_SIMD // NOLINT
 #endif
 
 #include <stdlib.h>
