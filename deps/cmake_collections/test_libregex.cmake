@@ -43,7 +43,9 @@ if(TARGET CEU_CM_EFL::libregex_shared)
         LINK_LIBRARIES
         CEU_CM_EFL::libregex_shared)
     if(NOT CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_SHARED EQUAL 0 AND TARGET CEU_CM_EFL::libiconv_shared)
-    set(CEU_CM_REGEX_REQUIRES_ICONV_SHARED ON CACHE INTERNAL "libregex needs libiconv")
+        set(CEU_CM_REGEX_REQUIRES_ICONV_SHARED
+            ON
+            CACHE INTERNAL "libregex needs libiconv")
         # Try again with libiconv
         ceu_cm_enhanced_try_run(
             VARNAME
@@ -56,13 +58,15 @@ if(TARGET CEU_CM_EFL::libregex_shared)
             CEU_CM_EFL::libregex_shared
             CEU_CM_EFL::libiconv_shared)
     else()
-    set(CEU_CM_REGEX_REQUIRES_ICONV_SHARED OFF CACHE INTERNAL "libregex does not need libiconv")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_COMPILE_SHARED
-        OFF
-        CACHE BOOL "not tested")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_RUN_SHARED
-        255
-        CACHE INTERNAL "not tested")
+        set(CEU_CM_REGEX_REQUIRES_ICONV_SHARED
+            OFF
+            CACHE INTERNAL "libregex does not need libiconv")
+        set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_COMPILE_SHARED
+            OFF
+            CACHE BOOL "not tested")
+        set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_RUN_SHARED
+            255
+            CACHE INTERNAL "not tested")
     endif()
 else()
     set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_COMPILE_SHARED
@@ -84,7 +88,9 @@ if(TARGET CEU_CM_EFL::libregex_static)
         LINK_LIBRARIES
         CEU_CM_EFL::libregex_static)
     if(NOT CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_STATIC EQUAL 0 AND TARGET CEU_CM_EFL::libiconv_static)
-    set(CEU_CM_REGEX_REQUIRES_ICONV_STATIC ON CACHE INTERNAL "libregex needs libiconv")
+        set(CEU_CM_REGEX_REQUIRES_ICONV_STATIC
+            ON
+            CACHE INTERNAL "libregex needs libiconv")
         # Try again with libiconv
         ceu_cm_enhanced_try_run(
             STATIC
@@ -98,13 +104,15 @@ if(TARGET CEU_CM_EFL::libregex_static)
             CEU_CM_EFL::libregex_static
             CEU_CM_EFL::libiconv_static)
     else()
-    set(CEU_CM_REGEX_REQUIRES_ICONV_STATIC OFF CACHE INTERNAL "libregex does not need libiconv")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_COMPILE_STATIC
-        OFF
-        CACHE BOOL "not tested")
-    set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_RUN_STATIC
-        255
-        CACHE INTERNAL "not tested")
+        set(CEU_CM_REGEX_REQUIRES_ICONV_STATIC
+            OFF
+            CACHE INTERNAL "libregex does not need libiconv")
+        set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_COMPILE_STATIC
+            OFF
+            CACHE BOOL "not tested")
+        set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_ICONV_RUN_STATIC
+            255
+            CACHE INTERNAL "not tested")
     endif()
 else()
     set(CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_COMPILE_STATIC

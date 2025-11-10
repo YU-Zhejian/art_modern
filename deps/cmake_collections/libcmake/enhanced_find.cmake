@@ -196,7 +196,7 @@ endfunction()
 function(filter_existing_paths PATH_LIST_VAR)
     set(existing_paths "")
     set(non_existing_paths "")
-    
+
     foreach(path ${${PATH_LIST_VAR}})
         if(EXISTS "${path}")
             list(APPEND existing_paths "${path}")
@@ -204,13 +204,15 @@ function(filter_existing_paths PATH_LIST_VAR)
             list(APPEND non_existing_paths "${path}")
         endif()
     endforeach()
-    
+
     if(non_existing_paths)
         message(WARNING "The following paths do not exist and will be excluded: ${non_existing_paths}")
     endif()
-    
+
     # Update the original list with only existing paths
-    set(${PATH_LIST_VAR} ${existing_paths} PARENT_SCOPE)
+    set(${PATH_LIST_VAR}
+        ${existing_paths}
+        PARENT_SCOPE)
 endfunction()
 
 #[=======================================================================[
@@ -272,8 +274,7 @@ function(ceu_cm_enhanced_find_library)
         set_target_properties(
             CEU_CM_EFL::${CEU_CM_EFL_OUTPUT_VARIABLE}
             PROPERTIES INTERFACE_LINK_LIBRARIES "${${CEU_CM_EFL_OUTPUT_VARIABLE}_TMP_LIBRARY_ABSPATHS}"
-                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS}"
-                       INTERFACE_LINK_OPTIONS "${THIS_LDFLAGS}"
+                       INTERFACE_COMPILE_OPTIONS "${THIS_CFLAGS}" INTERFACE_LINK_OPTIONS "${THIS_LDFLAGS}"
                        INTERFACE_INCLUDE_DIRECTORIES "${THIS_INCDIRS}")
         unset(THIS_CFLAGS)
         unset(THIS_LDFLAGS)

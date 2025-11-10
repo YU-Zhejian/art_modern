@@ -2,11 +2,24 @@ cmake_minimum_required(VERSION 3.17)
 
 if(DEFINED USE_CCACHE)
     message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
+    unset(USE_CCACHE)
 endif()
 
 if(DEFINED USE_ABSL)
     message(WARNING "-DUSE_ABSL is deprecated. Ignored.")
+    unset(USE_ABSL)
 endif()
+
+if(DEFINED USE_BTREE_MAP)
+    message(WARNING "-DUSE_BTREE_MAP is deprecated. Ignored.")
+    unset(USE_BTREE_MAP)
+endif()
+
+if(DEFINED USE_QUAL_GEN)
+    message(WARNING "-DUSE_QUAL_GEN is deprecated. Ignored.")
+    unset(USE_QUAL_GEN)
+endif()
+
 
 if(DEFINED REPRODUCIBLE_BUILD)
     set(CEU_REPRODUCIBLE_BUILDS
@@ -87,7 +100,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
