@@ -171,15 +171,24 @@ touch:
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
 testsmall: debug raw_data
-	env ART=$(OPT_DIR)/build_debug_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
+		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-mpi
 # testsmall with MPI
 testsmall-mpi: debug-mpi raw_data
-	env ART=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
+		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
+		MPIEXEC=$(MPIEXEC) \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: test-art_profile_builder
 # Run tests for art_profile_builder with release builds
+# TODO: Refactor into testsmall.
 test-art_profile_builder: raw_data release
 	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
 	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
@@ -187,19 +196,32 @@ test-art_profile_builder: raw_data release
 .PHONY: testsmall-release
 # Run small tests with release build
 testsmall-release: release raw_data
-	env ART=$(OPT_DIR)/build_release_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin/art_modern \
+		APB_PATH=$(OPT_DIR)/build_release_install/bin/art_profile_builder \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release-mpi
 # testsmall-release with MPI
 testsmall-release-mpi: release-mpi raw_data
-	env ART=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi \
+		APB_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_profile_builder-mpi \
+		MPIEXEC=$(MPIEXEC) \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
+# TODO: Add MPI version when bioconda supports it
 testsmall-conda: raw_data
 	conda env remove -n _art_modern_bioconda -y || true
 	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(shell conda run -n _art_modern_bioconda type -p art_modern)" $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern)" \
+		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder)" \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: raw_data
 # Download raw data required for tests

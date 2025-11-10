@@ -265,7 +265,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             stderr=log_file,
             env={
                 **os.environ,
-                "ART": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
+                "ART_MODERN_PATH": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
+                "APB_PATH": os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else "")),
                 "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
                 "MPIEXEC": MPIEXEC if WITH_MPI else "",
                 "SAMTOOLS_THREADS": "4",

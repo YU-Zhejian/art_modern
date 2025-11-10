@@ -28,7 +28,8 @@ CE11_CHR1="$(readlink -f "data/raw_data/ce11_chr1.fa")"
 export MPI_PARALLEL="${MPI_PARALLEL:-4}"
 export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
 export IDRATE=0.1                                 # Increase indel rate to fail faster
-export ART="${ART}"                               # Do NOT have a default, must be set from outside
+export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
+export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
@@ -38,15 +39,15 @@ export MRNA_PBSIM3_TRANSCRIPT
 # Assemble the ART command
 # If MPIEXEC is set, use it to run ART in parallel using MPI
 if [ -z "${MPIEXEC:-}" ]; then
-    ART_CMD_ASSEMBLED=("${ART}")
+    ART_CMD_ASSEMBLED=("${ART_MODERN_PATH}")
     export PARALLEL="${PARALLEL:-4}" # Reduce parallelism overhead for small tests
 else
     export MPIEXEC
     export PARALLEL="${PARALLEL:-2}"
-    ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART}")
+    ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART_MODERN_PATH}")
 fi
 
-echo "ART=${ART} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
+echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
 
 function sam2bam() {
     # Single-threaded sorting should be fast enough

@@ -1,6 +1,5 @@
 #include "depth_utils.hh"
 
-#include "arithmetic_utils.hh"
 #include "libam_support/Dtypes.h"
 
 #include <array>
@@ -8,7 +7,6 @@
 #include <cstdlib>
 #include <limits>
 #include <tuple>
-#include <vector>
 
 namespace labw::art_modern {
 std::size_t num_base_positive_pe(const am_read_len_t read_len_1, const am_read_len_t read_len_2,
