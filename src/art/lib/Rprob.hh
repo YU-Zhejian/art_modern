@@ -31,7 +31,7 @@
 #include <mkl.h> // NOLINT
 #elif defined(USE_PCG_RANDOM)
 #include "libam_support/ds/pcg_32_c.hh"
-#define PCG_CLASS_NAME pcg_32_c
+#define PCG_CLASS_NAME pcg32_c
 #elif defined(USE_SYSTEM_PCG_RANDOM)
 #include <pcg_random.hpp>
 #define PCG_CLASS_NAME pcg32_fast

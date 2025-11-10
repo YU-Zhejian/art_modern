@@ -116,8 +116,10 @@ namespace {
 
     void print_pcg_version()
     {
-#ifdef USE_PCG_RANDOM
+#if defined(USE_PCG_RANDOM)
         std::cout << "PCG: Really Minimal PCG32 Code" << std::endl;
+#elif defined(USE_SYSTEM_PCG_RANDOM)
+        std::cout << "PCG: System PCG Random" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif
