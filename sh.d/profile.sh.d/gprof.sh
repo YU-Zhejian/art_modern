@@ -12,7 +12,7 @@ mkdir -p "${PROFILE_DIR}"
 env -C "${PROFILE_DIR}" \
     CFLAGS='-pg' \
     CXXFLAGS='-pg' \
-    LDFLAGS='-pg -lgmon' \
+    LDFLAGS='-pg' \
     cmake \
     -DCMAKE_C_COMPILER=gcc \
     -DCMAKE_CXX_COMPILER=g++ \
@@ -23,7 +23,7 @@ env -C "${PROFILE_DIR}" \
     ${CMAKE_FLAGS:-} \
     -G Ninja "$(pwd)"
 
-env -C "${PROFILE_DIR}" ninja -j "$(nproc)" -v
+# env -C "${PROFILE_DIR}" ninja -j "$(nproc)" -v
 
 if is_windows; then
     # Move DLLs
@@ -38,12 +38,12 @@ ldd "${PROFILE_DIR}"/art_modern"${SUFFIX}"
 nm "${PROFILE_DIR}"/art_modern"${SUFFIX}" | grep gmon # Check for gmon symbols
 
 export GMON_OUT_PREFIX="${PROFILE_DIR}"/gmon
-rm -f "${PROFILE_DIR}"/gmon.out*
+rm -f "${GMON_OUT_PREFIX}"*
 "${PROFILE_DIR}"/art_modern"${SUFFIX}" \
-    --i-file data/raw_data/lambda_phage.fa \
+    --i-file data/raw_data/ce11_chr1.fa \
     --mode wgs \
     --lc se \
     --i-parser memory \
-    --i-fcov 200 \
+    --i-fcov 2 \
     --parallel 5
-gprof "${PROFILE_DIR}"/art_modern"${SUFFIX}" "${PROFILE_DIR}"/gmon.out* > "${PROFILE_DIR}"/gprof_report.txt
+gprof "${PROFILE_DIR}"/art_modern"${SUFFIX}" "${GMON_OUT_PREFIX}"* > "${PROFILE_DIR}"/gprof_report.txt
