@@ -8,16 +8,22 @@ This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, t
 
 ```shell
 # Read 1
-seqtk seq 1.fq -1 > 1_1.fq
+seqtk seq a.fq -1 > a_1.fq
 # Read 2
-seqtk seq 1.fq -2 > 1_2.fq
+seqtk seq a.fq -2 > a_2.fq
 ```
 
-You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`.
+You may also generate SAM/BAM files and extract PE FASTQ from them using `samtools`. For example:
+
+```shell
+samtools fastq -1 a_1.fq -2 a_2.fq -N a.sam
+```
+
+**NOTE** Please sort the generated FASTQ files using `seqkit sort` to ensure reads with the same name are in the same order.
 
 ### How to add adaptors \& primers to the reads?
 
-Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use `templ` mode to introduce sequencing errors.
+Currently, there's no support for such features in the simulator. However, you may manually chop your reference genome, add adaptors to them, and use template mode to introduce sequencing errors.
 
 ### How to support new Illumina models?
 
@@ -35,10 +41,6 @@ No. Reasons:
 ### What kinds of CPUs are supported by the simulator?
 
 Although this application should theoretically support both endianness, only little endian is tested. That is, if you're working on an Intel or AMD CPU, this application should work fine.
-
-### Is there an interface for Python, Java, and more?
-
-We may develop a C interface in the future after the APIs and design of the core library are settled.
 
 ### Does this program support cross-compilation?
 

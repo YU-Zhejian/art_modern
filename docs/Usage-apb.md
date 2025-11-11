@@ -9,7 +9,7 @@ This new executable is designed to suppress the old `art_profiler_illumina` Shel
 
 ## Options
 
-- `--i-file`: Input file path. FASTQ/SAM/BAM files are supported. We currently relies on HTSLib to determine file format automatically. See also: [`htsfile(1)`](https://www.htslib.org/doc/htsfile.html).
+- `--i-file`: Input file path. FASTQ/SAM/BAM files are supported. We currently rely on HTSLib to determine file format automatically. See also: [`htsfile(1)`](https://www.htslib.org/doc/htsfile.html).
 - `--i-num_threads`: Number of threads used to decompress BAM input.
 - `--read_len`: Read length. For each read, only the first `read_len` bases are used. If the read is shorter than `read_len`, only the available bases are used.
 - `--is_pe`: For SAM/BAM input, whether the input is paired-end.
