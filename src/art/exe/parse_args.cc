@@ -136,9 +136,9 @@ namespace {
             "simulating WGS reads.");
 
         po::options_description reporting_opts("Reporting options");
-        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_AJE, po::value<std::size_t>()->default_value(1),
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_AJE, po::value<std::size_t>()->default_value(5),
             "The reporting interval (in seconds) for individual art_modern job.");
-        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_JP, po::value<std::size_t>()->default_value(5),
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_JP, po::value<std::size_t>()->default_value(10),
             "The reporting interval (in seconds) for JobPool.");
 
         po::options_description art_opts("ART-specific options");
@@ -178,9 +178,9 @@ namespace {
                 .c_str());
         art_opts.add_options()(ARG_READ_LEN_1, po::value<am_read_len_t>(), "read length of read 1 to be simulated");
         art_opts.add_options()(ARG_READ_LEN_2, po::value<am_read_len_t>(), "read length of read 2 to be simulated");
-        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
+        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>(),
             "Mean distance between DNA/RNA fragments for paired-end simulations");
-        art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>()->default_value(0),
+        art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>(),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
         art_opts.add_options()(
@@ -579,7 +579,6 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             BOOST_LOG_TRIVIAL(warning) << "PE fragment distance parameters are ignored in single-end mode.";
         } else if (art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-
             BOOST_LOG_TRIVIAL(warning) << "PE fragment distance parameters are ignored in template mode.";
         }
     }

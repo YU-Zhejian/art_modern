@@ -249,7 +249,7 @@ void ArtJobExecutor::operator()()
             }
         }
         BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
-                                << to_si(total_num_reads_generated_) << " reads (mean depth=" << real_coverage
+                                << to_si(total_num_reads_generated_.load()) << " reads (mean depth=" << real_coverage
                                 << ") generated.";
     }
     reporter.stop();
@@ -268,9 +268,9 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 std::string ArtJobExecutor::thread_info() const
 {
     return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",
-        job_.job_id, mpi_rank_str_, current_contig_name_, to_si(current_n_reads_generated_),
-        to_si(current_n_reads_left_), to_si(current_n_fails_), to_si(current_max_tolerence_),
-        to_si(total_num_reads_generated_));
+        job_.job_id, mpi_rank_str_, current_contig_name_, to_si(current_n_reads_generated_.load()),
+        to_si(current_n_reads_left_.load()), to_si(current_n_fails_.load()), to_si(current_max_tolerence_.load()),
+        to_si(total_num_reads_generated_.load()));
 }
 
 } // namespace labw::art_modern

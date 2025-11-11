@@ -68,8 +68,8 @@ void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAl
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     BamUtils::assert_correct_cigar(pwa, cigar);
     if (!pwa.is_plus_strand) {
-        std::reverse(qual.begin(), qual.end());
-        std::reverse(cigar.begin(), cigar.end());
+        reverse(qual.data(), qual.size());
+        reverse(cigar.data(), cigar.size());
         revcomp_inplace(seq);
     }
 
@@ -116,11 +116,11 @@ void HeadlessBamReadOutput::writePE(
     BamUtils::assert_correct_cigar(pwa2, cigar2);
 
     if (!pwa1.is_plus_strand) {
-        std::reverse(cigar1.begin(), cigar1.end());
+        reverse(cigar1.data(), cigar1.size());
         revcomp_inplace(seq1);
     }
     if (!pwa2.is_plus_strand) {
-        std::reverse(cigar2.begin(), cigar2.end());
+        reverse(cigar2.data(), cigar2.size());
         revcomp_inplace(seq2);
     }
 

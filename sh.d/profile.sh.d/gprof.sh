@@ -23,23 +23,27 @@ env -C "${PROFILE_DIR}" \
     ${CMAKE_FLAGS:-} \
     -G Ninja "$(pwd)"
 
-env -C "${PROFILE_DIR}" ninja -j120 -v
+env -C "${PROFILE_DIR}" ninja -j "$(nproc)" -v
 
 if is_windows; then
     # Move DLLs
-    cp "${PROFILE_DIR}"/deps/*/cyg*.dll "${PROFILE_DIR}"
+    cp "${PROFILE_DIR}"/deps/*/*.dll "${PROFILE_DIR}"
+    SUFFIX=".exe"
+else
+    SUFFIX=""
 fi
 
-"${PROFILE_DIR}"/art_modern --version
-ldd "${PROFILE_DIR}"/art_modern
-nm "${PROFILE_DIR}"/art_modern | grep gmon # Check for gmon symbols
+"${PROFILE_DIR}"/art_modern"${SUFFIX}" --version
+ldd "${PROFILE_DIR}"/art_modern"${SUFFIX}"
+nm "${PROFILE_DIR}"/art_modern"${SUFFIX}" | grep gmon # Check for gmon symbols
 
 export GMON_OUT_PREFIX="${PROFILE_DIR}"/gmon
-"${PROFILE_DIR}"/art_modern \
-    --i-file data/raw_data/ce11_chr1.fa \
+rm -f "${PROFILE_DIR}"/gmon.out*
+"${PROFILE_DIR}"/art_modern"${SUFFIX}" \
+    --i-file data/raw_data/lambda_phage.fa \
     --mode wgs \
     --lc se \
     --i-parser memory \
-    --i-fcov 2 \
-    --parallel 20
-gprof "${PROFILE_DIR}"/art_modern "${PROFILE_DIR}"/gmon.out* > "${PROFILE_DIR}"/gprof_report.txt
+    --i-fcov 200 \
+    --parallel 5
+gprof "${PROFILE_DIR}"/art_modern"${SUFFIX}" "${PROFILE_DIR}"/gmon.out* > "${PROFILE_DIR}"/gprof_report.txt
