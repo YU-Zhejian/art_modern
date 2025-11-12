@@ -87,10 +87,15 @@ def validate(in_fq: str, in_fa: str, in_cov: Union[float, str], file_type: FileT
     # stddev not used since the data may contain 1 data point only
     diff_mean = statistics.fmean(diffs, diff_weights)
     print("Diff: mean=", diff_mean, ".", sep="")
-    if (diff_mean) > 0.1:
+    if is_template:
+        diff_threshold = 0.3
+    else:
+        diff_threshold = 0.1
+    if (diff_mean) > diff_threshold:
         plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01)
         plt.show()
         plt.clf()
+        raise ValueError("Mean coverage difference is greater than 10%.")
 
 
 if __name__ == "__main__":
