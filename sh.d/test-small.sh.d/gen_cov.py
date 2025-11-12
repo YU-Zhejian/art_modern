@@ -4,8 +4,6 @@ import sys
 
 import pyfastx
 
-BASE_DIR = os.path.join("data", "raw_data")
-
 if __name__ == "__main__":
     rng = random.SystemRandom()
     basename = sys.argv[1]

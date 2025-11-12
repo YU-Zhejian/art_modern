@@ -182,7 +182,7 @@ This option allows you to specify coverage. `art_modern` supports the following 
   - Introduced in [1.3.0](#v-1.3.0-section).
 - If a 3-column (stranded) coverage file or input in format of `pvsim3_transcripts` is provided, the coverage will be intepreted as-is.
 
-For example, if you specified `--read_len_1 10 --read_len_2 150` with unified coverage 5, you'll be likely to see:
+For example, if you specified `--read_len_1 10 --read_len_2 150` with unified/unstranded coverage 5 and PE library construction mode, you'll be likely to see:
 
 ```text
 |================================================|
@@ -202,6 +202,17 @@ With stranded coverage positive=3 and negative=2, you may see:
 |---->                              <------------|
 |------------>                              <----|
 |------------>                              <----|
+```
+
+while for MP library construction mode you would see:
+
+```text
+|================================================|
+<------------|                              |---->
+<------------|                              |---->
+<------------|                              |---->
+<----|                              |------------>
+<----|                              |------------>
 ```
 
 ### Compatibility Matrices of Input Parameters

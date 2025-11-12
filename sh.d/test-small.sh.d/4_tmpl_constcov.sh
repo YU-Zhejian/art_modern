@@ -16,6 +16,8 @@ for lc in se pe mp; do
         --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq
     merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".sam
     merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq
+    python sh.d/test-small.sh.d/validate_template.py \
+        "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".sam "${lc}"
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}" "${MRNA_HEAD}"
     python sh.d/test-small.sh.d/validate_cov.py \
         "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}".fq \

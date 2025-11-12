@@ -16,6 +16,10 @@ for coverage in stranded strandless; do
             --o-fastq "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
+        if [ "${coverage}" = "strandless" ]; then
+            python sh.d/test-small.sh.d/validate_template.py \
+                "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam "${lc}"
+        fi
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}" "${MRNA_HEAD}"
         python sh.d/test-small.sh.d/validate_cov.py \
             "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
