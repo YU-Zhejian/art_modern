@@ -63,6 +63,7 @@
 - Support UCSC MAF output format?
 - Add flags to disable/enable diverse BAM tags.
 - Support circular genome or RNA?
+- Support simulating BGI/MGISEQ reads?
 
 ## Simulate Allele-Specific Expression
 

@@ -92,7 +92,7 @@ std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start
         abort_mpi();
     }
 
-    if (end > seqs_[seq_id].size() || start > seqs_[seq_id].size() || start < 0 || end < 0 || start > end) {
+    if (start < 0 || end < 0 || static_cast<std::size_t>(end) > seqs_[seq_id].size() || static_cast<std::size_t>(start) > seqs_[seq_id].size() || start > end) {
         BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested range [" << start << ", " << end
                                  << ") is out of bounds for sequence of length " << seqs_[seq_id].size() << ".";
         abort_mpi();

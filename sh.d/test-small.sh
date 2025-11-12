@@ -125,18 +125,18 @@ function AM_EXEC() {
     EXEC_ORDER=$((EXEC_ORDER + 1))
     return ${retval}
 }
-function ABP_EXEC() {
+function APB_EXEC() {
     echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
     env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}
     if [ ${retval} -ne 0 ]; then
-        echo "ABP_EXEC failed with exit code ${retval}" >&2
+        echo "APB_EXEC failed with exit code ${retval}" >&2
         cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
         exit 1
     else
-        echo "ABP_EXEC succeeded."
+        echo "APB_EXEC succeeded."
         rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     fi
     EXEC_ORDER=$((EXEC_ORDER + 1))

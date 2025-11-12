@@ -131,6 +131,7 @@ CMakeLists.txt.user
 perf.data*
 *.geany
 *.f[aq]
+*.fast[aq]
 *.pm
 *.dump
 *.log.d
