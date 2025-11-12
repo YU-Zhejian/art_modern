@@ -17,13 +17,13 @@ samtools fastq \
 deps/ART_profiler_illumina/art_profiler_illumina \
     "${OUT_DIR}"/out_se_art_perl "${OUT_DIR}"/ fq
 
-ABP_EXEC \
+APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.fq \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_fq.txt \
     --parallel "${PARALLEL}" \
     --old_behavior
-ABP_EXEC \
+APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
@@ -33,6 +33,22 @@ ABP_EXEC \
 cmp "${OUT_DIR}"/out_se_art_cxx_fq.txt "${OUT_DIR}"/out_se_art_perl.txt
 cmp "${OUT_DIR}"/out_se_art_cxx_sam.txt "${OUT_DIR}"/out_se_art_perl.txt
 
-rm -fr "${OUT_DIR}"/*
+APB_EXEC \
+    --i-file "${OUT_DIR}"/out_se.sam \
+    --read_len_1 "${RLEN}" \
+    --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
+    --parallel "${PARALLEL}" \
+    --old_behavior
+[ "$(grep -c -v '^$' <"${OUT_DIR}"/out_se_art_cxx_sam.txt)" == "432" ]
+
+APB_EXEC \
+    --i-file "${OUT_DIR}"/out_se.sam \
+    --read_len_1 10 \
+    --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
+    --parallel "${PARALLEL}" \
+    --old_behavior
+[ "$(grep -c -v '^$' <"${OUT_DIR}"/out_se_art_cxx_sam.txt)" == "120" ]
+
+rm -fr "${OUT_DIR:?}"/*
 assert_cleandir
 unset RLEN

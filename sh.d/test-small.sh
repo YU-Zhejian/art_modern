@@ -153,15 +153,15 @@ if [ "${HELP_VERSION_ONLY:-0}" == "1" ]; then
     rm -fr "${OUT_DIR}"
     exit 0
 fi
-#. "${SHDIR}"/test-small.sh.d/0_out_fmts.sh       # Test all output is working
-#. "${SHDIR}"/test-small.sh.d/1_fail.sh           # FASTA that would fail the simulator
-#. "${SHDIR}"/test-small.sh.d/2_wgs.sh            # WGS mode (with constant coverage)
-#. "${SHDIR}"/test-small.sh.d/3_trans_constcov.sh # Transcript mode with constant coverage
-#. "${SHDIR}"/test-small.sh.d/4_tmpl_constcov.sh  # Template mode with constant coverage
-#. "${SHDIR}"/test-small.sh.d/5_trans_scov.sh     # Transcript mode with stranded/strandless coverage
-# . "${SHDIR}"/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
-. "${SHDIR}"/test-small.sh.d/7_tmpl_pbsim3.sh  # Transcript mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/8_trans_pbsim3.sh # Template mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/21-apb-se.sh      # APB single-end test
-. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh      # APB paired-end test
-rm -d "${OUT_DIR}"                             # Which should now be empty
+. "${SHDIR}"/test-small.sh.d/0_out_fmts.sh       # Test all output is working
+. "${SHDIR}"/test-small.sh.d/1_fail.sh           # FASTA that would fail the simulator
+. "${SHDIR}"/test-small.sh.d/2_wgs.sh            # WGS mode (with constant coverage)
+. "${SHDIR}"/test-small.sh.d/3_trans_constcov.sh # Transcript mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/4_tmpl_constcov.sh  # Template mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/5_trans_scov.sh     # Transcript mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/7_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/8_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh        # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh        # APB paired-end test
+rm -d "${OUT_DIR}"                               # Which should now be empty

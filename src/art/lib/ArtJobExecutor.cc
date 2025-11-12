@@ -125,7 +125,12 @@ bool ArtJobExecutor::generate_pe_(
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, true, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, false, rprob_);
-    art_contig.generate_read_pe(is_plus_strand, read_1, read_2);
+    try {
+        art_contig.generate_read_pe(is_plus_strand, read_1, read_2);
+    } catch (const ArtGenerationFailure&) {
+        return false;
+    }
+
     read_1.generate_snv_on_qual();
     read_2.generate_snv_on_qual();
     if (require_alignment_) {
@@ -147,7 +152,11 @@ bool ArtJobExecutor::generate_se_(
     auto read_id = fmt::format(
         "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
     ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), true, rprob_);
-    art_contig.generate_read_se(is_plus_strand, art_read);
+    try {
+        art_contig.generate_read_se(is_plus_strand, art_read);
+    } catch (const ArtGenerationFailure&) {
+        return false;
+    }
     art_read.generate_snv_on_qual();
     if (require_alignment_) {
         art_read.generate_pairwise_aln();

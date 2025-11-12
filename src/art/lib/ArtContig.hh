@@ -24,10 +24,13 @@
 #include <htslib/hts.h>
 
 #include <cstddef>
+#include <exception>
 #include <memory>
 #include <string>
 
 namespace labw::art_modern {
+
+class ArtGenerationFailure : public std::exception { };
 
 class ArtContig {
 

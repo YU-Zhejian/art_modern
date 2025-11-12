@@ -20,7 +20,7 @@ namespace labw::art_modern {
 
 namespace {
 
-    static std::array<double, HIGHEST_QUAL> gen_err_prob_()
+    std::array<double, HIGHEST_QUAL> gen_err_prob_()
     {
         std::array<double, HIGHEST_QUAL> tmp_err_prob {};
         for (int i = 0; i < HIGHEST_QUAL; i++) {
