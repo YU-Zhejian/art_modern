@@ -62,7 +62,7 @@ double CoverageInfo::coverage_negative(const std::string& contig_name) const
     return 0.0;
 }
 
-CoverageInfo::CoverageInfo(std::istream& istream)
+CoverageInfo::CoverageInfo(std::istream& istream, const bool is_template_mode)
     : static_coverage_positive_(0)
     , static_coverage_negative_(0)
 {
@@ -78,8 +78,13 @@ CoverageInfo::CoverageInfo(std::istream& istream)
             coverage_positive_.try_emplace(tokens.at(0), std::stod(tokens.at(1)));
             coverage_negative_.try_emplace(tokens.at(0), std::stod(tokens.at(2)));
         } else if (tokens.size() == 2) {
-            coverage_positive_.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
-            coverage_negative_.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
+            if (is_template_mode) {
+                coverage_positive_.try_emplace(tokens.at(0), std::stod(tokens.at(1)));
+                coverage_negative_.try_emplace(tokens.at(0), 0.0);
+            } else {
+                coverage_positive_.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
+                coverage_negative_.try_emplace(tokens.at(0), std::stod(tokens.at(1)) / 2);
+            }
         }
     }
 }

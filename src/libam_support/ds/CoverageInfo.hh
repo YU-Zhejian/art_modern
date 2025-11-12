@@ -31,7 +31,7 @@ public:
     explicit CoverageInfo(double static_coverage);
     explicit CoverageInfo(double static_coverage_positive, double static_coverage_negative);
     CoverageInfo(coverage_map&& coverage_positive, coverage_map&& coverage_negative);
-    explicit CoverageInfo(std::istream& istream);
+    explicit CoverageInfo(std::istream& istream, bool is_template_mode);
 
     DEFAULT_COPY(CoverageInfo)
     DEFAULT_MOVE(CoverageInfo)

@@ -394,7 +394,7 @@ The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
-- `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.2.2](#v-1.2.2-section).
+- `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.3.0](#v-1.3.0-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
 - `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. See also [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
 
@@ -529,7 +529,7 @@ See [MPI Library](#mpi-section) for requirements.
 (find-random-mkl-through-pkgconf-section)=
 ### `FIND_RANDOM_MKL_THROUGH_PKGCONF`
 
-Available since [1.2.2](#v-1.2.2-section).
+Available since [1.3.0](#v-1.3.0-section).
 
 Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) set to `ONEMKL`.
 
@@ -541,5 +541,5 @@ Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `U
 - `USE_BTREE_MAP` was deprecated in [1.1.2](#v-1.1.2-section).
 - `USE_CCACHE` was deprecated in [1.1.7](#v-1.1.7-section).
 - `GSL` option of [`USE_RANDOM_GENERATOR`](#use-random-generator-section) was deprecated in [1.2.0](#v-1.2.0-section) and removed in [1.2.1](#v-1.2.1-section).
-- `USE_ABSL` was deprecated in [1.2.2](#v-1.2.2-section).
-- `USE_QUAL_GEN` was deprecated in [1.2.2](#v-1.2.2-section).
+- `USE_ABSL` was deprecated in [1.3.0](#v-1.3.0-section).
+- `USE_QUAL_GEN` was deprecated in [1.3.0](#v-1.3.0-section).

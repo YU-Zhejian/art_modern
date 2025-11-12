@@ -20,21 +20,29 @@ function(ceu_cm_enhanced_check_compiler_flag)
     cmake_parse_arguments(CEU_CM_ECCF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     foreach(FLAG ${CEU_CM_ECCF_FLAGS})
         if(DEFINED CMAKE_C_COMPILER)
-        if(NOT DEFINED C_COMPILER_HAVE_${FLAG})
-            check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
-            set(C_COMPILER_HAVE_${FLAG} ${C_COMPILER_HAVE_${FLAG}} CACHE INTERNAL "Whether C compiler supports ${FLAG}")
-        endif()
+            if(NOT DEFINED C_COMPILER_HAVE_${FLAG})
+                check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
+                set(C_COMPILER_HAVE_${FLAG}
+                    ${C_COMPILER_HAVE_${FLAG}}
+                    CACHE INTERNAL "Whether C compiler supports ${FLAG}")
+            endif()
         else()
             # If no C support is added, bypass the test.
-            set(C_COMPILER_HAVE_${FLAG} ON CACHE INTERNAL "Test bypassed because no C compiler is defined.")
+            set(C_COMPILER_HAVE_${FLAG}
+                ON
+                CACHE INTERNAL "Test bypassed because no C compiler is defined.")
         endif()
         if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER)
-        if(NOT DEFINED CXX_COMPILER_HAVE_${FLAG})
-            check_cxx_compiler_flag(${FLAG} CXX_COMPILER_HAVE_${FLAG})
-            set(CXX_COMPILER_HAVE_${FLAG} ${CXX_COMPILER_HAVE_${FLAG}} CACHE INTERNAL "Whether CXX compiler supports ${FLAG}")
-        endif()
+            if(NOT DEFINED CXX_COMPILER_HAVE_${FLAG})
+                check_cxx_compiler_flag(${FLAG} CXX_COMPILER_HAVE_${FLAG})
+                set(CXX_COMPILER_HAVE_${FLAG}
+                    ${CXX_COMPILER_HAVE_${FLAG}}
+                    CACHE INTERNAL "Whether CXX compiler supports ${FLAG}")
+            endif()
         else()
-            set(CXX_COMPILER_HAVE_${FLAG} ON CACHE INTERNAL "Test bypassed because no CXX compiler is defined.")
+            set(CXX_COMPILER_HAVE_${FLAG}
+                ON
+                CACHE INTERNAL "Test bypassed because no CXX compiler is defined.")
         endif()
         if(C_COMPILER_HAVE_${FLAG} AND CXX_COMPILER_HAVE_${FLAG})
             # add_compile_options(${FLAG})

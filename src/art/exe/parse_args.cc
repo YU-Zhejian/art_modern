@@ -317,7 +317,7 @@ namespace {
         } catch (const std::invalid_argument&) {
             validate_input_filename(fcov_arg_str, ARG_FCOV);
             std::ifstream cov_fs(fcov_arg_str, std::ios::binary);
-            auto coverage_info = CoverageInfo(cov_fs);
+            auto const coverage_info = CoverageInfo(cov_fs, simulation_mode == SIMULATION_MODE::TEMPLATE);
             cov_fs.close();
             return coverage_info;
         }

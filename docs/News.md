@@ -1,8 +1,10 @@
 # News \& Release Notes
 
-(v-1.2.2-section)=
-## 1.2.2 (Ongoing)
+(v-1.3.0-section)=
+## 1.3.0 (Ongoing)
 
+- **BREAKING CHANGE**
+  - If a 2-column (unstranded) coverage file is provided to template mode, the coverage will be intepreted as positive coverage. Prior versions would divide the coverage by 2 for each strand.
 - Algorithm:
   - **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
   - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.

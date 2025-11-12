@@ -234,11 +234,16 @@ opt/build_release/art_modern \
    --lc pe \
    --i-file opt/build_release/ce11_mrna_1000.fa.pbsim3_trans.tsv \
    --o-fastq opt/build_release/c_elegans_template_pbsim3_se.fastq \
-   --parallel 4 \
    --i-type pbsim3_transcripts
 ```
 
 Please note that the mean and standard deviation of fragment length is not specified since in template-based simulation, a template is considered a fragment.
+
+**NOTE** For coverage of the template mode:
+
+- If a unified coverage file is provided, the coverage will be intepreted as positive coverage instead of being divided equally into both strands.
+- If a 2-column (unstranded) coverage file is provided, the coverage will be intepreted as positive coverage.
+- If a 3-column (stranded) coverage file or input in format of `pvsim3_transcripts` is provided, the coverage will be intepreted as-is.
 
 ### Using UNIX Pipelines
 

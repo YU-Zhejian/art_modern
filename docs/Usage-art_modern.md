@@ -51,8 +51,8 @@ A diagram for mate-pair extraction:
 
 ```text
 FRAGMENT:  |==============================|
-MP READ 1: <-------|
-MP READ 2:                        |------->
+MP READ 1:                        |------->
+MP READ 2: <-------|
 ```
 
 #### See also
@@ -171,6 +171,38 @@ This option allows you to specify coverage. `art_modern` supports the following 
 **NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`. This format comes with contig-specific coverage information.
 
 **NOTE** We prefer unified coverage floating points to TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
+
+**NOTE** For coverage of the template mode:
+
+- If a unified coverage file is provided, the coverage will be intepreted as positive coverage. That is:
+  - If the library is SE, all reads will be generated from the positive strand at the 1st base.
+  - If the library is PE, all read 1 will be generated from the positive strand at the first base, with read 2 generated from the negative strand at the last base.
+  - If the library is MP, all read 1 will be generated from the positive strand to the last base, with read 2 generated from the negative strand to the first base.
+- If a 2-column (unstranded) coverage file is provided, the coverage will be intepreted as positive coverage.
+  - Introduced in [1.3.0](#v-1.3.0-section).
+- If a 3-column (stranded) coverage file or input in format of `pvsim3_transcripts` is provided, the coverage will be intepreted as-is.
+
+For example, if you specified `--read_len_1 10 --read_len_2 150` with unified coverage 5, you'll be likely to see:
+
+```text
+|================================================|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+```
+
+With stranded coverage positive=3 and negative=2, you may see:
+
+```text
+|================================================|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|------------>                              <----|
+|------------>                              <----|
+```
 
 ### Compatibility Matrices of Input Parameters
 

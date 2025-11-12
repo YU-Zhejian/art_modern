@@ -96,7 +96,8 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     const int tid = CExceptionsProxy::assert_numeric(sam_hdr_name2tid(sam_header_, pwa1.contig_name.c_str()),
         USED_HTSLIB_NAME, "Failed to fetch TID for contig '" + pwa1.contig_name + "'", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
-    const auto rlen = pwa1.query.size();
+    const auto rlen_1 = pwa1.query.size();
+    const auto rlen_2 = pwa2.query.size();
 
     const auto& cigar1 = pwa1.generate_cigar_array(sam_options_.use_m);
     const auto& cigar2 = pwa2.generate_cigar_array(sam_options_.use_m);
@@ -135,7 +136,7 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     }
 
     const hts_pos_t isize1
-        = pos2 > pos1 ? static_cast<hts_pos_t>(pos2 + rlen - pos1) : -static_cast<hts_pos_t>(pos1 + rlen - pos2);
+        = pos2 > pos1 ? static_cast<hts_pos_t>(pos2 + rlen_2 - pos1) : -static_cast<hts_pos_t>(pos1 + rlen_1 - pos2);
     const hts_pos_t isize2 = -isize1;
 
     auto sam_record1 = BamUtils::init_uptr();
@@ -143,19 +144,19 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1.get(), pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
-            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen, seq1.c_str(),
+            cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen_1, seq1.c_str(),
             reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
-            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen, seq2.c_str(),
+            cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen_2, seq2.c_str(),
             reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record1.get()), rlen);
+        reverse(bam_get_qual(sam_record1.get()), rlen_1);
         reverse(bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
     } else {
-        reverse(bam_get_qual(sam_record2.get()), rlen);
+        reverse(bam_get_qual(sam_record2.get()), rlen_2);
         reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
     }
 

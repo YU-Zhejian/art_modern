@@ -23,7 +23,7 @@ env -C "${PROFILE_DIR}" \
     ${CMAKE_FLAGS:-} \
     -G Ninja "$(pwd)"
 
-# env -C "${PROFILE_DIR}" ninja -j "$(nproc)" -v
+env -C "${PROFILE_DIR}" ninja -j "$(nproc)" -v
 
 if is_windows; then
     # Move DLLs
@@ -46,4 +46,4 @@ rm -f "${GMON_OUT_PREFIX}"*
     --i-parser memory \
     --i-fcov 2 \
     --parallel 5
-gprof "${PROFILE_DIR}"/art_modern"${SUFFIX}" "${GMON_OUT_PREFIX}"* > "${PROFILE_DIR}"/gprof_report.txt
+gprof "${PROFILE_DIR}"/art_modern"${SUFFIX}" "${GMON_OUT_PREFIX}"* >"${PROFILE_DIR}"/gprof_report.txt

@@ -14,7 +14,7 @@ SHDIR="$(readlink -f "$(dirname "${0}")")"
 cd "${SHDIR}/../"
 
 if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
-    python "${SHDIR}"/test-small.sh.d/gen_cov.py
+    python "${SHDIR}"/test-small.sh.d/gen_cov.py data/raw_data/ce11.mRNA_head 5
 fi
 
 # Create a temporary output directory
@@ -145,10 +145,10 @@ function ABP_EXEC() {
 
 rm -fr "${OUT_DIR}" # Remove previous runs
 mkdir "${OUT_DIR}"
-AM_EXEC --version # Just to log the version used
-AM_EXEC --help    # Just to log the help message
+AM_EXEC --version  # Just to log the version used
+AM_EXEC --help     # Just to log the help message
 APB_EXEC --version # Just to log the version used
-APB_EXEC --help # Just to log the help message
+APB_EXEC --help    # Just to log the help message
 if [ "${HELP_VERSION_ONLY:-0}" == "1" ]; then
     rm -fr "${OUT_DIR}"
     exit 0
