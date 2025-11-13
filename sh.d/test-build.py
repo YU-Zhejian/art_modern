@@ -1,7 +1,5 @@
 """
 This re-implementation of test-build.sh does not call make.
-
-TODO: Add timeout. Also add time measurement.
 """
 
 from __future__ import annotations
@@ -14,6 +12,7 @@ import tempfile
 from typing import List, Optional
 import threading
 import argparse
+from datetime import datetime
 
 THIS_PID = os.getpid()
 
@@ -36,6 +35,8 @@ IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
 FAILED_ID = []
 
+def time() -> str:
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
@@ -175,37 +176,48 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     os.makedirs(build_dir)
     os.makedirs(install_dir)
     with IO_MUTEX:
-        print(f"{this_job_id} {' '.join(cmake_opts)}")
-        print(f"{this_job_id} B: {build_dir}, I: {install_dir}")
+        print(f"{time()} {this_job_id} {' '.join(cmake_opts)}")
+        print(f"{time()} {this_job_id} B: {build_dir}, I: {install_dir}")
     log_path = os.path.join(LOG_DIR, f"{this_job_id}.txt")
     with open(log_path, "wb", buffering=0) as log_file:
-        log_file.write(f"Build log for job {this_job_id}\n".encode("utf-8"))
-        log_file.write(f"CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
-        log_file.write(f"{this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
+        log_file.write(f"{time()} Build log for job {this_job_id}\n".encode("utf-8"))
+        log_file.write(f"{time()} CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
+        log_file.write(f"{time()} {this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
         # Invoke CMake to configure the build
 
         def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs) -> bool:
             with IO_MUTEX:
-                print(f"{this_job_id} {step_name} START")
-            log_file.write(f"{this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
+                print(f"{time()} {this_job_id} {step_name} START")
+            log_file.write(f"{time()} {this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
 
-            log_file.write(f"{this_job_id} {step_name} START\n".encode("utf-8"))
+            log_file.write(f"{time()} {this_job_id} {step_name} START\n".encode("utf-8"))
 
             if DRY_RUN:
                 with IO_MUTEX:
-                    print(f"{this_job_id} {step_name} DRYRUN")
-                log_file.write(f"{this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
+                    print(f"{time()} {this_job_id} {step_name} DRYRUN")
+                log_file.write(f"{time()} {this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
 
             else:
-                proc = subprocess.run(cmdline, *args, **kwargs)
+                try:
+                    proc = subprocess.run(cmdline, *args, **kwargs)
+                except subprocess.TimeoutExpired as e:
+                    with IO_MUTEX:
+                        print(f"{time()} {this_job_id} {step_name} TIMEOUT")
+                    log_file.write(f"{time()} {this_job_id} {step_name} TIMEOUT: {e}\n".encode("utf-8"))
+                    return False
+                except subprocess.SubprocessError as e:
+                    with IO_MUTEX:
+                        print(f"{time()} {this_job_id} {step_name} FAILED")
+                    log_file.write(f"{time()} {this_job_id} {step_name} FAILED: {e}\n".encode("utf-8"))
+                    return False
                 if proc.returncode != 0:
                     with IO_MUTEX:
-                        print(f"{this_job_id} {step_name} FAILED")
-                    log_file.write(f"{this_job_id} {step_name} FAILED\n".encode("utf-8"))
+                        print(f"{time()} {this_job_id} {step_name} FAILED")
+                    log_file.write(f"{time()} {this_job_id} {step_name} FAILED\n".encode("utf-8"))
                     return False
             with IO_MUTEX:
-                print(f"{this_job_id} {step_name} DONE")
-            log_file.write(f"{this_job_id} {step_name} DONE\n".encode("utf-8"))
+                print(f"{time()} {this_job_id} {step_name} DONE")
+            log_file.write(f"{time()} {this_job_id} {step_name} DONE\n".encode("utf-8"))
             return True
 
         if not run_wrapper(
@@ -242,6 +254,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             ],
             stdout=log_file,
             stderr=log_file,
+            timeout=360,
         ):
             with IO_MUTEX:
                 FAILED_ID.append(this_job_id)
@@ -252,6 +265,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             cwd=build_dir,
             stdout=log_file,
             stderr=log_file,
+            timeout=60,
         ):
             with IO_MUTEX:
                 FAILED_ID.append(this_job_id)
@@ -262,6 +276,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             [CMAKE, "--install", build_dir],
             stdout=log_file,
             stderr=log_file,
+            timeout=60,
         ):
             with IO_MUTEX:
                 FAILED_ID.append(this_job_id)
@@ -284,6 +299,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "NO_FASTQC": "1",
                 "OUT_DIR": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
             },
+            timeout=1200,
         ):
             with IO_MUTEX:
                 FAILED_ID.append(this_job_id)
@@ -331,17 +347,17 @@ if __name__ == "__main__":
     if os.path.exists(LOG_DIR):
         shutil.rmtree(LOG_DIR)
     os.makedirs(LOG_DIR)
-    print(f"LOG_DIR={LOG_DIR}")
+    print(f"{time()} LOG_DIR={LOG_DIR}")
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
-    print("Probing for MKL through CMake...", end="")
+    print(f"{time()} Probing for MKL through CMake...", end="")
     if probe_using_cmake_project("test-mkl.cmake"):
         RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print("Probing for concurrent queue...", end="")
+    print(f"{time()} Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
         print(concurrent_queue_path)
@@ -349,46 +365,46 @@ if __name__ == "__main__":
         print("FAIL")
 
     MALLOCS = ["NOP"]
-    print("Probing for jemalloc...", end="")
+    print(f"{time()} Probing for jemalloc...", end="")
     if probe_pkg_config("jemalloc"):
         MALLOCS.append("JEMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print("Probing for mimalloc...", end="")
+    print(f"{time()} Probing for mimalloc...", end="")
     if probe_using_cmake_project("test-mimalloc.cmake"):
         MALLOCS.append("MIMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print("Probing for tcmalloc...", end="")
+    print(f"{time()} Probing for tcmalloc...", end="")
     if probe_pkg_config("libtcmalloc"):
         MALLOCS.append("TCMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print("Probing for tcmalloc_minimal...", end="")
+    print(f"{time()} Probing for tcmalloc_minimal...", end="")
     if probe_pkg_config("libtcmalloc_minimal"):
         MALLOCS.append("TCMALLOC_MINIMAL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print("Probing for HTSLib...", end="")
+    print(f"{time()} Probing for HTSLib...", end="")
     is_htslib_exist = probe_pkg_config("htslib")
     if is_htslib_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print("Probing for {fmt}...", end="")
+    print(f"{time()} Probing for " + "{fmt}" +"...", end="")
     is_libfmt_exist = probe_pkg_config("fmt")
     if is_libfmt_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print("Probing for <pcg_random.hpp>...", end="")
+    print(f"{time()} Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
         RANDOM_GENERATORS.append("SYSTEM_PCG")
@@ -396,7 +412,7 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print("Probing for MKL found through pkg-config...", end="")
+    print(f"{time()} Probing for MKL found through pkg-config...", end="")
     mkl_pc = peobe_mkl_using_pkgconf()
     if mkl_pc:
         print(";".join(mkl_pc))
@@ -464,8 +480,8 @@ if __name__ == "__main__":
     executor.shutdown()
     SUCCESS_ID = sorted(SUCCESS_ID)
     FAILED_ID = sorted(FAILED_ID)
-    print(f"Successful builds: {', '.join(map(str, SUCCESS_ID))}")
-    print(f"Failed builds: {', '.join(map(str,FAILED_ID))}")
+    print(f"{time()} Successful builds: {', '.join(map(str, SUCCESS_ID))}")
+    print(f"{time()} Failed builds: {', '.join(map(str,FAILED_ID))}")
     if not FAILED_ID:
         shutil.rmtree(LOG_DIR)
     exit(1 if FAILED_ID else 0)

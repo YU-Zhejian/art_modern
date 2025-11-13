@@ -38,6 +38,7 @@ export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
 export IDRATE=0.1                                 # Increase indel rate to fail faster
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
+export TIMEOUT="${TIMEOUT:-120}"                  # Default timeout for each test command
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
@@ -119,7 +120,7 @@ EXEC_ORDER=0
 function AM_EXEC() {
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "EXEC ${EXEC_ORDER}: ${ART_CMD_ASSEMBLED[*]} $*"
-    timeout 120s -s KILL env \
+    timeout "${TIMEOUT}"s -s KILL env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     retval=${?}
@@ -137,7 +138,7 @@ function AM_EXEC() {
 function APB_EXEC() {
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
-    timeout 120s -s KILL env \
+    timeout "${TIMEOUT}"s -s KILL env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}
