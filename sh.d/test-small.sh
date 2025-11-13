@@ -117,34 +117,36 @@ function assert_cleandir() {
 EXEC_ORDER=0
 
 function AM_EXEC() {
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "EXEC ${EXEC_ORDER}: ${ART_CMD_ASSEMBLED[*]} $*"
-    env \
+    timeout 120s -s KILL env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     retval=${?}
     if [ ${retval} -ne 0 ]; then
-        echo "AM_EXEC failed with exit code ${retval}" >&2
+        echo "EXEC ${EXEC_ORDER}: Failed with exit code ${retval}" >&2
         cat "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log >&2
         exit 1
     else
-        echo "AM_EXEC succeeded."
+        echo "EXEC ${EXEC_ORDER}: Succeeded."
         rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     fi
     EXEC_ORDER=$((EXEC_ORDER + 1))
     return ${retval}
 }
 function APB_EXEC() {
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
     echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
-    env \
+    timeout 120s -s KILL env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}
     if [ ${retval} -ne 0 ]; then
-        echo "APB_EXEC failed with exit code ${retval}" >&2
+        echo "EXEC ${EXEC_ORDER}: Failed with exit code ${retval}" >&2
         cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
         exit 1
     else
-        echo "APB_EXEC succeeded."
+        echo "EXEC ${EXEC_ORDER}: Succeeded."
         rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     fi
     EXEC_ORDER=$((EXEC_ORDER + 1))

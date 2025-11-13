@@ -1,5 +1,7 @@
 """
 This re-implementation of test-build.sh does not call make.
+
+TODO: Add timeout. Also add time measurement.
 """
 
 from __future__ import annotations

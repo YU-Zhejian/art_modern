@@ -147,12 +147,6 @@ fmt:
 scc:
 	$(BASH) sh.d/scc.sh
 
-.PHONY: touch
-# Touch all source files to current timestamp
-# This **MAY** work when CMake does strange things like compiling the source files again and again.
-touch:
-	$(BASH) sh.d/touch-all.sh
-
 .PHONY: testsmall
 # Alias to testsmall-debug
 testsmall: testsmall-debug
