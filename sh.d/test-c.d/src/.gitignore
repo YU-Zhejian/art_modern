@@ -1,2 +1,5 @@
 /generate_many_contigs
 /generate_large_contigs
+/fast-classify
+/find-dups
+*.o
