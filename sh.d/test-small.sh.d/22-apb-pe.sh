@@ -18,8 +18,7 @@ samtools fastq \
     -N \
     "${OUT_DIR}"/out_pe.sam
 
-deps/ART_profiler_illumina/art_profiler_illumina \
-    "${OUT_DIR}"/out_pe_art_perl_ "${OUT_DIR}"/ fq
+art_profile_illumina "${OUT_DIR}"/out_pe_art_perl_ "${OUT_DIR}"/ fq
 
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_pe.1.fq \
@@ -62,10 +61,14 @@ APB_EXEC \
     --i-num_threads 4 \
     --old_behavior
 
-set -x
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set -x
+fi
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_pe_art_cxx_sam_R1.txt)" == "432" ]
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_pe_art_cxx_sam_R2.txt)" == "432" ]
-set +x
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set +x
+fi
 
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_pe.sam \
@@ -78,10 +81,14 @@ APB_EXEC \
     --i-num_threads 4 \
     --old_behavior
 
-set -x
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set -x
+fi
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_pe_art_cxx_sam_R1.txt)" == "120" ]
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_pe_art_cxx_sam_R2.txt)" == "432" ]
-set +x
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set +x
+fi
 
 rm -fr "${OUT_DIR:?}"/*
 assert_cleandir

@@ -10,7 +10,7 @@
 #include <hedley/hedley.h>
 #include <rapidhash/rapidhash.h>
 
-#define _POSIX_C_SOURCE 200809L // For getline, CLOCK_MONOTONIC
+#define _POSIX_C_SOURCE 200809L // NOLINT: For getline, CLOCK_MONOTONIC
 
 #include <stdint.h>
 #include <stdio.h>
@@ -18,14 +18,13 @@
 #include <string.h>
 
 #include <time.h>
-#include <unistd.h>
 
 KHASH_INIT(dup_set, kh_cstr_t, char, 0, kh_str_hash_func, kh_str_hash_equal)
 
 const size_t BLOOM_FILTER_SIZE = 10ULL * 1024 * 1024 * 1024; // 10GiB
 const size_t REPORT_INTERVAL = 1000000ULL;
 
-hash_type xxh64_wrapper(const void* data, size_t len) { return XXH64(data, len, 0); }
+HEDLEY_ALWAYS_INLINE hash_type xxh64_wrapper(const void* data, size_t len) { return XXH64(data, len, 0); }
 
 hash_type rapidhash_wrapper(const void* data, size_t len) { return rapidhashMicro(data, len); }
 
@@ -60,7 +59,7 @@ int main(void)
     ssize_t linelen;
     size_t linecount = 0;
     size_t bloom_errors = 0;
-    bool fucked = false;
+    bool found_duplicate = false;
     struct timespec ts_start;
     struct timespec ts_end;
     clock_gettime(CLOCK_MONOTONIC, &ts_start);
@@ -74,7 +73,7 @@ int main(void)
             if (k != kh_end(dups)) {
                 // Confirmed duplicate
                 fprintf(stderr, "Duplicate found (%zu): %s", linecount, line);
-                fucked = true;
+                found_duplicate = true;
                 goto cleanup;
             } else {
                 bloom_errors++;
@@ -87,7 +86,7 @@ int main(void)
         if (ret == -1) {
             // Failed to insert into khash
             fprintf(stderr, "Failed to insert into duplicate set\n");
-            fucked = true;
+            found_duplicate = true;
             goto cleanup;
         }
         if (linecount % REPORT_INTERVAL == 0) {
@@ -105,5 +104,5 @@ cleanup:
     free(line);
     kh_destroy(dup_set, dups);
     bloom_free(bloom_filter);
-    return fucked ? EXIT_FAILURE : EXIT_SUCCESS;
+    return found_duplicate ? EXIT_FAILURE : EXIT_SUCCESS;
 }

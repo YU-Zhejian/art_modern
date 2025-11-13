@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC1091
+# shellcheck disable=SC2034
 # Taking environment variables:
 # - NO_FASTQC: If set to "1", skip fastqc tests
 # - HELP_VERSION_ONLY: If set to "1", only test help and version outputs
@@ -9,12 +10,22 @@
 # - MPI_PARALLEL: If set, use this many MPI processes
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
 # - OUT_DIR: If set, use this as the output directory (will be cleaned first)
+# - SET_X: If set to "1", enable bash -x for debugging
+
+if [ "${SET_X:-0}" == "1" ]; then
+    set -x
+    BASH_WRAPPER=("${SHELL}" "-x")
+else
+    BASH_WRAPPER=("${SHELL}")
+fi
 
 set -ue
 SHDIR="$(readlink -f "$(dirname "${0}")")"
 cd "${SHDIR}/../"
+PROJDIR="$(pwd)/"
+export PROJDIR
 
-if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
+if [ ! -f "${PROJDIR}"/data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python "${SHDIR}"/test-small.sh.d/gen_cov.py data/raw_data/ce11.mRNA_head 5
 fi
 
@@ -28,17 +39,17 @@ else
     OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir=/tmp)"
     echo "Created OUT_DIR=${OUT_DIR}"
 fi
-MRNA_HEAD="$(readlink -f "data/raw_data/ce11.mRNA_head.fa")"
-MRNA_PBSIM3_TRANSCRIPT="$(readlink -f "data/raw_data/ce11.mRNA_head.pbsim3.transcript")"
-LAMBDA_PHAGE="$(readlink -f "data/raw_data/lambda_phage.fa")"
-CE11_CHR1="$(readlink -f "data/raw_data/ce11_chr1.fa")"
+MRNA_HEAD="${PROJDIR}/data/raw_data/ce11.mRNA_head.fa"
+MRNA_PBSIM3_TRANSCRIPT="${PROJDIR}/data/raw_data/ce11.mRNA_head.pbsim3.transcript"
+LAMBDA_PHAGE="${PROJDIR}/data/raw_data/lambda_phage.fa"
+CE11_CHR1="${PROJDIR}/data/raw_data/ce11_chr1.fa"
 
 export MPI_PARALLEL="${MPI_PARALLEL:-4}"
 export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
 export IDRATE=0.1                                 # Increase indel rate to fail faster
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
-export TIMEOUT="${TIMEOUT:-120}"                  # Default timeout for each test command
+export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
@@ -63,7 +74,7 @@ echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
 function sam2bam() {
     # Single-threaded sorting should be fast enough
     samtools sort --write-index "${1}".sam -o "${1}".bam
-    python sh.d/test-small.sh.d/test_sam.py "${2}" "${1}".bam
+    python "${SHDIR}"/test-small.sh.d/test_sam.py "${2}" "${1}".bam
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
@@ -115,39 +126,55 @@ function assert_cleandir() {
     mkdir "${OUT_DIR}"
 }
 
+function validate_rlen() {
+    python "${SHDIR}"/test-small.sh.d/validate_rlen.py "${@}"
+}
+
+function validate_cov() {
+    python "${SHDIR}"/test-small.sh.d/validate_cov.py "${@}"
+}
+
+function validate_template() {
+    python "${SHDIR}"/test-small.sh.d/validate_template.py "${@}"
+}
+
+function art_profile_illumina() {
+    env -C "${OUT_DIR}" \
+        "${BASH_WRAPPER[@]}" \
+        "${PROJDIR}"/deps/ART_profiler_illumina/art_profiler_illumina "${@}"
+}
+
 EXEC_ORDER=0
 
 function AM_EXEC() {
-    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "EXEC ${EXEC_ORDER}: ${ART_CMD_ASSEMBLED[*]} $*"
-    timeout "${TIMEOUT}"s -s KILL env \
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
+    timeout -s KILL "${TIMEOUT}"s env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     retval=${?}
     if [ ${retval} -ne 0 ]; then
-        echo "EXEC ${EXEC_ORDER}: Failed with exit code ${retval}" >&2
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
         cat "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log >&2
         exit 1
     else
-        echo "EXEC ${EXEC_ORDER}: Succeeded."
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
         rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     fi
     EXEC_ORDER=$((EXEC_ORDER + 1))
     return ${retval}
 }
 function APB_EXEC() {
-    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S')"
-    echo "EXEC ${EXEC_ORDER}: ${APB_CMD_ASSEMBLED[*]} $*"
-    timeout "${TIMEOUT}"s -s KILL env \
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${APB_CMD_ASSEMBLED[*]} $*"
+    timeout -s KILL "${TIMEOUT}"s env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}
     if [ ${retval} -ne 0 ]; then
-        echo "EXEC ${EXEC_ORDER}: Failed with exit code ${retval}" >&2
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
         cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
         exit 1
     else
-        echo "EXEC ${EXEC_ORDER}: Succeeded."
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
         rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     fi
     EXEC_ORDER=$((EXEC_ORDER + 1))

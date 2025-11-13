@@ -2,13 +2,13 @@
 #include <libdeflate.h>
 #include <zlib.h>
 
-#define _POSIX_C_SOURCE 200809L // For getline, CLOCK_MONOTONIC
+#define _POSIX_C_SOURCE 200809L // NOLINT: For getline, CLOCK_MONOTONIC
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-const size_t NUM_CLASSES = 16 * 16; // 256 classes for 2 hex digits
+const size_t NUM_CLASSES = 16ULL * 16; // 256 classes for 2 hex digits
 
 int main(int argc, char** argv)
 {

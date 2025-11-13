@@ -17,11 +17,11 @@ for coverage in stranded strandless; do
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
         if [ "${coverage}" = "strandless" ]; then
-            python sh.d/test-small.sh.d/validate_template.py \
+            validate_template \
                 "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".sam "${lc}"
         fi
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}" "${MRNA_HEAD}"
-        python sh.d/test-small.sh.d/validate_cov.py \
+        validate_cov \
             "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
             "${MRNA_HEAD}" \
             data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \
@@ -48,7 +48,7 @@ for coverage in stranded strandless; do
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl.sam
         merge_file "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".hl "${MRNA_HEAD}"
-        python sh.d/test-small.sh.d/validate_cov.py \
+        validate_cov \
             "${OUT_DIR}"/test_small_"${lc}"_template_"${parser}"_"${coverage}".fq \
             "${MRNA_HEAD}" \
             data/raw_data/ce11.mRNA_head.cov_"${coverage}".tsv \

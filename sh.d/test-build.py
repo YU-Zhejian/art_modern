@@ -5,6 +5,7 @@ This re-implementation of test-build.sh does not call make.
 from __future__ import annotations
 
 import concurrent.futures
+import glob
 import os
 import shutil
 import subprocess
@@ -35,8 +36,10 @@ IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
 FAILED_ID = []
 
+
 def time() -> str:
     return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
@@ -178,7 +181,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     with IO_MUTEX:
         print(f"{time()} {this_job_id} {' '.join(cmake_opts)}")
         print(f"{time()} {this_job_id} B: {build_dir}, I: {install_dir}")
-    log_path = os.path.join(LOG_DIR, f"{this_job_id}.txt")
+    log_path = os.path.join(LOG_DIR, f"{this_job_id}.log")
     with open(log_path, "wb", buffering=0) as log_file:
         log_file.write(f"{time()} Build log for job {this_job_id}\n".encode("utf-8"))
         log_file.write(f"{time()} CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
@@ -220,95 +223,104 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             log_file.write(f"{time()} {this_job_id} {step_name} DONE\n".encode("utf-8"))
             return True
 
-        if not run_wrapper(
-            "CONFIG",
-            [
-                CMAKE,
-                "-G",
-                CMAKE_GENERATOR,
-                "-Wdev",
-                "-Wdeprecated",
-                "--warn-uninitialized",
-                "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
-                "-DCMAKE_VERBOSE_MAKEFILE=ON",
-                *cmake_opts,
-                f"-DCMAKE_INSTALL_PREFIX={install_dir}",
-                os.getcwd(),
-            ],
-            cwd=build_dir,
-            stdout=log_file,
-            stderr=log_file,
-        ):
-            with IO_MUTEX:
-                FAILED_ID.append(this_job_id)
-            return
-
-        if not run_wrapper(
-            "BUILD",
-            [
-                CMAKE,
-                "--build",
-                build_dir,
-                "-j",
-                str(4),
-            ],
-            stdout=log_file,
-            stderr=log_file,
-            timeout=360,
-        ):
-            with IO_MUTEX:
-                FAILED_ID.append(this_job_id)
-                return
-        if not run_wrapper(
-            "CTEST",
-            [CTEST, "--output-on-failure"],
-            cwd=build_dir,
-            stdout=log_file,
-            stderr=log_file,
-            timeout=60,
-        ):
-            with IO_MUTEX:
-                FAILED_ID.append(this_job_id)
+        with open(os.path.join(LOG_DIR, f"{this_job_id}-config.log"), "wb", buffering=0) as config_log_file:
+            if not run_wrapper(
+                "CONFIG",
+                [
+                    CMAKE,
+                    "-G",
+                    CMAKE_GENERATOR,
+                    "-Wdev",
+                    "-Wdeprecated",
+                    "--warn-uninitialized",
+                    "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
+                    "-DCMAKE_VERBOSE_MAKEFILE=ON",
+                    *cmake_opts,
+                    f"-DCMAKE_INSTALL_PREFIX={install_dir}",
+                    os.getcwd(),
+                ],
+                cwd=build_dir,
+                stdout=config_log_file,
+                stderr=config_log_file,
+            ):
+                with IO_MUTEX:
+                    FAILED_ID.append(this_job_id)
                 return
 
-        if not run_wrapper(
-            "INSTALL",
-            [CMAKE, "--install", build_dir],
-            stdout=log_file,
-            stderr=log_file,
-            timeout=60,
-        ):
-            with IO_MUTEX:
-                FAILED_ID.append(this_job_id)
-                return
+        with open(os.path.join(LOG_DIR, f"{this_job_id}-build.log"), "wb", buffering=0) as build_log_file:
+            if not run_wrapper(
+                "BUILD",
+                [
+                    CMAKE,
+                    "--build",
+                    build_dir,
+                    "-j",
+                    str(4),
+                ],
+                stdout=build_log_file,
+                stderr=build_log_file,
+                timeout=360,
+            ):
+                with IO_MUTEX:
+                    FAILED_ID.append(this_job_id)
+                    return
+        with open(os.path.join(LOG_DIR, f"{this_job_id}-ctest.log"), "wb", buffering=0) as ctest_log_file:
+            if not run_wrapper(
+                "CTEST",
+                [CTEST, "--output-on-failure"],
+                cwd=build_dir,
+                stdout=ctest_log_file,
+                stderr=ctest_log_file,
+                timeout=60,
+            ):
+                with IO_MUTEX:
+                    FAILED_ID.append(this_job_id)
+                    return
 
-        if not run_wrapper(
-            "TESTSMALL",
-            [BASH, os.path.join(SHDIR, "test-small.sh")],
-            stdout=log_file,
-            stderr=log_file,
-            env={
-                **os.environ,
-                "ART_MODERN_PATH": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
-                "APB_PATH": os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else "")),
-                "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-                "MPIEXEC": MPIEXEC if WITH_MPI else "",
-                "SAMTOOLS_THREADS": "4",
-                "MPI_PARALLEL": "4",
-                "PARALLEL": "2",
-                "NO_FASTQC": "1",
-                "OUT_DIR": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
-            },
-            timeout=1200,
-        ):
-            with IO_MUTEX:
-                FAILED_ID.append(this_job_id)
-                return
+        with open(os.path.join(LOG_DIR, f"{this_job_id}-install.log"), "wb", buffering=0) as install_log_file:
+            if not run_wrapper(
+                "INSTALL",
+                [CMAKE, "--install", build_dir],
+                stdout=install_log_file,
+                stderr=install_log_file,
+                timeout=60,
+            ):
+                with IO_MUTEX:
+                    FAILED_ID.append(this_job_id)
+                    return
+
+        with open(os.path.join(LOG_DIR, f"{this_job_id}-testsmall.log"), "wb", buffering=0) as testsmall_log_file:
+            if not run_wrapper(
+                "TESTSMALL",
+                [BASH, os.path.join(SHDIR, "test-small.sh")],
+                stdout=testsmall_log_file,
+                stderr=testsmall_log_file,
+                env={
+                    **os.environ,
+                    "ART_MODERN_PATH": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
+                    "APB_PATH": os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else "")),
+                    "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
+                    "MPIEXEC": MPIEXEC if WITH_MPI else "",
+                    "SAMTOOLS_THREADS": "4",
+                    "MPI_PARALLEL": "4",
+                    "PARALLEL": "2",
+                    "NO_FASTQC": "1",
+                    "OUT_DIR": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
+                    "SET_X": "1",
+                },
+                timeout=1200,
+            ):
+                with IO_MUTEX:
+                    FAILED_ID.append(this_job_id)
+                    return
 
         shutil.rmtree(build_dir)
         shutil.rmtree(install_dir)
     os.remove(log_path)  # Remove log if successful.
-    SUCCESS_ID.append(this_job_id)
+    for fn in glob.glob(os.path.join(LOG_DIR, f"{this_job_id}-*.log")):
+        os.remove(fn)
+    with IO_MUTEX:
+        SUCCESS_ID.append(this_job_id)
 
 
 if __name__ == "__main__":
@@ -397,7 +409,7 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for " + "{fmt}" +"...", end="")
+    print(f"{time()} Probing for " + "{fmt}" + "...", end="")
     is_libfmt_exist = probe_pkg_config("fmt")
     if is_libfmt_exist:
         print("SUCCESS")

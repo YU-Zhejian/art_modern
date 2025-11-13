@@ -20,13 +20,13 @@ for parser in memory htslib; do
         merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
         merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".sam
         sam2bam "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}" "${CE11_CHR1}"
-        python sh.d/test-small.sh.d/validate_cov.py \
+        validate_cov \
             "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
             "${CE11_CHR1}" \
             "${FCOV}" \
             CONST_COV \
             NOT_TEMPLATE
-        python sh.d/test-small.sh.d/validate_rlen.py \
+        validate_rlen \
             "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
             150
         rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
@@ -52,7 +52,7 @@ for lc in pe mp; do
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500
     merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-    python sh.d/test-small.sh.d/validate_rlen.py \
+    validate_rlen \
         "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
         100
     rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
@@ -74,7 +74,7 @@ for lc in pe mp; do
         --pe_frag_dist_std_dev 20 \
         --pe_frag_dist_mean 500
     merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-    python sh.d/test-small.sh.d/validate_rlen.py \
+    validate_rlen \
         "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
         100
     rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
@@ -97,7 +97,7 @@ AM_EXEC \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
 merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-python sh.d/test-small.sh.d/validate_rlen.py \
+validate_rlen \
     "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
     100
 rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
@@ -118,7 +118,7 @@ AM_EXEC \
     --pe_frag_dist_std_dev 20 \
     --pe_frag_dist_mean 500
 merge_file "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq
-python sh.d/test-small.sh.d/validate_rlen.py \
+validate_rlen \
     "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq \
     100
 rm -fr "${OUT_DIR}"/test_small_"${lc}"_wgs_"${parser}".fq

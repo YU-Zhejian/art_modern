@@ -2,4 +2,5 @@
 /generate_large_contigs
 /fast-classify
 /find-dups
+/generate_rand_large_contigs
 *.o

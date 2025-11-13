@@ -15,8 +15,7 @@ samtools fastq \
     -n \
     "${OUT_DIR}"/out_se.sam
 
-deps/ART_profiler_illumina/art_profiler_illumina \
-    "${OUT_DIR}"/out_se_art_perl "${OUT_DIR}"/ fq
+art_profile_illumina "${OUT_DIR}"/out_se_art_perl "${OUT_DIR}"/ fq
 
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.fq \
@@ -40,7 +39,14 @@ APB_EXEC \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
     --parallel "${PARALLEL}" \
     --old_behavior
+
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set -x
+fi
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_se_art_cxx_sam.txt)" == "432" ]
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set +x
+fi
 
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam \
@@ -48,7 +54,14 @@ APB_EXEC \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
     --parallel "${PARALLEL}" \
     --old_behavior
+
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set -x
+fi
 [ "$(grep -c -v '^$' <"${OUT_DIR}"/out_se_art_cxx_sam.txt)" == "120" ]
+if [ ! "${SET_X:-0}" == "1" ]; then
+    set +x
+fi
 
 rm -fr "${OUT_DIR:?}"/*
 assert_cleandir

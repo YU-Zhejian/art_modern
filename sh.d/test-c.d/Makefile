@@ -4,14 +4,26 @@ CFLAGS ?= \
 	-O3 -mtune=native -march=native \
 	-Wall -Wextra -Wpedantic \
 	-std=gnu11 \
-	$(shell pkg-config --cflags zlib libxxhash libdeflate) \
+	$(shell pkg-config --cflags zlib libxxhash libdeflate mkl-sdl-lp64) \
 	-isystem src/
 CC ?= gcc
 
-LIBS ?= $(shell pkg-config --libs zlib libxxhash libdeflate) -lm -lc
+LIBS ?= $(shell pkg-config --libs zlib libxxhash libdeflate mkl-sdl-lp64) -lm -lc -fopenmp
+
+.PNONY: all
+all: bin
 
 .PHONY: bin
-bin: bin/fast-classify bin/find-dups bin/generate_many_contigs bin/generate_large_contigs
+bin: \
+	bin/fast-classify \
+	bin/find-dups \
+	bin/generate_many_contigs \
+	bin/generate_large_contigs \
+	bin/generate_rand_large_contigs
+
+.PHONY: clean
+clean:
+	rm -f src/*.o src/*/*.o bin/*
 
 src/fast-classify: src/fast-classify.o
 	$(CC) -o $@ $^ $(LIBS)
@@ -25,11 +37,15 @@ src/generate_many_contigs: src/generate_many_contigs.o
 src/generate_large_contigs: src/generate_large_contigs.o
 	$(CC) -o $@ $^ $(LIBS)
 
+src/generate_rand_large_contigs: src/generate_rand_large_contigs.o src/twobit.o
+	$(CC) -o $@ $^ $(LIBS)
+
 large_contigs.fa.gz: src/generate_large_contigs
 	src/generate_large_contigs | bgzip --threads 20 --force --index -l 9 -o large_contigs.fa.gz
 
 large_contigs.fa.gz.fai: large_contigs.fa.gz
 	samtools faidx large_contigs.fa.gz
+
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

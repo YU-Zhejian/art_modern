@@ -1,7 +1,7 @@
 # shellcheck shell=bash
 FCOV=10
 parser=memory
-err_file="data/raw_data/err.fa"
+err_file="${PROJDIR}/data/raw_data/err.fa"
 for lc in se pe mp; do
     for mode in wgs trans template; do
         AM_EXEC \
