@@ -11,6 +11,7 @@ AM_EXEC \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 50 \
     --lc pe
+merge_file "${OUT_DIR}"/out_pe.sam
 samtools fastq \
     -1 "${OUT_DIR}"/out_pe.1.fq \
     -2 "${OUT_DIR}"/out_pe.2.fq \

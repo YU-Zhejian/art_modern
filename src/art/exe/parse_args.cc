@@ -399,8 +399,8 @@ namespace {
 
     void validate_read_length(const am_read_len_t read_len)
     {
-        if (read_len < 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
+        if (read_len < 5) {
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Read length must be equal to or larger than 5.";
             abort_mpi();
         }
     }

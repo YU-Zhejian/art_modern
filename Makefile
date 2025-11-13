@@ -233,6 +233,16 @@ testbuild:
 testbuild-mpi:
 	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
 
+.PHONY: testbuild-small
+# Test building using diverse conditions with testsmall configurations
+testbuild-small:
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small  $(CMAKE_FLAGS)
+
+.PHONY: testbuild-small-mpi
+# testbuild with MPI with testsmall configurations
+testbuild-small-mpi:
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
+
 .PHONY: doc
 # Build documentation
 doc:

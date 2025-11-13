@@ -9,6 +9,7 @@ AM_EXEC \
     --read_len "${RLEN}" \
     --parallel "${PARALLEL}" \
     --lc se
+merge_file "${OUT_DIR}"/out_se.sam
 samtools fastq \
     -0 "${OUT_DIR}"/out_se.fq \
     -n \

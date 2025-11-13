@@ -16,9 +16,8 @@
 
 #include "libam_support/utils/version_utils.hh"
 
-#include "libam_support/utils/seq_utils.hh"
-
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 #include "ceu_check/ceu_check_c_cxx_std.hh"
 #include "ceu_check/ceu_check_cc.hh"
@@ -42,7 +41,7 @@
 
 // MKL
 #ifdef WITH_ONEMKL
-#include <mkl_version.h>
+#include <mkl.h> // NOLINT
 #endif
 
 // MPI

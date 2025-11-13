@@ -8,6 +8,7 @@
 # - ART: If set, use this path as the art_modern executable
 # - MPI_PARALLEL: If set, use this many MPI processes
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
+# - OUT_DIR: If set, use this as the output directory (will be cleaned first)
 
 set -ue
 SHDIR="$(readlink -f "$(dirname "${0}")")"
@@ -18,8 +19,15 @@ if [ ! -f data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
 fi
 
 # Create a temporary output directory
-OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir=/tmp)"
-
+if [ -n "${OUT_DIR:-}" ]; then
+    echo "Using existing OUT_DIR=${OUT_DIR}. Cleaning it first."
+    rm -fr "${OUT_DIR}"
+    mkdir -p "${OUT_DIR}"
+else
+    echo "Creating temporary OUT_DIR."
+    OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir=/tmp)"
+    echo "Created OUT_DIR=${OUT_DIR}"
+fi
 MRNA_HEAD="$(readlink -f "data/raw_data/ce11.mRNA_head.fa")"
 MRNA_PBSIM3_TRANSCRIPT="$(readlink -f "data/raw_data/ce11.mRNA_head.pbsim3.transcript")"
 LAMBDA_PHAGE="$(readlink -f "data/raw_data/lambda_phage.fa")"

@@ -40,6 +40,12 @@
     "Define USE_STL_RANDOM, USE_BOOST_RANDOM, USE_ONEMKL_RANDOM, USE_PCG_RANDOM, USE_SYSTEM_PCG_RANDOM for random generators!"
 #endif
 
+#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
+#define USE_STL_LIKE_RANDOM
+#endif
+
+#include <htslib/hts.h>
+
 // Include C++ stdlibs
 #if defined(USE_ONEMKL_RANDOM)
 #include <array> // Cache uses std::array
@@ -79,7 +85,7 @@ public:
      * Generate an insertion length based on Gaussian distribution.
      * @return
      */
-    int insertion_length();
+    hts_pos_t insertion_length();
     /**
      * Generate one of A, C, G, T.
      */
@@ -120,7 +126,7 @@ private:
     std::size_t cached_rand_quality_less_than_10_index_ = 0;
 #endif
 
-#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
+#if defined(USE_STL_LIKE_RANDOM)
 #if defined(USE_STL_RANDOM)
     std::mt19937 gen_;
 #elif defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)

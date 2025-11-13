@@ -13,6 +13,8 @@ from typing import List, Optional
 import threading
 import argparse
 
+THIS_PID = os.getpid()
+
 MPIEXEC = os.environ.get("MPIEXEC")
 MAKE = shutil.which("make")
 CMAKE = shutil.which("cmake")
@@ -20,7 +22,7 @@ CTEST = shutil.which("ctest")
 BASH = shutil.which("bash")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
 SHDIR = os.path.dirname(os.path.abspath(__file__))
-LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath("test-build.log.d"))
+LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
 PKG_CONFIG_PATH = shutil.which("pkg-config")
 if PKG_CONFIG_PATH is None:
     PKG_CONFIG_PATH = shutil.which("pkgconf")
@@ -45,11 +47,11 @@ def probe_using_cmake_script(cmake_file_path: str) -> bool:
 
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
-    # Dummy implementation for MKL probing
+    log_path = os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log")
     with (
         tempfile.TemporaryDirectory() as proj_dir,
         tempfile.TemporaryDirectory() as build_dir,
-        open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file,
+        open(log_path, "wb") as log_file,
     ):
         shutil.copy(
             os.path.join(SHDIR, "test-build.d", cmake_file_path),
@@ -61,7 +63,9 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
             stdout=log_file,
             stderr=log_file,
         )
-        return result.returncode == 0
+    if result.returncode == 0:
+        os.unlink(log_path)
+    return result.returncode == 0
 
 
 def probe_pkg_config(package_name: str) -> bool:
@@ -103,11 +107,12 @@ def probe_pcg_random_hpp() -> Optional[str]:
     return None
 
 
-def peobe_mkl_using_pkgconf() -> Optional[str]:
+def peobe_mkl_using_pkgconf() -> List[str]:
+    retl = []
     for p in ["mkl-sdl", "mkl-sdl-lp64"]:
         if probe_pkg_config(p):
-            return p
-    return None
+            retl.append(p)
+    return retl
 
 
 class BuildConfig:
@@ -163,8 +168,10 @@ class BuildConfig:
 
 def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
-    build_dir = os.path.abspath(tempfile.mkdtemp(prefix="art_modern-test-build-"))
-    install_dir = os.path.abspath(tempfile.mkdtemp(prefix="art_modern-test-build-install-"))
+    build_dir = os.path.join(LOG_DIR, f"art_modern-test-build-{this_job_id}")
+    install_dir = os.path.join(LOG_DIR, f"art_modern-test-install-{this_job_id}")
+    os.makedirs(build_dir)
+    os.makedirs(install_dir)
     with IO_MUTEX:
         print(f"{this_job_id} {' '.join(cmake_opts)}")
         print(f"{this_job_id} B: {build_dir}, I: {install_dir}")
@@ -272,6 +279,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "SAMTOOLS_THREADS": "4",
                 "MPI_PARALLEL": "4",
                 "PARALLEL": "2",
+                "NO_FASTQC": "1",
+                "OUT_DIR": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
             },
         ):
             with IO_MUTEX:
@@ -279,6 +288,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 return
 
         shutil.rmtree(build_dir)
+        shutil.rmtree(install_dir)
     os.remove(log_path)  # Remove log if successful.
     SUCCESS_ID.append(this_job_id)
 
@@ -294,6 +304,11 @@ if __name__ == "__main__":
         "--mpi",
         action="store_true",
         help="Use MPI for builds and tests.",
+    )
+    parser.add_argument(
+        "--small",
+        action="store_true",
+        help="Run test_small.",
     )
 
     _args, _old_cmake_flags = parser.parse_known_args()
@@ -314,6 +329,7 @@ if __name__ == "__main__":
     if os.path.exists(LOG_DIR):
         shutil.rmtree(LOG_DIR)
     os.makedirs(LOG_DIR)
+    print(f"LOG_DIR={LOG_DIR}")
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
     print("Probing for MKL through CMake...", end="")
@@ -380,8 +396,8 @@ if __name__ == "__main__":
 
     print("Probing for MKL found through pkg-config...", end="")
     mkl_pc = peobe_mkl_using_pkgconf()
-    if mkl_pc is not None:
-        print(mkl_pc)
+    if mkl_pc:
+        print(";".join(mkl_pc))
     else:
         print("FAIL")
 
@@ -391,6 +407,8 @@ if __name__ == "__main__":
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for cmake_build_type in cmake_build_types:
             bc = BuildConfig(_old_cmake_flags)
+
+            bc.HELP_VERSION_ONLY = not _args.small
             bc.CMAKE_BUILD_TYPE = cmake_build_type
 
             for use_thread_parallel in ["BS", "NOP"]:
@@ -428,17 +446,16 @@ if __name__ == "__main__":
             job_id += 1
             bc.AM_NO_Q_REVERSE = False
 
-            bc.HELP_VERSION_ONLY = False
-
             for use_random_generator in RANDOM_GENERATORS:
                 bc.USE_RANDOM_GENERATOR = use_random_generator
                 executor.submit(do_build, bc.copy(), job_id)
                 job_id += 1
             if mkl_pc:
                 bc.USE_RANDOM_GENERATOR = "ONEMKL"
-                bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = mkl_pc
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
+                for pc in mkl_pc:
+                    bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = pc
+                    executor.submit(do_build, bc.copy(), job_id)
+                    job_id += 1
                 bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
 
             bc.USE_RANDOM_GENERATOR = "PCG"
@@ -447,4 +464,6 @@ if __name__ == "__main__":
     FAILED_ID = sorted(FAILED_ID)
     print(f"Successful builds: {', '.join(map(str, SUCCESS_ID))}")
     print(f"Failed builds: {', '.join(map(str,FAILED_ID))}")
+    if not FAILED_ID:
+        shutil.rmtree(LOG_DIR)
     exit(1 if FAILED_ID else 0)
