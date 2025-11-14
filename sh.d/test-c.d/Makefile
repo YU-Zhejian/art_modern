@@ -40,12 +40,17 @@ src/generate_large_contigs: src/generate_large_contigs.o
 src/generate_rand_large_contigs: src/generate_rand_large_contigs.o src/twobit.o
 	$(CC) -o $@ $^ $(LIBS)
 
-large_contigs.fa.gz: src/generate_large_contigs
-	src/generate_large_contigs | bgzip --threads 20 --force --index -l 9 -o large_contigs.fa.gz
+data/large_contigs.fa.gz: bin/generate_large_contigs
+	bin/generate_large_contigs | bgzip --threads 20 --force --index -l 9 -o data/large_contigs.fa.gz
 
-large_contigs.fa.gz.fai: large_contigs.fa.gz
-	samtools faidx large_contigs.fa.gz
+data/large_contigs.fa.gz.fai: data/large_contigs.fa.gz
+	samtools faidx data/large_contigs.fa.gz
 
+data/rand_large_contigs.fa: bin/generate_rand_large_contigs
+	bin/generate_rand_large_contigs >data/rand_large_contigs.fa
+
+data/rand_large_contigs.fa.fai: data/rand_large_contigs.fa
+	samtools faidx rand_large_contigs.fa
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<

@@ -5,6 +5,7 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
+- The `art_modern` would still stuck on random situations.
 - Support different read length for R1 and R2. Update docs.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - Hack Sphinx and Sphinx SVG-to-PDF converters to allow shields.io badges in the documentation like:
@@ -22,7 +23,6 @@
 ## Packing
 
 - Suppress all lintian issues.
-- More testings required.
 
 ## Performance
 

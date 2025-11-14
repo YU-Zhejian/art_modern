@@ -5,8 +5,10 @@
 
 - **BREAKING CHANGE**
   - If a 2-column (unstranded) coverage file is provided to template mode, the coverage will be intepreted as positive coverage. Prior versions would divide the coverage by 2 for each strand.
+- **KNOWN BUGS**
+  - The MPI mode may suffer from non-reproducible stucks, with no clear reason. This issue is not seen in non-MPI mode. The author is working on fixing this issue.
 - Algorithm:
-  - **EXPERIMENTAL** Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
+  - Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` to Cmake options to disable this feature.
   - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.
   - Several low-level C++ features re-done in C to improve compilation speed.
 - Interface:
