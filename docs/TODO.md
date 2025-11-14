@@ -6,19 +6,7 @@
 - Perform large contig, many contig, and ultra deep tests.
 - Add `art_modern-onenmpi` Conda package to Readme and News if approved.
 - The `art_modern` would still stuck on random situations.
-- Support different read length for R1 and R2. Update docs.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-- Hack Sphinx and Sphinx SVG-to-PDF converters to allow shields.io badges in the documentation like:
-
-  ```markdown
-  [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern)](https://github.com/YU-Zhejian/art_modern/)
-  [![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total.svg)](https://github.com/YU-Zhejian/art_modern/releases/)
-  [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
-  
-  [![Install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
-  [![Conda Version](https://img.shields.io/conda/vn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
-  [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
-  ```
 
 ## Packing
 

@@ -5,6 +5,7 @@ BUILD_DIR := $(CURDIR)/_build
 .PHONY: all
 all: html pdf
 	cp -r $(BUILD_DIR)/html/ $(BUILD_DIR)/art_modern.html
+	rm -f $(BUILD_DIR)/art_modern.zip
 	env -C  $(BUILD_DIR) zip art_modern.zip -r art_modern.html
 	cp $(BUILD_DIR)/latex/art_modern.pdf $(BUILD_DIR)/art_modern.pdf
 	rm -fr $(BUILD_DIR)/art_modern.html
@@ -14,6 +15,7 @@ cp:
 	mkdir -p src/ src/docs
 	cp ../*.md src/docs/
 	cp ../../*.md src/
+	python convert_readme.py
 
 .PHONY: html
 html: cp # apidoc  refs.bibtex.bib

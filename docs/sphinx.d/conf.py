@@ -30,6 +30,8 @@ project = "art_modern"
 author = "YU Zhejian"
 copyright_string = f"2024-{datetime.datetime.now().year}, {author}"
 release = os.environ.get("PACKAGE_VERSION")
+if not release:
+    release = "0.0.0-dev"
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"

@@ -14,7 +14,6 @@ See [News.md](News.md) for details of the bugs fixed in each release.
 - Boost earlier than 1.65 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
 - GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system.
 - GCC would fail on Debian GNU/Hurd.
-- PCG random generator will fail on Mac OS X due to the lack of `cxxabi.h`.
 
 ## Known Bugs in Original ART
 
