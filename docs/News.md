@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.3.0-section)=
-## 1.3.0 (Ongoing)
+## 1.3.0 (2025/11/14)
 
 - **BREAKING CHANGE**
   - If a 2-column (unstranded) coverage file is provided to template mode, the coverage will be intepreted as positive coverage. Prior versions would divide the coverage by 2 for each strand.
