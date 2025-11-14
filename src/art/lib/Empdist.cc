@@ -106,9 +106,10 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe)
+Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
+    , silence_(silence)
 {
     for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
         if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
@@ -120,6 +121,11 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
                 = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
             std::istringstream ss(builtin_profile_1);
             read_emp_dist_(ss, true);
+            if (is_pe && ENCODED_BUILTIN_PROFILES[i][1][0] == '\0') {
+                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Paired-end profile requires both first-read and second-read "
+                                            "quality profile files.";
+                abort_mpi();
+            }
             if (ENCODED_BUILTIN_PROFILES[i][1][0] != '\0') {
                 std::string const builtin_profile_2
                     = decompress(ENCODED_BUILTIN_PROFILES[i][1], BUILTIN_PROFILE_LENGTHS[i][1]);
@@ -127,8 +133,11 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
                 read_emp_dist_(ss2, false);
             }
             validate_();
-            BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
-            log();
+            if (!silence_) {
+                BOOST_LOG_TRIVIAL(info) << "Read quality profile loaded successfully.";
+                log();
+            }
+            return;
         }
     }
     BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
@@ -139,8 +148,14 @@ Empdist::Empdist(
     const std::string& emp_filename_1, const std::string& emp_filename_2, const bool sep_qual, const bool is_pe)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
+    , silence_(false)
 {
     read_emp_dist_(emp_filename_1, true);
+    if (is_pe && emp_filename_2.empty()) {
+        BOOST_LOG_TRIVIAL(fatal)
+            << "Fatal Error: Paired-end profile requires both first-read and second-read quality profile files.";
+        abort_mpi();
+    }
     if (!emp_filename_2.empty()) {
         read_emp_dist_(emp_filename_2, false);
     }
@@ -191,7 +206,6 @@ void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bo
     const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
     rprob.r_probs(read_len);
     for (am_read_len_t i = 0; i < read_len; i++) {
-        // TODO: This line of code have catastrophic locality.
         qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
     }
 }
@@ -373,8 +387,10 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Profile empty!";
         abort_mpi();
     }
-    BOOST_LOG_TRIVIAL(info) << "QRange for R" << (is_first ? 1 : 2) << ": [" << std::to_string(qmin) << ", "
-                            << std::to_string(qmax) << "].";
+    if (!silence_) {
+        BOOST_LOG_TRIVIAL(info) << "QRange for R" << (is_first ? 1 : 2) << ": [" << std::to_string(qmin) << ", "
+                                << std::to_string(qmax) << "].";
+    }
 }
 
 void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
@@ -412,10 +428,12 @@ void Empdist::validate_() const
             || c_qual_dist_first.size() != t_qual_dist_first.size()) {
             BOOST_LOG_TRIVIAL(warning) << "The length of 1st read in each qual dist is not equal!";
         }
-        if (a_qual_dist_second.size() != g_qual_dist_second.size()
-            || g_qual_dist_second.size() != c_qual_dist_second.size()
-            || c_qual_dist_second.size() != t_qual_dist_second.size()) {
-            BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
+        if (is_pe_) {
+            if (a_qual_dist_second.size() != g_qual_dist_second.size()
+                || g_qual_dist_second.size() != c_qual_dist_second.size()
+                || c_qual_dist_second.size() != t_qual_dist_second.size()) {
+                BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
+            }
         }
     }
 }

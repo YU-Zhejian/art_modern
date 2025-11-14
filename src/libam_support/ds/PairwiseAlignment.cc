@@ -110,10 +110,10 @@ std::string PairwiseAlignment::serialize(const int is_read_1_or_2) const
 {
     if (is_read_1_or_2 == 0) {
         return fmt::format(">{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, contig_name, pos_on_contig,
-            is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
+            (is_plus_strand ? '+' : '-'), aln_query, aln_ref, qual_str);
     }
     return fmt::format(">{}/{}\t{}:{}:{}\n{}\n{}\n{}\n", read_name, is_read_1_or_2, contig_name, pos_on_contig,
-        is_plus_strand ? '+' : '-', aln_query, aln_ref, qual_str);
+        (is_plus_strand ? '+' : '-'), aln_query, aln_ref, qual_str);
 }
 void PairwiseAlignment::check_() const
 {

@@ -14,6 +14,7 @@
 #cmakedefine USE_PCG_RANDOM
 #cmakedefine USE_BOOST_RANDOM
 #cmakedefine USE_ONEMKL_RANDOM
+#cmakedefine USE_SYSTEM_PCG_RANDOM
 
 // Library availability
 
@@ -21,6 +22,7 @@
 #cmakedefine WITH_MPI
 #cmakedefine WITH_ONEMKL
 #cmakedefine WITH_BOOST_STACKTRACE
+#cmakedefine WITH_SYSTEM_PCG
 
 // Debug
 #cmakedefine CEU_CM_IS_DEBUG
@@ -31,6 +33,7 @@
 // Malloc
 #cmakedefine WITH_MIMALLOC
 #cmakedefine WITH_JEMALLOC
+#cmakedefine WITH_TCMALLOC
 
 // OpenMP
 #cmakedefine WITH_OPENMP

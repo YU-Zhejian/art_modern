@@ -31,9 +31,7 @@ valgrind \
     --gen-suppressions=all \
     --log-file="${VALGRIND_LOG}" \
     "${PROFILE_DIR}"/art_modern \
-    --builtin_qual_file HiSeq2500_125bp \
     --i-file data/raw_data/lambda_phage.fa \
-    --read_len 125 \
     --mode wgs \
     --lc pe \
     --i-parser memory \

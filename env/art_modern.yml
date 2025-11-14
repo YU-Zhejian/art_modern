@@ -49,3 +49,7 @@ dependencies:
   - perl # For Windows MikTeX users
   - cairosvg
   - jinja2=3.1
+
+  - pip
+  - pip:
+    - art-modern-utils==0.1.0

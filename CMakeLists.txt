@@ -2,10 +2,22 @@ cmake_minimum_required(VERSION 3.17)
 
 if(DEFINED USE_CCACHE)
     message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
+    unset(USE_CCACHE)
 endif()
 
 if(DEFINED USE_ABSL)
     message(WARNING "-DUSE_ABSL is deprecated. Ignored.")
+    unset(USE_ABSL)
+endif()
+
+if(DEFINED USE_BTREE_MAP)
+    message(WARNING "-DUSE_BTREE_MAP is deprecated. Ignored.")
+    unset(USE_BTREE_MAP)
+endif()
+
+if(DEFINED USE_QUAL_GEN)
+    message(WARNING "-DUSE_QUAL_GEN is deprecated. Ignored.")
+    unset(USE_QUAL_GEN)
 endif()
 
 if(DEFINED REPRODUCIBLE_BUILD)
@@ -19,7 +31,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.2.2
+    VERSION 1.3.0
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
@@ -29,12 +41,6 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-if(CYGWIN
-   OR MINGW
-   OR MSYS)
-    set(BUILD_SHARED_LIBS OFF)
-endif()
 
 if(NOT DEFINED Python3_EXECUTABLE)
     set(Python3_EXECUTABLE python3)
@@ -79,15 +85,10 @@ if(GIT_FOUND)
     set(WITH_GIT ON)
 endif()
 
-# TODO
-#if(DEFINED CMAKE_C_FLAGS AND DEFINED CMAKE_CXX_FLAGS)
-#    string(REPLACE " " ";" AM_CC_FLAGS "${CMAKE_CXX_FLAGS}")
-#else()
 unset(CEU_CM_SILENT)
 set(CEU_CM_CC_FLAGS "")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/get_compiler_flags.cmake")
 set(AM_CC_FLAGS ${CEU_CM_CC_FLAGS})
-#endif()
 
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/libcmake/enhanced_find.cmake")
 
@@ -98,7 +99,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/parallel.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/htslib.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/libfmt.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/qualgen.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")

@@ -11,6 +11,7 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
  **/
+#include <art_modern_config.h> // NOLINT: For CEU_CM_IS_DEBUG
 
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 
@@ -95,6 +96,20 @@ FaidxFetch::FaidxFetch(faidx_t* faidx)
 }
 std::string FaidxFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
+#ifdef CEU_CM_IS_DEBUG
+    if (seq_id >= seq_names_.size()) {
+        BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested seq_id " << seq_id
+                                 << " is out of bounds for total sequences of " << seq_names_.size() << ".";
+        abort_mpi();
+    }
+    const hts_pos_t max_len = faidx_seq_len64(faidx_, seq_names_[seq_id].c_str());
+
+    if (end > max_len || start > max_len || start < 0 || end < 0 || start > end) {
+        BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested range [" << start << ", " << end
+                                 << ") is out of bounds for sequence of length " << max_len << ".";
+        abort_mpi();
+    }
+#endif
     hts_pos_t len = 0;
     auto* const cfetch_str = faidx_fetch_seq64(faidx_, seq_names_[seq_id].c_str(), start, end - 1, &len);
     if (cfetch_str == nullptr || len != end - start) {

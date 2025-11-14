@@ -24,6 +24,7 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/depth_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -54,20 +55,34 @@ namespace {
         {
         }
 
+        DELETE_COPY(AJEReporter)
+        DELETE_MOVE(AJEReporter)
+        ~AJEReporter() { stop(); }
+
         void stop()
         {
             should_stop_ = true;
-            thread_.join();
+            if (thread_.joinable()) {
+                thread_.join();
+            }
         }
         void start() { thread_ = std::thread(&AJEReporter::job_, this); }
 
     private:
         void job_() const
         {
-            std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
+            std::size_t current_sleep = 0;
+            while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+                current_sleep++;
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
             while (!should_stop_) {
+                current_sleep = 0;
                 BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-                std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
+                while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+                    current_sleep++;
+                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                }
             }
         }
 
@@ -118,7 +133,12 @@ bool ArtJobExecutor::generate_pe_(
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, true, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, false, rprob_);
-    art_contig.generate_read_pe(is_plus_strand, read_1, read_2);
+    try {
+        art_contig.generate_read_pe(is_plus_strand, read_1, read_2);
+    } catch (const ArtGenerationFailure&) {
+        return false;
+    }
+
     read_1.generate_snv_on_qual();
     read_2.generate_snv_on_qual();
     if (require_alignment_) {
@@ -140,7 +160,11 @@ bool ArtJobExecutor::generate_se_(
     auto read_id = fmt::format(
         "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
     ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), true, rprob_);
-    art_contig.generate_read_se(is_plus_strand, art_read);
+    try {
+        art_contig.generate_read_se(is_plus_strand, art_read);
+    } catch (const ArtGenerationFailure&) {
+        return false;
+    }
     art_read.generate_snv_on_qual();
     if (require_alignment_) {
         art_read.generate_pairwise_aln();
@@ -206,8 +230,8 @@ void ArtJobExecutor::operator()()
             num_pos_reads = npr;
             num_neg_reads = nnr;
         } else {
-            const auto [npr, nnr] = calculate_num_reads(
-                contig_size, art_params_.read_len_1, art_params_.read_len_2, cov_pos, cov_neg, num_reads_to_reduce_);
+            const auto [npr, nnr]
+                = calculate_num_reads_old(contig_size, art_params_.read_len_1, cov_pos, cov_neg, num_reads_to_reduce_);
             num_pos_reads = npr;
             num_neg_reads = nnr;
         }
@@ -242,7 +266,7 @@ void ArtJobExecutor::operator()()
             }
         }
         BOOST_LOG_TRIVIAL(info) << "Finished simulation for job " << job_.job_id << " with "
-                                << to_si(total_num_reads_generated_) << " reads (mean depth=" << real_coverage
+                                << to_si(total_num_reads_generated_.load()) << " reads (mean depth=" << real_coverage
                                 << ") generated.";
     }
     reporter.stop();
@@ -261,9 +285,9 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
 std::string ArtJobExecutor::thread_info() const
 {
     return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",
-        job_.job_id, mpi_rank_str_, current_contig_name_, to_si(current_n_reads_generated_),
-        to_si(current_n_reads_left_), to_si(current_n_fails_), to_si(current_max_tolerence_),
-        to_si(total_num_reads_generated_));
+        job_.job_id, mpi_rank_str_, current_contig_name_, to_si(current_n_reads_generated_.load()),
+        to_si(current_n_reads_left_.load()), to_si(current_n_fails_.load()), to_si(current_max_tolerence_.load()),
+        to_si(total_num_reads_generated_.load()));
 }
 
 } // namespace labw::art_modern

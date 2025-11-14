@@ -68,8 +68,8 @@ void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAl
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     BamUtils::assert_correct_cigar(pwa, cigar);
     if (!pwa.is_plus_strand) {
-        std::reverse(qual.begin(), qual.end());
-        std::reverse(cigar.begin(), cigar.end());
+        reverse(qual.data(), qual.size());
+        reverse(cigar.data(), cigar.size());
         revcomp_inplace(seq);
     }
 
@@ -104,7 +104,8 @@ void HeadlessBamReadOutput::writePE(
     auto sam_record1 = BamUtils::init_uptr();
     auto sam_record2 = BamUtils::init_uptr();
 
-    const auto rlen = pwa1.query.size();
+    const auto rlen_1 = pwa1.query.size();
+    const auto rlen_2 = pwa2.query.size();
 
     auto seq1 = pwa1.query;
     auto seq2 = pwa2.query;
@@ -116,11 +117,11 @@ void HeadlessBamReadOutput::writePE(
     BamUtils::assert_correct_cigar(pwa2, cigar2);
 
     if (!pwa1.is_plus_strand) {
-        std::reverse(cigar1.begin(), cigar1.end());
+        reverse(cigar1.data(), cigar1.size());
         revcomp_inplace(seq1);
     }
     if (!pwa2.is_plus_strand) {
-        std::reverse(cigar2.begin(), cigar2.end());
+        reverse(cigar2.data(), cigar2.size());
         revcomp_inplace(seq2);
     }
 
@@ -151,7 +152,7 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq1.c_str(), reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
+            rlen_1, seq1.c_str(), reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.size(), pwa2.read_name.c_str(),
@@ -164,13 +165,13 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen, seq2.c_str(), reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
+            rlen_2, seq2.c_str(), reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     if (!pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record1), rlen);
+        reverse(bam_get_qual(sam_record1), rlen_1);
     } else {
-        reverse(bam_get_qual(sam_record2), rlen);
+        reverse(bam_get_qual(sam_record2), rlen_2);
     }
 
     tags1.patch(sam_record1.get());

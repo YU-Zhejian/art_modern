@@ -33,4 +33,16 @@ export
 
 __iflog "====== LOOP /bin/sulogin ======"
 __iflog 'In QEMU, exit through `reboot -f`'
+
+# Fiestly try to mount root filesystem if specified
+# Move essential directories if needed
+mkdir -p /mnt
+if mount /dev/sda /mnt; then
+    __iflog "Mounted root filesystem successfully. Now chroot..."
+    chroot /mnt /bin/bash -li
+    __iflog "Exited from chroot."
+else
+    __iflog "Failed to mount root filesystem."
+fi
+
 while true; do /bin/sulogin; done

@@ -22,7 +22,6 @@ We have `./profile.sh ${PROFILER}` to perform profiling of the software with pro
 
 - `intel-advisor` for Intel Advisor. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `intel-vtune` for Intel VTune Profiler. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
-- `nsys` for NVIDIA Nsight Systems. NVIDIA compiler with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `valgrind` for Valgrind Callgrind. GCC with `Debug` mode will be used since optimization may produce instructions that are not supported by Valgrind.
 - `amd-uprof` for AMD uProf. AMD compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 

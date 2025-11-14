@@ -1,4 +1,13 @@
-#include <stdint.h>
+/*!
+ * \file generate_large_contigs.c
+ * \brief Generate large contigs for testing.
+ *
+ * Note that the generated contigs are not biologically meaningful.
+ * They are just sequences of 'A's to reach the desired size.
+ *
+ * Speed: ~2.06 GiB/s.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,5 +28,5 @@ int main(void)
             printf("%s\n", line);
         }
     }
-    return 0;
+    return EXIT_SUCCESS;
 }

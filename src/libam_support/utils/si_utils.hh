@@ -27,12 +27,18 @@ std::string format_with_commas(std::size_t number);
 template <typename T> std::string to_si(T number, int precision = 2, T base = 1024)
 {
     std::size_t unit_index = 0;
-    auto size_in_unit = number;
+    std::string is_neg;
+    auto size_in_unit = static_cast<double>(number);
+    if (size_in_unit < 0) {
+        is_neg = "-";
+        size_in_unit = -size_in_unit;
+    }
 
     while (size_in_unit >= base && unit_index < SI_UNITS_LENGTH) {
         size_in_unit /= base;
         ++unit_index;
     }
-    return fmt::format("{:.{}f}{}", size_in_unit, precision, SI_UNITS[unit_index]);
+    // Named-arg variant (explicitly binds precision)
+    return fmt::format("{0}{1:.{2}f}{3}", is_neg, size_in_unit, precision, SI_UNITS[unit_index]);
 }
 } // namespace labw::art_modern

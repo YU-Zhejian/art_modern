@@ -92,7 +92,7 @@ Affected files:
 
 Licensed under the Apache 2.0 License.
 
-**NOTE** Added in [1.2.2](#v-1.2.2-section).
+**NOTE** Added in [1.3.0](#v-1.3.0-section).
 
 ## GNU Scientific Library by M. Galassi _et al._
 
@@ -117,7 +117,7 @@ Affected files:
 
 Licensed under the MIT license.
 
-**NOTE** Added in [1.2.2](#v-1.2.2-section).
+**NOTE** Added in [1.3.0](#v-1.3.0-section).
 
 ## `cgranges` by Heng Li
 
@@ -142,3 +142,4 @@ Affected files:
 With Apache/MIT License.
 
 **NOTE** Added in ???.
+

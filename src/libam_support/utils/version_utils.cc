@@ -16,9 +16,8 @@
 
 #include "libam_support/utils/version_utils.hh"
 
-#include "libam_support/utils/seq_utils.hh"
-
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 #include "ceu_check/ceu_check_c_cxx_std.hh"
 #include "ceu_check/ceu_check_cc.hh"
@@ -42,7 +41,7 @@
 
 // MKL
 #ifdef WITH_ONEMKL
-#include <mkl_version.h>
+#include <mkl.h> // NOLINT
 #endif
 
 // MPI
@@ -55,6 +54,8 @@
 #include <mimalloc.h>
 #elif defined(WITH_JEMALLOC)
 #include <jemalloc/jemalloc.h>
+#elif defined(WITH_TCMALLOC)
+#include <gperftools/tcmalloc.h>
 #endif
 
 // In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
@@ -114,8 +115,10 @@ namespace {
 
     void print_pcg_version()
     {
-#ifdef USE_PCG_RANDOM
+#if defined(USE_PCG_RANDOM)
         std::cout << "PCG: Really Minimal PCG32 Code" << std::endl;
+#elif defined(USE_SYSTEM_PCG_RANDOM)
+        std::cout << "PCG: System PCG Random" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif
@@ -134,8 +137,13 @@ namespace {
     void print_onemkl_version()
     {
 #ifdef USE_ONEMKL_RANDOM
+#ifdef __INTEL_MKL_PATCH__
         std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
                   << "." << __INTEL_MKL_PATCH__ << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#else // Not present in Debian MKL.
+        std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
+                  << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#endif
 #else
         std::cout << "MKL: not used" << std::endl;
 #endif
@@ -241,6 +249,9 @@ namespace {
         std::cout << "jemalloc: " << JEMALLOC_VERSION_MAJOR << "." << JEMALLOC_VERSION_MINOR << "."
                   << JEMALLOC_VERSION_BUGFIX << std::endl;
 #endif
+#elif defined(WITH_TCMALLOC)
+        std::cout << "tcmalloc: " << TC_VERSION_MAJOR << "." << TC_VERSION_MINOR << "." << TC_VERSION_PATCH
+                  << std::endl;
 #else
         std::cout << "*malloc: not used" << std::endl;
 #endif

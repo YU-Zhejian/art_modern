@@ -3,6 +3,7 @@
 #include "libam_support/utils/class_macros_utils.hh"
 
 #include <cstdint>
+#include <limits>
 
 namespace labw::art_modern {
 
@@ -25,8 +26,8 @@ public:
     DELETE_COPY(pcg32_c)
     DELETE_MOVE(pcg32_c)
 
-    static constexpr result_type min() noexcept;
-    static constexpr result_type max() noexcept;
+    static constexpr result_type min() noexcept { return std::numeric_limits<result_type>::min(); }
+    static constexpr result_type max() noexcept { return std::numeric_limits<result_type>::max(); }
 
     result_type operator()();
 

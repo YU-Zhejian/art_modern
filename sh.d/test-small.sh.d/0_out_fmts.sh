@@ -2,7 +2,7 @@
 
 AM_EXEC \
     --sep_flag \
-    --i-file data/raw_data/ce11_chr1.fa \
+    --i-file "${CE11_CHR1}" \
     --mode wgs \
     --lc se \
     --i-parser memory \

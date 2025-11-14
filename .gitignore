@@ -116,7 +116,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 /config
-/deps/simde
 CMakeLists.txt.user
 .cache
 *.tar
@@ -132,6 +131,7 @@ CMakeLists.txt.user
 perf.data*
 *.geany
 *.f[aq]
+*.fast[aq]
 *.pm
 *.dump
 *.log.d
@@ -141,3 +141,5 @@ perf.data*
 *.f[axq]i
 *.gzi
 /bin/
+*.[sb]a[mi]
+*.csi

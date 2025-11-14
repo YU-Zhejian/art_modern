@@ -18,10 +18,11 @@
 #include <_mingw.h>
 #endif
 
-#if defined(CEU_ON_WINDOWS)
+#if defined(CEU_ON_WINDOWS) || defined(CEU_ON_CYGWIN)
 #include <windows.h>
 #endif
 
+#include <ostream>
 #include <sstream>
 #include <string>
 
@@ -29,56 +30,36 @@ std::string ceu_check_get_compile_time_os_info()
 {
     std::stringstream oss;
     oss << "Compile-time OS info:" << std::endl;
-    oss << "\tPRIMIARY OS='" << CEU_PRIMARY_OS_TYPE << "'" << std::endl;
-#if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
+    oss << "\tPRIMARY OS='" << CEU_PRIMARY_OS_TYPE << "'" << std::endl;
+#if defined(CEU_ON_MINGW32) || defined(CEU_ON_MINGW64)
 #if defined(CEU_HAVE_INCLUDE__MINGW_H) && CEU_HAVE_INCLUDE__MINGW_H == 1
-
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("MinGW ver. ", 128);
+    oss << "\tMinGW ver. ";
 #if defined(__MINGW32_MAJOR_VERSION) && defined(__MINGW32_MINOR_VERSION)
-    ceu_ystr_t* mingw32_api_ver = convert_version_to_ystr2(__MINGW32_MAJOR_VERSION, __MINGW32_MINOR_VERSION);
+    oss << "MinGW 32-bit API: " << __MINGW32_MAJOR_VERSION << "." << __MINGW32_MINOR_VERSION;
 #else
-    ceu_ystr_t* mingw32_api_ver = ceu_ystr_create_from_cstr("undefined");
+    oss << "MinGW 32-bit API: undefined";
 #endif
 #if defined(__MINGW64_VERSION_MAJOR) && defined(__MINGW64_VERSION_MINOR) && defined(__MINGW64_VERSION_BUGFIX)
-    ceu_ystr_t* mingw64_api_ver
-        = convert_version_to_ystr3(__MINGW64_VERSION_MAJOR, __MINGW64_VERSION_MINOR, __MINGW64_VERSION_BUGFIX);
+    oss << ", MinGW 64-bit API: " << __MINGW64_VERSION_MAJOR << "." << __MINGW64_VERSION_MINOR << "."
+        << __MINGW64_VERSION_BUGFIX;
 #else
-    ceu_ystr_t* mingw64_api_ver = ceu_ystr_create_from_cstr("undefined");
+    oss << ", MinGW 64-bit API: undefined";
 #endif
 #if defined(__MINGW64_VERSION_STATE)
-    ceu_ystr_cstr_concat_inplace(mingw64_api_ver, " (");
-    ceu_ystr_cstr_concat_inplace(mingw64_api_ver, __MINGW64_VERSION_STATE);
-    ceu_ystr_cstr_concat_inplace(mingw64_api_ver, ")");
+    oss << " (" << __MINGW64_VERSION_STATE << ")";
 #endif
-    ceu_ystr_cstr_concat_inplace(rets, "mingw32='");
-    ceu_ystr_concat_inplace(rets, mingw32_api_ver);
-    ceu_ystr_cstr_concat_inplace(rets, "'; mingw64='");
-    ceu_ystr_concat_inplace(rets, mingw64_api_ver);
-    ceu_ystr_cstr_concat_inplace(rets, "'");
-
-    ceu_ystr_destroy(mingw64_api_ver);
-    ceu_ystr_destroy(mingw32_api_ver);
-#else
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr("MinGW ver. undefined");
+    oss << std::endl;
 #endif
-    return rets;
 #endif
-#if defined(CEU_ON_CYGWIN_LIKE) && (0) // TODO: Temporarily disabled.
+#if defined(CEU_ON_CYGWIN)
 #if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("CYGWIN API ver. ", 128);
-    ceu_ystr_t* cygwin_api_ver = convert_version_to_ystr2(CYGWIN_VERSION_API_MAJOR, CYGWIN_VERSION_API_MINOR);
-    ceu_ystr_t* cygwin_dll_ver = convert_version_to_ystr2(CYGWIN_VERSION_DLL_MAJOR, CYGWIN_VERSION_DLL_MINOR);
-    ceu_ystr_concat_inplace(rets, cygwin_api_ver);
-    ceu_ystr_cstr_concat_inplace(rets, ", with dll (");
-    ceu_ystr_cstr_concat_inplace(rets, CYGWIN_VERSION_DLL_IDENTIFIER);
-    ceu_ystr_cstr_concat_inplace(rets, ") ver. ");
-    ceu_ystr_concat_inplace(rets, cygwin_dll_ver);
-    ceu_ystr_destroy(cygwin_dll_ver);
-    ceu_ystr_destroy(cygwin_api_ver);
+    oss << "\tCYGWIN API ver. ";
+    oss << CYGWIN_VERSION_API_MAJOR << "." << CYGWIN_VERSION_API_MINOR;
+    oss << ", with dll (" << CYGWIN_VERSION_DLL_IDENTIFIER << ") ver. ";
+    oss << CYGWIN_VERSION_DLL_MAJOR << "." << CYGWIN_VERSION_DLL_MINOR;
 #else
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr("CYGWIN API ver. undefined\n\tCYGWIN DLL (undefined) ver. undefined");
+    oss << "\tCYGWIN API ver. undefined\n\tCYGWIN DLL (undefined) ver. undefined";
 #endif
-    return rets;
 #endif
 
 #ifdef CEU_ON_POSIX
@@ -128,75 +109,114 @@ std::string ceu_check_get_run_time_os_info()
     oss << "\tPOSIX UTSINFO: undefined" << std::endl;
 #endif
 #endif
-#if defined(CEU_ON_WINDOWS) && !defined(CEU_ON_CYGWIN) && (0) // TODO: Temporarily disabled.
-    ceu_ystr_t* readable_version_number; /// Human-readable Windows version like Microsoft Windows 10.
-    ceu_ystr_t* win_ver; /// Windows version like 10.0.0.
-    ceu_ystr_t* win_spver; /// Windows service pack version.
+#if defined(CEU_ON_WINDOWS) || defined(CEU_ON_CYGWIN)
 
-    ceu_ystr_t* rets = ceu_ystr_create_from_cstr_guarantee("Windows ver. ", 128);
+    oss << "\tWindows OS Version Info: " << std::endl;
     OSVERSIONINFOEX osvi;
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    if (!GetVersionEx((OSVERSIONINFO*)&osvi)) {
-        // GetVersionEx Failed!
-        return CEU_NULL;
-    }
-
-    switch (osvi.dwPlatformId) {
-    case VER_PLATFORM_WIN32_WINDOWS:
-        readable_version_number = ceu_ystr_create_from_cstr("Windows 95 / 98 / Me");
-        break;
-    case VER_PLATFORM_WIN32_NT:
-        if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
-            readable_version_number = ceu_ystr_create_from_cstr("Windows 2000");
-        } else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
-            readable_version_number = ceu_ystr_create_from_cstr("Windows XP");
-        } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
-            readable_version_number = ceu_ystr_create_from_cstr(
-                osvi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008");
-        } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1) {
-            readable_version_number = ceu_ystr_create_from_cstr(
-                osvi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2");
-        } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2) {
-            readable_version_number = ceu_ystr_create_from_cstr(
-                osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012");
-        } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 3) {
-            readable_version_number = ceu_ystr_create_from_cstr(
-                osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2");
-        } else if (osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0) {
-            readable_version_number = ceu_ystr_create_from_cstr(
-                osvi.wProductType == VER_NT_WORKSTATION ? "Windows 10" : "Windows Server 2016 or later");
-        } else {
-            readable_version_number = ceu_ystr_create_from_cstr("Windows NT unknown");
+    oss << "\t\tPlatform ID: ";
+    if (GetVersionEx((OSVERSIONINFO*)&osvi)) {
+        switch (osvi.dwPlatformId) {
+        case VER_PLATFORM_WIN32_WINDOWS:
+            oss << "Windows 95 / 98 / Me" << std::endl;
+            break;
+        case VER_PLATFORM_WIN32_NT:
+            if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 0) {
+                oss << "Windows 2000" << std::endl;
+            } else if (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion == 1) {
+                oss << "Windows XP" << std::endl;
+            } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 0) {
+                oss << (osvi.wProductType == VER_NT_WORKSTATION ? "Windows Vista" : "Windows Server 2008") << std::endl;
+            } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 1) {
+                oss << (osvi.wProductType == VER_NT_WORKSTATION ? "Windows 7" : "Windows Server 2008 R2") << std::endl;
+            } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 2) {
+                oss << (osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8" : "Windows Server 2012") << std::endl;
+            } else if (osvi.dwMajorVersion == 6 && osvi.dwMinorVersion == 3) {
+                oss << (osvi.wProductType == VER_NT_WORKSTATION ? "Windows 8.1" : "Windows Server 2012 R2")
+                    << std::endl;
+            } else if (osvi.dwMajorVersion == 10 && osvi.dwMinorVersion == 0) {
+                // Here is where build numbers start to matter.
+                if (osvi.wProductType == VER_NT_WORKSTATION) {
+                    // https://en.wikipedia.org/wiki/Windows_10_version_history
+                    // https://en.wikipedia.org/wiki/Windows_11_version_history
+                    if (osvi.dwBuildNumber < 10240) {
+                        oss << "Windows 10 before 1507 (Threshold)" << std::endl;
+                    } else if (10240 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 10586) {
+                        oss << "Windows 10 1507 (Threshold)" << std::endl;
+                    } else if (10586 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 14393) {
+                        oss << "Windows 10 1511 (Threshold 2)" << std::endl;
+                    } else if (14393 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 15063) {
+                        oss << "Windows 10 1607 (Redstone, Anniversary Update)" << std::endl;
+                    } else if (15063 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 16299) {
+                        oss << "Windows 10 1703 (Redstone 2, Creators Update)" << std::endl;
+                    } else if (16299 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 17134) {
+                        oss << "Windows 10 1709 (Redstone 3, Fall Creators Update)" << std::endl;
+                    } else if (17134 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 17763) {
+                        oss << "Windows 10 1803 (Redstone 4, April 2018 Update)" << std::endl;
+                    } else if (17763 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 18362) {
+                        oss << "Windows 10 1809 (Redstone 5, October 2018 Update)" << std::endl;
+                    } else if (18362 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 18363) {
+                        oss << "Windows 10 1903 (19H1, May 2019 Update)" << std::endl;
+                    } else if (18363 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19041) {
+                        oss << "Windows 10 1909 (19H2, November 2019 Update)" << std::endl;
+                    } else if (19041 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19042) {
+                        oss << "Windows 10 2004 (20H1, May 2020 Update)" << std::endl;
+                    } else if (19042 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19043) {
+                        oss << "Windows 10 20H2 (October 2020 Update)" << std::endl;
+                    } else if (19042 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19044) {
+                        oss << "Windows 10 21H1 (21H1, May 2021 Update)" << std::endl;
+                    } else if (19044 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19045) {
+                        oss << "Windows 10 21H2 (21H2, November 2021 Update)" << std::endl;
+                    } else if (19045 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 22000) {
+                        oss << "Windows 10 22H2 (22H2, October 2022 Update)" << std::endl;
+                    } else if (22000 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 22621) {
+                        oss << "Windows 11 21H2 (Sun Valley, October 2021 Update)" << std::endl;
+                    } else if (22621 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 22631) {
+                        oss << "Windows 11 22H2 (Sun Valley 2, September 2022 Update)" << std::endl;
+                    } else if (22631 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 26100) {
+                        oss << "Windows 11 23H2 (Sun Valley 3, October 2023 Update)" << std::endl;
+                    } else if (26100 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 26200) {
+                        oss << "Windows 11 24H2 (Hudson Valley, October 2024 Update)" << std::endl;
+                    } else if (26200 <= osvi.dwBuildNumber) {
+                        oss << "Windows 11 25H2 (2025 Update)" << std::endl;
+                    } else {
+                        oss << "Windows 10/11 unknown" << std::endl;
+                    }
+                } else {
+                    if (osvi.dwBuildNumber < 14393){
+                        oss << "Windows Server 2016 before 1607" << std::endl;
+                    } else if (14393 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 17763) {
+                        oss << "Windows Server 2016 (1607)" << std::endl;
+                    } else if (17763 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 20348) {
+                        oss << "Windows Server 2019 (1809)" << std::endl;
+                    } else if (20348 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 26100) {
+                        oss << "Windows Server 2022 (20H2)" << std::endl;
+                    } else if (26100 <= osvi.dwBuildNumber) {
+                        oss << "Windows Server 2025 or later" << std::endl;
+                    }
+                }
+            } else {
+                oss << "Windows NT unknown" << std::endl;
+            }
+            break;
+        default:
+            oss << "Windows unknown" << std::endl;
+            break;
         }
-        break;
-    default:
-        readable_version_number = ceu_ystr_create_from_cstr("Windows unknown");
-        break;
-    }
-
-    win_ver = convert_version_to_ystr3(osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber);
-    ceu_ystr_concat_inplace(rets, win_ver);
-    ceu_ystr_cstr_concat_inplace(rets, " (");
-    ceu_ystr_concat_inplace(rets, readable_version_number);
-    ceu_ystr_cstr_concat_inplace(rets, ")");
-
-    win_spver = ceu_ystr_create_from_cstr_guarantee(" Service Pack ", 128);
-    if (osvi.wServicePackMajor != 0 || osvi.wServicePackMinor != 0 || osvi.szCSDVersion[0] != '\0') {
-        ceu_ystr_t* win_spver_s = convert_version_to_ystr2(osvi.wServicePackMajor, osvi.wServicePackMinor);
-        ceu_ystr_concat_const(win_spver, win_spver_s);
-        ceu_ystr_cstr_concat_const(win_spver, " (");
-        ceu_ystr_cstr_concat_const(win_spver, osvi.szCSDVersion);
-        ceu_ystr_cstr_concat_const(win_spver, ")");
-        ceu_ystr_destroy(win_spver_s);
+        oss << "\t\tMajor Version: " << osvi.dwMajorVersion << "." << osvi.dwMinorVersion << "." << osvi.dwBuildNumber
+            << std::endl;
+        oss << "\t\tService Pack: ";
+        if (osvi.wServicePackMajor != 0 || osvi.wServicePackMinor != 0 || osvi.szCSDVersion[0] != '\0') {
+            oss << osvi.wServicePackMajor << "." << osvi.wServicePackMinor;
+            oss << " (" << osvi.szCSDVersion << ")" << std::endl;
+        } else {
+            oss << "not installed" << std::endl;
+        }
     } else {
-        ceu_ystr_cstr_concat_inplace(win_spver, "not installed");
+        oss << "failed." << std::endl;
     }
-    ceu_ystr_concat_inplace(rets, win_spver);
-    ceu_ystr_destroy(win_spver);
-    ceu_ystr_destroy(win_ver);
-    ceu_ystr_destroy(readable_version_number);
-    return rets;
+
 #endif
     return oss.str();
 }

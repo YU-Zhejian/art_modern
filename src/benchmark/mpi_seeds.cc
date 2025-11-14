@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 {
     init_mpi(&argc, &argv);
     init_logger();
-    init_file_logger(true);
+    init_file_logger("mpi_seeds", true);
 
     if (mpi_rank() != MPI_MAIN_RANK) {
         main_worker();

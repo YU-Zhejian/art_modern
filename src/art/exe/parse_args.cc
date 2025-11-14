@@ -15,7 +15,7 @@
 
 #include "art/exe/parse_args.hh"
 
-#include "art/builtin_profiles.hh"
+#include "art/builtin_profiles.h"
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtIOParams.hh"
 #include "art/lib/ArtParams.hh"
@@ -52,6 +52,7 @@
 #include <fstream>
 #include <iostream>
 #include <limits>
+#include <sstream>
 #include <stdexcept>
 #include <string>
 #include <tuple>
@@ -135,18 +136,18 @@ namespace {
             "simulating WGS reads.");
 
         po::options_description reporting_opts("Reporting options");
-        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_AJE, po::value<std::size_t>()->default_value(1),
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_AJE, po::value<std::size_t>()->default_value(5),
             "The reporting interval (in seconds) for individual art_modern job.");
-        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_JP, po::value<std::size_t>()->default_value(5),
+        reporting_opts.add_options()(ARG_REPORTING_INTERVAL_JP, po::value<std::size_t>()->default_value(10),
             "The reporting interval (in seconds) for JobPool.");
 
         po::options_description art_opts("ART-specific options");
         art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
             "the prefix identification tag for read ID");
 
-        const std::string arg_builtin_qual_file_desc = "name of some built-in quality profile. Valid values are: "
-            + join(std::vector<std::string> { BUILTIN_PROFILE_NAMES, BUILTIN_PROFILE_NAMES + N_BUILTIN_PROFILE }, ", ")
-            + ". Set this to avoid " + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
+        const std::string arg_builtin_qual_file_desc
+            = std::string("name of some built-in quality profile. See below for valid values. Set this to avoid ")
+            + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(DEFAULT_ERR_PROFILE),
             arg_builtin_qual_file_desc.c_str());
         art_opts.add_options()(
@@ -177,9 +178,9 @@ namespace {
                 .c_str());
         art_opts.add_options()(ARG_READ_LEN_1, po::value<am_read_len_t>(), "read length of read 1 to be simulated");
         art_opts.add_options()(ARG_READ_LEN_2, po::value<am_read_len_t>(), "read length of read 2 to be simulated");
-        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>()->default_value(0),
+        art_opts.add_options()(ARG_PE_FRAG_DIST_MEAN, po::value<double>(),
             "Mean distance between DNA/RNA fragments for paired-end simulations");
-        art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>()->default_value(0),
+        art_opts.add_options()(ARG_PE_FRAG_DIST_STD_DEV, po::value<double>(),
             "Std. deviation of distance between DNA/RNA fragments for paired-end "
             "simulations");
         art_opts.add_options()(
@@ -316,7 +317,7 @@ namespace {
         } catch (const std::invalid_argument&) {
             validate_input_filename(fcov_arg_str, ARG_FCOV);
             std::ifstream cov_fs(fcov_arg_str, std::ios::binary);
-            auto coverage_info = CoverageInfo(cov_fs);
+            auto const coverage_info = CoverageInfo(cov_fs, simulation_mode == SIMULATION_MODE::TEMPLATE);
             cov_fs.close();
             return coverage_info;
         }
@@ -398,8 +399,8 @@ namespace {
 
     void validate_read_length(const am_read_len_t read_len)
     {
-        if (read_len < 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: The read length must be a positive integer.";
+        if (read_len < 5) {
+            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Read length must be equal to or larger than 5.";
             abort_mpi();
         }
     }
@@ -468,7 +469,20 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     const po::options_description po_desc_ = option_parser();
     std::vector<std::string> args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
-    const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
+    // Generate suffix docs for builtin profiles
+    std::stringstream ss;
+    ss << "Builtin profiles:\n";
+    for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
+        const auto& profile = Empdist(BUILTIN_PROFILE_NAMES[i], false, false, true);
+        const bool supports_pe = profile.get_read_2_max_length() > 0;
+        const auto r1_max_rlen = profile.get_read_1_max_length();
+        const auto r2_max_rlen = profile.get_read_2_max_length();
+        ss << "\t" << BUILTIN_PROFILE_NAMES[i] << ": " << (supports_pe ? "PE" : "SE")
+           << ", max read length :" << r1_max_rlen
+           << (supports_pe ? (std::string(", ") + std::to_string(r2_max_rlen)) : "") << "\n";
+    }
+
+    const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv, "", ss.str());
 
     // Parse simple options first
     const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));
@@ -550,6 +564,14 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     qdist.shift_all_emp(qual_shift_1, qual_shift_2, min_qual, max_qual);
     qdist.index();
 
+    // Assess whether different read length is legal
+    if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE
+        && read_len_1 != read_len_2) {
+        BOOST_LOG_TRIVIAL(fatal)
+            << "Fatal Error: Different read lengths for read 1 and read 2 are only supported in template mode.";
+        abort_mpi();
+    }
+
     // Validate PE fragment distance parameters
     double pe_frag_dist_mean = 0;
     double pe_frag_dist_std_dev = 0;
@@ -557,7 +579,6 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             BOOST_LOG_TRIVIAL(warning) << "PE fragment distance parameters are ignored in single-end mode.";
         } else if (art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-
             BOOST_LOG_TRIVIAL(warning) << "PE fragment distance parameters are ignored in template mode.";
         }
     }

@@ -95,7 +95,7 @@ private:
 
 public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);
-    Empdist(const std::string& builtin_profile_name, bool sep_qual, bool is_pe);
+    Empdist(const std::string& builtin_profile_name, bool sep_qual, bool is_pe, bool silence = false);
 
     void set_read_length(am_read_len_t read_len_1, am_read_len_t read_len_2);
     void shift_all_emp(am_qual_t q_shift_1, am_qual_t q_shift_2, am_qual_t min_qual, am_qual_t max_qual);
@@ -118,6 +118,7 @@ private:
     const bool is_pe_;
     am_read_len_t read_len_1_ { 0 };
     am_read_len_t read_len_2_ { 0 };
+    const bool silence_;
 };
 
 } // namespace labw::art_modern

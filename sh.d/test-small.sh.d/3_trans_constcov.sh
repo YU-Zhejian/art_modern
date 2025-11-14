@@ -20,7 +20,7 @@ for lc in se pe mp; do
     merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".sam
     merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}" "${MRNA_HEAD}"
-    python sh.d/test-small.sh.d/validate_cov.py \
+    validate_cov \
         "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq \
         "${MRNA_HEAD}" \
         "${FCOV}" \

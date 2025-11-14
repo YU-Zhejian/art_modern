@@ -57,16 +57,16 @@ private:
      * Cached MPI rank in string.
      */
     const std::string mpi_rank_str_;
-    am_readnum_t total_num_reads_generated_ = 0;
+    std::atomic<am_readnum_t> total_num_reads_generated_ = 0;
     std::shared_ptr<OutputDispatcher> output_dispatcher_;
     const am_readnum_t num_reads_to_reduce_;
     const bool require_alignment_;
     std::atomic<bool> is_running_ = false;
     std::string current_contig_name_;
-    am_readnum_t current_n_reads_left_ = 0;
-    am_readnum_t current_n_fails_ = 0;
-    am_readnum_t current_max_tolerence_ = 0;
-    am_readnum_t current_n_reads_generated_ = 0;
+    std::atomic<am_readnum_t> current_n_reads_left_ = 0;
+    std::atomic<am_readnum_t> current_n_fails_ = 0;
+    std::atomic<am_readnum_t> current_max_tolerence_ = 0;
+    std::atomic<am_readnum_t> current_n_reads_generated_ = 0;
     OutputDispatcher::TokenRing token_ring_;
 };
 

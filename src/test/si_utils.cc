@@ -12,30 +12,18 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "profile_utils.hh"
+#define BOOST_TEST_MODULE test_si_utils // NOLINT
 
-#include <ceu_check/ceu_check_os_macro.h>
+#include "libam_support/utils/si_utils.hh"
 
-#ifdef CEU_ON_POSIX
-#include <sys/resource.h>
-#endif
+#include <boost/test/unit_test.hpp>
 
-#include <boost/log/trivial.hpp>
+using namespace labw::art_modern;
 
-namespace labw::art_modern::details {
-
-void print_memory_usage(const char* file, const int line)
+BOOST_AUTO_TEST_CASE(test_si_utils_1)
 {
-#ifdef CEU_ON_POSIX
-    // NOLINTBEGIN
-    struct rusage usage;
-    if (getrusage(RUSAGE_SELF, &usage) == 0) {
-        BOOST_LOG_TRIVIAL(info) << file << ":" << line << ": " << "Memory usage: " << usage.ru_maxrss * 1024;
-    }
-    // NOLINTEND
-#else
-    // Do nothing on non-POSIX systems
-#endif
+    BOOST_TEST("0.00" == to_si(0.0));
+    BOOST_TEST("-10.00" == to_si(-10.0));
+    BOOST_TEST("1.00K" == to_si(1024.0));
+    BOOST_TEST("1.00K" == to_si(1024));
 }
-
-} // namespace labw::art_modern::details

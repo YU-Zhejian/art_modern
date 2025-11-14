@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+/** Read 1 read and handle errors **/
 #define READ_1                                                                                                         \
     retv = sam_read1(in, hdr, b);                                                                                      \
     num_parsed_reads++;                                                                                                \

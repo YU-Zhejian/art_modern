@@ -35,12 +35,17 @@ template <typename T> T sd(const std::vector<T>& data, T mean_)
     return std::sqrt(sum_squared_diff / static_cast<T>(data.size() - 1));
 }
 
-template <typename T> static std::string describe(const std::vector<T>& times)
+template <typename T> static std::string describe(const std::vector<T>& times, bool commas = true)
 {
     auto const mean_ = mean(times);
     std::ostringstream oss;
-    oss << "gmean: " << std::setw(10) << format_with_commas(geometric_mean(times)) << "; mean/sd: " << std::setw(15)
-        << format_with_commas(mean_) + "/" + format_with_commas(sd(times, mean_));
+    if (commas) {
+        oss << "gmean: " << std::setw(10) << format_with_commas(geometric_mean(times)) << "; mean/sd: " << std::setw(15)
+            << format_with_commas(mean_) + "/" + format_with_commas(sd(times, mean_));
+    } else {
+        oss << "gmean: " << std::setw(10) << geometric_mean(times) << "; mean/sd: " << std::setw(15)
+            << std::to_string(mean_) + "/" + std::to_string(sd(times, mean_));
+    }
     return oss.str();
 }
 

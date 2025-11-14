@@ -47,7 +47,7 @@ namespace labw::art_modern {
 template <typename FloatType> class GslDiscreteDistribution {
     std::size_t K;
     std::vector<FloatType> F;
-    std::vector<size_t> A;
+    std::vector<std::size_t> A;
 
 public:
     GslDiscreteDistribution();
@@ -57,23 +57,7 @@ public:
      * @param u A uniform random number in [0,1)
      * @return
      */
-    size_t operator()(FloatType u) const;
-};
-
-template <typename IntType> class GslDiscreteIntDistribution {
-    size_t K;
-    std::vector<IntType> F;
-    std::vector<size_t> A;
-
-public:
-    GslDiscreteIntDistribution();
-    explicit GslDiscreteIntDistribution(const std::vector<IntType>& prob_array);
-
-    /**
-     * @param u A uniform random number in [0,K)
-     * @return
-     */
-    size_t operator()(IntType u) const;
+    std::size_t operator()(FloatType u) const;
 };
 
 template <typename FloatType>
@@ -86,20 +70,20 @@ template <typename FloatType>
 GslDiscreteDistribution<FloatType>::GslDiscreteDistribution(const std::vector<FloatType>& prob_array)
     : K(prob_array.size())
     , F(std::vector<FloatType>(prob_array.size()))
-    , A(std::vector<size_t>(prob_array.size()))
+    , A(std::vector<std::size_t>(prob_array.size()))
 {
-    std::stack<size_t> Bigs;
-    std::stack<size_t> Smalls;
+    std::stack<std::size_t> Bigs;
+    std::stack<std::size_t> Smalls;
     FloatType const pTotal = std::accumulate(prob_array.begin(), prob_array.end(), 0.0);
     FloatType mean = 1.0 / K;
     std::vector<FloatType> E(K);
 
-    for (size_t k = 0; k < K; ++k) {
+    for (std::size_t k = 0; k < K; ++k) {
         E[k] = prob_array[k] / pTotal;
     }
 
     /* Now create the Bigs and the Smalls */
-    for (size_t k = 0; k < K; ++k) {
+    for (std::size_t k = 0; k < K; ++k) {
         auto& Dest = E[k] > mean ? Bigs : Smalls;
         Dest.push(k);
     }
@@ -141,16 +125,16 @@ GslDiscreteDistribution<FloatType>::GslDiscreteDistribution(const std::vector<Fl
     /* This saves some arithmetic in gsl_ran_discrete(); I find that
      * it doesn't actually make much difference.
      */
-    for (size_t k = 0; k < K; ++k) {
+    for (std::size_t k = 0; k < K; ++k) {
         F[k] += k;
         F[k] /= K;
     }
 #endif
 }
 
-template <typename FloatType> size_t GslDiscreteDistribution<FloatType>::operator()(FloatType u) const
+template <typename FloatType> std::size_t GslDiscreteDistribution<FloatType>::operator()(FloatType u) const
 {
-    size_t c = 0;
+    std::size_t c = 0;
 #if (1) // KNUTH_CONVENTION
     c = u * K;
 #else
@@ -165,87 +149,4 @@ template <typename FloatType> size_t GslDiscreteDistribution<FloatType>::operato
     return A[c];
 }
 
-template <typename IntType>
-GslDiscreteIntDistribution<IntType>::GslDiscreteIntDistribution()
-    : K(0)
-{
-}
-
-template <typename IntType>
-GslDiscreteIntDistribution<IntType>::GslDiscreteIntDistribution(const std::vector<IntType>& prob_array)
-    : K(prob_array.size())
-    , F(std::vector<IntType>(prob_array.size()))
-    , A(std::vector<size_t>(prob_array.size()))
-{
-    std::stack<size_t> Bigs;
-    std::stack<size_t> Smalls;
-    IntType pTotal = std::accumulate(prob_array.begin(), prob_array.end(), static_cast<IntType>(0));
-    IntType mean = pTotal / K;
-    std::vector<IntType> E(K);
-
-    for (size_t k = 0; k < K; ++k) {
-        E[k] = prob_array[k] * K / pTotal;
-    }
-
-    /* Now create the Bigs and the Smalls */
-    for (size_t k = 0; k < K; ++k) {
-        auto& Dest = E[k] > mean ? Bigs : Smalls;
-        Dest.push(k);
-    }
-
-    /* Now work through the smalls */
-    while (!Smalls.empty()) {
-        auto s = Smalls.top();
-        Smalls.pop();
-        if (Bigs.empty()) {
-            A[s] = s;
-            F[s] = K;
-            continue;
-        }
-        auto b = Bigs.top();
-        Bigs.pop();
-        A[s] = b;
-        F[s] = E[s];
-        IntType const d = mean - E[s];
-        E[s] += d; /* now E[s] == mean */
-        E[b] -= d;
-        if (E[b] < mean) {
-            Smalls.push(b); /* no longer big, join ranks of the small */
-        } else if (E[b] > mean) {
-            Bigs.push(b); /* still big, put it back where you found it */
-        } else {
-            /* E[b]==mean implies it is finished too */
-            A[b] = b;
-            F[b] = K;
-        }
-    }
-    while (!Bigs.empty()) {
-        auto b = Bigs.top();
-        Bigs.pop();
-        A[b] = b;
-        F[b] = K;
-    }
-#if (1) // KNUTH_CONVENTION
-    /* For convenience, set F'[k]=(k+F[k]) */
-    for (size_t k = 0; k < K; ++k) {
-        F[k] += k;
-    }
-#endif
-}
-
-template <typename IntType> size_t GslDiscreteIntDistribution<IntType>::operator()(IntType u) const
-{
-    size_t c = 0;
-#if (1) // KNUTH_CONVENTION
-    c = u;
-#else
-    c = u / K;
-    u -= c * K;
-#endif
-    IntType const f = F[c];
-    if (f == K || u < f) {
-        return c;
-    }
-    return A[c];
-}
 } // namespace labw::art_modern
