@@ -11,7 +11,6 @@ make -C "${SHDIR}"/test-am-many-contigs.d/
         --builtin_qual_file HiSeq2500_125bp \
         --i-file /dev/stdin \
         --i-type fasta \
-        --read_len 125 \
         --mode template \
         --lc se \
         --i-parser stream \

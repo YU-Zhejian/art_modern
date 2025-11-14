@@ -109,7 +109,6 @@ apt-get install --no-install-recommends -y \
     pkgconf \
     libfmt-dev \
     libconcurrentqueue-dev \
-    libabsl-dev \
     openmpi-bin libopenmpi-dev
 ```
 

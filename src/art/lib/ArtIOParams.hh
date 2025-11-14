@@ -15,6 +15,7 @@
 
 #pragma once
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/ds/CoverageInfo.hh"
 
 #include <boost/program_options/variables_map.hpp>
@@ -25,13 +26,14 @@
 
 namespace labw::art_modern {
 
-struct ArtIOParams {
+class ArtIOParams {
+public:
     const std::string input_file_name;
     const INPUT_FILE_TYPE art_input_file_type;
     const INPUT_FILE_PARSER art_input_file_parser;
     const CoverageInfo coverage_info;
     const std::size_t parallel;
-    const int batch_size;
+    const am_readnum_t batch_size;
     const boost::program_options::variables_map vm;
     const std::vector<std::string> args;
 };

@@ -4,6 +4,7 @@
 
 #include <boost/log/trivial.hpp>
 
+#include <chrono>
 #include <cstdlib>
 #include <thread>
 
@@ -21,12 +22,19 @@ void JobPoolReporter::stop()
     thread_.join();
 }
 void JobPoolReporter::job_() const
-
 {
-    std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
+    std::size_t current_sleep = 0;
+    while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+        current_sleep++;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
     while (!should_stop_) {
+        current_sleep = 0;
         BOOST_LOG_TRIVIAL(info) << "JobPoolReporter: " << jp_.n_running_executors() << " JobExecutors running";
-        std::this_thread::sleep_for(std::chrono::seconds(reporting_interval_seconds_));
+        while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+            current_sleep++;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
     }
 }
 } // namespace labw::art_modern

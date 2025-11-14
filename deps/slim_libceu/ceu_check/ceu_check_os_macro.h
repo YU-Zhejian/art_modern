@@ -36,12 +36,6 @@
 #define CEU_ON_MINGW32
 
 /*!
- *@def CEU_ON_CYGWIN_LIKE
- *@brief Indicating CEU is compiled on CygWin/MSYS/MinGW or friends.
- */
-#define CEU_ON_CYGWIN_LIKE
-
-/*!
  *@def CEU_ON_WINDOWS_64
  *@brief Indicating CEU is compiled on 64-bit Microsoft Windows.
  */
@@ -203,9 +197,8 @@
 #define CEU_ON_UNIX
 #endif
 
-
 // Note that MSYS and MinGW are NOT POSIX.
-#if defined(CEU_ON_UNIX) || defined(CEU_ON_CYGWIN_LIKE)
+#if defined(CEU_ON_UNIX) || defined(CEU_ON_CYGWIN)
 #define CEU_ON_POSIX
 #endif
 

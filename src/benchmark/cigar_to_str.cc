@@ -15,8 +15,9 @@
 #include "benchmark_utils.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/seq_utils.hh"
+#include "libam_support/utils/si_utils.hh"
 
 #include <htslib/sam.h>
 
@@ -24,6 +25,7 @@
 #include <cstring>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -32,6 +34,18 @@ using namespace labw::art_modern; // NOLINT
 constexpr std::size_t N_REPLICA = 50UL;
 
 const std::string benchmark_using_bam = "/dev/null"; // Replace with a real BAM file path for actual benchmarking
+
+namespace {
+std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
+{
+    std::ostringstream oss;
+    for (size_t i = 0; i < n; i += 1) {
+        oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);
+        oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
+    }
+    return oss.str();
+}
+} // namespace
 
 int main()
 {
@@ -66,7 +80,7 @@ int main()
     for (std::size_t j = 0; j < N_REPLICA; j++) {
         auto start = std::chrono::high_resolution_clock::now();
         for (const auto& cigar : cigars) {
-            volatile auto s = cigar_arr_to_str_optim(cigar.data(), cigar.size()); // NOLINT
+            volatile auto s = cigar_arr_to_str(cigar.data(), cigar.size()); // NOLINT
         }
         auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());

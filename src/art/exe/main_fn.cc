@@ -61,9 +61,8 @@ public:
         reporter_.start();
     }
 
-    void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch, const bool clear_after_use)
+    void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
     {
-        clear_after_use_ = clear_after_use;
         OutParams const params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
         out_dispatcher_ = out_dispatcher_factory.create(params);
     }
@@ -71,8 +70,7 @@ public:
     void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
     {
         SimulationJob sj { fetch, coverage_info, ++job_id_ };
-        const auto aje
-            = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_, clear_after_use_);
+        const auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_);
         job_pool_.add(aje);
     }
 
@@ -87,7 +85,6 @@ public:
     }
 
 private:
-    bool clear_after_use_ = true;
     std::size_t job_id_ = 0;
     const ArtParams art_params_;
     const ArtIOParams art_io_params_;
@@ -120,12 +117,12 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch
                 = std::make_shared<InMemoryFastaFetch>(art_io_params.input_file_name);
-            generator.init_dispatcher(fetch, false);
+            generator.init_dispatcher(fetch);
             for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(fetch, coverage_info);
             }
         } else {
-            generator.init_dispatcher(std::make_shared<FaidxFetch>(art_io_params.input_file_name), true);
+            generator.init_dispatcher(std::make_shared<FaidxFetch>(art_io_params.input_file_name));
             for (std::size_t i = 0; i < art_io_params.parallel; ++i) {
                 generator.add(std::make_shared<FaidxFetch>(art_io_params.input_file_name), coverage_info);
             }
@@ -139,7 +136,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
             if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
                 FastaStreamBatcher fsb_f(std::numeric_limits<std::size_t>::max(), fasta_stream, sls);
                 auto fetch = std::make_shared<InMemoryFastaFetch>(fsb_f.fetch());
-                generator.init_dispatcher(fetch, true);
+                generator.init_dispatcher(fetch);
                 InMemoryFastaBatcher fsb(static_cast<int>(fetch->num_seqs() / art_io_params.parallel + 1), fetch);
                 while (true) {
                     auto fa_view = fsb.fetch();
@@ -148,9 +145,9 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     }
                     generator.add(fa_view, coverage_info);
                 }
-            } else {
+            } else { // Stream
                 FastaStreamBatcher fsb_f(art_io_params.batch_size, fasta_stream, sls);
-                generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>(), true);
+                generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>());
                 while (true) {
                     auto fa_view = fsb_f.fetch();
                     if (fa_view.empty()) {
@@ -166,7 +163,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                 Pbsim3TranscriptBatcher batcher(std::numeric_limits<int>::max(), input_file_stream, sls);
                 const auto [fasta_fetch, coverage_info] = batcher.fetch();
                 input_file_stream.close();
-                generator.init_dispatcher(fasta_fetch, true);
+                generator.init_dispatcher(fasta_fetch);
 
                 InMemoryFastaBatcher fsb(
                     static_cast<int>(fasta_fetch->num_seqs() / art_io_params.parallel + 1), fasta_fetch);
@@ -178,7 +175,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
                     generator.add(fa_view, coverage_info);
                 }
             } else { // Stream
-                generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>(), true);
+                generator.init_dispatcher(std::make_shared<InMemoryFastaFetch>());
                 std::ifstream pbsim3_transcript_stream(art_io_params.input_file_name);
                 Pbsim3TranscriptBatcher fsb(art_io_params.batch_size, pbsim3_transcript_stream, sls);
                 while (true) {

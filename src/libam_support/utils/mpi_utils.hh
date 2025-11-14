@@ -1,5 +1,9 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * @brief Utility functions for MPI.
+ *
+ * Here defines some utility functions that would work under MPI.
+ *
+ * @copyright Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -12,13 +16,6 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-/**
- * @brief Utility functions for MPI.
- *
- * Here defines some utility functions that would work under MPI.
- *
- */
-
 #pragma once
 
 #include <cstddef>
@@ -27,10 +24,27 @@
 
 namespace labw::art_modern {
 
+/**
+ * Check if MPI is available.
+ * @return true if MPI is available. Otherwise, return false.
+ */
 bool have_mpi() noexcept;
 
+/**
+ * Check if MPI is finalized.
+ * Abort if MPI is not available.
+ * @return true if MPI is finalized. Otherwise, return false.
+ */
 bool is_mpi_finalized();
 
+/**
+ * Call `MPI_Init`. Do nothing if MPI is not available.
+ *
+ * Every process should call this method before any other MPI functions.
+ *
+ * @param argc Pointer to argc from main.
+ * @param argv Pointer to argv from main.
+ */
 void init_mpi(int* argc, char*** argv);
 
 /**
@@ -41,7 +55,7 @@ void init_mpi(int* argc, char*** argv);
 std::size_t mpi_size();
 
 /**
- * Call `MPI_Finalize` (if MPI is not finalized).
+ * Call `MPI_Finalize` (if MPI is not finalized). Do nothing if MPI is not available.
  *
  * Every process should call this method.
  */
@@ -55,6 +69,11 @@ void exit_mpi() noexcept;
  */
 [[noreturn]] void abort_mpi(int status = EXIT_FAILURE) noexcept;
 
+/**
+ * Check if the current process is the main MPI process (rank 0) or MPI is not available.
+ *
+ * @return true if the current process is the main MPI process or MPI is not available. Otherwise, return false.
+ */
 bool is_on_mpi_main_process_or_nompi();
 
 /**

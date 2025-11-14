@@ -8,8 +8,6 @@ The project assumes x86\_64 (aka., Intel 64, AMD64, x64, with chips manufactured
 
 The project assumes modern GNU/Linux distributions that are still under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus). Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
 
-This project used bundled source code of [Google Abseil](https://abseil.io/), whose requirements are available [here](https://github.com/google/oss-policies-info/blob/main/foundational-cxx-support-matrix.md).
-
 ## C/C++ Compilers
 
 ### Checking C11 and C++17 Compatibility
@@ -174,18 +172,24 @@ If benchmarking (See [CMake flag `BUILD_ART_MODERN_BENCHMARKS`](#build-art-moder
 (accelerated-random-number-generators)=
 ### Accelerated Random Number Generators
 
-Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
+Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel Library (OneMKL)](https://www.intel.com/content/www/us/en/developer/tools/oneapi/onemkl.html). To use this option, set [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL`.
 
-**NOTE** This library is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+OneMKL can be found through CMake. This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
 
-See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) below.
+OneMKL can also be found through pkgconfig. For example, Debian packing of Intel MKL [`libmkl-dev`](https://packages.debian.org/sid/libmkl-dev) provides `mkl-sdl-lp64.pc`. Intel OneAPI MKL installation provides `mkl-sdl.pc`. To use MKL specified using pkgconfig instead of CMake, see [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
+
+**NOTE** OneMKL is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
+
+[PCG](https://www.pcg-random.org/) is used as an alternative to [`std::mt19937`](https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine.html) for random number generation. File `<pcg_random.hpp>` is required. This file usually located in `/usr/include/pcg_random.hpp` if you installed Debian package [`libpcg-cpp-dev`](https://packages.debian.org/sid/all/libpcg-cpp-dev). To use this option, set [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) to `SYSTEM_PCG`. Note that we also provide a bundled minified version of PCG random number generators under the name of `PCG`.
 
 (alt-malloc-section)=
 ### Alternate `malloc`/`free` Implementations
 
-Users may use either [mi-malloc](https://github.com/microsoft/mimalloc) or [jemalloc](https://github.com/jemalloc/jemalloc) to slightly improve the performance of memory allocation and deallocation.
+Users may use either [mi-malloc](https://github.com/microsoft/mimalloc), [jemalloc](https://github.com/jemalloc/jemalloc), or [tcmalloc](https://github.com/gperftools/gperftools) to slightly improve the performance of memory allocation and deallocation.
 
 For jemalloc, `jemalloc.pc` file is required. For mi-malloc, `mimalloc-config.cmake` file is required.
+
+For tcmalloc, `libtcmalloc.pc` or `libtcmalloc_minimal.pc` is required. Under Debian GNU/Linux, this file is provided by [`libgoogle-perftools-dev`](https://packages.debian.org/sid/libgoogle-perftools-dev) package.
 
 See also: [CMake variable `USE_MALLOC`](#use-malloc-section) below.
 
@@ -269,22 +273,6 @@ No additional dependency is required.
 
 The library is header-only, so only the path to `concurrentqueue.h` is required. At least [1.0.4](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.4) is required.
 
-### Google Abseil C++ Library
-
-[Abseil](https://github.com/abseil/abseil-cpp) is used for several decorators.
-
-See also: [CMake variable `USE_ABSL`](#use-absl-section) mentioned below.
-
-(bundled-absl-section)=
-#### Bundled
-
-No additional dependency is required.
-
-(external-absl-section)=
-#### External
-
-Make sure that Abseil can be found using CMake. This usually requires the presence of `abslConfig.cmake` file. At least [`20220623.1`](https://github.com/abseil/abseil-cpp/releases/tag/20220623.1) is required.
-
 ### `{fmt}`
 
 [`{fmt}`](https://github.com/fmtlib/fmt) is used for high-speed formatting FASTA and FASTQ output.
@@ -319,15 +307,6 @@ The required bundled dependencies of this project is `libceu`. No additional dep
 No additional dependency is required.
 
 See also: [CMake variable `USE_THREAD_PARALLEL`](#use-thread-parallel-section) mentioned below.
-
-(pcg-random-generator-section)=
-### PCG Random Number Generator
-
-[PCG](https://www.pcg-random.org/) is used as an alternative to `std::mt19937` for random number generation.
-
-No additional dependency is required.
-
-See also: [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) mentioned below.
 
 ## CMake Variables
 
@@ -414,9 +393,10 @@ Available since [1.0.0](#v-1.0.0-section).
 The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
-- `PCG`: PCG random generators. Available since [1.1.1](#v-1.1.1-section). See [PCG Random Number Generator](#pcg-random-generator-section) for requirements.
+- `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
+- `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.3.0](#v-1.3.0-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
-- `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements.
+- `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. See also [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
 
 On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
@@ -472,25 +452,18 @@ Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
 
-### `USE_QUAL_GEN`
-
-Available since [1.1.2](#v-1.1.2-section).
-
-The quality generation algorithm. Theoretically, different algorithms should generate identical results, with the Walker's algorithm considerably faster.
-
-- **`WALKER` (DEFAULT): Use [Walker's Algorithm](https://doi.org/10.1145/355744.355749) to accelerate quality synthesis.**
-- `STL`: Use binary search algorithm implemented in `std::map`. This is identical to the original ART.
-
 (use-malloc-section)=
 ### `USE_MALLOC`
 
 Available since [1.1.1](#v-1.1.1-section).
 
-Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc or jemalloc (see above). Using those implementations can improve the performance of the program but slightly increase memory consumption.
+Whether to use alternative high-performance `malloc`/`free` implementations like mi-malloc, jemalloc, or tcmalloc (see above). Using those implementations can improve the performance of the program but slightly increase memory consumption.
 
-- **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc if possible.**
+- **`AUTO` (DEFAULT): Will use jemalloc and then mi-malloc, then tcmalloc, finally minimal tcmalloc if possible.**
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
+- `TCMALLOC`: Find and use tcmalloc, and fail if not found.
+- `TCMALLOC_MINIMAL`: Find and use minimal version of tcmalloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
 See [Alternate `malloc`/`free` Implementations](#alt-malloc-section) for requirements.
@@ -515,18 +488,6 @@ Whether to use bundled `moodycamel::ConcurrentQueue<T>`. Specifically, where `co
 
 - **Unset (DEFAULT): Will use bundled `moodycamel::ConcurrentQueue<T>`.** See [Bundled `moodycamel::ConcurrentQueue<T>`](#bundled-concurrent-queue-section) for requirements.
 - Any value `[val]`: Will search for `moodycamel::ConcurrentQueue<T>` at including path `[val]`. See [External `moodycamel::ConcurrentQueue<T>`](#external-concurrent-queue-section) for requirements.
-
-(use-absl-section)=
-### `USE_ABSL`
-
-Available since [1.1.7](#v-1.1.7-section).
-
-Whether to use bundled Abseil library.
-
-Although the project only uses a small portion of Abseil development header files, the binary `libabsl_base.so` may be linked to the final executable if you use system Abseil.
-
-- **Unset (DEFAULT): Will use bundled Abseil.** See [Bundled Abseil](#bundled-absl-section) for requirements.
-- Any value `[val]`: Will use system Abseil. See [External Abseil](#external-absl-section) for requirements.
 
 ### `REPRODUCIBLE_BUILDS`
 
@@ -565,8 +526,20 @@ Whether to enable MPI-based parallelization.
 
 See [MPI Library](#mpi-section) for requirements.
 
+(find-random-mkl-through-pkgconf-section)=
+### `FIND_RANDOM_MKL_THROUGH_PKGCONF`
+
+Available since [1.3.0](#v-1.3.0-section).
+
+Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) set to `ONEMKL`.
+
+- **Unset (DEFAULT): Will not find Intel OneAPI MKL through pkgconf.**
+- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file. 
+
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in [1.1.2](#v-1.1.2-section).
 - `USE_CCACHE` was deprecated in [1.1.7](#v-1.1.7-section).
 - `GSL` option of [`USE_RANDOM_GENERATOR`](#use-random-generator-section) was deprecated in [1.2.0](#v-1.2.0-section) and removed in [1.2.1](#v-1.2.1-section).
+- `USE_ABSL` was deprecated in [1.3.0](#v-1.3.0-section).
+- `USE_QUAL_GEN` was deprecated in [1.3.0](#v-1.3.0-section).

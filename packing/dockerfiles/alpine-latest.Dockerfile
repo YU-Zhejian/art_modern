@@ -23,7 +23,7 @@ RUN apk update && \
     bzip2-dev \
     libdeflate-static \
     libdeflate-dev
-# Bundled {fmt}, moodycamel, HTSLib, and abseil libraries are used
+# Bundled {fmt}, moodycamel, and HTSLib libraries are used
 # Since we're not releasing a package, using bundled libraries is acceptable.
 
 COPY build_alpine_tgz.sh /

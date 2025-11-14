@@ -15,7 +15,7 @@
 #include "benchmark_utils.hh"
 
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
@@ -167,11 +167,11 @@ private:
     std::vector<am_qual_t> qual_;
     boost::random::discrete_distribution<std::size_t> rd_;
 };
-class SlimEmpDistGslDiscrete final : public SlimEmpDist {
+class SlimEmpDistGslDiscreteDbl final : public SlimEmpDist {
 public:
-    DELETE_MOVE(SlimEmpDistGslDiscrete)
-    DELETE_COPY(SlimEmpDistGslDiscrete)
-    SlimEmpDistGslDiscrete(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
+    DELETE_MOVE(SlimEmpDistGslDiscreteDbl)
+    DELETE_COPY(SlimEmpDistGslDiscreteDbl)
+    SlimEmpDistGslDiscreteDbl(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
         : qual_(qual)
     {
         std::vector<double> init_list;
@@ -182,7 +182,7 @@ public:
         }
         rd_ = GslDiscreteDistribution(init_list);
     }
-    ~SlimEmpDistGslDiscrete() override = default;
+    ~SlimEmpDistGslDiscreteDbl() override = default;
 
     void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
     {
@@ -196,36 +196,36 @@ private:
     GslDiscreteDistribution<double> rd_;
     boost::uniform_01<> rnd_01_;
 };
-class SlimEmpDistGslDiscreteInt final : public SlimEmpDist {
+class SlimEmpDistGslDiscreteFlt final : public SlimEmpDist {
 public:
-    DELETE_MOVE(SlimEmpDistGslDiscreteInt)
-    DELETE_COPY(SlimEmpDistGslDiscreteInt)
-    SlimEmpDistGslDiscreteInt(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
+    DELETE_MOVE(SlimEmpDistGslDiscreteFlt)
+    DELETE_COPY(SlimEmpDistGslDiscreteFlt)
+    SlimEmpDistGslDiscreteFlt(const std::vector<am_qual_t>& qual, const std::vector<am_qual_count_t>& count)
         : qual_(qual)
-        , rnd_(0, count.size() - 1)
     {
-        std::vector<int64_t> init_list;
-        int64_t prev = 0;
+        std::vector<float> init_list;
+        double prev = 0;
         for (const int i : count) {
             init_list.emplace_back(i - prev);
             prev = i;
         }
-        rd_ = GslDiscreteIntDistribution(init_list);
+        rd_ = GslDiscreteDistribution(init_list);
     }
-    ~SlimEmpDistGslDiscreteInt() override = default;
+    ~SlimEmpDistGslDiscreteFlt() override = default;
 
     void gen_qualities([[maybe_unused]] std::vector<am_qual_t>& qual) override
     {
         for (auto& i : qual) {
-            i = qual_[rd_(rnd_(gen))];
+            i = qual_[rd_(rnd_01_(gen))];
         }
     }
 
 private:
     std::vector<am_qual_t> qual_;
-    GslDiscreteIntDistribution<int64_t> rd_;
-    boost::random::uniform_int_distribution<int64_t> rnd_;
+    GslDiscreteDistribution<float> rd_;
+    boost::uniform_01<> rnd_01_;
 };
+
 class SlimEmpDistGslDiscreteInterpolated final : public SlimEmpDist {
 public:
     DELETE_MOVE(SlimEmpDistGslDiscreteInterpolated)
@@ -358,7 +358,8 @@ void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
     }
 
     // Extract the mean and standard deviation
-    BOOST_LOG_TRIVIAL(info) << std::setw(30) << name << ": " << describe(times) << "ns Q: values=" << describe(acc);
+    BOOST_LOG_TRIVIAL(info) << std::setw(16) << name << ": " << describe(times)
+                            << "ns Q: values=" << describe(acc, false);
 }
 } // namespace
 
@@ -371,9 +372,9 @@ int main()
     bench(std::make_unique<SlimEmpDistUsingBoostFlatMap>(empdist_quals, empdist_counts), "boost::flat_map");
     bench(std::make_unique<SlimEmpDistStdDiscrete>(empdist_quals, empdist_counts), "std::dd");
     bench(std::make_unique<SlimEmpDistBoostDiscrete>(empdist_quals, empdist_counts), "boost::dd");
-    bench(std::make_unique<SlimEmpDistGslDiscrete>(empdist_quals, empdist_counts), "GSL::dd (float)");
+    bench(std::make_unique<SlimEmpDistGslDiscreteDbl>(empdist_quals, empdist_counts), "GSL::dd (dbl)");
+    bench(std::make_unique<SlimEmpDistGslDiscreteFlt>(empdist_quals, empdist_counts), "GSL::dd (flt)");
     // Not working since accuracy lost?
-    bench(std::make_unique<SlimEmpDistGslDiscreteInt>(empdist_quals, empdist_counts), "GSL::dd (int)");
     bench(std::make_unique<SlimEmpDistGslDiscreteInterpolated>(empdist_quals, empdist_counts), "GSL::dd (+)");
     return EXIT_SUCCESS;
 }

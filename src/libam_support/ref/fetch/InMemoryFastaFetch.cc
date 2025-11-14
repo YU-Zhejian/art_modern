@@ -12,6 +12,8 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include <art_modern_config.h> // NOLINT: For CEU_CM_IS_DEBUG
+
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
@@ -83,6 +85,20 @@ InMemoryFastaFetch::InMemoryFastaFetch(std::istream& iss)
 
 std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
+#ifdef CEU_CM_IS_DEBUG
+    if (seq_id >= seqs_.size()) {
+        BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested seq_id " << seq_id
+                                 << " is out of bounds for total sequences of " << seqs_.size() << ".";
+        abort_mpi();
+    }
+
+    if (start < 0 || end < 0 || static_cast<std::size_t>(end) > seqs_[seq_id].size()
+        || static_cast<std::size_t>(start) > seqs_[seq_id].size() || start > end) {
+        BOOST_LOG_TRIVIAL(fatal) << "InMemoryFastaFetch::fetch: Requested range [" << start << ", " << end
+                                 << ") is out of bounds for sequence of length " << seqs_[seq_id].size() << ".";
+        abort_mpi();
+    }
+#endif
     return seqs_[seq_id].substr(start, end - start);
 }
 

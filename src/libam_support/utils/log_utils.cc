@@ -32,7 +32,6 @@
 #include <boost/log/utility/setup/file.hpp>
 
 #include <iostream>
-#include <sstream>
 #include <string>
 
 namespace logging = boost::log;
@@ -58,7 +57,7 @@ void init_logger()
         core->add_sink(sink);
     }
 }
-void init_file_logger(const bool auto_flush)
+void init_file_logger(const std::string& exename, const bool auto_flush)
 {
     const auto core = logging::core::get();
     if (std::getenv("ART_NO_LOG_DIR") != nullptr) {
@@ -77,7 +76,7 @@ void init_file_logger(const bool auto_flush)
             if (is_on_mpi_main_process_or_nompi()) {
                 BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";
             }
-            art_log_dir = "log.d";
+            art_log_dir = exename + "-log.d";
         } else {
             art_log_dir = art_log_dir_c;
         }
@@ -93,9 +92,5 @@ void init_file_logger(const bool auto_flush)
         BOOST_LOG_TRIVIAL(info) << "Log file sink to '" << file_name << "' added.";
     }
 }
-void flush_all_sinks()
-{
-    const auto core = logging::core::get();
-    core->flush();
-}
+void flush_all_sinks() { logging::core::get()->flush(); }
 } // namespace labw::art_modern

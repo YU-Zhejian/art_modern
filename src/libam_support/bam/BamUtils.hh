@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
@@ -33,7 +33,7 @@ class BamUtils {
 public:
     DELETE_MOVE(BamUtils)
     DELETE_COPY(BamUtils)
-    ~BamUtils() = default;
+    DEFAULT_DESTRUCTOR(BamUtils)
     BamUtils() = delete;
 
     static void assert_correct_cigar(

@@ -13,116 +13,102 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
+
 #include "art/lib/Rprob.hh"
 
-#include "art/lib/ArtConstants.hh"
-
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
+#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/rand_utils.hh"
-
-#if defined(USE_STL_RNDOM)
-#include <random>
-#endif
-
-#if defined(USE_BOOST_RANDOM)
-#include <boost/random/uniform_int_distribution.hpp>
-#endif
 
 #if defined(USE_ONEMKL_RANDOM)
 #include <mkl.h>
 #endif
 
+#include <htslib/hts.h>
+
 #include <algorithm> // NOLINT for std::generate_n
 #include <cstddef>
-#include <cstdint>
+#if defined(USE_STL_RNDOM)
+#include <random>
+#endif
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 namespace labw::art_modern {
 
-std::uint64_t Rprob::seed() { return rand_seed(); }
-
 void Rprob::public_init_()
 {
-    tmp_qual_dists_.resize(read_length_);
-    tmp_probs_.resize(read_length_);
+    read_len_max_ = am_max(read_len_1_, read_len_2_);
+    tmp_probs_.resize(read_len_max_);
 }
-void Rprob::r_probs() { r_probs(read_length_); }
 
-#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
+#if defined(USE_STL_LIKE_RANDOM)
 Rprob::~Rprob() = default;
-Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_(seed())
+Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
+    am_read_len_t read_len_2)
+    : gen_(rand_seed())
+#if !defined(USE_BOOST_RANDOM)
     , dis_(0.0, 1.0)
+#endif
     , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
     , base_(0, 3)
-    , strand_(0, 1)
     , quality_less_than_10_(1, 10)
-    , quality_(1, MAX_DIST_NUMBER)
-    , pos_on_read_(0, read_length - 1)
-    , pos_on_read_not_head_and_tail_(1, read_length - 2)
-    , read_length_(read_length)
+    , read_len_1_(read_len_1)
+    , read_len_2_(read_len_2)
 {
-    public_init_();
-}
-#elif defined(USE_BOOST_RANDOM)
-Rprob::~Rprob() = default;
-Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
-    : gen_(seed())
-    , insertion_length_gaussian_(pe_frag_dist_mean, pe_frag_dist_std_dev)
-    , base_(0, 3)
-    , strand_(0, 1)
-    , quality_less_than_10_(1, 10)
-    , quality_(1, MAX_DIST_NUMBER)
-    , pos_on_read_(0, read_length - 1)
-    , pos_on_read_not_head_and_tail_(1, read_length - 2)
-    , read_length_(read_length)
-{
+    pos_on_read_1_ = INT_DIST<int>(0, read_len_1 - 1);
+    pos_on_read_1_not_head_and_tail_ = INT_DIST<int>(1, read_len_1 - 2);
+    if (read_len_2 != 0) {
+        pos_on_read_2_ = INT_DIST<int>(0, read_len_2 - 1);
+        pos_on_read_2_not_head_and_tail_ = INT_DIST<int>(1, read_len_2 - 2);
+    }
     public_init_();
 }
 #elif defined(USE_ONEMKL_RANDOM)
-Rprob::~Rprob() = default;
-Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const int read_length)
+Rprob::~Rprob() { vslDeleteStream(&stream_); }
+
+Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
+    const am_read_len_t read_len_2)
     : stream_() // Initialized in the function body
     , pe_frag_dist_mean_(pe_frag_dist_mean)
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
-    , read_length_(read_length)
+    , read_len_1_(read_len_1)
+    , read_len_2_(read_len_2)
 {
-    vslNewStream(&stream_, VSL_BRNG_SFMT19937, seed());
-    cached_rand_pos_on_read_.resize(CACHE_SIZE_);
-    cached_rand_pos_on_read_not_head_and_tail_.resize(CACHE_SIZE_);
-    cached_insertion_lengths_.resize(CACHE_SIZE_);
-    cached_rand_base_indices_.resize(CACHE_SIZE_);
-    cached_rand_quality_less_than_10_.resize(CACHE_SIZE_);
+    vslNewStream(&stream_, VSL_BRNG_SFMT19937, rand_seed());
     public_init_();
 }
 #endif
 
 void Rprob::r_probs(const std::size_t n)
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
+#if defined(USE_STL_LIKE_RANDOM)
     std::generate_n(tmp_probs_.begin(), n, [this]() { return dis_(gen_); });
 #elif defined(USE_ONEMKL_RANDOM)
     vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<MKL_INT>(n), tmp_probs_.data(), 0.0, 1.0);
 #endif
 }
 
-int Rprob::insertion_length()
+hts_pos_t Rprob::insertion_length()
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
-    return static_cast<int>(insertion_length_gaussian_(gen_));
+#if defined(USE_STL_LIKE_RANDOM)
+    return static_cast<hts_pos_t>(insertion_length_gaussian_(gen_));
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_insertion_lengths_index_ == 0) {
         vdRngGaussian(VSL_RNG_METHOD_GAUSSIAN_ICDF, stream_, CACHE_SIZE_, cached_insertion_lengths_.data(),
             pe_frag_dist_mean_, pe_frag_dist_std_dev_);
         cached_insertion_lengths_index_ = CACHE_SIZE_;
     }
-    return static_cast<int>(cached_insertion_lengths_[--cached_insertion_lengths_index_]);
+    return static_cast<hts_pos_t>(cached_insertion_lengths_[--cached_insertion_lengths_index_]);
 #endif
 }
 
 char Rprob::rand_base()
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
+#if defined(USE_STL_LIKE_RANDOM)
     return ART_ACGT[base_(gen_)];
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_base_indices_index_ == 0) {
@@ -133,33 +119,29 @@ char Rprob::rand_base()
 #endif
 }
 
-void Rprob::rand_quality_dist()
+am_qual_t Rprob::rand_quality_less_than_10()
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
-    std::generate_n(tmp_qual_dists_.begin(), read_length_, [this]() { return quality_(gen_); });
-#elif defined(USE_ONEMKL_RANDOM)
-    viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, read_length_, tmp_qual_dists_.data(), 1, MAX_DIST_NUMBER);
-#endif
-}
-
-int Rprob::rand_quality_less_than_10()
-{
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
+#if defined(USE_STL_LIKE_RANDOM)
     return quality_less_than_10_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_quality_less_than_10_index_ == 0) {
-        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_,
+            reinterpret_cast<int*>(cached_rand_quality_less_than_10_.data()), 1, 10);
         cached_rand_quality_less_than_10_index_ = CACHE_SIZE_;
     }
     return cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_];
 #endif
 }
 
-int Rprob::rand_pos_on_read()
+int Rprob::rand_pos_on_read(const bool is_read1)
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
-    return pos_on_read_(gen_);
+#if defined(USE_STL_LIKE_RANDOM)
+    return (is_read1 ? pos_on_read_1_ : pos_on_read_2_)(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
+    auto cached_rand_pos_on_read_index_
+        = is_read1 ? cached_rand_pos_on_read_1_index_ : cached_rand_pos_on_read_2_index_;
+    auto& cached_rand_pos_on_read_ = is_read1 ? cached_rand_pos_on_read_1_ : cached_rand_pos_on_read_2_;
+    const auto read_length_ = is_read1 ? read_len_1_ : read_len_2_;
     if (cached_rand_pos_on_read_index_ == 0) {
         viRngUniform(
             VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_pos_on_read_.data(), 0, read_length_);
@@ -168,11 +150,17 @@ int Rprob::rand_pos_on_read()
     return cached_rand_pos_on_read_[--cached_rand_pos_on_read_index_];
 #endif
 }
-int Rprob::rand_pos_on_read_not_head_and_tail()
+int Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
 {
-#if defined(USE_STL_RANDOM) || defined(USE_BOOST_RANDOM) || defined(USE_PCG_RANDOM)
-    return pos_on_read_not_head_and_tail_(gen_);
+#if defined(USE_STL_LIKE_RANDOM)
+    return (is_read1 ? pos_on_read_1_not_head_and_tail_ : pos_on_read_2_not_head_and_tail_)(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
+    auto cached_rand_pos_on_read_not_head_and_tail_index_ = is_read1
+        ? cached_rand_pos_on_read_1_not_head_and_tail_index_
+        : cached_rand_pos_on_read_2_not_head_and_tail_index_;
+    auto& cached_rand_pos_on_read_not_head_and_tail_
+        = is_read1 ? cached_rand_pos_on_read_1_not_head_and_tail_ : cached_rand_pos_on_read_2_not_head_and_tail_;
+    const auto read_length_ = is_read1 ? read_len_1_ : read_len_2_;
     if (cached_rand_pos_on_read_not_head_and_tail_index_ == 0) {
         viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_,
             cached_rand_pos_on_read_not_head_and_tail_.data(), 1, read_length_ - 1);
@@ -183,10 +171,14 @@ int Rprob::rand_pos_on_read_not_head_and_tail()
 }
 int Rprob::randint(const int min, const int max)
 {
-#if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM)
-    return std::uniform_int_distribution<int>(min, max - 1)(gen_);
-#elif defined(USE_BOOST_RANDOM)
-    return boost::random::uniform_int_distribution<int>(min, max - 1)(gen_);
+#ifdef CEU_CM_IS_DEBUG
+    if (min >= max) {
+        throw std::invalid_argument(
+            "Rprob::randint: min (" + std::to_string(min) + ") must be less than max (" + std::to_string(max) + ").");
+    }
+#endif
+#if defined(USE_STL_LIKE_RANDOM)
+    return INT_DIST<int>(min, max - 1)(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
     int result = 0;
     viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, 1, &result, min, max);

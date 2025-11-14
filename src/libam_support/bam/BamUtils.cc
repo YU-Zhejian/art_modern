@@ -18,7 +18,7 @@
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTypes.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
@@ -47,7 +47,7 @@ namespace labw::art_modern {
 std::string BamUtils::generate_oa_tag(
     const PairwiseAlignment& pwa, const std::vector<am_cigar_t>& cigar, const std::int32_t nm_tag)
 {
-    return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, pwa.is_plus_strand ? '+' : '-',
+    return fmt::format("{},{},{},{},{},{};", pwa.contig_name, pwa.pos_on_contig + 1, (pwa.is_plus_strand ? '+' : '-'),
         cigar_arr_to_str(cigar), MAPQ_MAX, nm_tag);
 }
 std::pair<std::int32_t, std::string> BamUtils::generate_nm_md_tag(

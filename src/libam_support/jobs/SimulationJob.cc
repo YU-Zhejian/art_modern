@@ -30,6 +30,13 @@ SimulationJob::SimulationJob(const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
     , job_id(job_id)
 {
 }
+SimulationJob::SimulationJob(std::shared_ptr<BaseFastaFetch>&& fasta_fetch,
+    std::shared_ptr<CoverageInfo>&& coverage_info, const std::size_t job_id)
+    : fasta_fetch(std::move(fasta_fetch))
+    , coverage_info(std::move(coverage_info))
+    , job_id(job_id)
+{
+}
 SimulationJob::SimulationJob(SimulationJob&& other) noexcept
     : fasta_fetch(std::move(other.fasta_fetch))
     , coverage_info(std::move(other.coverage_info))

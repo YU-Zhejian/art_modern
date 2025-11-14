@@ -23,6 +23,7 @@
 
 #include <boost/test/unit_test.hpp>
 
+#include <cstdlib>
 #include <memory>
 #include <sstream>
 #include <string>

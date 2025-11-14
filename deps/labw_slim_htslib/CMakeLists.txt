@@ -69,12 +69,8 @@ if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "-lm not found!")
     endif()
 
-    if(DEFINED CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_SHARED}
-                                                                  EQUAL 0)
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} CEU_CM_EFL::libregex_shared)
-    elseif(DEFINED CEU_CM_HAVE_WORKING_C_NO_LIBREGEX_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_C_NO_LIBREGEX_RUN_SHARED}
-                                                                    EQUAL 0)
-        # Do nothing!
+    if(NOT CEU_CM_LIBREGEX_SHARED STREQUAL "CEU_CM_LIBREGEX_SHARED-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBREGEX_SHARED})
     else()
         message(FATAL_ERROR "-lregex not found!")
     endif()
@@ -127,12 +123,8 @@ else()
         message(FATAL_ERROR "-lm not found!")
     endif()
 
-    if(DEFINED CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_C_WITH_LIBREGEX_RUN_STATIC}
-                                                                  EQUAL 0)
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} CEU_CM_EFL::libregex_static)
-    elseif(DEFINED CEU_CM_HAVE_WORKING_C_NO_LIBREGEX_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_C_NO_LIBREGEX_RUN_STATIC}
-                                                                    EQUAL 0)
-        # Do nothing!
+    if(NOT CEU_CM_LIBREGEX_STATIC STREQUAL "CEU_CM_LIBREGEX_STATIC-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBREGEX_STATIC})
     else()
         message(FATAL_ERROR "-lregex not found!")
     endif()

@@ -14,7 +14,7 @@
 
 #pragma once
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 
 #include <string>
 

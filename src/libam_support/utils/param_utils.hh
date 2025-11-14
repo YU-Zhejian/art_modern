@@ -34,8 +34,8 @@ T labw::art_modern::get_param(const boost::program_options::variables_map& vm, c
     try {
         return vm[name].as<T>();
     } catch (const std::exception& exp) {
-        BOOST_LOG_TRIVIAL(fatal) << exp.what();
         BOOST_LOG_TRIVIAL(fatal) << "Failed to get parameter: " << name;
+        BOOST_LOG_TRIVIAL(fatal) << exp.what();
         abort_mpi();
     }
 }

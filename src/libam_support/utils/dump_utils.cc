@@ -18,6 +18,8 @@
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
+#include <ceu_check/ceu_check_os_macro.h> // NOLINT: For CEU_ON_POSIX
+
 #include <boost/filesystem/operations.hpp>
 
 #ifdef WITH_BOOST_STACKTRACE
@@ -25,34 +27,62 @@
 #include <boost/stacktrace/stacktrace.hpp>
 #endif
 
+#ifdef CEU_ON_POSIX
+#include <pthread.h>
+#include <signal.h>
+#endif
+
 #include <csignal>
+#include <exception>
 #include <fstream>
 #include <iostream>
 #include <string>
 
 namespace labw::art_modern {
 #ifdef WITH_BOOST_STACKTRACE
-
 namespace {
     constexpr char DUMP_BASE_FILENAME[] = "./backtrace.dump";
 
-    // FIXME: The signal handler is not guaranteed to be thread safe. The return values are also unprocessed.
     void my_signal_handler(const int signum) noexcept
     {
-        std::signal(signum, SIG_DFL);
         const std::string dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, mpi_rank_s());
 
+#ifdef CEU_ON_POSIX
+        struct sigaction sa { };
+        sa.sa_handler = SIG_DFL;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sigaction(signum, &sa, nullptr);
+        boost::stacktrace::safe_dump_to(dump_filename.c_str());
+        pthread_kill(pthread_self(), SIGABRT);
+#else
+        std::signal(signum, SIG_DFL);
         boost::stacktrace::safe_dump_to(dump_filename.c_str());
         std::raise(SIGABRT);
+#endif
     }
+
+    void my_signal_handler() noexcept { my_signal_handler(SIGABRT); }
 
 } // namespace
 #endif
 void handle_dumps()
 {
 #ifdef WITH_BOOST_STACKTRACE
+#ifdef CEU_ON_POSIX
+    {
+        struct sigaction sa { };
+        sa.sa_handler = my_signal_handler;
+        sigemptyset(&sa.sa_mask);
+        sa.sa_flags = 0;
+        sigaction(SIGSEGV, &sa, nullptr);
+        sigaction(SIGABRT, &sa, nullptr);
+    }
+#else
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
+#endif
+    std::set_terminate(&my_signal_handler);
 
     std::string const possible_dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, "0");
     if (boost::filesystem::exists(possible_dump_filename)) {

@@ -12,23 +12,26 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "seq_utils.hh"
+#include "libam_support/utils/seq_utils.hh"
 
-#include "libam_support/Constants.hh"
-#include "libam_support/Dtypes.hh"
+#include "libam_support/seq/qual_to_str.h"
+#include "libam_support/seq/str_to_qual.h"
 
-// NOLINTBEGIN
-#if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
-#include <immintrin.h>
+#include "libam_support/Dtypes.h"
+
+#include "ceu_check/ceu_check_cc_macro.h"
+
+// Some compiler's -O3 optimization is better than ours
+#if (defined(CEU_COMPILER_IS_INTEL_CLANG) || defined(CEU_COMPILER_IS_ICC) || defined(CEU_COMPILER_IS_CLANG)            \
+    || defined(CEU_COMPILER_IS_GCC))                                                                                   \
+    && !(defined(CEU_CM_IS_DEBUG))
+#define IN_COMPILER_WE_TRUST
 #endif
-// NOLINTEND
 
 #include <htslib/sam.h>
 
-#include <algorithm>
 #include <cstdio>
 #include <cstring>
-#include <sstream>
 #include <string>
 #include <vector>
 
@@ -57,253 +60,39 @@ void str_to_qual(std::vector<am_qual_t>& qual, const std::string& str)
 {
     str_to_qual(qual.data(), str.c_str(), str.size());
 }
+
 void str_to_qual(am_qual_t* qual, const char* str, size_t qlen)
 {
-#if defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__)
-    if (qlen <= 100) {
-        str_to_qual_mmx(qual, str, qlen);
-        return;
-    }
-    if (qlen <= 200) {
-        str_to_qual_sse2(qual, str, qlen);
-        return;
-    }
-    str_to_qual_avx2(qual, str, qlen);
+#if !defined(IN_COMPILER_WE_TRUST)
+    str_to_qual_comb(qual, str, qlen);
 #else
-    str_to_qual_foreach(qual, str, qlen);
+    str_to_qual_for_loop(qual, str, qlen);
 #endif
 }
 
-void str_to_qual_mmx(am_qual_t* qual, const char* str, const size_t qlen)
+void qual_to_str(const am_qual_t* qual, char* str, size_t qlen)
 {
-    size_t i = 0;
-#ifdef __MMX__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 8; // MMX processes 8 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 3) << 3; // Align to 8-byte boundary
-    __m64 phred_offset_vec = _mm_set1_pi8(static_cast<uint8_t>(PHRED_OFFSET));
-
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m64 str_vec = *reinterpret_cast<const __m64*>(&str[i]);
-        __m64 result_vec = _mm_sub_pi8(str_vec, phred_offset_vec);
-        *reinterpret_cast<__m64*>(&qual[i]) = result_vec;
-    }
-    _mm_empty(); // Empty the MMX state
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
-    }
-}
-
-std::string qual_to_str_mmx(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    size_t i = 0;
-#ifdef __MMX__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 8; // MMX processes 8 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 3) << 3; // Align to 8-byte boundary
-    __m64 phred_offset_vec = _mm_set1_pi8(static_cast<uint8_t>(PHRED_OFFSET));
-
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m64 qual_vec = *reinterpret_cast<const __m64*>(&qual[i]);
-        __m64 result_vec = _mm_add_pi8(qual_vec, phred_offset_vec);
-        *reinterpret_cast<__m64*>(&retq[i]) = result_vec;
-    }
-    _mm_empty(); // Empty the MMX state
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-std::string qual_to_str_sse2(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    size_t i = 0;
-#ifdef __SSE2__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 16; // SSE2 processes 16 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
-    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
-
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m128i qual_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&qual[i]));
-        __m128i result_vec = _mm_add_epi8(qual_vec, phred_offset_vec);
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(&retq[i]), result_vec);
-    }
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-void str_to_qual_sse2(am_qual_t* qual, const char* str, const size_t qlen)
-{
-    size_t i = 0;
-#ifdef __SSE2__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 16; // SSE2 processes 16
-    const size_t aligned_size = (qlen >> 4) << 4; // Align to 16-byte boundary
-    __m128i phred_offset_vec = _mm_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m128i str_vec = _mm_loadu_si128(reinterpret_cast<const __m128i*>(&str[i]));
-        __m128i result_vec = _mm_sub_epi8(str_vec, phred_offset_vec);
-        _mm_storeu_si128(reinterpret_cast<__m128i*>(&qual[i]), result_vec);
-    }
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
-    }
-}
-
-std::string qual_to_str_avx2(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    size_t i = 0;
-#ifdef __AVX2__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 32; // AVX2 processes 32 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 5) << 5; // Align to 32-byte boundary
-    __m256i phred_offset_vec = _mm256_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
-
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m256i qual_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&qual[i]));
-        __m256i result_vec = _mm256_add_epi8(qual_vec, phred_offset_vec);
-        _mm256_storeu_si256(reinterpret_cast<__m256i*>(&retq[i]), result_vec);
-    }
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-void str_to_qual_avx2(am_qual_t* qual, const char* str, const size_t qlen)
-{
-    size_t i = 0;
-#ifdef __AVX2__
-    // NOLINTBEGIN
-    const size_t num_elements_per_simd = 32; // AVX2 processes 32 uint8_t elements at a time
-    const size_t aligned_size = (qlen >> 5) << 5; // Align to 32-byte boundary
-    __m256i phred_offset_vec = _mm256_set1_epi8(static_cast<uint8_t>(PHRED_OFFSET));
-    for (; i < aligned_size; i += num_elements_per_simd) {
-        __m256i str_vec = _mm256_loadu_si256(reinterpret_cast<const __m256i*>(&str[i]));
-        __m256i result_vec = _mm256_sub_epi8(str_vec, phred_offset_vec);
-        _mm256_storeu_si256(reinterpret_cast<__m256i*>(&qual[i]), result_vec);
-    }
-    // NOLINTEND
-#endif
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (; i < qlen; ++i) {
-        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
-    }
-}
-
-std::string qual_to_str_for_loop(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    // Handle the remaining elements that do not fit into a full SIMD register
-    for (size_t i = 0; i < qlen; ++i) {
-        retq[i] = static_cast<char>(qual[i] + PHRED_OFFSET);
-    }
-    return retq;
-}
-
-void str_to_qual_for_loop(am_qual_t* qual, const char* str, const size_t qlen)
-{
-    for (size_t i = 0; i < qlen; ++i) {
-        qual[i] = static_cast<char>(str[i] - PHRED_OFFSET);
-    }
-}
-
-std::string qual_to_str_foreach(const am_qual_t* qual, const size_t qlen)
-{
-    std::string retq;
-    retq.resize(qlen);
-    std::memcpy(retq.data(), qual, qlen);
-    std::for_each(retq.begin(), retq.end(), [](char& c) { c += PHRED_OFFSET; });
-    return retq;
-}
-
-void str_to_qual_foreach(am_qual_t* qual, const char* str, const size_t qlen)
-{
-    std::memcpy(qual, str, qlen);
-    std::for_each(qual, qual + qlen, [](am_qual_t& c) { c -= PHRED_OFFSET; });
-}
-
-std::string qual_to_str(const am_qual_t* qual, const size_t qlen)
-{
-#if defined(__MMX__) || defined(__SSE2__) || defined(__AVX2__)
-    if (qlen <= 100) {
-        return qual_to_str_mmx(qual, qlen);
-    }
-    if (qlen <= 200) {
-        return qual_to_str_sse2(qual, qlen);
-    }
-    return qual_to_str_avx2(qual, qlen);
+#if !defined(IN_COMPILER_WE_TRUST)
+    qual_to_str_comb(qual, str, qlen);
 #else
-    return qual_to_str_foreach(qual, qlen);
+    qual_to_str_for_loop(qual, str, qlen);
 #endif
 }
 
-std::string qual_to_str(const std::vector<am_qual_t>& qual) { return qual_to_str(qual.data(), qual.size()); }
-
-std::string comp(const std::string& dna)
+std::string qual_to_str(const std::vector<am_qual_t>& qual)
 {
-    std::string rets;
-    rets.resize(dna.length());
-    for (decltype(dna.length()) i = 0; i < dna.length(); i++) {
-        rets[i] = rev_comp_trans_2[dna[i] & 0xFF];
-    }
-    return rets;
-}
-std::string revcomp(const std::string& dna)
-{
-    auto rets = comp(dna);
-    reverse(rets.begin(), rets.end());
-    return rets;
-}
-
-[[maybe_unused]] std::string normalize(const std::string& dna)
-{
-    std::string rets = dna;
-    std::for_each(rets.begin(), rets.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
-    return rets;
+    std::string retq;
+    retq.resize(qual.size());
+    qual_to_str(qual.data(), retq.data(), qual.size());
+    return retq;
 }
 
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 {
-    return cigar_arr_to_str_optim(cigar_arr.data(), cigar_arr.size());
+    return cigar_arr_to_str(cigar_arr.data(), cigar_arr.size());
 }
 
-std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
-{
-    std::ostringstream oss;
-    for (size_t i = 0; i < n; i += 1) {
-        oss << (cigar_arr[i] >> BAM_CIGAR_SHIFT);
-        oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
-    }
-    return oss.str();
-}
-
-std::string cigar_arr_to_str_optim(const am_cigar_t* cigar_arr, const size_t n)
+std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::string result;
     result.reserve(n << 1); // Rough estimate: each CIGAR op is at least 2 chars
@@ -317,7 +106,11 @@ std::string cigar_arr_to_str_optim(const am_cigar_t* cigar_arr, const size_t n)
 
 void comp_inplace(std::string& dna)
 {
-    std::for_each(dna.begin(), dna.end(), [](char& c) { c = rev_comp_trans_2[c & 0xFF]; });
+    char* data = dna.data();
+    std::size_t const size = dna.size();
+    for (std::size_t i = 0; i < size; ++i) {
+        data[i] = rev_comp_trans_2[data[i] & 0xFF];
+    }
 }
 
 void revcomp_inplace(std::string& dna)
@@ -328,7 +121,11 @@ void revcomp_inplace(std::string& dna)
 
 void normalize_inplace(std::string& dna)
 {
-    std::for_each(dna.begin(), dna.end(), [](char& c) { c = normalization_matrix[c & 0xFF]; });
+    char* data = dna.data();
+    std::size_t const size = dna.size();
+    for (std::size_t i = 0; i < size; ++i) {
+        data[i] = normalization_matrix[data[i] & 0xFF];
+    }
 }
 
 bool ends_with(const std::string& str, const std::string& suffix)

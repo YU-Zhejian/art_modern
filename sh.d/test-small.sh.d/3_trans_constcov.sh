@@ -5,9 +5,7 @@ parser=memory
 FCOV=10
 for lc in se pe mp; do
     AM_EXEC \
-        --builtin_qual_file HiSeq2500_125bp \
         --i-file "${MRNA_HEAD}" \
-        --read_len 125 \
         --mode trans \
         --lc "${lc}" \
         --i-parser "${parser}" \
@@ -22,7 +20,7 @@ for lc in se pe mp; do
     merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".sam
     merge_file "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq
     sam2bam "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}" "${MRNA_HEAD}"
-    python sh.d/test-small.sh.d/validate_cov.py \
+    validate_cov \
         "${OUT_DIR}"/test_small_"${lc}"_trans_"${parser}".fq \
         "${MRNA_HEAD}" \
         "${FCOV}" \

@@ -28,7 +28,7 @@ class BamLFIO final : public LockFreeIO<bam1_t_uptr> {
 public:
     DELETE_MOVE(BamLFIO)
     DELETE_COPY(BamLFIO)
-    ~BamLFIO() override = default;
+    DEFAULT_DESTRUCTOR(BamLFIO)
     void write(bam1_t_uptr ss) override;
     BamLFIO(std::string name, samFile* fp, const sam_hdr_t* h);
 

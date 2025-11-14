@@ -10,7 +10,7 @@ This contains documentation for `art_modern` Users. Generated using:
 :glob:
 :maxdepth: 2
 
-src/Readme.md
+src/README_NEW.md
 src/docs/Install.md
 src/docs/Usage-art_modern.md
 src/docs/Usage-apb.md

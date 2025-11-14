@@ -16,7 +16,7 @@
 
 #include "libam_support/utils/fs_utils.hh"
 
-#include "libam_support/Dtypes.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/filesystem/exception.hpp>

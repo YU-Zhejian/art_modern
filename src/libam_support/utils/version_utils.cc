@@ -17,17 +17,14 @@
 #include "libam_support/utils/version_utils.hh"
 
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/seq_utils.hh"
 
 #include "ceu_check/ceu_check_c_cxx_std.hh"
 #include "ceu_check/ceu_check_cc.hh"
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 #include "ceu_check/ceu_check_os.hh"
 
-// Abseil
-#include <absl/base/config.h>
-
 // Boost
-#include <boost/algorithm/string/join.hpp>
 #include <boost/version.hpp>
 
 // HTSLib
@@ -44,7 +41,7 @@
 
 // MKL
 #ifdef WITH_ONEMKL
-#include <mkl_version.h>
+#include <mkl.h> // NOLINT
 #endif
 
 // MPI
@@ -57,6 +54,8 @@
 #include <mimalloc.h>
 #elif defined(WITH_JEMALLOC)
 #include <jemalloc/jemalloc.h>
+#elif defined(WITH_TCMALLOC)
+#include <gperftools/tcmalloc.h>
 #endif
 
 // In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
@@ -114,19 +113,12 @@ namespace {
         std::cout << "BOOST: " << major << "." << minor << "." << patch_level << std::endl;
     }
 
-    void print_absl_version()
-    {
-#if defined(ABSL_LTS_RELEASE_VERSION) && defined(ABSL_LTS_RELEASE_PATCH_LEVEL)
-        std::cout << "Abseil: " << ABSL_LTS_RELEASE_VERSION << "." << ABSL_LTS_RELEASE_PATCH_LEVEL << std::endl;
-#else
-        std::cout << "Abseil: Not on LTS" << std::endl;
-#endif
-    }
-
     void print_pcg_version()
     {
-#ifdef USE_PCG_RANDOM
-        std::cout << "PCG: " << "0.98" << std::endl;
+#if defined(USE_PCG_RANDOM)
+        std::cout << "PCG: Really Minimal PCG32 Code" << std::endl;
+#elif defined(USE_SYSTEM_PCG_RANDOM)
+        std::cout << "PCG: System PCG Random" << std::endl;
 #else
         std::cout << "PCG: not used" << std::endl;
 #endif
@@ -145,8 +137,13 @@ namespace {
     void print_onemkl_version()
     {
 #ifdef USE_ONEMKL_RANDOM
+#ifdef __INTEL_MKL_PATCH__
         std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
                   << "." << __INTEL_MKL_PATCH__ << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#else // Not present in Debian MKL.
+        std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
+                  << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#endif
 #else
         std::cout << "MKL: not used" << std::endl;
 #endif
@@ -225,7 +222,7 @@ namespace {
 #ifdef SIMDE_X86_SSE2_NATIVE
         simd_info.emplace_back("SSE2");
 #endif
-        std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
 #else
         std::cout << "SIMDE: N/A" << std::endl;
 #ifdef __MMX__
@@ -237,7 +234,7 @@ namespace {
 #ifdef __AVX2__
         simd_info.emplace_back("AVX2");
 #endif
-        std::cout << "\twith ISE: " << boost::algorithm::join(simd_info, " ") << std::endl;
+        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
 #endif
     }
 
@@ -252,6 +249,9 @@ namespace {
         std::cout << "jemalloc: " << JEMALLOC_VERSION_MAJOR << "." << JEMALLOC_VERSION_MINOR << "."
                   << JEMALLOC_VERSION_BUGFIX << std::endl;
 #endif
+#elif defined(WITH_TCMALLOC)
+        std::cout << "tcmalloc: " << TC_VERSION_MAJOR << "." << TC_VERSION_MINOR << "." << TC_VERSION_PATCH
+                  << std::endl;
 #else
         std::cout << "*malloc: not used" << std::endl;
 #endif
@@ -275,7 +275,6 @@ void print_version()
 #endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_htslib_version();
-    print_absl_version();
     print_fmt_version();
     print_boost_version();
     print_onemkl_version();

@@ -5,8 +5,9 @@
 # Additional CMake flags for CMake-related tasks
 CMAKE_FLAGS ?=
 
-# Number of parallel jobs for building
-JOBS ?= $(shell cat /proc/cpuinfo | grep processor | wc -l)
+# Number of parallel jobs for building.
+# Defaults to number of CPU cores detected using `nproc`.
+JOBS ?= $(shell nproc)
 
 # Shell to use for shell scripts
 BASH ?= bash
@@ -14,12 +15,10 @@ BASH ?= bash
 # Python interpreter to use for Python scripts
 PYTHON ?= python3
 
-# MPI run command. Used in MPI-related tests only
+# MPI launcher command. Used in MPI-related tests only
 # NOTE: Setting this target does NOT enable MPI build!
 # Use release-mpi or debug-mpi targets to build with MPI support.
 MPIEXEC ?= mpiexec
-
-MPIEXEC_NJOBS ?= 4
 
 # Output directory for build artifacts
 OPT_DIR ?= $(CURDIR)/opt
@@ -58,9 +57,6 @@ debug:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_debug
-	env -C $(OPT_DIR)/build_debug ctest --output-on-failure
-	$(OPT_DIR)/build_debug_install/bin/art_modern --help
-	$(OPT_DIR)/build_debug_install/bin/art_modern --version
 
 .PHONY: debug-mpi
 # debug with MPI
@@ -79,9 +75,6 @@ debug-mpi:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug-mpi -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_debug-mpi
-	env -C $(OPT_DIR)/build_debug-mpi ctest --output-on-failure
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --help
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: release
 # Generates release build with native optimizations
@@ -99,8 +92,6 @@ release:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_release
-	$(OPT_DIR)/build_release_install/bin/art_modern --help
-	$(OPT_DIR)/build_release_install/bin/art_modern --version
 
 .PHONY: release-mpi
 # release with MPI
@@ -119,8 +110,6 @@ release-mpi:
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release-mpi -j$(JOBS)
 	cmake --install $(OPT_DIR)/build_release-mpi
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --help
-	$(MPIEXEC) -n $(MPIEXEC_NJOBS) $(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi --version
 
 .PHONY: rel_with_dbg_alpine
 # Generates RelWithDebInfo build without native optimizations
@@ -158,48 +147,65 @@ fmt:
 scc:
 	$(BASH) sh.d/scc.sh
 
-.PHONY: touch
-# Touch all source files to current timestamp
-# This **MAY** work when CMake does strange things like compiling the source files again and again.
-touch:
-	$(BASH) sh.d/touch-all.sh
-
 .PHONY: testsmall
-# Run small tests with debug build
+# Alias to testsmall-debug
+testsmall: testsmall-debug
+
+.PHONY: testsmall-mpi
+# Alias to testsmall-debug-mpi
+testsmall-mpi: testsmall-debug-mpi
+
+.PHONY: testsmall-debug
+# Run (not necessiarily) small integration tests with debug build. Also tests `art_profile_builder`.
 # Env. Flags:
 # 
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
-testsmall: debug raw_data
-	env ART=$(OPT_DIR)/build_debug_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
+testsmall-debug: debug raw_data
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
+		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
-.PHONY: testsmall-mpi
+.PHONY: testsmall-debug-mpi
 # testsmall with MPI
-testsmall-mpi: debug-mpi raw_data
-	env ART=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
-
-.PHONY: test-art_profile_builder
-# Run tests for art_profile_builder with release builds
-test-art_profile_builder: raw_data release
-	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-se.sh
-	env ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin $(BASH) sh.d/test-art_profile_builder-pe.sh
+testsmall-debug-mpi: debug-mpi raw_data
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
+		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
+		MPIEXEC=$(MPIEXEC) \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release
 # Run small tests with release build
 testsmall-release: release raw_data
-	env ART=$(OPT_DIR)/build_release_install/bin/art_modern MPIEXEC="" $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin/art_modern \
+		APB_PATH=$(OPT_DIR)/build_release_install/bin/art_profile_builder \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release-mpi
 # testsmall-release with MPI
 testsmall-release-mpi: release-mpi raw_data
-	env ART=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi MPIEXEC=$(MPIEXEC) $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi \
+		APB_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_profile_builder-mpi \
+		MPIEXEC=$(MPIEXEC) \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
+# TODO: Add MPI version when bioconda supports it
 testsmall-conda: raw_data
 	conda env remove -n _art_modern_bioconda -y || true
 	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
-	env ART="$(shell conda run -n _art_modern_bioconda type -p art_modern)" $(BASH) sh.d/test-small.sh
+	env \
+		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern)" \
+		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder)" \
+		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
 
 .PHONY: raw_data
 # Download raw data required for tests
@@ -220,6 +226,16 @@ testbuild:
 # testbuild with MPI
 testbuild-mpi:
 	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
+
+.PHONY: testbuild-small
+# Test building using diverse conditions with testsmall configurations
+testbuild-small:
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small  $(CMAKE_FLAGS)
+
+.PHONY: testbuild-small-mpi
+# testbuild with MPI with testsmall configurations
+testbuild-small-mpi:
+	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation

@@ -51,8 +51,8 @@ A diagram for mate-pair extraction:
 
 ```text
 FRAGMENT:  |==============================|
-MP READ 1: <-------|
-MP READ 2:                        |------->
+MP READ 1:                        |------->
+MP READ 2: <-------|
 ```
 
 #### See also
@@ -171,6 +171,49 @@ This option allows you to specify coverage. `art_modern` supports the following 
 **NOTE** This parameter is ignored if the file type is set to `pbsim3_transcripts`. This format comes with contig-specific coverage information.
 
 **NOTE** We prefer unified coverage floating points to TSVs. That is, if you set this parameter to 10.0, we're **NOT** going to check whether there's a file named `10.0`. So please make sure that the file name is not a number if you want to specify a coverage file.
+
+**NOTE** For coverage of the template mode:
+
+- If a unified coverage file is provided, the coverage will be intepreted as positive coverage. That is:
+  - If the library is SE, all reads will be generated from the positive strand at the 1st base.
+  - If the library is PE, all read 1 will be generated from the positive strand at the first base, with read 2 generated from the negative strand at the last base.
+  - If the library is MP, all read 1 will be generated from the positive strand to the last base, with read 2 generated from the negative strand to the first base.
+- If a 2-column (unstranded) coverage file is provided, the coverage will be intepreted as positive coverage.
+  - Introduced in [1.3.0](#v-1.3.0-section).
+- If a 3-column (stranded) coverage file or input in format of `pvsim3_transcripts` is provided, the coverage will be intepreted as-is.
+
+For example, if you specified `--read_len_1 10 --read_len_2 150` with unified/unstranded coverage 5 and PE library construction mode, you'll be likely to see:
+
+```text
+|================================================|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+```
+
+With stranded coverage positive=3 and negative=2, you may see:
+
+```text
+|================================================|
+|---->                              <------------|
+|---->                              <------------|
+|---->                              <------------|
+|------------>                              <----|
+|------------>                              <----|
+```
+
+while for MP library construction mode you would see:
+
+```text
+|================================================|
+<------------|                              |---->
+<------------|                              |---->
+<------------|                              |---->
+<----|                              |------------>
+<----|                              |------------>
+```
 
 ### Compatibility Matrices of Input Parameters
 
@@ -299,16 +342,33 @@ This output writer supports other BAM formatting parameters.
 
 ## Miscellaneous Parameters
 
-- `--id`: Read ID Prefix. Used to distinguish between different runs.
-- `--read_len`: Read length. Please note that the read length needs to be smaller than the maximum length supported by the quality profiles.
+### Read Length Parameters
+
+`--read_len`, `--read_len_1`, and `--read_len_2` controls read length. Specifically:
+
+- If none of the 3 parameters are set, will use the longest read length supported by the quality distribution file(s).
+- If only `--read_len` is set, will use the specified read length for both read 1 and read 2.
+- `--read_len` cannot be used together with `--read_len_1` or `--read_len_2`.
+- If `--read_len_1` and/or `--read_len_2` is set, will use the specified read lengths for read 1 and/or read 2 respectively.
+- For paired-end or mate-pair library construction mode, both read lengths must be set either using `--read_len` **OR** `--read_len_1` and `--read_len_2`.
+
+### Indel Error Parameters
+
 - `--ins_rate_1`, `--ins_rate_2`, `--del_rate_1`, and `--del_rate_2`: Targeted insertion and deletion rate for read 1 and 2.
 - `--max_indel`: The maximum total number of insertions and deletions per read.
+
+### Ambiguous Base Parameters
+
 - `--max_n`: The maximum total number of ambiguous bases (N) per read.
+
+### Others
+
+- `--id`: Read ID Prefix. Used to distinguish between different runs.
 
 ## Logging Parameters
 
 - `--reporting_interval-job_executor`: The reporting interval (in seconds) for individual `art_modern` job. Added in [1.2.1](#v-1.2.1-section).
-- `--reporting_interval-thread_pool`: The reporting interval (in seconds) for ThreadPool. Added in [1.2.1](#v-1.2.1-section).
+- `--reporting_interval-job_pool`: The reporting interval (in seconds) for ThreadPool. Added in [1.2.1](#v-1.2.1-section).
 
 Those logs are designed for observation of long-running jobs. Increase the interval to reduce log size.
 
