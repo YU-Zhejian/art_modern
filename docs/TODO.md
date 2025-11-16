@@ -21,7 +21,6 @@
 ## I/O Formats
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
-- Support UCSC MAF output format?
 - Add flags to disable/enable diverse BAM tags.
 - Support circular genome or RNA?
 - Support simulating BGI/MGISEQ reads?

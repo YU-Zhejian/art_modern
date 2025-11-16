@@ -122,7 +122,7 @@ void ArtRead::generate_snv_on_qual()
     }
 }
 
-    hts_pos_t ArtRead::generate_indels()
+hts_pos_t ArtRead::generate_indels()
 {
     indel_.clear();
     hts_pos_t ins_len = 0;
@@ -169,7 +169,7 @@ void ArtRead::generate_snv_on_qual()
     return ins_len - del_len;
 }
 
-    hts_pos_t ArtRead::generate_indels_2()
+hts_pos_t ArtRead::generate_indels_2()
 {
     indel_.clear();
     hts_pos_t ins_len = 0;

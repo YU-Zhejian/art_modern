@@ -127,15 +127,14 @@ am_qual_t Rprob::rand_quality_less_than_10()
     return quality_less_than_10_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_quality_less_than_10_index_ == 0) {
-        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_,
-                     cached_rand_quality_less_than_10_.data(), 1, 10);
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
         cached_rand_quality_less_than_10_index_ = CACHE_SIZE_;
     }
     return static_cast<am_qual_t>(cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_]);
 #endif
 }
 
-    hts_pos_t Rprob::rand_pos_on_read(const bool is_read1)
+hts_pos_t Rprob::rand_pos_on_read(const bool is_read1)
 {
 #if defined(USE_STL_LIKE_RANDOM)
     return (is_read1 ? pos_on_read_1_ : pos_on_read_2_)(gen_);
@@ -152,7 +151,7 @@ am_qual_t Rprob::rand_quality_less_than_10()
     return static_cast<hts_pos_t>(cached_rand_pos_on_read_[--cached_rand_pos_on_read_index_]);
 #endif
 }
-    hts_pos_t Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
+hts_pos_t Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
 {
 #if defined(USE_STL_LIKE_RANDOM)
     return (is_read1 ? pos_on_read_1_not_head_and_tail_ : pos_on_read_2_not_head_and_tail_)(gen_);
