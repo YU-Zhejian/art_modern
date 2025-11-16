@@ -4,7 +4,6 @@
 
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
-- Add `art_modern-onenmpi` Conda package to Readme and News if approved.
 - The `art_modern` would still stuck on random situations.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 
@@ -22,7 +21,6 @@
 ## I/O Formats
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
-- Support UCSC MAF output format?
 - Add flags to disable/enable diverse BAM tags.
 - Support circular genome or RNA?
 - Support simulating BGI/MGISEQ reads?

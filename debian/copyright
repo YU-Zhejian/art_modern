@@ -11,9 +11,7 @@ Files-Excluded:
  env/*
  deps/labw_slim_htslib/*
  deps/thread-pool/*
- sh.d/test-am-large-contigs.d/*
- sh.d/test-am-many-contigs.d/*
- sh.d/test-am-ultra-deep.d/*
+ sh.d/test-c.d/*
  sh.d/bench-art_profile_builder-se.sh
  sh.d/test-am-large-contigs.sh
  sh.d/test-am-many-contigs.sh

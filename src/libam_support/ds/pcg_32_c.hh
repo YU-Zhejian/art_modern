@@ -1,3 +1,15 @@
+/**
+ * Copyright
+ * 2014 M.E. O'Neill / pcg-random.org
+ * 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+ *
+ * @brief Minimalist PCG32 implementation in C.
+ *
+ * See: <https://github.com/imneme/pcg-c-basic>
+ **/
+
 #pragma once
 
 #include "libam_support/utils/class_macros_utils.hh"
@@ -7,14 +19,6 @@
 
 namespace labw::art_modern {
 
-/**
- * Minimalist PCG32 implementation in C.
- *
- * See: <https://github.com/imneme/pcg-c-basic>
- *
- * *Really* minimal PCG32 code / (c) 2014 M.E. O'Neill / pcg-random.org
- * Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
- */
 class pcg32_c {
 public:
     using result_type = uint32_t;

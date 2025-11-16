@@ -1,14 +1,21 @@
-//
-// Created by yuzj on 11/2/25.
-//
+/**
+ * Copyright
+ * 2014 M.E. O'Neill / pcg-random.org
+ * 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
+ *
+ * @brief Minimalist PCG32 implementation in C.
+ *
+ * See: <https://github.com/imneme/pcg-c-basic>
+ **/
 
 #include "libam_support/ds/pcg_32_c.hh"
 
 #include <cstdint>
-#include <limits>
 
 namespace labw::art_modern {
-pcg32_c::pcg32_c(uint64_t state, uint64_t inc)
+pcg32_c::pcg32_c(const uint64_t state, const uint64_t inc)
     : state_(state)
     , inc_(inc) {};
 pcg32_c::pcg32_c()
@@ -24,7 +31,7 @@ pcg32_c::result_type pcg32_c::operator()()
     uint32_t const rot = oldstate >> 59U;
     return (xorshifted >> rot) | (xorshifted << ((-rot) & 31));
 }
-pcg32_c::pcg32_c(uint64_t seed_value)
+pcg32_c::pcg32_c(const uint64_t seed_value)
     : pcg32_c()
 {
     seed(seed_value);
