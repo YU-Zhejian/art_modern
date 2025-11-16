@@ -4,7 +4,6 @@
 
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
-- Add `art_modern-onenmpi` Conda package to Readme and News if approved.
 - The `art_modern` would still stuck on random situations.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 

@@ -41,9 +41,9 @@ public:
     ArtRead(const ArtParams& art_params, std::string contig_name, std::string read_name, bool is_read_1, Rprob& rprob);
     [[nodiscard]] PairwiseAlignment to_pwa();
 
-    int generate_indels();
+    hts_pos_t generate_indels();
     // number of deletions <= number of insertions
-    int generate_indels_2();
+    hts_pos_t generate_indels_2();
 
     /**
      * Populate the read while adding insertions and deletions.
@@ -68,7 +68,7 @@ private:
     std::string aln_ref_;
     const ArtParams& art_params_;
     std::string contig_name_;
-    std::map<int, char, std::less<>> indel_;
+    std::map<hts_pos_t, char, std::less<>> indel_;
     bool is_plus_strand_ = false;
     hts_pos_t pos_on_contig_ = 0;
     std::vector<am_qual_t> qual_;
