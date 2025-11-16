@@ -7,8 +7,11 @@
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
+
+#include <htslib/hts.h>
 
 #include <fmt/format.h>
 
@@ -48,65 +51,65 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
         }
         reverse(bam_get_cigar(t_aln), t_aln->core.n_cigar);
 
-        auto seq_str = bam_seq_to_str(t_aln);
-        revcomp_inplace(seq_str);
+        auto seq_str_tmp = bam_seq_to_str(t_aln);
+        revcomp_inplace(seq_str_tmp);
         // Reverse BAM_FLAG
         t_aln->core.flag ^= BAM_FREVERSE;
 
-        bam_set_seq_eqlen(t_aln, seq_str.c_str());
+        bam_set_seq_eqlen(t_aln, seq_str_tmp.c_str());
         t_aln->core.pos = transcript.unspliced_length - bam_endpos(t_aln);
     }
 
     /** Number of CIGAR at taln **/
-    const uint32_t t_n_cigar = t_aln->core.n_cigar;
+    const auto t_n_cigar = t_aln->core.n_cigar;
     /** CIGAR at taln **/
-    const uint32_t* t_cigar = bam_get_cigar(t_aln);
+    const am_cigar_t * t_cigar = bam_get_cigar(t_aln);
 
-    auto qual_str = bam_qual_to_str(t_aln);
-    auto seq_str = bam_seq_to_str(t_aln);
+    auto const qual_str = bam_qual_to_str(t_aln);
+    auto const seq_str = bam_seq_to_str(t_aln);
 
-    int32_t g_aln_start = 0;
+    hts_pos_t g_aln_start = 0;
     auto g_aln_flag = t_aln->core.flag;
     /** Splice site positions oc corresponding transcript **/
     const auto& ssp = transcript.splice_site_positions;
 
     clear_pe_flag(g_aln_flag);
 
-    std::vector<uint32_t> g_cigar;
+    std::vector<am_cigar_t> g_cigar;
     g_cigar.reserve(t_n_cigar + ssp.size());
 
     /** Position on unspliced transcript 5' to 3' **/
-    int32_t pos_on_transcript = 0;
+    hts_pos_t pos_on_transcript = 0;
 
     /** Position on read **/
-    int32_t pos_on_read = 0;
+    hts_pos_t pos_on_read = 0;
 
     /** Position on genome **/
-    int32_t pos_on_genome = 0;
+    hts_pos_t pos_on_genome = 0;
 
     /** CIGAR operation **/
-    int32_t this_cigar_ops = 0;
+    hts_pos_t this_cigar_ops = 0;
 
     /** CIGAR length **/
-    int32_t this_cigar_len = 0;
+    hts_pos_t this_cigar_len = 0;
 
     /** CIGAR type. See bam_cigar_type for details. **/
-    int this_cigar_type = 0;
+    am_cigar_type_t this_cigar_type = 0;
 
     // Miscellaneous helper variables
     std::size_t lower_idx = 0;
     std::size_t upper_idx = 0;
-    int32_t remaining_exon_length = 0;
-    int32_t remaining_cigar_length = 0;
+    hts_pos_t remaining_exon_length = 0;
+    hts_pos_t remaining_cigar_length = 0;
 
 #ifdef CEU_CM_IS_DEBUG
     cigar_trace << ">" << qname << "\n";
 #endif
 
     /** Position on unspliced transcript 5' to 3' **/
-    pos_on_transcript = static_cast<int32_t>(t_aln->core.pos);
+    pos_on_transcript = t_aln->core.pos;
     pos_on_read = 0;
-    pos_on_genome = static_cast<int32_t>(transcript.start + t_aln->core.pos);
+    pos_on_genome = transcript.start + t_aln->core.pos;
 
     // Get alignment start by populating introns
     lower_idx = std::lower_bound(ssp.begin(), ssp.end(), /** Transcript start **/ 0) - ssp.begin();
@@ -198,6 +201,9 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
             // No advancement on pos_of_read
             break;
         default: // Error
+            BOOST_LOG_TRIVIAL(fatal) << "Error: Unknown CIGAR type " << std::to_string(this_cigar_type)
+                                     << " for CIGAR operation " << bam_cigar_opchr(this_cigar_ops) << " in read "
+                                     << qname << std::endl;
             abort_mpi();
         }
 #ifdef CEU_CM_IS_DEBUG

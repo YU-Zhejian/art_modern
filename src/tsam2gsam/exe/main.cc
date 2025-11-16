@@ -6,8 +6,6 @@
  * @date 2024-11-09
  *
  * @copyright Copyright (c) 2024 YU Zhejian
- *
- * TODO: This code sufferes from QUAL string issues.
  */
 
 #include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
