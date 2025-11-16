@@ -35,7 +35,6 @@
 
 #include <htslib/sam.h>
 
-#include <algorithm>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -223,9 +222,9 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
         so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-hl_sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-hl_sam-compress_level"].as<char>();
-        if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {
+        if (std::string(BamOptions::ALLOWED_COMPRESSION_LEVELS).find(so.compress_level) == std::string::npos) {
             BOOST_LOG_TRIVIAL(fatal) << "Invalid compression level: " << so.compress_level
-                                     << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
+                                     << ". Allowed values are: " << BamOptions::ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
         return std::make_shared<HeadlessBamReadOutput>(
@@ -233,6 +232,4 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
     }
     throw OutputNotSpecifiedException {};
 }
-
-HeadlessBamReadOutputFactory::~HeadlessBamReadOutputFactory() = default;
 } // namespace labw::art_modern

@@ -25,6 +25,7 @@
 
 #include <htslib/sam.h>
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 
@@ -60,7 +61,7 @@ public:
     [[nodiscard]] std::string name() const override { return "HeadlessBam"; }
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
-    ~HeadlessBamReadOutputFactory() override;
+    ~HeadlessBamReadOutputFactory() override = default;
 
 private:
     BamOptions sam_options_;

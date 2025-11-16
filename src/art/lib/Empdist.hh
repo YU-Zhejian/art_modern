@@ -39,6 +39,7 @@ class SlimEmpDistGslDiscrete {
 public:
     DEFAULT_COPY(SlimEmpDistGslDiscrete)
     DEFAULT_MOVE(SlimEmpDistGslDiscrete)
+    DEFAULT_DESTRUCTOR(SlimEmpDistGslDiscrete)
     explicit SlimEmpDistGslDiscrete(const dist_map_type& dist)
     {
         std::vector<double> count;
@@ -54,7 +55,6 @@ public:
         }
         rd_ = GslDiscreteDistribution(init_list);
     }
-    ~SlimEmpDistGslDiscrete() = default;
 
     [[nodiscard]] am_qual_t gen_qual(const double u) const { return qual_[rd_(u)]; }
 

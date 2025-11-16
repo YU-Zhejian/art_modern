@@ -1,18 +1,4 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
- *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
- * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
- * version.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along with this program. If not, see
- * <https://www.gnu.org/licenses/>.
- **/
-
-/**
  * GSL Discrete Distribution
  *
  * Re-implemented in C++ from <randist/discrete.c> in GSL 2.8.
@@ -20,7 +6,8 @@
  *
  * Original license as follows:
  *
- * Copyright (C) 1996, 1997, 1998, 1999, 2000, 2007, 2009 James Theiler, Brian Gough
+ * 1996, 1997, 1998, 1999, 2000, 2007, 2009 James Theiler, Brian Gough
+ * 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

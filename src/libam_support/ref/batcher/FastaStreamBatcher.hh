@@ -36,7 +36,7 @@ public:
 
     DELETE_COPY(FastaStreamBatcher)
     DELETE_MOVE(FastaStreamBatcher)
-    ~FastaStreamBatcher() = default;
+    DEFAULT_DESTRUCTOR(FastaStreamBatcher)
 
 private:
     std::size_t batch_size_;

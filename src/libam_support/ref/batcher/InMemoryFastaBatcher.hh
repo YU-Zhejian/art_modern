@@ -26,7 +26,7 @@ namespace labw::art_modern {
 class InMemoryFastaBatcher {
 public:
     InMemoryFastaBatcher(std::size_t batch_size, const std::shared_ptr<InMemoryFastaFetch>& stream);
-    ~InMemoryFastaBatcher() = default;
+    DEFAULT_DESTRUCTOR(InMemoryFastaBatcher)
 
     DELETE_COPY(InMemoryFastaBatcher)
     DELETE_MOVE(InMemoryFastaBatcher)
