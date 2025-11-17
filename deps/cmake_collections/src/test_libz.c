@@ -1,39 +1,75 @@
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include "randstr.h"
+
 #include <zlib.h>
 
-uLong get_adler_crc32(char* buff)
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+int perform(uint8_t* randbuf, size_t randbuf_len)
 {
-    uLong adler_checksum = adler32(0L, Z_NULL, 0);
-    adler_checksum = adler32(adler_checksum, buff, sizeof(buff));
-    return adler_checksum;
+    int retv;
+    // Estimate the maximum compressed size
+    size_t max_compressed_size = compressBound(randbuf_len);
+    uint8_t* compressed_buf = (uint8_t*)malloc(max_compressed_size);
+    size_t compressed_size = 0;
+    if (compressed_buf == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return 1;
+    }
+    
+    retv = compress(
+        (Bytef*)compressed_buf, &compressed_size, (Bytef*)randbuf, randbuf_len);
+    if (retv != Z_OK) {
+        fprintf(stderr, "Compression failed with error code %d\n", retv);
+        free(compressed_buf);
+        return 1;
+    }
+    size_t decompressed_size = randbuf_len;
+    uint8_t* decompressed_buf = (uint8_t*)malloc(decompressed_size);
+    if (decompressed_buf == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        free(compressed_buf);
+        return 1;
+    }
+    retv
+        = uncompress(decompressed_buf, &decompressed_size, compressed_buf, compressed_size);
+    if (retv != Z_OK) {
+        fprintf(stderr, "Decompression failed with error code %d\n", retv);
+        free(compressed_buf);
+        free(decompressed_buf);
+        return 1;
+    }
+    // Verify that the decompressed data matches the original data
+    if (decompressed_size != randbuf_len || memcmp(randbuf, decompressed_buf, randbuf_len) != 0) {
+        fprintf(stderr, "Decompressed data does not match original data\n");
+        free(compressed_buf);
+        free(decompressed_buf);
+        return 1;
+    }
+    free(compressed_buf);
+    free(decompressed_buf);
+    return 0;
 }
 
 int main(void)
 {
-    printf("Zlib version: %s\n", ZLIB_VERSION);
-
-    char strSrc[] = "hello world!";
-    char buf[1024] = { 0 };
-    char strDst[1024] = { 0 };
-    uLong srcLen = sizeof(strSrc);
-    uLong bufLen = sizeof(buf);
-    uLong dstLen = sizeof(strDst);
-
-    printf("Src string: %s (len = %zu)\n", strSrc, srcLen);
-
-    compress(buf, &bufLen, strSrc, srcLen);
-    printf("After Compressed Length: %zu\n", bufLen);
-
-    uncompress(strDst, &dstLen, buf, bufLen);
-    printf("Dst string: %s (len = %zu)\n", strDst, dstLen);
-
-    if (strncmp(strSrc, strDst, 1024) != 0) {
-        return 1;
+    printf("zlib version: %s\n", ZLIB_VERSION);
+    const size_t randbuf_len = 4ULL * 1024; // 4kB
+    pcg32_random_t rng;
+    pcg32_srandom_r(&rng, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng);
+    uint8_t* randbuf = (uint8_t*)malloc(randbuf_len);
+    if (randbuf == NULL) {
+        fprintf(stderr, "Memory allocation failed\n");
+        return EXIT_FAILURE;
     }
-    if (get_adler_crc32(strSrc) != get_adler_crc32(strDst)) {
-        return 1;
+    generate_randbuf(randbuf, randbuf_len, &rng);
+    if (perform(randbuf, randbuf_len) != 0) {
+        free(randbuf);
+        return EXIT_FAILURE;
     }
-    return 0;
+
+    return EXIT_SUCCESS;
 }

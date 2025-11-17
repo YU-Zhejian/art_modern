@@ -1,6 +1,8 @@
 #include "cst_workload.h"
+
+#include <pthread.h>
+
 #include <cstdio>
-#include <thread>
 #include <vector>
 
 typedef struct
