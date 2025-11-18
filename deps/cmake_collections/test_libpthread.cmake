@@ -1,4 +1,5 @@
 # Would firstly test whether C program runs without libpthread.
+# TODO: Modernize this using imported libs.
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")

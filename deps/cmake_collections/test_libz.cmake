@@ -1,5 +1,3 @@
-# Search for zlib <https://www.zlib.net>
-
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")
