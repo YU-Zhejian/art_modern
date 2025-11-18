@@ -14,14 +14,13 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
     // Estimate the maximum compressed size
     size_t max_compressed_size = compressBound(randbuf_len);
     uint8_t* compressed_buf = (uint8_t*)malloc(max_compressed_size);
-    size_t compressed_size = 0;
+    size_t compressed_size = max_compressed_size;
     if (compressed_buf == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
         return 1;
     }
-    
-    retv = compress(
-        (Bytef*)compressed_buf, &compressed_size, (Bytef*)randbuf, randbuf_len);
+
+    retv = compress((Bytef*)compressed_buf, &compressed_size, (Bytef*)randbuf, randbuf_len);
     if (retv != Z_OK) {
         fprintf(stderr, "Compression failed with error code %d\n", retv);
         free(compressed_buf);
@@ -34,8 +33,7 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
         free(compressed_buf);
         return 1;
     }
-    retv
-        = uncompress(decompressed_buf, &decompressed_size, compressed_buf, compressed_size);
+    retv = uncompress(decompressed_buf, &decompressed_size, compressed_buf, compressed_size);
     if (retv != Z_OK) {
         fprintf(stderr, "Decompression failed with error code %d\n", retv);
         free(compressed_buf);
