@@ -2,8 +2,7 @@
 #include <pthread.h>
 #include <stdio.h>
 
-typedef struct
-{
+typedef struct {
     int thread_id;
     int num_to_sqrt;
     int num_of_rounds;
@@ -23,7 +22,8 @@ int main(void)
 {
     parallel_params_type parallel_params = parse_args();
     pthread_t* thr = (pthread_t*)malloc(sizeof(pthread_t) * parallel_params.num_of_threads);
-    pthread_params_type* pthread_params_arr = (pthread_params_type*)malloc(sizeof(pthread_params_type) * parallel_params.num_of_threads);
+    pthread_params_type* pthread_params_arr
+        = (pthread_params_type*)malloc(sizeof(pthread_params_type) * parallel_params.num_of_threads);
     for (int i = 0; i < parallel_params.num_of_threads; ++i) {
         pthread_params_arr[i].thread_id = i;
         pthread_params_arr[i].num_to_sqrt = parallel_params.num_to_sqrt;

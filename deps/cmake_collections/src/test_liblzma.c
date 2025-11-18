@@ -8,7 +8,6 @@
 #include <string.h>
 #include <time.h>
 
-
 int perform(uint8_t* randbuf, size_t randbuf_len)
 {
     lzma_ret ret;
@@ -37,7 +36,8 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
     /* run until stream end */
     for (;;) {
         ret = lzma_code(&enc, LZMA_FINISH);
-        if (ret == LZMA_STREAM_END) break;
+        if (ret == LZMA_STREAM_END)
+            break;
         if (ret != LZMA_OK) {
             fprintf(stderr, "Compression failed: %d\n", ret);
             free(compressed_buf);
@@ -75,7 +75,8 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
 
     for (;;) {
         ret = lzma_code(&dec, LZMA_FINISH);
-        if (ret == LZMA_STREAM_END) break;
+        if (ret == LZMA_STREAM_END)
+            break;
         if (ret != LZMA_OK) {
             fprintf(stderr, "Decompression failed: %d\n", ret);
             free(compressed_buf);
@@ -100,7 +101,6 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
     free(decompressed_buf);
     return 0;
 }
-
 
 int main(void)
 {

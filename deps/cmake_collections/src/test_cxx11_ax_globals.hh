@@ -16,8 +16,7 @@ namespace cxx11 {
 
 namespace test_static_assert {
 
-    template <typename T>
-    struct check {
+    template <typename T> struct check {
         static_assert(sizeof(int) <= sizeof(T), "not big enough");
     };
 
@@ -39,9 +38,7 @@ namespace test_final_override {
 
 namespace test_double_right_angle_brackets {
 
-    template <typename T>
-    struct check {
-    };
+    template <typename T> struct check { };
 
     typedef check<void> single_type;
     typedef check<check<void>> double_type;
@@ -52,8 +49,7 @@ namespace test_double_right_angle_brackets {
 
 namespace test_decltype {
 
-    int
-    f()
+    int f()
     {
         int a = 1;
         decltype(a) b = 2;
@@ -64,25 +60,17 @@ namespace test_decltype {
 
 namespace test_type_deduction {
 
-    template <typename T1, typename T2>
-    struct is_same {
+    template <typename T1, typename T2> struct is_same {
         static const bool value = false;
     };
 
-    template <typename T>
-    struct is_same<T, T> {
+    template <typename T> struct is_same<T, T> {
         static const bool value = true;
     };
 
-    template <typename T1, typename T2>
-    auto
-    add(T1 a1, T2 a2) -> decltype(a1 + a2)
-    {
-        return a1 + a2;
-    }
+    template <typename T1, typename T2> auto add(T1 a1, T2 a2) -> decltype(a1 + a2) { return a1 + a2; }
 
-    int
-    test(const int c, volatile int v)
+    int test(const int c, volatile int v)
     {
         static_assert(is_same<int, decltype(0)>::value == true, "");
         static_assert(is_same<int, decltype(c)>::value == false, "");
@@ -113,14 +101,12 @@ namespace test_noexcept {
 
 namespace test_constexpr {
 
-    template <typename CharT>
-    unsigned long constexpr strlen_c_r(const CharT* const s, const unsigned long acc) noexcept
+    template <typename CharT> unsigned long constexpr strlen_c_r(const CharT* const s, const unsigned long acc) noexcept
     {
         return *s ? strlen_c_r(s + 1, acc + 1) : acc;
     }
 
-    template <typename CharT>
-    unsigned long constexpr strlen_c(const CharT* const s) noexcept
+    template <typename CharT> unsigned long constexpr strlen_c(const CharT* const s) noexcept
     {
         return strlen_c_r(s, 0UL);
     }
@@ -134,8 +120,7 @@ namespace test_constexpr {
 
 namespace test_rvalue_references {
 
-    template <int N>
-    struct answer {
+    template <int N> struct answer {
         static constexpr int value = N;
     };
 
@@ -143,8 +128,7 @@ namespace test_rvalue_references {
     answer<2> f(const int&) { return answer<2>(); }
     answer<3> f(int&&) { return answer<3>(); }
 
-    void
-    test()
+    void test()
     {
         int i = 0;
         const int c = 0;
@@ -169,8 +153,7 @@ namespace test_uniform_initialization {
 
 namespace test_lambdas {
 
-    void
-    test1()
+    void test1()
     {
         auto lambda1 = []() {};
         auto lambda2 = lambda1;
@@ -178,8 +161,7 @@ namespace test_lambdas {
         lambda2();
     }
 
-    int
-    test2()
+    int test2()
     {
         auto a = [](int i, int j) { return i + j; }(1, 2);
         auto b = []() -> int { return '0'; }();
@@ -194,17 +176,14 @@ namespace test_lambdas {
         return a + b + c + d + e;
     }
 
-    int
-    test3()
+    int test3()
     {
         const auto nullary = []() { return 0; };
         const auto unary = [](int x) { return x; };
         using nullary_t = decltype(nullary);
         using unary_t = decltype(unary);
         const auto higher1st = [](nullary_t f) { return f(); };
-        const auto higher2nd = [unary](nullary_t f1) {
-            return [unary, f1](unary_t f2) { return f2(unary(f1())); };
-        };
+        const auto higher2nd = [unary](nullary_t f1) { return [unary, f1](unary_t f2) { return f2(unary(f1())); }; };
         return higher1st(nullary) + higher2nd(nullary)(unary);
     }
 
@@ -212,16 +191,13 @@ namespace test_lambdas {
 
 namespace test_variadic_templates {
 
-    template <int...>
-    struct sum;
+    template <int...> struct sum;
 
-    template <int N0, int... N1toN>
-    struct sum<N0, N1toN...> {
+    template <int N0, int... N1toN> struct sum<N0, N1toN...> {
         static constexpr auto value = N0 + sum<N1toN...>::value;
     };
 
-    template <>
-    struct sum<> {
+    template <> struct sum<> {
         static constexpr auto value = 0;
     };
 
@@ -239,17 +215,13 @@ namespace test_variadic_templates {
 // because of this.
 namespace test_template_alias_sfinae {
 
-    struct foo {
-    };
+    struct foo { };
 
-    template <typename T>
-    using member = typename T::member_type;
+    template <typename T> using member = typename T::member_type;
 
-    template <typename T>
-    void func(...) { }
+    template <typename T> void func(...) { }
 
-    template <typename T>
-    void func(member<T>*) { }
+    template <typename T> void func(member<T>*) { }
 
     void test();
 

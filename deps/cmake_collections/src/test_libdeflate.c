@@ -38,7 +38,8 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
         free(compressed_buf);
         return 1;
     }
-    retv = libdeflate_gzip_decompress(d, compressed_buf, compressed_size, decompressed_buf, decompressed_size, &decompressed_size);
+    retv = libdeflate_gzip_decompress(
+        d, compressed_buf, compressed_size, decompressed_buf, decompressed_size, &decompressed_size);
     if (retv != LIBDEFLATE_SUCCESS) {
         fprintf(stderr, "Decompression failed with error code %d\n", retv);
         free(compressed_buf);

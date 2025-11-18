@@ -22,8 +22,8 @@ int main()
     thread_vector.reserve(parallel_params.num_of_threads);
     std::vector<int> return_vector(parallel_params.num_of_threads);
     for (int i = 0; i < parallel_params.num_of_threads; i++) {
-        thread_vector.emplace_back(worker, i, parallel_params.num_to_sqrt, parallel_params.num_of_rounds,
-            &return_vector[i]);
+        thread_vector.emplace_back(
+            worker, i, parallel_params.num_to_sqrt, parallel_params.num_of_rounds, &return_vector[i]);
     }
     for (int i = 0; i < parallel_params.num_of_threads; i++) {
         if (!thread_vector[i].joinable()) {

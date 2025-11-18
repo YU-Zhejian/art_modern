@@ -184,7 +184,7 @@ std::string ceu_check_get_run_time_os_info()
                         oss << "Windows 10/11 unknown" << std::endl;
                     }
                 } else {
-                    if (osvi.dwBuildNumber < 14393){
+                    if (osvi.dwBuildNumber < 14393) {
                         oss << "Windows Server 2016 before 1607" << std::endl;
                     } else if (14393 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 17763) {
                         oss << "Windows Server 2016 (1607)" << std::endl;

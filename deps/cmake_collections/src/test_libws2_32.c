@@ -1,10 +1,11 @@
+#include <stdio.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <stdio.h>
 
-int main() {
+int main()
+{
     WSADATA wsaData;
-    int result = WSAStartup(MAKEWORD(2,2), &wsaData);
+    int result = WSAStartup(MAKEWORD(2, 2), &wsaData);
     if (result != 0) {
         return 1;
     }

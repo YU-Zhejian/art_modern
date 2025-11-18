@@ -30,17 +30,9 @@ namespace test::nested_namespace::definitions {
 
 namespace test_fold_expression {
 
-    template <typename... Args>
-    int multiply(Args... args)
-    {
-        return (args * ... * 1);
-    }
+    template <typename... Args> int multiply(Args... args) { return (args * ... * 1); }
 
-    template <typename... Args>
-    bool all(Args... args)
-    {
-        return (args && ...);
-    }
+    template <typename... Args> bool all(Args... args) { return (args && ...); }
 
 }
 
@@ -61,17 +53,13 @@ namespace test_auto_brace_init_list {
 
 namespace test_typename_in_template_template_parameter {
 
-    template <template <typename> typename X>
-    struct D;
+    template <template <typename> typename X> struct D;
 
 }
 
 namespace test_fallthrough_nodiscard_maybe_unused_attributes {
 
-    int f1()
-    {
-        return 42;
-    }
+    int f1() { return 42; }
 
     [[nodiscard]] int f2()
     {
@@ -96,10 +84,7 @@ namespace test_extended_aggregate_initialization {
     };
 
     struct base2 {
-        base2()
-        {
-            b3 = 42;
-        }
+        base2() { b3 = 42; }
         int b3;
     };
 
@@ -117,15 +102,9 @@ namespace test_general_range_based_for_loop {
     struct iter {
         int i;
 
-        int& operator*()
-        {
-            return i;
-        }
+        int& operator*() { return i; }
 
-        const int& operator*() const
-        {
-            return i;
-        }
+        const int& operator*() const { return i; }
 
         iter& operator++()
         {
@@ -138,26 +117,14 @@ namespace test_general_range_based_for_loop {
         int i;
     };
 
-    bool operator==(const iter& i, const sentinel& s)
-    {
-        return i.i == s.i;
-    }
+    bool operator==(const iter& i, const sentinel& s) { return i.i == s.i; }
 
-    bool operator!=(const iter& i, const sentinel& s)
-    {
-        return !(i == s);
-    }
+    bool operator!=(const iter& i, const sentinel& s) { return !(i == s); }
 
     struct range {
-        iter begin() const
-        {
-            return { 0 };
-        }
+        iter begin() const { return { 0 }; }
 
-        sentinel end() const
-        {
-            return { 5 };
-        }
+        sentinel end() const { return { 5 }; }
     };
 
     void f()
@@ -177,9 +144,7 @@ namespace test_lambda_capture_asterisk_this_by_value {
         int i;
         int foo()
         {
-            return [*this]() {
-                return i;
-            }();
+            return [*this]() { return i; }();
         }
     };
 
@@ -195,8 +160,7 @@ namespace test_enum_class_construction {
 
 namespace test_constexpr_if {
 
-    template <bool cond>
-    int f()
+    template <bool cond> int f()
     {
         if constexpr (cond) {
             return 13;
@@ -209,10 +173,7 @@ namespace test_constexpr_if {
 
 namespace test_selection_statement_with_initializer {
 
-    int f()
-    {
-        return 13;
-    }
+    int f() { return 13; }
 
     int f2()
     {
@@ -233,8 +194,7 @@ namespace test_selection_statement_with_initializer {
 
 namespace test_template_argument_deduction_for_class_templates {
 
-    template <typename T1, typename T2>
-    struct pair {
+    template <typename T1, typename T2> struct pair {
         pair(T1 p1, T2 p2)
             : m1 { p1 }
             , m2 { p2 }
@@ -245,18 +205,13 @@ namespace test_template_argument_deduction_for_class_templates {
         T2 m2;
     };
 
-    void f()
-    {
-        [[maybe_unused]] auto p = pair { 13, 42u };
-    }
+    void f() { [[maybe_unused]] auto p = pair { 13, 42u }; }
 
 }
 
 namespace test_non_type_auto_template_parameters {
 
-    template <auto n>
-    struct B {
-    };
+    template <auto n> struct B { };
 
     B<5> b1;
     B<'a'> b2;
@@ -268,25 +223,16 @@ namespace test_structured_bindings {
     int arr[2] = { 1, 2 };
     std::pair<int, int> pr = { 1, 2 };
 
-    auto f1() -> int (&)[2]
-    {
-        return arr;
-    }
+    auto f1() -> int (&)[2] { return arr; }
 
-    auto f2() -> std::pair<int, int>&
-    {
-        return pr;
-    }
+    auto f2() -> std::pair<int, int>& { return pr; }
 
     struct S {
         int x1 : 2;
         volatile double y1;
     };
 
-    S f3()
-    {
-        return {};
-    }
+    S f3() { return {}; }
 
     auto [x1, y1] = f1();
     auto& [xr1, yr1] = f1();
@@ -298,21 +244,15 @@ namespace test_structured_bindings {
 
 namespace test_exception_spec_type_system {
 
-    struct Good {
-    };
-    struct Bad {
-    };
+    struct Good { };
+    struct Bad { };
 
     void g1() noexcept;
     void g2();
 
-    template <typename T>
-    Bad
-    f(T*, T*);
+    template <typename T> Bad f(T*, T*);
 
-    template <typename T1, typename T2>
-    Good
-    f(T1*, T2*);
+    template <typename T1, typename T2> Good f(T1*, T2*);
 
     static_assert(std::is_same_v<Good, decltype(f(g1, g2))>);
 
@@ -320,27 +260,13 @@ namespace test_exception_spec_type_system {
 
 namespace test_inline_variables {
 
-    template <class T>
-    void f(T)
-    {
-    }
+    template <class T> void f(T) { }
 
-    template <class T>
-    inline T g(T)
-    {
-        return T {};
-    }
+    template <class T> inline T g(T) { return T {}; }
 
-    template <>
-    inline void f<>(int)
-    {
-    }
+    template <> inline void f<>(int) { }
 
-    template <>
-    int g<>(int)
-    {
-        return 5;
-    }
+    template <> int g<>(int) { return 5; }
 
 }
 
