@@ -1,7 +1,6 @@
 #include "bloom.h"
 #include "../dtypes.h"
 
-#include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -67,7 +66,7 @@ void bloom_add(bloom_t filter, const void* item, const size_t len)
     }
 }
 
-bool bloom_test(bloom_t filter, const void* item, const size_t len)
+int bloom_test(bloom_t filter, const void* item, const size_t len)
 {
     struct bloom_hash* h = filter->func;
     uint8_t* bits = filter->bits;
@@ -75,9 +74,9 @@ bool bloom_test(bloom_t filter, const void* item, const size_t len)
         hash_type hash = h->func(item, len);
         hash %= filter->size * 8;
         if (!(bits[hash / 8] & 1 << hash % 8)) {
-            return false;
+            return 0;
         }
         h = h->next;
     }
-    return true;
+    return 1;
 }

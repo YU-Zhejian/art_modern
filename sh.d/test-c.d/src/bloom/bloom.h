@@ -1,7 +1,7 @@
 #ifndef _BLOOM_H
 #define _BLOOM_H
 #include "../dtypes.h"
-#include <stdbool.h>
+
 #include <stddef.h>
 #include <stdint.h>
 
@@ -20,6 +20,6 @@ void bloom_add(bloom_t filter, const void* item, const size_t len);
  *
  * Returns false if the item has definitely not been added before. Returns true
  * if the item was probably added before. */
-bool bloom_test(bloom_t filter, const void* item, const size_t len);
+int bloom_test(bloom_t filter, const void* item, const size_t len);
 
 #endif

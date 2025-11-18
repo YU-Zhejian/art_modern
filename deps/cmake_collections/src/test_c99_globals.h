@@ -6,13 +6,47 @@
 
 // See if C++-style comments work.
 
-#include <stdbool.h>
 extern int puts(const char*);
 extern int printf(const char*, ...);
 // extern int dprintf(int, const char*, ...);
 // FIXME: Not working under Windows
 extern void* malloc(size_t);
 extern void free(void*);
+
+// YU Zhejian: Check Bool
+#include <stdbool.h>
+#ifndef __bool_true_false_are_defined
+#error "__bool_true_false_are_defined not defined!"
+#endif
+
+#if __bool_true_false_are_defined != 1
+#error "__bool_true_false_are_defined != 1!"
+#endif
+
+#define CEU_TB_BOOL bool
+#define CEU_TB_T true
+#define CEU_TB_F false
+#include <stdlib.h> // abort()
+#define TB_ASSERT(i) \
+    if (!(i)) {      \
+        abort();     \
+    }
+
+#define TEST_BOOL_F(BOOL_TYPE, INIT_TRUE, INIT_FALSE) \
+    TB_ASSERT(sizeof(BOOL_TYPE) == 1)                 \
+    BOOL_TYPE t = INIT_TRUE;                          \
+    BOOL_TYPE f = INIT_FALSE;                         \
+    TB_ASSERT(t);                                     \
+    TB_ASSERT(t == 1);                                \
+    TB_ASSERT(f == 0);                                \
+    TB_ASSERT(!f);                                    \
+    TB_ASSERT(!(!t));                                 \
+    TB_ASSERT(!(t && f));                             \
+    TB_ASSERT(t || f);                                \
+    TB_ASSERT(t&& t);                                 \
+    TB_ASSERT(!(f && f));                             \
+    TB_ASSERT(!(f || f));\
+
 
 // Check varargs macros.  These examples are taken from C99 6.10.3.5.
 // dprintf is used instead of fprintf to avoid needing to declare
@@ -109,6 +143,14 @@ int c99main(int argc, char** argv)
     // Check bool.
     _Bool success = false;
     success |= (argc != 0);
+
+    // YU Zhejian: Check bool.
+
+    TEST_BOOL_F(CEU_TB_BOOL, CEU_TB_T, CEU_TB_F);
+    TEST_BOOL_F(CEU_TB_BOOL, 1, 0);
+    TEST_BOOL_F(CEU_TB_BOOL, 4, 0);
+    TEST_BOOL_F(CEU_TB_BOOL, -4, 0);
+    TEST_BOOL_F(CEU_TB_BOOL, 0.5, 0);
 
     // Check restrict.
     if (test_restrict("String literal") == 0)
