@@ -61,11 +61,11 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , read_len_1_(read_len_1)
     , read_len_2_(read_len_2)
 {
-    pos_on_read_1_ = INT_DIST<int>(0, read_len_1 - 1);
-    pos_on_read_1_not_head_and_tail_ = INT_DIST<int>(1, read_len_1 - 2);
+    pos_on_read_1_ = INT_DIST<hts_pos_t>(0, read_len_1 - 1);
+    pos_on_read_1_not_head_and_tail_ = INT_DIST<hts_pos_t>(1, read_len_1 - 2);
     if (read_len_2 != 0) {
-        pos_on_read_2_ = INT_DIST<int>(0, read_len_2 - 1);
-        pos_on_read_2_not_head_and_tail_ = INT_DIST<int>(1, read_len_2 - 2);
+        pos_on_read_2_ = INT_DIST<hts_pos_t>(0, read_len_2 - 1);
+        pos_on_read_2_not_head_and_tail_ = INT_DIST<hts_pos_t>(1, read_len_2 - 2);
     }
     public_init_();
 }

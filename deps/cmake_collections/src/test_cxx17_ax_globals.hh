@@ -152,7 +152,7 @@ namespace test_lambda_capture_asterisk_this_by_value {
 
 namespace test_enum_class_construction {
 
-    enum class byte : unsigned char {};
+    enum class byte : unsigned char { };
 
     byte foo { 42 };
 

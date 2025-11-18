@@ -17,9 +17,9 @@
 namespace labw::art_modern {
 pcg32_c::pcg32_c(const uint64_t state, const uint64_t inc)
     : state_(state)
-    , inc_(inc) {};
+    , inc_(inc) { };
 pcg32_c::pcg32_c()
-    : pcg32_c { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL } {};
+    : pcg32_c { 0x853c49e6748fea9bULL, 0xda3e39cb94b95bdbULL } { };
 
 pcg32_c::result_type pcg32_c::operator()()
 {

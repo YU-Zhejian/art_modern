@@ -155,7 +155,7 @@ namespace test_lambdas {
 
     void test1()
     {
-        auto lambda1 = []() {};
+        auto lambda1 = []() { };
         auto lambda2 = lambda1;
         lambda1();
         lambda2();
