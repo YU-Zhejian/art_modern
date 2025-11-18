@@ -34,8 +34,8 @@ class FastaEOFException final : public std::exception { };
 class MalformedFastaException final : public std::runtime_error {
 public:
     explicit MalformedFastaException(const std::string& reason)
-        : std::runtime_error(reason) {};
-    ~MalformedFastaException() override = default;
+        : std::runtime_error(reason) { };
+    DEFAULT_DESTRUCTOR(MalformedFastaException)
     DEFAULT_COPY(MalformedFastaException)
     DEFAULT_MOVE(MalformedFastaException)
 };
@@ -47,7 +47,7 @@ public:
 
     DELETE_COPY(FastaIterator)
     DELETE_MOVE(FastaIterator)
-    ~FastaIterator() = default;
+    DEFAULT_DESTRUCTOR(FastaIterator)
 
     FastaRecord next();
 

@@ -33,7 +33,6 @@ elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Inf
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O3 -O2)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g)
 else() # Debug, the default.
-    # ceu_cm_enhanced_check_compiler_flag(-fsanitize=address)
     if(NOT MSVC)
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Og) # Add debug info
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g3) # Add debug info

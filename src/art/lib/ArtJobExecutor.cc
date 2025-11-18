@@ -210,11 +210,11 @@ void ArtJobExecutor::operator()()
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
         const auto& contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
-        if (contig_size < art_params_.read_len_max || /** unlikely */ contig_size == 0) {
+        if (contig_size < art_params_.contig_len_threshold || /** unlikely */ contig_size == 0) {
             BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
                                      << job_.fasta_fetch->seq_len(seq_id)
-                                     << "bps ) is skipped as it < the defined maximum read length ("
-                                     << art_params_.read_len_max << " bps)";
+                                     << "bps ) is skipped as it < the contig length threshold ("
+                                     << art_params_.contig_len_threshold << " bps)";
             continue;
         }
         accumulated_contig_len += contig_size;

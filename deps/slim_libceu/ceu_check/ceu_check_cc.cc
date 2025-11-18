@@ -1,14 +1,13 @@
 #include "ceu_check/ceu_check_cc.hh"
 #include "libceu_stddef.h"
 
-
 #include <sstream>
 #include <string>
 
 std::string ceu_check_get_compiler_info()
 {
     std::ostringstream oss;
-    #ifdef CEU_REPRODUCIBLE_BUILDS
+#ifdef CEU_REPRODUCIBLE_BUILDS
     oss << "Compiled at: N/A due to reproducible build" << std::endl;
 #else
 #if defined(__DATE__)
@@ -22,7 +21,7 @@ std::string ceu_check_get_compiler_info()
     std::string time_str = "unknown time";
 #endif
     oss << "Compiled at: " << date_str << ", " << time_str << std::endl;
-    #endif
+#endif
     oss << "Compiler Identification:" << std::endl;
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     oss << "\t" << "Intel Clang compatible version number: " << __INTEL_CLANG_COMPILER / 10000 << '.'
@@ -67,7 +66,8 @@ std::string ceu_check_get_compiler_info()
     std::string msc_minor_ver = "unknown";
 #endif
     oss << "\t" << "MSVC compatible version number: " << msc_major_ver << '.' << msc_minor_ver << '.'
-        << msc_internal_ver << '.' << msc_build_ver << ", with Visual Studio ver. " << CEU_VISUAL_STUDIO_VER << std::endl;
+        << msc_internal_ver << '.' << msc_build_ver << ", with Visual Studio ver. " << CEU_VISUAL_STUDIO_VER
+        << std::endl;
 #endif
 
 #if defined(CEU_COMPILER_IS_NVHPC)

@@ -3,6 +3,7 @@
 (v-1.3.1-section)=
 ## 1.3.1 (Ongoing)
 
+- A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
 - Miscellaneous bug fixes.
 
 (v-1.3.0-section)=

@@ -12,12 +12,12 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
  **/
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 
 #include "art/lib/ArtRead.hh"
 
 #include "art/lib/Rprob.hh"
 
-#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 #include "libam_support/Constants.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -33,8 +33,6 @@
 #include <sstream>
 #include <utility>
 
-#define USE_NEW_INDEL_GEN_METHOD 1
-
 namespace labw::art_modern {
 
 void ArtRead::generate_pairwise_aln()
@@ -45,7 +43,6 @@ void ArtRead::generate_pairwise_aln()
     const std::size_t maxk = read_len_ + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
-#if (USE_NEW_INDEL_GEN_METHOD)
     hts_pos_t num_match = 0;
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
         num_match = this_pos_on_aln_str - pos_on_aln_str;
@@ -75,35 +72,6 @@ void ArtRead::generate_pairwise_aln()
     std::memcpy(aln_query_.data() + pos_on_aln_str, query_.data() + pos_on_query, num_match);
     std::memcpy(aln_ref_.data() + pos_on_aln_str, ref_.data() + pos_on_ref, num_match);
     pos_on_aln_str += num_match;
-#else // Old version for historical purposes
-    while (pos_on_ref < seq_ref_.size()) {
-        const auto find = indel_.find(pos_on_aln_str);
-        if (find == indel_.end()) { // No indel
-            aln_read_[pos_on_aln_str] = seq_read_[pos_on_read];
-            aln_ref_[pos_on_aln_str] = seq_ref_[pos_on_ref];
-            pos_on_read++;
-            pos_on_ref++;
-        } else if (find->second == ALN_GAP) { // Deletion
-            aln_read_[pos_on_aln_str] = ALN_GAP;
-            aln_ref_[pos_on_aln_str] = seq_ref_[pos_on_ref];
-            pos_on_ref++;
-        } else { // Insertion
-            aln_read_[pos_on_aln_str] = find->second;
-            aln_ref_[pos_on_aln_str] = ALN_GAP;
-            pos_on_read++;
-        }
-        pos_on_aln_str++;
-    }
-    while (true) { // Insertions after reference
-        const auto find = indel_.find(pos_on_aln_str);
-        if (find == indel_.end()) {
-            break;
-        }
-        aln_read_[pos_on_aln_str] = find->second;
-        aln_ref_[pos_on_aln_str] = ALN_GAP;
-        pos_on_aln_str++;
-    }
-#endif
     aln_query_.resize(pos_on_aln_str);
     aln_ref_.resize(pos_on_aln_str);
 
@@ -154,14 +122,14 @@ void ArtRead::generate_snv_on_qual()
     }
 }
 
-int ArtRead::generate_indels()
+hts_pos_t ArtRead::generate_indels()
 {
     indel_.clear();
-    int ins_len = 0;
-    int del_len = 0;
-    int i = 0;
-    int j = 0;
-    int pos = 0;
+    hts_pos_t ins_len = 0;
+    hts_pos_t del_len = 0;
+    hts_pos_t i = 0;
+    hts_pos_t j = 0;
+    hts_pos_t pos = 0;
     const auto& per_base_del_rate = is_read_1_ ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1_ ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
     // deletion
@@ -201,12 +169,12 @@ int ArtRead::generate_indels()
     return ins_len - del_len;
 }
 
-int ArtRead::generate_indels_2()
+hts_pos_t ArtRead::generate_indels_2()
 {
     indel_.clear();
-    int ins_len = 0;
-    int del_len = 0;
-    int pos = 0;
+    hts_pos_t ins_len = 0;
+    hts_pos_t del_len = 0;
+    hts_pos_t pos = 0;
     const auto& per_base_del_rate = is_read_1_ ? art_params_.per_base_del_rate_1 : art_params_.per_base_del_rate_2;
     const auto& per_base_ins_rate = is_read_1_ ? art_params_.per_base_ins_rate_1 : art_params_.per_base_ins_rate_2;
 
@@ -269,7 +237,6 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     const std::size_t maxk = read_len_ + 1 + 1 + indel_.size();
     aln_query_.resize(maxk);
     aln_ref_.resize(maxk);
-#if (USE_NEW_INDEL_GEN_METHOD)
     hts_pos_t num_match = 0;
 
     for (const auto& [this_pos_on_aln_str, indel] : indel_) {
@@ -294,31 +261,6 @@ void ArtRead::ref2read(std::string seq_ref, const bool is_plus_strand, const hts
     }
 #endif
     std::memcpy(query_.data() + pos_on_read, ref_.data() + pos_on_ref, num_match);
-#else // Old code for historical purposes
-    for (decltype(seq_ref_.size()) pos_on_ref = 0; pos_on_ref < seq_ref_.size();) {
-        const auto find = indel_.find(k);
-        if (find == indel_.end()) { // No indel
-            seq_read_[pos_on_read] = seq_ref_[pos_on_ref];
-            pos_on_ref++;
-            pos_on_read++;
-        } else if (find->second == ALN_GAP) { // Deletion
-            pos_on_ref++;
-        } else { // Insertion
-            seq_read_[pos_on_read] = find->second;
-            pos_on_read++;
-        }
-        k++;
-    }
-    while (true) { // Insertions after reference
-        const auto find = indel_.find(k);
-        if (find == indel_.end()) {
-            break;
-        }
-        seq_read_[pos_on_read] = find->second;
-        pos_on_read++;
-        k++;
-    }
-#endif
 #ifdef CEU_CM_IS_DEBUG
     if (static_cast<int>(query_.size()) != read_len_) {
         BOOST_LOG_TRIVIAL(error) << "Generated read length (" << query_.size()

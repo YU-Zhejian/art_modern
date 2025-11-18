@@ -7,8 +7,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
 
-#include <htslib/hts.h>
-
 #include <array>
 #include <cmath>
 #include <cstdlib>
@@ -54,9 +52,20 @@ ArtParams::ArtParams(const labw::art_modern::SIMULATION_MODE art_simulation_mode
     , job_pool_reporting_interval_seconds(job_pool_reporting_interval_seconds)
     , art_job_executor_reporting_interval_seconds(art_job_executor_reporting_interval_seconds)
     , err_prob(gen_err_prob_())
-    , pe_dist_mean_minus_2_std(static_cast<hts_pos_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev))
-    , read_len_max(am_max(read_len_1, read_len_2))
+    , pe_dist_mean_minus_2_std(static_cast<am_read_len_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev))
 {
+    if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
+        contig_len_threshold = read_len_1;
+        return;
+    }
+    if (art_lib_const_mode == ART_LIB_CONST_MODE::PE || art_lib_const_mode == ART_LIB_CONST_MODE::MP) {
+        if (art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
+            contig_len_threshold = am_max(read_len_1, read_len_2);
+        } else {
+            contig_len_threshold = am_max(pe_dist_mean_minus_2_std, am_max(read_len_1, read_len_2));
+        }
+        return;
+    }
 }
 
 } // namespace labw::art_modern

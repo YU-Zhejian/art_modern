@@ -20,8 +20,9 @@
 #include <string>
 
 namespace labw::art_modern {
-const std::string ALLOWED_COMPRESSION_LEVELS = "0123456789u";
-struct BamOptions {
+class BamOptions {
+public:
+    static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u' };
     /**
      * Format version. Accepted format: `/^[0-9]+\.[0-9]+$`.
      */

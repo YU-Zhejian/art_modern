@@ -1,5 +1,6 @@
 /**
  *@brief Implementation proxy of some third-party job pools.
+ *
  * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public

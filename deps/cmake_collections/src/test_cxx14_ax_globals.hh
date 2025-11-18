@@ -15,13 +15,10 @@ namespace cxx14 {
 
 namespace test_polymorphic_lambdas {
 
-    int
-    test()
+    int test()
     {
         const auto lambda = [](auto&&... args) {
-            const auto istiny = [](auto x) {
-                return (sizeof(x) == 1UL) ? 1 : 0;
-            };
+            const auto istiny = [](auto x) { return (sizeof(x) == 1UL) ? 1 : 0; };
             const int aretiny[] = { istiny(args)... };
             return aretiny[0];
         };
@@ -39,9 +36,7 @@ namespace test_binary_literals {
 
 namespace test_generalized_constexpr {
 
-    template <typename CharT>
-    constexpr unsigned long
-    strlen_c(const CharT* const s) noexcept
+    template <typename CharT> constexpr unsigned long strlen_c(const CharT* const s) noexcept
     {
         auto length = 0UL;
         for (auto p = s; *p; ++p)
@@ -58,8 +53,7 @@ namespace test_generalized_constexpr {
 
 namespace test_lambda_init_capture {
 
-    int
-    test()
+    int test()
     {
         auto x = 0;
         const auto lambda1 = [a = x](int b) { return a + b; };
@@ -81,18 +75,15 @@ namespace test_return_type_deduction {
     auto f(int& x) { return x; }
     decltype(auto) g(int& x) { return x; }
 
-    template <typename T1, typename T2>
-    struct is_same {
+    template <typename T1, typename T2> struct is_same {
         static constexpr auto value = false;
     };
 
-    template <typename T>
-    struct is_same<T, T> {
+    template <typename T> struct is_same<T, T> {
         static constexpr auto value = true;
     };
 
-    int
-    test()
+    int test()
     {
         auto x = 0;
         static_assert(is_same<int, decltype(f(x))>::value, "");

@@ -32,8 +32,7 @@ static inline int perform_sqrt(int num_of_rounds, int num_to_sqrt)
     return 0;
 }
 
-typedef struct
-{
+typedef struct {
     int num_to_sqrt;
     int num_of_rounds;
     int num_of_threads;

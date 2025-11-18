@@ -11,11 +11,7 @@ extern char aligned_as_int;
 char _Alignas(0) _Alignas(int) aligned_as_int;
 
 // Check _Alignof.
-enum {
-    int_alignment = _Alignof(int),
-    int_array_alignment = _Alignof(int[100]),
-    char_alignment = _Alignof(char)
-};
+enum { int_alignment = _Alignof(int), int_array_alignment = _Alignof(int[100]), char_alignment = _Alignof(char) };
 _Static_assert(0 < -_Alignof(int), "_Alignof is signed");
 
 // Check _Noreturn.
@@ -28,8 +24,7 @@ int _Noreturn does_not_return(void)
 // Check _Static_assert.
 struct test_static_assert {
     int x;
-    _Static_assert(sizeof(int) <= sizeof(long int),
-        "_Static_assert does not work in struct");
+    _Static_assert(sizeof(int) <= sizeof(long int), "_Static_assert does not work in struct");
     long int y;
 };
 
@@ -61,9 +56,8 @@ struct anonymous {
 int c11main(void)
 {
     int ok = 0;
-    _Static_assert((offsetof(struct anonymous, i)
-                       == offsetof(struct anonymous, w.k)),
-        "Anonymous union alignment botch");
+    _Static_assert(
+        (offsetof(struct anonymous, i) == offsetof(struct anonymous, w.k)), "Anonymous union alignment botch");
     v1.i = 2;
     v1.w.k = 5;
     ok |= v1.i != 5;

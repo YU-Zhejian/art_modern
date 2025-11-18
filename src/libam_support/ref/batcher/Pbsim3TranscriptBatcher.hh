@@ -31,7 +31,7 @@ class Pbsim3TranscriptBatcher final {
 public:
     DELETE_COPY(Pbsim3TranscriptBatcher)
     DELETE_MOVE(Pbsim3TranscriptBatcher)
-    ~Pbsim3TranscriptBatcher() = default;
+    DEFAULT_DESTRUCTOR(Pbsim3TranscriptBatcher)
 
     explicit Pbsim3TranscriptBatcher(std::size_t batch_size, std::istream& istream, const SkipLoaderSettings& sls);
     std::pair<std::shared_ptr<InMemoryFastaFetch>, std::shared_ptr<CoverageInfo>> fetch();

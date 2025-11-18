@@ -223,9 +223,9 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
         so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-sam-compress_level"].as<char>();
-        if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {
+        if (std::string(BamOptions::ALLOWED_COMPRESSION_LEVELS).find(so.compress_level) == std::string::npos) {
             BOOST_LOG_TRIVIAL(fatal) << "Invalid compression level: " << so.compress_level
-                                     << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
+                                     << ". Allowed values are: " << BamOptions::ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
         return std::make_shared<BamReadOutput>(
@@ -235,6 +235,4 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
     throw OutputNotSpecifiedException {};
 }
 std::string BamReadOutputFactory::name() const { return "BAM"; }
-
-BamReadOutputFactory::~BamReadOutputFactory() = default;
 } // namespace labw::art_modern

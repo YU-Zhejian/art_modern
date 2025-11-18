@@ -91,8 +91,8 @@ public:
      */
     char rand_base();
     am_qual_t rand_quality_less_than_10();
-    int rand_pos_on_read(bool is_read1);
-    int rand_pos_on_read_not_head_and_tail(bool is_read1);
+    hts_pos_t rand_pos_on_read(bool is_read1);
+    hts_pos_t rand_pos_on_read_not_head_and_tail(bool is_read1);
     /** Slow random integer function **/
     int randint(int min, int max);
     std::vector<double> tmp_probs_;
@@ -122,7 +122,7 @@ private:
     std::array<int, CACHE_SIZE_> cached_rand_base_indices_ {};
     std::size_t cached_rand_base_indices_index_ = 0;
 
-    std::array<am_qual_t, CACHE_SIZE_> cached_rand_quality_less_than_10_ {};
+    std::array<int, CACHE_SIZE_> cached_rand_quality_less_than_10_ {};
     std::size_t cached_rand_quality_less_than_10_index_ = 0;
 #endif
 
@@ -138,10 +138,10 @@ private:
     NORM_DIST<double> insertion_length_gaussian_;
     INT_DIST<int> base_;
     INT_DIST<am_qual_t> quality_less_than_10_;
-    INT_DIST<int> pos_on_read_1_;
-    INT_DIST<int> pos_on_read_2_;
-    INT_DIST<int> pos_on_read_1_not_head_and_tail_;
-    INT_DIST<int> pos_on_read_2_not_head_and_tail_;
+    INT_DIST<hts_pos_t> pos_on_read_1_;
+    INT_DIST<hts_pos_t> pos_on_read_2_;
+    INT_DIST<hts_pos_t> pos_on_read_1_not_head_and_tail_;
+    INT_DIST<hts_pos_t> pos_on_read_2_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
     VSLStreamStatePtr stream_;
     double pe_frag_dist_mean_;

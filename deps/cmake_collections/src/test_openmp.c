@@ -1,6 +1,9 @@
 #include "cst_workload.h"
+
 #include <omp.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 
 int main(void)
 {
@@ -14,5 +17,5 @@ int main(void)
         retv = perform_sqrt(parallel_params.num_of_rounds, parallel_params.num_to_sqrt);
         printf("Thread %d join with return value %d\n", thread_no, retv);
     }
-    return 0;
+    return EXIT_SUCCESS;
 }
