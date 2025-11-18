@@ -3,11 +3,15 @@
 #include "tsam2gsam/lib/TidNotFound.hh"
 #include "tsam2gsam/lib/Transcript.hh"
 
+#include <boost/log/trivial.hpp>
+
 #include <htslib/sam.h>
 
 #include <istream>
 #include <string>
 #include <unordered_map>
+
+
 namespace labw::art_modern {
 std::unordered_map<std::string, Transcript> read_gffutils_bed(sam_hdr_t* thdr, sam_hdr_t* ghdr, std::istream& in)
 {
@@ -18,8 +22,8 @@ std::unordered_map<std::string, Transcript> read_gffutils_bed(sam_hdr_t* thdr, s
         try {
             auto transcript = Transcript::from_gffread_bed_line(line, thdr, ghdr);
             transcript_id_to_transcript_map.emplace(transcript.transcript_id, transcript);
-        } catch (TidNotFound& /** ignored **/) {
-            // ignored
+        } catch (TidNotFound& /** e **/) {
+            BOOST_LOG_TRIVIAL(error) << "Skipping transcript due to missing TID mapping: " << line;
         }
     }
     return transcript_id_to_transcript_map;

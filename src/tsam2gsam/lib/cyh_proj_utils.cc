@@ -50,10 +50,10 @@ namespace {
      * @param seq destination string of bases.
      * @param len length of the sequence.
      */
-    void nibble2base_default(const uint8_t* nib, std::string& seq, const int len)
+    void nibble2base_default(const uint8_t* nib, std::string& seq, const size_t len)
     {
-        int i = len / 2;
-        const int len2 = i;
+        size_t i = len / 2;
+        const size_t len2 = i;
         seq[0] = 0;
         for (i = 0; i < len2; i++) {
             // Note size_t cast helps gcc optimiser.
@@ -77,7 +77,7 @@ std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
             break;
         }
     }
-    for (std::ptrdiff_t i = g_cigar_cp.size() - 1; i >= 0; i -= 1) {
+    for (auto i = static_cast<std::ptrdiff_t>(g_cigar_cp.size() - 1); i >= 0; i -= 1) {
         if (bam_cigar_op(g_cigar_cp[i]) == BAM_CINS) {
             g_cigar_cp[i] = bam_cigar_gen(bam_cigar_oplen(g_cigar_cp[i]), BAM_CSOFT_CLIP);
         } else {
@@ -121,10 +121,6 @@ std::vector<am_cigar_t> merge_cigars(const std::vector<am_cigar_t>& g_cigar)
     if (prev_cigar_length != 0) {
         g_cigar_merged.emplace_back(bam_cigar_gen(prev_cigar_length, prev_cigar_op));
     }
-    //    if(g_cigar != g_cigar_merged){
-    //        std::cerr << "Merging CIGARs: " << labw::art_modern::cigar_arr_to_str(g_cigar) << " -> " <<
-    //        labw::art_modern::cigar_arr_to_str(g_cigar_merged) << std::endl;
-    //    }
     return g_cigar_merged;
 }
 
@@ -165,7 +161,7 @@ std::string bam_seq_to_str(const bam1_t* aln)
 void bam_set_seq_eqlen(bam1_t* aln, const char* seq)
 {
     auto* cp = bam_get_seq(aln);
-    int i = 0;
+    decltype(aln->core.l_qseq) i = 0;
     for (i = 0; i + 1 < aln->core.l_qseq; i += 2) {
         *cp++ = static_cast<uint8_t>(seq_nt16_table[static_cast<unsigned char>(seq[i])] << 4
             | seq_nt16_table[static_cast<unsigned char>(seq[i + 1])]);

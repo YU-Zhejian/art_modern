@@ -1,14 +1,17 @@
+#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
+
 #include "tsam2gsam/lib/Transcript.hh"
 
 #include "tsam2gsam/lib/TidNotFound.hh"
 #include "tsam2gsam/lib/cyh_proj_utils.hh"
 
-#include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
+#include "libam_support/utils/mpi_utils.hh"
 
+#include <htslib/hts.h>
 #include <htslib/sam.h>
 
 #include <array>
-#include <cstdint>
+#include <cstddef>
 #include <sstream>
 #include <string>
 #include <utility>
@@ -19,23 +22,23 @@ Transcript Transcript::from_gffread_bed_line(const std::string& line, sam_hdr_t*
 {
     std::string transcript_id;
     std::string contig_name;
-    std::vector<int32_t> splice_site_positions;
+    std::vector<hts_pos_t> splice_site_positions;
     splice_site_positions.reserve(NUM_EXONS_EXPECTED);
-    std::vector<int32_t> splice_site_lengths;
+    std::vector<hts_pos_t> splice_site_lengths;
     splice_site_lengths.reserve(NUM_EXONS_EXPECTED);
     bool is_reverse = false;
-    int32_t t_start = 0;
-    int32_t t_end = 0;
+    hts_pos_t t_start = 0;
+    hts_pos_t t_end = 0;
     int tid_on_transcriptome = 0;
     int tid_on_genome = 0;
     std::array<std::string, NUM_GFFUTILS_BED_FIELDS> tokens;
     std::string token;
-    int n_exons = 0;
-    int32_t accumulated_exon_length = 0;
-    int32_t accumulated_intron_length = 0;
-    int32_t current_exon_length = 0;
-    int32_t current_intron_length = 0;
-    int32_t current_exon_pos_on_unspliced_transcript = 0;
+    std::size_t n_exons = 0;
+    hts_pos_t accumulated_exon_length = 0;
+    hts_pos_t accumulated_intron_length = 0;
+    hts_pos_t current_exon_length = 0;
+    hts_pos_t current_intron_length = 0;
+    hts_pos_t current_exon_pos_on_unspliced_transcript = 0;
 
     std::istringstream line_ss(line);
     for (int i = 0; i < NUM_GFFUTILS_BED_FIELDS; ++i) {
@@ -53,7 +56,7 @@ Transcript Transcript::from_gffread_bed_line(const std::string& line, sam_hdr_t*
     std::istringstream epos_ss(tokens[11]);
     accumulated_exon_length = 0;
     accumulated_intron_length = 0;
-    for (auto exon_id = 0; exon_id < n_exons; ++exon_id) {
+    for (std::size_t exon_id = 0; exon_id < n_exons; ++exon_id) {
         std::getline(epos_ss, token, ',');
         current_exon_pos_on_unspliced_transcript = std::stoi(token);
         std::getline(elen_ss, token, ',');
