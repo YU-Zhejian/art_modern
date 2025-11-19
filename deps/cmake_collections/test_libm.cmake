@@ -61,6 +61,7 @@ else()
 endif()
 
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
+    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)
     ceu_cm_print_test_status("libm: without -lm (c)" C_NO_LIBM)
     ceu_cm_print_test_status("libm: with -lm (c)" C_WITH_LIBM)
 endif()
