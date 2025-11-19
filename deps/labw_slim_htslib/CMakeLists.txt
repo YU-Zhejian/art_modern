@@ -8,8 +8,6 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)
 endif()
 
-find_package(Threads REQUIRED)
-
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/enable_debug.cmake")
 
 set(CEU_CM_SILENT ON)
@@ -22,7 +20,7 @@ include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_c11.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_c_helloworld.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libm.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libregex.cmake")
-# FIXME include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libpthread.cmake")
+include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libpthread.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libz.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_libbz2.cmake")
 include("${LIBCEU_CMAKE_COLLECTION_DIR}/test_liblzma.cmake")
@@ -61,12 +59,16 @@ if(BUILD_SHARED_LIBS)
         message(FATAL_ERROR "CMake cannot compile & run a C11 program!")
     endif()
 
-    if(DEFINED CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_SHARED} EQUAL 0)
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} CEU_CM_EFL::libm_shared)
-    elseif(DEFINED CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_SHARED} EQUAL 0)
-        # Do nothing!
+    if(NOT CEU_CM_LIBM_SHARED STREQUAL "CEU_CM_LIBM_SHARED-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBM_SHARED})
     else()
         message(FATAL_ERROR "-lm not found!")
+    endif()
+
+    if(NOT CEU_CM_LIBPTHREAD_SHARED STREQUAL "CEU_CM_LIBPTHREAD_SHARED-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBPTHREAD_SHARED})
+    else()
+        message(FATAL_ERROR "pthread not found!")
     endif()
 
     if(NOT CEU_CM_LIBREGEX_SHARED STREQUAL "CEU_CM_LIBREGEX_SHARED-NOTFOUND")
@@ -115,12 +117,16 @@ else()
         message(FATAL_ERROR "CMake cannot compile & run a C11 program!")
     endif()
 
-    if(DEFINED CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_C_WITH_LIBM_RUN_STATIC} EQUAL 0)
-        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} CEU_CM_EFL::libm_static)
-    elseif(DEFINED CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_STATIC AND ${CEU_CM_HAVE_WORKING_C_NO_LIBM_RUN_STATIC} EQUAL 0)
-        # Do nothing!
+    if(NOT CEU_CM_LIBM_STATIC STREQUAL "CEU_CM_LIBM_STATIC-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBM_STATIC})
     else()
         message(FATAL_ERROR "-lm not found!")
+    endif()
+
+    if(NOT CEU_CM_LIBPTHREAD_STATIC STREQUAL "CEU_CM_LIBPTHREAD_STATIC-NOTFOUND")
+        set(LABW_SLIM_HTSLIB_LINK_LIBRARIES ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} ${CEU_CM_LIBPTHREAD_STATIC})
+    else()
+        message(FATAL_ERROR "pthread not found!")
     endif()
 
     if(NOT CEU_CM_LIBREGEX_STATIC STREQUAL "CEU_CM_LIBREGEX_STATIC-NOTFOUND")
@@ -193,5 +199,5 @@ set_target_properties(
 message(STATUS "HTSLib compiler flags: ${HTSLIB_CC_FLAGS}")
 message(STATUS "HTSLib link libs: ${LABW_SLIM_HTSLIB_LINK_LIBRARIES}")
 
-target_link_libraries(labw_slim_htslib PUBLIC ${LABW_SLIM_HTSLIB_LINK_LIBRARIES} Threads::Threads)
+target_link_libraries(labw_slim_htslib PUBLIC ${LABW_SLIM_HTSLIB_LINK_LIBRARIES})
 install(TARGETS labw_slim_htslib)

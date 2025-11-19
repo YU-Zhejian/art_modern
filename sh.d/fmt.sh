@@ -54,9 +54,6 @@ wait
 which cmake-format &>/dev/null &&
     git ls-files |
     grep -v '.idea/' |
-        grep -v 'art_original' |
-        grep -v 'dwgsim' |
-        grep -v 'htslib-1.21' |
         grep -e '\.cmake$' -e 'CMakeLists.txt' |
         while read -r line; do
             if [ -e "${line}" ]; then

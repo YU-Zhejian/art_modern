@@ -1,6 +1,13 @@
+/**
+ * Used CMake pthread testing function.
+ * Copyright 2024 Kitware, Inc. Distributed under the OSI-approved BSD 3-Clause License.
+ * From CMake 3.28
+ */
+
 #include "cst_workload.h"
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct {
     int thread_id;
@@ -17,6 +24,7 @@ void* pthread_thread(void* args)
     printf("Thread %d end with return value %d\n", pthread_params->thread_id, pthread_params->retv);
     pthread_exit(NULL);
 }
+static void* test_func(void* data) { return data; }
 
 int main(void)
 {
@@ -36,5 +44,13 @@ int main(void)
     }
     free(pthread_params_arr);
     free(thr);
-    return 0;
+
+    pthread_t thread;
+    pthread_create(&thread, NULL, test_func, NULL);
+    pthread_detach(thread);
+    pthread_cancel(thread);
+    pthread_join(thread, NULL);
+    pthread_atfork(NULL, NULL, NULL);
+    pthread_exit(NULL);
+    return EXIT_SUCCESS;
 }
