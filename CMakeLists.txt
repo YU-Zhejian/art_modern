@@ -291,6 +291,20 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS ${ART_SAMCMP_EXE})
 
+if(WITH_MPI)
+    set(ART_SAMCMP3_EXE art_samcmp3-mpi)
+else()
+    set(ART_SAMCMP3_EXE art_samcmp3)
+endif()
+
+add_executable(${ART_SAMCMP3_EXE} "${CMAKE_CURRENT_LIST_DIR}/src/art_samcmps/exe/samcmp3.cc")
+target_compile_options(${ART_SAMCMP3_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_SAMCMP3_EXE} PUBLIC art_samcmps_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(${ART_SAMCMP3_EXE})
+endif()
+install(TARGETS ${ART_SAMCMP3_EXE})
+
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
 
