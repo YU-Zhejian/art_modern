@@ -20,7 +20,7 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
         return 1;
     }
 
-    uint64_t out_bound = lzma_stream_buffer_bound((uint64_t)randbuf_len);
+    size_t out_bound = lzma_stream_buffer_bound(randbuf_len);
     uint8_t* compressed_buf = (uint8_t*)malloc(out_bound);
     if (compressed_buf == NULL) {
         fprintf(stderr, "Memory allocation failed\n");
@@ -31,7 +31,7 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
     enc.next_in = randbuf;
     enc.avail_in = randbuf_len;
     enc.next_out = compressed_buf;
-    enc.avail_out = (size_t)out_bound;
+    enc.avail_out = out_bound;
 
     /* run until stream end */
     for (;;) {
