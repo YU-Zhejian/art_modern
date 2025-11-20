@@ -68,7 +68,6 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
     auto const qual_str = bam_qual_to_str(t_aln);
     auto const seq_str = bam_seq_to_str(t_aln);
 
-    hts_pos_t g_aln_start = 0;
     auto g_aln_flag = t_aln->core.flag;
     /** Splice site positions oc corresponding transcript **/
     const auto& ssp = transcript.splice_site_positions;
@@ -117,7 +116,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
     for (auto ss_idx = lower_idx; ss_idx < upper_idx; ++ss_idx) {
         pos_on_genome += transcript.splice_site_lengths[ss_idx];
     }
-    g_aln_start = pos_on_genome;
+    const hts_pos_t g_aln_start = pos_on_genome;
 
     for (decltype(t_aln->core.n_cigar) t_cigar_idx = 0; t_cigar_idx < t_n_cigar; ++t_cigar_idx) {
         this_cigar_ops = bam_cigar_op(t_cigar[t_cigar_idx]);
@@ -210,6 +209,12 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
         cigar_trace << "\n";
 #endif
     }
+#ifdef CEU_CM_IS_DEBUG
+        cigar_trace << "Pos on read: " << pos_on_read << " vs. " << "Expected:   " << t_aln->core.l_qseq << "\n";
+    cigar_trace << "Span on genome: " << g_aln_start << "-" <<  pos_on_genome << "\n";
+    cigar_trace << "Span on transcript: " << t_aln->core.pos << "-" << pos_on_transcript << "\n";
+    cigar_trace << std::flush;
+#endif
     if (pos_on_read != t_aln->core.l_qseq) {
         BOOST_LOG_TRIVIAL(fatal) << "Error: pos_on_read (" << pos_on_read << ") != t_aln->core.l_qseq ("
                                  << t_aln->core.l_qseq << ")" << std::endl;
@@ -234,7 +239,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
             /** isize **/ 0,
             /** l_seq **/ t_aln->core.l_qseq,
             /** seq **/ seq_str.c_str(),
-            /** qual **/ qual_str.c_str(),
+            /** qual **/ nullptr, // FIXME: qual_str.c_str()
             /** l_aux **/ bam_get_l_aux(t_aln) + (/** XT **/ 2 + 1 + transcript.transcript_id.size() + 1)
                 + (/** XI **/ 2 + 1 + 4))
             + (/** OA **/ 2 + 1 + oa_tag.size() + 1),
@@ -242,7 +247,9 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     // Copy existing tags
-    std::memcpy(bam_get_aux(g_aln), bam_get_aux(t_aln), bam_get_l_aux(t_aln));
+    if(bam_get_l_aux(t_aln) != 0) {
+        std::memcpy(bam_get_aux(g_aln), bam_get_aux(t_aln), bam_get_l_aux(t_aln));
+    }
     // Add XT tag
     CExceptionsProxy::assert_numeric(bam_aux_update_str(g_aln, "XT", static_cast<int>(transcript.transcript_id.size()),
                                          transcript.transcript_id.c_str()),
@@ -259,7 +266,8 @@ void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char** argv)
 {
     CExceptionsProxy::assert_numeric(sam_hdr_remove_lines(ghdr, "SQ", nullptr, nullptr), USED_HTSLIB_NAME,
         "Failed to remove existing SQ lines from SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
-    for (int i = 0; i < faidx_nseq(faidx); ++i) {
+    int i = 0;
+    for (; i < faidx_nseq(faidx); ++i) {
         const auto* name = CExceptionsProxy::assert_not_null(faidx_iseq(faidx, i), USED_HTSLIB_NAME,
             fmt::format("Failed to get sequence name for index {} from FASTA index.", i));
         auto const len = faidx_seq_len64(faidx, name);
@@ -268,6 +276,7 @@ void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char** argv)
             std::string("Failed to populate SQ tag to SAM header for seq ") + name, false,
             CExceptionsProxy::EXPECTATION::ZERO);
     }
+    BOOST_LOG_TRIVIAL( info) << i << " sequences added to SAM header from FASTA index.";
     std::string const args = join(std::vector<std::string>(argv, argv + argc), " ");
     CExceptionsProxy::assert_numeric(sam_hdr_change_HD(ghdr, "SO", "unknown"), USED_HTSLIB_NAME,
         "Failed to populate SO tag to SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);

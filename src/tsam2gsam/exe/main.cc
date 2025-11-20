@@ -70,7 +70,7 @@ int main(int argc, char** argv)
         std::string("Failed to open HTS file ") + argv[1]);
     sam_hdr_t* thdr = CExceptionsProxy::assert_not_null(
         sam_hdr_read(tsam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[1]);
-    samFile* gsam = CExceptionsProxy::assert_not_null(sam_open(argv[2], get_sam_mode(argv[1], true)), USED_HTSLIB_NAME,
+    samFile* gsam = CExceptionsProxy::assert_not_null(sam_open(argv[2], get_sam_mode(argv[2], true)), USED_HTSLIB_NAME,
         std::string("Failed to open HTS file ") + argv[2]);
     hts_set_threads(gsam, N_THREADS_FOR_HTSLIB); // 10 concurrent threads for compression
 #ifdef CEU_CM_IS_DEBUG
@@ -124,8 +124,8 @@ int main(int argc, char** argv)
 #else
             (t_aln, g_aln, transcript_iter->second);
 #endif
-        CExceptionsProxy::assert_numeric(sam_write1(gsam, ghdr, t_aln), USED_HTSLIB_NAME,
-            std::string("Failed to write SAM entry '") + bam_get_qname(t_aln) + "' to output file.", false,
+        CExceptionsProxy::assert_numeric(sam_write1(gsam, ghdr, g_aln), USED_HTSLIB_NAME,
+            std::string("Failed to write SAM entry '") + bam_get_qname(g_aln) + "' to output file.", false,
             CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
         num_correct_transcripts++;
         if (num_correct_transcripts % 10000 == 0) {
