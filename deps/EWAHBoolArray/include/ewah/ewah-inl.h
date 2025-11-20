@@ -330,8 +330,9 @@ template <class uword> size_t EWAHBoolArray<uword>::numberOfWords() const {
   return tot;
 }
 
+// Modified by YU ZJ: Added [[maybe_unused]]
 template <class uword>
-void EWAHBoolArray<uword>::assertWordCount(std::string message) const {
+void EWAHBoolArray<uword>::assertWordCount([[maybe_unused]] std::string message) const {
 #ifdef EWAHASSERT
   size_t tot = numberOfWords();
   size_t expected = (sizeinbits + wordinbits - 1) / wordinbits;

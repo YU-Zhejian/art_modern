@@ -91,9 +91,12 @@ int main(int argc, char** argv)
     // clang-format on
     am_readnum_t num_reads = 0;
     am_readnum_t total_num_reads = 0;
-    bam_hdr_t* ref_hdr = sam_hdr_read(ref_sam);
-    bam_hdr_t* query1_hdr = sam_hdr_read(query1_sam);
-    bam_hdr_t* query2_hdr = sam_hdr_read(query2_sam);
+    sam_hdr_t* ref_hdr = CExceptionsProxy::assert_not_null(
+        sam_hdr_read(ref_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[1]);
+    sam_hdr_t* query1_hdr = CExceptionsProxy::assert_not_null(
+        sam_hdr_read(query1_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[2]);
+    sam_hdr_t* query2_hdr = CExceptionsProxy::assert_not_null(
+        sam_hdr_read(query2_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[3]);
     bam1_t* ref_aln = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     bam1_t* query1_aln = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     bam1_t* query2_aln = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");

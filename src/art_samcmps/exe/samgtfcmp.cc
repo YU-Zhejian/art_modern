@@ -3,6 +3,7 @@
 #include "art_tsam2gsam/lib/cyh_proj_utils.hh"
 
 #include "art_samcmps/lib/AlignmentMiscInfo.hh"
+#include "art_samcmps/lib/TranscriptOverlapper.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Dtypes.h"
@@ -36,10 +37,10 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
     init_logger();
-    init_file_logger("samcmp");
-    print_version("samcmp");
+    init_file_logger("samgtfcmp");
+    print_version("samgtfcmp");
     handle_dumps();
-    BOOST_LOG_TRIVIAL(info) << "SYNOPSIS: " << argv[0] << " ref.bam query.bam out.tsv";
+    BOOST_LOG_TRIVIAL(info) << "SYNOPSIS: " << argv[0] << " ref.gtf query.bam out.tsv";
     if (argc != 4) {
         BOOST_LOG_TRIVIAL(fatal) << "ERROR: Invalid number of arguments!";
         abort_mpi();
@@ -52,13 +53,20 @@ int main(int argc, char** argv)
 #else
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
-    samFile* ref_sam = CExceptionsProxy::assert_not_null(sam_open(argv[1], get_sam_mode(argv[1], false)),
-        USED_HTSLIB_NAME, std::string("Failed to open HTS file ") + argv[1]);
+
     samFile* query_sam = CExceptionsProxy::assert_not_null(sam_open(argv[2], get_sam_mode(argv[2], false)),
         USED_HTSLIB_NAME, std::string("Failed to open HTS file ") + argv[2]);
+    sam_hdr_t* query_hdr = CExceptionsProxy::assert_not_null(
+        sam_hdr_read(query_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[2]);
+
+    auto gtf_stream = std::ifstream(argv[1]);
+    TranscriptOverlapper ref_gtf(gtf_stream);
+    gtf_stream.close();
+
     std::ofstream out(argv[3]);
     // clang-format off
-    out << "REF_QNAME"
+    out << "QUERY_QNAME"
+        << "\t" << "REF_QNAME"
         << "\t" << "REF_EXONIC_LEN"
         << "\t" << "QUERY_EXONIC_LEN"
         << "\t" << "REF_TOTAL_LEN"
@@ -73,18 +81,9 @@ int main(int argc, char** argv)
         << std::endl;
     // clang-format on
     am_readnum_t num_reads = 0;
-    am_readnum_t total_num_reads = 0;
-    am_readnum_t num_non_primiary_reads = 0;
-    am_readnum_t num_refskip = 0;
-    sam_hdr_t* ref_hdr = CExceptionsProxy::assert_not_null(
-        sam_hdr_read(ref_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[1]);
-    sam_hdr_t* query_hdr = CExceptionsProxy::assert_not_null(
-        sam_hdr_read(query_sam), USED_HTSLIB_NAME, std::string("Failed to get header from HTS file ") + argv[2]);
-    bam1_t* ref_aln = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     bam1_t* query_aln = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
     int read_retv = 0;
-    std::string ref_qname;
-    std::string query_qname;
+    std::string query_contig_name;
 
     while (true) {
         read_retv = sam_read1(query_sam, query_hdr, query_aln);
@@ -92,68 +91,53 @@ int main(int argc, char** argv)
             break;
         }
         if (((query_aln->core.flag & BAM_FSUPPLEMENTARY) | (query_aln->core.flag & BAM_FSECONDARY)) != 0) {
-            num_non_primiary_reads++;
             continue; // TODO: Current version ignores secondary & supplementary alignments.
         }
-        query_qname = bam_get_qname(query_aln);
+        query_contig_name = std::string(sam_hdr_tid2name(query_hdr, query_aln->core.tid));
 
-        while (true) {
-            read_retv = sam_read1(ref_sam, ref_hdr, ref_aln);
-            if (read_retv == SAM_READ_EOF) {
-                break;
-            }
-            ref_qname = bam_get_qname(ref_aln);
-            if (ref_qname == query_qname) {
-                break;
-            }
-            num_refskip++;
-            BOOST_LOG_TRIVIAL(warning) << "Skipping ref_qname " << ref_qname << " that was not found in query"
-                                       << std::endl;
-        }
-
-        if (read_retv == SAM_READ_EOF) {
-            break;
-        }
         if ((query_aln->core.flag & BAM_FUNMAP) != 0) {
-            num_non_primiary_reads++;
             continue; // TODO: Current version ignores unmapped alignments.
         }
-        AlignmentMiscInfo ref_misc;
-        ref_misc.from_bam_record(ref_hdr, ref_aln);
         AlignmentMiscInfo query_misc;
         query_misc.from_bam_record(query_hdr, query_aln);
-        // clang-format off
-        out << ref_qname
-            << "\t" << ref_misc.exonic_length
+
+        for (const auto* ref_misc :
+            ref_gtf.get_overlapping_transcripts(query_contig_name, static_cast<int>(query_aln->core.pos),
+                static_cast<int>(query_aln->core.pos
+                    + bam_cigar2rlen(static_cast<int>(query_aln->core.n_cigar), bam_get_cigar(query_aln))))) {
+            const auto no_base = n_overlapping_base(*ref_misc, query_misc);
+            const auto no_ss = n_overlapping_ss(*ref_misc, query_misc);
+            const auto no_exons = n_overlapping_exons(*ref_misc, query_misc);
+            if (no_base + no_ss + no_exons == 0) {
+                continue;
+            }
+            // clang-format off
+        out << query_misc.name
+            << "\t"<< ref_misc->name
+            << "\t" << ref_misc->exonic_length
             << "\t" << query_misc.exonic_length
-            << "\t" << bam_cigar2qlen(static_cast<int>(ref_aln->core.n_cigar), bam_get_cigar(ref_aln))
+            << "\t" << ref_misc->end - ref_misc->start
             << "\t" << bam_cigar2qlen(static_cast<int>(query_aln->core.n_cigar), bam_get_cigar(query_aln))
-            << "\t" << ref_misc.ss_starts.size()
+            << "\t" << ref_misc->ss_starts.size()
             << "\t" << query_misc.ss_starts.size()
-            << "\t" << ref_misc.exon_starts.size()
+            << "\t" << ref_misc->exon_starts.size()
             << "\t" << query_misc.exon_starts.size()
-            << "\t" << n_overlapping_base(ref_misc, query_misc)
-            << "\t" << n_overlapping_ss(ref_misc, query_misc)
-            << "\t" << n_overlapping_exons(ref_misc, query_misc)
+            << "\t" << no_base
+            << "\t" << no_ss
+            << "\t" << no_exons
             << std::endl;
-        // clang-format on
+            // clang-format on
+        }
+
         num_reads++;
-        total_num_reads++;
         if (num_reads > 1000) {
-            BOOST_LOG_TRIVIAL(info) << "Processed " << num_reads << " reads.";
+            std::cerr << "Processed " << num_reads << " reads." << std::endl;
             num_reads = 0;
         }
     }
-    BOOST_LOG_TRIVIAL(info) << "# total reads: " << total_num_reads;
-    BOOST_LOG_TRIVIAL(info) << "# skipped ref_qname: " << num_refskip;
-    BOOST_LOG_TRIVIAL(info) << "# skipped non-primary reads: " << num_non_primiary_reads;
 
-    sam_hdr_destroy(ref_hdr);
     sam_hdr_destroy(query_hdr);
-    bam_destroy1(ref_aln);
     bam_destroy1(query_aln);
-    CExceptionsProxy::assert_numeric(sam_close(ref_sam), USED_HTSLIB_NAME, "Failed to close SAM/BAM file", false,
-        CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(sam_close(query_sam), USED_HTSLIB_NAME, "Failed to close SAM/BAM file", false,
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
