@@ -4,6 +4,8 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 
+#include <boost/log/trivial.hpp>
+
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
@@ -183,7 +185,8 @@ const char* get_sam_mode(const char* file_name, const bool write)
 
 void print_version(const std::string& prog_name)
 {
-    std::cout << prog_name << " ver. " << TSAM2GSAM_VERSION << " with " << USED_HTSLIB_NAME << " " << hts_version()
-              << ", EWAHBoolArray, cgranges, compiled at " << __DATE__ << ", " << __TIME__ << "." << std::endl;
+    BOOST_LOG_TRIVIAL(info) << prog_name << " ver. " << TSAM2GSAM_VERSION << " with " << USED_HTSLIB_NAME << " "
+                            << hts_version() << ", EWAHBoolArray, cgranges, compiled at " << __DATE__ << ", "
+                            << __TIME__ << ".";
 }
 } // namespace labw::art_modern

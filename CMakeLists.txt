@@ -268,6 +268,29 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS ${ART_TSAM2GSAM_EXE})
 
+file(GLOB ART_SAMCMPS_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_samcmps/lib/*.cc")
+add_library(art_samcmps_lib ${ART_SAMCMPS_LIB_SOURCE})
+target_compile_options(art_samcmps_lib BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(art_samcmps_lib PUBLIC am_support_lib art_tsam2gsam_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(art_samcmps_lib)
+endif()
+install(TARGETS art_samcmps_lib)
+
+if(WITH_MPI)
+    set(ART_SAMCMP_EXE art_samcmp-mpi)
+else()
+    set(ART_SAMCMP_EXE art_samcmp)
+endif()
+
+add_executable(${ART_SAMCMP_EXE} "${CMAKE_CURRENT_LIST_DIR}/src/art_samcmps/exe/samcmp.cc")
+target_compile_options(${ART_SAMCMP_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_SAMCMP_EXE} PUBLIC art_samcmps_lib)
+if(NOT BUILD_SHARED_LIBS)
+    ceu_cm_set_static_target(${ART_SAMCMP_EXE})
+endif()
+install(TARGETS ${ART_SAMCMP_EXE})
+
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
 
