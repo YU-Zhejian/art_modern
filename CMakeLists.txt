@@ -114,7 +114,6 @@ include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/cgranges/cpp")
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/EWAHBoolArray/include")
 
-
 if(BUILD_SHARED_LIBS)
     if(DEFINED CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED AND ${CEU_CM_HAVE_WORKING_LIBZ_RUN_SHARED} EQUAL 0)
         set(ART_MODERN_LINK_LIBS ${ART_MODERN_LINK_LIBS} CEU_CM_EFL::libz_shared)

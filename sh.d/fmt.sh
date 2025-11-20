@@ -37,6 +37,8 @@ which clang-format &>/dev/null &&
     grep -v 'deps/concurrentqueue/' |
         grep -v 'deps/labw_slim_htslib/' |
         grep -v 'deps/slim_fmt/' |
+        grep -v 'deps/EWAHBoolArray/' |
+        grep -v 'deps/cgranges/' |
         grep -v 'deps/thread-pool/' |
         grep -v '.idea/' |
         grep -v 'benchmark_other_simulators/src/' |

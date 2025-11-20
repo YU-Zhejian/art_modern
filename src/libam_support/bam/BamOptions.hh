@@ -22,7 +22,7 @@
 namespace labw::art_modern {
 class BamOptions {
 public:
-    static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u' , 0};
+    static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u', 0 };
     /**
      * Format version. Accepted format: `/^[0-9]+\.[0-9]+$`.
      */
@@ -66,6 +66,6 @@ public:
     /**
      * Compression level `[u0-9]`.
      */
-    char compress_level = '4';
+    char compress_level = ALLOWED_COMPRESSION_LEVELS[4]; // Default '4'
 };
 } // namespace labw::art_modern

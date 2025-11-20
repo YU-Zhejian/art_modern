@@ -63,7 +63,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
     /** Number of CIGAR at taln **/
     const auto t_n_cigar = t_aln->core.n_cigar;
     /** CIGAR at taln **/
-    const am_cigar_t * t_cigar = bam_get_cigar(t_aln);
+    const am_cigar_t* t_cigar = bam_get_cigar(t_aln);
 
     auto const qual_str = bam_qual_to_str(t_aln);
     auto const seq_str = bam_seq_to_str(t_aln);
@@ -210,8 +210,8 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
 #endif
     }
 #ifdef CEU_CM_IS_DEBUG
-        cigar_trace << "Pos on read: " << pos_on_read << " vs. " << "Expected:   " << t_aln->core.l_qseq << "\n";
-    cigar_trace << "Span on genome: " << g_aln_start << "-" <<  pos_on_genome << "\n";
+    cigar_trace << "Pos on read: " << pos_on_read << " vs. " << "Expected:   " << t_aln->core.l_qseq << "\n";
+    cigar_trace << "Span on genome: " << g_aln_start << "-" << pos_on_genome << "\n";
     cigar_trace << "Span on transcript: " << t_aln->core.pos << "-" << pos_on_transcript << "\n";
     cigar_trace << std::flush;
 #endif
@@ -247,7 +247,7 @@ void convert_transcript_to_genome_alignment(bam1_t* t_aln, bam1_t* g_aln, const 
         CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
     // Copy existing tags
-    if(bam_get_l_aux(t_aln) != 0) {
+    if (bam_get_l_aux(t_aln) != 0) {
         std::memcpy(bam_get_aux(g_aln), bam_get_aux(t_aln), bam_get_l_aux(t_aln));
     }
     // Add XT tag
@@ -276,7 +276,7 @@ void populate_ghdr(sam_hdr_t* ghdr, faidx_t* faidx, int argc, char** argv)
             std::string("Failed to populate SQ tag to SAM header for seq ") + name, false,
             CExceptionsProxy::EXPECTATION::ZERO);
     }
-    BOOST_LOG_TRIVIAL( info) << i << " sequences added to SAM header from FASTA index.";
+    BOOST_LOG_TRIVIAL(info) << i << " sequences added to SAM header from FASTA index.";
     std::string const args = join(std::vector<std::string>(argv, argv + argc), " ");
     CExceptionsProxy::assert_numeric(sam_hdr_change_HD(ghdr, "SO", "unknown"), USED_HTSLIB_NAME,
         "Failed to populate SO tag to SAM header.", false, CExceptionsProxy::EXPECTATION::ZERO);
