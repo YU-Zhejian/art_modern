@@ -35,10 +35,6 @@
 #include <BS_thread_pool.hpp>
 #endif
 
-#ifdef WITH_OPENMP
-#include <omp.h>
-#endif
-
 // MKL
 #ifdef WITH_ONEMKL
 #include <mkl.h> // NOLINT
@@ -169,62 +165,9 @@ namespace {
 #endif
     }
 
-    void print_openmp_version()
-    {
-#ifdef WITH_OPENMP
-        std::cout << "OpenMP (C): " << OpenMP_C_SPEC_DATE <<
-#ifdef OpenMP_C_VERSION
-            " v" << OpenMP_C_VERSION <<
-#endif
-            std::endl;
-        std::cout << "OpenMP (CXX): " << OpenMP_CXX_SPEC_DATE <<
-#ifdef OpenMP_CXX_VERSION
-            " v" << OpenMP_CXX_VERSION <<
-#endif
-            std::endl;
-        std::cout << "OpenMP Macros: _OPENMP=";
-#ifdef _OPENMP
-        try {
-            std::cout << _OPENMP;
-        } catch (std::exception& e) {
-            std::cout << "YES";
-        }
-#else
-        std::cout << "NO";
-#endif
-        std::cout << " _OPENMP_SIMD=";
-#ifdef _OPENMP_SIMD
-        try {
-            std::cout << _OPENMP_SIMD;
-        } catch (std::exception& e) {
-            std::cout << "YES";
-        }
-        std::cout << "YES";
-#else
-        std::cout << "NO";
-#endif
-        std::cout << std::endl;
-
-#else
-        std::cout << "OpenMP: not used" << std::endl;
-#endif
-    }
-
-    void print_simde_version()
+    void print_ise_version()
     {
         std::vector<std::string> simd_info;
-#if (0)
-        std::cout << "SIMDE: " << SIMDE_VERSION_MAJOR << "." << SIMDE_VERSION_MINOR << "." << SIMDE_VERSION_MICRO
-                  << std::endl;
-#ifdef SIMDE_X86_SSE_NATIVE
-        simd_info.emplace_back("SSE");
-#endif
-#ifdef SIMDE_X86_SSE2_NATIVE
-        simd_info.emplace_back("SSE2");
-#endif
-        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
-#else
-        std::cout << "SIMDE: N/A" << std::endl;
 #ifdef __MMX__
         simd_info.emplace_back("MMX");
 #endif
@@ -234,8 +177,10 @@ namespace {
 #ifdef __AVX2__
         simd_info.emplace_back("AVX2");
 #endif
-        std::cout << "\twith ISE: " << join(simd_info, " ") << std::endl;
+#ifdef __ARM_NEON
+        simd_info.emplace_back("NEON");
 #endif
+        std::cout << "SIMD ISE: " << join(simd_info, " ") << std::endl;
     }
 
     void print_malloc_version()
@@ -279,9 +224,8 @@ void print_version()
     print_boost_version();
     print_onemkl_version();
     print_pcg_version();
+    print_ise_version();
     print_mpi_version();
-    print_openmp_version();
-    print_simde_version();
     print_bs_version();
     print_malloc_version();
     std::cout << ceu_interpret_c_std_version();
