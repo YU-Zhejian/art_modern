@@ -35,13 +35,6 @@
 #cmakedefine WITH_JEMALLOC
 #cmakedefine WITH_TCMALLOC
 
-// OpenMP
-#cmakedefine WITH_OPENMP
-#cmakedefine OpenMP_C_SPEC_DATE "${OpenMP_C_SPEC_DATE}"
-#cmakedefine OpenMP_CXX_SPEC_DATE "${OpenMP_CXX_SPEC_DATE}"
-#cmakedefine OpenMP_C_VERSION "${OpenMP_C_VERSION}"
-#cmakedefine OpenMP_CXX_VERSION "${OpenMP_CXX_VERSION}"
-
 // Git
 #cmakedefine WITH_GIT
 #cmakedefine CEU_CM_GIT_COMMIT_HASH "${CEU_CM_GIT_COMMIT_HASH}"

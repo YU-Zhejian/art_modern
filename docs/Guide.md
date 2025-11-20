@@ -153,6 +153,75 @@ Apple Mac OS X comes with zlib and its development headers pre-installed.
 
 You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).
 
+### MSYS2 MinGW64
+
+See [MSYS2 Environments](https://www.msys2.org/docs/environments/) for the differences between MSYS2 environments.
+
+Use `pacman` to install the following packages:
+
+```text
+autoconf-wrapper
+automake-wrapper
+base
+bc
+diffstat
+dos2unix
+man-db
+mingw-w64-x86_64-autotools
+mingw-w64-x86_64-binutils
+mingw-w64-x86_64-boost
+mingw-w64-x86_64-cmake
+mingw-w64-x86_64-crt-git
+mingw-w64-x86_64-fmt
+mingw-w64-x86_64-gcc
+mingw-w64-x86_64-gcc-libs
+mingw-w64-x86_64-gdb
+mingw-w64-x86_64-headers-git
+mingw-w64-x86_64-htslib
+mingw-w64-x86_64-libgccjit
+mingw-w64-x86_64-libmangle-git
+mingw-w64-x86_64-libwinpthread
+mingw-w64-x86_64-pkgconf
+mingw-w64-x86_64-samtools
+mingw-w64-x86_64-winpthreads
+p7zip
+pactoys
+parallel
+patch
+patchutils
+pcre
+pcre2
+pkgfile
+procps-ng
+psmisc
+reflex
+rlwrap
+sqlite
+wcd
+xorg-util-macros
+xorgproto
+zip
+zsh
+```
+
+% TODO
+
+### MSYS2 Clang64
+
+Use `pacman` to install the following packages in addition:
+
+```text
+mingw-w64-clang-x86_64-autotools
+mingw-w64-clang-x86_64-boost
+mingw-w64-clang-x86_64-boost-libs
+mingw-w64-clang-x86_64-clang
+mingw-w64-clang-x86_64-cmake
+mingw-w64-clang-x86_64-fmt
+mingw-w64-clang-x86_64-htslib
+mingw-w64-clang-x86_64-python
+mingw-w64-clang-x86_64-samtools
+```
+
 ### Installing Boost from Source
 
 If your system Boost library does not exist (e.g., on brand-new Apple Mac OS X), is too old (e.g., older than 1.65.0) or ABI incompatible (e.g., compiled with GCC, but you want to use Clang/LLVM), you may install Boost from source. Here is an example of installing Boost 1.89.0 using Clang/LLVM toolchain to `"${HOME}"/opt/boost-1.89.0-clang`:

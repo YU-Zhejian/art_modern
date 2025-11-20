@@ -103,8 +103,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
-# OpenMP temporarily disabled.
-# include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/openmp.cmake")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.

@@ -56,9 +56,9 @@ std::string ceu_check_get_compile_time_os_info()
     oss << "\tCYGWIN API ver. ";
     oss << CYGWIN_VERSION_API_MAJOR << "." << CYGWIN_VERSION_API_MINOR;
     oss << ", with dll (" << CYGWIN_VERSION_DLL_IDENTIFIER << ") ver. ";
-    oss << CYGWIN_VERSION_DLL_MAJOR << "." << CYGWIN_VERSION_DLL_MINOR;
+    oss << CYGWIN_VERSION_DLL_MAJOR << "." << CYGWIN_VERSION_DLL_MINOR << std::endl;
 #else
-    oss << "\tCYGWIN API ver. undefined\n\tCYGWIN DLL (undefined) ver. undefined";
+    oss << "\tCYGWIN API ver. undefined, with dll (undefined) ver. undefined" << std::endl;
 #endif
 #endif
 
