@@ -1,7 +1,7 @@
-#include "tsam2gsam/lib/gffread_bed_utils.hh"
+#include "art_tsam2gsam/lib/gffread_bed_utils.hh"
 
-#include "tsam2gsam/lib/TidNotFound.hh"
-#include "tsam2gsam/lib/Transcript.hh"
+#include "art_tsam2gsam/lib/TidNotFound.hh"
+#include "art_tsam2gsam/lib/Transcript.hh"
 
 #include <boost/log/trivial.hpp>
 

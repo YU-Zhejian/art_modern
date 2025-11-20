@@ -1,9 +1,9 @@
-#include "tsam2gsam/exe/main_fn.hh"
+#include "art_tsam2gsam/exe/main_fn.hh"
 
 #include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 
-#include "tsam2gsam/lib/Transcript.hh"
-#include "tsam2gsam/lib/cyh_proj_utils.hh"
+#include "art_tsam2gsam/lib/Transcript.hh"
+#include "art_tsam2gsam/lib/cyh_proj_utils.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"

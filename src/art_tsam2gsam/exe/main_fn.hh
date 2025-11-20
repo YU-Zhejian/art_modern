@@ -1,7 +1,7 @@
 #pragma once
 #include "art_modern_config.h" // NOLINT: For CEU_CM_IS_DEBUG
 
-#include "tsam2gsam/lib/Transcript.hh"
+#include "art_tsam2gsam/lib/Transcript.hh"
 
 #include <htslib/faidx.h>
 #include <htslib/sam.h>

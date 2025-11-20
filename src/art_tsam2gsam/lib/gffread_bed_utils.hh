@@ -1,6 +1,6 @@
 #pragma once
 
-#include "tsam2gsam/lib/Transcript.hh"
+#include "art_tsam2gsam/lib/Transcript.hh"
 
 #include <htslib/hts.h>
 
