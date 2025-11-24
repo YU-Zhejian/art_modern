@@ -2,11 +2,6 @@ if(CEU_CM_SHOULD_USE_NATIVE)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -march=native)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -mtune=native -mtune)
 endif()
-if(CMAKE_VERSION GREATER_EQUAL 3.12)
-    add_compile_definitions(__STDC_WANT_LIB_EXT1__=1)
-else()
-    add_compile_options("-D__STDC_WANT_LIB_EXT1__=1")
-endif()
 
 if(MSVC)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS /Zc:__STDC__) # Define __STDC__
