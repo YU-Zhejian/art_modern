@@ -14,7 +14,7 @@ namespace labw::art_modern {
 /**
  * Version of the current programs.
  */
-constexpr char TSAM2GSAM_VERSION[] = "2025-11-06-patch2";
+constexpr char TSAM2GSAM_VERSION[] = "2025-11-24-patch0";
 
 /**
  * Number of exons expected when initializing the list.

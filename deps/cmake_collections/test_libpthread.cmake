@@ -11,7 +11,15 @@ add_library(CEU_CM_EFL::pthread_flag INTERFACE IMPORTED)
 set_property(
     TARGET CEU_CM_EFL::pthread_flag
     PROPERTY INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
-             "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>")
+             "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>"
+             # Add -static flag if BUILD_SHARED_LIBS is OFF
+)
+set_property(
+    TARGET CEU_CM_EFL::pthread_flag
+    PROPERTY INTERFACE_LINK_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
+             "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>"
+
+    )
 
 if(BUILD_SHARED_LIBS)
     ceu_cm_enhanced_try_run(

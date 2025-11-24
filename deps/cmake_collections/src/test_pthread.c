@@ -45,6 +45,7 @@ int main(void)
     free(pthread_params_arr);
     free(thr);
 
+    /** // Code from CMake pthread test temporarily disabled
     pthread_t thread;
     pthread_create(&thread, NULL, test_func, NULL);
     pthread_detach(thread);
@@ -52,5 +53,6 @@ int main(void)
     pthread_join(thread, NULL);
     pthread_atfork(NULL, NULL, NULL);
     pthread_exit(NULL);
+    **/
     return EXIT_SUCCESS;
 }

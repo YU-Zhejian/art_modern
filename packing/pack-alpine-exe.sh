@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -ue
 ARCH="$(uname -m)"
-ARCH=$(dpkg --print-architecture)
+
 if [ -z "${PACKAGE_VERSION:-}" ]; then
     export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
 fi
@@ -14,6 +14,7 @@ singularity exec \
     cd /mnt/art_modern-master && \
     mkdir -p ${OPT_DIR}/build_rel_with_dbg_alpine && \
     env -C ${OPT_DIR}/build_rel_with_dbg_alpine cmake \
+    '"${CMAKE_FLAGS:-}"' \
     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCEU_CM_SHOULD_ENABLE_TEST=OFF \
     -DCEU_CM_SHOULD_USE_NATIVE=OFF \
