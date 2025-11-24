@@ -8,17 +8,16 @@ include("${CMAKE_CURRENT_LIST_DIR}/test_c_helloworld.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_libm.cmake")
 
 add_library(CEU_CM_EFL::pthread_flag INTERFACE IMPORTED)
+# The -pthread flag should affect both compile and link options.
 set_property(
     TARGET CEU_CM_EFL::pthread_flag
     PROPERTY INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
              "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>"
-             # Add -static flag if BUILD_SHARED_LIBS is OFF
 )
 set_property(
     TARGET CEU_CM_EFL::pthread_flag
     PROPERTY INTERFACE_LINK_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
              "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>"
-
     )
 
 if(BUILD_SHARED_LIBS)
