@@ -7,7 +7,7 @@
 
 int main()
 {
-    std::cout << ceu_interpret_c_std_version();
+    // std::cout << ceu_interpret_c_std_version(); // C standard is meaningless in a C++-only project
     std::cout << ceu_interpret_cxx_std_version();
     std::cout << ceu_check_get_compiler_info();
     std::cout << ceu_check_get_ctypes_limit_info();

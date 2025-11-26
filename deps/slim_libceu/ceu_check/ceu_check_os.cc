@@ -22,6 +22,7 @@
 #include <windows.h>
 #endif
 
+#include <fstream>
 #include <ostream>
 #include <sstream>
 #include <string>
@@ -110,7 +111,6 @@ std::string ceu_check_get_run_time_os_info()
 #endif
 #endif
 #if defined(CEU_ON_WINDOWS) || defined(CEU_ON_CYGWIN)
-
     oss << "\tWindows OS Version Info: " << std::endl;
     OSVERSIONINFOEX osvi;
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
@@ -216,7 +216,38 @@ std::string ceu_check_get_run_time_os_info()
     } else {
         oss << "failed." << std::endl;
     }
+#endif
+    // Probe lsb-release. Should be in /etc/os-release or /usr/lib/os-release in most modern Linux distros.
+#ifdef CEU_ON_GNU_LINUX
+    oss << "\tLinux lsb-release info: ";
+    // See which file exists
+    const char* lsb_files[] = { "/etc/lsb-release", "/usr/lib/lsb-release" };
+    const char* target_file = nullptr;
+    for (const auto& file : lsb_files) {
+        if (access(file, F_OK) != -1) {
+            target_file = file;
+            break;
+        }
+    }
+    if (target_file != nullptr) {
+        oss << target_file << std::endl;
 
+        std::ifstream ifs(target_file);
+        if (ifs.is_open()) {
+            std::string line;
+            while (std::getline(ifs, line)) {
+                oss << "\t\t" << line << std::endl;
+            }
+            if (ifs.bad()) {
+                oss << "\t\tRead failure." << std::endl;
+            }
+            ifs.close();
+        } else {
+            oss << "\t\tRead failure." << std::endl;
+        }
+    } else {
+        oss << "not found" << std::endl;
+    }
 #endif
     return oss.str();
 }

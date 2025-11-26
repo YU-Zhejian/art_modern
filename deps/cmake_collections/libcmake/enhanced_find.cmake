@@ -213,6 +213,8 @@ function(filter_existing_paths PATH_LIST_VAR)
     set(${PATH_LIST_VAR}
         ${existing_paths}
         PARENT_SCOPE)
+    unset(existing_paths)
+    unset(non_existing_paths)
 endfunction()
 
 #[=======================================================================[

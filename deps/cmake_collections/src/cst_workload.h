@@ -9,9 +9,9 @@
 #ifndef LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 #define LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #ifdef __cplusplus
 extern "C" {

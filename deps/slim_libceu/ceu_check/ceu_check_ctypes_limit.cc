@@ -1,42 +1,53 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 
 #include <cinttypes>
-#include <climits>
 #include <cstdint>
+#include <iomanip>
+#include <limits>
 #include <sstream>
 #include <string>
+
+namespace {
+template <typename T> std::string ceu_get_int_limits(const std::string& name)
+{
+    std::ostringstream oss;
+    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size):      " << std::showpos
+        << std::setw(20) << std::to_string(std::numeric_limits<T>::min()) << " -> " << std::setw(20)
+        << std::to_string(std::numeric_limits<T>::max()) << std::noshowpos;
+    return oss.str();
+}
+template <typename T> std::string ceu_get_float_limits(const std::string& name)
+{
+    std::ostringstream oss;
+    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size):      " << std::scientific
+        << std::setprecision(12) << std::setw(20) << std::numeric_limits<T>::min() << " -> " << std::setw(20)
+        << std::numeric_limits<T>::max() << ", eps=" << std::setw(20) << std::numeric_limits<T>::epsilon()
+        << std::defaultfloat;
+    return oss.str();
+}
+} // namespace
 
 std::string ceu_check_get_ctypes_limit_info()
 {
     std::ostringstream oss;
     oss << "Compile-time C Types max, min, etc. limits:" << std::endl;
-    oss << "\tchar           (" << sizeof(char) << " size):      " << std::showpos << static_cast<int>(CHAR_MIN)
-        << " -> " << static_cast<int>(CHAR_MAX) << std::noshowpos << std::endl;
-    oss << "\tschar          (" << sizeof(signed char) << " size):      " << std::showpos << static_cast<int>(SCHAR_MIN)
-        << " -> " << static_cast<int>(SCHAR_MAX) << std::noshowpos << std::endl;
-    oss << "\tuchar          (" << sizeof(unsigned char) << " size):      " << std::showpos << 0 << " -> "
-        << static_cast<unsigned int>(UCHAR_MAX) << std::noshowpos << std::endl;
-    oss << "\tsize_t         (" << sizeof(size_t) << " size):      " << std::showpos << 0 << " -> " << SIZE_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tptrdiff_t      (" << sizeof(ptrdiff_t) << " size):      " << std::showpos << PTRDIFF_MIN << " -> "
-        << PTRDIFF_MAX << std::noshowpos << std::endl;
-    oss << "\tshort          (" << sizeof(short) << " size):      " << std::showpos << SHRT_MIN << " -> " << SHRT_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tushort         (" << sizeof(unsigned short) << " size):      " << std::showpos << 0 << " -> " << USHRT_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tint            (" << sizeof(int) << " size):      " << std::showpos << INT_MIN << " -> " << INT_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tuint           (" << sizeof(unsigned int) << " size):      " << std::showpos << 0 << " -> " << UINT_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tlong           (" << sizeof(long) << " size):      " << std::showpos << LONG_MIN << " -> " << LONG_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tulong          (" << sizeof(unsigned long) << " size):      " << std::showpos << 0 << " -> " << ULONG_MAX
-        << std::noshowpos << std::endl;
-    oss << "\tllong          (" << sizeof(long long) << " size):      " << std::showpos << LLONG_MIN << " -> "
-        << LLONG_MAX << std::noshowpos << std::endl;
-    oss << "\tullong         (" << sizeof(unsigned long long) << " size):      " << std::showpos << 0 << " -> "
-        << ULLONG_MAX << std::noshowpos << std::endl;
-    oss << "\tbool           (" << sizeof(bool) << " size):      " << std::showpos << static_cast<int>(false) << " -> "
-        << static_cast<int>(true) << std::noshowpos << std::endl;
+    oss << ceu_get_int_limits<char>("char") << std::endl;
+    oss << ceu_get_int_limits<signed char>("schar") << std::endl;
+    oss << ceu_get_int_limits<unsigned char>("uchar") << std::endl;
+    oss << ceu_get_int_limits<size_t>("size_t") << std::endl;
+    oss << ceu_get_int_limits<ptrdiff_t>("ptrdiff_t") << std::endl;
+    oss << ceu_get_int_limits<short>("short") << std::endl;
+    oss << ceu_get_int_limits<unsigned short>("ushort") << std::endl;
+    oss << ceu_get_int_limits<int>("int") << std::endl;
+    oss << ceu_get_int_limits<unsigned int>("uint") << std::endl;
+    oss << ceu_get_int_limits<long>("long") << std::endl;
+    oss << ceu_get_int_limits<unsigned long>("ulong") << std::endl;
+    oss << ceu_get_int_limits<long long>("llong") << std::endl;
+    oss << ceu_get_int_limits<unsigned long long>("ullong") << std::endl;
+    oss << ceu_get_int_limits<bool>("bool") << std::endl;
+
+    oss << ceu_get_float_limits<float>("float") << std::endl;
+    oss << ceu_get_float_limits<double>("double") << std::endl;
+    oss << ceu_get_float_limits<long double>("ldouble") << std::endl;
     return oss.str();
 }
