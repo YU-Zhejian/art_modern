@@ -18,7 +18,7 @@
 #include "libam_support/Dtypes.h"
 
 #ifdef INCLUDE_INTEL_SIMD
-#include INCLUDE_INTEL_SIMD // NOLINT
+#include INCLUDE_INTEL_SIMD /* NOLINT */
 #endif
 
 #include <stdlib.h>

@@ -14,10 +14,10 @@
 
 #include "libam_support/utils/hts_utils.h"
 
-#include <htslib/bgzf.h> // NOLINT
+#include <htslib/bgzf.h> /** NOLINT */
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
-#include <htslib/sam.h> // NOLINT
+#include <htslib/sam.h> /** NOLINT */
 
 #include <stddef.h>
 

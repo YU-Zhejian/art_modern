@@ -1,13 +1,13 @@
 #pragma once
 
-// Whether <cygwin/version.h> is available
+/** Whether <cygwin/version.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_CYGWIN_VERSION_H
 
-// Whether <sys/utsname.h> is available
+/** Whether <sys/utsname.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_SYS_UTSNAME_H
 
-// Whether <_mingw.h> is available
+/** Whether <_mingw.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE__MINGW_H
 
-// Whether to enable reproducible builds
+/** Whether to enable reproducible builds */
 #cmakedefine01 CEU_REPRODUCIBLE_BUILDS

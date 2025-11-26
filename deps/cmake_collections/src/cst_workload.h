@@ -54,4 +54,4 @@ parse_args(void)
 };
 #endif
 
-#endif // LIBCONCURRENTQUEUE_CST_WORKLOAD_H
+#endif /**  LIBCONCURRENTQUEUE_CST_WORKLOAD_H*/

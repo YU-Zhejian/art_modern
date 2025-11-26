@@ -115,25 +115,25 @@
 
 #else
 
-// Undefine conflicting macros
+/* Undefine conflicting macros first */
 #ifdef CEU_COMPILER_NAME
 #undef CEU_COMPILER_NAME
 #endif
 
-// Inclusion order of following lines should be preserved
-// clang-format off
-#include "ceu_check/cc/ceu_cc_turboc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_icc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_intel_clang.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_amd_clang.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_msvc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_nvhpc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_pgic.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_tcc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_clang.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_gcc.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_edg.h" // NOLINT
-#include "ceu_check/cc/ceu_cc_unknown.h" // NOLINT
-// clang-format on
+/* Inclusion order of following lines should be preserved to avoid conflicts. */
+/* clang-format off */
+#include "ceu_check/cc/ceu_cc_turboc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_icc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_intel_clang.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_amd_clang.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_msvc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_nvhpc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_pgic.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_tcc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_clang.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_gcc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_edg.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_unknown.h" /* NOLINT */
+/* clang-format on */
 #endif
-#endif // CEU_CHECK_CC_MACRO_H
+#endif /* CEU_CHECK_CC_MACRO_H */

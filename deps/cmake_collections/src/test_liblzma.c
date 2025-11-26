@@ -105,7 +105,7 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
 int main(void)
 {
     printf("liblzma version: %s\n", LZMA_VERSION_STRING);
-    const size_t randbuf_len = 4ULL * 1024; // 4kB
+    const size_t randbuf_len = 4ULL * 1024;
     pcg32_random_t rng;
     pcg32_srandom_r(&rng, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng);
     uint8_t* randbuf = (uint8_t*)malloc(randbuf_len);

@@ -23,4 +23,4 @@ char* ceu_check_get_compiler_info();
 #ifdef __cplusplus
 }
 #endif
-#endif // CEU_CHECK_CC_H
+#endif /* CEU_CHECK_CC_H        */

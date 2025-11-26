@@ -1,4 +1,4 @@
-// Include this file before "ceu_cc_clang.h"!
+/* Include this file before "ceu_cc_clang.h"!   */
 
 #ifndef CEU_CC_ICC_H
 #define CEU_CC_ICC_H

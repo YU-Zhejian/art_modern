@@ -25,4 +25,4 @@
 #define CEU_COMPILER_NAME "Unknown LLVM-based"
 #endif
 #endif
-#endif // CEU_CC_CLANG_H
+#endif /* CEU_CC_CLANG_H */

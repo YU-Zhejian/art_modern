@@ -155,13 +155,12 @@
 #undef CEU_PRIMARY_OS_TYPE
 #endif
 
-// Inclusion order of following lines should be preserved
-// clang-format off
-#include <ceu_check/os/ceu_os_mainframe_unix.h> // NOLINT
-#include <ceu_check/os/ceu_os_bsd.h> // NOLINT
-#include <ceu_check/os/ceu_os_windows.h> // NOLINT
-
-// clang-format on
+/* Inclusion order of following lines should be preserved to avoid conflicts. */
+/* clang-format off */
+#include <ceu_check/os/ceu_os_mainframe_unix.h> /* NOLINT */
+#include <ceu_check/os/ceu_os_bsd.h> /* NOLINT */
+#include <ceu_check/os/ceu_os_windows.h> /* NOLINT */
+/* clang-format on */
 #if defined(__HAIKU__)
 #define CEU_ON_HAIKU
 #define CEU_PRIMARY_OS_TYPE "Haiku"
@@ -197,7 +196,7 @@
 #define CEU_ON_UNIX
 #endif
 
-// Note that MSYS and MinGW are NOT POSIX.
+/* Note that MSYS and MinGW are NOT POSIX. */
 #if defined(CEU_ON_UNIX) || defined(CEU_ON_CYGWIN)
 #define CEU_ON_POSIX
 #endif
@@ -215,4 +214,4 @@
 #endif
 
 #endif
-#endif // CEU_CHECK_OS_MACRO_H
+#endif /* CEU_CHECK_OS_MACRO_H */
