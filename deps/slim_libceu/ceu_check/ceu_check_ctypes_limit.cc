@@ -36,14 +36,14 @@ std::string ceu_check_get_ctypes_limit_info()
     oss << ceu_get_int_limits<unsigned char>("uchar") << std::endl;
     oss << ceu_get_int_limits<size_t>("size_t") << std::endl;
     oss << ceu_get_int_limits<ptrdiff_t>("ptrdiff_t") << std::endl;
-    oss << ceu_get_int_limits<short>("short") << std::endl;
-    oss << ceu_get_int_limits<unsigned short>("ushort") << std::endl;
+    oss << ceu_get_int_limits<short>("short") << std::endl; /* NOLINT */
+    oss << ceu_get_int_limits<unsigned short>("ushort") << std::endl; /* NOLINT */
     oss << ceu_get_int_limits<int>("int") << std::endl;
     oss << ceu_get_int_limits<unsigned int>("uint") << std::endl;
-    oss << ceu_get_int_limits<long>("long") << std::endl;
-    oss << ceu_get_int_limits<unsigned long>("ulong") << std::endl;
-    oss << ceu_get_int_limits<long long>("llong") << std::endl;
-    oss << ceu_get_int_limits<unsigned long long>("ullong") << std::endl;
+    oss << ceu_get_int_limits<long>("long") << std::endl; /* NOLINT */
+    oss << ceu_get_int_limits<unsigned long>("ulong") << std::endl; /* NOLINT */
+    oss << ceu_get_int_limits<long long>("llong") << std::endl; /* NOLINT */
+    oss << ceu_get_int_limits<unsigned long long>("ullong") << std::endl; /* NOLINT */
     oss << ceu_get_int_limits<bool>("bool") << std::endl;
 
     oss << ceu_get_float_limits<float>("float") << std::endl;

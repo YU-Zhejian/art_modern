@@ -11,4 +11,4 @@
 #define CEU_COMPILER_NAME "GNU Compiler Collection (GCC)"
 #endif
 #endif
-#endif
+#endif /* CEU_CC_GCC_H */

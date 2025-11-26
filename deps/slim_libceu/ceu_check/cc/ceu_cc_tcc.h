@@ -9,4 +9,4 @@
 #define CEU_COMPILER_IS_TCC
 #define CEU_COMPILER_NAME "Tiny C Compiler"
 #endif
-#endif
+#endif /* CEU_CC_TCC_H */

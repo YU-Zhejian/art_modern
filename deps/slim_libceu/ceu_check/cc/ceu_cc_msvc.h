@@ -113,4 +113,4 @@
 #define CEU_VISUAL_STUDIO_VER "unknown"
 #endif
 #endif
-#endif
+#endif /* CEU_CC_MSVC_H */

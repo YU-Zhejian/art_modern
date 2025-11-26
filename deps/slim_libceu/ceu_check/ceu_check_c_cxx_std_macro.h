@@ -96,4 +96,4 @@
 #endif
 
 #endif
-#endif /** CEU_CHECK_C_CXX_STD_MACRO_H  */
+#endif /* CEU_CHECK_C_CXX_STD_MACRO_H  */

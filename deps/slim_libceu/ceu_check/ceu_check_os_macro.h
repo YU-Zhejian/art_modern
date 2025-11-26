@@ -175,6 +175,7 @@
 #define CEU_ON_MACH
 #if defined(__APPLE__)
 #define CEU_ON_APPLE
+#define CEU_PRIMARY_OS_TYPE "Apple MACH"
 #elif defined(__gnu_hurd__)
 #define CEU_ON_GNU_HURD
 #define CEU_PRIMARY_OS_TYPE "GNU Hurd"

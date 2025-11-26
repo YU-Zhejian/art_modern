@@ -24,7 +24,7 @@ char* ceu_check_get_compiler_info()
     }
     char* ptr = buffer;
     int remaining = 40960 * sizeof(char);
-    int written;
+    int written = 0;
 
 #ifdef CEU_REPRODUCIBLE_BUILDS
     written = CEU_SNPRINTF(ptr, remaining, "Compiled at: N/A due to reproducible build\n");

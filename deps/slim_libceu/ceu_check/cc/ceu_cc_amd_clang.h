@@ -10,4 +10,4 @@
 #if (defined(CEU_COMPILER_IS_AOCC) && !defined(CEU_COMPILER_NAME))
 #define CEU_COMPILER_NAME "AMD Optimizing C/C++ and Fortran Compilers (AOCC)"
 #endif
-#endif
+#endif /* CEU_CC_AMD_CLANG_H */

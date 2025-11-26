@@ -1,4 +1,4 @@
-#include "ceu_check/ceu_check_c_cxx_std.hh"
+#include "ceu_check/ceu_check_cxx_std.hh"
 #include "ceu_check/ceu_check_c_cxx_std_macro.h"
 
 #include <sstream>

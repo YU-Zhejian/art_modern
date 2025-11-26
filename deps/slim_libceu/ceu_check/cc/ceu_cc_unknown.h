@@ -3,4 +3,4 @@
 #if !defined(CEU_COMPILER_NAME)
 #define CEU_COMPILER_NAME "unknown"
 #endif
-#endif
+#endif /* CEU_CC_UNKNOWN_H */

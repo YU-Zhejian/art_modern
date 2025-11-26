@@ -15,4 +15,4 @@
 #define CEU_COMPILER_NAME "Intel(R) C++ Compiler Classic (ICC)"
 #endif
 #endif
-#endif
+#endif /* CEU_CC_ICC_H */

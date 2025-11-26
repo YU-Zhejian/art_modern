@@ -120,7 +120,7 @@
 #undef CEU_COMPILER_NAME
 #endif
 
-/* Inclusion order of following lines should be preserved to avoid conflicts. */
+/* The inclusion order of the following lines should be preserved to avoid conflicts. */
 /* clang-format off */
 #include "ceu_check/cc/ceu_cc_turboc.h" /* NOLINT */
 #include "ceu_check/cc/ceu_cc_icc.h" /* NOLINT */
