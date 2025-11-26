@@ -19,42 +19,37 @@ function(ceu_cm_enhanced_check_compiler_flag)
     set(multiValueArgs FLAGS)
     cmake_parse_arguments(CEU_CM_ECCF "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
     foreach(FLAG ${CEU_CM_ECCF_FLAGS})
-        if(DEFINED CMAKE_C_COMPILER)
+        if(DEFINED CMAKE_C_COMPILER AND CMAKE_C_COMPILER AND CMAKE_C_COMPILER_ID)
             if(NOT DEFINED C_COMPILER_HAVE_${FLAG})
                 check_c_compiler_flag(${FLAG} C_COMPILER_HAVE_${FLAG})
                 set(C_COMPILER_HAVE_${FLAG}
                     ${C_COMPILER_HAVE_${FLAG}}
                     CACHE INTERNAL "Whether C compiler supports ${FLAG}")
             endif()
-        else()
-            # If no C support is added, bypass the test.
-            set(C_COMPILER_HAVE_${FLAG}
-                ON
-                CACHE INTERNAL "Test bypassed because no C compiler is defined.")
         endif()
-        if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER)
+        if(DEFINED CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER AND CMAKE_CXX_COMPILER_ID)
             if(NOT DEFINED CXX_COMPILER_HAVE_${FLAG})
                 check_cxx_compiler_flag(${FLAG} CXX_COMPILER_HAVE_${FLAG})
                 set(CXX_COMPILER_HAVE_${FLAG}
                     ${CXX_COMPILER_HAVE_${FLAG}}
                     CACHE INTERNAL "Whether CXX compiler supports ${FLAG}")
             endif()
-        else()
-            set(CXX_COMPILER_HAVE_${FLAG}
-                ON
-                CACHE INTERNAL "Test bypassed because no CXX compiler is defined.")
         endif()
         if(C_COMPILER_HAVE_${FLAG} AND CXX_COMPILER_HAVE_${FLAG})
             # add_compile_options(${FLAG})
             set(${CEU_CM_ECCF_OUT_NAME}
                 ${FLAG} ${${CEU_CM_ECCF_OUT_NAME}}
                 PARENT_SCOPE)
+            undef(CEU_CM_ECCF_REQUIRED)
+            undef(CEU_CM_ECCF_OUT_NAME)
+            undef(CEU_CM_ECCF_FLAGS)
             return()
         endif()
-        unset(C_COMPILER_HAVE_${FLAG})
-        unset(CXX_COMPILER_HAVE_${FLAG})
     endforeach()
     if(CEU_CM_ECCF_REQUIRED)
         message(FATAL_ERROR "None of the compiler flags ${CEU_CM_ECCF_FLAGS} are supported by the compiler.")
     endif()
+    undef(CEU_CM_ECCF_REQUIRED)
+    undef(CEU_CM_ECCF_OUT_NAME)
+    undef(CEU_CM_ECCF_FLAGS)
 endfunction()
