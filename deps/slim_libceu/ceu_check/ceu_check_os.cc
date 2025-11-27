@@ -1,4 +1,7 @@
 #include "ceu_check/ceu_check_os.hh"
+
+#include "ceu_check/ceu_check_os_macro.h"
+
 #include "libceu_stddef.h"
 
 #ifdef CEU_ON_POSIX

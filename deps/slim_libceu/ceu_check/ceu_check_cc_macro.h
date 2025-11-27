@@ -124,6 +124,8 @@
 /* clang-format off */
 #include "ceu_check/cc/ceu_cc_turboc.h" /* NOLINT */
 #include "ceu_check/cc/ceu_cc_icc.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_arm_compiler_linux.h" /* NOLINT */
+#include "ceu_check/cc/ceu_cc_arm_compiler_embedded.h" /* NOLINT */
 #include "ceu_check/cc/ceu_cc_intel_clang.h" /* NOLINT */
 #include "ceu_check/cc/ceu_cc_amd_clang.h" /* NOLINT */
 #include "ceu_check/cc/ceu_cc_msvc.h" /* NOLINT */

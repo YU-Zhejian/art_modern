@@ -1,12 +1,12 @@
 #include "ceu_check/ceu_check_c_std.h"
+
 #include "ceu_check/c_snprintf.h"
 #include "ceu_check/ceu_check_c_cxx_std_macro.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
-char* ceu_interpret_c_std_version()
+char* ceu_interpret_c_std_version(void)
 {
     char* buffer = calloc(1024, sizeof(char));
     if (buffer == NULL) {

@@ -1,13 +1,16 @@
 #ifndef CEU_CHECK_C_SNPRINTF_H
 #define CEU_CHECK_C_SNPRINTF_H
+
+#include "ceu_check/ceu_check_cc_macro.h"
+
 #ifdef CEU_COMPILER_IS_MSVC
 /**  Enable MSVC secure CRT functions */
 #ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS /* NOLINT */
 #endif
 
 #ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE
+#define _CRT_SECURE_NO_DEPRECATE /* NOLINT */
 #endif
 #endif
 #include <stdio.h>

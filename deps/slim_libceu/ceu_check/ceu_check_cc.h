@@ -7,7 +7,6 @@
 #ifndef CEU_CHECK_CC_H
 #define CEU_CHECK_CC_H
 
-#include <ceu_check/ceu_check_cc_macro.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +17,7 @@ extern "C" {
  *
  * @return Returned buffer, should be freed manually.
  */
-char* ceu_check_get_compiler_info();
+char* ceu_check_get_compiler_info(void);
 
 #ifdef __cplusplus
 }

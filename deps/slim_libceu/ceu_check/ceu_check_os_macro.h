@@ -36,18 +36,6 @@
 #define CEU_ON_MINGW32
 
 /*!
- *@def CEU_ON_WINDOWS_64
- *@brief Indicating CEU is compiled on 64-bit Microsoft Windows.
- */
-#define CEU_ON_WINDOWS_64
-
-/*!
- *@def CEU_ON_WINDOWS_32
- *@brief Indicating CEU is compiled on 32-bit Microsoft Windows.
- */
-#define CEU_ON_WINDOWS_32
-
-/*!
  *@def CEU_ON_WINDOWS
  *@brief Indicating CEU is compiled on Microsoft Windows.
  */

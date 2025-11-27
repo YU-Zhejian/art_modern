@@ -11,3 +11,6 @@
 
 /** Whether to enable reproducible builds */
 #cmakedefine01 CEU_REPRODUCIBLE_BUILDS
+
+/** Whether <features.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_FEATURES_H

@@ -1,3 +1,5 @@
+#include "ceu_check/ceu_check_cc.h"
+
 #include "ceu_check/ceu_check_cc_macro.h"
 #include "libceu_stddef.h"
 
@@ -7,14 +9,8 @@
  */
 
 #include "ceu_check/c_snprintf.h"
-#include "ceu_check/ceu_check_cc.h"
-#include "libceu_stddef.h"
 
 #include <stdlib.h>
-#include <string.h>
-
-#define STRINGIFY_HELPER(x) #x
-#define STRINGIFY(x) STRINGIFY_HELPER(x)
 
 char* ceu_check_get_compiler_info()
 {
@@ -26,7 +22,7 @@ char* ceu_check_get_compiler_info()
     int remaining = 40960 * sizeof(char);
     int written = 0;
 
-#ifdef CEU_REPRODUCIBLE_BUILDS
+#if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)
     written = CEU_SNPRINTF(ptr, remaining, "Compiled at: N/A due to reproducible build\n");
     if (written > 0 && written < remaining) {
         ptr += written;
@@ -60,7 +56,7 @@ char* ceu_check_get_compiler_info()
     }
 #endif
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compiler Identification:\n");
+    written = CEU_SNPRINTF(ptr, remaining, "Compiler Identification: %s\n", CEU_COMPILER_NAME);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -72,6 +68,40 @@ char* ceu_check_get_compiler_info()
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     written = CEU_SNPRINTF(ptr, remaining, "\tIntel Clang compatible version number: %d.%d.%d\n",
         __INTEL_CLANG_COMPILER / 10000, __INTEL_CLANG_COMPILER % 10000 / 100, __INTEL_CLANG_COMPILER % 100);
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
+
+    #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
+    written = CEU_SNPRINTF(
+        ptr, remaining, "\tARM Compiler for Linux compatible version number: %d.%d.%d (%s)\n",
+        __armclang_major__, 
+        __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__, __armclang_version__
+    );
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
+#if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
+#ifdef __ARMCC_VERSION
+    // P.VV.BBBB
+    written = CEU_SNPRINTF(
+        ptr, remaining, "\tARM Compiler for Embedded compatible version number: %d.%d.%d\n",
+        __ARMCC_VERSION / 1000000, 
+        (__ARMCC_VERSION / 10000) % 100, __ARMCC_VERSION % 10000
+    );
+#else
+    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Embedded compatible version number: %s\n", "UNDEFINED");
+#endif
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -137,45 +167,59 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_MSVC)
-    const char* msc_build_ver =
+    char* msc_build_ver = (char*)calloc(32, sizeof(char));
+    if (msc_build_ver == NULL) {
+        free(buffer);
+        return NULL;
+    }
 #ifdef _MSC_BUILD
-#define MSC_BUILD_STR_HELPER(x) #x
-#define MSC_BUILD_STR(x) MSC_BUILD_STR_HELPER(x)
-        MSC_BUILD_STR(_MSC_BUILD);
+    CEU_SNPRINTF(msc_build_ver, 32, "%d", _MSC_BUILD);
 #else
-        "unknown";
+    CEU_SNPRINTF(msc_build_ver, 32, "%s", "unknown");
 #endif
 
-    const char* msc_internal_ver =
+    char* msc_internal_ver = (char*)calloc(32, sizeof(char));
+    if (msc_internal_ver == NULL) {
+        free(msc_build_ver);
+        free(buffer);
+        return NULL;
+    }
 #ifdef _MSC_FULL_VER
-#define MSC_INTERNAL_STR_HELPER(x) #x
-#define MSC_INTERNAL_STR(x) MSC_INTERNAL_STR_HELPER(x)
-        MSC_INTERNAL_STR(_MSC_FULL_VER % 100000);
+    CEU_SNPRINTF(msc_internal_ver, 32, "%d", _MSC_FULL_VER % 100000);
 #else
-        "unknown";
+    CEU_SNPRINTF(msc_internal_ver, 32, "%s", "unknown");    
 #endif
 
-    const char* msc_major_ver =
+    char* msc_major_ver = (char*)calloc(32, sizeof(char));
+    if (msc_major_ver == NULL) {
+        free(msc_internal_ver);
+        free(msc_build_ver);
+        free(buffer);
+        return NULL;
+    }
+    char* msc_minor_ver = (char*)calloc(32, sizeof(char));
+    if (msc_minor_ver == NULL) {
+        free(msc_major_ver);
+        free(msc_internal_ver);
+        free(msc_build_ver);
+        free(buffer);
+        return NULL;
+    }
 #ifdef _MSC_VER
-#define MSC_MAJOR_STR_HELPER(x) #x
-#define MSC_MAJOR_STR(x) MSC_MAJOR_STR_HELPER(x)
-        MSC_MAJOR_STR(_MSC_VER / 100);
+    CEU_SNPRINTF(msc_major_ver, 32, "%d", _MSC_VER / 100);
+    CEU_SNPRINTF(msc_minor_ver, 32, "%d", _MSC_VER % 100);
 #else
-        "unknown";
+    CEU_SNPRINTF(msc_major_ver, 32, "%s", "unknown");
+    CEU_SNPRINTF(msc_minor_ver, 32, "%s", "unknown");
 #endif
-
-    const char* msc_minor_ver =
-#ifdef _MSC_VER
-#define MSC_MINOR_STR_HELPER(x) #x
-#define MSC_MINOR_STR(x) MSC_MINOR_STR_HELPER(x)
-        MSC_MINOR_STR(_MSC_VER % 100);
-#else
-        "unknown";
-#endif
-
     written
         = CEU_SNPRINTF(ptr, remaining, "\tMSVC compatible version number: %s.%s.%s.%s, with Visual Studio ver. %s\n",
-            msc_major_ver, msc_minor_ver, msc_internal_ver, msc_build_ver, STRINGIFY(CEU_VISUAL_STUDIO_VER));
+            msc_major_ver, msc_minor_ver, msc_internal_ver, msc_build_ver, CEU_VISUAL_STUDIO_VER);
+    free(msc_build_ver);
+    free(msc_internal_ver);
+    free(msc_major_ver);
+    free(msc_minor_ver);
+
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -242,7 +286,7 @@ char* ceu_check_get_compiler_info()
     int borland_major = __BORLANDC__ / 256;
     int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
     written = CEU_SNPRINTF(ptr, remaining, "\tBorland compatible version number: %d.%d, with %s\n", borland_major,
-        borland_revision, STRINGIFY(CEU_CPPB_VERSION));
+        borland_revision, CEU_CPPB_VERSION);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
