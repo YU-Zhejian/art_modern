@@ -15,12 +15,12 @@ std::string ceu_interpret_cxx_stdlib()
         // The libcxx version is XX.Y.ZZ
         oss << "\tVersion: " << _LIBCPP_VERSION / 1000 << "."
             << (_LIBCPP_VERSION / 100) % 10 << "."
-            << _LIBCPP_VERSION % 100 << std::endl;
+            << _LIBCPP_VERSION % 100 << " (pre-16 spec)" << std::endl;
     } else {
         // The libcxx version is XX.YY.ZZ
         oss << "\tVersion: " << _LIBCPP_VERSION / 10000 << "."
             << (_LIBCPP_VERSION / 100) % 100 << "."
-            << _LIBCPP_VERSION % 100 << std::endl;
+            << _LIBCPP_VERSION % 100 << " (post-16 spec)" <<  std::endl;
     }
 #elif defined(CEU_CXX_STDLIB_IS_LIBSTDCXX)
     oss << "\tVersion: "  << CEU_CXX_STDLIB_GLIBCXX_VERSION << std::endl;
@@ -31,7 +31,7 @@ std::string ceu_interpret_cxx_stdlib()
     "undefined" 
 #endif
     << std::endl;
-    oss << "\t_GLIBCXX_VERSION/_GLIBCPP_VERSION :" <<
+    oss << "\t_GLIBCXX_VERSION/_GLIBCPP_VERSION: " <<
 #if defined(_GLIBCPP_VERSION) || defined(_GLIBCXX_VERSION)
     #ifdef _GLIBCXX_VERSION
          _GLIBCXX_VERSION 

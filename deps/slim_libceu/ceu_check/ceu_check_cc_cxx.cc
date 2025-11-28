@@ -30,6 +30,25 @@ std::string ceu_check_get_compiler_info()
     oss << "\t" << "Intel Clang compatible version number: " << __INTEL_CLANG_COMPILER / 10000 << '.'
         << __INTEL_CLANG_COMPILER % 10000 / 100 << '.' << __INTEL_CLANG_COMPILER % 100 << std::endl;
 #endif
+    #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
+    oss << \tARM Compiler for Linux compatible version number: %d.%d.%d (%s)\n" 
+        << __armclang_major__ << '.' << __armclang_minor__ << '.' << __ARM_LINUX_COMPILER_BUILD__ 
+        << " (" << __armclang_version__ << ")" << std::endl;
+#endif
+#if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
+    oss << "\tARM Compiler for Embedded compatible version number"<<
+#ifdef __ARMCC_VERSION
+    // P.VV.BBBB
+    __ARMCC_VERSION / 1000000 << "." << (__ARMCC_VERSION / 10000) % 100 << "." << __ARMCC_VERSION % 10000
+#else
+        "UNDEFINED"
+#endif
+    << std::endl;
+#endif
+
+
+
+
 #if defined(CEU_COMPILER_IS_AOCC)
     oss << "\t" << "AMD Optimizing C++ Compiler (AOCC) compatible version number: "
 #ifdef __aocc_major__
