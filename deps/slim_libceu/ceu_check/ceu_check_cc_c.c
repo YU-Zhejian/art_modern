@@ -129,6 +129,9 @@ char* ceu_check_get_compiler_info()
     }
 #endif
 
+/** FIXME: See: <https://github.com/cpredef/predef/blob/master/Compilers.md#intel-cc> for pre-2021 and post-2021 version intepretation differences.
+ * See also: <https://github.com/intel/llvm/blob/6dd1bc3465612188fda216a208341869df5d7d8b/openmp/runtime/src/kmp_version.cpp#L32>
+ */
 #if defined(CEU_COMPILER_IS_ICC)
     written = CEU_SNPRINTF(ptr, remaining, "\tIntel Compiler Classic (ICC) compatible version number: %d", __ICC);
     if (written > 0 && written < remaining) {
@@ -281,6 +284,31 @@ char* ceu_check_get_compiler_info()
     int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
     written = CEU_SNPRINTF(ptr, remaining, "\tBorland compatible version number: %d.%d, with %s\n", borland_major,
         borland_revision, CEU_CPPB_VERSION);
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+    written = CEU_SNPRINTF(ptr, remaining, "\t\t__CODEGEARC_VERSION__=");
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+
+#ifdef __CODEGEARC_VERSION__
+    written = CEU_SNPRINTF(ptr, remaining, "%X.%X.%d\n", 
+        ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24),
+        ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16),
+        ((__CODEGEARC_VERSION__ & 0x0000FFFF)));
+#else
+    written = CEU_SNPRINTF(ptr, remaining, "=UNDEFINED\n");
+#endif
+
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;

@@ -6,6 +6,14 @@ project(
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 include_directories("${CMAKE_BINARY_DIR}/include")
 
+# Set C++ standard to C++11 if not already defined
+if(NOT DEFINED CMAKE_CXX_STANDARD)
+    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif()
+# Do not set C standard.
+
 include(CheckIncludeFile)
 include(CheckIncludeFileCXX)
 include(CheckSymbolExists)

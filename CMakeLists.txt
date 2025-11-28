@@ -39,8 +39,10 @@ set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF) # To make C standard conformance stricter.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) # To make C++ standard conformance stricter.
 
 if(NOT DEFINED Python3_EXECUTABLE)
     set(Python3_EXECUTABLE python3)

@@ -1,7 +1,5 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 
-#include <cinttypes>
-#include <cstdint>
 #include <iomanip>
 #include <limits>
 #include <sstream>

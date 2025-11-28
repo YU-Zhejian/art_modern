@@ -9,9 +9,9 @@
     || defined(__TURBOC__)
 #define CEU_COMPILER_IS_BORLAND
 #if defined(__clang__)
-#define CEU_COMPILER_NAME "Borland C++Builder Compilers with Clang support"
+#define CEU_COMPILER_NAME "Borland/Embarcadero C++Builder Compilers with Clang support"
 #else
-#define CEU_COMPILER_NAME "Borland C++Builder Compilers"
+#define CEU_COMPILER_NAME "Borland/Embarcadero C++Builder Compilers"
 #endif
 
 #undef CEU_CPPB_VERSION

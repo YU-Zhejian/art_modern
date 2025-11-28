@@ -115,6 +115,17 @@ std::string ceu_check_get_compiler_info()
     int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
     oss << "\t" << "Borland compatible version number: " << borland_major << '.' << borland_revision << ", with "
         << CEU_CPPB_VERSION << std::endl;
+ oss << "\t\t__CODEGEARC_VERSION__="
+#ifdef __CODEGEARC_VERSION__
+            << std::hex
+            << ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24) << '.'
+            << ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16) << '.'
+            << std::dec
+            << ((__CODEGEARC_VERSION__ & 0x0000FFFF))
+            << std::endl;
+            #else
+    <<"=UNDEFINED" << std::endl;
+#endif
 #endif
 #if defined(CEU_COMPILER_IS_CLANG)
     oss << "\t" << "Clang compatible version number: ";
