@@ -1,9 +1,9 @@
 /**
  * Include before EDG
- * 
- * NOTE: This compiler is propertairy software from Arm Ltd. We did not purchase a copy and the following 
+ *
+ * NOTE: This compiler is propertairy software from Arm Ltd. We did not purchase a copy and the following
  * information is based on publicly available documentation.
- * 
+ *
  */
 
 #ifndef CEU_CC_ARM_COMPILER_EMBEDDED_H

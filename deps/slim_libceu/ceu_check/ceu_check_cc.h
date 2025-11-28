@@ -7,7 +7,6 @@
 #ifndef CEU_CHECK_CC_H
 #define CEU_CHECK_CC_H
 
-
 #ifdef __cplusplus
 extern "C" {
 #endif

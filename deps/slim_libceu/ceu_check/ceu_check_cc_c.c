@@ -77,12 +77,9 @@ char* ceu_check_get_compiler_info()
     }
 #endif
 
-    #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
-    written = CEU_SNPRINTF(
-        ptr, remaining, "\tARM Compiler for Linux compatible version number: %d.%d.%d (%s)\n",
-        __armclang_major__, 
-        __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__, __armclang_version__
-    );
+#if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
+    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Linux compatible version number: %d.%db%d (%s)\n",
+        __armclang_major__, __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__, __armclang_version__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -94,11 +91,8 @@ char* ceu_check_get_compiler_info()
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
 #ifdef __ARMCC_VERSION
     // P.VV.BBBB
-    written = CEU_SNPRINTF(
-        ptr, remaining, "\tARM Compiler for Embedded compatible version number: %d.%d.%d\n",
-        __ARMCC_VERSION / 1000000, 
-        (__ARMCC_VERSION / 10000) % 100, __ARMCC_VERSION % 10000
-    );
+    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Embedded compatible version number: %d.%d.%d\n",
+        __ARMCC_VERSION / 1000000, (__ARMCC_VERSION / 10000) % 100, __ARMCC_VERSION % 10000);
 #else
     written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Embedded compatible version number: %s\n", "UNDEFINED");
 #endif
@@ -187,7 +181,7 @@ char* ceu_check_get_compiler_info()
 #ifdef _MSC_FULL_VER
     CEU_SNPRINTF(msc_internal_ver, 32, "%d", _MSC_FULL_VER % 100000);
 #else
-    CEU_SNPRINTF(msc_internal_ver, 32, "%s", "unknown");    
+    CEU_SNPRINTF(msc_internal_ver, 32, "%s", "unknown");
 #endif
 
     char* msc_major_ver = (char*)calloc(32, sizeof(char));

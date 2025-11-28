@@ -16,7 +16,7 @@
 
 #if defined(__ANDROID__)
 #define CEU_LIBC_IS_ANDROID
-#elif defined (CEU_COMPILER_IS_MSVC)
+#elif defined(CEU_COMPILER_IS_MSVC)
 /**
  * Should be either MSVCRT or UCRT.
  */
@@ -39,6 +39,5 @@
 #endif
 #endif
 #endif
-
 
 #endif /* CEU_CHECK_C_STDLIB_MACRO_H */

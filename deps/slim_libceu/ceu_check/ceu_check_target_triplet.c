@@ -6,16 +6,15 @@
 #define CEU_ARCHITECTURE_I386
 #endif
 
-
-
 /**
  * Detect endianness of the target machine.
  *
  * @return 1 if the machine is big endian, 0 otherwise.
  */
-int ceu_is_big_endian(void) {
-#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) || defined(__LITTLE_ENDIAN__) || defined(__LITTLE_ENDIAN)               \
-    || defined(CEU_ARCHITECTURE_X86_64) || defined(CEU_ARCHITECTURE_I386)
+int ceu_is_big_endian(void)
+{
+#if (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__) || defined(__LITTLE_ENDIAN__)               \
+    || defined(__LITTLE_ENDIAN) || defined(CEU_ARCHITECTURE_X86_64) || defined(CEU_ARCHITECTURE_I386)
     return 0;
 #elif (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__) || defined(__BIG_ENDIAN__)                   \
     || defined(__BIG_ENDIAN)
@@ -29,20 +28,19 @@ int ceu_is_big_endian(void) {
 /**
  * @return Reverse of ceu_is_big_endian().
  */
-int ceu_is_little_endian(void) {
-    return !ceu_is_big_endian();
-}
+int ceu_is_little_endian(void) { return !ceu_is_big_endian(); }
 
 /**
  * Get the target architecture triplet's first part.
  *
  * @return A string representing the architecture, or "unknown" if not detected.
  */
-char* ceu_check_get_target_triplet_part_one(void) {
+char* ceu_check_get_target_triplet_part_one(void)
+{
 #if defined(CEU_ARCHITECTURE_X86_64)
     return "x86_64";
-#elif defined(CEU_ARCHITECTURE_I386) 
+#elif defined(CEU_ARCHITECTURE_I386)
     return "i386";
 #endif
-  return "unknown";
+    return "unknown";
 }

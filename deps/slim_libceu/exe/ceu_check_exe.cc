@@ -1,8 +1,8 @@
-#include "ceu_check/ceu_check_cxx_std.hh"
 #include "ceu_check/ceu_check_cc.hh"
 #include "ceu_check/ceu_check_ctypes_limit.hh"
-#include "ceu_check/ceu_check_os.hh"
+#include "ceu_check/ceu_check_cxx_std.hh"
 #include "ceu_check/ceu_check_cxx_stdlib.hh"
+#include "ceu_check/ceu_check_os.hh"
 
 #include <iostream>
 
