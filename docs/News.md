@@ -3,6 +3,8 @@
 (v-1.3.1-section)=
 ## 1.3.1 (Ongoing)
 
+- A possibly unidentified bug in CMake build system when trying to compile static version of testing C source code while the project is being configured is fixed.
+- The minimal test code for libdeflate, zlib, libbz2, and liblzma unified. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
 - A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
 - Miscellaneous bug fixes.
 

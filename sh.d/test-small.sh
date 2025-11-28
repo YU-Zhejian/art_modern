@@ -141,7 +141,7 @@ function validate_template() {
 function art_profile_illumina() {
     env -C "${OUT_DIR}" \
         "${BASH_WRAPPER[@]}" \
-        "${PROJDIR}"/deps/ART_profiler_illumina/art_profiler_illumina "${@}"
+        "${SHDIR}"/test-small.sh.d/ART_profiler_illumina/art_profiler_illumina "${@}"
 }
 
 EXEC_ORDER=0

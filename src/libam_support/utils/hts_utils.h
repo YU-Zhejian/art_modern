@@ -35,4 +35,4 @@ size_t am_hts_tell(htsFile* fp);
 
 ART_MODERN_END_C_DECLS
 
-#endif // ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H
+#endif /** ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H */

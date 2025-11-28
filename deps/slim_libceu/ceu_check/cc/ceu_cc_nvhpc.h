@@ -10,4 +10,4 @@
 #define CEU_COMPILER_NAME "NVidia High Performance Computing (NVHPC) Toolkit NVC++"
 #endif
 
-#endif
+#endif /* CEU_CC_NVHPC_H */

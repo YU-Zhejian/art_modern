@@ -19,7 +19,6 @@ git ls-files |
     grep -v '^bioconda/' |
     grep -v '^chroot/' |
     grep -v '^debian/' |
-    grep -v '^deps/ART_profiler_illumina/' |
     grep -v '^deps/concurrentqueue/' |
     grep -v '^deps/labw_slim_htslib/' |
     grep -v '^deps/slim_fmt/' |

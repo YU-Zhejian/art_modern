@@ -31,23 +31,12 @@
 #define CEU_ON_MINGW32
 #endif
 
-#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__)
-#define CEU_ON_WINDOWS_64
-#ifndef CEU_PRIMARY_OS_TYPE
-#define CEU_PRIMARY_OS_TYPE "Microsoft Windows 64"
-#endif
-#elif (defined(WIN32) || defined(_WIN32) || defined(__WIN32) || defined(__WIN32__))
-#define CEU_ON_WINDOWS_32
-#ifndef CEU_PRIMARY_OS_TYPE
-#define CEU_PRIMARY_OS_TYPE "Microsoft Windows 32"
-#endif
-#endif
-
-#if defined(CEU_ON_WINDOWS_32) || defined(CEU_ON_WINDOWS_64)
+#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32)   \
+    || defined(__WIN32) || defined(__WIN32__)
 #define CEU_ON_WINDOWS
 #ifndef CEU_PRIMARY_OS_TYPE
 #define CEU_PRIMARY_OS_TYPE "Microsoft Windows"
 #endif
 #endif
 
-#endif
+#endif /* CEU_OS_WINDOWS_H */

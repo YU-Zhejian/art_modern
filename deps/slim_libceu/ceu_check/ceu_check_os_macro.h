@@ -36,18 +36,6 @@
 #define CEU_ON_MINGW32
 
 /*!
- *@def CEU_ON_WINDOWS_64
- *@brief Indicating CEU is compiled on 64-bit Microsoft Windows.
- */
-#define CEU_ON_WINDOWS_64
-
-/*!
- *@def CEU_ON_WINDOWS_32
- *@brief Indicating CEU is compiled on 32-bit Microsoft Windows.
- */
-#define CEU_ON_WINDOWS_32
-
-/*!
  *@def CEU_ON_WINDOWS
  *@brief Indicating CEU is compiled on Microsoft Windows.
  */
@@ -155,13 +143,12 @@
 #undef CEU_PRIMARY_OS_TYPE
 #endif
 
-// Inclusion order of following lines should be preserved
-// clang-format off
-#include <ceu_check/os/ceu_os_mainframe_unix.h> // NOLINT
-#include <ceu_check/os/ceu_os_bsd.h> // NOLINT
-#include <ceu_check/os/ceu_os_windows.h> // NOLINT
-
-// clang-format on
+/* Inclusion order of following lines should be preserved to avoid conflicts. */
+/* clang-format off */
+#include <ceu_check/os/ceu_os_mainframe_unix.h> /* NOLINT */
+#include <ceu_check/os/ceu_os_bsd.h> /* NOLINT */
+#include <ceu_check/os/ceu_os_windows.h> /* NOLINT */
+/* clang-format on */
 #if defined(__HAIKU__)
 #define CEU_ON_HAIKU
 #define CEU_PRIMARY_OS_TYPE "Haiku"
@@ -176,6 +163,7 @@
 #define CEU_ON_MACH
 #if defined(__APPLE__)
 #define CEU_ON_APPLE
+#define CEU_PRIMARY_OS_TYPE "Apple MACH"
 #elif defined(__gnu_hurd__)
 #define CEU_ON_GNU_HURD
 #define CEU_PRIMARY_OS_TYPE "GNU Hurd"
@@ -197,7 +185,7 @@
 #define CEU_ON_UNIX
 #endif
 
-// Note that MSYS and MinGW are NOT POSIX.
+/* Note that MSYS and MinGW are NOT POSIX. */
 #if defined(CEU_ON_UNIX) || defined(CEU_ON_CYGWIN)
 #define CEU_ON_POSIX
 #endif
@@ -215,4 +203,4 @@
 #endif
 
 #endif
-#endif // CEU_CHECK_OS_MACRO_H
+#endif /* CEU_CHECK_OS_MACRO_H */

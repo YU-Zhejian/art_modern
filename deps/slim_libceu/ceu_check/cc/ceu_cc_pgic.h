@@ -1,4 +1,4 @@
-// Include this file after <ceu_cc_nvhpc.h>!
+/* Include this file after <ceu_cc_nvhpc.h>! */
 #ifndef CEU_CC_PGIC_H
 #define CEU_CC_PGIC_H
 
@@ -13,4 +13,4 @@
 #endif
 #endif
 
-#endif
+#endif /* CEU_CC_PGIC_H */

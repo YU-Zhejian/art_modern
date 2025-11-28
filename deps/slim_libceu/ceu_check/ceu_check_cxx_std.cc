@@ -1,21 +1,9 @@
-#include "ceu_check/ceu_check_c_cxx_std.hh"
+#include "ceu_check/ceu_check_cxx_std.hh"
+
+#include "ceu_check/ceu_check_c_cxx_std_macro.h"
 
 #include <sstream>
 #include <string>
-
-std::string ceu_interpret_c_std_version()
-{
-    std::ostringstream oss;
-    std::string cstd_macro;
-    oss << "Compile-time C std.: ver. " << CEU_C_STD;
-#ifdef CEU_C_STD_VERSION_MACRO
-    cstd_macro = std::to_string(CEU_C_STD_VERSION_MACRO);
-#else
-    cstd_macro = "__STDC_VERSION__ undefined";
-#endif
-    oss << " (" << cstd_macro << ")" << std::endl;
-    return oss.str();
-}
 
 std::string ceu_interpret_cxx_std_version()
 {

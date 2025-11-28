@@ -8,4 +8,4 @@
 #define CEU_COMPILER_IS_INTEL_CLANG
 #define CEU_COMPILER_NAME "Intel(R) oneAPI DPC++/C++ Compiler (ICX)"
 #endif
-#endif
+#endif /* CEU_CC_INTEL_CLANG_H */

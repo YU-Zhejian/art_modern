@@ -18,7 +18,6 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
         return 1;
     }
 
-    // Estimate the maximum compressed size
     size_t max_compressed_size = libdeflate_gzip_compress_bound(c, randbuf_len);
     uint8_t* compressed_buf = (uint8_t*)malloc(max_compressed_size);
     if (compressed_buf == NULL) {
@@ -46,7 +45,7 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
         free(decompressed_buf);
         return 1;
     }
-    // Verify that the decompressed data matches the original data
+
     if (decompressed_size != randbuf_len || memcmp(randbuf, decompressed_buf, randbuf_len) != 0) {
         fprintf(stderr, "Decompressed data does not match original data\n");
         free(compressed_buf);
@@ -55,14 +54,14 @@ int perform(uint8_t* randbuf, size_t randbuf_len)
     }
     free(compressed_buf);
     free(decompressed_buf);
-    // Why we do not need to free c and d?
+
     return 0;
 }
 
 int main(void)
 {
     printf("libdeflate version: %s\n", LIBDEFLATE_VERSION_STRING);
-    const size_t randbuf_len = 4ULL * 1024; // 4kB
+    const size_t randbuf_len = 4ULL * 1024;
     pcg32_random_t rng;
     pcg32_srandom_r(&rng, (uint64_t)time(NULL), (uint64_t)(uintptr_t)&rng);
     uint8_t* randbuf = (uint8_t*)malloc(randbuf_len);

@@ -13,7 +13,7 @@ Requires:
     - `CEU_CM_HAVE_WORKING_${VARNAME}_COMPILE_STATIC`
     - `CEU_CM_HAVE_WORKING_${VARNAME}_RUN_STATIC`
 #]=======================================================================]
-macro(ceu_cm_print_test_status NAME VARNAME)
+function(ceu_cm_print_test_status NAME VARNAME)
     if(DEFINED CEU_CM_HAVE_WORKING_${VARNAME}_COMPILE_SHARED AND DEFINED CEU_CM_HAVE_WORKING_${VARNAME}_RUN_SHARED)
         message(
             STATUS
@@ -26,4 +26,4 @@ macro(ceu_cm_print_test_status NAME VARNAME)
                 "CEU_CM_CHECK: Checking ${NAME} ... static: compile=${CEU_CM_HAVE_WORKING_${VARNAME}_COMPILE_STATIC}, run=${CEU_CM_HAVE_WORKING_${VARNAME}_RUN_STATIC}"
         )
     endif()
-endmacro()
+endfunction()
