@@ -1,6 +1,7 @@
 #include "ceu_check/ceu_check_cc.h"
 
 #include "ceu_check/ceu_check_cc_macro.h"
+#include "ceu_check/ceu_constants.h"
 #include "libceu_stddef.h"
 
 /**
@@ -36,14 +37,14 @@ char* ceu_check_get_compiler_info()
 #if defined(__DATE__)
         __DATE__;
 #else
-        "unknown date";
+        CEU_UNDEFINED;
 #endif
 
     const char* time_str =
 #if defined(__TIME__)
         __TIME__;
 #else
-        "unknown time";
+        CEU_UNDEFINED;
 #endif
 
     written = CEU_SNPRINTF(ptr, remaining, "Compiled at: %s, %s\n", date_str, time_str);
@@ -66,8 +67,9 @@ char* ceu_check_get_compiler_info()
     }
 
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
-    written = CEU_SNPRINTF(ptr, remaining, "\tIntel Clang compatible version number: %d.%d.%d\n",
-        __INTEL_CLANG_COMPILER / 10000, __INTEL_CLANG_COMPILER % 10000 / 100, __INTEL_CLANG_COMPILER % 100);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n",
+        CEU_COMPILER_NAME_INTEL_ONEAPI_DPCPP, __INTEL_CLANG_COMPILER / 10000, __INTEL_CLANG_COMPILER % 10000 / 100,
+        __INTEL_CLANG_COMPILER % 100);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -78,8 +80,9 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
-    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Linux compatible version number: %d.%db%d (%s)\n",
-        __armclang_major__, __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__, __armclang_version__);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%db%d (%s)\n",
+        CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__,
+        __armclang_version__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -91,10 +94,12 @@ char* ceu_check_get_compiler_info()
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
 #ifdef __ARMCC_VERSION
     // P.VV.BBBB
-    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Embedded compatible version number: %d.%d.%d\n",
-        __ARMCC_VERSION / 1000000, (__ARMCC_VERSION / 10000) % 100, __ARMCC_VERSION % 10000);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n",
+        CEU_COMPILER_NAME_ARM_COMPILER_EMBEDDED, __ARMCC_VERSION / 1000000, (__ARMCC_VERSION / 10000) % 100,
+        __ARMCC_VERSION % 10000);
 #else
-    written = CEU_SNPRINTF(ptr, remaining, "\tARM Compiler for Embedded compatible version number: %s\n", "UNDEFINED");
+    written = CEU_SNPRINTF(
+        ptr, remaining, "\t%s compatible version number: %s\n", CEU_COMPILER_NAME_ARM_COMPILER_EMBEDDED, "UNDEFINED");
 #endif
     if (written > 0 && written < remaining) {
         ptr += written;
@@ -106,7 +111,7 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_AOCC)
-    written = CEU_SNPRINTF(ptr, remaining, "\tAMD Optimizing C++ Compiler (AOCC) compatible version number: ");
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_AOCC);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -118,7 +123,7 @@ char* ceu_check_get_compiler_info()
 #ifdef __aocc_major__
     written = CEU_SNPRINTF(ptr, remaining, "%d.%d.%d\n", __aocc_major__, __aocc_minor__, __aocc_patchlevel__);
 #else
-    written = CEU_SNPRINTF(ptr, remaining, "unknown\n");
+    written = CEU_SNPRINTF(ptr, remaining, "%s\n", CEU_UNDEFINED);
 #endif
     if (written > 0 && written < remaining) {
         ptr += written;
@@ -129,11 +134,12 @@ char* ceu_check_get_compiler_info()
     }
 #endif
 
-/** FIXME: See: <https://github.com/cpredef/predef/blob/master/Compilers.md#intel-cc> for pre-2021 and post-2021 version intepretation differences.
- * See also: <https://github.com/intel/llvm/blob/6dd1bc3465612188fda216a208341869df5d7d8b/openmp/runtime/src/kmp_version.cpp#L32>
+/** FIXME: See: <https://github.com/cpredef/predef/blob/master/Compilers.md#intel-cc> for pre-2021 and post-2021 version
+ * intepretation differences. See also:
+ * <https://github.com/intel/llvm/blob/6dd1bc3465612188fda216a208341869df5d7d8b/openmp/runtime/src/kmp_version.cpp#L32>
  */
 #if defined(CEU_COMPILER_IS_ICC)
-    written = CEU_SNPRINTF(ptr, remaining, "\tIntel Compiler Classic (ICC) compatible version number: %d", __ICC);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d", CEU_COMPILER_NAME_ICC, __ICC);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -152,7 +158,6 @@ char* ceu_check_get_compiler_info()
         return NULL;
     }
 #endif
-
     written = CEU_SNPRINTF(ptr, remaining, "\n");
     if (written > 0 && written < remaining) {
         ptr += written;
@@ -172,7 +177,7 @@ char* ceu_check_get_compiler_info()
 #ifdef _MSC_BUILD
     CEU_SNPRINTF(msc_build_ver, 32, "%d", _MSC_BUILD);
 #else
-    CEU_SNPRINTF(msc_build_ver, 32, "%s", "unknown");
+    CEU_SNPRINTF(msc_build_ver, 32, "%s", CEU_UNDEFINED);
 #endif
 
     char* msc_internal_ver = (char*)calloc(32, sizeof(char));
@@ -184,7 +189,7 @@ char* ceu_check_get_compiler_info()
 #ifdef _MSC_FULL_VER
     CEU_SNPRINTF(msc_internal_ver, 32, "%d", _MSC_FULL_VER % 100000);
 #else
-    CEU_SNPRINTF(msc_internal_ver, 32, "%s", "unknown");
+    CEU_SNPRINTF(msc_internal_ver, 32, "%s", CEU_UNDEFINED);
 #endif
 
     char* msc_major_ver = (char*)calloc(32, sizeof(char));
@@ -206,12 +211,11 @@ char* ceu_check_get_compiler_info()
     CEU_SNPRINTF(msc_major_ver, 32, "%d", _MSC_VER / 100);
     CEU_SNPRINTF(msc_minor_ver, 32, "%d", _MSC_VER % 100);
 #else
-    CEU_SNPRINTF(msc_major_ver, 32, "%s", "unknown");
-    CEU_SNPRINTF(msc_minor_ver, 32, "%s", "unknown");
+    CEU_SNPRINTF(msc_major_ver, 32, "%s", CEU_UNDEFINED);
+    CEU_SNPRINTF(msc_minor_ver, 32, "%s", CEU_UNDEFINED);
 #endif
-    written
-        = CEU_SNPRINTF(ptr, remaining, "\tMSVC compatible version number: %s.%s.%s.%s, with Visual Studio ver. %s\n",
-            msc_major_ver, msc_minor_ver, msc_internal_ver, msc_build_ver, CEU_VISUAL_STUDIO_VER);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %s.%s.%s.%s, with Visual Studio ver. %s\n",
+        CEU_COMPILER_NAME_MSVC, msc_major_ver, msc_minor_ver, msc_internal_ver, msc_build_ver, CEU_VISUAL_STUDIO_VER);
     free(msc_build_ver);
     free(msc_internal_ver);
     free(msc_major_ver);
@@ -227,9 +231,8 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_NVHPC)
-    written = CEU_SNPRINTF(ptr, remaining,
-        "\tNVidia High-Performance Compiler (NVHPC) compatible version number: %d.%d.%d\n", __NVCOMPILER_MAJOR__,
-        __NVCOMPILER_MINOR__, __NVCOMPILER_PATCHLEVEL__);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_NVHPC,
+        __NVCOMPILER_MAJOR__, __NVCOMPILER_MINOR__, __NVCOMPILER_PATCHLEVEL__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -240,8 +243,8 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_PGIC)
-    written = CEU_SNPRINTF(ptr, remaining, "\tPGI Compiler (PGIC) compatible version number: %d.%d.%d\n", __PGIC__,
-        __PGIC_MINOR__, __PGIC_PATCHLEVEL__);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_PGIC,
+        __PGIC__, __PGIC_MINOR__, __PGIC_PATCHLEVEL__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -255,8 +258,8 @@ char* ceu_check_get_compiler_info()
     int tcc_major = __TINYC__ / 10000;
     int tcc_minor = (__TINYC__ - tcc_major * 10000) / 100;
     int tcc_patchlevel = __TINYC__ % 100;
-    written = CEU_SNPRINTF(ptr, remaining, "\tTiny C Compiler (TCC) compatible version number: %d.%d.%d\n", tcc_major,
-        tcc_minor, tcc_patchlevel);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_TCC,
+        tcc_major, tcc_minor, tcc_patchlevel);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -269,7 +272,8 @@ char* ceu_check_get_compiler_info()
 #if defined(CEU_COMPILER_IS_EDG)
     int edg_major = __EDG_VERSION__ / 100;
     int edg_minor = (__EDG_VERSION__ - edg_major * 100);
-    written = CEU_SNPRINTF(ptr, remaining, "\tEDG compatible version number: %d.%d\n", edg_major, edg_minor);
+    written = CEU_SNPRINTF(
+        ptr, remaining, "\t%s compatible version number: %d.%d\n", CEU_COMPILER_NAME_EDG, edg_major, edg_minor);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -282,8 +286,8 @@ char* ceu_check_get_compiler_info()
 #if defined(CEU_COMPILER_IS_BORLAND)
     int borland_major = __BORLANDC__ / 256;
     int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
-    written = CEU_SNPRINTF(ptr, remaining, "\tBorland compatible version number: %d.%d, with %s\n", borland_major,
-        borland_revision, CEU_CPPB_VERSION);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d, with %s\n",
+        CEU_COMPILER_NAME_BORLAND, borland_major, borland_revision, CEU_CPPB_VERSION);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -301,10 +305,8 @@ char* ceu_check_get_compiler_info()
     }
 
 #ifdef __CODEGEARC_VERSION__
-    written = CEU_SNPRINTF(ptr, remaining, "%X.%X.%d\n", 
-        ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24),
-        ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16),
-        ((__CODEGEARC_VERSION__ & 0x0000FFFF)));
+    written = CEU_SNPRINTF(ptr, remaining, "%X.%X.%d\n", ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24),
+        ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16), ((__CODEGEARC_VERSION__ & 0x0000FFFF)));
 #else
     written = CEU_SNPRINTF(ptr, remaining, "=UNDEFINED\n");
 #endif
@@ -319,7 +321,7 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_CLANG)
-    written = CEU_SNPRINTF(ptr, remaining, "\tClang compatible version number: ");
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_CLANG);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -355,7 +357,7 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_GCC)
-    written = CEU_SNPRINTF(ptr, remaining, "\tGCC compatible version number: ");
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_GCC);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;

@@ -9,7 +9,7 @@
 #if defined(__PGI)
 #define CEU_COMPILER_IS_PGIC
 #if !defined(CEU_COMPILER_NAME)
-#define CEU_COMPILER_NAME "Portland Group (PGI) C/C++ compilers"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_PGIC
 #endif
 #endif
 

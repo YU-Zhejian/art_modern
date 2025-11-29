@@ -4,6 +4,7 @@
 #include "ceu_check/ceu_check_cxx_stdlib.hh"
 #include "ceu_check/ceu_check_os.hh"
 
+#include <cstdlib>
 #include <iostream>
 
 int main()
@@ -14,4 +15,5 @@ int main()
     std::cout << ceu_check_get_ctypes_limit_info();
     std::cout << ceu_check_get_compile_time_os_info();
     std::cout << ceu_check_get_run_time_os_info();
+    return EXIT_SUCCESS;
 }

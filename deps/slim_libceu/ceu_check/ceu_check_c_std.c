@@ -3,7 +3,6 @@
 #include "ceu_check/c_snprintf.h"
 #include "ceu_check/ceu_check_c_cxx_std_macro.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 char* ceu_interpret_c_std_version(void)
@@ -30,7 +29,7 @@ char* ceu_interpret_c_std_version(void)
 #ifdef CEU_C_STD_VERSION_MACRO
     CEU_SNPRINTF(cstd_macro, sizeof(cstd_macro), "%ld", (long)CEU_C_STD_VERSION_MACRO);
 #else
-    CEU_SNPRINTF(cstd_macro, sizeof(cstd_macro), "__STDC_VERSION__ undefined");
+    CEU_SNPRINTF(cstd_macro, sizeof(cstd_macro), "%s", CEU_UNDEFINED);
 #endif
 
     written = CEU_SNPRINTF(ptr, remaining, " (%s)\n", cstd_macro);

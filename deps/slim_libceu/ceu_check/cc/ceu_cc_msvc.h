@@ -11,7 +11,7 @@
 #ifdef __clang__
 #define CEU_COMPILER_NAME "Microsoft Visual Studio Clang Compiler"
 #else
-#define CEU_COMPILER_NAME "Microsoft Visual Studio C/C++ Compiler (MSVC)"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_MSVC
 #endif
 #endif
 #undef CEU_VISUAL_STUDIO_VER

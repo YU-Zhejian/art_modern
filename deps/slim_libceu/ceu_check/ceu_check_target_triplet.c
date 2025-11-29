@@ -28,14 +28,14 @@ int ceu_is_big_endian(void)
 /**
  * @return Reverse of ceu_is_big_endian().
  */
-int ceu_is_little_endian(void) { return !ceu_is_big_endian(); }
+int ceu_is_little_endian(void) /* NOLINT */ { return !ceu_is_big_endian(); /* NOLINT */ }
 
 /**
  * Get the target architecture triplet's first part.
  *
  * @return A string representing the architecture, or "unknown" if not detected.
  */
-char* ceu_check_get_target_triplet_part_one(void)
+char* ceu_check_get_target_triplet_part_one(void) /* NOLINT */
 {
 #if defined(CEU_ARCHITECTURE_X86_64)
     return "x86_64";

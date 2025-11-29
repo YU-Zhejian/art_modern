@@ -7,6 +7,6 @@
 
 #if defined(__TINYC__)
 #define CEU_COMPILER_IS_TCC
-#define CEU_COMPILER_NAME "Tiny C Compiler"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_TCC
 #endif
 #endif /* CEU_CC_TCC_H */

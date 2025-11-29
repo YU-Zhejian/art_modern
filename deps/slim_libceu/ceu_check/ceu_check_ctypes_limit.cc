@@ -1,6 +1,7 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 
 #include <iomanip>
+#include <ios>
 #include <limits>
 #include <sstream>
 #include <string>
