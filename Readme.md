@@ -21,6 +21,7 @@
 `art-modern-utils` on PyPI:
 [![Python version](https://img.shields.io/badge/python-3.9-blue)](https://www.python.org/downloads/)
 [![PyPI - Version](https://img.shields.io/pypi/v/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)

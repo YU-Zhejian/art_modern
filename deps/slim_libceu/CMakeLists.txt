@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.17)
 project(
     slim_libceu
     LANGUAGES C CXX
-    VERSION 1.0.0)
+    VERSION 2025.12.03)
 include_directories(${CMAKE_CURRENT_LIST_DIR})
 include_directories("${CMAKE_BINARY_DIR}/include")
 

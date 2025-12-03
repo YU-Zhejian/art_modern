@@ -19,7 +19,8 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/seq_utils.hh"
 
-#include "ceu_check/ceu_check_c_cxx_std.hh"
+#include "ceu_check/ceu_check_cxx_std.hh"
+#include "ceu_check/ceu_check_cxx_stdlib.hh"
 #include "ceu_check/ceu_check_cc.hh"
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 #include "ceu_check/ceu_check_os.hh"
@@ -228,8 +229,8 @@ void print_version()
     print_mpi_version();
     print_bs_version();
     print_malloc_version();
-    std::cout << ceu_interpret_c_std_version();
     std::cout << ceu_interpret_cxx_std_version();
+    std::cout << ceu_interpret_cxx_stdlib();
     std::cout << ceu_check_get_compiler_info();
     std::cout << ceu_check_get_ctypes_limit_info();
     std::cout << ceu_check_get_compile_time_os_info();

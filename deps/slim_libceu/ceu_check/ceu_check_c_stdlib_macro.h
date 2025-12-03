@@ -1,5 +1,7 @@
 /**
  * TODO: Check libc
+ * 
+ * FIXME: Implement the library part.
  */
 #ifndef CEU_CHECK_C_STDLIB_MACRO_H
 #define CEU_CHECK_C_STDLIB_MACRO_H
