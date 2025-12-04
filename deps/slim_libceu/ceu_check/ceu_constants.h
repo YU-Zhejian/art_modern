@@ -2,4 +2,4 @@
 #define CEU_CONSTANTS_H
 #define CEU_UNDEFINED "UNDEFINED"
 
-#endif //CEU_CONSTANTS_H
+#endif // CEU_CONSTANTS_H

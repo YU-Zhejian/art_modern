@@ -14,3 +14,6 @@
 
 /** Whether <features.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_FEATURES_H
+
+/** Whether <sys/cdefs.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_SYS_CDEFS_H

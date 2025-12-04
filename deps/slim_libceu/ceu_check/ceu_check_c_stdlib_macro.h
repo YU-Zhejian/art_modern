@@ -1,15 +1,14 @@
-/**
- * TODO: Check libc
- * 
- * FIXME: Implement the library part.
- */
 #ifndef CEU_CHECK_C_STDLIB_MACRO_H
 #define CEU_CHECK_C_STDLIB_MACRO_H
 
 #include "libceu_stddef.h"
 
 #if defined(CEU_HAVE_INCLUDE_FEATURES_H) && (CEU_HAVE_INCLUDE_FEATURES_H == 1)
-#include <features.h>
+#include <features.h> /* NOLINT*/
+#endif
+
+#if defined(CEU_HAVE_INCLUDE_SYS_CDEFS_H) && (CEU_HAVE_INCLUDE_SYS_CDEFS_H == 1)
+#include <sys/cdefs.h> /* NOLINT*/
 #endif
 
 #include "ceu_check/ceu_check_cc_macro.h"

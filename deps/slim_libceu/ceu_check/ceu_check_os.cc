@@ -48,7 +48,7 @@ std::string ceu_check_get_compile_time_os_info()
     oss << ", MinGW 64-bit API: " << __MINGW64_VERSION_MAJOR << "." << __MINGW64_VERSION_MINOR << "."
         << __MINGW64_VERSION_BUGFIX;
 #else
-    oss << ", MinGW 64-bit API: "<< CEU_UNDEFINED;
+    oss << ", MinGW 64-bit API: " << CEU_UNDEFINED;
 #endif
 #if defined(__MINGW64_VERSION_STATE)
     oss << " (" << __MINGW64_VERSION_STATE << ")";
@@ -63,7 +63,8 @@ std::string ceu_check_get_compile_time_os_info()
     oss << ", with dll (" << CYGWIN_VERSION_DLL_IDENTIFIER << ") ver. ";
     oss << CYGWIN_VERSION_DLL_MAJOR << "." << CYGWIN_VERSION_DLL_MINOR << std::endl;
 #else
-    oss << "\tCYGWIN API ver. " << CEU_UNDEFINED << ", with dll (" << CEU_UNDEFINED << ") ver. " << CEU_UNDEFINED << std::endl;
+    oss << "\tCYGWIN API ver. " << CEU_UNDEFINED << ", with dll (" << CEU_UNDEFINED << ") ver. " << CEU_UNDEFINED
+        << std::endl;
 #endif
 #endif
 
@@ -102,7 +103,7 @@ std::string ceu_check_get_run_time_os_info()
     oss << "Run-time OS info:" << std::endl;
 #ifdef CEU_ON_POSIX
 #if defined(CEU_HAVE_INCLUDE_SYS_UTSNAME_H) && CEU_HAVE_INCLUDE_SYS_UTSNAME_H == 1
-    struct utsname ceu_utsname{};
+    struct utsname ceu_utsname {};
     uname(&ceu_utsname);
     oss << "\tPOSIX UTSINFO:" << std::endl;
     oss << "\t\tsysname=" << ceu_utsname.sysname << std::endl;
@@ -145,7 +146,7 @@ std::string ceu_check_get_run_time_os_info()
                     // https://en.wikipedia.org/wiki/Windows_10_version_history
                     // https://en.wikipedia.org/wiki/Windows_11_version_history
                     if (osvi.dwBuildNumber < 10240) {
-                        platform_id =  "Windows 10 before 1507 (Threshold)";
+                        platform_id = "Windows 10 before 1507 (Threshold)";
                     } else if (10240 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 10586) {
                         platform_id = "Windows 10 1507 (Threshold)";
                     } else if (10586 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 14393) {
