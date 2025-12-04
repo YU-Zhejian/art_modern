@@ -20,9 +20,11 @@
 #if defined(__ANDROID__)
 #define CEU_LIBC_IS_ANDROID
 #define CEU_LIBC_NAME "Bionic"
-#elif defined(CEU_COMPILER_IS_MSVC)
+#elif defined(CEU_COMPILER_IS_MSVC) || defined(__MSVCRT_VERSION__) || defined(_UCRT) || defined(__CRTDLL__)
 /**
  * Should be either MSVCRT or UCRT.
+ *
+ * The latter 3 macros are defined by MinGW.
  */
 #define CEU_LIBC_IS_MSVC
 #define CEU_LIBC_NAME "MSVCRT or UCRT"
