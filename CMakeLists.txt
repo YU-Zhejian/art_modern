@@ -1,24 +1,13 @@
 cmake_minimum_required(VERSION 3.17)
 
-if(DEFINED USE_CCACHE)
-    message(WARNING "-DUSE_CCACHE is deprecated. Ignored.")
-    unset(USE_CCACHE)
-endif()
-
-if(DEFINED USE_ABSL)
-    message(WARNING "-DUSE_ABSL is deprecated. Ignored.")
-    unset(USE_ABSL)
-endif()
-
-if(DEFINED USE_BTREE_MAP)
-    message(WARNING "-DUSE_BTREE_MAP is deprecated. Ignored.")
-    unset(USE_BTREE_MAP)
-endif()
-
-if(DEFINED USE_QUAL_GEN)
-    message(WARNING "-DUSE_QUAL_GEN is deprecated. Ignored.")
-    unset(USE_QUAL_GEN)
-endif()
+set(DEPRECATED_OPTS USE_CCACHE USE_ABSL USE_BTREE_MAP USE_QUAL_GEN)
+foreach(opt ${DEPRECATED_OPTS})
+    if(DEFINED ${opt})
+        message(WARNING "-D${opt} is deprecated. Ignored.")
+        unset(${opt})
+    endif()
+endforeach()
+unset(DEPRECATED_OPTS)
 
 if(DEFINED REPRODUCIBLE_BUILD)
     set(CEU_REPRODUCIBLE_BUILDS
@@ -39,8 +28,10 @@ set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
+set(CMAKE_C_EXTENSIONS OFF) # To make C standard conformance stricter.
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF) # To make C++ standard conformance stricter.
 
 if(NOT DEFINED Python3_EXECUTABLE)
     set(Python3_EXECUTABLE python3)
@@ -164,7 +155,6 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/src/libam_support/art_modern_config.h.
 
 # -----------------------------------------------------------------------------
 # Dealing with includes.
-
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/src/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/include/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/gen/src/")
@@ -174,8 +164,14 @@ if(DEFINED C_INCLUDE_PATH)
 endif()
 
 # -----------------------------------------------------------------------------
-# Dealing with am_support_lib.
+# Dealing with ${AM_SUPPORT_LIB}.
+if(WITH_MPI)
+    set(AM_MPI_POSTFIX "-mpi")
+else()
+    set(AM_MPI_POSTFIX "")
+endif()
 
+set(AM_SUPPORT_LIB "am_support_lib${AM_MPI_POSTFIX}")
 file(
     GLOB
     AM_SUPPORT_LIB_SOURCE
@@ -185,56 +181,47 @@ file(
     "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*.c"
     "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*/*.c"
     "${CMAKE_CURRENT_LIST_DIR}/src/libam_support/*/*.c")
-add_library(am_support_lib ${AM_SUPPORT_LIB_SOURCE})
-target_compile_options(am_support_lib BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(am_support_lib PUBLIC ${ART_MODERN_LINK_LIBS})
+add_library(${AM_SUPPORT_LIB} ${AM_SUPPORT_LIB_SOURCE})
+target_compile_options(${AM_SUPPORT_LIB} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${AM_SUPPORT_LIB} PUBLIC ${ART_MODERN_LINK_LIBS})
 if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(am_support_lib)
+    ceu_cm_set_static_target(${AM_SUPPORT_LIB})
 endif()
-install(TARGETS am_support_lib)
+install(TARGETS ${AM_SUPPORT_LIB})
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
-
+set(ART_MODERN_LIB "art_modern_lib${AM_MPI_POSTFIX}")
 file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.c")
-add_library(art_modern_lib ${ART_MODERN_LIB_SOURCE})
-target_compile_options(art_modern_lib BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(art_modern_lib PUBLIC am_support_lib)
+add_library(${ART_MODERN_LIB} ${ART_MODERN_LIB_SOURCE})
+target_compile_options(${ART_MODERN_LIB} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_MODERN_LIB} PUBLIC ${AM_SUPPORT_LIB})
 if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(art_modern_lib)
+    ceu_cm_set_static_target(${ART_MODERN_LIB})
 endif()
-install(TARGETS art_modern_lib)
+install(TARGETS ${ART_MODERN_LIB})
 
-if(WITH_MPI)
-    set(ART_MODERN_EXE art_modern-mpi)
-else()
-    set(ART_MODERN_EXE art_modern)
-endif()
-
+set(ART_MODERN_EXE "art_modern${AM_MPI_POSTFIX}")
 file(GLOB ART_MODERN_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/exe/*.cc")
 add_executable(${ART_MODERN_EXE} ${ART_MODERN_EXE_SOURCE})
 target_compile_options(${ART_MODERN_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(${ART_MODERN_EXE} PUBLIC art_modern_lib)
+target_link_libraries(${ART_MODERN_EXE} PUBLIC ${ART_MODERN_LIB})
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(${ART_MODERN_EXE})
 endif()
 install(TARGETS ${ART_MODERN_EXE})
 
+set(ART_PROFILE_BUILDER_LIB "art_profile_builder_lib${AM_MPI_POSTFIX}")
 file(GLOB ART_PROFILE_BUILDER_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/lib/*.cc")
-add_library(art_profile_builder_lib ${ART_PROFILE_BUILDER_LIB_SOURCE})
-target_compile_options(art_profile_builder_lib BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(art_profile_builder_lib PUBLIC am_support_lib)
+add_library(${ART_PROFILE_BUILDER_LIB} ${ART_PROFILE_BUILDER_LIB_SOURCE})
+target_compile_options(${ART_PROFILE_BUILDER_LIB} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_PROFILE_BUILDER_LIB} PUBLIC ${AM_SUPPORT_LIB})
 if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(art_profile_builder_lib)
+    ceu_cm_set_static_target(${ART_PROFILE_BUILDER_LIB})
 endif()
-install(TARGETS art_profile_builder_lib)
+install(TARGETS ${ART_PROFILE_BUILDER_LIB})
 
-if(WITH_MPI)
-    set(ART_PROFILE_BUILDER_EXE art_profile_builder-mpi)
-else()
-    set(ART_PROFILE_BUILDER_EXE art_profile_builder)
-endif()
-
+set(ART_PROFILER_BUILDER_EXE "art_profile_builder${AM_MPI_POSTFIX}")
 file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
 add_executable(${ART_PROFILE_BUILDER_EXE} ${ART_PROFILE_BUILDER_EXE_SOURCE})
 target_compile_options(${ART_PROFILE_BUILDER_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
@@ -327,25 +314,31 @@ if(NOT CEU_CM_SHOULD_ENABLE_TEST)
 elseif(Boost_unit_test_framework_FOUND)
     message(NOTICE "Testing enabled.")
     enable_testing()
-    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/test/*.cc")
 
+    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/test/*.cc")
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
-        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
+        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}${AM_MPI_POSTFIX}")
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
-        target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC am_support_lib Boost::unit_test_framework)
-        add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
+        target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC ${AM_SUPPORT_LIB} Boost::unit_test_framework)
         target_compile_options("${ART_MODERN_TEST_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
+        if(NOT BUILD_SHARED_LIBS)
+            ceu_cm_set_static_target("${ART_MODERN_TEST_EXEC}")
+        endif()
+        add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
     endforeach()
 
     file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/art/test/*.cc")
-
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
-        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}")
+        set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}${AM_MPI_POSTFIX}")
         add_executable("${ART_MODERN_TEST_EXEC}" "${ART_MODERN_TEST_SOURCE}")
-        target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC am_support_lib Boost::unit_test_framework art_modern_lib)
+        target_link_libraries("${ART_MODERN_TEST_EXEC}" PUBLIC ${AM_SUPPORT_LIB} Boost::unit_test_framework
+                                                               ${ART_MODERN_LIB})
         add_test(NAME "${ART_MODERN_TEST_EXEC}" COMMAND "${ART_MODERN_TEST_EXEC}")
+        if(NOT BUILD_SHARED_LIBS)
+            ceu_cm_set_static_target("${ART_MODERN_TEST_EXEC}")
+        endif()
         target_compile_options("${ART_MODERN_TEST_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
     endforeach()
 else()
@@ -358,14 +351,15 @@ endif()
 if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/benchmark/benchmark_adaptor.h.in"
                    "${CMAKE_BINARY_DIR}/include/benchmark_adaptor.h")
-
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
-
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
         get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WE)
-        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}")
+        set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}${AM_MPI_POSTFIX}")
         add_executable("${ART_MODERN_BENCHMARK_EXEC}" "${ART_MODERN_BENCHMARK_SOURCE}")
-        target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" PUBLIC am_support_lib)
+        target_link_libraries("${ART_MODERN_BENCHMARK_EXEC}" PUBLIC ${AM_SUPPORT_LIB})
         target_compile_options("${ART_MODERN_BENCHMARK_EXEC}" BEFORE PRIVATE ${AM_CC_FLAGS})
+        if(NOT BUILD_SHARED_LIBS)
+            ceu_cm_set_static_target("${ART_MODERN_TEST_EXEC}")
+        endif()
     endforeach()
 endif()

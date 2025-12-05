@@ -15,7 +15,7 @@
 #ifndef ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H
 #define ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H
 
-// See: https://www.gnu.org/software/libtool/manual/html_node/C-header-files.html
+/** See: https://www.gnu.org/software/libtool/manual/html_node/C-header-files.html */
 #undef ART_MODERN_BEGIN_C_DECLS
 #undef ART_MODERN_END_C_DECLS
 
@@ -36,4 +36,4 @@
 #undef INCLUDE_INTEL_SIMD
 #endif
 
-#endif // ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H
+#endif /** ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H */

@@ -97,8 +97,7 @@ AGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACTGATCG
 Create a profile with command:
 
 ```shell
-deps/ART_profiler_illumina/art_profiler_illumina \
-    opt/noqual_test/noqual_test_ opt/noqual_test fq
+art_profiler_illumina opt/noqual_test/noqual_test_ opt/noqual_test fq
 ```
 
 And then use the original ART to generate reads with the created profile:

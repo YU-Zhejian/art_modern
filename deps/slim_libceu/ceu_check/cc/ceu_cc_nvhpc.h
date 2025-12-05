@@ -7,7 +7,7 @@
 
 #if defined(__NVCOMPILER_MAJOR__)
 #define CEU_COMPILER_IS_NVHPC
-#define CEU_COMPILER_NAME "NVidia High Performance Computing (NVHPC) Toolkit NVC++"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_NVHPC
 #endif
 
-#endif
+#endif /* CEU_CC_NVHPC_H */

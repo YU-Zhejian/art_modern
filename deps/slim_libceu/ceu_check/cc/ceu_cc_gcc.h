@@ -8,7 +8,7 @@
 #if defined(__GNUC__)
 #define CEU_COMPILER_IS_GCC
 #if !defined(CEU_COMPILER_NAME)
-#define CEU_COMPILER_NAME "GNU Compiler Collection (GCC)"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_GCC
 #endif
 #endif
-#endif
+#endif /* CEU_CC_GCC_H */

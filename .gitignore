@@ -134,7 +134,7 @@ perf.data*
 *.fast[aq]
 *.pm
 *.dump
-*.log.d
+*.log.d/
 *.heap
 /intel/
 /.intel/

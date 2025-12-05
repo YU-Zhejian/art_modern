@@ -1,4 +1,4 @@
-// Include this file after <ceu_cc_nvhpc.h>!
+/* Include this file after <ceu_cc_nvhpc.h>! */
 #ifndef CEU_CC_PGIC_H
 #define CEU_CC_PGIC_H
 
@@ -9,8 +9,8 @@
 #if defined(__PGI)
 #define CEU_COMPILER_IS_PGIC
 #if !defined(CEU_COMPILER_NAME)
-#define CEU_COMPILER_NAME "Portland Group (PGI) C/C++ compilers"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_PGIC
 #endif
 #endif
 
-#endif
+#endif /* CEU_CC_PGIC_H */

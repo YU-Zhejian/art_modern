@@ -8,7 +8,11 @@
 #if defined(_MSC_VER)
 #define CEU_COMPILER_IS_MSVC
 #ifndef CEU_COMPILER_NAME
-#define CEU_COMPILER_NAME "MSVC"
+#ifdef __clang__
+#define CEU_COMPILER_NAME "Microsoft Visual Studio Clang Compiler"
+#else
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_MSVC
+#endif
 #endif
 #undef CEU_VISUAL_STUDIO_VER
 #if _MSC_VER < 800
@@ -113,4 +117,4 @@
 #define CEU_VISUAL_STUDIO_VER "unknown"
 #endif
 #endif
-#endif
+#endif /* CEU_CC_MSVC_H */

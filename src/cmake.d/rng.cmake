@@ -50,6 +50,6 @@ elseif("${USE_RANDOM_GENERATOR}" STREQUAL "ONEMKL")
 else()
     message(
         FATAL_ERROR
-            "Variable USE_RANDOM_GENERATOR should be set to one of STL, GSL, BOOST or ONEMKL. Current: ${USE_RANDOM_GENERATOR}"
+            "Variable USE_RANDOM_GENERATOR should be set to one of STL, PCG, SYSTEM_PCG, BOOST or ONEMKL. Current: ${USE_RANDOM_GENERATOR}"
     )
 endif()

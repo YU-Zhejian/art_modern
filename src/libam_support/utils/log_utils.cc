@@ -31,6 +31,7 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
+#include <cstdlib> // NOLINT: For std::getenv
 #include <iostream>
 #include <string>
 

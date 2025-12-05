@@ -17,11 +17,12 @@
 [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern_utils.svg)](https://github.com/YU-Zhejian/art_modern_utils/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern_utils/total.svg?style=social&logo=github&label=Download)](https://github.com/YU-Zhejian/art_modern_utils/releases)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 `art-modern-utils` on PyPI:
 [![Python version](https://img.shields.io/badge/python-3.9-blue)](https://www.python.org/downloads/)
 [![PyPI - Version](https://img.shields.io/pypi/v/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
 
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)
 

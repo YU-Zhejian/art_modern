@@ -6,7 +6,6 @@
  */
 #pragma once
 
-#include <ceu_check/ceu_check_cc_macro.h>
 #include <string>
 
 /*!

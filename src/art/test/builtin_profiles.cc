@@ -21,6 +21,8 @@
 
 #include <boost/log/trivial.hpp>
 
+#include <cstdlib>
+
 using namespace labw::art_modern;
 
 int main()

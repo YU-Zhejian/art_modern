@@ -16,6 +16,7 @@
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/hts_utils.h"
 #include "libam_support/utils/seq_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
@@ -57,7 +58,7 @@ int main()
     while (sam_read1(in, header, b) >= 0) {
         cigars.emplace_back();
         cigars.back().resize(b->core.n_cigar);
-        std::memcpy(cigars.back().data(), bam_get_cigar(b), b->core.n_cigar * sizeof(am_cigar_t));
+        std::memcpy(cigars.back().data(), am_bam_get_cigar(b), b->core.n_cigar * sizeof(am_cigar_t));
     }
     bam_destroy1(b);
     bam_hdr_destroy(header);

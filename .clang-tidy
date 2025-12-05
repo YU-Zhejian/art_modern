@@ -105,6 +105,9 @@ Checks:
   # HTSLib uses unions in several places.
   - -cppcoreguidelines-pro-type-union-access
 
+  # snprintf_s is not available in all platforms.
+  - clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit

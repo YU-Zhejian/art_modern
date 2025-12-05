@@ -34,4 +34,4 @@ static inline void generate_randbuf(uint8_t* out, size_t length, pcg32_random_t*
 }
 #endif
 
-#endif // RANDSTR_H_INCLUDED
+#endif /**RANDSTR_H_INCLUDED */

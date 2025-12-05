@@ -6,6 +6,6 @@
 #endif
 #if defined(__INTEL_CLANG_COMPILER) || defined(__INTEL_LLVM_COMPILER)
 #define CEU_COMPILER_IS_INTEL_CLANG
-#define CEU_COMPILER_NAME "Intel(R) oneAPI DPC++/C++ Compiler (ICX)"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_INTEL_ONEAPI_DPCPP
 #endif
-#endif
+#endif /* CEU_CC_INTEL_CLANG_H */

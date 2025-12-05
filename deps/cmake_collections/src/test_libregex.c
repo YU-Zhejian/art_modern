@@ -13,14 +13,14 @@ int main(void)
     if (ret != 0) {
         return EXIT_FAILURE;
     }
-    // Test the regex
+    /* Test the regex */
     if (regexec(&re, test_string, 0, NULL, 0) != 0) {
         regfree(&re);
-        return EXIT_FAILURE; // Should match
+        return EXIT_FAILURE; /*Should match*/
     }
     if (regexec(&re, non_matching_string, 0, NULL, 0) == 0) {
         regfree(&re);
-        return EXIT_FAILURE; // Should not match
+        return EXIT_FAILURE; /*Should not match*/
     }
 
     regfree(&re);

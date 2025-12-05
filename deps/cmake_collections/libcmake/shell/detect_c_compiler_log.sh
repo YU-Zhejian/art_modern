@@ -7,7 +7,7 @@
 #   - ${OUT} The output directory.
 # Output:
 # If there's no error, there would be a file at "${CEU_DCPM_OUT}/test_${CEU_DCPM_LANG}_cpp.h" with all macros inside.
-set -ue
+# set -ue # Set is bash-specific
 CEU_DCPM_CC=${1}
 CEU_DCPM_LANG=${2}
 CEU_DCPM_OUT=${3}
@@ -24,8 +24,11 @@ for CMD in \
     "\"${CEU_DCPM_CC}\" --verbose -Wl,--verbose -x \"${CEU_DCPM_LANG}\" /dev/stdin" \
     "\"${CEU_DCPM_CC}\" --verbose -Wl,--verbose -x\"${CEU_DCPM_LANG}\" -" \
     "\"${CEU_DCPM_CC}\" --verbose -Wl,--verbose -x\"${CEU_DCPM_LANG}\"" \
-    "\"${CEU_DCPM_CC}\" --verbose -Wl,--verbose -" ; do
+    "\"${CEU_DCPM_CC}\" --verbose -Wl,--verbose -" \
+    "\"${CEU_DCPM_CC}\" -vv" \
+    ; do
     if perform_cmd "${CMD}"; then
         exit
     fi
 done
+# NOTE: The 6th command is for `tcc`.

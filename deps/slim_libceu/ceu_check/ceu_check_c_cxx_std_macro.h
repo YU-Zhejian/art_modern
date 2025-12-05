@@ -7,32 +7,7 @@
 #ifndef CEU_CHECK_C_CXX_STD_MACRO_H
 #define CEU_CHECK_C_CXX_STD_MACRO_H
 
-#ifdef CEU_UNDER_DOXYGEN
-/*!
- * @def CEU_CXX_STD
- * @brief The C++ Standard in a human-readable way. This macro is always defined.
- */
-#define CEU_CXX_STD /* implementation-defined */
-
-/*!
- * @def CEU_CXX_STD_VERSION_MACRO
- * @brief The C++ Standard version macro, should be equal to `_MSVC_LANG` or `__cplusplus__` or undefined.
- */
-#define CEU_CXX_STD_VERSION_MACRO /* implementation-defined */
-
-/*!
- * @def CEU_C_STD
- * @brief The C Standard in a human-readable way. This macro is always defined.
- */
-#define CEU_C_STD /* implementation-defined */
-
-/*!
- * @def CEU_C_STD_VERSION_MACRO
- * @brief The C Standard version macro, should be equal to `__STDC_VERSION__` or undefined.
- */
-#define CEU_C_STD_VERSION_MACRO /* implementation-defined */
-
-#else
+#include "ceu_check/ceu_constants.h"
 
 #ifdef CEU_CXX_STD_VERSION_MACRO
 #undef CEU_CXX_STD_VERSION_MACRO
@@ -44,7 +19,7 @@
 #endif
 
 #ifndef CEU_CXX_STD_VERSION_MACRO
-#define CEU_CXX_STD "UNDEFINED"
+#define CEU_CXX_STD CEU_UNDEFINED
 #elif CEU_CXX_STD_VERSION_MACRO < 199711L
 #define CEU_CXX_STD "pre-98"
 #elif CEU_CXX_STD_VERSION_MACRO >= 202100L
@@ -75,7 +50,7 @@
 #ifdef __STDC__
 #define CEU_C_STD "unknown ISO C"
 #else
-#define CEU_C_STD "UNDEFINED"
+#define CEU_C_STD CEU_UNDEFINED
 #endif
 #elif CEU_C_STD_VERSION_MACRO < 199409L
 #define CEU_C_STD "pre-94"
@@ -95,5 +70,4 @@
 #define CEU_C_STD "unknown"
 #endif
 
-#endif
-#endif // CEU_CHECK_C_CXX_STD_MACRO_H
+#endif /* CEU_CHECK_C_CXX_STD_MACRO_H  */

@@ -9,9 +9,9 @@
     || defined(__TURBOC__)
 #define CEU_COMPILER_IS_BORLAND
 #if defined(__clang__)
-#define CEU_COMPILER_NAME "Borland C++Builder Compilers with Clang support"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_BORLAND_CLANG
 #else
-#define CEU_COMPILER_NAME "Borland C++Builder Compilers"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_BORLAND
 #endif
 
 #undef CEU_CPPB_VERSION
@@ -71,4 +71,4 @@
 #define CEU_CPPB_VERSION "unknown after C++Builder Alexandria"
 #endif
 #endif
-#endif
+#endif /* CEU_CC_TURBOC_H */

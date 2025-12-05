@@ -13,15 +13,19 @@
  **/
 
 #include "art_modern_config.h" // NOLINT: for various flags
+#include "libceu_stddef.h" // NOLINT: For CEU_VERSION
 
 #include "libam_support/utils/version_utils.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/seq_utils.hh"
 
-#include "ceu_check/ceu_check_c_cxx_std.hh"
+#include "ceu_check/ceu_check_c_std.h"
+#include "ceu_check/ceu_check_c_stdlib.h"
 #include "ceu_check/ceu_check_cc.hh"
 #include "ceu_check/ceu_check_ctypes_limit.hh"
+#include "ceu_check/ceu_check_cxx_std.hh"
+#include "ceu_check/ceu_check_cxx_stdlib.hh"
 #include "ceu_check/ceu_check_os.hh"
 
 // Boost
@@ -133,13 +137,11 @@ namespace {
     void print_onemkl_version()
     {
 #ifdef USE_ONEMKL_RANDOM
-#ifdef __INTEL_MKL_PATCH__
         std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
-                  << "." << __INTEL_MKL_PATCH__ << " (" << INTEL_MKL_VERSION << ")" << std::endl;
-#else // Not present in Debian MKL.
-        std::cout << "MKL Version: " << __INTEL_MKL__ << "." << __INTEL_MKL_MINOR__ << "." << __INTEL_MKL_UPDATE__
-                  << " (" << INTEL_MKL_VERSION << ")" << std::endl;
+#ifdef __INTEL_MKL_PATCH__ // Not present in Debian MKL.
+                  << "." << __INTEL_MKL_PATCH__
 #endif
+                  << " (" << INTEL_MKL_VERSION << ")" << std::endl;
 #else
         std::cout << "MKL: not used" << std::endl;
 #endif
@@ -204,8 +206,31 @@ namespace {
 
     void print_fmt_version()
     {
+        // NOLINTNEXTLINE
         std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100
                   << std::endl;
+    }
+
+    void print_git_info()
+    {
+#if defined(WITH_GIT) && defined(CEU_CM_GIT_COMMIT_HASH) && defined(CEU_CM_GIT_COMMIT_DATE)
+        std::cout << "Git: (" << CEU_CM_GIT_COMMIT_HASH << ") " << CEU_CM_GIT_COMMIT_DATE << std::endl;
+#else
+        std::cout << "Git: N/A" << std::endl;
+#endif
+    }
+
+    void print_libceu_various_info()
+    {
+        std::cout << "LibCEU: " << CEU_VERSION << std::endl;
+        std::cout << ceu_interpret_c_std_version();
+        std::cout << ceu_interpret_c_stdlib_version();
+        std::cout << ceu_interpret_cxx_std_version();
+        std::cout << ceu_interpret_cxx_stdlib();
+        std::cout << ceu_check_get_compiler_info();
+        std::cout << ceu_check_get_ctypes_limit_info();
+        std::cout << ceu_check_get_compile_time_os_info();
+        std::cout << ceu_check_get_run_time_os_info();
     }
 
 } // namespace
@@ -213,12 +238,8 @@ namespace {
 void print_version()
 {
     std::cout << "ART: " << ART_VERSION << ", ART_MODERN: " << ART_MODERN_VERSION << std::endl;
-#if defined(WITH_GIT) && defined(CEU_CM_GIT_COMMIT_HASH) && defined(CEU_CM_GIT_COMMIT_DATE)
-    std::cout << "Git: (" << CEU_CM_GIT_COMMIT_HASH << ") " << CEU_CM_GIT_COMMIT_DATE << std::endl;
-#else
-    std::cout << "Git: N/A" << std::endl;
-#endif
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
+    print_git_info();
     print_htslib_version();
     print_fmt_version();
     print_boost_version();
@@ -228,11 +249,6 @@ void print_version()
     print_mpi_version();
     print_bs_version();
     print_malloc_version();
-    std::cout << ceu_interpret_c_std_version();
-    std::cout << ceu_interpret_cxx_std_version();
-    std::cout << ceu_check_get_compiler_info();
-    std::cout << ceu_check_get_ctypes_limit_info();
-    std::cout << ceu_check_get_compile_time_os_info();
-    std::cout << ceu_check_get_run_time_os_info();
+    print_libceu_various_info();
 }
 } // namespace labw::art_modern

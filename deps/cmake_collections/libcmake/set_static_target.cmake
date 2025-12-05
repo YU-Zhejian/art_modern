@@ -15,12 +15,11 @@ Notice:
 Warnings:
     - For those who uses pthreads & openMP on GLibC platforms (i.e., common GNU/Linux EXCLUDING Alpine Linux), this option would lead to segfaults.
 #]=======================================================================]
-macro(ceu_cm_set_static_target name)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1)
-    set_target_properties("${name}" PROPERTIES LINK_SEARCH_END_STATIC 1)
-    set_target_properties("${name}" PROPERTIES INSTALL_RPATH "")
+function(ceu_cm_set_static_target name)
+    set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1 LINK_SEARCH_END_STATIC 1 INSTALL_RPATH "")
     if(NOT (BORLAND OR MSVC))
-        set_target_properties("${name}" PROPERTIES LINK_FLAGS -static $<$<COMPILE_LANGUAGE:C,CXX>:-static-libgcc>
-                                                                      $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
+        target_link_options("${name}" PRIVATE -static)
+        target_link_options("${name}" PRIVATE $<$<COMPILE_LANGUAGE:C>:-static-libgcc>
+                            $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
     endif()
-endmacro()
+endfunction()

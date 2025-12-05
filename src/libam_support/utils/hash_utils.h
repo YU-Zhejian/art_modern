@@ -32,7 +32,7 @@ inline void am_boost_hash_combine_impl32(uint32_t& seed, uint32_t value)
     seed ^= value + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
-// Improved by Tongyi Lingma
+/** Improved by Tongyi Lingma */
 inline void am_boost_hash_combine_impl64(uint64_t& seed, uint64_t value)
 {
     seed ^= value + 0x9e3779b97f4a7c15ULL + (seed << 13) + (seed >> 19);
@@ -40,4 +40,4 @@ inline void am_boost_hash_combine_impl64(uint64_t& seed, uint64_t value)
 
 ART_MODERN_END_C_DECLS
 
-#endif // LABW_ART_MODERN_LIBAM_SUPPORT_UTILS_HASH_UTILS_H
+#endif /** LABW_ART_MODERN_LIBAM_SUPPORT_UTILS_HASH_UTILS_H */

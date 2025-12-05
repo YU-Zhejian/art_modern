@@ -7,6 +7,6 @@
 
 #if defined(__EDG__)
 #define CEU_COMPILER_IS_EDG
-// Do not define compiler name since there are multiple compilers that uses EDG frontend.
+/*  Do not define compiler name since there are multiple compilers that uses EDG frontend.  */
 #endif
-#endif
+#endif /* CEU_CC_EDG_H */
