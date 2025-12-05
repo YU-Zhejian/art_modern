@@ -14,6 +14,12 @@
 #endif
 #endif
 
+#ifdef CEU_ON_FreeBSD
+#if defined(CEU_HAVE_INCLUDE_SYS_PARAM_H) && CEU_HAVE_INCLUDE_SYS_PARAM_H == 1
+#include <sys/param.h>
+#endif
+#endif
+
 #if defined(CEU_HAVE_INCLUDE_CYGWIN_VERSION_H) && CEU_HAVE_INCLUDE_CYGWIN_VERSION_H == 1
 #include <cygwin/version.h>
 #endif
@@ -66,6 +72,16 @@ std::string ceu_check_get_compile_time_os_info()
     oss << "\tCYGWIN API ver. " << CEU_UNDEFINED << ", with dll (" << CEU_UNDEFINED << ") ver. " << CEU_UNDEFINED
         << std::endl;
 #endif
+#endif
+
+#ifdef CEU_ON_FreeBSD
+    oss << "\tFreeBSD Version: " << __FreeBSD__ << " (__FreeBSD_version: ";
+#ifdef __FreeBSD_version
+    oss << std::to_string(__FreeBSD_version);
+#else
+    oss << CEU_UNDEFINED;
+#endif
+    oss << ")" << std::endl;
 #endif
 
 #ifdef CEU_ON_POSIX

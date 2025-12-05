@@ -21,6 +21,7 @@ include(CheckSymbolExists)
 check_include_file("cygwin/version.h" CEU_HAVE_INCLUDE_CYGWIN_VERSION_H)
 check_include_file("sys/utsname.h" CEU_HAVE_INCLUDE_SYS_UTSNAME_H)
 check_include_file("sys/cdefs.h" CEU_HAVE_INCLUDE_SYS_CDEFS_H)
+check_include_file("sys/param.h" CEU_HAVE_INCLUDE_SYS_PARAM_H)
 check_include_file("_mingw.h" CEU_HAVE_INCLUDE__MINGW_H)
 check_include_file("features.h" CEU_HAVE_INCLUDE_FEATURES_H)
 
