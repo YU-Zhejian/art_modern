@@ -219,15 +219,15 @@ if(NOT BUILD_SHARED_LIBS)
 endif()
 install(TARGETS ${ART_PROFILE_BUILDER_LIB})
 
-set(ART_PROFILER_BUILDER_EXE "art_profile_builder${AM_MPI_POSTFIX}")
+set(ART_PROFILE_BUILDER_EXE "art_profile_builder${AM_MPI_POSTFIX}")
 file(GLOB ART_PROFILE_BUILDER_EXE_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art_profile_builder/exe/*.cc")
-add_executable(${ART_PROFILER_BUILDER_EXE} ${ART_PROFILE_BUILDER_EXE_SOURCE})
-target_compile_options(${ART_PROFILER_BUILDER_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
-target_link_libraries(${ART_PROFILER_BUILDER_EXE} PUBLIC ${ART_PROFILE_BUILDER_LIB})
+add_executable(${ART_PROFILE_BUILDER_EXE} ${ART_PROFILE_BUILDER_EXE_SOURCE})
+target_compile_options(${ART_PROFILE_BUILDER_EXE} BEFORE PRIVATE ${AM_CC_FLAGS})
+target_link_libraries(${ART_PROFILE_BUILDER_EXE} PUBLIC ${ART_PROFILE_BUILDER_LIB})
 if(NOT BUILD_SHARED_LIBS)
-    ceu_cm_set_static_target(${ART_PROFILER_BUILDER_EXE})
+    ceu_cm_set_static_target(${ART_PROFILE_BUILDER_EXE})
 endif()
-install(TARGETS ${ART_PROFILER_BUILDER_EXE})
+install(TARGETS ${ART_PROFILE_BUILDER_EXE})
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern tests.
