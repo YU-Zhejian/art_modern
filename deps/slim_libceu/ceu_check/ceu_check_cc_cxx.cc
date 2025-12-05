@@ -1,10 +1,13 @@
+#include "libceu_stddef.h" /* NOLINT */
+
 #include "ceu_check/ceu_check_cc.hh"
 
 #include "ceu_check/ceu_check_cc_macro.h"
-#include "ceu_check/ceu_constants.h"
+#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
-#include "libceu_stddef.h"
+#include "ceu_check/ceu_compiler_names.h"
 
+#include <ostream>
 #include <sstream>
 #include <string>
 

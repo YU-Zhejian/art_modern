@@ -11,7 +11,7 @@
 #include <sys/cdefs.h> /* NOLINT*/
 #endif
 
-#include "ceu_check/ceu_check_cc_macro.h"
+#include "ceu_check/ceu_check_cc_macro.h" /* NOLINT for CEU_COMPILER_IS_MSVC */
 
 #include <limits.h> /* NOLINT for __GLIBC__ */
 
@@ -29,6 +29,7 @@
 #define CEU_LIBC_IS_MSVC
 #define CEU_LIBC_NAME "MSVCRT or UCRT"
 #elif defined(__UCLIBC__)
+/* We do not distinguish between uClibc and uClibc-ng */
 #define CEU_LIBC_IS_UCLIBC
 #define CEU_LIBC_NAME "uClibc"
 #elif defined(__dietlibc__)

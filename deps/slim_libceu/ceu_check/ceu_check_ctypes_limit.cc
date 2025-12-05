@@ -1,8 +1,11 @@
 #include "ceu_check/ceu_check_ctypes_limit.hh"
 
+#include <cstddef> /* NOLINT: for size_t, ptrdiff_t */
+#include <cstdlib> /* NOLINT: for NULL */
 #include <iomanip>
 #include <ios>
 #include <limits>
+#include <ostream>
 #include <sstream>
 #include <string>
 

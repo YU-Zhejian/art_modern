@@ -12,7 +12,6 @@ char* ceu_interpret_c_std_version(void)
         return NULL;
     }
 
-    char cstd_macro[256];
     char* ptr = buffer;
     int remaining = 1024;
     int written = 0;
@@ -27,12 +26,10 @@ char* ceu_interpret_c_std_version(void)
     }
 
 #ifdef CEU_C_STD_VERSION_MACRO
-    CEU_SNPRINTF(cstd_macro, sizeof(cstd_macro), "%ld", (long)CEU_C_STD_VERSION_MACRO);
+    written = CEU_SNPRINTF(ptr, remaining, " (%ld)\n", (long)CEU_C_STD_VERSION_MACRO);
 #else
-    CEU_SNPRINTF(cstd_macro, sizeof(cstd_macro), "%s", CEU_UNDEFINED);
+    written = CEU_SNPRINTF(ptr, remaining, " (%s)\n", CEU_UNDEFINED);
 #endif
-
-    written = CEU_SNPRINTF(ptr, remaining, " (%s)\n", cstd_macro);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;

@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_os.hh"
 
 #include "ceu_check/ceu_check_os_macro.h"
-#include "ceu_check/ceu_constants.h"
+#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #include "libceu_stddef.h"
 
@@ -244,7 +244,7 @@ std::string ceu_check_get_run_time_os_info()
 #ifdef CEU_ON_GNU_LINUX
     oss << "\tLinux lsb-release info: ";
     // See which file exists
-    const char* lsb_files[] = { "/etc/lsb-release", "/usr/lib/lsb-release" };
+    const char* const lsb_files[] = { "/etc/lsb-release", "/usr/lib/lsb-release" };
     const char* target_file = nullptr;
     for (const auto& file : lsb_files) {
         if (access(file, F_OK) != -1) {

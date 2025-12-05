@@ -27,6 +27,7 @@ char* ceu_interpret_c_stdlib_version(void)
     }
 #ifdef CEU_LIBC_IS_GNU
 #ifdef __GLIBC__
+    /* NOLINTNEXTLINE: __GLIBC_MINOR__ in <feature.h> should have been included if possible. */
     written = CEU_SNPRINTF(ptr, remaining, "\tglibc version number: %d.%d\n", __GLIBC__, __GLIBC_MINOR__);
 #else
     written = CEU_SNPRINTF(ptr, remaining, "\tglibc version number: %s\n", CEU_UNDEFINED);

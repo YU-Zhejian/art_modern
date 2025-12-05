@@ -1,7 +1,7 @@
 #ifndef CEU_CHECK_C_SNPRINTF_H
 #define CEU_CHECK_C_SNPRINTF_H
 
-#include "ceu_check/ceu_check_cc_macro.h"
+#include "ceu_check/ceu_check_cc_macro.h" /* NOLINT: For CEU_COMPILER_IS_MSVC */
 
 #ifdef CEU_COMPILER_IS_MSVC
 /**  Enable MSVC secure CRT functions */
@@ -13,7 +13,7 @@
 #define _CRT_SECURE_NO_DEPRECATE /* NOLINT */
 #endif
 #endif
-#include <stdio.h>
+#include <stdio.h> /* NOLINT: For snprintf or _snprintf_s */
 
 #ifdef CEU_COMPILER_IS_MSVC
 /** Macro for _snprintf_s with truncation behavior similar to snprintf  */

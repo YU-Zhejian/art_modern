@@ -45,7 +45,7 @@
 #if defined(__linux) || defined(__linux__) || defined(linux) || defined(__gnu_linux__)
 #define CEU_ON_GNU_LINUX
 #ifndef CEU_PRIMARY_OS_TYPE
-#define CEU_PRIMARY_OS_TYPE "GNU/Linux"
+#define CEU_PRIMARY_OS_TYPE "GNU/Linux" /* NOLINT */
 #endif
 #endif /* __linux */
 
