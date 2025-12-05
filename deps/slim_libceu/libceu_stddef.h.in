@@ -20,3 +20,6 @@
 
 /** Whether <sys/param.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_SYS_PARAM_H
+
+/** Version */
+#cmakedefine CEU_VERSION "${CEU_VERSION}"

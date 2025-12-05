@@ -15,6 +15,7 @@
 #ifndef ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H
 #define ART_MODERN_LIBAM_SUPPORT_UTILS_HTS_UTILS_H
 
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/c_macro_utils.h"
 
 #include <htslib/hts.h>
@@ -32,6 +33,21 @@ ART_MODERN_BEGIN_C_DECLS
  * @return Where we are.
  */
 size_t am_hts_tell(htsFile* fp);
+
+/*! @function
+ @abstract  Get the CIGAR array
+ @param  b  pointer to an alignment
+ @return    pointer to the CIGAR array
+
+ @discussion In the CIGAR array, each element is a 32-bit integer. The
+ lower 4 bits gives a CIGAR operation and the higher 28 bits keep the
+ length of a CIGAR.
+ */
+#ifdef __cplusplus
+#define am_bam_get_cigar(b) (reinterpret_cast<am_cigar_t*>((b)->data + (b)->core.l_qname))
+#else
+#define am_bam_get_cigar(b) ((am_cigar_t*)((b)->data + (b)->core.l_qname))
+#endif
 
 ART_MODERN_END_C_DECLS
 

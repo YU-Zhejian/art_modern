@@ -103,7 +103,7 @@ void exit_mpi() noexcept
 
 std::size_t mpi_size()
 {
-    int size = 1;
+    int size = 1; // NOLINT: Default value for non-MPI build
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
         exception_mpi_is_finalized();

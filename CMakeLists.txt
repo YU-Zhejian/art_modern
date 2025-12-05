@@ -153,7 +153,6 @@ configure_file("${CMAKE_CURRENT_LIST_DIR}/src/libam_support/art_modern_config.h.
 
 # -----------------------------------------------------------------------------
 # Dealing with includes.
-
 include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/src/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/include/")
 include_directories(BEFORE "${CMAKE_BINARY_DIR}/gen/src/")
@@ -190,7 +189,6 @@ install(TARGETS ${AM_SUPPORT_LIB})
 
 # -----------------------------------------------------------------------------
 # Dealing with art_modern executable.
-
 set(ART_MODERN_LIB "art_modern_lib${AM_MPI_POSTFIX}")
 file(GLOB ART_MODERN_LIB_SOURCE "${CMAKE_CURRENT_LIST_DIR}/src/art/lib/*.cc" "${CMAKE_BINARY_DIR}/gen/src/art/*.c")
 add_library(${ART_MODERN_LIB} ${ART_MODERN_LIB_SOURCE})
@@ -239,8 +237,8 @@ if(NOT CEU_CM_SHOULD_ENABLE_TEST)
 elseif(Boost_unit_test_framework_FOUND)
     message(NOTICE "Testing enabled.")
     enable_testing()
-    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/test/*.cc")
 
+    file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/test/*.cc")
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
         set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}${AM_MPI_POSTFIX}")
@@ -254,7 +252,6 @@ elseif(Boost_unit_test_framework_FOUND)
     endforeach()
 
     file(GLOB ART_MODERN_TEST_SOURCES "${CMAKE_CURRENT_LIST_DIR}/src/art/test/*.cc")
-
     foreach(ART_MODERN_TEST_SOURCE ${ART_MODERN_TEST_SOURCES})
         get_filename_component(ART_MODERN_TEST_EXEC "${ART_MODERN_TEST_SOURCE}" NAME_WE)
         set(ART_MODERN_TEST_EXEC "am_test_${ART_MODERN_TEST_EXEC}${AM_MPI_POSTFIX}")
@@ -277,9 +274,7 @@ endif()
 if(DEFINED BUILD_ART_MODERN_BENCHMARKS AND BUILD_ART_MODERN_BENCHMARKS)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/benchmark/benchmark_adaptor.h.in"
                    "${CMAKE_BINARY_DIR}/include/benchmark_adaptor.h")
-
     file(GLOB ART_MODERN_BENCHMARK_SOURCES "src/benchmark/*.cc")
-
     foreach(ART_MODERN_BENCHMARK_SOURCE ${ART_MODERN_BENCHMARK_SOURCES})
         get_filename_component(ART_MODERN_BENCHMARK_EXEC "${ART_MODERN_BENCHMARK_SOURCE}" NAME_WE)
         set(ART_MODERN_BENCHMARK_EXEC "am_bench_${ART_MODERN_BENCHMARK_EXEC}${AM_MPI_POSTFIX}")

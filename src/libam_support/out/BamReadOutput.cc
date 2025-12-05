@@ -27,6 +27,7 @@
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/hts_utils.h"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -81,7 +82,7 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
         reverse(bam_get_qual(sam_record.get()), rlen);
-        reverse(bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
     }
     tags.patch(sam_record.get());
 
@@ -154,10 +155,10 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa1.is_plus_strand) {
         reverse(bam_get_qual(sam_record1.get()), rlen_1);
-        reverse(bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
     } else {
         reverse(bam_get_qual(sam_record2.get()), rlen_2);
-        reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
     }
 
     tags1.patch(sam_record1.get());
