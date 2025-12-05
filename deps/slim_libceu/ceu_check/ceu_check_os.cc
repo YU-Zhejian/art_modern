@@ -74,6 +74,7 @@ std::string ceu_check_get_compile_time_os_info()
 #endif
 #endif
 
+/* TODO: What's __FreeBSD_cc_version? */
 #ifdef CEU_ON_FreeBSD
     oss << "\tFreeBSD Version: " << __FreeBSD__ << " (__FreeBSD_version: ";
 #ifdef __FreeBSD_version
