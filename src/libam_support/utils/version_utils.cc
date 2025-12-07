@@ -22,8 +22,8 @@
 
 #include "ceu_check/ceu_check_c_std.h"
 #include "ceu_check/ceu_check_c_stdlib.h"
-#include "ceu_check/ceu_check_cxx_compiler.hh"
 #include "ceu_check/ceu_check_ctypes_limit.hh"
+#include "ceu_check/ceu_check_cxx_compiler.hh"
 #include "ceu_check/ceu_check_cxx_std.hh"
 #include "ceu_check/ceu_check_cxx_stdlib.hh"
 #include "ceu_check/ceu_check_os.hh"

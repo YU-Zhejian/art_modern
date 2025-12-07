@@ -18,6 +18,7 @@
 #define CEU_COMPILER_NAME_BORLAND "Borland/Embarcadero C++Builder Compiler"
 #define CEU_COMPILER_NAME_BORLAND_CLANG "Borland/Embarcadero C++Builder Compilers with Clang support"
 #define CEU_COMPILER_NAME_EDG "Eddison Design Group (EDG)-based Compiler"
+#define CEU_COMPILER_NMAME_TI "Texas Instruments C/C++ Compiler"
 #define CEU_COMPILER_NAME_UNKNOWN_EDG_BASED "Unknown Eddison Design Group (EDG)-based Compiler"
 
 #endif // CEU_COMPILER_NAMES_H

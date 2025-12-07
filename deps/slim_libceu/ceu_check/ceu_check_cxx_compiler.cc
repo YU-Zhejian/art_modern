@@ -32,6 +32,21 @@ std::string ceu_check_get_cxx_compiler_info()
     oss << "Compiled at: " << date_str << ", " << time_str << std::endl;
 #endif
     oss << "Compiler Identification: " << CEU_COMPILER_NAME << std::endl;
+
+#if defined(CEU_COMPILER_IS_TI)
+    long ti_version =
+#ifdef __TI_COMPILER_VERSION__
+        __TI_COMPILER_VERSION__
+#elif defined(__TI_COMPILER_VERSION)
+        __TI_COMPILER_VERSION
+#else
+        0L
+#endif
+        ;
+    oss << "\t" << CEU_COMPILER_NAME_TI << " compatible version number: " << ti_version / 1000000L << '.'
+        << (ti_version % 1000000L) / 1000 << '.' << ti_version % 1000 << std::endl;
+#endif
+
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     oss << "\t" << CEU_COMPILER_NAME_INTEL_ONEAPI_DPCPP
         << " compatible version number: " << __INTEL_CLANG_COMPILER / 10000 << '.'
@@ -39,7 +54,7 @@ std::string ceu_check_get_cxx_compiler_info()
 #endif
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
     oss << "\t" << CEU_COMPILER_NAME_ARM_COMPILER_LINUX << " compatible version number: " << __armclang_major__ << '.'
-        << __armclang_minor__ << 'b' << __ARM_LINUX_COMPILER_BUILD__ << " (" << __armclang_version__ << ")"
+        << __armclang_minor__ << " (" << __armclang_version__ << ")" << " build " << __ARM_LINUX_COMPILER_BUILD__
         << std::endl;
 #endif
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)

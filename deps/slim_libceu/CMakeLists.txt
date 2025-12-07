@@ -25,6 +25,7 @@ check_include_file("sys/cdefs.h" CEU_HAVE_INCLUDE_SYS_CDEFS_H)
 check_include_file("sys/param.h" CEU_HAVE_INCLUDE_SYS_PARAM_H)
 check_include_file("_mingw.h" CEU_HAVE_INCLUDE__MINGW_H)
 check_include_file("features.h" CEU_HAVE_INCLUDE_FEATURES_H)
+check_include_file("endian.h" CEU_HAVE_INCLUDE_ENDIAN_H)
 
 configure_file("${CMAKE_CURRENT_LIST_DIR}/libceu_stddef.h.in" "${CMAKE_BINARY_DIR}/include/libceu_stddef.h")
 
@@ -36,7 +37,6 @@ else()
 endif()
 set_target_properties(slim_libceu PROPERTIES VERSION "${PROJECT_VERSION}" SOVERSION 1)
 install(TARGETS slim_libceu)
-
 
 if(DEFINED PROJECT_IS_TOP_LEVEL AND PROJECT_IS_TOP_LEVEL)
     add_executable(ceu_check_exe exe/ceu_check_exe.cc)

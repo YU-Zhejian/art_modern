@@ -1,6 +1,6 @@
 /**
  *@file ceu_check_c_compiler.c
-* Converted from C++ implementation to C using TONGYI LINGMA.
+ * Converted from C++ implementation to C using TONGYI LINGMA.
  * MSVC secure C standard version
  */
 
@@ -14,7 +14,6 @@
 #include "ceu_check/utils/c_snprintf.h"
 
 #include <stdlib.h>
-
 
 char* ceu_check_get_c_compiler_info()
 {
@@ -68,6 +67,26 @@ char* ceu_check_get_c_compiler_info()
         free(buffer);
         return NULL;
     }
+#if defined(CEU_COMPILER_IS_TI)
+    long ti_version =
+#ifdef __TI_COMPILER_VERSION__
+        __TI_COMPILER_VERSION__
+#elif defined(__TI_COMPILER_VERSION)
+        __TI_COMPILER_VERSION
+#else
+        0L
+#endif
+        ;
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %ld.%ld.%ld\n", CEU_COMPILER_NAME_TI,
+        ti_version / 1000000L, (ti_version / 1000000L) % 1000L, ti_version % 1000L);
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
 
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n",
@@ -83,9 +102,9 @@ char* ceu_check_get_c_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
-    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%db%d (%s)\n",
-        CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__,
-        __armclang_version__);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d (%s) build %d\n",
+        CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __armclang_version__,
+        __ARM_LINUX_COMPILER_BUILD__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -94,6 +113,7 @@ char* ceu_check_get_c_compiler_info()
         return NULL;
     }
 #endif
+
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
 #ifdef __ARMCC_VERSION
     // P.VV.BBBB

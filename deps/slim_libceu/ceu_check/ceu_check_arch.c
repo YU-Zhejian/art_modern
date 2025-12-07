@@ -1,15 +1,12 @@
-
-#include "ceu_check/ceu_check_arch_macros.h"
 #include "ceu_check/ceu_check_arch.h"
-
+#include "ceu_check/ceu_check_arch_macros.h"
 
 int ceu_is_big_endian(void)
 {
-#if ((defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)) || defined(__LITTLE_ENDIAN__)               \
-    || defined(__LITTLE_ENDIAN) || defined(CEU_ARCHITECTURE_X86_64) || defined(CEU_ARCHITECTURE_I386)
+
+#if defined(CEU_COMPILE_TIME_IS_LITTLE_ENDIAN)
     return 0;
-#elif ((defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)) || defined(__BIG_ENDIAN__)                   \
-    || defined(__BIG_ENDIAN)
+#elif defined(CEU_COMPILE_TIME_IS_BIG_ENDIAN)
     return 1;
 #else /* Fallback method */
     unsigned int x = 1;

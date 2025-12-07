@@ -28,9 +28,10 @@
 #include "ceu_check/cc/08_nvhpc.h" /* NOLINT */
 #include "ceu_check/cc/09_pgic.h" /* NOLINT */
 #include "ceu_check/cc/10_tcc.h" /* NOLINT */
-#include "ceu_check/cc/11_clang.h" /* NOLINT */
-#include "ceu_check/cc/12_gcc.h" /* NOLINT */
-#include "ceu_check/cc/13_edg.h" /* NOLINT */
+#include "ceu_check/cc/11_ti.h" /* NOLINT */
+#include "ceu_check/cc/30_clang.h" /* NOLINT */
+#include "ceu_check/cc/40_gcc.h" /* NOLINT */
+#include "ceu_check/cc/50_edg.h" /* NOLINT */
 #include "ceu_check/cc/99_unknown.h" /* NOLINT */
 /* clang-format on */
 

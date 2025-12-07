@@ -26,7 +26,7 @@ int ceu_is_little_endian(void);
  *
  * @return A string representing the architecture, or "unknown" if not detected.
  */
-char* ceu_check_get_target_triplet_part_one(void) ;
+char* ceu_check_get_target_triplet_part_one(void);
 
 #ifdef __cplusplus
 }

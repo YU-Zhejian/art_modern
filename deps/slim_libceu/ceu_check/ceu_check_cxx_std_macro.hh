@@ -36,4 +36,3 @@
 #elif CEU_CXX_STD_VERSION_MACRO == 199711L
 #define CEU_CXX_STD "98"
 #endif
-
