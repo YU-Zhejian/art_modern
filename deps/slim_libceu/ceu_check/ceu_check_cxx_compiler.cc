@@ -15,7 +15,7 @@ std::string ceu_check_get_cxx_compiler_info()
 {
     std::ostringstream oss;
 #if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)
-    oss << "Compiled at: N/A due to reproducible build" << std::endl;
+    oss << "C++ Compiled at: N/A due to reproducible build" << std::endl;
 #else
     const std::string date_str =
 #if defined(__DATE__)
@@ -29,9 +29,9 @@ std::string ceu_check_get_cxx_compiler_info()
 #else
         CEU_UNDEFINED;
 #endif
-    oss << "Compiled at: " << date_str << ", " << time_str << std::endl;
+    oss << "C++ Compiled at: " << date_str << ", " << time_str << std::endl;
 #endif
-    oss << "Compiler Identification: " << CEU_COMPILER_NAME << std::endl;
+    oss << "C++ Compiler Identification: " << CEU_COMPILER_NAME << std::endl;
 
 #if defined(CEU_COMPILER_IS_TI)
     long ti_version =

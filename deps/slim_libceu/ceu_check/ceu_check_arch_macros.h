@@ -6,6 +6,17 @@
 
 #if defined(CEU_HAVE_INCLUDE_ENDIAN_H) && (CEU_HAVE_INCLUDE_ENDIAN_H == 1)
 #include <endian.h>
+#if (!defined(BYTE_ORDER)) || (!defined(LITTLE_ENDIAN)) || (!defined(BIG_ENDIAN)) || (!defined(PDP_ENDIAN))
+#error "<endian.h> is included but BYTE_ORDER, LITTLE_ENDIAN, BIG_ENDIAN or PDP_ENDIAN is not defined."
+#endif
+#define CEU_INCLUDED_ENDIAN_H
+#endif
+
+/* GCC 4.6+ and Clang provide __BYTE_ORDER__ */
+#ifdef CEU_COMPILER_IS_GCC
+#if (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && defined(__ORDER_BIG_ENDIAN__) && defined(__ORDER_PDP_ENDIAN__))
+#define CEU_GCC_LIKE_ENDIAN_MACROS
+#endif
 #endif
 
 /* ---------------------------------------------------------------------- */
@@ -26,9 +37,9 @@
  */
 
 /* Firstly, we would error on PDP-endian, which is not supported here */
-#if (defined(BYTE_ORDER) && defined(PDP_ENDIAN) && (BYTE_ORDER == PDP_ENDIAN))                                         \
-    || (defined(__BYTE_ORDER__) && defined(__ORDER_PDP_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_PDP_ENDIAN__))
-#error "PDP-endian is not supported by ceu_check library."
+#if (defined(CEU_INCLUDED_ENDIAN_H) && (BYTE_ORDER == PDP_ENDIAN))                                                     \
+    || (defined(CEU_GCC_LIKE_ENDIAN_MACROS) && (__BYTE_ORDER__ == __ORDER_PDP_ENDIAN__))
+#error "PDP-endian is not supported."
 #endif
 
 /**
@@ -50,10 +61,10 @@
     0 /* Placeholder for future LE architectures */                                                                    \
     || /* Known LE Arch */ defined(CEU_ARCHITECTURE_X86_64)                                                            \
     || /* Known LE Arch */ defined(CEU_ARCHITECTURE_I386)                                                              \
-    || /* <endian.h> */ (defined(BYTE_ORDER) && defined(LITTLE_ENDIAN) && (BYTE_ORDER == LITTLE_ENDIAN))               \
-    || /* GCC */                                                                                                       \
-        (defined(__BYTE_ORDER__) && defined(__ORDER_LITTLE_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))   \
+    || /* <endian.h> */ (defined(CEU_INCLUDED_ENDIAN_H) && (BYTE_ORDER == LITTLE_ENDIAN))                              \
+    || /* GCC */  (defined(CEU_GCC_LIKE_ENDIAN_MACROS) && (__BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__))                 \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1))          \
+    || /* Clang */ (defined(CEU_COMPILER_IS_CLANG) && defined(__LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1))          \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__little_endian__) && (__little_endian__ == 1))          \
     || /* TI CL6X */ (defined(CEU_COMPILER_IS_TI) && defined(_LITTLE_ENDIAN) && (_LITTLE_ENDIAN == 1))                 \
     || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && (!defined(__ARM_BIG_ENDIAN)))                                  \
@@ -62,10 +73,10 @@
 #define CEU_COMPILE_TIME_IS_LITTLE_ENDIAN
 #elif \
     0 /* Placeholder for future BE architectures */                                                                    \
-    || /* <endian.h> */ (defined(BYTE_ORDER) && defined(BIG_ENDIAN) && (BYTE_ORDER == BIG_ENDIAN))                     \
-    || /* GCC */                                                                                                       \
-        (defined(__BYTE_ORDER__) && defined(__ORDER_BIG_ENDIAN__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))         \
+    || /* <endian.h> */ (defined(CEU_INCLUDED_ENDIAN_H) && (BYTE_ORDER == BIG_ENDIAN))                                 \
+    || /* GCC */  (defined(CEU_GCC_LIKE_ENDIAN_MACROS) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))                    \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ == 1))                \
+    || /* Clang */ (defined(CEU_COMPILER_IS_CLANG) && defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ == 1))                \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__big_endian__) && (__big_endian__ == 1))                \
     || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && defined(__ARM_BIG_ENDIAN))                                     \
     || /* ARM Embedded */ (defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED) && defined(__BIG_ENDIAN))                    \
@@ -76,6 +87,10 @@
 
 #if (!defined(CEU_COMPILE_TIME_IS_LITTLE_ENDIAN)) && (!defined(CEU_COMPILE_TIME_IS_BIG_ENDIAN))
 #define CEU_COMPILE_TIME_IS_UNKNOWN_ENDIAN
+#endif
+
+#ifdef CEU_INCLUDED_ENDIAN_H
+#undef CEU_INCLUDED_ENDIAN_H
 #endif
 
 #endif /* CEU_CHECK_ARCH_MACRO_H */

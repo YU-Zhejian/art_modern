@@ -26,7 +26,7 @@ char* ceu_check_get_c_compiler_info()
     int written = 0;
 
 #if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)
-    written = CEU_SNPRINTF(ptr, remaining, "Compiled at: N/A due to reproducible build\n");
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: N/A due to reproducible build\n");
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -49,7 +49,7 @@ char* ceu_check_get_c_compiler_info()
         CEU_UNDEFINED;
 #endif
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compiled at: %s, %s\n", date_str, time_str);
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: %s, %s\n", date_str, time_str);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -59,7 +59,7 @@ char* ceu_check_get_c_compiler_info()
     }
 #endif
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compiler Identification: %s\n", CEU_COMPILER_NAME);
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiler Identification: %s\n", CEU_COMPILER_NAME);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
