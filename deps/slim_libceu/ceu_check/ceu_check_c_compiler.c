@@ -1,20 +1,22 @@
-#include "ceu_check/ceu_check_cc.h"
-
-#include "ceu_check/ceu_check_cc_macro.h"
-#include "ceu_check/ceu_compiler_names.h"
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
-#include "libceu_stddef.h"
-
 /**
- * Converted from C++ implementation to C using TONGYI LINGMA.
+ *@file ceu_check_c_compiler.c
+* Converted from C++ implementation to C using TONGYI LINGMA.
  * MSVC secure C standard version
  */
 
-#include "ceu_check/c_snprintf.h"
+#include "libceu_stddef.h"
+
+#include "ceu_check/ceu_check_c_compiler.h"
+
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h"
+#include "ceu_check/ceu_compiler_names.h"
+#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
+#include "ceu_check/utils/c_snprintf.h"
 
 #include <stdlib.h>
 
-char* ceu_check_get_compiler_info()
+
+char* ceu_check_get_c_compiler_info()
 {
     char* buffer = calloc(40960, sizeof(char));
     if (buffer == NULL) {

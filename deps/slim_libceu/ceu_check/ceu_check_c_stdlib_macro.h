@@ -11,7 +11,7 @@
 #include <sys/cdefs.h> /* NOLINT*/
 #endif
 
-#include "ceu_check/ceu_check_cc_macro.h" /* NOLINT for CEU_COMPILER_IS_MSVC */
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h" /* NOLINT for CEU_COMPILER_IS_MSVC */
 
 #include <limits.h> /* NOLINT for __GLIBC__ */
 

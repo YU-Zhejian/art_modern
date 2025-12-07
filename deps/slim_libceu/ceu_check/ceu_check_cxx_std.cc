@@ -1,6 +1,6 @@
 #include "ceu_check/ceu_check_cxx_std.hh"
 
-#include "ceu_check/ceu_check_c_cxx_std_macro.h"
+#include "ceu_check/ceu_check_cxx_std_macro.hh"
 #include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #include <ostream>

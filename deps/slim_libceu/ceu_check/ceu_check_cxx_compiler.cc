@@ -1,8 +1,8 @@
 #include "libceu_stddef.h" /* NOLINT */
 
-#include "ceu_check/ceu_check_cc.hh"
+#include "ceu_check/ceu_check_cxx_compiler.hh"
 
-#include "ceu_check/ceu_check_cc_macro.h"
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h"
 #include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #include "ceu_check/ceu_compiler_names.h"
@@ -11,7 +11,7 @@
 #include <sstream>
 #include <string>
 
-std::string ceu_check_get_compiler_info()
+std::string ceu_check_get_cxx_compiler_info()
 {
     std::ostringstream oss;
 #if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)

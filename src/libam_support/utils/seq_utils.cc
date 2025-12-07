@@ -19,7 +19,7 @@
 
 #include "libam_support/Dtypes.h"
 
-#include "ceu_check/ceu_check_cc_macro.h"
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h"
 
 // Some compiler's -O3 optimization is better than ours
 #if (defined(CEU_COMPILER_IS_INTEL_CLANG) || defined(CEU_COMPILER_IS_ICC) || defined(CEU_COMPILER_IS_CLANG)            \

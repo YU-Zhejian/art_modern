@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_c_std.h"
 
-#include "ceu_check/c_snprintf.h"
-#include "ceu_check/ceu_check_c_cxx_std_macro.h"
+#include "ceu_check/ceu_check_c_std_macro.h"
+#include "ceu_check/utils/c_snprintf.h"
 
 #include <stdlib.h>
 
