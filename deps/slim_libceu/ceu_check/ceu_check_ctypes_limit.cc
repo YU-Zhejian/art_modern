@@ -13,20 +13,18 @@ namespace {
 template <typename T> std::string ceu_get_int_limits(const std::string& name)
 {
     std::ostringstream oss;
-    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size, " << std::setw(3)  <<sizeof(T)  * 8 << " bits): "
-    << std::showpos
-        << std::setw(20) << std::to_string(std::numeric_limits<T>::min()) << " -> " << std::setw(20)
-        << std::to_string(std::numeric_limits<T>::max()) << std::noshowpos;
+    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size, " << std::setw(3)
+        << sizeof(T) * 8 << " bits): " << std::showpos << std::setw(20) << std::to_string(std::numeric_limits<T>::min())
+        << " -> " << std::setw(20) << std::to_string(std::numeric_limits<T>::max()) << std::noshowpos;
     return oss.str();
 }
 template <typename T> std::string ceu_get_float_limits(const std::string& name)
 {
     std::ostringstream oss;
-    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size, " << std::setw(3)  <<sizeof(T)  * 8 << " bits): "
-    << std::scientific
-        << std::setprecision(12) << std::setw(20) << std::numeric_limits<T>::min() << " -> " << std::setw(20)
-        << std::numeric_limits<T>::max() << ", eps=" << std::setw(20) << std::numeric_limits<T>::epsilon()
-        << std::defaultfloat;
+    oss << "\t" << std::setw(12) << name << " (" << std::setw(3) << sizeof(T) << " size, " << std::setw(3)
+        << sizeof(T) * 8 << " bits): " << std::scientific << std::setprecision(12) << std::setw(20)
+        << std::numeric_limits<T>::min() << " -> " << std::setw(20) << std::numeric_limits<T>::max()
+        << ", eps=" << std::setw(20) << std::numeric_limits<T>::epsilon() << std::defaultfloat;
     return oss.str();
 }
 } // namespace

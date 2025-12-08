@@ -18,10 +18,5 @@ int ceu_is_little_endian(void) /* NOLINT */ { return !ceu_is_big_endian(); /* NO
 
 char* ceu_check_get_target_triplet_part_one(void) /* NOLINT */
 {
-#if defined(CEU_ARCHITECTURE_X86_64)
-    return "x86_64";
-#elif defined(CEU_ARCHITECTURE_I386)
-    return "i386";
-#endif
-    return "unknown";
+    return CEU_ARCH_NAME;
 }
