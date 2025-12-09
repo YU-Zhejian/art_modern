@@ -1,3 +1,5 @@
 /build*/
 /.idea/
 /out/
+/opt/
+!cross_config.csv

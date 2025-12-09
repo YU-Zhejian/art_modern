@@ -1,3 +1,5 @@
+#include "ceu_check/ceu_check_arch.h"
+#include "ceu_check/ceu_check_arch_macros.h"
 #include "ceu_check/ceu_check_c_compiler.h"
 #include "ceu_check/ceu_check_c_std.h"
 #include "ceu_check/ceu_check_c_stdlib.h"
@@ -13,6 +15,40 @@
 
 int main()
 {
+    {
+        std::cout << "Architecture: " << CEU_ARCH_NAME << std::endl;
+#if defined(CEU_COMPILE_TIME_IS_LITTLE_ENDIAN)
+        std::cout << "Endianness: Little Endian (Compile-time)" << std::endl;
+#elif defined(CEU_COMPILE_TIME_IS_BIG_ENDIAN)
+        std::cout << "Endianness: Big Endian (Compile-time)" << std::endl;
+#else
+        if (ceu_is_little_endian()) {
+            std::cout << "Endianness: Little Endian (Run-time)" << std::endl;
+        } else if (ceu_is_big_endian()) {
+            std::cout << "Endianness: Big Endian (Run-time)" << std::endl;
+        } else {
+            std::cout << "Endianness: Unknown (Run-time)" << std::endl;
+        }
+        std::cout << "Endianness: Unknown" << std::endl;
+#endif
+#if defined(CEU_ARCHITECTURE_16_BIT)
+        std::cout << "Architecture Bitness: 16-bit (Compile-time Macro)" << std::endl;
+#elif defined(CEU_ARCHITECTURE_32_BIT)
+        std::cout << "Architecture Bitness: 32-bit (Compile-time Macro)" << std::endl;
+#elif defined(CEU_ARCHITECTURE_64_BIT)
+        std::cout << "Architecture Bitness: 64-bit (Compile-time Macro)" << std::endl;
+#else
+        if (ceu_is_system_16_bit()) {
+            std::cout << "Architecture Bitness: 16-bit (Compile-time Sizeof)" << std::endl;
+        } else if (ceu_is_system_32_bit()) {
+            std::cout << "Architecture Bitness: 32-bit (Compile-time Sizeof)" << std::endl;
+        } else if (ceu_is_system_64_bit()) {
+            std::cout << "Architecture Bitness: 64-bit (Compile-time Sizeof)" << std::endl;
+        } else {
+            std::cout << "Architecture Bitness: Unknown (Compile-time Sizeof)" << std::endl;
+        }
+#endif
+    }
     {
         char* info = ceu_interpret_c_std_version();
         if (info == nullptr) {

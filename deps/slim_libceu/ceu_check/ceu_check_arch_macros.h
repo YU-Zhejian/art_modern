@@ -20,9 +20,6 @@
 #endif
 #endif
 
-
-
-
 /* ---------------------------------------------------------------------- */
 /** Define architecture macros
  */
@@ -30,7 +27,6 @@
 #ifdef CEU_ARCH_NAME
 #undef CEU_ARCH_NAME
 #endif
-
 
 /* clang-format off */
 
@@ -59,7 +55,7 @@
     || /* ARM v6 */ defined(__ARM_ARCH_6T2__) || defined(__TI_ARM_V6M0__) || defined(__TI_ARM_V6__)                    \
     || /* ARM v5 */ defined(__ARM_ARCH_5TE__) || defined(__ARM_ARCH_5TEJ__) || defined(__TI_ARM_V5__)                  \
     || /* ARM v5 */ defined(__ARM_ARCH_5__) || defined(__ARM_ARCH_5E__) || defined(__ARM_ARCH_5T__)                    \
-    || /* ARM v4 */ defined(__ARM_ARCH_4T__) || defined(__ARM_ARCH_4__) ||  || defined(__TI_ARM_V4__)                  \
+    || /* ARM v4 */ defined(__ARM_ARCH_4T__) || defined(__ARM_ARCH_4__) || defined(__TI_ARM_V4__)                      \
     || /* ARM v4 */ defined(__TARGET_ARM_4T)                                                                           \
     || /* ARM v3 */ defined(__ARM_ARCH_3__) || defined(__ARM_ARCH_3M__)                                                \
     || /* ARM v2 */ defined(__ARM_ARCH_2__)                                                                            \
@@ -78,9 +74,29 @@
 #elif defined(__riscv_xlen) && (__riscv_xlen == 32)
 #define CEU_ARCHITECTURE_RISCV32
 #define CEU_ARCH_NAME "riscv32"
+#elif 0 || defined(__m68k__) || defined(M68000)                                                                        \
+    || defined(__mc68000__) || defined(mc68000) || defined(__mc68000)                                                  \
+    || defined(__mc68010__) || defined(mc68010) || defined(__mc68010)                                                  \
+    || defined(__mc68020__) || defined(mc68020) || defined(__mc68020)                                                  \
+    || defined(__mc68030__) || defined(mc68030) || defined(__mc68030)                                                  \
+    || defined(__mc68040__) || defined(mc68040) || defined(__mc68040)                                                  \
+    || defined(__mc68060__) || defined(mc68060) || defined(__mc68060)                                                  \
+    || 0
+#define CEU_ARCHITECTURE_M68K
+#define CEU_ARCH_NAME "Motorola 68000"
+#elif defined(sparc) || defined(__sparc__) || defined(__sparc)                                                         \
+    || defined(__sparcv9) || defined(__sparc_v9__)                                                                     \
+    || defined(__sparc_v8__) || defined(__sparcv8)
+#define CEU_ARCHITECTURE_SPARC
+#if  defined(__sparcv9) || defined(__sparc_v9__)
+#define CEU_ARCH_NAME "SPARC (Scalable Processor ARChitecture) v9"
+#elif defined(__sparc_v8__) || defined(__sparcv8)
+#define CEU_ARCH_NAME "SPARC (Scalable Processor ARChitecture) v8"
 #else
-/** TODO: systemz, sparc, sparcel, sparcv9, ppc32, ppc32le, ppc64, ppc64le, mips, mipsel, mips64, mips64el
- * m68k */
+#define CEU_ARCH_NAME "SPARC (Scalable Processor ARChitecture)"
+#endif
+#else
+/** TODO: systemz, ppc32, ppc32le, ppc64, ppc64le, mips, mipsel, mips64, mips64el */
 #define CEU_ARCHITECTURE_UNKNOWN
 #define CEU_ARCH_NAME "unknown"
 #endif
@@ -88,6 +104,7 @@
 
 #if 0                                                                                                                  \
     || /* Known 64-bit */ defined(__ARM_64BIT_STATE)                                                                   \
+    || /* Known 32-bit */ defined(__sparc_v9__) || defined(__sparcv9)                                                  \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_AARCH64)                                                            \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_X86_64)                                                             \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_LOONGARCH64)                                                        \
@@ -96,10 +113,12 @@
 #define CEU_ARCHITECTURE_64_BIT
 #elif 0                                                                                                                \
     || /* Known 32-bit */ defined(__ARM_32BIT_STATE)                                                                   \
+    || /* Known 32-bit */ defined(__sparc_v8__) || defined(__sparcv8)                                                  \
     || /* Known 32-bit */ defined(CEU_ARCHITECTURE_ARM)                                                                \
     || /* Known 32-bit */ defined(CEU_ARCHITECTURE_I386)                                                               \
     || /* Known 32-bit */ defined(CEU_ARCHITECTURE_LOONGARCH32)                                                        \
     || /* Known 32-bit */ defined(CEU_ARCHITECTURE_RISCV32)                                                            \
+    || /* Known 32-bit */ defined(CEU_ARCHITECTURE_M68K)                                                               \
     || 0
 #define CEU_ARCHITECTURE_32_BIT
 #endif
@@ -150,6 +169,8 @@
 #elif \
     0 /* Placeholder for future BE architectures */                                                                    \
     || /* Known BE Arch */ defined(__ARMEB__)                                                                          \
+    || /* Known BE Arch */ defined(__sparc_v8__) || defined(__sparcv8)                                                 \
+    || /* Known BE Arch */ defined(CEU_ARCHITECTURE_M68K)                                                              \
     || /* <endian.h> */ (defined(CEU_INCLUDED_ENDIAN_H) && (BYTE_ORDER == BIG_ENDIAN))                                 \
     || /* GCC */  (defined(CEU_GCC_LIKE_ENDIAN_MACROS) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__))                    \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ == 1))                \

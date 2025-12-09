@@ -1,7 +1,3 @@
-/**
- *
- * TODO: Support more architectures.
- */
 #ifndef CEU_CHECK_ARCH_H
 #define CEU_CHECK_ARCH_H
 
@@ -21,12 +17,9 @@ int ceu_is_big_endian(void);
  */
 int ceu_is_little_endian(void);
 
-/**
- * Get the target architecture triplet's first part.
- *
- * @return A string representing the architecture, or "unknown" if not detected.
- */
-char* ceu_check_get_target_triplet_part_one(void);
+int ceu_is_system_16_bit(void);
+int ceu_is_system_32_bit(void);
+int ceu_is_system_64_bit(void);
 
 #ifdef __cplusplus
 }

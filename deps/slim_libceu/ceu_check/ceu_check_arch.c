@@ -16,7 +16,38 @@ int ceu_is_big_endian(void)
 
 int ceu_is_little_endian(void) /* NOLINT */ { return !ceu_is_big_endian(); /* NOLINT */ }
 
-char* ceu_check_get_target_triplet_part_one(void) /* NOLINT */
+int ceu_is_system_16_bit(void)
 {
-    return CEU_ARCH_NAME;
+#if defined(CEU_ARCHITECTURE_16_BIT)
+    return 1;
+#elif defined(CEU_ARCHITECTURE_32_BIT) || defined(CEU_ARCHITECTURE_64_BIT)
+    return 0;
+#else
+    /* Fallback method */
+    return sizeof(void*) == 2;
+#endif
+}
+
+int ceu_is_system_32_bit(void)
+{
+#if defined(CEU_ARCHITECTURE_32_BIT)
+    return 1;
+#elif defined(CEU_ARCHITECTURE_64_BIT) || defined(CEU_ARCHITECTURE_16_BIT)
+    return 0;
+#else
+    /* Fallback method */
+    return sizeof(void*) == 4;
+#endif
+}
+
+int ceu_is_system_64_bit(void)
+{
+#if defined(CEU_ARCHITECTURE_64_BIT)
+    return 1;
+#elif defined(CEU_ARCHITECTURE_32_BIT) || defined(CEU_ARCHITECTURE_16_BIT)
+    return 0;
+#else
+    /* Fallback method */
+    return sizeof(void*) == 8;
+#endif
 }
