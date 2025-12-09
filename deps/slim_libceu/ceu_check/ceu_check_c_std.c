@@ -16,7 +16,7 @@ char* ceu_interpret_c_std_version(void)
     int remaining = 1024;
     int written = 0;
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compile-time C std.: ver. %s", CEU_C_STD);
+    written = CEU_SNPRINTF(ptr, remaining, "C compile-time std.: ver. %s", CEU_C_STD);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
