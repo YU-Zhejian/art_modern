@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_cxx_stdlib.hh"
 
 #include "ceu_check/ceu_check_cxx_stdlib_macro.hh"
-#include "ceu_check/ceu_constants.h"
+#include "ceu_utils/ceu_constants.h"
 
 #include <ostream>
 #include <sstream>

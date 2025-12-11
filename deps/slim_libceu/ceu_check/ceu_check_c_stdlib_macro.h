@@ -15,7 +15,9 @@
 
 #include <limits.h> /* NOLINT for __GLIBC__ */
 
+#ifdef CEU_LIBC_NAME
 #undef CEU_LIBC_NAME
+#endif
 
 #if defined(__ANDROID__)
 #define CEU_LIBC_IS_ANDROID

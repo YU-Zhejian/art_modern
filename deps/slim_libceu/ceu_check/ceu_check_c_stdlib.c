@@ -1,8 +1,8 @@
 #include "ceu_check/ceu_check_c_stdlib.h"
 
 #include "ceu_check/ceu_check_c_stdlib_macro.h"
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
-#include "ceu_check/utils/c_snprintf.h"
+#include "ceu_utils/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
+#include "ceu_utils/c_snprintf.h"
 
 #include <stdlib.h>
 

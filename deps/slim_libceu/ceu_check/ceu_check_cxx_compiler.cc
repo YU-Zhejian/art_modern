@@ -3,9 +3,9 @@
 #include "ceu_check/ceu_check_cxx_compiler.hh"
 
 #include "ceu_check/ceu_check_c_cxx_compiler_macro.h"
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
+#include "ceu_utils/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
-#include "ceu_check/ceu_compiler_names.h"
+#include "ceu_utils/ceu_compiler_names.h"
 
 #include <ostream>
 #include <sstream>

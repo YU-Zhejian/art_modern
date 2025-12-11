@@ -14,7 +14,7 @@
 #undef CEU_COMPILER_NAME
 #endif
 
-#include "ceu_check/ceu_compiler_names.h"
+#include "ceu_utils/ceu_compiler_names.h" /* NOLINT: for diverse compiler names used in the following includes */
 
 /* The inclusion order of the following lines should be preserved to avoid conflicts. */
 /* clang-format off */

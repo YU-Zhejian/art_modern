@@ -5,11 +5,12 @@
 #include "libceu_stddef.h" /* NOLINT: CEU_HAVE_INCLUDE_ENDIAN_H */
 
 #if defined(CEU_HAVE_INCLUDE_ENDIAN_H) && (CEU_HAVE_INCLUDE_ENDIAN_H == 1)
-#include <endian.h>
+#include <endian.h> /* NOLINT */
 #if (!defined(BYTE_ORDER)) || (!defined(LITTLE_ENDIAN)) || (!defined(BIG_ENDIAN)) || (!defined(PDP_ENDIAN))
-#error "<endian.h> is included but BYTE_ORDER, LITTLE_ENDIAN, BIG_ENDIAN or PDP_ENDIAN is not defined."
-#endif
+/* error "<endian.h> is included but BYTE_ORDER, LITTLE_ENDIAN, BIG_ENDIAN or PDP_ENDIAN is not defined." */
+#else
 #define CEU_INCLUDED_ENDIAN_H
+#endif
 #endif
 
 /* GCC 4.6+ and Clang provide __BYTE_ORDER__ */

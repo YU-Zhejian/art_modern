@@ -7,7 +7,7 @@
 #ifndef CEU_CHECK_C_STD_MACRO_H
 #define CEU_CHECK_C_STD_MACRO_H
 
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
+#include "ceu_utils/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #if defined(__cplusplus)
 #error "This is a C-only header. Do not include it in C++ code!"

@@ -6,8 +6,6 @@
 
 #pragma once
 
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
-
 #ifdef CEU_CXX_STD_VERSION_MACRO
 #undef CEU_CXX_STD_VERSION_MACRO
 #endif

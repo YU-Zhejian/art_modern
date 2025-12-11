@@ -49,6 +49,11 @@ check_include_file("sys/param.h" CEU_HAVE_INCLUDE_SYS_PARAM_H)
 check_include_file("_mingw.h" CEU_HAVE_INCLUDE__MINGW_H)
 check_include_file("features.h" CEU_HAVE_INCLUDE_FEATURES_H)
 check_include_file("endian.h" CEU_HAVE_INCLUDE_ENDIAN_H)
+if(MSVC)
+    check_include_file("intrin.h" CEU_HAVE_INCLUDE_INTRIN_H)
+else()
+    check_include_file("x86intrin.h" CEU_HAVE_INCLUDE_X86INTRIN_H)
+endif()
 
 configure_file("${CMAKE_CURRENT_LIST_DIR}/libceu_stddef.h.in" "${CMAKE_BINARY_DIR}/include/libceu_stddef.h")
 

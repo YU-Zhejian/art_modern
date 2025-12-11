@@ -26,14 +26,5 @@
 #define ART_MODERN_BEGIN_C_DECLS /* empty */
 #define ART_MODERN_END_C_DECLS /* empty */
 #endif
-#if defined(__SSE2__) || defined(__AVX2__) || defined(__MMX__)
-#ifdef _MSC_VER
-#define INCLUDE_INTEL_SIMD <intrin.h>
-#else
-#define INCLUDE_INTEL_SIMD <x86intrin.h>
-#endif
-#else
-#undef INCLUDE_INTEL_SIMD
-#endif
 
 #endif /** ART_MODERN_LIBAM_SUPPORT_UTILS_C_MACROS_H */
