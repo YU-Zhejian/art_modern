@@ -135,6 +135,7 @@ perf.data*
 *.pm
 *.dump
 *.log.d/
+*-log.d/
 *.heap
 /intel/
 /.intel/

@@ -8,9 +8,9 @@
 - The minimal test code for libdeflate, zlib, libbz2, and liblzma unified. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
 - A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
 - Bundled LibCEU routines which influences `art_modern --version` output:
-  - Supporting detection of C++ standard library added. Currently supporting GNU libstdc++ and LLVM libc++.
-  - Supporting detection of Arm Compiler for Embedded (ACOMPE), Arm Compiler for Linux, and Microsoft Visual Studio Clang Compiler.
-  - Supporting detection of C standard library added. Currently supporting GNU libc, Bionic libc (for Android), uClibc, newlib, Musl libc, Diet libc, and Microsoft C Runtime Library.
+  - Supporting detection of C++ standard library. Currently supporting GNU libstdc++, LLVM libc++, and P. J. Plauger/Dinkumware, Ltd. C++ standard template library.
+  - Supporting detection of Arm Compiler for Embedded (ACOMPE), Arm Compiler for Linux, Texas Instruments Compilers (`armcl` and `tiarmclang`), and Microsoft Visual Studio Clang Compiler.
+  - Supporting detection of C standard library. Currently supporting GNU libc, Bionic libc (for Android), uClibc, newlib, Musl libc, Diet libc, and Microsoft C Runtime Library.
   - Supporting detection of FreeBSD version.
 - Miscellaneous bug fixes.
 

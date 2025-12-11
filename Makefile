@@ -2,6 +2,9 @@
 # Suffix rules disabled
 .SUFFIXES:
 
+# Add -R to make to clear buitin variables
+MAKEFLAGS += -R
+
 # Additional CMake flags for CMake-related tasks
 CMAKE_FLAGS ?=
 
@@ -34,8 +37,15 @@ $(info Building for version $(PACKAGE_VERSION))
 $(info Using following additional CMake flags: $(CMAKE_FLAGS))
 
 .PHONY: help
+# Generate help message from Makefile comments
 help:
 	$(PYTHON) $(CURDIR)/sh.d/make2help.py txt < $(CURDIR)/Makefile
+
+.PHONY: dumpvar
+# List all variables using .VARIABLES
+dumpvar:
+	@$(foreach v,$(.VARIABLES),$(info $(v)=$($(v))))
+
 
 .PHONY: build
 # build as an alias to debug

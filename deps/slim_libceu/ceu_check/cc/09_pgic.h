@@ -3,7 +3,7 @@
 #define CEU_CC_PGIC_H
 
 #ifndef CEU_CHECK_CC_MACRO_H
-#error "Do not include this file, include <ceu_check/ceu_check_cc_macro.h> instead!"
+#error "Do not include this file, include <ceu_check/ceu_check_c_cxx_compiler_macro.h> instead!"
 #endif
 
 #if defined(__PGI)

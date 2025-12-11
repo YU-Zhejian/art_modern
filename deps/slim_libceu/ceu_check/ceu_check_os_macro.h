@@ -15,9 +15,9 @@
 
 /* Inclusion order of following lines should be preserved to avoid conflicts. */
 /* clang-format off */
-#include <ceu_check/os/ceu_os_mainframe_unix.h> /* NOLINT */
-#include <ceu_check/os/ceu_os_bsd.h> /* NOLINT */
-#include <ceu_check/os/ceu_os_windows.h> /* NOLINT */
+#include "ceu_check/os/01_mainframe_unix.h" /* NOLINT */
+#include "ceu_check/os/02_bsd.h" /* NOLINT */
+#include "ceu_check/os/03_windows.h" /* NOLINT */
 /* clang-format on */
 #if defined(__HAIKU__)
 #define CEU_ON_HAIKU

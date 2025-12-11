@@ -14,7 +14,7 @@
 #define CEU_CXX_STDLIB_NAME "GNU libstdc++"
 #elif defined(_CPPLIB_VER)
 #define CEU_CXX_STDLIB_IS_MSVC
-#define CEU_CXX_STDLIB_NAME "MSVC STL (Dinkumware, Ltd.; by P. J. Plauger)"
+#define CEU_CXX_STDLIB_NAME "MSVC STL (by P. J. Plauger/Dinkumware, Ltd.)"
 #else
 #define CEU_CXX_STDLIB_IS_UNKNOWN
 #define CEU_CXX_STDLIB_NAME "Unknown C++ Standard Library"

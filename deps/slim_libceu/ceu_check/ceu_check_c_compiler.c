@@ -1,20 +1,22 @@
-#include "ceu_check/ceu_check_cc.h"
-
-#include "ceu_check/ceu_check_cc_macro.h"
-#include "ceu_check/ceu_compiler_names.h"
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
-#include "libceu_stddef.h"
-
 /**
+ *@file ceu_check_c_compiler.c
  * Converted from C++ implementation to C using TONGYI LINGMA.
  * MSVC secure C standard version
  */
 
-#include "ceu_check/c_snprintf.h"
+#include "libceu_stddef.h"
+
+#include "ceu_check/ceu_check_c_compiler.h"
+
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h"
+
+#include "ceu_utils/c_snprintf.h"
+#include "ceu_utils/ceu_compiler_names.h"
+#include "ceu_utils/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #include <stdlib.h>
 
-char* ceu_check_get_compiler_info()
+char* ceu_check_get_c_compiler_info()
 {
     char* buffer = calloc(40960, sizeof(char));
     if (buffer == NULL) {
@@ -25,7 +27,7 @@ char* ceu_check_get_compiler_info()
     int written = 0;
 
 #if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)
-    written = CEU_SNPRINTF(ptr, remaining, "Compiled at: N/A due to reproducible build\n");
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: N/A due to reproducible build\n");
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -48,7 +50,7 @@ char* ceu_check_get_compiler_info()
         CEU_UNDEFINED;
 #endif
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compiled at: %s, %s\n", date_str, time_str);
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: %s, %s\n", date_str, time_str);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -58,7 +60,7 @@ char* ceu_check_get_compiler_info()
     }
 #endif
 
-    written = CEU_SNPRINTF(ptr, remaining, "Compiler Identification: %s\n", CEU_COMPILER_NAME);
+    written = CEU_SNPRINTF(ptr, remaining, "C Compiler Identification: %s\n", CEU_COMPILER_NAME);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -66,6 +68,26 @@ char* ceu_check_get_compiler_info()
         free(buffer);
         return NULL;
     }
+#if defined(CEU_COMPILER_IS_TI)
+    long ti_version =
+#ifdef __TI_COMPILER_VERSION__
+        __TI_COMPILER_VERSION__
+#elif defined(__TI_COMPILER_VERSION)
+        __TI_COMPILER_VERSION
+#else
+        0L
+#endif
+        ;
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %ld.%ld.%ld\n", CEU_COMPILER_NAME_TI,
+        ti_version / 1000000L, (ti_version / 1000000L) % 1000L, ti_version % 1000L);
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
 
 #if defined(CEU_COMPILER_IS_INTEL_CLANG)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n",
@@ -81,9 +103,9 @@ char* ceu_check_get_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_LINUX)
-    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%db%d (%s)\n",
-        CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __ARM_LINUX_COMPILER_BUILD__,
-        __armclang_version__);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d (%s) build %d\n",
+        CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __armclang_version__,
+        __ARM_LINUX_COMPILER_BUILD__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;
@@ -92,6 +114,7 @@ char* ceu_check_get_compiler_info()
         return NULL;
     }
 #endif
+
 #if defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED)
 #ifdef __ARMCC_VERSION
     // P.VV.BBBB

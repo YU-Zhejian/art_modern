@@ -21,5 +21,14 @@
 /** Whether <sys/param.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_SYS_PARAM_H
 
+/** Whether <endian.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_ENDIAN_H
+
+/** Whether <intrin.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_INTRIN_H
+
+/** Whether <x86intrin.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_X86INTRIN_H
+
 /** Version */
 #cmakedefine CEU_VERSION "${CEU_VERSION}"

@@ -1,16 +1,24 @@
 /*!
- * @file ceu_check_cc.h
+ * @file ceu_check_c_compiler.h
  * @brief Header to get compiler information at compile time
  *
  * @see https://sourceforge.net/p/predef/wiki/Architectures/
  */
-#pragma once
+#ifndef CEU_CHECK_CC_H
+#define CEU_CHECK_CC_H
 
-#include <string>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /*!
  * @brief Get compiler information.
  *
  * @return Returned buffer, should be freed manually.
  */
-std::string ceu_check_get_compiler_info();
+char* ceu_check_get_c_compiler_info(void);
+
+#ifdef __cplusplus
+}
+#endif
+#endif /* CEU_CHECK_CC_H        */

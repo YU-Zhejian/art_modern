@@ -1,7 +1,7 @@
 #ifndef CEU_CHECK_C_SNPRINTF_H
 #define CEU_CHECK_C_SNPRINTF_H
 
-#include "ceu_check/ceu_check_cc_macro.h" /* NOLINT: For CEU_COMPILER_IS_MSVC */
+#include "ceu_check/ceu_check_c_cxx_compiler_macro.h" /* NOLINT: For CEU_COMPILER_IS_MSVC */
 
 #ifdef CEU_COMPILER_IS_MSVC
 /**  Enable MSVC secure CRT functions */

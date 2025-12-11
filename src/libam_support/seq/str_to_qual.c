@@ -12,14 +12,11 @@
  * <https://www.gnu.org/licenses/>.
  **/
 #include "libam_support/seq/str_to_qual.h"
-#include "libam_support/utils/c_macro_utils.h" // NOLINT: For INCLUDE_INTEL_SIMD
 
 #include "libam_support/Constants.h"
 #include "libam_support/Dtypes.h"
 
-#if defined(INCLUDE_INTEL_SIMD)
-#include INCLUDE_INTEL_SIMD /* NOLINT */
-#endif
+#include "ceu_includes/x86_simd.h" // NOLINT: For Intel SIMD intrinsics
 
 #include <stdlib.h>
 

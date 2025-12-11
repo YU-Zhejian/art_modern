@@ -20,20 +20,17 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/seq_utils.hh"
 
-#include "ceu_check/ceu_check_c_std.h"
-#include "ceu_check/ceu_check_c_stdlib.h"
-#include "ceu_check/ceu_check_cc.hh"
-#include "ceu_check/ceu_check_ctypes_limit.hh"
-#include "ceu_check/ceu_check_cxx_std.hh"
-#include "ceu_check/ceu_check_cxx_stdlib.hh"
-#include "ceu_check/ceu_check_os.hh"
-
 // Boost
 #include <boost/version.hpp>
 
 // HTSLib
 #include <htslib/hfile.h>
 #include <htslib/hts.h>
+
+// LibCEU checks
+#include <ceu_check/check_exe_main.hh>
+
+#include "libam_support/CExceptionsProxy.hh"
 
 #ifdef USE_BS_PARALLEL
 #include <BS_thread_pool.hpp>
@@ -222,15 +219,8 @@ namespace {
 
     void print_libceu_various_info()
     {
-        std::cout << "LibCEU: " << CEU_VERSION << std::endl;
-        std::cout << ceu_interpret_c_std_version();
-        std::cout << ceu_interpret_c_stdlib_version();
-        std::cout << ceu_interpret_cxx_std_version();
-        std::cout << ceu_interpret_cxx_stdlib();
-        std::cout << ceu_check_get_compiler_info();
-        std::cout << ceu_check_get_ctypes_limit_info();
-        std::cout << ceu_check_get_compile_time_os_info();
-        std::cout << ceu_check_get_run_time_os_info();
+        CExceptionsProxy::assert_numeric(
+            ceu_check_exe_main(), "libCEU", "libceu_check_exe_main returned non-zero value");
     }
 
 } // namespace

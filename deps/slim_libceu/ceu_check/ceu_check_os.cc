@@ -1,7 +1,7 @@
 #include "ceu_check/ceu_check_os.hh"
 
 #include "ceu_check/ceu_check_os_macro.h"
-#include "ceu_check/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
+#include "ceu_utils/ceu_constants.h" /* NOLINT: for CEU_UNDEFINED */
 
 #include "libceu_stddef.h"
 

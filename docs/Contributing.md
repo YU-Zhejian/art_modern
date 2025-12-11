@@ -64,7 +64,8 @@ Before you send a PR, please make sure that:
 - All CTest passes.
 - `make clean testsmall-release testsmall-release-mpi` passes. This test usually requires 6 to 8 minutes.
 - `make clean testsmall testsmall-mpi` passes. This test usually requires 12 to 18 minutes. Here, the additional tests that are not enabled in release mode will be activated.
-- `make testbuild testbuild-mpi` passes. This test usually requires 4 to 6 hours.
+- `make testbuild testbuild-mpi` passes. This test usually requires 1 to 2 hours.
+- `make testbuild-small testbuild-small-mpi` passes. This test usually requires 4 to 6 hours.
 
 You may also:
 

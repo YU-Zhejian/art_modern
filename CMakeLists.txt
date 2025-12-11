@@ -165,6 +165,7 @@ endif()
 
 # -----------------------------------------------------------------------------
 # Dealing with ${AM_SUPPORT_LIB}.
+# TODO: Make AM_MPI_POSTFIX adjustable.
 if(WITH_MPI)
     set(AM_MPI_POSTFIX "-mpi")
 else()
