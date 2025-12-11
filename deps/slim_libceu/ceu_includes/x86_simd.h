@@ -10,7 +10,7 @@
 #if defined(CEU_HAVE_INCLUDE_INTRIN_H) && (CEU_HAVE_INCLUDE_INTRIN_H == 1)
 #include <intrin.h> /* NOLINT */
 #endif
-#elif  defined(CEU_COMPILER_IS_GCC)
+#elif defined(CEU_COMPILER_IS_GCC)
 #if defined(CEU_HAVE_INCLUDE_X86INTRIN_H) && (CEU_HAVE_INCLUDE_X86INTRIN_H == 1)
 #include <x86intrin.h> /* NOLINT */
 #endif

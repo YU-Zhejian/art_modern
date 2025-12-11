@@ -219,7 +219,8 @@ namespace {
 
     void print_libceu_various_info()
     {
-        CExceptionsProxy::assert_numeric(ceu_check_exe_main(), "libCEU", "libceu_check_exe_main returned non-zero value");
+        CExceptionsProxy::assert_numeric(
+            ceu_check_exe_main(), "libCEU", "libceu_check_exe_main returned non-zero value");
     }
 
 } // namespace
