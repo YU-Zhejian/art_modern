@@ -33,10 +33,8 @@
 #if defined(USE_STL_RNDOM)
 #include <random>
 #endif
-#if defined(USE_STL_LIKE_RANDOM)
-#include <stdexcept>
-#include <string>
-#endif
+#include <stdexcept> // NOLINT for std::invalid_argument
+#include <string> // NOLINT for std::to_string
 #include <vector>
 
 namespace labw::art_modern {
