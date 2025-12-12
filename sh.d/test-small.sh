@@ -74,7 +74,7 @@ echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
 function sam2bam() {
     # Single-threaded sorting should be fast enough
     samtools sort --write-index "${1}".sam -o "${1}".bam
-    python "${SHDIR}"/test-small.sh.d/test_sam.py "${2}" "${1}".bam
+    art-sam-validate "${2}" "${1}".bam # Using art_modern_utils
     rm -f "${1}".sam "${1}".bam "${1}".bam.csi "${1}".bam.bai
 }
 
