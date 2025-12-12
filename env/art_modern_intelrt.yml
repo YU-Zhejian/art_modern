@@ -1,9 +1,13 @@
 # Work under Linux only.
-name: art_modern
+# art_modern test environment with Intel runtime enabled.
+# Boost and zlib libraries still need to be installed manually.
+
+name: art_modern_intelrt
 channels:
   - nodefaults
   - conda-forge
   - bioconda
+  - https://software.repos.intel.com/python/conda/
 
 dependencies:
   - python=3.11
@@ -20,16 +24,6 @@ dependencies:
   - scipy
   - matplotlib=3.10
 
-  # Code formatter
-  - cmake_format
-  - black
-  - go-shfmt
-
-  # Downloader
-  - curl
-  - entrez-direct
-  - sra-tools=3.2.1
-
   # Build tools
   - conda-forge::ninja
   - conda-forge::cmake >=3.17
@@ -37,17 +31,13 @@ dependencies:
   - conda-forge::coreutils >=8.28
   - conda-forge::bash
   - conda-forge::pkg-config
-  - docker-squash
 
-  # Sphinx documentation
-  - conda-forge::sphinx=8.2
-  - sphinx-copybutton=0.5
-  - sphinxcontrib-svg2pdfconverter # Failed under Windows
-  - furo=2024.8.6
-  - myst-parser=4.0.1
-  - perl # For Windows MikTeX users
-  - cairosvg
-  - jinja2=3.1
+  # Intel runtimes
+  - dpcpp-cpp-rt=2025.3.0
+  - mkl=2025.3.0
+  - impi_rt=2021.17.0
+  - intel-openmp=2025.3.0
+  - intel-sycl-rt=2025.3.0
 
   - pip
   - pip:
