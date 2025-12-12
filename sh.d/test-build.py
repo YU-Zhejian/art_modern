@@ -29,7 +29,6 @@ PKG_CONFIG_PATH = shutil.which("pkg-config")
 if PKG_CONFIG_PATH is None:
     PKG_CONFIG_PATH = shutil.which("pkgconf")
 if PKG_CONFIG_PATH is None:
-    # Except
     raise RuntimeError("pkg-config or pkgconf not found in PATH")
 
 IO_MUTEX = threading.Lock()
@@ -179,48 +178,48 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     os.makedirs(build_dir)
     os.makedirs(install_dir)
     with IO_MUTEX:
-        print(f"{time()} {this_job_id} {' '.join(cmake_opts)}")
-        print(f"{time()} {this_job_id} B: {build_dir}, I: {install_dir}")
+        print(f"{time()} {this_job_id}/{num_total_jobs} {' '.join(cmake_opts)}")
+        print(f"{time()} {this_job_id}/{num_total_jobs} B: {build_dir}, I: {install_dir}")
     log_path = os.path.join(LOG_DIR, f"{this_job_id}.log")
     with open(log_path, "wb", buffering=0) as log_file:
         log_file.write(f"{time()} Build log for job {this_job_id}\n".encode("utf-8"))
         log_file.write(f"{time()} CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
-        log_file.write(f"{time()} {this_job_id} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
+        log_file.write(f"{time()} {this_job_id}/{num_total_jobs} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
         # Invoke CMake to configure the build
 
         def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs) -> bool:
             with IO_MUTEX:
-                print(f"{time()} {this_job_id} {step_name} START")
-            log_file.write(f"{time()} {this_job_id} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
+                print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START")
+            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
 
-            log_file.write(f"{time()} {this_job_id} {step_name} START\n".encode("utf-8"))
+            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START\n".encode("utf-8"))
 
             if DRY_RUN:
                 with IO_MUTEX:
-                    print(f"{time()} {this_job_id} {step_name} DRYRUN")
-                log_file.write(f"{time()} {this_job_id} {step_name} DRYRUN\n".encode("utf-8"))
+                    print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DRYRUN")
+                log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DRYRUN\n".encode("utf-8"))
 
             else:
                 try:
                     proc = subprocess.run(cmdline, *args, **kwargs)
                 except subprocess.TimeoutExpired as e:
                     with IO_MUTEX:
-                        print(f"{time()} {this_job_id} {step_name} TIMEOUT")
-                    log_file.write(f"{time()} {this_job_id} {step_name} TIMEOUT: {e}\n".encode("utf-8"))
+                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT")
+                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT: {e}\n".encode("utf-8"))
                     return False
                 except subprocess.SubprocessError as e:
                     with IO_MUTEX:
-                        print(f"{time()} {this_job_id} {step_name} FAILED")
-                    log_file.write(f"{time()} {this_job_id} {step_name} FAILED: {e}\n".encode("utf-8"))
+                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED")
+                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED: {e}\n".encode("utf-8"))
                     return False
                 if proc.returncode != 0:
                     with IO_MUTEX:
-                        print(f"{time()} {this_job_id} {step_name} FAILED")
-                    log_file.write(f"{time()} {this_job_id} {step_name} FAILED\n".encode("utf-8"))
+                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED")
+                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED\n".encode("utf-8"))
                     return False
             with IO_MUTEX:
-                print(f"{time()} {this_job_id} {step_name} DONE")
-            log_file.write(f"{time()} {this_job_id} {step_name} DONE\n".encode("utf-8"))
+                print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DONE")
+            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DONE\n".encode("utf-8"))
             return True
 
         with open(os.path.join(LOG_DIR, f"{this_job_id}-config.log"), "wb", buffering=0) as config_log_file:
@@ -432,64 +431,60 @@ if __name__ == "__main__":
         print("FAIL")
 
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
-    job_id = 0
     max_workers = min(5, os.cpu_count() // 4)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        for cmake_build_type in cmake_build_types:
-            bc = BuildConfig(_old_cmake_flags)
+    bcs = []
 
-            bc.HELP_VERSION_ONLY = not _args.small
-            bc.CMAKE_BUILD_TYPE = cmake_build_type
+    for cmake_build_type in cmake_build_types:
+        bc = BuildConfig(_old_cmake_flags)
 
-            for use_thread_parallel in ["BS", "NOP"]:
-                bc.USE_THREAD_PARALLEL = use_thread_parallel
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-            bc.USE_THREAD_PARALLEL = "ASIO"
+        bc.HELP_VERSION_ONLY = not _args.small
+        bc.CMAKE_BUILD_TYPE = cmake_build_type
 
-            for use_malloc in MALLOCS:
-                bc.USE_MALLOC = use_malloc
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-            bc.USE_MALLOC = "AUTO"
+        for use_thread_parallel in ["BS", "NOP"]:
+            bc.USE_THREAD_PARALLEL = use_thread_parallel
+            bcs.append(bc.copy())
+        bc.USE_THREAD_PARALLEL = "ASIO"
 
-            if is_libfmt_exist:
-                bc.USE_LIBFMT = "fmt"
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-                bc.USE_LIBFMT = None
+        for use_malloc in MALLOCS:
+            bc.USE_MALLOC = use_malloc
+            bcs.append(bc.copy())
+        bc.USE_MALLOC = "AUTO"
 
-            if is_htslib_exist:
-                bc.USE_HTSLIB = "hts"
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-                bc.USE_HTSLIB = None
+        if is_libfmt_exist:
+            bc.USE_LIBFMT = "fmt"
+            bcs.append(bc.copy())
+            bc.USE_LIBFMT = None
 
-            if concurrent_queue_path is not None:
-                bc.USE_CONCURRENT_QUEUE = concurrent_queue_path
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
+        if is_htslib_exist:
+            bc.USE_HTSLIB = "hts"
+            bcs.append(bc.copy())
+            bc.USE_HTSLIB = None
+
+        if concurrent_queue_path is not None:
+            bc.USE_CONCURRENT_QUEUE = concurrent_queue_path
+            bcs.append(bc.copy())
             bc.USE_CONCURRENT_QUEUE = None
 
-            bc.AM_NO_Q_REVERSE = True
-            executor.submit(do_build, bc.copy(), job_id)
-            job_id += 1
-            bc.AM_NO_Q_REVERSE = False
+        bc.AM_NO_Q_REVERSE = True
+        bcs.append(bc.copy())
+        bc.AM_NO_Q_REVERSE = False
 
-            for use_random_generator in RANDOM_GENERATORS:
-                bc.USE_RANDOM_GENERATOR = use_random_generator
-                executor.submit(do_build, bc.copy(), job_id)
-                job_id += 1
-            if mkl_pc:
-                bc.USE_RANDOM_GENERATOR = "ONEMKL"
-                for pc in mkl_pc:
-                    bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = pc
-                    executor.submit(do_build, bc.copy(), job_id)
-                    job_id += 1
-                bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
+        for use_random_generator in RANDOM_GENERATORS:
+            bc.USE_RANDOM_GENERATOR = use_random_generator
+            bcs.append(bc.copy())
+        if mkl_pc:
+            bc.USE_RANDOM_GENERATOR = "ONEMKL"
+            for pc in mkl_pc:
+                bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = pc
+                bcs.append(bc.copy())
+            bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
 
-            bc.USE_RANDOM_GENERATOR = "PCG"
-    executor.shutdown()
+        bc.USE_RANDOM_GENERATOR = "PCG"
+    num_total_jobs = len(bcs)
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        for job_id, bc in enumerate(bcs, 1):
+            executor.submit(do_build, bc, job_id)
+        executor.shutdown()
     SUCCESS_ID = sorted(SUCCESS_ID)
     FAILED_ID = sorted(FAILED_ID)
     print(f"{time()} Successful builds: {', '.join(map(str, SUCCESS_ID))}")
