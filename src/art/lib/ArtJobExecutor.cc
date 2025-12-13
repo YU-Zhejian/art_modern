@@ -37,7 +37,6 @@
 
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -72,16 +71,18 @@ namespace {
         void job_() const
         {
             std::size_t current_sleep = 0;
-            while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+            const std::size_t reporting_interval_ms = reporting_interval_seconds_ * 1000;
+            while (!should_stop_ && current_sleep < reporting_interval_ms) {
                 current_sleep++;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
             }
             while (!should_stop_) {
-                current_sleep = 0;
                 BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-                while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
+
+                current_sleep = 0;
+                while (!should_stop_ && current_sleep < reporting_interval_ms) {
                     current_sleep++;
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
+                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
                 }
             }
         }
@@ -91,7 +92,6 @@ namespace {
         std::thread thread_;
         std::size_t reporting_interval_seconds_;
     };
-
 } // namespace
 void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig,
     am_readnum_t& read_id, Rprob& rprob_)
@@ -101,14 +101,11 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
     current_n_reads_generated_ = 0;
     current_max_tolerence_ = am_max(static_cast<am_readnum_t>(5),
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
-    bool retv = false;
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {
-        if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
-            retv = generate_se_(art_contig, is_positive, read_id, rprob_);
-        } else {
-            retv = generate_pe_(art_contig, is_positive, read_id, rprob_);
-        }
+        bool retv
+            = (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? generate_se_ : generate_pe_)(
+                art_contig, is_positive, read_id, rprob_);
         if (retv) {
             current_n_reads_left_ -= num_reads_to_reduce_;
             total_num_reads_generated_ += num_reads_to_reduce_;

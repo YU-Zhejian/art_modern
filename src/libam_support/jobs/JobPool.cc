@@ -46,7 +46,7 @@ std::size_t JobPool::n_running_executors() const
 #if defined(USE_NOP_PARALLEL)
     return 1;
 #else
-    return n_running_executors_;
+    return cached_n_running_executors_;
 #endif
 }
 
@@ -55,16 +55,14 @@ void JobPool::prune_finished_jobs()
 #if defined(USE_NOP_PARALLEL)
 #else
     const std::scoped_lock op_lock(operation_mutex_);
-    std::size_t n_running = 0;
     std::vector<std::shared_ptr<JobExecutor>> passed_ajes_;
     for (auto aje : executors_) {
         if (aje && aje->is_running()) {
-            n_running++;
             passed_ajes_.emplace_back(std::move(aje));
         }
     }
     executors_ = std::move(passed_ajes_);
-    n_running_executors_ = n_running;
+    cached_n_running_executors_ = executors_.size();
 #endif
 }
 
@@ -81,6 +79,7 @@ void JobPool::stop()
     if (supervisor_thread_.joinable()) {
         supervisor_thread_.join();
     }
+    cached_n_running_executors_ = 0;
 #endif
 }
 
@@ -90,7 +89,12 @@ void JobPool::supervisor_()
 #else
     while (!should_stop_) {
         prune_finished_jobs();
-        std::this_thread::sleep_for(std::chrono::milliseconds(supervisor_interval_ms_));
+
+        std::size_t slept_ms = 0;
+        while (!should_stop_ && slept_ms < supervisor_interval_ms_) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            slept_ms++;
+        }
     }
 #endif
 }
@@ -102,8 +106,7 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
 #else
     const std::scoped_lock add_lock(add_mutex_);
     // Spin until there's a slot
-    while (n_running_executors_ >= pool_size_) {
-        prune_finished_jobs();
+    while (cached_n_running_executors_ >= pool_size_) {
         std::this_thread::sleep_for(std::chrono::milliseconds(add_spin_waits_ms_));
     }
     // Start the job first
@@ -122,10 +125,10 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
 
 JobPool::~JobPool() { stop(); }
 
+JobPool::JobPool(const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
-JobPool::JobPool([[maybe_unused]] const std::size_t pool_size) { };
+    {}
 #else
-JobPool::JobPool([[maybe_unused]] const std::size_t pool_size)
     : pool_(pool_size)
     , pool_size_(pool_size)
 {

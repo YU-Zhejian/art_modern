@@ -97,7 +97,7 @@ private:
     /** All running executors inside the pool. */
     std::vector<std::shared_ptr<JobExecutor>> executors_;
     /** Cached number of running executors. */
-    std::size_t n_running_executors_ = 0;
+    std::size_t cached_n_running_executors_ = 0;
     /** Size of the pool. */
     std::size_t pool_size_ = 1;
     /** Mutex for operations on the pool. */
