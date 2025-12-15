@@ -31,13 +31,11 @@
 #endif
 
 #if !defined(USE_NOP_PARALLEL)
-#include <atomic>
-#include <chrono>
 #include <mutex>
-#include <thread>
 #include <vector>
 #endif
 
+#include <condition_variable>
 #include <cstddef>
 #include <memory>
 
@@ -84,6 +82,9 @@ public:
     void prune_finished_jobs();
 
 private:
+    /** Cached number of running executors. */
+    std::size_t cached_n_running_executors_ = 0;
+    std::condition_variable cached_n_running_executors_cv_;
 #if defined(USE_NOP_PARALLEL)
     // Do nothing!
 #elif defined(USE_BS_PARALLEL)
@@ -91,22 +92,17 @@ private:
 #elif defined(USE_ASIO_PARALLEL)
     boost::asio::thread_pool pool_;
 #endif
-    /** Prune the finished jobs periodically. */
-    void supervisor_();
 #if !defined(USE_NOP_PARALLEL)
     /** All running executors inside the pool. */
     std::vector<std::shared_ptr<JobExecutor>> executors_;
-    /** Cached number of running executors. */
-    std::size_t cached_n_running_executors_ = 0;
     /** Size of the pool. */
     std::size_t pool_size_ = 1;
     /** Mutex for operations on the pool. */
     std::mutex operation_mutex_;
     /** Mutex for adding jobs. */
     std::mutex add_mutex_;
-    std::thread supervisor_thread_;
-    std::atomic<bool> should_stop_ { false };
-    std::size_t add_spin_waits_ms_ = 100;
+    void* supervisor_;
+    std::size_t add_spin_waits_ms_ = 1000;
     std::size_t supervisor_interval_ms_ = 500;
 #endif
 };

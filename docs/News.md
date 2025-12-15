@@ -5,8 +5,9 @@
 
 - Update bundled `{fmt}` to [`12.1.0`](https://github.com/fmtlib/fmt/releases/tag/12.1.0).
 - A possibly unidentified bug in CMake build system when trying to compile static version of testing C source code while the project is being configured is fixed.
-- The minimal test code for libdeflate, zlib, libbz2, and liblzma unified. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
+- The minimal test code for libdeflate, zlib, libbz2, and liblzma are reimplemented in a unified style. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
 - A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
+- Several changes done to the reporting system, resulting an increase of CPU ultilization rate.
 - Bundled LibCEU routines which influences `art_modern --version` output:
   - Supporting detection of C++ standard library. Currently supporting GNU libstdc++, LLVM libc++, and P. J. Plauger/Dinkumware, Ltd. C++ standard template library.
   - Supporting detection of Arm Compiler for Embedded (ACOMPE), Arm Compiler for Linux, Texas Instruments Compilers (`armcl` and `tiarmclang`), and Microsoft Visual Studio Clang Compiler.

@@ -16,6 +16,7 @@
 
 #include "art/lib/ArtRead.hh"
 
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
@@ -114,7 +115,7 @@ void ArtRead::generate_snv_on_qual()
             continue;
         }
         if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
-        std::size_t num_tries = 0;
+            std::size_t num_tries = 0;
             do {
                 achar = rprob_.rand_base();
                 num_tries++;

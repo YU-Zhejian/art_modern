@@ -17,6 +17,12 @@
 #include "libam_support/jobs/JobExecutor.hh"
 #include "libam_support/jobs/JobPool.hh"
 
+#include "libam_support/jobs/Scheduler.hh"
+#include "libam_support/utils/class_macros_utils.hh"
+#include "libam_support/utils/mpi_utils.hh"
+
+#include <boost/log/trivial.hpp>
+
 #if defined(USE_NOP_PARALLEL)
 // Do nothing!
 #elif defined(USE_BS_PARALLEL)
@@ -28,7 +34,6 @@
 #endif
 
 #if !defined(USE_NOP_PARALLEL)
-#include <atomic>
 #include <chrono>
 #include <mutex>
 #include <thread>
@@ -41,14 +46,26 @@
 
 namespace labw::art_modern {
 
-std::size_t JobPool::n_running_executors() const
-{
-#if defined(USE_NOP_PARALLEL)
-    return 1;
-#else
-    return cached_n_running_executors_;
-#endif
-}
+namespace {
+    class JobPoolSupervisor : public Scheduler<std::chrono::milliseconds> {
+    public:
+        JobPoolSupervisor(JobPool& jp, const std::size_t supervisor_interval_ms)
+            : Scheduler(
+                  std::chrono::milliseconds(supervisor_interval_ms), std::chrono::milliseconds(supervisor_interval_ms))
+            , jp_(jp)
+        {
+        }
+        ~JobPoolSupervisor() override { stop(); }
+        DELETE_MOVE(JobPoolSupervisor)
+        DELETE_COPY(JobPoolSupervisor)
+        void callback() override { jp_.prune_finished_jobs(); }
+
+    private:
+        JobPool& jp_;
+    };
+} // namespace
+
+std::size_t JobPool::n_running_executors() const { return cached_n_running_executors_; }
 
 void JobPool::prune_finished_jobs()
 {
@@ -63,6 +80,7 @@ void JobPool::prune_finished_jobs()
     }
     executors_ = std::move(passed_ajes_);
     cached_n_running_executors_ = executors_.size();
+    cached_n_running_executors_cv_.notify_all();
 #endif
 }
 
@@ -75,26 +93,14 @@ void JobPool::stop()
 #elif defined(USE_ASIO_PARALLEL)
     pool_.join();
 #endif
-    should_stop_ = true;
-    if (supervisor_thread_.joinable()) {
-        supervisor_thread_.join();
-    }
-    cached_n_running_executors_ = 0;
+    (static_cast<JobPoolSupervisor*>(supervisor_))->stop();
 #endif
-}
-
-void JobPool::supervisor_()
-{
-#if defined(USE_NOP_PARALLEL)
-#else
-    while (!should_stop_) {
-        prune_finished_jobs();
-
-        std::size_t slept_ms = 0;
-        while (!should_stop_ && slept_ms < supervisor_interval_ms_) {
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            slept_ms++;
-        }
+    prune_finished_jobs(); // Should clear all jobs.
+#ifdef CEU_CM_IS_DEBUG
+    if (cached_n_running_executors_ != 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Number of cached executors are not 0 when exiting the job pool! "
+        << "Actual: " << cached_n_running_executors_;
+        abort_mpi();
     }
 #endif
 }
@@ -102,12 +108,19 @@ void JobPool::supervisor_()
 void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
 {
 #if defined(USE_NOP_PARALLEL)
+    cached_n_running_executors_ = 1;
     job_executor->operator()();
+    cached_n_running_executors_ = 0;
 #else
-    const std::scoped_lock add_lock(add_mutex_);
+    // Lock for adding jobs
+    std::unique_lock add_lock(add_mutex_);
     // Spin until there's a slot
     while (cached_n_running_executors_ >= pool_size_) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(add_spin_waits_ms_));
+        cached_n_running_executors_cv_.wait_for(
+            add_lock,
+            std::chrono::milliseconds(add_spin_waits_ms_),
+            [this]() { return this->cached_n_running_executors_ < this->pool_size_; }
+    );
     }
     // Start the job first
 #if defined(USE_BS_PARALLEL)
@@ -123,7 +136,11 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
 #endif
 }
 
-JobPool::~JobPool() { stop(); }
+JobPool::~JobPool()
+{
+    stop();
+    // No idea how to free supervisor.
+}
 
 JobPool::JobPool(const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
@@ -132,7 +149,8 @@ JobPool::JobPool(const std::size_t pool_size)
     : pool_(pool_size)
     , pool_size_(pool_size)
 {
-    supervisor_thread_ = std::thread(&JobPool::supervisor_, this);
+    supervisor_ = new JobPoolSupervisor(*this, supervisor_interval_ms_);
+    static_cast<JobPoolSupervisor*>(supervisor_)->start();
 }
 #endif
 

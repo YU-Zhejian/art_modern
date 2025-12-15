@@ -190,7 +190,9 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs) -> bool:
             with IO_MUTEX:
                 print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START")
-            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8"))
+            log_file.write(
+                f"{time()} {this_job_id}/{num_total_jobs} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8")
+            )
 
             log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START\n".encode("utf-8"))
 
@@ -205,7 +207,9 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 except subprocess.TimeoutExpired as e:
                     with IO_MUTEX:
                         print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT")
-                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT: {e}\n".encode("utf-8"))
+                    log_file.write(
+                        f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT: {e}\n".encode("utf-8")
+                    )
                     return False
                 except subprocess.SubprocessError as e:
                     with IO_MUTEX:

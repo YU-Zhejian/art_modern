@@ -182,9 +182,12 @@ template <typename T> void LockFreeIO<T>::push(T&& value)
         success = queue_.try_enqueue(std::move(value));
         num_trials += 1;
     }
-    BOOST_LOG_TRIVIAL(warning) << name_ << " LockFreeIO: Using syncronized push after " << num_trials
-    << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled jobs.";
-    queue_.enqueue(std::move(value));
+    if (!success) {
+        BOOST_LOG_TRIVIAL(warning)
+            << name_ << " LockFreeIO: Using syncronized push after " << num_trials
+            << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled jobs.";
+        queue_.enqueue(std::move(value));
+    }
     ++num_reads_in_;
 }
 
@@ -200,9 +203,12 @@ template <typename T> inline void LockFreeIO<T>::push(T&& value, const ProducerT
         success = queue_.try_enqueue(token.token, std::move(value));
         num_trials += 1;
     }
-    BOOST_LOG_TRIVIAL(warning) << name_ << " LockFreeIO: Using syncronized push after " << num_trials
-    << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled jobs.";
-    queue_.enqueue(std::move(value));
+    if (!success) {
+        BOOST_LOG_TRIVIAL(warning)
+            << name_ << " LockFreeIO: Using syncronized push after " << num_trials
+            << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled jobs.";
+        queue_.enqueue(std::move(value));
+    }
     ++num_reads_in_;
 }
 

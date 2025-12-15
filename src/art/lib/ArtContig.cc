@@ -15,7 +15,8 @@
 
 #include "art/lib/ArtContig.hh"
 
-#include "ArtConstants.hh"
+#include "art/lib/ArtConstants.hh"
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/ArtRead.hh"
 #include "art/lib/Rprob.hh"
 

@@ -17,11 +17,13 @@
 
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtContig.hh"
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/ArtRead.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/jobs/Scheduler.hh"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
@@ -40,57 +42,27 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include <thread>
 #include <utility>
 
 namespace labw::art_modern {
 namespace {
 
-    class AJEReporter {
+    class AJEReporter : public Scheduler<std::chrono::seconds> {
     public:
-        explicit AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
-            : aje_(aje)
-            , reporting_interval_seconds_(reporting_interval_seconds)
+        AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
+            : Scheduler(
+                  std::chrono::seconds(reporting_interval_seconds), std::chrono::seconds(reporting_interval_seconds))
+            , aje_(aje)
         {
         }
 
         DELETE_COPY(AJEReporter)
         DELETE_MOVE(AJEReporter)
-        ~AJEReporter() { stop(); }
-
-        void stop()
-        {
-            should_stop_ = true;
-            if (thread_.joinable()) {
-                thread_.join();
-            }
-        }
-        void start() { thread_ = std::thread(&AJEReporter::job_, this); }
+        ~AJEReporter() override { stop(); }
+        void callback() override { BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info(); }
 
     private:
-        void job_() const
-        {
-            std::size_t current_sleep = 0;
-            const std::size_t reporting_interval_ms = reporting_interval_seconds_ * 1000;
-            while (!should_stop_ && current_sleep < reporting_interval_ms) {
-                current_sleep++;
-                std::this_thread::sleep_for(std::chrono::milliseconds(1));
-            }
-            while (!should_stop_) {
-                BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-
-                current_sleep = 0;
-                while (!should_stop_ && current_sleep < reporting_interval_ms) {
-                    current_sleep++;
-                    std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                }
-            }
-        }
-
         ArtJobExecutor& aje_;
-        std::atomic<bool> should_stop_ { false };
-        std::thread thread_;
-        std::size_t reporting_interval_seconds_;
     };
 } // namespace
 void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig,
@@ -103,9 +75,12 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {
-        bool retv
-            = (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? generate_se_ : generate_pe_)(
-                art_contig, is_positive, read_id, rprob_);
+        bool retv = false;
+        if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
+            retv = generate_se_(art_contig, is_positive, read_id, rprob_);
+        } else {
+            retv = generate_pe_(art_contig, is_positive, read_id, rprob_);
+        }
         if (retv) {
             current_n_reads_left_ -= num_reads_to_reduce_;
             total_num_reads_generated_ += num_reads_to_reduce_;

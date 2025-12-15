@@ -11,31 +11,12 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see
  * <https://www.gnu.org/licenses/>.
  **/
+
 #pragma once
 
-#include "libam_support/jobs/JobPool.hh"
-#include "libam_support/jobs/Scheduler.hh"
-#include "libam_support/utils/class_macros_utils.hh"
-
-#include <atomic>
-#include <chrono>
-#include <cstdlib>
-#include <thread>
+#include <exception>
 
 namespace labw::art_modern {
 
-class JobPoolReporter : public Scheduler<std::chrono::seconds> {
-public:
-    JobPoolReporter(JobPool& jp, std::size_t reporting_interval_seconds);
-    void callback() override;
-    ~JobPoolReporter() override;
-    DELETE_MOVE(JobPoolReporter)
-    DELETE_COPY(JobPoolReporter)
-
-private:
-    JobPool& jp_;
-    std::atomic<bool> should_stop_ { false };
-    std::thread thread_;
-};
-
+class ArtGenerationFailure : public std::exception { };
 } // namespace labw::art_modern
