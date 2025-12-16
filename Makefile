@@ -207,7 +207,6 @@ testsmall-release-mpi: release-mpi raw_data
 
 .PHONY: testsmall-conda
 # Run small tests with conda-installed art_modern
-# TODO: Add MPI version when bioconda supports it
 testsmall-conda: raw_data
 	conda env remove -n _art_modern_bioconda -y || true
 	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern
@@ -215,6 +214,17 @@ testsmall-conda: raw_data
 		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern)" \
 		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder)" \
 		MPIEXEC="" \
+		$(BASH) sh.d/test-small.sh
+
+.PHONY: testsmall-conda-mpi
+# testsmall-conda with MPI
+testsmall-conda-mpi: raw_data
+	conda env remove -n _art_modern_bioconda -y || true
+	conda create -y -n _art_modern_bioconda -c bioconda -c conda-forge art_modern-openmpi
+	env \
+		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern-mpi)" \
+		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder-mpi)" \
+		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 
 .PHONY: raw_data

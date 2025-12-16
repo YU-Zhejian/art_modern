@@ -31,7 +31,7 @@
 
 Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster.
 
-`art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that creates ART-compatible profiles out of FASTQ, SAM ad BAM files.
+`art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that creates ART-compatible profiles out of FASTQ, SAM, and BAM files.
 
 ## Quick Start
 
@@ -41,7 +41,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` or `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, that should work on most x86\_64 Linux distributions. Unzip it and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` or `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
 
 **WARNING** Static builds may lead to compromised security.
 
@@ -99,7 +99,7 @@ opt/build_release/art_modern --version
 
 ### Simulating WGS Data using _E. Coli_ Genome
 
-Download _E. coli_ reference genome from NCBI. Here we'll use K12 strand MG1655 sub-strand as an example.
+Download _E. coli_ reference genome from NCBI. Here, we'll use the K12 strand MG1655 sub-strand as an example.
 
 ```shell
 mkdir -p opt/data/
