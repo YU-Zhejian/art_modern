@@ -16,6 +16,7 @@
 
 #include "art/lib/ArtRead.hh"
 
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
@@ -114,8 +115,13 @@ void ArtRead::generate_snv_on_qual()
             continue;
         }
         if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
+            std::size_t num_tries = 0;
             do {
                 achar = rprob_.rand_base();
+                num_tries++;
+                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                    throw ArtGenerationFailure();
+                }
             } while (query_[i] == achar);
             query_[i] = achar;
         }
@@ -138,11 +144,16 @@ hts_pos_t ArtRead::generate_indels()
         if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
             del_len = i + 1;
             j = i;
+            std::size_t num_tries = 0;
             while (j >= 0) {
                 pos = rprob_.rand_pos_on_read_not_head_and_tail(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = ALN_GAP;
                     j--;
+                }
+                num_tries++;
+                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                    throw ArtGenerationFailure();
                 }
             }
             break;
@@ -156,11 +167,16 @@ hts_pos_t ArtRead::generate_indels()
         if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
             ins_len = i + 1;
             j = i;
+            std::size_t num_tries = 0;
             while (j >= 0) {
                 pos = rprob_.rand_pos_on_read(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
+                }
+                num_tries++;
+                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                    throw ArtGenerationFailure();
                 }
             }
             break;

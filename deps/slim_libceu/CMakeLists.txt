@@ -29,14 +29,17 @@ function(ceu_cm_set_static_target name)
 endfunction()
 
 if(NOT DEFINED BUILD_SHARED_LIBS)
-    if(WIN32 OR CYGWIN OR MINGW OR MSVC)
+    if(WIN32
+       OR CYGWIN
+       OR MINGW
+       OR MSVC)
         set(BUILD_SHARED_LIBS OFF)
     else()
         set(BUILD_SHARED_LIBS ON)
     endif()
-    message (STATUS "BUILD_SHARED_LIBS is defined to default as: ${BUILD_SHARED_LIBS}")
+    message(STATUS "BUILD_SHARED_LIBS is defined to default as: ${BUILD_SHARED_LIBS}")
 else()
-    message (STATUS "BUILD_SHARED_LIBS is defined externally as: ${BUILD_SHARED_LIBS}")
+    message(STATUS "BUILD_SHARED_LIBS is defined externally as: ${BUILD_SHARED_LIBS}")
 endif()
 
 if(BUILD_SHARED_LIBS)

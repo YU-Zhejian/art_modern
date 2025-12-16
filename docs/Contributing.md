@@ -69,7 +69,8 @@ Before you send a PR, please make sure that:
 
 You may also:
 
-- You used Valgrind to check for memory leaks.
+- Use Valgrind to check for memory leaks.
+- Run the profilers.
 
 ## Scripts for Testing
 
