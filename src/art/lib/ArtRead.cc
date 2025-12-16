@@ -119,7 +119,7 @@ void ArtRead::generate_snv_on_qual()
             do {
                 achar = rprob_.rand_base();
                 num_tries++;
-                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                if (num_tries > MAX_RETRIES_ON_INDEL_GENERATION) {
                     throw ArtGenerationFailure();
                 }
             } while (query_[i] == achar);
@@ -152,7 +152,7 @@ hts_pos_t ArtRead::generate_indels()
                     j--;
                 }
                 num_tries++;
-                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                if (num_tries > MAX_RETRIES_ON_INDEL_GENERATION) {
                     throw ArtGenerationFailure();
                 }
             }
@@ -175,7 +175,7 @@ hts_pos_t ArtRead::generate_indels()
                     j--;
                 }
                 num_tries++;
-                if (num_tries > 1000 /* TODO: Eliminate this magic number*/) {
+                if (num_tries > MAX_RETRIES_ON_INDEL_GENERATION) {
                     throw ArtGenerationFailure();
                 }
             }
@@ -200,15 +200,14 @@ hts_pos_t ArtRead::generate_indels_2()
             ins_len = i + 1;
             int j = i;
             std::size_t num_tries = 0;
-            while ( j >= 0) {
+            while (j >= 0) {
                 pos = rprob_.rand_pos_on_read(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
                 }
                 num_tries++;
-                if (num_tries > 1000 /* TODO: Eliminate this magic number*/)
-                {
+                if (num_tries > MAX_RETRIES_ON_INDEL_GENERATION) {
                     throw ArtGenerationFailure();
                 }
             }
@@ -231,7 +230,7 @@ hts_pos_t ArtRead::generate_indels_2()
             del_len = i + 1;
             int j = i;
             std::size_t num_tries = 0;
-            while ( j >= 0) {
+            while (j >= 0) {
                 pos = rprob_.rand_pos_on_read_not_head_and_tail(is_read_1_);
                 if (pos == 0) {
                     continue;
@@ -241,8 +240,7 @@ hts_pos_t ArtRead::generate_indels_2()
                     j--;
                 }
                 num_tries++;
-                if (num_tries > 1000 /* TODO: Eliminate this magic number*/)
-                {
+                if (num_tries > MAX_RETRIES_ON_INDEL_GENERATION) {
                     throw ArtGenerationFailure();
                 }
             }

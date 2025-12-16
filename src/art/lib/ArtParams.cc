@@ -27,12 +27,11 @@ namespace {
         return tmp_err_prob;
     }
 } // namespace
-ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode,
-    const ART_LIB_CONST_MODE art_lib_const_mode, const bool sep_flag, std::string&& id,
-    const int max_n, const am_read_len_t read_len_1, const am_read_len_t read_len_2, const double pe_frag_dist_mean,
-    const double pe_frag_dist_std_dev, std::vector<double>&& per_base_ins_rate_1,
-    std::vector<double>&& per_base_del_rate_1, std::vector<double>&& per_base_ins_rate_2,
-    std::vector<double>&& per_base_del_rate_2, Empdist&& qdist,
+ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode, const ART_LIB_CONST_MODE art_lib_const_mode,
+    const bool sep_flag, std::string&& id, const int max_n, const am_read_len_t read_len_1,
+    const am_read_len_t read_len_2, const double pe_frag_dist_mean, const double pe_frag_dist_std_dev,
+    std::vector<double>&& per_base_ins_rate_1, std::vector<double>&& per_base_del_rate_1,
+    std::vector<double>&& per_base_ins_rate_2, std::vector<double>&& per_base_del_rate_2, Empdist&& qdist,
     const std::size_t job_pool_reporting_interval_seconds,
     const std::size_t art_job_executor_reporting_interval_seconds)
     : art_simulation_mode(art_simulation_mode)

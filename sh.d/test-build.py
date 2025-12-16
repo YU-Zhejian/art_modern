@@ -206,7 +206,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                     # Kill the process first
                     proc.terminate()
                     try:
-                        proc.wait(timeout = 3)
+                        proc.wait(timeout=3)
                     except subprocess.TimeoutExpired:
                         proc.kill()
                         proc.wait()

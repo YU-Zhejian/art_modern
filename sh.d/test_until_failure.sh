@@ -18,8 +18,8 @@ while true; do
     echo "Starting test #${NUM_TESTS}..."
     rm -fr "${WORKDIR}"
     mkdir -p "${WORKDIR}"
-   
-        "${OPT_DIR}/build_release_install/bin/art_modern" \
+
+    "${OPT_DIR}/build_release_install/bin/art_modern" \
         --i-file "${PWD}"/data/raw_data/ce11.mRNA_head.pbsim3.transcript \
         --i-type pbsim3_transcripts \
         --i-batch_size 100 \
