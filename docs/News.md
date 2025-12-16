@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.3.1-section)=
-## 1.3.1 (Ongoing)
+## 1.3.1 (2025/12/15)
 
 - **KNOWN BUGS**
   - Non-reproducible stucks, with no clear reason. Currently seen in both MPI and non-MPI mode. Seen in LLVM and Intel C++/DPC++ compilers. Currently only seen in `pbsim3_transcripts`, `template` mode with unequal read1/read2 lengths specified. The author is working on fixing this issue.
