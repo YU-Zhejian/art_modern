@@ -1,13 +1,34 @@
 #pragma once
 
-// Whether <cygwin/version.h> is available
+/** Whether <cygwin/version.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_CYGWIN_VERSION_H
 
-// Whether <sys/utsname.h> is available
+/** Whether <sys/utsname.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE_SYS_UTSNAME_H
 
-// Whether <_mingw.h> is available
+/** Whether <_mingw.h> is available */
 #cmakedefine01 CEU_HAVE_INCLUDE__MINGW_H
 
-// Whether to enable reproducible builds
+/** Whether to enable reproducible builds */
 #cmakedefine01 CEU_REPRODUCIBLE_BUILDS
+
+/** Whether <features.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_FEATURES_H
+
+/** Whether <sys/cdefs.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_SYS_CDEFS_H
+
+/** Whether <sys/param.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_SYS_PARAM_H
+
+/** Whether <endian.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_ENDIAN_H
+
+/** Whether <intrin.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_INTRIN_H
+
+/** Whether <x86intrin.h> is available */
+#cmakedefine01 CEU_HAVE_INCLUDE_X86INTRIN_H
+
+/** Version */
+#cmakedefine CEU_VERSION "${CEU_VERSION}"

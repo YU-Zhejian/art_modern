@@ -4,19 +4,26 @@
 [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern.svg)](https://github.com/YU-Zhejian/art_modern/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total.svg?style=social&logo=github&label=Download)](https://github.com/YU-Zhejian/art_modern/releases/)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
+[![Code style: black](https://img.shields.io/badge/code%20style-webkit-blue.svg)](https://webkit.org/code-style-guidelines/)
 
-[![Install with BioConda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
+`art_modern` on BioConda: [![Install with BioConda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Conda Version](https://img.shields.io/conda/vn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
 [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
+
+`art_modern-openmpi` on BioConda: [![Install with BioConda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern-openmpi/README.html)
+[![Conda Version](https://img.shields.io/conda/vn/bioconda/art_modern-openmpi)](https://anaconda.org/bioconda/art_modern-openmpi)
+[![Conda Downloads](https://img.shields.io/conda/dn/bioconda/art_modern-openmpi)](https://anaconda.org/bioconda/art_modern-openmpi)
 
 `art-modern-utils` badges:
 [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern_utils.svg)](https://github.com/YU-Zhejian/art_modern_utils/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern_utils/total.svg?style=social&logo=github&label=Download)](https://github.com/YU-Zhejian/art_modern_utils/releases)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
+`art-modern-utils` on PyPI:
 [![Python version](https://img.shields.io/badge/python-3.9-blue)](https://www.python.org/downloads/)
 [![PyPI - Version](https://img.shields.io/pypi/v/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![PyPI - Downloads](https://img.shields.io/pypi/dm/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
 
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)
 

@@ -34,15 +34,13 @@ void test_exception_syntax()
     }
 }
 
-template <typename T>
-struct test_template {
+template <typename T> struct test_template {
     T const val;
     explicit test_template(T t)
         : val(t)
     {
     }
-    template <typename U>
-    T add(U u) { return static_cast<T>(u) + val; }
+    template <typename U> T add(U u) { return static_cast<T>(u) + val; }
 };
 
 } // anonymous namespace

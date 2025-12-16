@@ -1,9 +1,12 @@
+#include "art_modern_config.h" // For USED_HTSLIB_NAME
+
 #include "art_profile_builder/exe/parse_args.hh"
 
 #include "art_profile_builder/lib/APBConfig.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/utils/frontend_utils.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"

@@ -1,0 +1,6 @@
+GCC_TRIPLET,QEMU_POSTFIX,GCC_OPTS
+aarch64-linux-gnu,arm64,
+arm-linux-gnueabi,arm,
+riscv64-linux-gnu,riscv64,
+m68k-linux-gnu,m68k,
+sparc64-linux-gnu,sparc64,

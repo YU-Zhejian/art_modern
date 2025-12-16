@@ -53,23 +53,11 @@ private:
 };
 
 // for testing lambda expressions
-template <typename Ret, typename Fn>
-Ret eval(Fn f, Ret v)
-{
-    return f(v);
-}
+template <typename Ret, typename Fn> Ret eval(Fn f, Ret v) { return f(v); }
 
 // for testing variadic templates and trailing return types
-template <typename V>
-auto sum(V first) -> V
-{
-    return first;
-}
-template <typename V, typename... Args>
-auto sum(V first, Args... rest) -> V
-{
-    return first + sum(rest...);
-}
+template <typename V> auto sum(V first) -> V { return first; }
+template <typename V, typename... Args> auto sum(V first, Args... rest) -> V { return first + sum(rest...); }
 }
 int cxx11main(int argc, char** argv)
 {
@@ -97,8 +85,7 @@ int cxx11main(int argc, char** argv)
     }
     {
         // Test range-based for
-        int array[] = { 9, 7, 13, 15, 4, 18, 12, 10, 5, 3,
-            14, 19, 17, 8, 6, 20, 16, 2, 11, 1 };
+        int array[] = { 9, 7, 13, 15, 4, 18, 12, 10, 5, 3, 14, 19, 17, 8, 6, 20, 16, 2, 11, 1 };
         for (auto& x : array) {
             x += 23;
         }

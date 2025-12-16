@@ -1,5 +1,20 @@
 # News \& Release Notes
 
+(v-1.3.1-section)=
+## 1.3.1 (2025/12/15)
+
+- **KNOWN BUGS**
+  - Non-reproducible stucks, with no clear reason. Currently seen in both MPI and non-MPI mode. Seen in LLVM and Intel C++/DPC++ compilers. Currently only seen in `pbsim3_transcripts`, `template` mode with unequal read1/read2 lengths specified. The author is working on fixing this issue.
+- Software Engineering:
+  - Update bundled `{fmt}` to [`12.1.0`](https://github.com/fmtlib/fmt/releases/tag/12.1.0).
+  - A possibly unidentified bug in CMake build system when trying to compile static version of testing C source code while the project is being configured is fixed.
+  - The minimal test code for libdeflate, zlib, libbz2, and liblzma are reimplemented in a unified style. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
+  - Bundled LibCEU routines can recognize more compilers \& architectures \& libraries.
+- Implementation:
+  - A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
+  - Several changes done to the reporting system, resulting an increase of CPU ultilization rate.
+- Miscellaneous bug fixes.
+
 (v-1.3.0-section)=
 ## 1.3.0 (2025/11/14)
 
@@ -29,7 +44,7 @@
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
 - Makefile integration test target `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
 - `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
-- `art_modern`: 
+- `art_modern`:
   - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
   - Memory performance of `stream` FASTA parser largely improved.
 - **EXPERIMENTAL** Packing: DEB package variant using OpenMPI added.

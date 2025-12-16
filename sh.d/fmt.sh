@@ -34,7 +34,10 @@ wait
 
 which clang-format &>/dev/null &&
     git ls-files |
-    grep -v 'deps' |
+    grep -v 'deps/concurrentqueue/' |
+        grep -v 'deps/labw_slim_htslib/' |
+        grep -v 'deps/slim_fmt/' |
+        grep -v 'deps/thread-pool/' |
         grep -v '.idea/' |
         grep -v 'benchmark_other_simulators/src/' |
         grep -e '\.cc$' -e '\.cpp$' -e '\.c$' -e '\.h$' -e '\.hh' -e '\.hpp$' |
@@ -51,9 +54,6 @@ wait
 which cmake-format &>/dev/null &&
     git ls-files |
     grep -v '.idea/' |
-        grep -v 'art_original' |
-        grep -v 'dwgsim' |
-        grep -v 'htslib-1.21' |
         grep -e '\.cmake$' -e 'CMakeLists.txt' |
         while read -r line; do
             if [ -e "${line}" ]; then

@@ -1,0 +1,9 @@
+name: intel-compilers
+channels:
+  - conda-forge
+  - https://software.repos.intel.com/python/conda/
+dependencies:
+  - dpcpp_linux-64=2025.3.0
+  - mkl-devel=2025.3.0
+  - impi-devel=2021.17.0
+  - intel-openmp=2025.3.0

@@ -48,7 +48,7 @@ namespace {
         const std::string dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, mpi_rank_s());
 
 #ifdef CEU_ON_POSIX
-        struct sigaction sa { };
+        struct sigaction sa {};
         sa.sa_handler = SIG_DFL;
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = 0;
@@ -71,7 +71,7 @@ void handle_dumps()
 #ifdef WITH_BOOST_STACKTRACE
 #ifdef CEU_ON_POSIX
     {
-        struct sigaction sa { };
+        struct sigaction sa {};
         sa.sa_handler = my_signal_handler;
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = 0;

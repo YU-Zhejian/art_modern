@@ -1,7 +1,7 @@
 /*!
  * @file cst_workload.h
  * @author YU Zhejian
- * @brief Workload for testing parallelization libraries like OpenMP, PThread, etc.
+ * @brief Workload for testing parallelization libraries like OpenMP, pthread, etc.
  * @version 0.1
  * @date 2024-04-28
  */
@@ -9,6 +9,7 @@
 #ifndef LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 #define LIBCONCURRENTQUEUE_CST_WORKLOAD_H
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@ static inline int perform_sqrt(int num_of_rounds, int num_to_sqrt)
     }
     for (int round = 0; round < num_of_rounds; round++) {
         for (int i = 0; i < num_to_sqrt; i++) {
-            result[i] = (i) / 2;
+            result[i] = sqrt((double)i);
         }
     }
     free(result);
@@ -32,8 +33,7 @@ static inline int perform_sqrt(int num_of_rounds, int num_to_sqrt)
     return 0;
 }
 
-typedef struct
-{
+typedef struct {
     int num_to_sqrt;
     int num_of_rounds;
     int num_of_threads;
@@ -54,4 +54,4 @@ parse_args(void)
 };
 #endif
 
-#endif // LIBCONCURRENTQUEUE_CST_WORKLOAD_H
+#endif /**  LIBCONCURRENTQUEUE_CST_WORKLOAD_H*/

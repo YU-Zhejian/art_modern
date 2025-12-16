@@ -1,0 +1,44 @@
+# Work under Linux only.
+# art_modern test environment with Intel runtime enabled.
+# Boost and zlib libraries still need to be installed manually.
+
+name: art_modern_intelrt
+channels:
+  - nodefaults
+  - conda-forge
+  - bioconda
+  - https://software.repos.intel.com/python/conda/
+
+dependencies:
+  - python=3.11
+  - samtools
+  - pysam
+  - tqdm
+  - seqtk
+  - seqkit
+  - pyfastx
+  - fastqc
+  - bwa
+  - numpy
+  - pandas
+  - scipy
+  - matplotlib=3.10
+
+  # Build tools
+  - conda-forge::ninja
+  - conda-forge::cmake >=3.17
+  - conda-forge::make
+  - conda-forge::coreutils >=8.28
+  - conda-forge::bash
+  - conda-forge::pkg-config
+
+  # Intel runtimes
+  - dpcpp-cpp-rt=2025.3.0
+  - mkl=2025.3.0
+  - impi_rt=2021.17.0
+  - intel-openmp=2025.3.0
+  - intel-sycl-rt=2025.3.0
+
+  - pip
+  - pip:
+    - art-modern-utils==0.1.0

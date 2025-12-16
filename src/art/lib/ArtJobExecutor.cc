@@ -17,11 +17,13 @@
 
 #include "art/lib/ArtConstants.hh"
 #include "art/lib/ArtContig.hh"
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/ArtRead.hh"
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/jobs/Scheduler.hh"
 #include "libam_support/out/OutputDispatcher.hh"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
@@ -37,61 +39,31 @@
 
 #include <atomic>
 #include <chrono>
-#include <cmath>
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include <thread>
 #include <utility>
 
 namespace labw::art_modern {
 namespace {
 
-    class AJEReporter {
+    class AJEReporter : public Scheduler<std::chrono::seconds> {
     public:
-        explicit AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
-            : aje_(aje)
-            , reporting_interval_seconds_(reporting_interval_seconds)
+        AJEReporter(ArtJobExecutor& aje, const std::size_t reporting_interval_seconds)
+            : Scheduler(
+                  std::chrono::seconds(reporting_interval_seconds), std::chrono::seconds(reporting_interval_seconds))
+            , aje_(aje)
         {
         }
 
         DELETE_COPY(AJEReporter)
         DELETE_MOVE(AJEReporter)
-        ~AJEReporter() { stop(); }
-
-        void stop()
-        {
-            should_stop_ = true;
-            if (thread_.joinable()) {
-                thread_.join();
-            }
-        }
-        void start() { thread_ = std::thread(&AJEReporter::job_, this); }
+        ~AJEReporter() override { stop(); }
+        void callback() override { BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info(); }
 
     private:
-        void job_() const
-        {
-            std::size_t current_sleep = 0;
-            while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
-                current_sleep++;
-                std::this_thread::sleep_for(std::chrono::seconds(1));
-            }
-            while (!should_stop_) {
-                current_sleep = 0;
-                BOOST_LOG_TRIVIAL(info) << "AJEReporter: Job " << aje_.thread_info();
-                while (!should_stop_ && current_sleep < reporting_interval_seconds_) {
-                    current_sleep++;
-                    std::this_thread::sleep_for(std::chrono::seconds(1));
-                }
-            }
-        }
-
         ArtJobExecutor& aje_;
-        std::atomic<bool> should_stop_ { false };
-        std::thread thread_;
-        std::size_t reporting_interval_seconds_;
     };
-
 } // namespace
 void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool is_positive, ArtContig& art_contig,
     am_readnum_t& read_id, Rprob& rprob_)
@@ -101,9 +73,9 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
     current_n_reads_generated_ = 0;
     current_max_tolerence_ = am_max(static_cast<am_readnum_t>(5),
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
-    bool retv = false;
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {
+        bool retv = false;
         if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
             retv = generate_se_(art_contig, is_positive, read_id, rprob_);
         } else {
@@ -210,11 +182,11 @@ void ArtJobExecutor::operator()()
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
         const auto& contig_name = job_.fasta_fetch->seq_name(seq_id);
         const auto contig_size = job_.fasta_fetch->seq_len(seq_id);
-        if (contig_size < art_params_.read_len_max || /** unlikely */ contig_size == 0) {
+        if (contig_size < art_params_.contig_len_threshold || /** unlikely */ contig_size == 0) {
             BOOST_LOG_TRIVIAL(debug) << "the reference sequence " << contig_name << " (length "
                                      << job_.fasta_fetch->seq_len(seq_id)
-                                     << "bps ) is skipped as it < the defined maximum read length ("
-                                     << art_params_.read_len_max << " bps)";
+                                     << "bps ) is skipped as it < the contig length threshold ("
+                                     << art_params_.contig_len_threshold << " bps)";
             continue;
         }
         accumulated_contig_len += contig_size;

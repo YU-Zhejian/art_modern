@@ -1,0 +1,42 @@
+#ifndef CEU_OS_WINDOWS_H
+#define CEU_OS_WINDOWS_H
+
+#ifndef CEU_CHECK_OS_MACRO_H
+#error "Do not include this file, include <ceu_check/ceu_check_os_macro.h> instead!"
+#endif
+#if defined(__MSYS__)
+#define CEU_PRIMARY_OS_TYPE "MSYS"
+
+#define CEU_ON_MSYS
+#endif
+
+#if defined(__CYGWIN__)
+#ifndef CEU_PRIMARY_OS_TYPE
+#define CEU_PRIMARY_OS_TYPE "CYGWIN"
+#endif
+#define CEU_ON_CYGWIN
+#endif
+
+#if defined(__MINGW64__)
+#ifndef CEU_PRIMARY_OS_TYPE
+#define CEU_PRIMARY_OS_TYPE "MINGW64"
+#endif
+#define CEU_ON_MINGW64
+#endif
+
+#if defined(__MINGW32__) || defined(__WINNT__) || defined(__WINNT)
+#ifndef CEU_PRIMARY_OS_TYPE
+#define CEU_PRIMARY_OS_TYPE "MINGW32"
+#endif
+#define CEU_ON_MINGW32
+#endif
+
+#if defined(WIN64) || defined(_WIN64) || defined(__WIN64) || defined(__WIN64__) || defined(WIN32) || defined(_WIN32)   \
+    || defined(__WIN32) || defined(__WIN32__)
+#define CEU_ON_WINDOWS
+#ifndef CEU_PRIMARY_OS_TYPE
+#define CEU_PRIMARY_OS_TYPE "Microsoft Windows"
+#endif
+#endif
+
+#endif /* CEU_OS_WINDOWS_H */

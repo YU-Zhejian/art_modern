@@ -1,0 +1,13 @@
+#ifndef CEU_CC_AMD_CLANG_H
+#define CEU_CC_AMD_CLANG_H
+
+#ifndef CEU_CHECK_CC_MACRO_H
+#error "Do not include this file, include <ceu_check/ceu_check_c_cxx_compiler_macro.h> instead!"
+#endif
+#if defined(__aocc__)
+#define CEU_COMPILER_IS_AOCC
+#endif
+#if (defined(CEU_COMPILER_IS_AOCC) && !defined(CEU_COMPILER_NAME))
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_AOCC
+#endif
+#endif /* CEU_CC_AMD_CLANG_H */

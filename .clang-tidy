@@ -105,6 +105,15 @@ Checks:
   # HTSLib uses unions in several places.
   - -cppcoreguidelines-pro-type-union-access
 
+  # snprintf_s is not available in all platforms.
+  - -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling
+
+  # 've been using anonymous namespace for internal linkage for a long time.
+  - -llvm-prefer-static-over-anonymous-namespace
+
+  # Using list of defines looks better than ifdef and elif defines.
+  - -*-use-concise-preprocessor-directives
+
 WarningsAsErrors: ''
 HeaderFilterRegex: ''
 FormatStyle: webkit

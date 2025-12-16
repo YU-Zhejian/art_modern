@@ -63,7 +63,7 @@ public:
     [[nodiscard]] std::string name() const override;
     void patch_options(boost::program_options::options_description& desc) const override;
     [[nodiscard]] std::shared_ptr<BaseReadOutput> create(const OutParams& params) const override;
-    ~BamReadOutputFactory() override;
+    ~BamReadOutputFactory() override = default;
 
 private:
     BamOptions sam_options_;

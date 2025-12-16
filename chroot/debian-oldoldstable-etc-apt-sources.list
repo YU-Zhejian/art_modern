@@ -1,3 +1,0 @@
-deb http://mirrors.ustc.edu.cn/debian/ oldstable main contrib non-free
-deb http://mirrors.ustc.edu.cn/debian/ oldstable-updates main contrib non-free
-deb http://mirrors.ustc.edu.cn/debian/ oldstable-backports main contrib non-free

@@ -10,7 +10,6 @@ dependencies:
   - samtools
   - pysam
   - tqdm
-  - fastp
   - seqtk
   - seqkit
   - pyfastx

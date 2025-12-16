@@ -31,6 +31,7 @@
 #include <boost/log/utility/setup/console.hpp>
 #include <boost/log/utility/setup/file.hpp>
 
+#include <cstdlib> // NOLINT: For std::getenv
 #include <iostream>
 #include <string>
 
@@ -73,12 +74,15 @@ void init_file_logger(const std::string& exename, const bool auto_flush)
         const char* art_log_dir_c = std::getenv("ART_LOG_DIR");
         std::string art_log_dir;
         if (art_log_dir_c == nullptr) {
-            if (is_on_mpi_main_process_or_nompi()) {
-                BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to 'log.d'.";
-            }
             art_log_dir = exename + "-log.d";
+            if (is_on_mpi_main_process_or_nompi()) {
+                BOOST_LOG_TRIVIAL(warning) << "ART_LOG_DIR not defined; Default to '" << art_log_dir << "'.";
+            }
         } else {
             art_log_dir = art_log_dir_c;
+            if (is_on_mpi_main_process_or_nompi()) {
+                BOOST_LOG_TRIVIAL(info) << "ART_LOG_DIR defined; Using '" << art_log_dir << "' as log directory.";
+            }
         }
         if (!boost::filesystem::exists(art_log_dir)) {
             boost::filesystem::create_directories(art_log_dir);

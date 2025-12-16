@@ -1,12 +1,22 @@
+/**
+ * Copyright 2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
 #include "libam_support/seq/str_to_qual.h"
-#include "libam_support/utils/c_macro_utils.h" // NOLINT: For INCLUDE_INTEL_SIMD
 
 #include "libam_support/Constants.h"
 #include "libam_support/Dtypes.h"
 
-#if defined(INCLUDE_INTEL_SIMD)
-#include INCLUDE_INTEL_SIMD // NOLINT
-#endif
+#include "ceu_includes/x86_simd.h" // NOLINT: For Intel SIMD intrinsics
 
 #include <stdlib.h>
 

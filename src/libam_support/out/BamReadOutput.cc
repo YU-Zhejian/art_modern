@@ -27,6 +27,7 @@
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/utils/fs_utils.hh"
+#include "libam_support/utils/hts_utils.h"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -81,7 +82,7 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
         reverse(bam_get_qual(sam_record.get()), rlen);
-        reverse(bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
     }
     tags.patch(sam_record.get());
 
@@ -154,10 +155,10 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa1.is_plus_strand) {
         reverse(bam_get_qual(sam_record1.get()), rlen_1);
-        reverse(bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
     } else {
         reverse(bam_get_qual(sam_record2.get()), rlen_2);
-        reverse(bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
+        reverse(am_bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
     }
 
     tags1.patch(sam_record1.get());
@@ -223,9 +224,9 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
         so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-sam-compress_level"].as<char>();
-        if (ALLOWED_COMPRESSION_LEVELS.find(so.compress_level) == std::string::npos) {
+        if (std::string(BamOptions::ALLOWED_COMPRESSION_LEVELS).find(so.compress_level) == std::string::npos) {
             BOOST_LOG_TRIVIAL(fatal) << "Invalid compression level: " << so.compress_level
-                                     << ". Allowed values are: " << ALLOWED_COMPRESSION_LEVELS;
+                                     << ". Allowed values are: " << BamOptions::ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
         return std::make_shared<BamReadOutput>(
@@ -235,6 +236,4 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
     throw OutputNotSpecifiedException {};
 }
 std::string BamReadOutputFactory::name() const { return "BAM"; }
-
-BamReadOutputFactory::~BamReadOutputFactory() = default;
 } // namespace labw::art_modern

@@ -33,8 +33,8 @@
 #if defined(USE_STL_RNDOM)
 #include <random>
 #endif
-#include <stdexcept>
-#include <string>
+#include <stdexcept> // NOLINT for std::invalid_argument
+#include <string> // NOLINT for std::to_string
 #include <vector>
 
 namespace labw::art_modern {
@@ -59,11 +59,11 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     , read_len_1_(read_len_1)
     , read_len_2_(read_len_2)
 {
-    pos_on_read_1_ = INT_DIST<int>(0, read_len_1 - 1);
-    pos_on_read_1_not_head_and_tail_ = INT_DIST<int>(1, read_len_1 - 2);
+    pos_on_read_1_ = INT_DIST<hts_pos_t>(0, read_len_1 - 1);
+    pos_on_read_1_not_head_and_tail_ = INT_DIST<hts_pos_t>(1, read_len_1 - 2);
     if (read_len_2 != 0) {
-        pos_on_read_2_ = INT_DIST<int>(0, read_len_2 - 1);
-        pos_on_read_2_not_head_and_tail_ = INT_DIST<int>(1, read_len_2 - 2);
+        pos_on_read_2_ = INT_DIST<hts_pos_t>(0, read_len_2 - 1);
+        pos_on_read_2_not_head_and_tail_ = INT_DIST<hts_pos_t>(1, read_len_2 - 2);
     }
     public_init_();
 }
@@ -125,15 +125,14 @@ am_qual_t Rprob::rand_quality_less_than_10()
     return quality_less_than_10_(gen_);
 #elif defined(USE_ONEMKL_RANDOM)
     if (cached_rand_quality_less_than_10_index_ == 0) {
-        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_,
-            reinterpret_cast<int*>(cached_rand_quality_less_than_10_.data()), 1, 10);
+        viRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_quality_less_than_10_.data(), 1, 10);
         cached_rand_quality_less_than_10_index_ = CACHE_SIZE_;
     }
-    return cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_];
+    return static_cast<am_qual_t>(cached_rand_quality_less_than_10_[--cached_rand_quality_less_than_10_index_]);
 #endif
 }
 
-int Rprob::rand_pos_on_read(const bool is_read1)
+hts_pos_t Rprob::rand_pos_on_read(const bool is_read1)
 {
 #if defined(USE_STL_LIKE_RANDOM)
     return (is_read1 ? pos_on_read_1_ : pos_on_read_2_)(gen_);
@@ -147,10 +146,10 @@ int Rprob::rand_pos_on_read(const bool is_read1)
             VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_rand_pos_on_read_.data(), 0, read_length_);
         cached_rand_pos_on_read_index_ = CACHE_SIZE_;
     }
-    return cached_rand_pos_on_read_[--cached_rand_pos_on_read_index_];
+    return static_cast<hts_pos_t>(cached_rand_pos_on_read_[--cached_rand_pos_on_read_index_]);
 #endif
 }
-int Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
+hts_pos_t Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
 {
 #if defined(USE_STL_LIKE_RANDOM)
     return (is_read1 ? pos_on_read_1_not_head_and_tail_ : pos_on_read_2_not_head_and_tail_)(gen_);

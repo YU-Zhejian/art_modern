@@ -172,26 +172,44 @@ void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const s
 
 template <typename T> void LockFreeIO<T>::push(T&& value)
 {
+    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success) {
+    while (!success && num_trials < 10000 /* TODO: Eliminate this magic number */) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(std::move(value));
+        num_trials += 1;
+    }
+    if (!success) {
+        // BOOST_LOG_TRIVIAL(warning)
+        //     << name_ << " LockFreeIO: Using syncronized push after " << num_trials
+        //     << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled
+        //     jobs.";
+        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }
 
 template <typename T> inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
+    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success) {
+    while (!success && num_trials < 10000 /* TODO: Eliminate this magic number */) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(token.token, std::move(value));
+        num_trials += 1;
+    }
+    if (!success) {
+        // BOOST_LOG_TRIVIAL(warning)
+        //     << name_ << " LockFreeIO: Using syncronized push after " << num_trials
+        //     << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled
+        //     jobs.";
+        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }

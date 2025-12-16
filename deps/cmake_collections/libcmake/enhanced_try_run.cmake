@@ -116,7 +116,8 @@ function(ceu_cm_enhanced_try_run)
             endforeach()
         endif()
 
-        if(CEU_CM_ENHANCED_TRY_RUN_STATIC AND NOT BORLAND) # Borland compiler does not support such functions
+        if(CEU_CM_ENHANCED_TRY_RUN_STATIC AND NOT BORLAND)
+            # Borland compiler does not support such functions
             set(THIS_LINK_FLAGS -static -static-libgcc -static-libstdc++ -static-libgfortran)
         else()
             set(THIS_LINK_FLAGS "")
@@ -132,7 +133,7 @@ function(ceu_cm_enhanced_try_run)
             CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_RUN_${TARGET_POSTFIX}
             CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}
             "${CMAKE_BINARY_DIR}/CEU_TRC" "${CEU_CM_ENHANCED_TRY_RUN_SRC_PATH}"
-            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES} -DLINK_FLAGS=${THIS_LINK_FLAGS}"
+            CMAKE_FLAGS "-DINCLUDE_DIRECTORIES=${CEU_CM_TRY_COMPILE_INCLUDES}" LINK_OPTIONS ${THIS_LINK_FLAGS}
                         LINK_LIBRARIES ${CEU_CM_ENHANCED_TRY_RUN_LINK_LIBRARIES}
             COMPILE_DEFINITIONS ${THIS_COMPILE_DEFS}
             COMPILE_OUTPUT_VARIABLE CEU_CM_HAVE_WORKING_${CEU_CM_ENHANCED_TRY_RUN_VARNAME}_COMPILE_${TARGET_POSTFIX}_VAR

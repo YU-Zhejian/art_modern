@@ -15,7 +15,8 @@
 
 #include "art/lib/ArtContig.hh"
 
-#include "ArtConstants.hh"
+#include "art/lib/ArtConstants.hh"
+#include "art/lib/ArtGenerationFailure.hh"
 #include "art/lib/ArtRead.hh"
 #include "art/lib/Rprob.hh"
 
@@ -46,12 +47,12 @@ constexpr std::size_t MAX_GENERATION_FAILURE_COUNT = 20;
  */
 void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
 {
-    std::size_t generation_failed_count = 0;
     const auto pos_1 = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         ? 0
         : rprob_.randint(0, static_cast<int>(valid_region_) + 1);
     auto slen_1 = read_1.generate_indels();
     // ensure get a fixed read length
+    std::size_t generation_failed_count = 0;
     while (pos_1 + art_params_.read_len_1 - slen_1 > seq_size) {
         slen_1 = read_1.generate_indels_2();
         generation_failed_count++;
@@ -83,7 +84,6 @@ void ArtContig::generate_read_se(const bool is_plus_strand, ArtRead& read_1)
  */
 void ArtContig::generate_read_pe(const bool is_plus_strand, ArtRead& read_1, ArtRead& read_2)
 {
-    std::size_t generation_failed_count = 0;
     const bool is_mp = art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::MP;
     const hts_pos_t fragment_len = generate_fragment_length();
     const hts_pos_t fragment_start = art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
@@ -94,10 +94,11 @@ void ArtContig::generate_read_pe(const bool is_plus_strand, ArtRead& read_1, Art
     const hts_pos_t pos_1 = is_mp == is_plus_strand ? fragment_end - art_params_.read_len_1 : fragment_start;
     const hts_pos_t pos_2 = is_mp == is_plus_strand ? fragment_start : fragment_end - art_params_.read_len_2;
 
-    int slen_1 = read_1.generate_indels();
-    int slen_2 = read_2.generate_indels();
+    auto slen_1 = read_1.generate_indels();
+    auto slen_2 = read_2.generate_indels();
 
     // ensure get a fixed read length
+    std::size_t generation_failed_count = 0;
     while (pos_1 + art_params_.read_len_1 - slen_1 > seq_size) {
         slen_1 = read_1.generate_indels_2();
         generation_failed_count++;
@@ -129,12 +130,11 @@ ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const s
     , fasta_fetch_(fasta_fetch)
     , rprob_(rprob)
     , seq_id_(seq_id)
-    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.read_len_max))
+    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.contig_len_threshold))
 {
 }
 hts_pos_t ArtContig::generate_fragment_length() const
 {
-    std::size_t num_tries = 0;
     hts_pos_t fragment_len = 0;
     if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE
         || art_params_.pe_dist_mean_minus_2_std > seq_size) {
@@ -143,6 +143,7 @@ hts_pos_t ArtContig::generate_fragment_length() const
         fragment_len = seq_size;
     } else {
         fragment_len = 0;
+        std::size_t num_tries = 0;
         while (fragment_len < longer_size_between_r1_r2_ || fragment_len > seq_size) {
             fragment_len = rprob_.insertion_length();
             num_tries++;

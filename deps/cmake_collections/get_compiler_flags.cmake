@@ -2,11 +2,6 @@ if(CEU_CM_SHOULD_USE_NATIVE)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -march=native)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -mtune=native -mtune)
 endif()
-if(CMAKE_VERSION GREATER_EQUAL 3.12)
-    add_compile_definitions(__STDC_WANT_LIB_EXT1__=1)
-else()
-    add_compile_options("-D__STDC_WANT_LIB_EXT1__=1")
-endif()
 
 if(MSVC)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS /Zc:__STDC__) # Define __STDC__
@@ -33,7 +28,6 @@ elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Inf
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O3 -O2)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g)
 else() # Debug, the default.
-    # ceu_cm_enhanced_check_compiler_flag(-fsanitize=address)
     if(NOT MSVC)
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Og) # Add debug info
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g3) # Add debug info

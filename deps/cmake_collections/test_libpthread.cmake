@@ -1,93 +1,135 @@
 # Would firstly test whether C program runs without libpthread.
+# Copyright 2024 Kitware, Inc. Distributed under the OSI-approved BSD 3-Clause License.
+# From CMake 3.28
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_try_run.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/enhanced_find.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/libcmake/print_test_status.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/test_c_helloworld.cmake")
-add_compile_options("-pthread")
-add_link_options("-pthread")
+include("${CMAKE_CURRENT_LIST_DIR}/test_libm.cmake")
 
-ceu_cm_enhanced_try_run(
-    VARNAME
-    C_NO_LIBPTHREAD
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-    LINK_FLAGS
-    "-pthread"
-    DEPENDS
-    C_HELLOWORLD)
-ceu_cm_enhanced_try_run(
-    STATIC
-    VARNAME
-    C_NO_LIBPTHREAD
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-    LINK_FLAGS
-    "-pthread"
-    DEPENDS
-    C_HELLOWORLD)
+add_library(CEU_CM_EFL::pthread_flag INTERFACE IMPORTED)
+# The -pthread flag should affect both compile and link options.
+set_property(
+    TARGET CEU_CM_EFL::pthread_flag
+    PROPERTY INTERFACE_COMPILE_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
+             "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>")
+set_property(
+    TARGET CEU_CM_EFL::pthread_flag
+    PROPERTY INTERFACE_LINK_OPTIONS "$<$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>:SHELL:-Xcompiler -pthread>"
+             "$<$<AND:$<NOT:$<COMPILE_LANG_AND_ID:CUDA,NVIDIA>>,$<NOT:$<COMPILE_LANGUAGE:Swift>>>:-pthread>")
 
-if(NOT DEFINED LIBPTHREAD_LIBRARY_SHARED)
-    ceu_cm_enhanced_find_library(OUTPUT_VARIABLE LIBPTHREAD_LIBRARY_SHARED LINKER_FLAG pthread)
+if(BUILD_SHARED_LIBS)
+    ceu_cm_enhanced_try_run(
+        VARNAME
+        C_WITH_PTHREAD_FLAG
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+        DEPENDS
+        C_HELLOWORLD
+        LINK_LIBRARIES
+        CEU_CM_EFL::pthread_flag
+        ${CEU_CM_LIBM_SHARED})
+    if(CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_COMPILE_SHARED AND CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_RUN_SHARED
+                                                                  EQUAL 0)
+        set(CEU_CM_LIBPTHREAD_SHARED
+            "CEU_CM_EFL::pthread_flag"
+            CACHE BOOL "pthread flag works")
+    endif()
+else()
+    ceu_cm_enhanced_try_run(
+        VARNAME
+        C_WITH_PTHREAD_FLAG
+        SRC_PATH
+        "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+        DEPENDS
+        STATIC
+        C_HELLOWORLD
+        LINK_LIBRARIES
+        CEU_CM_EFL::pthread_flag
+        ${CEU_CM_LIBM_STATIC})
+    if(CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_COMPILE_STATIC AND CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_RUN_STATIC
+                                                                  EQUAL 0)
+        set(CEU_CM_LIBPTHREAD_STATIC
+            "CEU_CM_EFL::pthread_flag"
+            CACHE BOOL "pthread flag works")
+    endif()
 endif()
 
-if(NOT DEFINED LIBPTHREAD_LIBRARY_STATIC)
-    ceu_cm_enhanced_find_library(STATIC OUTPUT_VARIABLE LIBPTHREAD_LIBRARY_STATIC LINKER_FLAG pthread)
+if(BUILD_SHARED_LIBS)
+    if(NOT CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_RUN_SHARED EQUAL 0)
+        if(NOT TARGET CEU_CM_EFL::libpthread_shared)
+            ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libpthread_shared LINKER_FLAG pthread)
+        endif()
+        if(TARGET CEU_CM_EFL::libpthread_shared)
+            ceu_cm_enhanced_try_run(
+                VARNAME
+                C_WITH_LIBPTHREAD
+                SRC_PATH
+                "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+                DEPENDS
+                C_HELLOWORLD
+                LINK_LIBRARIES
+                CEU_CM_EFL::libpthread_shared
+                ${CEU_CM_LIBM_SHARED})
+        else()
+            set(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_COMPILE_SHARED
+                OFF
+                CACHE BOOL "libpthread not found")
+            set(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_SHARED
+                255
+                CACHE INTERNAL "libpthread not found")
+        endif()
+        if(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_COMPILE_SHARED AND CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_SHARED
+                                                                    EQUAL 0)
+            set(CEU_CM_LIBPTHREAD_SHARED
+                "CEU_CM_EFL::libpthread_shared"
+                CACHE BOOL "-lpthread works")
+        else()
+            set(CEU_CM_LIBPTHREAD_SHARED
+                "CEU_CM_LIBPTHREAD_SHARED-NOTFOUND"
+                CACHE BOOL "-lpthread does not work")
+        endif()
+    endif()
+else()
+    if(NOT CEU_CM_HAVE_WORKING_C_WITH_PTHREAD_FLAG_RUN_STATIC EQUAL 0)
+        if(NOT TARGET CEU_CM_EFL::libpthread_static)
+            ceu_cm_enhanced_find_library(OUTPUT_VARIABLE libpthread_static LINKER_FLAG pthread)
+        endif()
+        if(TARGET CEU_CM_EFL::libpthread_static)
+            ceu_cm_enhanced_try_run(
+                VARNAME
+                C_WITH_LIBPTHREAD
+                SRC_PATH
+                "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
+                DEPENDS
+                C_HELLOWORLD
+                STATIC
+                LINK_LIBRARIES
+                CEU_CM_EFL::libpthread_static
+                ${CEU_CM_LIBM_STATIC})
+        else()
+            set(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_COMPILE_STATIC
+                OFF
+                CACHE BOOL "libpthread not found")
+            set(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_STATIC
+                255
+                CACHE INTERNAL "libpthread not found")
+        endif()
+        if(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_COMPILE_STATIC AND CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_STATIC
+                                                                    EQUAL 0)
+            set(CEU_CM_LIBPTHREAD_STATIC
+                "CEU_CM_EFL::libpthread_static"
+                CACHE BOOL "-lpthread works")
+        else()
+            set(CEU_CM_LIBPTHREAD_STATIC
+                "CEU_CM_LIBPTHREAD_STATIC-NOTFOUND"
+                CACHE BOOL "-lpthread does not work")
+        endif()
+    endif()
 endif()
 
-ceu_cm_enhanced_try_run(
-    VARNAME
-    C_WITH_LIBPTHREAD
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-    DEPENDS
-    C_HELLOWORLD
-    LINK_LIBRARIES
-    "${LIBPTHREAD_LIBRARY_SHARED}"
-    LINK_FLAGS
-    "-pthread")
-ceu_cm_enhanced_try_run(
-    STATIC
-    VARNAME
-    C_WITH_LIBPTHREAD
-    SRC_PATH
-    "${CMAKE_CURRENT_LIST_DIR}/src/test_pthread.c"
-    DEPENDS
-    C_HELLOWORLD
-    LINK_LIBRARIES
-    "${LIBPTHREAD_LIBRARY_STATIC}"
-    LINK_FLAGS
-    "-pthread")
 if(NOT DEFINED "${CMAKE_CURRENT_LIST_FILE}_INCLUDED")
-    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED"
-        ON
-        CACHE INTERNAL "This file was included")
-    ceu_cm_print_test_status("libpthread: without -lpthread (c)" C_NO_LIBPTHREAD)
-    ceu_cm_print_test_status("libpthread: with -lpthread (c)" C_WITH_LIBPTHREAD)
-endif()
-if(CEU_CM_HAVE_WORKING_C_NO_LIBPTHREAD_RUN_SHARED EQUAL 0)
-    set(CEU_CM_LIBPTHREAD_SHARED
-        ""
-        CACHE INTERNAL "pthread functions work without libm")
-elseif(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_SHARED EQUAL 0)
-    set(CEU_CM_LIBPTHREAD_SHARED
-        "${LIBPTHREAD_LIBRARY_SHARED}"
-        CACHE INTERNAL "pthread functions work with libm")
-else()
-    set(CEU_CM_LIBPTHREAD_SHARED
-        "CEU_CM_LIBPTHREAD_SHARED-NOTFOUND"
-        CACHE INTERNAL "pthread functions not working")
-endif()
-
-if(CEU_CM_HAVE_WORKING_C_NO_LIBPTHREAD_RUN_STATIC EQUAL 0)
-    set(CEU_CM_LIBPTHREAD_STATIC
-        ""
-        CACHE INTERNAL "pthread functions work without libm")
-elseif(CEU_CM_HAVE_WORKING_C_WITH_LIBPTHREAD_RUN_STATIC EQUAL 0)
-    set(CEU_CM_LIBPTHREAD_STATIC
-        "${LIBPTHREAD_LIBRARY_STATIC}"
-        CACHE INTERNAL "pthread functions work with libm")
-else()
-    set(CEU_CM_LIBPTHREAD_STATIC
-        "CEU_CM_LIBPTHREAD_STATIC-NOTFOUND"
-        CACHE INTERNAL "pthread functions not working")
+    set("${CMAKE_CURRENT_LIST_FILE}_INCLUDED" ON)
+    ceu_cm_print_test_status("libpthread (-lpthread)" C_WITH_LIBPTHREAD)
+    ceu_cm_print_test_status("libpthread (-pthread)" C_WITH_PTHREAD_FLAG)
 endif()
