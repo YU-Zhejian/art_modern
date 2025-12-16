@@ -146,9 +146,11 @@ function art_profile_illumina() {
 
 EXEC_ORDER=0
 
+TIMEOUT_CMD=("$(type -p timeout)" "-s" "TERM" "${TIMEOUT}"s)
+
 function AM_EXEC() {
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
-    timeout -s KILL "${TIMEOUT}"s env \
+    "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     retval=${?}
@@ -165,7 +167,7 @@ function AM_EXEC() {
 }
 function APB_EXEC() {
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${APB_CMD_ASSEMBLED[*]} $*"
-    timeout -s KILL "${TIMEOUT}"s env \
+    "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}

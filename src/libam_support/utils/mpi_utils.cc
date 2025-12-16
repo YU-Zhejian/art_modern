@@ -86,9 +86,6 @@ void exit_mpi() noexcept
 [[noreturn]] void abort_mpi([[maybe_unused]] const int status) noexcept
 {
     BOOST_LOG_TRIVIAL(info) << "ABORT";
-#ifdef WITH_BOOST_STACKTRACE
-    BOOST_LOG_TRIVIAL(info) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
-#endif
 #ifdef WITH_MPI
     BOOST_LOG_TRIVIAL(debug) << "Sending MPI_ABORT...";
     flush_all_sinks();

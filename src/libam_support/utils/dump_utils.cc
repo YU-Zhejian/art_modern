@@ -22,6 +22,8 @@
 
 #include <boost/filesystem/operations.hpp>
 
+#include <boost/log/trivial.hpp>
+
 #ifdef WITH_BOOST_STACKTRACE
 #include <boost/stacktrace/safe_dump_to.hpp>
 #include <boost/stacktrace/stacktrace.hpp>
@@ -53,6 +55,9 @@ namespace {
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = 0;
         sigaction(signum, &sa, nullptr);
+#ifdef WITH_BOOST_STACKTRACE
+        BOOST_LOG_TRIVIAL(info) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
+#endif
         boost::stacktrace::safe_dump_to(dump_filename.c_str());
         pthread_kill(pthread_self(), SIGABRT);
 #else
@@ -77,10 +82,14 @@ void handle_dumps()
         sa.sa_flags = 0;
         sigaction(SIGSEGV, &sa, nullptr);
         sigaction(SIGABRT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
+        sigaction(SIGINT, &sa, nullptr);
     }
 #else
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
+    std::signal(SIGTERM, &my_signal_handler);
+    std::signal(SIGINT, &my_signal_handler);
 #endif
     std::set_terminate(&my_signal_handler);
 
