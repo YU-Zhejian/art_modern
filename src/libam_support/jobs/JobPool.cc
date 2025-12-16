@@ -99,7 +99,7 @@ void JobPool::stop()
 #ifdef CEU_CM_IS_DEBUG
     if (cached_n_running_executors_ != 0) {
         BOOST_LOG_TRIVIAL(fatal) << "Number of cached executors are not 0 when exiting the job pool! "
-        << "Actual: " << cached_n_running_executors_;
+                                 << "Actual: " << cached_n_running_executors_;
         abort_mpi();
     }
 #endif
@@ -116,11 +116,8 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
     std::unique_lock add_lock(add_mutex_);
     // Spin until there's a slot
     while (cached_n_running_executors_ >= pool_size_) {
-        cached_n_running_executors_cv_.wait_for(
-            add_lock,
-            std::chrono::milliseconds(add_spin_waits_ms_),
-            [this]() { return this->cached_n_running_executors_ < this->pool_size_; }
-    );
+        cached_n_running_executors_cv_.wait_for(add_lock, std::chrono::milliseconds(add_spin_waits_ms_),
+            [this]() { return this->cached_n_running_executors_ < this->pool_size_; });
     }
     // Start the job first
 #if defined(USE_BS_PARALLEL)
