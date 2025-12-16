@@ -3,7 +3,10 @@
 (v-1.3.2-section)=
 ## 1.3.2 (Ongoing)
 
-- Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
+- Bug fixes:
+  - The bugs affecting [`1.3.0`](#v-1.3.0-section) and [`1.3.1`](#v-1.3.1-section) should be fixed.
+- Software Engineering:
+  - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
 - Miscellaneous bug fixes.
 
 (v-1.3.1-section)=

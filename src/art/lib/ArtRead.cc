@@ -198,11 +198,18 @@ hts_pos_t ArtRead::generate_indels_2()
     for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
         if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
             ins_len = i + 1;
-            for (int j = i; j >= 0;) {
+            int j = i;
+            std::size_t num_tries = 0;
+            while ( j >= 0) {
                 pos = rprob_.rand_pos_on_read(is_read_1_);
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = rprob_.rand_base();
                     j--;
+                }
+                num_tries++;
+                if (num_tries > 1000 /* TODO: Eliminate this magic number*/)
+                {
+                    throw ArtGenerationFailure();
                 }
             }
             break;
@@ -222,7 +229,9 @@ hts_pos_t ArtRead::generate_indels_2()
 
         if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
             del_len = i + 1;
-            for (int j = i; j >= 0;) {
+            int j = i;
+            std::size_t num_tries = 0;
+            while ( j >= 0) {
                 pos = rprob_.rand_pos_on_read_not_head_and_tail(is_read_1_);
                 if (pos == 0) {
                     continue;
@@ -230,6 +239,11 @@ hts_pos_t ArtRead::generate_indels_2()
                 if (indel_.find(pos) == indel_.end()) {
                     indel_[pos] = ALN_GAP;
                     j--;
+                }
+                num_tries++;
+                if (num_tries > 1000 /* TODO: Eliminate this magic number*/)
+                {
+                    throw ArtGenerationFailure();
                 }
             }
             break;

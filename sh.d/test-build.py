@@ -150,8 +150,6 @@ class BuildConfig:
             cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
-        if self.AM_NO_Q_REVERSE:
-            cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
         if self.FIND_RANDOM_MKL_THROUGH_PKGCONF:
             cmake_flags.append(f"-DFIND_RANDOM_MKL_THROUGH_PKGCONF={self.FIND_RANDOM_MKL_THROUGH_PKGCONF}")
         return cmake_flags
@@ -205,6 +203,13 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 try:
                     proc = subprocess.run(cmdline, *args, **kwargs)
                 except subprocess.TimeoutExpired as e:
+                    # Kill the process first
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout = 3)
+                    except subprocess.TimeoutExpired:
+                        proc.kill()
+                        proc.wait()
                     with IO_MUTEX:
                         print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT")
                     log_file.write(
