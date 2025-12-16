@@ -27,12 +27,13 @@ if("${CMAKE_BUILD_TYPE}" STREQUAL "Release") # Release
 elseif("${CMAKE_BUILD_TYPE}" STREQUAL "RelWithDebInfo") # Release with Debug Information
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O3 -O2)
     ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g)
+    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -rdynamic)
 else() # Debug, the default.
     if(NOT MSVC)
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Og) # Add debug info
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -g3) # Add debug info
-        ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -pg) # Add profiling info
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -O0) # Stop optimization
+        ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -rdynamic)
     endif()
 
     if(MSVC)

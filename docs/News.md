@@ -3,6 +3,10 @@
 (v-1.3.2-section)=
 ## 1.3.2 (Ongoing)
 
+- Bug fixes:
+  - The bugs affecting [`1.3.0`](#v-1.3.0-section) and [`1.3.1`](#v-1.3.1-section) should be fixed.
+- Software Engineering:
+  - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
 - Miscellaneous bug fixes.
 
 (v-1.3.1-section)=
@@ -95,7 +99,7 @@
 - Extensively revised documentation for installation.
 - The simulator now supports `/dev/null` or an empty file as input.
 - Static libraries removed from Alpine Linux build to reduce download size.
-- HTSLib lower bound bumped to 1.17.
+- HTSLib lower bound bumped to [`1.17`](https://github.com/samtools/htslib/releases/tag/1.17).
 - Boost::Thread removed from required dependencies.
 - Miscellaneous bug fixes.
 
@@ -131,7 +135,7 @@
 (v-1.1.5-section)=
 ## 1.1.5 (2025/09/12)
 
-- Bumped bundled HTSLib to 1.22.1.
+- Bumped bundled HTSLib to [`1.22.1`](https://github.com/samtools/htslib/releases/tag/1.22.1).
 - Miscellaneous bug fixes.
 
 (v-1.1.4-section)=
@@ -180,7 +184,7 @@
 - [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
 - Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
 - Tested Mac OS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
-- Bumped bundled HTSLib to 1.21.
+- Bumped bundled HTSLib to [`1.21`](https://github.com/samtools/htslib/releases/tag/1.21).
 - Miscellaneous bug fixes.
 
 (v-1.0.1-section)=

@@ -24,6 +24,7 @@
 
 #include <htslib/hts.h>
 
+#include <cstdlib>
 #include <functional>
 #include <map>
 #include <string>
@@ -76,6 +77,7 @@ private:
     Rprob& rprob_;
     std::string query_;
     std::string ref_;
+    static constexpr std::size_t MAX_RETRIES_ON_INDEL_GENERATION = 1000;
 
     [[noreturn]] [[maybe_unused]] void except_() const;
 };
