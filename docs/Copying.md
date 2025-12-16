@@ -19,7 +19,7 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrieved from [GitHub 1.22.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.22.1/htslib-1.22.1.tar.bz2).
+**NOTE** This project uses the source code retrieved from [GitHub 1.23 Release Tarball](https://github.com/samtools/htslib/releases/download/1.23/htslib-1.23.tar.bz2).
 
 ## `gitignore` by GitHub
 
