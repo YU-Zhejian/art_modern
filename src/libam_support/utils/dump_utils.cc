@@ -55,10 +55,30 @@ namespace {
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = 0;
         sigaction(signum, &sa, nullptr);
-#ifdef WITH_BOOST_STACKTRACE
+        // signal to str
+        std::string signal_str;
+        switch (signum) {
+        case SIGSEGV:
+            signal_str = "SIGSEGV";
+            break;
+        case SIGABRT:
+            signal_str = "SIGABRT";
+            break;
+        case SIGTERM:
+            signal_str = "SIGTERM";
+            break;
+        case SIGINT:
+            signal_str = "SIGINT";
+            break;
+        default:
+            signal_str = "UNKNOWN";
+            break;
+        }
+        BOOST_LOG_TRIVIAL(info) << "Signal " << signal_str << " (" << signum
+                                << ") received. Generating stacktrace dump to " << dump_filename;
         BOOST_LOG_TRIVIAL(info) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
-#endif
         boost::stacktrace::safe_dump_to(dump_filename.c_str());
+        sigaction(SIGABRT, &sa, nullptr); // reset SIGABRT to default
         pthread_kill(pthread_self(), SIGABRT);
 #else
         std::signal(signum, SIG_DFL);

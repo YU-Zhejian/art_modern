@@ -19,9 +19,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
-#include <iostream>
 #include <memory>
-#include <thread>
 #include <vector>
 
 using namespace labw::art_modern;
@@ -50,8 +48,6 @@ int main(int argc, char** argv)
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
 
-    std::vector<std::thread> threads;
-
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r1;
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r2;
 
@@ -60,11 +56,9 @@ int main(int argc, char** argv)
         ieds_r1.emplace_back(this_ied1);
         auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length_2);
         ieds_r2.emplace_back(this_ied2);
-        threads.emplace_back(view_sam, this_ied1, this_ied2, thread_id, config);
     }
-    for (auto& thread : threads) {
-        thread.join();
-    }
+    view_sam_mt(ieds_r1, ieds_r2, config.num_threads, config);
+
     std::size_t total_reads = 0;
     std::size_t total_bases = 0;
 

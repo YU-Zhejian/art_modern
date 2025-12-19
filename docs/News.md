@@ -7,6 +7,8 @@
   - The bugs affecting [`1.3.0`](#v-1.3.0-section) and [`1.3.1`](#v-1.3.1-section) should be fixed.
 - Software Engineering:
   - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
+- Implementation:
+  - The speed of `art_profile_builder` improved by using a single-producer-multi-consumer queue. The improvement will be more obvious for SAM/BAM files and would reduce computational burden when parsing FASTQ files.
 - Miscellaneous bug fixes.
 
 (v-1.3.1-section)=
