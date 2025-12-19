@@ -93,10 +93,10 @@ namespace {
         for (auto& i : map_to_process) {
             for (auto& [fst, snd] : i) {
                 // Prevent overflow and underflow
-                auto snd_int = static_cast<int32_t>(snd) + static_cast<int32_t>(q_shift);
-                if (snd_int < static_cast<int32_t>(min_qual)) {
+                auto snd_int = static_cast<std::int32_t>(snd) + static_cast<std::int32_t>(q_shift);
+                if (snd_int < static_cast<std::int32_t>(min_qual)) {
                     snd = min_qual;
-                } else if (snd_int > static_cast<int32_t>(max_qual)) {
+                } else if (snd_int > static_cast<std::int32_t>(max_qual)) {
                     snd = max_qual;
                 } else {
                     snd = static_cast<am_qual_t>(snd_int);
@@ -202,11 +202,20 @@ void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_
 // read]
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
-    const auto read_len = first ? read_len_1_ : read_len_2_;
-    const auto& qual_dist_idx = first ? qual_dist_first_idx_ : qual_dist_second_idx_;
-    rprob.r_probs(read_len);
-    for (am_read_len_t i = 0; i < read_len; i++) {
-        qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+    if (first) {
+        const auto read_len = read_len_1_;
+        const auto& qual_dist_idx = qual_dist_first_idx_;
+        rprob.r_probs(read_len);
+        for (am_read_len_t i = 0; i < read_len; i++) {
+            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        }
+    } else {
+        const auto read_len = read_len_2_;
+        const auto& qual_dist_idx = qual_dist_second_idx_;
+        rprob.r_probs(read_len);
+        for (am_read_len_t i = 0; i < read_len; i++) {
+            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        }
     }
 }
 
@@ -424,7 +433,8 @@ void Empdist::shift_all_emp(
 void Empdist::validate_() const
 {
     if (sep_qual_) {
-        if (a_qual_dist_first_.size() != g_qual_dist_first_.size() || g_qual_dist_first_.size() != c_qual_dist_first_.size()
+        if (a_qual_dist_first_.size() != g_qual_dist_first_.size()
+            || g_qual_dist_first_.size() != c_qual_dist_first_.size()
             || c_qual_dist_first_.size() != t_qual_dist_first_.size()) {
             BOOST_LOG_TRIVIAL(warning) << "The length of 1st read in each qual dist is not equal!";
         }

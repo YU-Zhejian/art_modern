@@ -44,6 +44,9 @@ Checks:
   # This warning is nonsense.
   - -fuchsia-overloaded-operator
 
+  # We do not use LLVM
+  - -llvm-use-ranges
+
   # This warning is nonsense.
   # Those FORTRAN people write functions with thousands lines of code.
   - -readability-function-cognitive-complexity

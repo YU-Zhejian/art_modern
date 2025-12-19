@@ -20,7 +20,6 @@
 ## Other Thoughts
 
 - A seed allocation algorithm is needed for ensureing reproducibility.
-- Cache quality scores for e.g., 4096 reads in advance to improve locality when generating qualities without separated quality?
 
 ## I/O Formats
 

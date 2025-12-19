@@ -1,3 +1,9 @@
+#include "art_modern_config.h" // NOLINT: For WITH_MPI
+#ifndef WITH_MPI
+#include <cstdlib>
+int main() { return EXIT_SUCCESS; }
+#else
+
 #include "libam_support/Constants.hh"
 #include "libam_support/utils/log_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -233,3 +239,4 @@ int main(int argc, char** argv)
     exit_mpi();
     return EXIT_SUCCESS;
 }
+#endif
