@@ -19,6 +19,8 @@ else()
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS /permissive) # Standards conformance
         ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS /sdl) # Enable Additional Security Checks
     endif()
+    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Wstack-usage=8388608)
+    ceu_cm_enhanced_check_compiler_flag(OUT_NAME CEU_CM_CC_FLAGS FLAGS -Wframe-larger-than=8388608)
 endif()
 
 if("${CMAKE_BUILD_TYPE}" STREQUAL "Release") # Release
