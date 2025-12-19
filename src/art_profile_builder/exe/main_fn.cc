@@ -183,10 +183,9 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
         }
         bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         if (!success) {
-            num_push_waits ++;
+            num_push_waits++;
         }
-        while (!success)
-        {
+        while (!success) {
             success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         }
         num_pushed_blocks++;
@@ -196,13 +195,13 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
         std::vector<bam1_t*> batch {};
         bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         if (!success) {
-            num_push_waits ++;
+            num_push_waits++;
         }
-        while (!success)
-        {
+        while (!success) {
             success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         }
-        num_pushed_blocks++;    }
+        num_pushed_blocks++;
+    }
     // Wait for workers to finish
     for (auto& worker : workers) {
         worker->join();

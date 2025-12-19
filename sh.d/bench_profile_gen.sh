@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-
+# make release
+set -ue
 mkdir -p opt/bench_profile_gen
 opt/build_release_install/bin/art_modern \
     --i-file data/raw_data/ce11_chr1.fa --i-fcov 400 \

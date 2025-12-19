@@ -95,9 +95,8 @@ namespace {
             + " will create " + ARG_NUM_IO_THREADS + " threads for I/O. ";
         parallel_opts.add_options()(
             ARG_NUM_IO_THREADS, po::value<std::size_t>()->default_value(4), io_thread_description.c_str());
-        parallel_opts.add_options()
-            (ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(K_SIZE),
-                "Size of the lock-free queue used in reading input HTS files.");
+        parallel_opts.add_options()(ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(K_SIZE),
+            "Size of the lock-free queue used in reading input HTS files.");
 
         po::options_description po_desc;
         po_desc.add(general_opts).add(required_opts).add(input_flags).add(parallel_opts);
@@ -157,6 +156,7 @@ APBConfig parse_args(int argc, char** argv)
         prepare_writer(out2);
     }
 
-    return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format, queue_size};
+    return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format,
+        queue_size };
 }
 } // namespace labw::art_modern
