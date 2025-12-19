@@ -99,7 +99,7 @@ std::shared_ptr<OutputDispatcher> OutputDispatcherFactory::create(const OutParam
         try {
             output_dispatcher->add(factory->create(params));
         } catch (const OutputNotSpecifiedException& /**e**/) {
-            // ignored
+            BOOST_LOG_TRIVIAL(debug) << "Output writer " << factory->name() << " not specified, skipping.";
         }
     }
     BOOST_LOG_TRIVIAL(info) << "All writers added";

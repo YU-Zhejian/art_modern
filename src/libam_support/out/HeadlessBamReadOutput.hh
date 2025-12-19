@@ -38,7 +38,8 @@ public:
 
     [[nodiscard]] bool require_alignment() const override;
 
-    HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options, std::size_t n_threads);
+    HeadlessBamReadOutput(
+        const std::string& filename, const BamOptions& sam_options, std::size_t n_threads, std::size_t queue_size);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;

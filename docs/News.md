@@ -9,6 +9,7 @@
   - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
 - Implementation:
   - The speed of `art_profile_builder` improved by using a single-producer-multi-consumer queue. The improvement will be more obvious for SAM/BAM files and would reduce computational burden when parsing FASTQ files.
+  - Queue size parameters added to `art_modern` and `art_profile_builder` to control the size of internal queues. Users may tune these parameters to achieve better performance or reducing memory usage.
 - Miscellaneous bug fixes.
 
 (v-1.3.1-section)=

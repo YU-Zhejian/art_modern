@@ -33,7 +33,6 @@
 namespace labw::art_modern {
 constexpr std::size_t REPORT_SIZE = 10000000; // 10 Million reads
 constexpr std::size_t APB_BATCH_SIZE = K_SIZE;
-constexpr std::size_t APB_QUEUE_SIZE = 100; // That's 100k read inside the queue already
 
 class ViewSamMtChild {
 
@@ -143,7 +142,7 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
     auto* b = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
 
-    moodycamel::ConcurrentQueue<std::vector<bam1_t*>> read_queue { APB_QUEUE_SIZE, 1, 0 };
+    moodycamel::ConcurrentQueue<std::vector<bam1_t*>> read_queue { config.queue_size, 1, 0 };
     moodycamel::ProducerToken const read_producer_token { read_queue };
 
     hts_set_opt(in, HTS_OPT_THREAD_POOL, &tpool);

@@ -23,6 +23,7 @@ public:
     const std::string output_1_file_path;
     const std::string output_2_file_path;
     const htsExactFormat input_file_format;
+    const std::size_t queue_size;
 };
 
 } // namespace labw::art_modern

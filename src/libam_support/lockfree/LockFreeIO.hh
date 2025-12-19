@@ -62,8 +62,10 @@ public:
      * Initialize the queue with the given number of producers.
      * @param num_explicit_producers Number of explicit producers (those with tokens).
      * @param num_implicit_producers Number of implicit producers (those without).
+     * @param min_capacity Minimum capacity of the queue.
      */
-    void init_queue(std::size_t num_explicit_producers, std::size_t num_implicit_producers);
+    void init_queue(
+        std::size_t num_explicit_producers, std::size_t num_implicit_producers, std::size_t min_capacity = QUEUE_SIZE);
 
     /**
      * Pushing a value into the queue.
@@ -169,9 +171,10 @@ LockFreeIO<T>::LockFreeIO(std::string name)
 }
 
 template <typename T>
-void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const std::size_t num_implicit_producers)
+void LockFreeIO<T>::init_queue(
+    const std::size_t num_explicit_producers, const std::size_t num_implicit_producers, const std::size_t min_capacity)
 {
-    queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
+    queue_ = moodycamel::ConcurrentQueue<T>(min_capacity, num_explicit_producers, num_implicit_producers);
 }
 
 template <typename T> void LockFreeIO<T>::push(T&& value)
