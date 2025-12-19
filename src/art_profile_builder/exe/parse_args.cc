@@ -96,7 +96,7 @@ namespace {
         parallel_opts.add_options()(
             ARG_NUM_IO_THREADS, po::value<std::size_t>()->default_value(4), io_thread_description.c_str());
         parallel_opts.add_options()
-            (ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(100),
+            (ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(K_SIZE),
                 "Size of the lock-free queue used in reading input HTS files.");
 
         po::options_description po_desc;

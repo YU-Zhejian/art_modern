@@ -8,8 +8,7 @@ opt/build_release_install/bin/art_modern \
     --o-fastq opt/bench_profile_gen/out_pe.fq \
     --pe_frag_dist_mean 200 \
     --pe_frag_dist_std_dev 50 \
-    --lc pe \
-    --o-sam-queue_size 102400
+    --lc pe
 # Order: Old, new
 #[2025-12-18 21:29:52.124864] [T=0x00007099780ee640] info: Total reads processed: 40.19M speed: 855.42K reads/s
 #[2025-12-18 21:29:52.124891] [T=0x00007099780ee640] info: Total bases processed: 6.03G speed: 128.31M bases/s

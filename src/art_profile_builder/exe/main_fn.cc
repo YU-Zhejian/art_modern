@@ -153,6 +153,8 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
         workers.back()->start();
     }
     am_readnum_t num_parsed_reads = 0;
+    am_readnum_t num_pushed_blocks = 0;
+    am_readnum_t num_push_waits = 0;
 
     // Prepare cache
     bool at_eof = false;
@@ -179,17 +181,36 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
                 abort_mpi();
             }
         }
-        read_queue.enqueue(read_producer_token, std::move(batch));
+        bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
+        if (!success) {
+            num_push_waits ++;
+        }
+        while (!success)
+        {
+            success = read_queue.try_enqueue(read_producer_token, std::move(batch));
+        }
+        num_pushed_blocks++;
     }
     // Send stop signals
     for (std::size_t i = 0; i < n_threads; ++i) {
-        std::vector<bam1_t*> null_vector {};
-        read_queue.enqueue(read_producer_token, std::move(null_vector));
-    }
+        std::vector<bam1_t*> batch {};
+        bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
+        if (!success) {
+            num_push_waits ++;
+        }
+        while (!success)
+        {
+            success = read_queue.try_enqueue(read_producer_token, std::move(batch));
+        }
+        num_pushed_blocks++;    }
     // Wait for workers to finish
     for (auto& worker : workers) {
         worker->join();
     }
+    BOOST_LOG_TRIVIAL(info) << "Total read blocks pushed: N. (IRetried/IAll): " << format_with_commas(num_push_waits)
+                            << "/" << format_with_commas(num_pushed_blocks) << " ("
+                            << (100.0 * static_cast<double>(num_push_waits) / static_cast<double>(num_pushed_blocks))
+                            << "%).";
     sam_hdr_destroy(hdr);
     bam_destroy1(b);
     hts_close(in);

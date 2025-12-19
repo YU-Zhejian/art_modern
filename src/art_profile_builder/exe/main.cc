@@ -19,6 +19,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <fstream>
+#include <ios>
 #include <memory>
 #include <vector>
 

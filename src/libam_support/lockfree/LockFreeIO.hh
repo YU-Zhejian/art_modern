@@ -124,8 +124,6 @@ private:
      */
     std::atomic<std::size_t> num_wait_in_ = 0;
 
-    std::atomic<std::size_t> num_sync_push_in_ = 0;
-
     /**
      * Number of @link write @endlink calls.
      */
@@ -159,8 +157,6 @@ private:
     void run_();
     /** Log the statistics. **/
     void log_() const;
-
-    static constexpr std::size_t MAX_RETRIES_BEFORE_SYNC_PUSH = 10000;
 };
 
 template <typename T>
@@ -179,38 +175,26 @@ void LockFreeIO<T>::init_queue(
 
 template <typename T> void LockFreeIO<T>::push(T&& value)
 {
-    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success && num_trials < MAX_RETRIES_BEFORE_SYNC_PUSH) {
+    while (!success) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(std::move(value));
-        num_trials += 1;
-    }
-    if (!success) {
-        num_sync_push_in_ += 1;
-        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }
 
 template <typename T> inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
-    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success && num_trials < MAX_RETRIES_BEFORE_SYNC_PUSH) {
+    while (!success) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(token.token, std::move(value));
-        num_trials += 1;
-    }
-    if (!success) {
-        num_sync_push_in_ += 1;
-        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }
@@ -308,11 +292,5 @@ template <typename T> void LockFreeIO<T>::log_() const
                             << " avg. write batch size: " << (1.0 * num_reads_out_ / num_writes) << ".";
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: " << to_si(num_bytes_out_) << "B written in " << time / 1000.0
                             << " seconds. Speed: " << to_si(1.0 * num_bytes_out_ / (time / 1000.0)) << "B/s.";
-    if (num_sync_push_in_ > 0) {
-        BOOST_LOG_TRIVIAL(warning)
-            << name_ << " LockFreeIO: " << format_with_commas(num_sync_push_in_)
-            << " push operations used synchronous push due to queue full after " << MAX_RETRIES_BEFORE_SYNC_PUSH
-            << " tries of unsync push. Consider having a faster SDD or reduce number of parallelel jobs.";
-    }
 }
 } // namespace labw::art_modern
