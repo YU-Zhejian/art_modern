@@ -98,8 +98,6 @@ namespace {
     constexpr char ARG_REPORTING_INTERVAL_AJE[] = "reporting_interval-job_executor";
     constexpr char ARG_REPORTING_INTERVAL_JP[] = "reporting_interval-job_pool";
 
-    constexpr char DEFAULT_ERR_PROFILE[] = "HiSeq2500_150bp";
-
     po::options_description option_parser() noexcept
     {
         const OutputDispatcherFactory out_dispatcher_factory_;

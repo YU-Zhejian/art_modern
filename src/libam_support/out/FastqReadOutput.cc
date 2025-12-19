@@ -15,6 +15,7 @@
 #include "libam_support/out/FastqReadOutput.hh"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
@@ -27,6 +28,7 @@
 #include <boost/program_options/value_semantic.hpp>
 
 #include <cstdio>
+#include <cstdlib>
 #include <memory>
 #include <string>
 
@@ -63,10 +65,10 @@ void FastqReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
-FastqReadOutput::FastqReadOutput(const std::string& filename, const std::size_t n_threads)
+FastqReadOutput::FastqReadOutput(const std::string& filename, const std::size_t n_threads, const std::size_t queue_size)
     : lfio_("FASTQ", filename)
 {
-    lfio_.init_queue(n_threads, 0);
+    lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
 }
 
@@ -88,13 +90,17 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
     boost::program_options::options_description fastq_desc("FASTQ Output");
     fastq_desc.add_options()("o-fastq", boost::program_options::value<std::string>(),
         "Destination of output FASTQ file. Unset to disable the writer.");
+    fastq_desc.add_options()("o-fastq-queue_size",
+        boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
+        "Size of the lock-free queue used in FASTQ output.");
     desc.add(fastq_desc);
 }
 std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-fastq") != 0) {
         return std::make_shared<FastqReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s()), params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s()), params.n_threads,
+            params.vm["o-fastq-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

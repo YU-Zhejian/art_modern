@@ -239,6 +239,8 @@ Here introduces diverse output formats supported by `art_modern`. You may specif
 
 If the parent directory does not exist, it will be created using a `mkdir -p`-like manner.
 
+For all output format, a queue size parameter (e.g., `--o-pwa-queue_size`) is provided to control the size of lockfree queue. Turn this up to improve performance when you have enough memory, and low if the application is consuming too much memory. Added in [1.3.2](#v-1.3.2-section).
+
 ### Pairwise Alignment Format (`--o-pwa`)
 
 PWA is serialization of the internally used data structure of the simulator. Currently, PWA consists of some metadata lines (Started with `#`) and a list of alignments, each spanning 4 lines.

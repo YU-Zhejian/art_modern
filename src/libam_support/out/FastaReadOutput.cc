@@ -15,6 +15,7 @@
 #include "libam_support/out/FastaReadOutput.hh"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
@@ -63,10 +64,10 @@ void FastaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
-FastaReadOutput::FastaReadOutput(const std::string& filename, const std::size_t n_threads)
+FastaReadOutput::FastaReadOutput(const std::string& filename, const std::size_t n_threads, const std::size_t queue_size)
     : lfio_("FASTA", filename)
 {
-    lfio_.init_queue(n_threads, 0);
+    lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
 }
 
@@ -88,13 +89,17 @@ void FastaReadOutputFactory::patch_options(boost::program_options::options_descr
     boost::program_options::options_description fasta_desc("FASTA Output");
     fasta_desc.add_options()("o-fasta", boost::program_options::value<std::string>(),
         "Destination of output FASTA file. Unset to disable the writer.");
+    fasta_desc.add_options()("o-fasta-queue_size",
+        boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
+        "Size of the lock-free queue used in FASTA output.");
     desc.add(fasta_desc);
 }
 std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-fasta") != 0) {
         return std::make_shared<FastaReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank_s()), params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank_s()), params.n_threads,
+            params.vm["o-fasta-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

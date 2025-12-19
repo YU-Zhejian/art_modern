@@ -16,12 +16,16 @@
   - The home-made "asynchronous IO" spent too much time in deallocating and creating new `std::unique_ptr`s. This problem is more obvious on smaller objects, like FASTA when being compared to FASTQ.
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams that allows reusing.
   - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worsen if POSIX AIO is used.
+
+## Other Thoughts
+
 - A seed allocation algorithm is needed for ensureing reproducibility.
 
 ## I/O Formats
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
 - Add flags to disable/enable diverse BAM tags.
+- Add a "no qual" option to various SAM/BAM writers?
 - Support circular genome or RNA?
 - Support simulating BGI/MGISEQ reads?
 - Add `--i-nreads` to accurately specify the number of reads to simulate?

@@ -23,6 +23,7 @@
 
 #include <boost/program_options/options_description.hpp>
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 #include <vector>
@@ -34,7 +35,8 @@ public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    explicit PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, std::size_t n_threads);
+    PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, std::size_t n_threads,
+        std::size_t queue_size);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;

@@ -40,6 +40,7 @@ namespace {
     constexpr char ARG_OUT1[] = "o-file1";
     constexpr char ARG_OUT2[] = "o-file2";
     constexpr char ARG_OB[] = "old_behavior";
+    constexpr char ARG_QUEUE_SIZE[] = "queue_size";
 
     htsExactFormat valid_file(const std::string& file_path)
     {
@@ -94,6 +95,8 @@ namespace {
             + " will create " + ARG_NUM_IO_THREADS + " threads for I/O. ";
         parallel_opts.add_options()(
             ARG_NUM_IO_THREADS, po::value<std::size_t>()->default_value(4), io_thread_description.c_str());
+        parallel_opts.add_options()(ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(K_SIZE),
+            "Size of the lock-free queue used in reading input HTS files.");
 
         po::options_description po_desc;
         po_desc.add(general_opts).add(required_opts).add(input_flags).add(parallel_opts);
@@ -145,6 +148,7 @@ APBConfig parse_args(int argc, char** argv)
     const auto num_threads = n_threads_from_parallel(get_param<int>(vm_, ARG_PARALLEL));
     const auto out1 = get_param<std::string>(vm_, ARG_OUT1);
     const auto out2 = is_pe ? get_param<std::string>(vm_, ARG_OUT2) : "";
+    const auto queue_size = get_param<std::size_t>(vm_, ARG_QUEUE_SIZE);
 
     const auto format = valid_file(input_file_name);
     prepare_writer(out1);
@@ -152,6 +156,7 @@ APBConfig parse_args(int argc, char** argv)
         prepare_writer(out2);
     }
 
-    return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format };
+    return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format,
+        queue_size };
 }
 } // namespace labw::art_modern

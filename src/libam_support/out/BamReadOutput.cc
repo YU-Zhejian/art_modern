@@ -22,6 +22,7 @@
 #include "libam_support/bam/BamTags.hh"
 #include "libam_support/bam/BamUtils.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
@@ -169,7 +170,7 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 }
 BamReadOutput::~BamReadOutput() { BamReadOutput::close(); }
 BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-    const BamOptions& sam_options, const std::size_t n_threads)
+    const BamOptions& sam_options, const std::size_t n_threads, const std::size_t queue_size)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -178,7 +179,7 @@ BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
-    lfio_.init_queue(n_threads, 0);
+    lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
 }
 
@@ -208,6 +209,9 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
     bam_desc.add_options()("o-sam-compress_level", po::value<char>()->default_value('4'),
         "Compression level in BAM. Support `u` for uncompressed raw BAM output and [0-9] for underlying zlib "
         "compression.");
+    bam_desc.add_options()("o-sam-queue_size",
+        boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
+        "Size of the lock-free queue used in SAM/BAM output.");
     desc.add(bam_desc);
 }
 std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& params) const
@@ -231,7 +235,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
         }
         return std::make_shared<BamReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank_s()), params.fasta_fetch, so,
-            params.n_threads);
+            params.n_threads, params.vm["o-sam-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

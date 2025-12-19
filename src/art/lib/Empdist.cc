@@ -93,10 +93,10 @@ namespace {
         for (auto& i : map_to_process) {
             for (auto& [fst, snd] : i) {
                 // Prevent overflow and underflow
-                auto snd_int = static_cast<int32_t>(snd) + static_cast<int32_t>(q_shift);
-                if (snd_int < static_cast<int32_t>(min_qual)) {
+                auto snd_int = static_cast<std::int32_t>(snd) + static_cast<std::int32_t>(q_shift);
+                if (snd_int < static_cast<std::int32_t>(min_qual)) {
                     snd = min_qual;
-                } else if (snd_int > static_cast<int32_t>(max_qual)) {
+                } else if (snd_int > static_cast<std::int32_t>(max_qual)) {
                     snd = max_qual;
                 } else {
                     snd = static_cast<am_qual_t>(snd_int);
@@ -166,12 +166,12 @@ Empdist::Empdist(
 
 am_read_len_t Empdist::get_read_1_max_length() const
 {
-    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first : qual_dist_first;
+    const auto& qual_dist_to_check_first = sep_qual_ ? a_qual_dist_first_ : qual_dist_first_;
     return static_cast<am_read_len_t>(qual_dist_to_check_first.size());
 }
 am_read_len_t Empdist::get_read_2_max_length() const
 {
-    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second : qual_dist_second;
+    const auto& qual_dist_to_check_second = sep_qual_ ? a_qual_dist_second_ : qual_dist_second_;
     return static_cast<am_read_len_t>(qual_dist_to_check_second.size());
 }
 
@@ -202,11 +202,20 @@ void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_
 // read]
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
-    const auto read_len = first ? read_len_1_ : read_len_2_;
-    const auto& qual_dist_idx = first ? qual_dist_first_idx : qual_dist_second_idx;
-    rprob.r_probs(read_len);
-    for (am_read_len_t i = 0; i < read_len; i++) {
-        qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs_[i]);
+    if (first) {
+        const auto read_len = read_len_1_;
+        const auto& qual_dist_idx = qual_dist_first_idx_;
+        rprob.r_probs(read_len);
+        for (am_read_len_t i = 0; i < read_len; i++) {
+            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        }
+    } else {
+        const auto read_len = read_len_2_;
+        const auto& qual_dist_idx = qual_dist_second_idx_;
+        rprob.r_probs(read_len);
+        for (am_read_len_t i = 0; i < read_len; i++) {
+            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        }
     }
 }
 
@@ -217,16 +226,16 @@ void Empdist::get_read_qual_sep_1(std::vector<am_qual_t>& qual, const std::strin
     for (decltype(seq.size()) i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
-            qual[i] = a_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = a_qual_dist_first_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'C':
-            qual[i] = c_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = c_qual_dist_first_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'G':
-            qual[i] = g_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = g_qual_dist_first_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'T':
-            qual[i] = t_qual_dist_first_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = t_qual_dist_first_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         default:
             qual[i] = rprob.rand_quality_less_than_10();
@@ -241,16 +250,16 @@ void Empdist::get_read_qual_sep_2(std::vector<am_qual_t>& qual, const std::strin
     for (size_t i = 0; i < len; i++) {
         switch (seq[i]) {
         case 'A':
-            qual[i] = a_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = a_qual_dist_second_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'C':
-            qual[i] = c_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = c_qual_dist_second_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'G':
-            qual[i] = g_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = g_qual_dist_second_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         case 'T':
-            qual[i] = t_qual_dist_second_idx[i].gen_qual(rprob.tmp_probs_[i]);
+            qual[i] = t_qual_dist_second_idx_[i].gen_qual(rprob.tmp_probs[i]);
             break;
         default:
             qual[i] = rprob.rand_quality_less_than_10();
@@ -368,15 +377,15 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
         }
         n_lines_parsed++;
         if (!sep_qual_) {
-            (is_first ? qual_dist_first : qual_dist_second).emplace_back(dist);
+            (is_first ? qual_dist_first_ : qual_dist_second_).emplace_back(dist);
         } else if (leading_base == 'A') {
-            (is_first ? a_qual_dist_first : a_qual_dist_second).emplace_back(dist);
+            (is_first ? a_qual_dist_first_ : a_qual_dist_second_).emplace_back(dist);
         } else if (leading_base == 'T') {
-            (is_first ? t_qual_dist_first : t_qual_dist_second).emplace_back(dist);
+            (is_first ? t_qual_dist_first_ : t_qual_dist_second_).emplace_back(dist);
         } else if (leading_base == 'G') {
-            (is_first ? g_qual_dist_first : g_qual_dist_second).emplace_back(dist);
+            (is_first ? g_qual_dist_first_ : g_qual_dist_second_).emplace_back(dist);
         } else if (leading_base == 'C') {
-            (is_first ? c_qual_dist_first : c_qual_dist_second).emplace_back(dist);
+            (is_first ? c_qual_dist_first_ : c_qual_dist_second_).emplace_back(dist);
         } else {
             BOOST_LOG_TRIVIAL(fatal) << "Unexpected Error: Profile was not read in correctly.";
             abort_mpi();
@@ -407,31 +416,32 @@ void Empdist::shift_all_emp(
     const am_qual_t q_shift_1, const am_qual_t q_shift_2, const am_qual_t min_qual, const am_qual_t max_qual)
 {
     if (!sep_qual_) {
-        shift_emp(qual_dist_first, q_shift_1, min_qual, max_qual);
-        shift_emp(qual_dist_second, q_shift_2, min_qual, max_qual);
+        shift_emp(qual_dist_first_, q_shift_1, min_qual, max_qual);
+        shift_emp(qual_dist_second_, q_shift_2, min_qual, max_qual);
     } else {
-        shift_emp(a_qual_dist_first, q_shift_1, min_qual, max_qual);
-        shift_emp(a_qual_dist_second, q_shift_2, min_qual, max_qual);
-        shift_emp(t_qual_dist_first, q_shift_1, min_qual, max_qual);
-        shift_emp(t_qual_dist_second, q_shift_2, min_qual, max_qual);
-        shift_emp(c_qual_dist_first, q_shift_1, min_qual, max_qual);
-        shift_emp(c_qual_dist_second, q_shift_2, min_qual, max_qual);
-        shift_emp(g_qual_dist_first, q_shift_1, min_qual, max_qual);
-        shift_emp(g_qual_dist_second, q_shift_2, min_qual, max_qual);
+        shift_emp(a_qual_dist_first_, q_shift_1, min_qual, max_qual);
+        shift_emp(a_qual_dist_second_, q_shift_2, min_qual, max_qual);
+        shift_emp(t_qual_dist_first_, q_shift_1, min_qual, max_qual);
+        shift_emp(t_qual_dist_second_, q_shift_2, min_qual, max_qual);
+        shift_emp(c_qual_dist_first_, q_shift_1, min_qual, max_qual);
+        shift_emp(c_qual_dist_second_, q_shift_2, min_qual, max_qual);
+        shift_emp(g_qual_dist_first_, q_shift_1, min_qual, max_qual);
+        shift_emp(g_qual_dist_second_, q_shift_2, min_qual, max_qual);
     }
 }
 
 void Empdist::validate_() const
 {
     if (sep_qual_) {
-        if (a_qual_dist_first.size() != g_qual_dist_first.size() || g_qual_dist_first.size() != c_qual_dist_first.size()
-            || c_qual_dist_first.size() != t_qual_dist_first.size()) {
+        if (a_qual_dist_first_.size() != g_qual_dist_first_.size()
+            || g_qual_dist_first_.size() != c_qual_dist_first_.size()
+            || c_qual_dist_first_.size() != t_qual_dist_first_.size()) {
             BOOST_LOG_TRIVIAL(warning) << "The length of 1st read in each qual dist is not equal!";
         }
         if (is_pe_) {
-            if (a_qual_dist_second.size() != g_qual_dist_second.size()
-                || g_qual_dist_second.size() != c_qual_dist_second.size()
-                || c_qual_dist_second.size() != t_qual_dist_second.size()) {
+            if (a_qual_dist_second_.size() != g_qual_dist_second_.size()
+                || g_qual_dist_second_.size() != c_qual_dist_second_.size()
+                || c_qual_dist_second_.size() != t_qual_dist_second_.size()) {
                 BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
             }
         }
@@ -441,51 +451,51 @@ void Empdist::validate_() const
 void Empdist::log() const
 {
     if (sep_qual_) {
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first.size()
-                                << ", C: " << c_qual_dist_first.size() << ", G: " << g_qual_dist_first.size()
-                                << ", T: " << t_qual_dist_first.size();
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: A: " << a_qual_dist_second.size()
-                                << ", C: " << c_qual_dist_second.size() << ", G: " << g_qual_dist_second.size()
-                                << ", T: " << t_qual_dist_second.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: A: " << a_qual_dist_first_.size()
+                                << ", C: " << c_qual_dist_first_.size() << ", G: " << g_qual_dist_first_.size()
+                                << ", T: " << t_qual_dist_first_.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: A: " << a_qual_dist_second_.size()
+                                << ", C: " << c_qual_dist_second_.size() << ", G: " << g_qual_dist_second_.size()
+                                << ", T: " << t_qual_dist_second_.size();
     } else {
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: " << qual_dist_first.size();
-        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R1: " << qual_dist_first_.size();
+        BOOST_LOG_TRIVIAL(info) << "Read quality profile size for R2: " << qual_dist_second_.size();
     }
 }
 
 void Empdist::index()
 {
     if (sep_qual_) {
-        for (const auto& dist : a_qual_dist_first) {
-            a_qual_dist_first_idx.emplace_back(dist);
+        for (const auto& dist : a_qual_dist_first_) {
+            a_qual_dist_first_idx_.emplace_back(dist);
         }
-        for (const auto& dist : a_qual_dist_second) {
-            a_qual_dist_second_idx.emplace_back(dist);
+        for (const auto& dist : a_qual_dist_second_) {
+            a_qual_dist_second_idx_.emplace_back(dist);
         }
-        for (const auto& dist : c_qual_dist_first) {
-            c_qual_dist_first_idx.emplace_back(dist);
+        for (const auto& dist : c_qual_dist_first_) {
+            c_qual_dist_first_idx_.emplace_back(dist);
         }
-        for (const auto& dist : c_qual_dist_second) {
-            c_qual_dist_second_idx.emplace_back(dist);
+        for (const auto& dist : c_qual_dist_second_) {
+            c_qual_dist_second_idx_.emplace_back(dist);
         }
-        for (const auto& dist : g_qual_dist_first) {
-            g_qual_dist_first_idx.emplace_back(dist);
+        for (const auto& dist : g_qual_dist_first_) {
+            g_qual_dist_first_idx_.emplace_back(dist);
         }
-        for (const auto& dist : g_qual_dist_second) {
-            g_qual_dist_second_idx.emplace_back(dist);
+        for (const auto& dist : g_qual_dist_second_) {
+            g_qual_dist_second_idx_.emplace_back(dist);
         }
-        for (const auto& dist : t_qual_dist_first) {
-            t_qual_dist_first_idx.emplace_back(dist);
+        for (const auto& dist : t_qual_dist_first_) {
+            t_qual_dist_first_idx_.emplace_back(dist);
         }
-        for (const auto& dist : t_qual_dist_second) {
-            t_qual_dist_second_idx.emplace_back(dist);
+        for (const auto& dist : t_qual_dist_second_) {
+            t_qual_dist_second_idx_.emplace_back(dist);
         }
     } else {
-        for (const auto& dist : qual_dist_first) {
-            qual_dist_first_idx.emplace_back(dist);
+        for (const auto& dist : qual_dist_first_) {
+            qual_dist_first_idx_.emplace_back(dist);
         }
-        for (const auto& dist : qual_dist_second) {
-            qual_dist_second_idx.emplace_back(dist);
+        for (const auto& dist : qual_dist_second_) {
+            qual_dist_second_idx_.emplace_back(dist);
         }
     }
 }

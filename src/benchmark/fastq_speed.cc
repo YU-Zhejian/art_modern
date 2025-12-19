@@ -15,6 +15,7 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/FastaReadOutput.hh"
 #include "libam_support/out/FastqReadOutput.hh"
@@ -106,8 +107,10 @@ int main()
     const auto ff = std::make_shared<InMemoryFastaFetch>(iss);
 
     // Temporarily disable logging
-    bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, NTHREAD), "FastqReadOutput", NTHREAD);
-    bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, NTHREAD), "FastaReadOutput", NTHREAD);
+    bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, NTHREAD, LockFreeIO<void*>::QUEUE_SIZE), "FastqReadOutput",
+        NTHREAD);
+    bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, NTHREAD, LockFreeIO<void*>::QUEUE_SIZE), "FastaReadOutput",
+        NTHREAD);
     boost::filesystem::remove(OUT_FILENAME);
 
     return EXIT_SUCCESS;

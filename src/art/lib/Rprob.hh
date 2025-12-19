@@ -16,6 +16,7 @@
 #pragma once
 
 #include "art_modern_config.h" // NOLINT: For USE_STL_RANDOM, etc.
+#include "libam_support/Constants.hh"
 
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/class_macros_utils.hh"
@@ -47,9 +48,6 @@
 #include <htslib/hts.h>
 
 // Include C++ stdlibs
-#if defined(USE_ONEMKL_RANDOM)
-#include <array> // Cache uses std::array
-#endif
 #include <cstddef>
 #if defined(USE_STL_RANDOM) || defined(USE_PCG_RANDOM) || defined(USE_SYSTEM_PCG_RANDOM)
 #include <random>
@@ -81,6 +79,7 @@ public:
      * n must be less than or equal to read_length_.
      */
     void r_probs(std::size_t n);
+    void r_probs_cached(std::size_t n, std::vector<double>& external_tmp_probs);
     /**
      * Generate an insertion length based on Gaussian distribution.
      * @return
@@ -95,35 +94,38 @@ public:
     hts_pos_t rand_pos_on_read_not_head_and_tail(bool is_read1);
     /** Slow random integer function **/
     int randint(int min, int max);
-    std::vector<double> tmp_probs_;
+    std::vector<double> tmp_probs;
 
 private:
     void public_init_();
 
 #if defined(USE_ONEMKL_RANDOM)
     // OneMKL bulk random number generation cache
-    constexpr static std::size_t CACHE_SIZE_ = 4096;
+    constexpr static std::size_t CACHE_SIZE_ = M_SIZE;
 
-    std::array<int, CACHE_SIZE_> cached_rand_pos_on_read_1_ {};
+    std::vector<int> cached_rand_pos_on_read_1_;
     std::size_t cached_rand_pos_on_read_1_index_ = 0;
 
-    std::array<int, CACHE_SIZE_> cached_rand_pos_on_read_2_ {};
+    std::vector<int> cached_rand_pos_on_read_2_;
     std::size_t cached_rand_pos_on_read_2_index_ = 0;
 
-    std::array<int, CACHE_SIZE_> cached_rand_pos_on_read_1_not_head_and_tail_ {};
+    std::vector<int> cached_rand_pos_on_read_1_not_head_and_tail_;
     std::size_t cached_rand_pos_on_read_1_not_head_and_tail_index_ = 0;
 
-    std::array<int, CACHE_SIZE_> cached_rand_pos_on_read_2_not_head_and_tail_ {};
+    std::vector<int> cached_rand_pos_on_read_2_not_head_and_tail_;
     std::size_t cached_rand_pos_on_read_2_not_head_and_tail_index_ = 0;
 
-    std::array<double, CACHE_SIZE_> cached_insertion_lengths_ {};
+    std::vector<double> cached_insertion_lengths_;
     std::size_t cached_insertion_lengths_index_ = 0;
 
-    std::array<int, CACHE_SIZE_> cached_rand_base_indices_ {};
+    std::vector<int> cached_rand_base_indices_;
     std::size_t cached_rand_base_indices_index_ = 0;
 
-    std::array<int, CACHE_SIZE_> cached_rand_quality_less_than_10_ {};
+    std::vector<int> cached_rand_quality_less_than_10_;
     std::size_t cached_rand_quality_less_than_10_index_ = 0;
+
+    std::vector<double> cached_tmp_probs_;
+    std::size_t cached_tmp_probs_index_ = 0;
 #endif
 
 #if defined(USE_STL_LIKE_RANDOM)
@@ -143,7 +145,7 @@ private:
     INT_DIST<hts_pos_t> pos_on_read_1_not_head_and_tail_;
     INT_DIST<hts_pos_t> pos_on_read_2_not_head_and_tail_;
 #elif defined(USE_ONEMKL_RANDOM)
-    VSLStreamStatePtr stream_;
+    VSLStreamStatePtr stream_ = nullptr;
     double pe_frag_dist_mean_;
     double pe_frag_dist_std_dev_;
 #endif
