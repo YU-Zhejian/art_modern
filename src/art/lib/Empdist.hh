@@ -24,7 +24,7 @@
 
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 
-#include <cstddef>
+#include <cstdlib>
 #include <functional>
 #include <istream>
 #include <map>
@@ -67,31 +67,32 @@ class Empdist {
 public:
     using dist_map_type = std::map<am_qual_count_t, am_qual_t, std::less<>>;
     using dist_type = std::vector<dist_map_type>;
+    using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;
 
 private:
-    dist_type qual_dist_first;
-    dist_type qual_dist_second;
+    dist_type qual_dist_first_;
+    dist_type qual_dist_second_;
 
-    dist_type a_qual_dist_first;
-    dist_type t_qual_dist_first;
-    dist_type g_qual_dist_first;
-    dist_type c_qual_dist_first;
+    dist_type a_qual_dist_first_;
+    dist_type t_qual_dist_first_;
+    dist_type g_qual_dist_first_;
+    dist_type c_qual_dist_first_;
 
-    dist_type a_qual_dist_second;
-    dist_type t_qual_dist_second;
-    dist_type g_qual_dist_second;
-    dist_type c_qual_dist_second;
-    using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;
-    dist_idx_type qual_dist_first_idx;
-    dist_idx_type qual_dist_second_idx;
-    dist_idx_type a_qual_dist_first_idx;
-    dist_idx_type t_qual_dist_first_idx;
-    dist_idx_type g_qual_dist_first_idx;
-    dist_idx_type c_qual_dist_first_idx;
-    dist_idx_type a_qual_dist_second_idx;
-    dist_idx_type t_qual_dist_second_idx;
-    dist_idx_type g_qual_dist_second_idx;
-    dist_idx_type c_qual_dist_second_idx;
+    dist_type a_qual_dist_second_;
+    dist_type t_qual_dist_second_;
+    dist_type g_qual_dist_second_;
+    dist_type c_qual_dist_second_;
+
+    dist_idx_type qual_dist_first_idx_;
+    dist_idx_type qual_dist_second_idx_;
+    dist_idx_type a_qual_dist_first_idx_;
+    dist_idx_type t_qual_dist_first_idx_;
+    dist_idx_type g_qual_dist_first_idx_;
+    dist_idx_type c_qual_dist_first_idx_;
+    dist_idx_type a_qual_dist_second_idx_;
+    dist_idx_type t_qual_dist_second_idx_;
+    dist_idx_type g_qual_dist_second_idx_;
+    dist_idx_type c_qual_dist_second_idx_;
 
 public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);

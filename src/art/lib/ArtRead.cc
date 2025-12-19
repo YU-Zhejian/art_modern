@@ -114,7 +114,7 @@ void ArtRead::generate_snv_on_qual()
             qual_[i] = MIN_QUAL;
             continue;
         }
-        if (rprob_.tmp_probs_[i] < art_params_.err_prob[qual_[i]]) {
+        if (rprob_.tmp_probs[i] < art_params_.err_prob[qual_[i]]) {
             std::size_t num_tries = 0;
             do {
                 achar = rprob_.rand_base();
@@ -141,7 +141,7 @@ hts_pos_t ArtRead::generate_indels()
     // deletion
     rprob_.r_probs(per_base_del_rate.size());
     for (i = static_cast<int>(per_base_del_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
+        if (per_base_del_rate[i] >= rprob_.tmp_probs[i]) {
             del_len = i + 1;
             j = i;
             std::size_t num_tries = 0;
@@ -164,7 +164,7 @@ hts_pos_t ArtRead::generate_indels()
         if (read_len_ - del_len - ins_len < i + 1) {
             continue; // ensure that there are stil enough unchanged position for mutation
         }
-        if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
+        if (per_base_ins_rate[i] >= rprob_.tmp_probs[i]) {
             ins_len = i + 1;
             j = i;
             std::size_t num_tries = 0;
@@ -196,7 +196,7 @@ hts_pos_t ArtRead::generate_indels_2()
 
     rprob_.r_probs(per_base_ins_rate.size());
     for (auto i = static_cast<int>(per_base_ins_rate.size()) - 1; i >= 0; i--) {
-        if (per_base_ins_rate[i] >= rprob_.tmp_probs_[i]) {
+        if (per_base_ins_rate[i] >= rprob_.tmp_probs[i]) {
             ins_len = i + 1;
             int j = i;
             std::size_t num_tries = 0;
@@ -226,7 +226,7 @@ hts_pos_t ArtRead::generate_indels_2()
             continue; // ensure that enough unchanged position for mutation
         }
 
-        if (per_base_del_rate[i] >= rprob_.tmp_probs_[i]) {
+        if (per_base_del_rate[i] >= rprob_.tmp_probs[i]) {
             del_len = i + 1;
             int j = i;
             std::size_t num_tries = 0;

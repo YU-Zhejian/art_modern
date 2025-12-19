@@ -42,7 +42,6 @@ namespace labw::art_modern {
 void Rprob::public_init_()
 {
     read_len_max_ = am_max(read_len_1_, read_len_2_);
-    tmp_probs_.resize(read_len_max_);
 }
 
 #if defined(USE_STL_LIKE_RANDOM)
@@ -85,10 +84,11 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
 
 void Rprob::r_probs(const std::size_t n)
 {
+    tmp_probs.resize(n);
 #if defined(USE_STL_LIKE_RANDOM)
-    std::generate_n(tmp_probs_.begin(), n, [this]() { return dis_(gen_); });
+    std::generate_n(tmp_probs.begin(), n, [this]() { return dis_(gen_); });
 #elif defined(USE_ONEMKL_RANDOM)
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<MKL_INT>(n), tmp_probs_.data(), 0.0, 1.0);
+    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<MKL_INT>(n), tmp_probs.data(), 0.0, 1.0);
 #endif
 }
 

@@ -95,7 +95,7 @@ public:
     hts_pos_t rand_pos_on_read_not_head_and_tail(bool is_read1);
     /** Slow random integer function **/
     int randint(int min, int max);
-    std::vector<double> tmp_probs_;
+    std::vector<double> tmp_probs;
 
 private:
     void public_init_();
