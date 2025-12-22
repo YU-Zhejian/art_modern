@@ -106,7 +106,7 @@ namespace {
     }
 } // namespace
 
-    SlimEmpDistGslDiscrete::SlimEmpDistGslDiscrete(const dist_map_type& dist)
+SlimEmpDistGslDiscrete::SlimEmpDistGslDiscrete(const dist_map_type& dist)
 {
     std::vector<double> count;
     for (const auto& [this_count, this_qual] : dist) {
@@ -122,11 +122,8 @@ namespace {
     rd_ = GslDiscreteDistribution(init_list);
 }
 
-    am_qual_t SlimEmpDistGslDiscrete::gen_qual(double u) const
-{
-    return qual_[rd_(u)];
-}
-    Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
+am_qual_t SlimEmpDistGslDiscrete::gen_qual(double u) const { return qual_[rd_(u)]; }
+Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , silence_(silence)

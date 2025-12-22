@@ -27,10 +27,14 @@
 
 #include <htslib/hts.h>
 
+#ifdef CEU_CM_IS_DEBUG
+#include "libam_support/utils/mpi_utils.hh"
+#include <boost/log/trivial.hpp>
+#endif
+
 #include <algorithm> // NOLINT for std::generate_n
 #include <cstddef>
 #include <cstring>
-#include <boost/log/trivial.hpp>
 #if defined(USE_STL_RNDOM)
 #include <random>
 #endif
@@ -46,15 +50,10 @@ void Rprob::public_init_()
     tmp_probs.resize(read_len_max_);
 }
 
-void Rprob::public_destroy_()
-{
-}
+void Rprob::public_destroy_() { }
 
 #if defined(USE_STL_LIKE_RANDOM)
-Rprob::~Rprob()
-{
-    public_destroy_();
-};
+Rprob::~Rprob() { public_destroy_(); };
 
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
     const am_read_len_t read_len_2, const am_rand_seed_t seed)
@@ -77,8 +76,11 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     public_init_();
 }
 #elif defined(USE_ONEMKL_RANDOM)
-Rprob::~Rprob() { vslDeleteStream(&stream_);
-    public_destroy_();}
+Rprob::~Rprob()
+{
+    vslDeleteStream(&stream_);
+    public_destroy_();
+}
 
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
     const am_read_len_t read_len_2, const am_rand_seed_t seed)
@@ -129,14 +131,11 @@ void Rprob::r_probs_cached(const std::size_t n, std::vector<double>& external_tm
     }
 
 #ifdef CEU_CM_IS_DEBUG
-    for (std::size_t i = 0; i < n; i++)
-    {
+    for (std::size_t i = 0; i < n; i++) {
         if (external_tmp_probs[i] < 0.0 || external_tmp_probs[i] >= 1.0) {
-            BOOST_LOG_TRIVIAL( error) << "Rprob::r_probs_cached: external_tmp_probs[" << i << "] out of range: "
-                                     << external_tmp_probs[i];
-            throw std::runtime_error(
-                "Rprob::r_probs_cached: external_tmp_probs[" + std::to_string(i) + "] out of range: " +
-                std::to_string(external_tmp_probs[i]));
+            BOOST_LOG_TRIVIAL(error) << "Rprob::r_probs_cached: external_tmp_probs[" << i
+                                     << "] out of range: " << external_tmp_probs[i];
+            abort_mpi();
         }
     }
 #endif
