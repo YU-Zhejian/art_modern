@@ -27,7 +27,7 @@ int main(int argc, char** argv)
     std::size_t const n_threads = std::thread::hardware_concurrency();
 
     SeedAlloc seed_alloc;
-    seed_alloc.run_seedalloc(false, 0);
+    seed_alloc.run_seedalloc(0);
     std::vector<am_rand_seed_t> seeds;
     for (std::size_t i = 0; i < n_threads; ++i) {
         seeds.emplace_back(seed_alloc.nextseed());

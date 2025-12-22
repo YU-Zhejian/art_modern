@@ -1,13 +1,12 @@
-#include <chrono>
-
-#include "art/lib/ArtConstants.hh"
 #include "art/lib/Empdist.hh"
+#include "art/lib/ArtConstants.hh"
 #include "art/lib/Rprob.hh"
 
 #include "benchmark/benchmark_utils.hh"
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/rand_utils.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -23,7 +22,7 @@ int main()
 {
     Empdist const empdist { DEFAULT_ERR_PROFILE, false, true, false };
 
-    Rprob rp(200.0, 10.0, 10, 150);
+    Rprob rp(200.0, 10.0, 10, 150, rand_seed());
     std::vector<am_qual_t> qual(150);
     std::vector<std::size_t> times;
 
