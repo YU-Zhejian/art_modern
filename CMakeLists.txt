@@ -9,7 +9,7 @@ foreach(opt ${DEPRECATED_OPTS})
 endforeach()
 unset(DEPRECATED_OPTS)
 
-if(DEFINED REPRODUCIBLE_BUILD)
+if(DEFINED REPRODUCIBLE_BUILDS AND REPRODUCIBLE_BUILDS)
     set(CEU_REPRODUCIBLE_BUILDS
         ON
         CACHE BOOL "Whether to build reproducible builds" FORCE)

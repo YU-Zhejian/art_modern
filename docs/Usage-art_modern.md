@@ -366,6 +366,7 @@ This output writer supports other BAM formatting parameters.
 ### Others
 
 - `--id`: Read ID Prefix. Used to distinguish between different runs.
+- `--i-seed`: Seed for random number generator to ensure reproducibility. Added in [1.3.2](#v-1.3.2-section).
 
 ## Logging Parameters
 
