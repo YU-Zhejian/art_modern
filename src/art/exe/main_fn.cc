@@ -46,17 +46,20 @@
 #include <memory>
 #include <utility>
 
+#include "libam_support/ds/SeedAlloc.hh"
+
 namespace labw::art_modern {
 
 class Generator {
 public:
     const OutputDispatcherFactory out_dispatcher_factory;
 
-    Generator(ArtParams art_params, const ArtIOParams& art_io_params)
+    Generator(ArtParams art_params, const ArtIOParams& art_io_params, std::unique_ptr<SeedAlloc>&& seed_alloc)
         : art_params_(std::move(art_params))
         , art_io_params_(art_io_params)
         , job_pool_(art_io_params.parallel)
         , reporter_(job_pool_, art_params_.job_pool_reporting_interval_seconds)
+        , seed_alloc_(std::move(seed_alloc))
     {
         reporter_.start();
     }
@@ -70,7 +73,8 @@ public:
     void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
     {
         SimulationJob sj { fetch, coverage_info, ++job_id_ };
-        const auto aje = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_);
+        const auto aje
+            = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_, seed_alloc_->nextseed());
         job_pool_.add(aje);
     }
 
@@ -91,6 +95,7 @@ private:
     JobPool job_pool_;
     JobPoolReporter reporter_;
     std::shared_ptr<OutputDispatcher> out_dispatcher_;
+    std::unique_ptr<SeedAlloc> seed_alloc_;
 };
 
 void print_banner()
@@ -110,7 +115,9 @@ void print_banner()
 
 void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 {
-    Generator generator(art_params, art_io_params);
+    std::unique_ptr<SeedAlloc> seed_alloc = std::make_unique<SeedAlloc>();
+    seed_alloc->run_seedalloc(art_params.seed);
+    Generator generator(art_params, art_io_params, std::move(seed_alloc));
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
         const std::size_t div_by = art_io_params.parallel * mpi_size();
         const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));

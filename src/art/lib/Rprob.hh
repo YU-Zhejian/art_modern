@@ -68,7 +68,8 @@ namespace labw::art_modern {
 
 class Rprob {
 public:
-    Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, am_read_len_t read_len_1, am_read_len_t read_len_2);
+    Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, am_read_len_t read_len_1, am_read_len_t read_len_2,
+        am_rand_seed_t seed);
     DELETE_COPY(Rprob)
     DELETE_MOVE(Rprob)
     ~Rprob();

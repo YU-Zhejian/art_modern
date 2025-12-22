@@ -19,7 +19,7 @@
 
 ## Other Thoughts
 
-- A seed allocation algorithm is needed for ensureing reproducibility.
+- Seedalloc added; Add test, news and docs.
 
 ## I/O Formats
 

@@ -20,7 +20,6 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
-#include "libam_support/utils/rand_utils.hh"
 
 #if defined(USE_ONEMKL_RANDOM)
 #include <mkl.h>
@@ -48,9 +47,10 @@ void Rprob::public_init_()
 
 #if defined(USE_STL_LIKE_RANDOM)
 Rprob::~Rprob() = default;
+
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
-    am_read_len_t read_len_2)
-    : gen_(rand_seed())
+    const am_read_len_t read_len_2, const am_rand_seed_t seed)
+    : gen_(seed)
 #if !defined(USE_BOOST_RANDOM)
     , dis_(0.0, 1.0)
 #endif
@@ -72,13 +72,13 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
 Rprob::~Rprob() { vslDeleteStream(&stream_); }
 
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
-    const am_read_len_t read_len_2)
+    const am_read_len_t read_len_2, const am_rand_seed_t seed)
     : pe_frag_dist_mean_(pe_frag_dist_mean)
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_len_1_(read_len_1)
     , read_len_2_(read_len_2)
 {
-    vslNewStream(&stream_, VSL_BRNG_SFMT19937, rand_seed());
+    vslNewStream(&stream_, VSL_BRNG_SFMT19937, seed);
     public_init_();
     cached_insertion_lengths_.resize(CACHE_SIZE_);
     cached_rand_base_indices_.resize(CACHE_SIZE_);

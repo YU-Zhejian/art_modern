@@ -13,6 +13,8 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include "art_modern_config.h" // NOLINT
+
 #include "art/exe/parse_args.hh"
 
 #include "art/builtin_profiles.h"
@@ -21,7 +23,6 @@
 #include "art/lib/ArtParams.hh"
 #include "art/lib/Empdist.hh"
 
-#include "art_modern_config.h"
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
@@ -32,6 +33,7 @@
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/param_utils.hh"
+#include "libam_support/utils/rand_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
 #include <boost/filesystem/operations.hpp>
@@ -72,6 +74,7 @@ namespace {
     constexpr char ARG_INPUT_FILE_TYPE[] = "i-type";
     constexpr char ARG_FCOV[] = "i-fcov";
     constexpr char ARG_BATCH_SIZE[] = "i-batch_size";
+    constexpr char ARG_SEED[] = "i-seed";
 
     constexpr char ARG_ID[] = "id";
     constexpr char ARG_PARALLEL[] = "parallel";
@@ -113,6 +116,8 @@ namespace {
             (std::string() + "library construction mode, should be " + ART_LIB_CONST_MODE_SE + ", "
                 + ART_LIB_CONST_MODE_PE + ", " + ART_LIB_CONST_MODE_MP + ".")
                 .c_str());
+        required_opts.add_options()(ARG_SEED, po::value<am_rand_seed_t>(),
+            "Random seed for simulation. If not specified, will be generated at random.");
         required_opts.add_options()(ARG_INPUT_FILE_PARSER,
             po::value<std::string>()->default_value(INPUT_FILE_PARSER_AUTO),
             (std::string() + "input file parser, should be " + INPUT_FILE_PARSER_AUTO + ", " + INPUT_FILE_PARSER_MEMORY
@@ -588,6 +593,8 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
         validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
     }
+    const auto seed = vm_.count(ARG_SEED) == 0 ? rand_seed() : get_param<am_rand_seed_t>(vm_, ARG_SEED);
+    BOOST_LOG_TRIVIAL(info) << "Using random seed: " << seed;
 
     ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id),
         // Read-length related
@@ -603,7 +610,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         // Per-base del rate 2
         gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel),
         // Others
-        std::move(qdist), report_interval_jp, report_interval_aje };
+        std::move(qdist), report_interval_jp, report_interval_aje, seed };
     ArtIOParams art_io_params { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel,
         batch_size, vm_, std::move(args) };
     return { std::move(art_params), std::move(art_io_params) };

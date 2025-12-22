@@ -6,7 +6,6 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/ds/pcg_32_c.hh"
 #include "libam_support/utils/mpi_utils.hh"
-#include "libam_support/utils/rand_utils.hh"
 
 #ifdef WITH_MPI
 #include <mpi.h>
@@ -15,24 +14,19 @@
 #include <boost/log/trivial.hpp>
 
 #include <cstdlib>
-#include <vector>
+#include <ios>
+#include <memory>
 
 namespace labw::art_modern {
-void SeedAlloc::run_seedalloc(
-    const bool ignore_seed_from_cmdline, const am_rand_seed_t seed_from_cmdline, const std::size_t n_threads)
+void SeedAlloc::run_seedalloc(const am_rand_seed_t seed)
 {
     // Generate master seed
     // Algorithm: If on MPI main process, use seed from command line (if not ignored) or generate a random seed.
     // Otherwise, receive the seed from the main process.
 
     if (is_on_mpi_main_process_or_nompi()) {
-        if (!ignore_seed_from_cmdline) {
-            master_seed_ = seed_from_cmdline;
-            BOOST_LOG_TRIVIAL(debug) << "Using seed from command line: " << std::hex << "0x" << master_seed_ << ".";
-        } else {
-            master_seed_ = rand_seed();
-            BOOST_LOG_TRIVIAL(debug) << "Generated random master seed: " << std::hex << "0x" << master_seed_ << ".";
-        }
+        master_seed_ = seed;
+        BOOST_LOG_TRIVIAL(debug) << "Using seed: " << std::hex << "0x" << master_seed_ << ".";
 #ifdef WITH_MPI
         // Broadcast master seed to other processes
         const am_mpi_size_t size = mpi_size();
@@ -57,11 +51,7 @@ void SeedAlloc::run_seedalloc(
     this_process_master_seed_ = master_seed_;
 #endif
     // Use PCG to generate seeds
-    pcg32_c pcg_rng(this_process_master_seed_);
-    for (std::size_t i = 0; i < n_threads; ++i) {
-        const auto allocated_seed = pcg_rng();
-        allocated_seeds_.emplace_back(allocated_seed);
-    }
+    pcg_rng_ = std::make_unique<pcg32_c>(this_process_master_seed_);
 }
-am_rand_seed_t SeedAlloc::seed(const std::size_t thread_idx) const { return allocated_seeds_.at(thread_idx); }
+am_rand_seed_t SeedAlloc::nextseed() const { return pcg_rng_->operator()(); }
 } // namespace labw::art_modern
