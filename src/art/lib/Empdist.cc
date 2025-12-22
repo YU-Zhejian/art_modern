@@ -106,7 +106,27 @@ namespace {
     }
 } // namespace
 
-Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
+    SlimEmpDistGslDiscrete::SlimEmpDistGslDiscrete(const dist_map_type& dist)
+{
+    std::vector<double> count;
+    for (const auto& [this_count, this_qual] : dist) {
+        qual_.emplace_back(this_qual);
+        count.emplace_back(static_cast<double>(this_count));
+    }
+    std::vector<double> init_list;
+    double prev = 0;
+    for (const auto i : count) {
+        init_list.emplace_back(i - prev);
+        prev = i;
+    }
+    rd_ = GslDiscreteDistribution(init_list);
+}
+
+    am_qual_t SlimEmpDistGslDiscrete::gen_qual(double u) const
+{
+    return qual_[rd_(u)];
+}
+    Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
     , silence_(silence)
@@ -203,18 +223,14 @@ void Empdist::set_read_length(const am_read_len_t read_len_1, const am_read_len_
 void Empdist::get_read_qual(std::vector<am_qual_t>& qual, Rprob& rprob, const bool first) const
 {
     if (first) {
-        const auto read_len = read_len_1_;
-        const auto& qual_dist_idx = qual_dist_first_idx_;
-        rprob.r_probs(read_len);
-        for (am_read_len_t i = 0; i < read_len; i++) {
-            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        rprob.r_probs(read_len_1_);
+        for (am_read_len_t i = 0; i < read_len_1_; i++) {
+            qual[i] = qual_dist_first_idx_[i].gen_qual(rprob.tmp_probs[i]);
         }
     } else {
-        const auto read_len = read_len_2_;
-        const auto& qual_dist_idx = qual_dist_second_idx_;
-        rprob.r_probs(read_len);
-        for (am_read_len_t i = 0; i < read_len; i++) {
-            qual[i] = qual_dist_idx[i].gen_qual(rprob.tmp_probs[i]);
+        rprob.r_probs(read_len_2_);
+        for (am_read_len_t i = 0; i < read_len_2_; i++) {
+            qual[i] = qual_dist_second_idx_[i].gen_qual(rprob.tmp_probs[i]);
         }
     }
 }

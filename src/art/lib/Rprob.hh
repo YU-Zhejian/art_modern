@@ -99,10 +99,11 @@ public:
 
 private:
     void public_init_();
+    void public_destroy_();
 
 #if defined(USE_ONEMKL_RANDOM)
     // OneMKL bulk random number generation cache
-    constexpr static std::size_t CACHE_SIZE_ = M_SIZE;
+    constexpr static std::size_t CACHE_SIZE_ = K_SIZE;
 
     std::vector<int> cached_rand_pos_on_read_1_;
     std::size_t cached_rand_pos_on_read_1_index_ = 0;
