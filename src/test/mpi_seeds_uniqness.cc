@@ -153,8 +153,9 @@ void main_worker()
         std::size_t position = 0;
         gs->ser(buffer, position);
         if (ser_size != position) {
-            BOOST_LOG_TRIVIAL(fatal) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " serialized seeds size ("
-                                     << ser_size << ") != position (" << to_si(position) << ")!";
+            BOOST_LOG_TRIVIAL(fatal) << "Rank " << mpi_rank_s() << " thread=" << thread_idx
+                                     << " serialized seeds size (" << ser_size << ") != position (" << to_si(position)
+                                     << ")!";
             abort_mpi();
         }
         BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " serialized "
@@ -192,7 +193,8 @@ void main_manager()
 
             // Then receive the actual serialized data
             char* buffer = new char[ser_size];
-            MPI_Recv(buffer, ser_size_i, MPI_CHAR, source_rank, static_cast<int>(thread_idx), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(buffer, ser_size_i, MPI_CHAR, source_rank, static_cast<int>(thread_idx), MPI_COMM_WORLD,
+                MPI_STATUS_IGNORE);
             BOOST_LOG_TRIVIAL(info) << "Rank " << source_rank << " thread=" << thread_idx << " RECV SUCCESS.";
 
             // Deserialize

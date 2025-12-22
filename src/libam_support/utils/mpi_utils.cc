@@ -156,7 +156,7 @@ std::string mpi_hostname()
     char hostname[MPI_MAX_PROCESSOR_NAME];
     int name_len = 0;
     MPI_Get_processor_name(hostname, &name_len);
-    return {hostname, static_cast<std::size_t>(name_len)};
+    return { hostname, static_cast<std::size_t>(name_len) };
 #endif
     return "N/A";
 }
