@@ -52,6 +52,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -594,7 +595,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
     }
     const auto seed = vm_.count(ARG_SEED) == 0 ? rand_seed() : get_param<am_rand_seed_t>(vm_, ARG_SEED);
-    BOOST_LOG_TRIVIAL(info) << "Using random seed: " << seed;
+    BOOST_LOG_TRIVIAL(info) << "Using random seed: " << std::hex << "0x" << seed;
 
     ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id),
         // Read-length related

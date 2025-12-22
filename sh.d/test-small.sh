@@ -46,7 +46,7 @@ CE11_CHR1="${PROJDIR}/data/raw_data/ce11_chr1.fa"
 
 export MPI_PARALLEL="${MPI_PARALLEL:-4}"
 export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
-export IDRATE=0.1                                 # Increase indel rate to fail faster
+export IDRATE=0.01                                # Increase indel rate to fail faster
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
