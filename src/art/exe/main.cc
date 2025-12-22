@@ -45,7 +45,7 @@ void handle_mpi_child()
             BOOST_LOG_TRIVIAL(info) << "MPI found! Cross-node parallelism enabled.";
             BOOST_LOG_TRIVIAL(info) << "MPI main process started.";
         } else {
-            BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank() << " started.";
+            BOOST_LOG_TRIVIAL(info) << "MPI child process with rank " << mpi_rank_s() << " started.";
         }
     } else {
         BOOST_LOG_TRIVIAL(info) << "MPI not found! Cross-node parallelism disabled.";

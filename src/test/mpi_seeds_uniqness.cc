@@ -135,9 +135,9 @@ void main_worker()
         auto gs = std::make_shared<GeneratedSeeds>();
         gss.emplace_back(gs);
         threads.emplace_back([thread_idx, &gss]() {
-            BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " thread=" << thread_idx << " generating seeds.";
+            BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " generating seeds.";
             gss[thread_idx]->generate_seeds_thread(NUM_SEEDS);
-            BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " thread=" << thread_idx << " generated "
+            BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " generated "
                                     << to_si(gss[thread_idx]->seeds_.size()) << " seeds.";
         });
     }
@@ -153,45 +153,46 @@ void main_worker()
         std::size_t position = 0;
         gs->ser(buffer, position);
         if (ser_size != position) {
-            BOOST_LOG_TRIVIAL(fatal) << "Rank " << mpi_rank() << " thread=" << thread_idx << " serialized seeds size ("
+            BOOST_LOG_TRIVIAL(fatal) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " serialized seeds size ("
                                      << ser_size << ") != position (" << to_si(position) << ")!";
             abort_mpi();
         }
-        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " thread=" << thread_idx << " serialized "
+        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " serialized "
                                 << to_si(ser_size) << " bytes.";
 
         // Send via MPI
-        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " thread=" << thread_idx << " sending via MPI.";
+        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " sending via MPI.";
         MPI_Send(
             buffer, static_cast<int>(ser_size), MPI_CHAR, MPI_MAIN_RANK, static_cast<int>(thread_idx), MPI_COMM_WORLD);
-        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " thread=" << thread_idx << " SEND SUCCESS.";
+        BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " thread=" << thread_idx << " SEND SUCCESS.";
 
         std::free(buffer);
     }
-    BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank() << " all threads joined.";
+    BOOST_LOG_TRIVIAL(info) << "Rank " << mpi_rank_s() << " all threads joined.";
 }
 void main_manager()
 {
     std::vector<GeneratedSeeds> all_seeds;
     // Receive and deserialize via MPI
-    for (int source_rank = MPI_MAIN_RANK + 1; source_rank < mpi_size(); ++source_rank) {
+    for (auto source_rank = MPI_MAIN_RANK + 1; source_rank < mpi_size(); ++source_rank) {
         for (std::size_t thread_idx = 0; thread_idx < NUM_THREADS; ++thread_idx) {
             BOOST_LOG_TRIVIAL(info) << "Rank " << source_rank << " thread=" << thread_idx << " waiting to RECV.";
             MPI_Status status;
             // Probe for an incoming message from process zero
-            MPI_Probe(source_rank, thread_idx, MPI_COMM_WORLD, &status);
+            MPI_Probe(source_rank, static_cast<int>(thread_idx), MPI_COMM_WORLD, &status);
             BOOST_LOG_TRIVIAL(info) << "Rank " << source_rank << " thread=" << thread_idx << " PROBE SUCCESS.";
 
-            int ser_size = 0;
+            int ser_size_i = 0;
             // When probe returns, the status object has the size and other
             // attributes of the incoming message. Get the message size
-            MPI_Get_count(&status, MPI_CHAR, &ser_size);
+            MPI_Get_count(&status, MPI_CHAR, &ser_size_i);
+            auto ser_size = static_cast<std::size_t>(ser_size_i);
             BOOST_LOG_TRIVIAL(info) << "Rank " << source_rank << " thread=" << thread_idx << " sized "
                                     << to_si(ser_size) << ".";
 
             // Then receive the actual serialized data
             char* buffer = new char[ser_size];
-            MPI_Recv(buffer, ser_size, MPI_CHAR, source_rank, thread_idx, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+            MPI_Recv(buffer, ser_size_i, MPI_CHAR, source_rank, static_cast<int>(thread_idx), MPI_COMM_WORLD, MPI_STATUS_IGNORE);
             BOOST_LOG_TRIVIAL(info) << "Rank " << source_rank << " thread=" << thread_idx << " RECV SUCCESS.";
 
             // Deserialize
@@ -231,7 +232,7 @@ int main(int argc, char** argv)
     init_logger();
     init_file_logger("mpi_seeds", true);
 
-    if (mpi_rank() != MPI_MAIN_RANK) {
+    if (is_on_mpi_main_process_or_nompi()) {
         main_worker();
     } else {
         main_manager();

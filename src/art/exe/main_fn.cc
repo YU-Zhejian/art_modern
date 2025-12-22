@@ -112,7 +112,7 @@ void generate_all(const ArtParams& art_params, const ArtIOParams& art_io_params)
 {
     Generator generator(art_params, art_io_params);
     if (art_params.art_simulation_mode == SIMULATION_MODE::WGS) {
-        const std::size_t div_by = art_io_params.parallel * (have_mpi() ? mpi_size() : 1);
+        const std::size_t div_by = art_io_params.parallel * mpi_size();
         const auto coverage_info = std::make_shared<CoverageInfo>(art_io_params.coverage_info.div(div_by));
         if (art_io_params.art_input_file_parser == INPUT_FILE_PARSER::MEMORY) {
             std::shared_ptr<BaseFastaFetch> const fetch

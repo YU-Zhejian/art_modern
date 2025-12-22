@@ -16,15 +16,11 @@
 
 #include "libam_support/utils/mpi_utils.hh"
 
+#include "libam_support/Constants.hh" // NOLINT: Used in MPI functions
+#include "libam_support/Dtypes.h" // NOLINT: Used in MPI functions
 #include "libam_support/utils/log_utils.hh"
 
-#include "libam_support/Constants.hh" // NOLINT: Used in MPI functions
-
 #include <boost/log/trivial.hpp>
-
-#ifdef WITH_BOOST_STACKTRACE
-#include <boost/stacktrace/stacktrace.hpp>
-#endif
 
 #ifdef WITH_MPI
 #include <mpi.h>
@@ -98,18 +94,16 @@ void exit_mpi() noexcept
 #endif
 }
 
-std::size_t mpi_size()
+am_mpi_size_t mpi_size()
 {
-    int size = 1; // NOLINT: Default value for non-MPI build
+    am_mpi_size_t size = 1; // NOLINT: Default value for non-MPI build
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
         exception_mpi_is_finalized();
     }
     MPI_Comm_size(MPI_COMM_WORLD, &size);
-    return static_cast<std::size_t>(size);
-#else
-    return size;
 #endif
+    return size;
 }
 
 void init_mpi([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv)
@@ -118,13 +112,13 @@ void init_mpi([[maybe_unused]] int* argc, [[maybe_unused]] char*** argv)
     MPI_Init(argc, argv);
 #endif
 }
-std::size_t mpi_rank()
+am_mpi_rank_t mpi_rank()
 {
 #ifdef WITH_MPI
     if (is_mpi_finalized()) {
         exception_mpi_is_finalized();
     }
-    int rank = MPI_UNAVAILABLE_RANK;
+    am_mpi_rank_t rank = MPI_UNAVAILABLE_RANK;
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     return rank;
 #else
@@ -162,7 +156,7 @@ std::string mpi_hostname()
     char hostname[MPI_MAX_PROCESSOR_NAME];
     int name_len = 0;
     MPI_Get_processor_name(hostname, &name_len);
-    return std::string(hostname, name_len);
+    return {hostname, static_cast<std::size_t>(name_len)};
 #endif
     return "N/A";
 }
