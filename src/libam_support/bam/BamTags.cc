@@ -12,11 +12,19 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
-#include "art_modern_config.h"
+#include "art_modern_config.h" // NOLINT: For USED_HTSLIB_NAME
 
 #include "libam_support/bam/BamTags.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
+
+#ifdef CEU_CM_IS_DEBUG
+#include "libam_support/utils/mpi_utils.hh"
+#endif
+
+#ifdef CEU_CM_IS_DEBUG
+#include <boost/log/trivial.hpp>
+#endif
 
 #include <htslib/sam.h>
 
@@ -26,12 +34,25 @@
 #include <cstring>
 #include <memory>
 #include <string>
+#ifdef CEU_CM_IS_DEBUG
+#include <unordered_set>
+#endif
 
 namespace labw::art_modern {
 BamTags::BamTags(const int est_num_tags) { tags_.reserve(est_num_tags); }
 void BamTags::patch(bam1_t* record) const
 {
+#ifdef CEU_CM_IS_DEBUG
+    std::unordered_set<std::string> existing_tags;
+#endif
     for (const auto& [tag_name, tag_type, tag_len, tag_data] : tags_) {
+#ifdef CEU_CM_IS_DEBUG
+        if (existing_tags.find(tag_name) != existing_tags.end()) {
+            BOOST_LOG_TRIVIAL(error) << "Duplicate tag " << tag_name << " found when patching BAM record.";
+            abort_mpi();
+        }
+        existing_tags.insert(tag_name);
+#endif
         auto* data = static_cast<std::uint8_t*>(std::calloc(tag_data->size(), sizeof(std::uint8_t)));
         // NOLINTNEXTLINE: cppcoreguidelines-pro-bounds-pointer-arithmetic
         std::memcpy(data, tag_data->data(), tag_data->size());

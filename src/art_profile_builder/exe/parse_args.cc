@@ -112,7 +112,7 @@ APBConfig parse_args(int argc, char** argv)
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv);
-    if(vm_.empty()) {
+    if (vm_.empty()) {
         exit_mpi();
         std::exit(EXIT_SUCCESS);
     }

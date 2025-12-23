@@ -16,10 +16,10 @@
 ## I/O Formats
 
 - Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
-- Add flags to disable/enable diverse BAM tags.
-- Add a "no qual" option to various SAM/BAM writers?
+- Add flags to disable/enable diverse BAM tags; Add a "no qual" option to various SAM/BAM writers: Done, tests and docs required.
 - Support circular genome or RNA?
 - Support simulating BGI/MGISEQ reads?
+- Add new Illumina models.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
 ## Simulate Allele-Specific Expression

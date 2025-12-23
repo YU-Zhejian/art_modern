@@ -25,9 +25,9 @@ constexpr char ARG_HELP[] = "help";
 void print_help(
     const boost::program_options::options_description& po_desc, const std::string& prefix, const std::string& suffix);
 
-    /**
-     * An empty variables_map is returned if help or version is requested.
-     */
+/**
+ * An empty variables_map is returned if help or version is requested.
+ */
 boost::program_options::variables_map generate_vm_while_handling_help_version(
     const boost::program_options::options_description& po_desc, int argc, char** argv, const std::string& prefix = "",
     const std::string& suffix = "");
