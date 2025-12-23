@@ -131,15 +131,14 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
     for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
         if (builtin_profile_name == BUILTIN_PROFILE_NAMES[i]) {
             if (ENCODED_BUILTIN_PROFILES[i][1][0] == '\0' && is_pe) {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name
-                                         << " is not a valid paired-end profile.";
+                BOOST_LOG_TRIVIAL(fatal) << "" << builtin_profile_name << " is not a valid paired-end profile.";
             }
             std::string const builtin_profile_1
                 = decompress(ENCODED_BUILTIN_PROFILES[i][0], BUILTIN_PROFILE_LENGTHS[i][0]);
             std::istringstream ss(builtin_profile_1);
             read_emp_dist_(ss, true);
             if (is_pe && ENCODED_BUILTIN_PROFILES[i][1][0] == '\0') {
-                BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Paired-end profile requires both first-read and second-read "
+                BOOST_LOG_TRIVIAL(fatal) << "Paired-end profile requires both first-read and second-read "
                                             "quality profile files.";
                 abort_mpi();
             }
@@ -157,7 +156,7 @@ Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, c
             return;
         }
     }
-    BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: " << builtin_profile_name << " is not a valid builtin profile.";
+    BOOST_LOG_TRIVIAL(fatal) << "" << builtin_profile_name << " is not a valid builtin profile.";
     abort_mpi();
 }
 
@@ -170,7 +169,7 @@ Empdist::Empdist(
     read_emp_dist_(emp_filename_1, true);
     if (is_pe && emp_filename_2.empty()) {
         BOOST_LOG_TRIVIAL(fatal)
-            << "Fatal Error: Paired-end profile requires both first-read and second-read quality profile files.";
+            << "Paired-end profile requires both first-read and second-read quality profile files.";
         abort_mpi();
     }
     if (!emp_filename_2.empty()) {
@@ -406,7 +405,7 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
     }
 
     if (n_lines_parsed == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Profile empty!";
+        BOOST_LOG_TRIVIAL(fatal) << "Profile empty!";
         abort_mpi();
     }
     if (!silence_) {
@@ -419,7 +418,7 @@ void Empdist::read_emp_dist_(const std::string& infile, const bool is_first)
 {
     std::ifstream distss(infile);
     if (!distss) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Cannot open the distribution file: '" << infile << "'";
+        BOOST_LOG_TRIVIAL(fatal) << "Cannot open the distribution file: '" << infile << "'";
         abort_mpi();
     }
     read_emp_dist_(distss, is_first);

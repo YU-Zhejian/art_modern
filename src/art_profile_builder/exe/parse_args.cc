@@ -119,20 +119,18 @@ APBConfig parse_args(int argc, char** argv)
     am_read_len_t read_len_2 = 0;
     // Mutal exclusion
     if ((vm_.count(ARG_READ_LEN) > 0) && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
-                                 << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
+        BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN << " cannot be specified together with --" << ARG_READ_LEN_1
+                                 << " or --" << ARG_READ_LEN_2 << ".";
         abort_mpi();
     }
     // At least one
     if (vm_.count(ARG_READ_LEN) == 0 && vm_.count(ARG_READ_LEN_1) == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " or --" << ARG_READ_LEN_1
-                                 << " must be specified.";
+        BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN << " or --" << ARG_READ_LEN_1 << " must be specified.";
         abort_mpi();
     }
     // For PE or MP, both read lengths must be specified
     if (is_pe && vm_.count(ARG_READ_LEN_1) > 0 && vm_.count(ARG_READ_LEN_2) == 0) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
-                                 << " must be specified for PE library construction mode.";
+        BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN_2 << " must be specified for PE library construction mode.";
         abort_mpi();
     }
     if (vm_.count(ARG_READ_LEN) != 0) {

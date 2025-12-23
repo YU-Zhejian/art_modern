@@ -349,7 +349,7 @@ namespace {
             return { builtin_profile_name, sep_flag, is_pe };
         }
         if (qual_file_1.empty()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
+            BOOST_LOG_TRIVIAL(fatal) << "Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
                                      << ") or first-read " << "quality profile (--" << ARG_QUAL_FILE_1
                                      << ") must be specified.";
             abort_mpi();
@@ -403,7 +403,7 @@ namespace {
     void validate_read_length(const am_read_len_t read_len)
     {
         if (read_len < 5) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Read length must be equal to or larger than 5.";
+            BOOST_LOG_TRIVIAL(fatal) << "Read length must be equal to or larger than 5.";
             abort_mpi();
         }
     }
@@ -543,8 +543,8 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
 
     // Mutal exclusion
     if (vm_.count(ARG_READ_LEN) > 0 && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
-                                 << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
+        BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN << " cannot be specified together with --" << ARG_READ_LEN_1
+                                 << " or --" << ARG_READ_LEN_2 << ".";
         abort_mpi();
     }
     am_read_len_t read_len_1 = 0;
@@ -560,7 +560,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         // Specify read_len_2 for PE or MP if read_len is not specified
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE && vm_.count(ARG_READ_LEN_2) == 0
             && vm_.count(ARG_READ_LEN) == 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
+            BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN_2
                                      << " must be specified for PE or MP library construction mode.";
             abort_mpi();
         }
@@ -585,8 +585,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Assess whether different read length is legal
     if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE
         && read_len_1 != read_len_2) {
-        BOOST_LOG_TRIVIAL(fatal)
-            << "Fatal Error: Different read lengths for read 1 and read 2 are only supported in template mode.";
+        BOOST_LOG_TRIVIAL(fatal) << "Different read lengths for read 1 and read 2 are only supported in template mode.";
         abort_mpi();
     }
 
