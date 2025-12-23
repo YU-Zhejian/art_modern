@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.3.2-section)=
-## 1.3.2 (Ongoing)
+## 1.3.2 (2025/12/22)
 
 - Bug fixes:
   - The bugs affecting [`1.3.0`](#v-1.3.0-section) and [`1.3.1`](#v-1.3.1-section) should be fixed.

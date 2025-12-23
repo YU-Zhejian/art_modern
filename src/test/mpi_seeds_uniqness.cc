@@ -233,6 +233,12 @@ int main(int argc, char** argv)
     init_mpi(&argc, &argv);
     init_logger();
     init_file_logger("mpi_seeds", true);
+    if (mpi_size() ==1)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "MPI size is 1, no need to test seed uniqueness with MPI.";
+        exit_mpi();
+        return  EXIT_SUCCESS;
+    }
 
     if (is_on_mpi_main_process_or_nompi()) {
         main_worker();

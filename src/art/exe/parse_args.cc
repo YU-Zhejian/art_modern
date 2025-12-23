@@ -523,9 +523,20 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     const am_qual_t qual_shift_1 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_1));
     const am_qual_t qual_shift_2 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_2));
 
-    auto qdist
-        = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
-            get_param<std::string>(vm_, ARG_QUAL_FILE_2), art_lib_const_mode, sep_flag);
+    std::string builtin_qual_file;
+    std::string qual_file_1;
+    std::string qual_file_2;
+    // Read quality profiles
+    if(vm_.count(ARG_BUILTIN_QUAL_FILE) > 0){
+        builtin_qual_file = get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE);
+        BOOST_LOG_TRIVIAL(info) << "Using built-in quality profile " << builtin_qual_file;
+    } else if (vm_.count(ARG_QUAL_FILE_1) > 0){
+        qual_file_1 = get_param<std::string>(vm_, ARG_QUAL_FILE_1);
+        qual_file_2 = get_param<std::string>(vm_, ARG_QUAL_FILE_2);
+        BOOST_LOG_TRIVIAL(info) << "Using quality profiles " << qual_file_1 << " and " << qual_file_2;
+    }
+
+    auto qdist = read_emp(builtin_qual_file, qual_file_1, qual_file_2, art_lib_const_mode, sep_flag);
 
     // Mutal exclusion
     if (vm_.count(ARG_READ_LEN) > 0 && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
