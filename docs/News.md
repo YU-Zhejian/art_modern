@@ -6,6 +6,7 @@
 - Bug fixes:
   - The bugs affecting [`1.3.0`](#v-1.3.0-section) and [`1.3.1`](#v-1.3.1-section) should be fixed.
   - Bug involved in parsing CMake option `-DREPRODUCIBLE_BUILDS` fixed.
+  - A severe bug that prevents `art_modern` from loading custom error profiles fixed.
 - Software Engineering:
   - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
 - Implementation:

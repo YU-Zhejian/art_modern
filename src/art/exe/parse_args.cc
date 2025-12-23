@@ -155,8 +155,8 @@ namespace {
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(DEFAULT_ERR_PROFILE),
             arg_builtin_qual_file_desc.c_str());
         art_opts.add_options()(
-            ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "path to the first-read quality profile");
-        art_opts.add_options()(ARG_QUAL_FILE_2, po::value<std::string>()->default_value(""),
+            ARG_QUAL_FILE_1, po::value<std::string>(), "path to the first-read quality profile");
+        art_opts.add_options()(ARG_QUAL_FILE_2, po::value<std::string>(),
             "path to the second-read quality profile. For PE/MP only.");
         art_opts.add_options()(
             ARG_INS_RATE_1, po::value<double>()->default_value(DEFAULT_INS_RATE_1), "the first-read insertion rate");
@@ -526,14 +526,18 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     std::string builtin_qual_file;
     std::string qual_file_1;
     std::string qual_file_2;
-    // Read quality profiles
-    if(vm_.count(ARG_BUILTIN_QUAL_FILE) > 0){
+
+    if (vm_.count(ARG_QUAL_FILE_1) > 0){
+        qual_file_1 = get_param<std::string>(vm_, ARG_QUAL_FILE_1);
+        BOOST_LOG_TRIVIAL(info) << "Using quality file for R1: " << qual_file_1;
+    }
+    if (vm_.count(ARG_QUAL_FILE_2) > 0){
+        qual_file_2 = get_param<std::string>(vm_, ARG_QUAL_FILE_2);
+        BOOST_LOG_TRIVIAL(info) << "Using quality file for R2: " << qual_file_2;
+    }
+    if(qual_file_1.empty() && qual_file_2.empty()){
         builtin_qual_file = get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE);
         BOOST_LOG_TRIVIAL(info) << "Using built-in quality profile " << builtin_qual_file;
-    } else if (vm_.count(ARG_QUAL_FILE_1) > 0){
-        qual_file_1 = get_param<std::string>(vm_, ARG_QUAL_FILE_1);
-        qual_file_2 = get_param<std::string>(vm_, ARG_QUAL_FILE_2);
-        BOOST_LOG_TRIVIAL(info) << "Using quality profiles " << qual_file_1 << " and " << qual_file_2;
     }
 
     auto qdist = read_emp(builtin_qual_file, qual_file_1, qual_file_2, art_lib_const_mode, sep_flag);
