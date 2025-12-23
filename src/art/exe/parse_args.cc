@@ -486,6 +486,11 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     }
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv, "", ss.str());
+    if(vm_.empty()) {
+        exit_mpi();
+        std::exit(EXIT_SUCCESS);
+    }
+
 
     // Parse simple options first
     const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));

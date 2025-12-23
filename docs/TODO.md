@@ -6,10 +6,6 @@
 - Perform large contig, many contig, and ultra deep tests.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 
-## Packing
-
-- Suppress all lintian issues.
-
 ## Performance
 
 - I/O:
