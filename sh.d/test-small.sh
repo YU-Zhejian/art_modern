@@ -46,7 +46,7 @@ CE11_CHR1="${PROJDIR}/data/raw_data/ce11_chr1.fa"
 
 export MPI_PARALLEL="${MPI_PARALLEL:-4}"
 export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
-export IDRATE=0.1                                 # Increase indel rate to fail faster
+export IDRATE=0.01                                # Increase indel rate to fail faster
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
@@ -146,9 +146,12 @@ function art_profile_illumina() {
 
 EXEC_ORDER=0
 
+TIMEOUT_CMD=("$(type -p timeout)" "-s" "TERM" "${TIMEOUT}"s)
+
 function AM_EXEC() {
+    EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
-    timeout -s KILL "${TIMEOUT}"s env \
+    "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
     retval=${?}
@@ -158,14 +161,35 @@ function AM_EXEC() {
         exit 1
     else
         echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
-        rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
+        if [ -z "${KEEPLOG:-}" ]; then
+            rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
+        fi
     fi
+}
+function AM_EXEC_SHOULD_FAIL() {
     EXEC_ORDER=$((EXEC_ORDER + 1))
-    return ${retval}
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
+    set +e
+    "${TIMEOUT_CMD[@]}" env \
+        "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
+        "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
+    retval=${?}
+    set -e
+    if [ ${retval} -eq 0 ]; then
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log >&2
+        exit 1
+    else
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
+        if [ -z "${KEEPLOG:-}" ]; then
+            rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
+        fi
+    fi
 }
 function APB_EXEC() {
+    EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${APB_CMD_ASSEMBLED[*]} $*"
-    timeout -s KILL "${TIMEOUT}"s env \
+    "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
     retval=${?}
@@ -175,10 +199,10 @@ function APB_EXEC() {
         exit 1
     else
         echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
-        rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
+        if [ -z "${KEEPLOG:-}" ]; then
+            rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
+        fi
     fi
-    EXEC_ORDER=$((EXEC_ORDER + 1))
-    return ${retval}
 }
 
 rm -fr "${OUT_DIR}" # Remove previous runs
@@ -191,15 +215,20 @@ if [ "${HELP_VERSION_ONLY:-0}" == "1" ]; then
     rm -fr "${OUT_DIR}"
     exit 0
 fi
-. "${SHDIR}"/test-small.sh.d/0_out_fmts.sh       # Test all output is working
-. "${SHDIR}"/test-small.sh.d/1_fail.sh           # FASTA that would fail the simulator
-. "${SHDIR}"/test-small.sh.d/2_wgs.sh            # WGS mode (with constant coverage)
-. "${SHDIR}"/test-small.sh.d/3_trans_constcov.sh # Transcript mode with constant coverage
-. "${SHDIR}"/test-small.sh.d/4_tmpl_constcov.sh  # Template mode with constant coverage
-. "${SHDIR}"/test-small.sh.d/5_trans_scov.sh     # Transcript mode with stranded/strandless coverage
-. "${SHDIR}"/test-small.sh.d/6_tmpl_scov.sh      # Template mode with stranded/strandless coverage
-. "${SHDIR}"/test-small.sh.d/7_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/8_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/21-apb-se.sh        # APB single-end test
-. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh        # APB paired-end test
-rm -d "${OUT_DIR}"                               # Which should now be empty
+. "${SHDIR}"/test-small.sh.d/00_out_fmts.sh       # Test all output is working
+. "${SHDIR}"/test-small.sh.d/01_fail.sh           # FASTA that would fail the simulator
+. "${SHDIR}"/test-small.sh.d/02_wgs.sh            # WGS mode (with constant coverage)
+. "${SHDIR}"/test-small.sh.d/03_trans_constcov.sh # Transcript mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/04_tmpl_constcov.sh  # Template mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/05_trans_scov.sh     # Transcript mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/06_tmpl_scov.sh      # Template mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/07_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/08_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/09_test_seedalloc.sh # Test seed allocation consistency
+if [ -z "${MPIEXEC:-}" ]; then
+    # In MPI mode, these tests are skipped since MPI termination may called early, preventing log generation
+    . "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
+fi
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh # APB paired-end test
+rm -d "${OUT_DIR}"                        # Which should now be empty

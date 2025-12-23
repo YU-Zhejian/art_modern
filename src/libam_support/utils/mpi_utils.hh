@@ -18,7 +18,8 @@
 
 #pragma once
 
-#include <cstddef>
+#include "libam_support/Dtypes.h" // NOLINT: Used in MPI functions
+
 #include <cstdlib>
 #include <string>
 
@@ -52,7 +53,7 @@ void init_mpi(int* argc, char*** argv);
  *
  * @return 1 if MPI is not available. Otherwise, return the size of MPI_COMM_WORLD.
  */
-std::size_t mpi_size();
+am_mpi_size_t mpi_size();
 
 /**
  * Call `MPI_Finalize` (if MPI is not finalized). Do nothing if MPI is not available.
@@ -93,7 +94,7 @@ std::string mpi_rank_s();
  * MPI_UNAVAILABLE_RANK if MPI had stopped.
  * "nompi" if MPI is not available.
  */
-std::size_t mpi_rank();
+am_mpi_rank_t mpi_rank();
 
 /**
  * Get the hostname of the current MPI process.

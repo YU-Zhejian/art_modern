@@ -17,6 +17,7 @@
 #include "art_modern_config.h"
 
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
@@ -67,11 +68,11 @@ void PwaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
 }
 
 PwaReadOutput::~PwaReadOutput() { PwaReadOutput::close(); }
-PwaReadOutput::PwaReadOutput(
-    const std::string& filename, const std::vector<std::string>& args, const std::size_t n_threads)
+PwaReadOutput::PwaReadOutput(const std::string& filename, const std::vector<std::string>& args,
+    const std::size_t n_threads, const std::size_t queue_size)
     : lfio_("PWA", filename, preamble(args))
 {
-    lfio_.init_queue(n_threads, 0);
+    lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
 }
 
@@ -93,13 +94,17 @@ void PwaReadOutputFactory::patch_options(boost::program_options::options_descrip
     boost::program_options::options_description pwa_desc("PWA Output");
     pwa_desc.add_options()("o-pwa", boost::program_options::value<std::string>(),
         "Destination of output pwa file. Unset to disable the writer.");
+    pwa_desc.add_options()("o-pwa-queue_size",
+        boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
+        "Size of the lock-free queue used in PWA output.");
     desc.add(pwa_desc);
 }
 std::shared_ptr<BaseReadOutput> PwaReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-pwa") != 0U) {
         return std::make_shared<PwaReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank_s()), params.args, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-pwa"].as<std::string>(), mpi_rank_s()), params.args, params.n_threads,
+            params.vm["o-pwa-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

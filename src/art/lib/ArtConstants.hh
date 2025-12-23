@@ -67,4 +67,6 @@ constexpr char ART_PROGRAM_NAME[] = "art_modern";
  */
 constexpr double MAX_TRIAL_RATIO_BEFORE_FAIL = 0.2;
 
+constexpr char DEFAULT_ERR_PROFILE[] = "HiSeq2500_150bp";
+
 } // namespace labw::art_modern

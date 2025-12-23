@@ -45,6 +45,6 @@ void pcg32_c::seed(const uint64_t initstate, const uint64_t initseq)
     (void)(*this)();
 }
 
-void pcg32_c::seed(const uint64_t seed_value) { seed(seed_value, reinterpret_cast<intptr_t>(this)); }
+void pcg32_c::seed(const uint64_t seed_value) { seed(seed_value, 0xda3e39cb94b95bdbULL); }
 
 } // namespace labw::art_modern

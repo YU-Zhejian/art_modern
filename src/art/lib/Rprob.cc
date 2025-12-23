@@ -20,7 +20,6 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
-#include "libam_support/utils/rand_utils.hh"
 
 #if defined(USE_ONEMKL_RANDOM)
 #include <mkl.h>
@@ -28,8 +27,14 @@
 
 #include <htslib/hts.h>
 
+#ifdef CEU_CM_IS_DEBUG
+#include "libam_support/utils/mpi_utils.hh"
+#include <boost/log/trivial.hpp>
+#endif
+
 #include <algorithm> // NOLINT for std::generate_n
 #include <cstddef>
+#include <cstring>
 #if defined(USE_STL_RNDOM)
 #include <random>
 #endif
@@ -42,14 +47,17 @@ namespace labw::art_modern {
 void Rprob::public_init_()
 {
     read_len_max_ = am_max(read_len_1_, read_len_2_);
-    tmp_probs_.resize(read_len_max_);
+    tmp_probs.resize(read_len_max_);
 }
 
+void Rprob::public_destroy_() { }
+
 #if defined(USE_STL_LIKE_RANDOM)
-Rprob::~Rprob() = default;
+Rprob::~Rprob() { public_destroy_(); };
+
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
-    am_read_len_t read_len_2)
-    : gen_(rand_seed())
+    const am_read_len_t read_len_2, const am_rand_seed_t seed)
+    : gen_(seed)
 #if !defined(USE_BOOST_RANDOM)
     , dis_(0.0, 1.0)
 #endif
@@ -68,27 +76,69 @@ Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, 
     public_init_();
 }
 #elif defined(USE_ONEMKL_RANDOM)
-Rprob::~Rprob() { vslDeleteStream(&stream_); }
+Rprob::~Rprob()
+{
+    vslDeleteStream(&stream_);
+    public_destroy_();
+}
 
 Rprob::Rprob(const double pe_frag_dist_mean, const double pe_frag_dist_std_dev, const am_read_len_t read_len_1,
-    const am_read_len_t read_len_2)
-    : stream_() // Initialized in the function body
-    , pe_frag_dist_mean_(pe_frag_dist_mean)
+    const am_read_len_t read_len_2, const am_rand_seed_t seed)
+    : pe_frag_dist_mean_(pe_frag_dist_mean)
     , pe_frag_dist_std_dev_(pe_frag_dist_std_dev)
     , read_len_1_(read_len_1)
     , read_len_2_(read_len_2)
 {
-    vslNewStream(&stream_, VSL_BRNG_SFMT19937, rand_seed());
+    vslNewStream(&stream_, VSL_BRNG_SFMT19937, seed);
     public_init_();
+    cached_insertion_lengths_.resize(CACHE_SIZE_);
+    cached_rand_base_indices_.resize(CACHE_SIZE_);
+    cached_rand_quality_less_than_10_.resize(CACHE_SIZE_);
+    cached_tmp_probs_.resize(CACHE_SIZE_);
+    cached_rand_pos_on_read_1_.resize(CACHE_SIZE_);
+    cached_rand_pos_on_read_2_.resize(CACHE_SIZE_);
+    cached_rand_pos_on_read_1_not_head_and_tail_.resize(CACHE_SIZE_);
+    cached_rand_pos_on_read_2_not_head_and_tail_.resize(CACHE_SIZE_);
 }
 #endif
 
-void Rprob::r_probs(const std::size_t n)
+void Rprob::r_probs(const std::size_t n) { r_probs_cached(n, tmp_probs); }
+
+void Rprob::r_probs_cached(const std::size_t n, std::vector<double>& external_tmp_probs)
 {
 #if defined(USE_STL_LIKE_RANDOM)
-    std::generate_n(tmp_probs_.begin(), n, [this]() { return dis_(gen_); });
+    std::generate_n(external_tmp_probs.begin(), n, [this]() { return dis_(gen_); });
 #elif defined(USE_ONEMKL_RANDOM)
-    vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, static_cast<MKL_INT>(n), tmp_probs_.data(), 0.0, 1.0);
+    std::size_t n_elements_copied = 0;
+    std::size_t n_elements_to_copy = 0;
+    while (n_elements_copied < n) {
+        if (cached_tmp_probs_index_ == 0) {
+            vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_tmp_probs_.data(), 0.0, 1.0);
+            cached_tmp_probs_index_ = CACHE_SIZE_;
+        }
+        n_elements_to_copy = am_min(n - n_elements_copied, cached_tmp_probs_index_);
+        std::memcpy(external_tmp_probs.data() + n_elements_copied,
+            cached_tmp_probs_.data() + (cached_tmp_probs_index_ - n_elements_to_copy),
+            n_elements_to_copy * sizeof(double));
+#if 0 // Enable for debugging
+        BOOST_LOG_TRIVIAL(info) << "CP: "
+        << n_elements_copied << "->" << n_elements_copied + n_elements_to_copy
+        << " from cached_tmp_probs_ index "
+        <<  (cached_tmp_probs_index_ - n_elements_to_copy) << "->" << (cached_tmp_probs_index_);
+#endif
+        cached_tmp_probs_index_ -= n_elements_to_copy;
+        n_elements_copied += n_elements_to_copy;
+    }
+
+#ifdef CEU_CM_IS_DEBUG
+    for (std::size_t i = 0; i < n; i++) {
+        if (external_tmp_probs[i] < 0.0 || external_tmp_probs[i] >= 1.0) {
+            BOOST_LOG_TRIVIAL(error) << "Rprob::r_probs_cached: external_tmp_probs[" << i
+                                     << "] out of range: " << external_tmp_probs[i];
+            abort_mpi();
+        }
+    }
+#endif
 #endif
 }
 
@@ -165,7 +215,8 @@ hts_pos_t Rprob::rand_pos_on_read_not_head_and_tail(const bool is_read1)
             cached_rand_pos_on_read_not_head_and_tail_.data(), 1, read_length_ - 1);
         cached_rand_pos_on_read_not_head_and_tail_index_ = CACHE_SIZE_;
     }
-    return cached_rand_pos_on_read_not_head_and_tail_[--cached_rand_pos_on_read_not_head_and_tail_index_];
+    return static_cast<hts_pos_t>(
+        cached_rand_pos_on_read_not_head_and_tail_[--cached_rand_pos_on_read_not_head_and_tail_index_]);
 #endif
 }
 int Rprob::randint(const int min, const int max)

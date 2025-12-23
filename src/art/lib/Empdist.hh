@@ -24,7 +24,7 @@
 
 #include "libam_support/ds/GslDiscreteDistribution.hh"
 
-#include <cstddef>
+#include <cstdlib>
 #include <functional>
 #include <istream>
 #include <map>
@@ -40,23 +40,9 @@ public:
     DEFAULT_COPY(SlimEmpDistGslDiscrete)
     DEFAULT_MOVE(SlimEmpDistGslDiscrete)
     DEFAULT_DESTRUCTOR(SlimEmpDistGslDiscrete)
-    explicit SlimEmpDistGslDiscrete(const dist_map_type& dist)
-    {
-        std::vector<double> count;
-        for (const auto& [this_count, this_qual] : dist) {
-            qual_.emplace_back(this_qual);
-            count.emplace_back(static_cast<double>(this_count));
-        }
-        std::vector<double> init_list;
-        double prev = 0;
-        for (const auto i : count) {
-            init_list.emplace_back(i - prev);
-            prev = i;
-        }
-        rd_ = GslDiscreteDistribution(init_list);
-    }
+    explicit SlimEmpDistGslDiscrete(const dist_map_type& dist);
 
-    [[nodiscard]] am_qual_t gen_qual(const double u) const { return qual_[rd_(u)]; }
+    [[nodiscard]] am_qual_t gen_qual(double u) const;
 
 private:
     std::vector<am_qual_t> qual_;
@@ -67,31 +53,32 @@ class Empdist {
 public:
     using dist_map_type = std::map<am_qual_count_t, am_qual_t, std::less<>>;
     using dist_type = std::vector<dist_map_type>;
+    using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;
 
 private:
-    dist_type qual_dist_first;
-    dist_type qual_dist_second;
+    dist_type qual_dist_first_;
+    dist_type qual_dist_second_;
 
-    dist_type a_qual_dist_first;
-    dist_type t_qual_dist_first;
-    dist_type g_qual_dist_first;
-    dist_type c_qual_dist_first;
+    dist_type a_qual_dist_first_;
+    dist_type t_qual_dist_first_;
+    dist_type g_qual_dist_first_;
+    dist_type c_qual_dist_first_;
 
-    dist_type a_qual_dist_second;
-    dist_type t_qual_dist_second;
-    dist_type g_qual_dist_second;
-    dist_type c_qual_dist_second;
-    using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;
-    dist_idx_type qual_dist_first_idx;
-    dist_idx_type qual_dist_second_idx;
-    dist_idx_type a_qual_dist_first_idx;
-    dist_idx_type t_qual_dist_first_idx;
-    dist_idx_type g_qual_dist_first_idx;
-    dist_idx_type c_qual_dist_first_idx;
-    dist_idx_type a_qual_dist_second_idx;
-    dist_idx_type t_qual_dist_second_idx;
-    dist_idx_type g_qual_dist_second_idx;
-    dist_idx_type c_qual_dist_second_idx;
+    dist_type a_qual_dist_second_;
+    dist_type t_qual_dist_second_;
+    dist_type g_qual_dist_second_;
+    dist_type c_qual_dist_second_;
+
+    dist_idx_type qual_dist_first_idx_;
+    dist_idx_type qual_dist_second_idx_;
+    dist_idx_type a_qual_dist_first_idx_;
+    dist_idx_type t_qual_dist_first_idx_;
+    dist_idx_type g_qual_dist_first_idx_;
+    dist_idx_type c_qual_dist_first_idx_;
+    dist_idx_type a_qual_dist_second_idx_;
+    dist_idx_type t_qual_dist_second_idx_;
+    dist_idx_type g_qual_dist_second_idx_;
+    dist_idx_type c_qual_dist_second_idx_;
 
 public:
     Empdist(const std::string& emp_filename_1, const std::string& emp_filename_2, bool sep_qual, bool is_pe);

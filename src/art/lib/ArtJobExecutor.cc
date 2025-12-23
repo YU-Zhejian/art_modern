@@ -87,7 +87,7 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
             current_n_reads_generated_ += num_reads_to_reduce_;
             read_id++;
         } else {
-            current_n_fails_++;
+            ++current_n_fails_;
         }
         if (current_n_fails_ >= current_max_tolerence_) {
             BOOST_LOG_TRIVIAL(debug) << "Failed to generate reads for " << art_contig.seq_name << " sized "
@@ -148,14 +148,15 @@ bool ArtJobExecutor::generate_se_(
     return true;
 }
 
-ArtJobExecutor::ArtJobExecutor(
-    SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher)
+ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
+    const std::shared_ptr<OutputDispatcher>& output_dispatcher, const am_rand_seed_t seed)
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_str_(mpi_rank_s())
     , output_dispatcher_(output_dispatcher)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(output_dispatcher->require_alignment())
+    , seed_(seed)
     , token_ring_(output_dispatcher->get_producer_tokens())
 {
 }
@@ -176,7 +177,7 @@ void ArtJobExecutor::operator()()
     hts_pos_t accumulated_contig_len = 0;
 
     Rprob rprob_(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len_1,
-        art_params_.read_len_2);
+        art_params_.read_len_2, seed_);
 
     BOOST_LOG_TRIVIAL(info) << "Starting simulation for job " << job_.job_id << " with " << num_contigs << " contigs";
     for (decltype(job_.fasta_fetch->num_seqs()) seq_id = 0; seq_id < num_contigs; ++seq_id) {
@@ -251,6 +252,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     , output_dispatcher_(std::move(other.output_dispatcher_))
     , num_reads_to_reduce_(other.num_reads_to_reduce_)
     , require_alignment_(other.require_alignment_)
+    , seed_(other.seed_)
     , token_ring_(std::move(other.token_ring_))
 {
 }

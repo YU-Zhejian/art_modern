@@ -27,6 +27,7 @@
 
 #include <htslib/sam.h>
 
+#include <cstdlib>
 #include <memory>
 #include <string>
 
@@ -38,7 +39,7 @@ public:
     DELETE_COPY(BamReadOutput)
 
     BamReadOutput(const std::string& filename, const std::shared_ptr<BaseFastaFetch>& fasta_fetch,
-        const BamOptions& sam_options, std::size_t n_threads);
+        const BamOptions& sam_options, std::size_t n_threads, std::size_t queue_size);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     void close() override;

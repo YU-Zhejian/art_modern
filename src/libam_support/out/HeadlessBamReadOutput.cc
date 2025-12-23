@@ -22,6 +22,7 @@
 #include "libam_support/bam/BamTags.hh"
 #include "libam_support/bam/BamUtils.hh"
 #include "libam_support/ds/PairwiseAlignment.hh"
+#include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/lockfree/ProducerToken.hh"
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
@@ -43,8 +44,8 @@
 namespace po = boost::program_options;
 
 namespace labw::art_modern {
-HeadlessBamReadOutput::HeadlessBamReadOutput(
-    const std::string& filename, const BamOptions& sam_options, const std::size_t n_threads)
+HeadlessBamReadOutput::HeadlessBamReadOutput(const std::string& filename, const BamOptions& sam_options,
+    const std::size_t n_threads, const std::size_t queue_size)
     : sam_file_(BamUtils::open_file(filename, sam_options))
     , sam_header_(BamUtils::init_header(sam_options))
     , sam_options_(sam_options)
@@ -52,7 +53,7 @@ HeadlessBamReadOutput::HeadlessBamReadOutput(
 {
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");
-    lfio_.init_queue(n_threads, 0);
+    lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
 }
 void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment& pwa)
@@ -206,6 +207,9 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
     bam_desc.add_options()("o-hl_sam-compress_level", po::value<char>()->default_value('4'),
         "Compression level in BAM. Support `u` for uncompressed raw BAM output and [0-9] for underlying zlib "
         "compression.");
+    bam_desc.add_options()("o-hl_sam-queue_size",
+        boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
+        "Size of the lock-free queue used in headless SAM/BAM output.");
     desc.add(bam_desc);
 }
 
@@ -228,7 +232,8 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
             abort_mpi();
         }
         return std::make_shared<HeadlessBamReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank_s()), so, params.n_threads);
+            attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank_s()), so, params.n_threads,
+            params.vm["o-hl_sam-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

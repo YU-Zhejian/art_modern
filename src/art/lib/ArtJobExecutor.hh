@@ -32,8 +32,8 @@ namespace labw::art_modern {
 
 class ArtJobExecutor final : public JobExecutor {
 public:
-    ArtJobExecutor(
-        SimulationJob&& job, const ArtParams& art_params, const std::shared_ptr<OutputDispatcher>& output_dispatcher);
+    ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
+        const std::shared_ptr<OutputDispatcher>& output_dispatcher, am_rand_seed_t seed);
 
     // Move constructor
     ArtJobExecutor(ArtJobExecutor&& other) noexcept;
@@ -67,6 +67,7 @@ private:
     std::atomic<am_readnum_t> current_n_fails_ = 0;
     std::atomic<am_readnum_t> current_max_tolerence_ = 0;
     std::atomic<am_readnum_t> current_n_reads_generated_ = 0;
+    am_rand_seed_t seed_;
     OutputDispatcher::TokenRing token_ring_;
 };
 

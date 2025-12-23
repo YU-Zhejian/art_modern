@@ -8,12 +8,8 @@
 #include <cstdlib>
 #include <exception>
 
-// FIXME: Following are the original GNU Autoconf files
 // <cassert> and <cstring> are *not* freestanding headers in C++98.
-// extern void assert (int);
-// namespace std {
-//     extern int strcmp (const char *, const char *);
-// }
+// They are included here to reject compilers that lack them.
 #include <cassert>
 #include <cstring>
 

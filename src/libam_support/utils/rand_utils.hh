@@ -13,12 +13,12 @@
  **/
 #pragma once
 
-#include <cstdint>
+#include "libam_support/Dtypes.h"
 
 namespace labw::art_modern {
 /**
  * Generate a random seed using current time, thread id, MPI rank and random device.
  * @return The generated random seed.
  */
-std::uint64_t rand_seed();
+am_rand_seed_t rand_seed();
 } // namespace labw::art_modern

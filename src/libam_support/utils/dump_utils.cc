@@ -22,6 +22,8 @@
 
 #include <boost/filesystem/operations.hpp>
 
+#include <boost/log/trivial.hpp>
+
 #ifdef WITH_BOOST_STACKTRACE
 #include <boost/stacktrace/safe_dump_to.hpp>
 #include <boost/stacktrace/stacktrace.hpp>
@@ -53,7 +55,30 @@ namespace {
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = 0;
         sigaction(signum, &sa, nullptr);
+        // signal to str
+        std::string signal_str;
+        switch (signum) {
+        case SIGSEGV:
+            signal_str = "SIGSEGV";
+            break;
+        case SIGABRT:
+            signal_str = "SIGABRT";
+            break;
+        case SIGTERM:
+            signal_str = "SIGTERM";
+            break;
+        case SIGINT:
+            signal_str = "SIGINT";
+            break;
+        default:
+            signal_str = "UNKNOWN";
+            break;
+        }
+        BOOST_LOG_TRIVIAL(info) << "Signal " << signal_str << " (" << signum
+                                << ") received. Generating stacktrace dump to " << dump_filename;
+        BOOST_LOG_TRIVIAL(info) << "Stacktrace:\n" << boost::stacktrace::stacktrace();
         boost::stacktrace::safe_dump_to(dump_filename.c_str());
+        sigaction(SIGABRT, &sa, nullptr); // reset SIGABRT to default
         pthread_kill(pthread_self(), SIGABRT);
 #else
         std::signal(signum, SIG_DFL);
@@ -77,10 +102,14 @@ void handle_dumps()
         sa.sa_flags = 0;
         sigaction(SIGSEGV, &sa, nullptr);
         sigaction(SIGABRT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
+        sigaction(SIGINT, &sa, nullptr);
     }
 #else
     std::signal(SIGSEGV, &my_signal_handler);
     std::signal(SIGABRT, &my_signal_handler);
+    std::signal(SIGTERM, &my_signal_handler);
+    std::signal(SIGINT, &my_signal_handler);
 #endif
     std::set_terminate(&my_signal_handler);
 

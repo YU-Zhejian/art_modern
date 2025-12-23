@@ -62,8 +62,10 @@ public:
      * Initialize the queue with the given number of producers.
      * @param num_explicit_producers Number of explicit producers (those with tokens).
      * @param num_implicit_producers Number of implicit producers (those without).
+     * @param min_capacity Minimum capacity of the queue.
      */
-    void init_queue(std::size_t num_explicit_producers, std::size_t num_implicit_producers);
+    void init_queue(
+        std::size_t num_explicit_producers, std::size_t num_implicit_producers, std::size_t min_capacity = QUEUE_SIZE);
 
     /**
      * Pushing a value into the queue.
@@ -165,51 +167,34 @@ LockFreeIO<T>::LockFreeIO(std::string name)
 }
 
 template <typename T>
-void LockFreeIO<T>::init_queue(const std::size_t num_explicit_producers, const std::size_t num_implicit_producers)
+void LockFreeIO<T>::init_queue(
+    const std::size_t num_explicit_producers, const std::size_t num_implicit_producers, const std::size_t min_capacity)
 {
-    queue_ = moodycamel::ConcurrentQueue<T>(QUEUE_SIZE, num_explicit_producers, num_implicit_producers);
+    queue_ = moodycamel::ConcurrentQueue<T>(min_capacity, num_explicit_producers, num_implicit_producers);
 }
 
 template <typename T> void LockFreeIO<T>::push(T&& value)
 {
-    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success && num_trials < 10000 /* TODO: Eliminate this magic number */) {
+    while (!success) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(std::move(value));
-        num_trials += 1;
-    }
-    if (!success) {
-        // BOOST_LOG_TRIVIAL(warning)
-        //     << name_ << " LockFreeIO: Using syncronized push after " << num_trials
-        //     << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled
-        //     jobs.";
-        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }
 
 template <typename T> inline void LockFreeIO<T>::push(T&& value, const ProducerToken& token)
 {
-    std::size_t num_trials = 0;
     bool success = queue_.try_enqueue(token.token, std::move(value));
     if (!success) {
         ++num_wait_in_;
     }
-    while (!success && num_trials < 10000 /* TODO: Eliminate this magic number */) {
+    while (!success) {
         std::this_thread::sleep_for(SLEEP_TIME);
         success = queue_.try_enqueue(token.token, std::move(value));
-        num_trials += 1;
-    }
-    if (!success) {
-        // BOOST_LOG_TRIVIAL(warning)
-        //     << name_ << " LockFreeIO: Using syncronized push after " << num_trials
-        //     << " times of failed unsyncronized push. Consider having a faster SDD or reduce number of paralleled
-        //     jobs.";
-        queue_.enqueue(std::move(value));
     }
     ++num_reads_in_;
 }
