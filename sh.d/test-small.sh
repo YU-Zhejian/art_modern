@@ -215,17 +215,20 @@ if [ "${HELP_VERSION_ONLY:-0}" == "1" ]; then
     rm -fr "${OUT_DIR}"
     exit 0
 fi
-. "${SHDIR}"/test-small.sh.d/00_out_fmts.sh           # Test all output is working
-. "${SHDIR}"/test-small.sh.d/01_fail.sh               # FASTA that would fail the simulator
-. "${SHDIR}"/test-small.sh.d/02_wgs.sh                # WGS mode (with constant coverage)
-. "${SHDIR}"/test-small.sh.d/03_trans_constcov.sh     # Transcript mode with constant coverage
-. "${SHDIR}"/test-small.sh.d/04_tmpl_constcov.sh      # Template mode with constant coverage
-. "${SHDIR}"/test-small.sh.d/05_trans_scov.sh         # Transcript mode with stranded/strandless coverage
-. "${SHDIR}"/test-small.sh.d/06_tmpl_scov.sh          # Template mode with stranded/strandless coverage
-. "${SHDIR}"/test-small.sh.d/07_tmpl_pbsim3.sh        # Transcript mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/08_trans_pbsim3.sh       # Template mode with pbsim3-formatted coverage
-. "${SHDIR}"/test-small.sh.d/09_test_seedalloc.sh     # Test seed allocation consistency
-. "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
-. "${SHDIR}"/test-small.sh.d/21-apb-se.sh             # APB single-end test
-. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh             # APB paired-end test
-rm -d "${OUT_DIR}"                                    # Which should now be empty
+. "${SHDIR}"/test-small.sh.d/00_out_fmts.sh       # Test all output is working
+. "${SHDIR}"/test-small.sh.d/01_fail.sh           # FASTA that would fail the simulator
+. "${SHDIR}"/test-small.sh.d/02_wgs.sh            # WGS mode (with constant coverage)
+. "${SHDIR}"/test-small.sh.d/03_trans_constcov.sh # Transcript mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/04_tmpl_constcov.sh  # Template mode with constant coverage
+. "${SHDIR}"/test-small.sh.d/05_trans_scov.sh     # Transcript mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/06_tmpl_scov.sh      # Template mode with stranded/strandless coverage
+. "${SHDIR}"/test-small.sh.d/07_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/08_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
+. "${SHDIR}"/test-small.sh.d/09_test_seedalloc.sh # Test seed allocation consistency
+if [ -z "${MPIEXEC:-}" ]; then
+    # In MPI mode, these tests are skipped since MPI termination may called early, preventing log generation
+    . "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
+fi
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh # APB paired-end test
+rm -d "${OUT_DIR}"                        # Which should now be empty
