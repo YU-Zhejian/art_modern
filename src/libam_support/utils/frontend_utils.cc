@@ -70,7 +70,7 @@ po::variables_map generate_vm_while_handling_help_version(const po::options_desc
             print_version();
         }
         exit_mpi();
-        std::exit(EXIT_SUCCESS);
+        std::exit(EXIT_SUCCESS); // FIXME: Change to an exception to prevent resource leak?
     }
     if (vm_.count(ARG_HELP) != 0U) {
         if (is_on_mpi_main_process_or_nompi()) {
