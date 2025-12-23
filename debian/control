@@ -15,7 +15,7 @@ Build-Depends: debhelper-compat (= 13),
                libconcurrentqueue-dev,
                lowdown,
                libopenmpi-dev,
-Standards-Version: 4.7.0
+Standards-Version: 4.7.2
 Homepage: https://github.com/YU-Zhejian/art_modern
 
 Package: art-modern
