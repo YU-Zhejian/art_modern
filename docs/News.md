@@ -1,5 +1,10 @@
 # News \& Release Notes
 
+(v-1.3.3-section)=
+## 1.3.3 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 (v-1.3.2-section)=
 ## 1.3.2 (2025/12/23)
 
