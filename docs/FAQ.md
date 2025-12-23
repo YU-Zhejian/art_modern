@@ -29,13 +29,6 @@ Currently, there's no support for such features in the simulator. However, you m
 
 See the documentation of [`art_profile_builder`](#art_profile_builder-usage-section) to build new profiles from real sequencing data.
 
-### Can I use seed to generate deterministic results?
-
-No. Reasons:
-
-- If a seed is passed to different threads, all thread will generate the same results, making the result looked weird (Batches of reads with identical start, end, and error profiles stacked together).
-- Different machines may build the program with different random number generators, making the results non-reproducible even if a seed is provided.
-
 ## Software Engineering
 
 ### What kinds of CPUs are supported by the simulator?

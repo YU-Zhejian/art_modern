@@ -40,23 +40,9 @@ public:
     DEFAULT_COPY(SlimEmpDistGslDiscrete)
     DEFAULT_MOVE(SlimEmpDistGslDiscrete)
     DEFAULT_DESTRUCTOR(SlimEmpDistGslDiscrete)
-    explicit SlimEmpDistGslDiscrete(const dist_map_type& dist)
-    {
-        std::vector<double> count;
-        for (const auto& [this_count, this_qual] : dist) {
-            qual_.emplace_back(this_qual);
-            count.emplace_back(static_cast<double>(this_count));
-        }
-        std::vector<double> init_list;
-        double prev = 0;
-        for (const auto i : count) {
-            init_list.emplace_back(i - prev);
-            prev = i;
-        }
-        rd_ = GslDiscreteDistribution(init_list);
-    }
+    explicit SlimEmpDistGslDiscrete(const dist_map_type& dist);
 
-    [[nodiscard]] am_qual_t gen_qual(const double u) const { return qual_[rd_(u)]; }
+    [[nodiscard]] am_qual_t gen_qual(double u) const;
 
 private:
     std::vector<am_qual_t> qual_;

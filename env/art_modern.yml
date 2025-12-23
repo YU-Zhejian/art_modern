@@ -24,6 +24,7 @@ dependencies:
   - cmake_format
   - black
   - go-shfmt
+  - conda-forge::clang-format>=21
 
   # Downloader
   - curl

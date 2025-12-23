@@ -67,5 +67,11 @@ public:
      * Compression level `[u0-9]`.
      */
     char compress_level = ALLOWED_COMPRESSION_LEVELS[4]; // Default '4'
+
+    /** For headless BAM only */
+    bool with_tag_OA = true;
+    bool with_tag_MD = true;
+    bool with_tag_NM = true;
+    bool no_qual = false;
 };
 } // namespace labw::art_modern

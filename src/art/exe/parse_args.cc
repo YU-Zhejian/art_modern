@@ -13,6 +13,8 @@
  * <https://www.gnu.org/licenses/>.
  **/
 
+#include "art_modern_config.h" // NOLINT
+
 #include "art/exe/parse_args.hh"
 
 #include "art/builtin_profiles.h"
@@ -21,7 +23,6 @@
 #include "art/lib/ArtParams.hh"
 #include "art/lib/Empdist.hh"
 
-#include "art_modern_config.h"
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
@@ -32,6 +33,7 @@
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/param_utils.hh"
+#include "libam_support/utils/rand_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
 #include <boost/filesystem/operations.hpp>
@@ -50,6 +52,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <fstream>
+#include <ios>
 #include <iostream>
 #include <limits>
 #include <sstream>
@@ -72,6 +75,7 @@ namespace {
     constexpr char ARG_INPUT_FILE_TYPE[] = "i-type";
     constexpr char ARG_FCOV[] = "i-fcov";
     constexpr char ARG_BATCH_SIZE[] = "i-batch_size";
+    constexpr char ARG_SEED[] = "i-seed";
 
     constexpr char ARG_ID[] = "id";
     constexpr char ARG_PARALLEL[] = "parallel";
@@ -113,6 +117,8 @@ namespace {
             (std::string() + "library construction mode, should be " + ART_LIB_CONST_MODE_SE + ", "
                 + ART_LIB_CONST_MODE_PE + ", " + ART_LIB_CONST_MODE_MP + ".")
                 .c_str());
+        required_opts.add_options()(ARG_SEED, po::value<am_rand_seed_t>(),
+            "Random seed for simulation. If not specified, will be generated at random.");
         required_opts.add_options()(ARG_INPUT_FILE_PARSER,
             po::value<std::string>()->default_value(INPUT_FILE_PARSER_AUTO),
             (std::string() + "input file parser, should be " + INPUT_FILE_PARSER_AUTO + ", " + INPUT_FILE_PARSER_MEMORY
@@ -148,10 +154,9 @@ namespace {
             + ARG_QUAL_FILE_1 + " and " + ARG_QUAL_FILE_2 + ".";
         art_opts.add_options()(ARG_BUILTIN_QUAL_FILE, po::value<std::string>()->default_value(DEFAULT_ERR_PROFILE),
             arg_builtin_qual_file_desc.c_str());
+        art_opts.add_options()(ARG_QUAL_FILE_1, po::value<std::string>(), "path to the first-read quality profile");
         art_opts.add_options()(
-            ARG_QUAL_FILE_1, po::value<std::string>()->default_value(""), "path to the first-read quality profile");
-        art_opts.add_options()(ARG_QUAL_FILE_2, po::value<std::string>()->default_value(""),
-            "path to the second-read quality profile. For PE/MP only.");
+            ARG_QUAL_FILE_2, po::value<std::string>(), "path to the second-read quality profile. For PE/MP only.");
         art_opts.add_options()(
             ARG_INS_RATE_1, po::value<double>()->default_value(DEFAULT_INS_RATE_1), "the first-read insertion rate");
         art_opts.add_options()(
@@ -344,7 +349,7 @@ namespace {
             return { builtin_profile_name, sep_flag, is_pe };
         }
         if (qual_file_1.empty()) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
+            BOOST_LOG_TRIVIAL(fatal) << "Either built-in quality profile (--" << ARG_BUILTIN_QUAL_FILE
                                      << ") or first-read " << "quality profile (--" << ARG_QUAL_FILE_1
                                      << ") must be specified.";
             abort_mpi();
@@ -398,7 +403,7 @@ namespace {
     void validate_read_length(const am_read_len_t read_len)
     {
         if (read_len < 5) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: Read length must be equal to or larger than 5.";
+            BOOST_LOG_TRIVIAL(fatal) << "Read length must be equal to or larger than 5.";
             abort_mpi();
         }
     }
@@ -481,6 +486,10 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     }
 
     const auto& vm_ = generate_vm_while_handling_help_version(po_desc_, argc, argv, "", ss.str());
+    if (vm_.empty()) {
+        exit_mpi();
+        std::exit(EXIT_SUCCESS);
+    }
 
     // Parse simple options first
     const auto& art_simulation_mode = get_simulation_mode(get_param<std::string>(vm_, ARG_SIMULATION_MODE));
@@ -517,14 +526,29 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     const am_qual_t qual_shift_1 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_1));
     const am_qual_t qual_shift_2 = static_cast<am_qual_t>(get_param<int>(vm_, ARG_Q_SHIFT_2));
 
-    auto qdist
-        = read_emp(get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE), get_param<std::string>(vm_, ARG_QUAL_FILE_1),
-            get_param<std::string>(vm_, ARG_QUAL_FILE_2), art_lib_const_mode, sep_flag);
+    std::string builtin_qual_file;
+    std::string qual_file_1;
+    std::string qual_file_2;
+
+    if (vm_.count(ARG_QUAL_FILE_1) > 0) {
+        qual_file_1 = get_param<std::string>(vm_, ARG_QUAL_FILE_1);
+        BOOST_LOG_TRIVIAL(info) << "Using quality file for R1: " << qual_file_1;
+    }
+    if (vm_.count(ARG_QUAL_FILE_2) > 0) {
+        qual_file_2 = get_param<std::string>(vm_, ARG_QUAL_FILE_2);
+        BOOST_LOG_TRIVIAL(info) << "Using quality file for R2: " << qual_file_2;
+    }
+    if (qual_file_1.empty() && qual_file_2.empty()) {
+        builtin_qual_file = get_param<std::string>(vm_, ARG_BUILTIN_QUAL_FILE);
+        BOOST_LOG_TRIVIAL(info) << "Using built-in quality profile " << builtin_qual_file;
+    }
+
+    auto qdist = read_emp(builtin_qual_file, qual_file_1, qual_file_2, art_lib_const_mode, sep_flag);
 
     // Mutal exclusion
     if (vm_.count(ARG_READ_LEN) > 0 && (vm_.count(ARG_READ_LEN_1) > 0 || vm_.count(ARG_READ_LEN_2) > 0)) {
-        BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN << " cannot be specified together with --"
-                                 << ARG_READ_LEN_1 << " or --" << ARG_READ_LEN_2 << ".";
+        BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN << " cannot be specified together with --" << ARG_READ_LEN_1
+                                 << " or --" << ARG_READ_LEN_2 << ".";
         abort_mpi();
     }
     am_read_len_t read_len_1 = 0;
@@ -540,7 +564,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         // Specify read_len_2 for PE or MP if read_len is not specified
         if (art_lib_const_mode != ART_LIB_CONST_MODE::SE && vm_.count(ARG_READ_LEN_2) == 0
             && vm_.count(ARG_READ_LEN) == 0) {
-            BOOST_LOG_TRIVIAL(fatal) << "Fatal Error: --" << ARG_READ_LEN_2
+            BOOST_LOG_TRIVIAL(fatal) << "--" << ARG_READ_LEN_2
                                      << " must be specified for PE or MP library construction mode.";
             abort_mpi();
         }
@@ -565,8 +589,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Assess whether different read length is legal
     if (art_simulation_mode != SIMULATION_MODE::TEMPLATE && art_lib_const_mode != ART_LIB_CONST_MODE::SE
         && read_len_1 != read_len_2) {
-        BOOST_LOG_TRIVIAL(fatal)
-            << "Fatal Error: Different read lengths for read 1 and read 2 are only supported in template mode.";
+        BOOST_LOG_TRIVIAL(fatal) << "Different read lengths for read 1 and read 2 are only supported in template mode.";
         abort_mpi();
     }
 
@@ -588,6 +611,8 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         pe_frag_dist_std_dev = get_param<double>(vm_, ARG_PE_FRAG_DIST_STD_DEV);
         validate_pe_frag_dist(pe_frag_dist_mean, pe_frag_dist_std_dev, read_len_1, read_len_2);
     }
+    const auto seed = vm_.count(ARG_SEED) == 0 ? rand_seed() : get_param<am_rand_seed_t>(vm_, ARG_SEED);
+    BOOST_LOG_TRIVIAL(info) << "Using random seed: " << std::hex << "0x" << seed;
 
     ArtParams art_params { art_simulation_mode, art_lib_const_mode, sep_flag, std::move(id),
         // Read-length related
@@ -603,7 +628,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         // Per-base del rate 2
         gen_per_base_mutation_rate(read_len_2, get_param<double>(vm_, ARG_DEL_RATE_2), max_indel),
         // Others
-        std::move(qdist), report_interval_jp, report_interval_aje };
+        std::move(qdist), report_interval_jp, report_interval_aje, seed };
     ArtIOParams art_io_params { input_file_name, input_file_type, input_file_parser, std::move(coverage_info), parallel,
         batch_size, vm_, std::move(args) };
     return { std::move(art_params), std::move(art_io_params) };

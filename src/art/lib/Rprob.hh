@@ -68,7 +68,8 @@ namespace labw::art_modern {
 
 class Rprob {
 public:
-    Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, am_read_len_t read_len_1, am_read_len_t read_len_2);
+    Rprob(double pe_frag_dist_mean, double pe_frag_dist_std_dev, am_read_len_t read_len_1, am_read_len_t read_len_2,
+        am_rand_seed_t seed);
     DELETE_COPY(Rprob)
     DELETE_MOVE(Rprob)
     ~Rprob();
@@ -98,10 +99,11 @@ public:
 
 private:
     void public_init_();
+    void public_destroy_();
 
 #if defined(USE_ONEMKL_RANDOM)
     // OneMKL bulk random number generation cache
-    constexpr static std::size_t CACHE_SIZE_ = M_SIZE;
+    constexpr static std::size_t CACHE_SIZE_ = K_SIZE;
 
     std::vector<int> cached_rand_pos_on_read_1_;
     std::size_t cached_rand_pos_on_read_1_index_ = 0;

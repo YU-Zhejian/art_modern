@@ -49,13 +49,14 @@ public:
     const std::array<double, HIGHEST_QUAL> err_prob;
     const am_read_len_t pe_dist_mean_minus_2_std;
     am_read_len_t contig_len_threshold;
+    am_rand_seed_t seed;
 
     ArtParams(SIMULATION_MODE art_simulation_mode, ART_LIB_CONST_MODE art_lib_const_mode, bool sep_flag,
         std::string&& id, int max_n, am_read_len_t read_len_1, am_read_len_t read_len_2, double pe_frag_dist_mean,
         double pe_frag_dist_std_dev, std::vector<double>&& per_base_ins_rate_1,
         std::vector<double>&& per_base_del_rate_1, std::vector<double>&& per_base_ins_rate_2,
         std::vector<double>&& per_base_del_rate_2, Empdist&& qdist, std::size_t job_pool_reporting_interval_seconds,
-        std::size_t art_job_executor_reporting_interval_seconds);
+        std::size_t art_job_executor_reporting_interval_seconds, am_rand_seed_t seed);
 };
 
 } // namespace labw::art_modern

@@ -41,7 +41,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.zip` or `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
 
 **WARNING** Static builds may lead to compromised security.
 
