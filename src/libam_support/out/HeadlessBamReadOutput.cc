@@ -64,34 +64,46 @@ void HeadlessBamReadOutput::writeSE(const ProducerToken& token, const PairwiseAl
     auto sam_record = BamUtils::init_uptr();
     const auto rlen = pwa.query.size();
     auto seq = pwa.query;
-    auto qual = pwa.qual_vec;
     auto cigar = pwa.generate_cigar_array(sam_options_.use_m);
     BamUtils::assert_correct_cigar(pwa, cigar);
     if (!pwa.is_plus_strand) {
-        reverse(qual.data(), qual.size());
         reverse(cigar.data(), cigar.size());
         revcomp_inplace(seq);
     }
-
-    const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
-    const auto& oa_tag = BamUtils::generate_oa_tag(pwa, cigar, nm_tag);
     BamTags tags;
-    tags.add_string("OA", oa_tag);
-    tags.add_string("MD", md_tag);
-    tags.add_int_i("NM", nm_tag);
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM || sam_options_.with_tag_OA) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
+        if (sam_options_.with_tag_MD) {
+            tags.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags.add_int_i("NM", nm_tag);
+        }
+        if (sam_options_.with_tag_OA) {
+            const auto& oa_tag = BamUtils::generate_oa_tag(pwa, cigar, nm_tag);
+            tags.add_string("OA", oa_tag);
+        }
+    }
 
-    CExceptionsProxy::assert_numeric(bam_set1(sam_record.get(), pwa.read_name.size(), pwa.read_name.c_str(),
-                                         BAM_FUNMAP, // Alignment info moved to OA tag
-                                         TID_FOR_UNMAPPED, // Alignment info moved to OA tag
-                                         0, // Alignment info moved to OA tag
-                                         0, // Alignment info moved to OA tag
-                                         0, // Alignment info moved to OA tag
-                                         nullptr, // Alignment info moved to OA tag
-                                         TID_FOR_UNMAPPED, // Unset for SE reads
-                                         0, // Unset for SE reads
-                                         0, // Unset for SE reads
-                                         rlen, seq.c_str(), reinterpret_cast<const char*>(qual.data()), tags.size()),
+    CExceptionsProxy::assert_numeric(
+        bam_set1(sam_record.get(), pwa.read_name.size(), pwa.read_name.c_str(),
+            BAM_FUNMAP, // Alignment info moved to OA tag
+            TID_FOR_UNMAPPED, // Alignment info moved to OA tag
+            0, // Alignment info moved to OA tag
+            0, // Alignment info moved to OA tag
+            0, // Alignment info moved to OA tag
+            nullptr, // Alignment info moved to OA tag
+            TID_FOR_UNMAPPED, // Unset for SE reads
+            0, // Unset for SE reads
+            0, // Unset for SE reads
+            rlen, seq.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa.qual_vec.data()),
+            tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
+    if (!sam_options_.no_qual) {
+        if (!pwa.is_plus_strand) {
+            reverse(bam_get_qual(sam_record), rlen);
+        }
+    }
     tags.patch(sam_record.get());
     lfio_.push(std::move(sam_record), token);
 }
@@ -125,21 +137,34 @@ void HeadlessBamReadOutput::writePE(
         revcomp_inplace(seq2);
     }
 
-    const auto& [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
-    const auto& [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
-
-    const auto& oa_tag1 = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag1);
-    const auto& oa_tag2 = BamUtils::generate_oa_tag(pwa2, cigar2, nm_tag2);
-
     BamTags tags1;
-    tags1.add_string("OA", oa_tag1);
-    tags1.add_string("MD", md_tag1);
-    tags1.add_int_i("NM", nm_tag1);
-
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM || sam_options_.with_tag_OA) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
+        if (sam_options_.with_tag_MD) {
+            tags1.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags1.add_int_i("NM", nm_tag);
+        }
+        if (sam_options_.with_tag_OA) {
+            const auto& oa_tag = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag);
+            tags1.add_string("OA", oa_tag);
+        }
+    }
     BamTags tags2;
-    tags2.add_string("OA", oa_tag2);
-    tags2.add_string("MD", md_tag2);
-    tags2.add_int_i("NM", nm_tag2);
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM || sam_options_.with_tag_OA) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+        if (sam_options_.with_tag_MD) {
+            tags2.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags2.add_int_i("NM", nm_tag);
+        }
+        if (sam_options_.with_tag_OA) {
+            const auto& oa_tag = BamUtils::generate_oa_tag(pwa1, cigar1, nm_tag);
+            tags2.add_string("OA", oa_tag);
+        }
+    }
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1.get(), pwa1.read_name.size(), pwa1.read_name.c_str(),
@@ -152,7 +177,8 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen_1, seq1.c_str(), reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
+            rlen_1, seq1.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa1.qual_vec.data()),
+            tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.size(), pwa2.read_name.c_str(),
@@ -165,13 +191,16 @@ void HeadlessBamReadOutput::writePE(
             TID_FOR_UNMAPPED, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
             0, // Alignment info moved to OA tag
-            rlen_2, seq2.c_str(), reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
+            rlen_2, seq2.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa2.qual_vec.data()),
+            tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
 
-    if (!pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record1), rlen_1);
-    } else {
-        reverse(bam_get_qual(sam_record2), rlen_2);
+    if (!sam_options_.no_qual) {
+        if (!pwa1.is_plus_strand) {
+            reverse(bam_get_qual(sam_record1), rlen_1);
+        } else {
+            reverse(bam_get_qual(sam_record2), rlen_2);
+        }
     }
 
     tags1.patch(sam_record1.get());
@@ -210,6 +239,13 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
     bam_desc.add_options()("o-hl_sam-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_OA",
+        "Set to disable the OA tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_MD",
+        "Set to disable the MD tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_NM",
+        "Set to disable the NM tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-no_qual", "Set to disable writing quality scores in headless SAM/BAM output.");
     desc.add(bam_desc);
 }
 
@@ -231,6 +267,10 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
                                      << ". Allowed values are: " << BamOptions::ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
+        so.with_tag_OA = params.vm.count("o-hl_sam-without_tag_OA") == 0;
+        so.with_tag_MD = params.vm.count("o-hl_sam-without_tag_MD") == 0;
+        so.with_tag_NM = params.vm.count("o-hl_sam-without_tag_NM") == 0;
+        so.no_qual = params.vm.count("o-hl_sam-no_qual") > 0;
         return std::make_shared<HeadlessBamReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank_s()), so, params.n_threads,
             params.vm["o-hl_sam-queue_size"].as<std::size_t>());

@@ -59,4 +59,10 @@ typedef size_t am_job_id_t;
 
 /** Length of reads. */
 typedef int32_t am_read_len_t;
+
+typedef int am_mpi_rank_t;
+typedef int am_mpi_size_t;
+typedef uint64_t am_rand_seed_t;
+typedef uint16_t am_bam_flag_t;
+
 #endif // ART_MODERN_LIBAM_SUPPORT_DTYPES_H

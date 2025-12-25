@@ -86,7 +86,7 @@ LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
     PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
     CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
     make testbuild testbuild-mpi \
-    CMAKE_FLAGS='-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/'
+    CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/"
 ```
 
 Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and `${HOME}/opt/boost-1.89.0-clang` respectively.

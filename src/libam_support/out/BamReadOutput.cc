@@ -18,6 +18,7 @@
 
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
+#include "libam_support/Dtypes.h"
 #include "libam_support/bam/BamOptions.hh"
 #include "libam_support/bam/BamTags.hh"
 #include "libam_support/bam/BamUtils.hh"
@@ -39,7 +40,6 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
-#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -68,10 +68,16 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
     }
     const hts_pos_t pos = pwa.pos_on_contig;
 
-    const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
     BamTags tags;
-    tags.add_string("MD", md_tag);
-    tags.add_int_i("NM", nm_tag);
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa, cigar);
+        if (sam_options_.with_tag_MD) {
+            tags.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags.add_int_i("NM", nm_tag);
+        }
+    }
 
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record.get(), pwa.read_name.length(), pwa.read_name.c_str(), pwa.is_plus_strand ? 0 : BAM_FREVERSE,
@@ -79,10 +85,12 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
             0, // Unset for SE reads
             0, // Unset for SE reads
             0, // Unset for SE reads
-            rlen, seq.c_str(), reinterpret_cast<const char*>(pwa.qual_vec.data()), tags.size()),
+            rlen, seq.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa.qual_vec.data()), tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
-        reverse(bam_get_qual(sam_record.get()), rlen);
+    if (!sam_options_.no_qual) {
+            reverse(bam_get_qual(sam_record), rlen);
+        }
         reverse(am_bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
     }
     tags.patch(sam_record.get());
@@ -107,16 +115,26 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     BamUtils::assert_correct_cigar(pwa1, cigar1);
     BamUtils::assert_correct_cigar(pwa2, cigar2);
 
-    const auto& [nm_tag1, md_tag1] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
-    const auto& [nm_tag2, md_tag2] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
-
     BamTags tags1;
-    tags1.add_string("MD", md_tag1);
-    tags1.add_int_i("NM", nm_tag1);
-
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa1, cigar1);
+        if (sam_options_.with_tag_MD) {
+            tags1.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags1.add_int_i("NM", nm_tag);
+        }
+    }
     BamTags tags2;
-    tags2.add_string("MD", md_tag2);
-    tags2.add_int_i("NM", nm_tag2);
+    if (sam_options_.with_tag_MD || sam_options_.with_tag_NM) {
+        const auto& [nm_tag, md_tag] = BamUtils::generate_nm_md_tag(pwa2, cigar2);
+        if (sam_options_.with_tag_MD) {
+            tags2.add_string("MD", md_tag);
+        }
+        if (sam_options_.with_tag_NM) {
+            tags2.add_int_i("NM", nm_tag);
+        }
+    }
 
     auto seq1 = pwa1.query;
     auto seq2 = pwa2.query;
@@ -124,8 +142,8 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     const hts_pos_t pos1 = pwa1.pos_on_contig;
     const hts_pos_t pos2 = pwa2.pos_on_contig;
 
-    uint16_t flag1 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD1;
-    uint16_t flag2 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD2;
+    am_bam_flag_t flag1 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD1;
+    am_bam_flag_t flag2 = BAM_FPAIRED | BAM_FPROPER_PAIR | BAM_FREAD2;
 
     if (pwa1.is_plus_strand) {
         flag1 |= BAM_FMREVERSE;
@@ -147,19 +165,24 @@ void BamReadOutput::writePE(const ProducerToken& token, const PairwiseAlignment&
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record1.get(), pwa1.read_name.length(), pwa1.read_name.c_str(), flag1, tid, pos1, MAPQ_MAX,
             cigar1.size(), cigar1.data(), tid, pos2, isize1, rlen_1, seq1.c_str(),
-            reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
+            sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa1.qual_vec.data()), tags1.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     CExceptionsProxy::assert_numeric(
         bam_set1(sam_record2.get(), pwa2.read_name.length(), pwa2.read_name.c_str(), flag2, tid, pos2, MAPQ_MAX,
             cigar2.size(), cigar2.data(), tid, pos1, isize2, rlen_2, seq2.c_str(),
-            reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
+            sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa2.qual_vec.data()), tags2.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa1.is_plus_strand) {
-        reverse(bam_get_qual(sam_record1.get()), rlen_1);
         reverse(am_bam_get_cigar(sam_record1.get()), sam_record1->core.n_cigar);
     } else {
-        reverse(bam_get_qual(sam_record2.get()), rlen_2);
         reverse(am_bam_get_cigar(sam_record2.get()), sam_record2->core.n_cigar);
+    }
+    if (!sam_options_.no_qual) {
+        if (!pwa1.is_plus_strand) {
+            reverse(bam_get_qual(sam_record1), rlen_1);
+        } else {
+            reverse(bam_get_qual(sam_record2), rlen_2);
+        }
     }
 
     tags1.patch(sam_record1.get());
@@ -212,6 +235,11 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
     bam_desc.add_options()("o-sam-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in SAM/BAM output.");
+    bam_desc.add_options()("o-sam-without_tag_MD",
+        "Set to disable the MD tag in SAM/BAM output.");
+    bam_desc.add_options()("o-sam-without_tag_NM",
+        "Set to disable the NM tag in SAM/BAM output.");
+    bam_desc.add_options()("o-sam-no_qual", "Set to disable writing quality scores in SAM/BAM output.");
     desc.add(bam_desc);
 }
 std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& params) const
@@ -233,6 +261,9 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
                                      << ". Allowed values are: " << BamOptions::ALLOWED_COMPRESSION_LEVELS;
             abort_mpi();
         }
+        so.with_tag_MD = params.vm.count("o-sam-without_tag_MD") == 0;
+        so.with_tag_NM = params.vm.count("o-sam-without_tag_NM") == 0;
+        so.no_qual = params.vm.count("o-sam-no_qual") > 0;
         return std::make_shared<BamReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank_s()), params.fasta_fetch, so,
             params.n_threads, params.vm["o-sam-queue_size"].as<std::size_t>());

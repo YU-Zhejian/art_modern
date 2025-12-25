@@ -144,3 +144,4 @@ perf.data*
 /bin/
 *.[sb]a[mi]
 *.csi
+*collect*

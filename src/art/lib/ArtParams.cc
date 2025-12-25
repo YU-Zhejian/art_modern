@@ -33,7 +33,7 @@ ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode, const ART_LIB_CO
     std::vector<double>&& per_base_ins_rate_1, std::vector<double>&& per_base_del_rate_1,
     std::vector<double>&& per_base_ins_rate_2, std::vector<double>&& per_base_del_rate_2, Empdist&& qdist,
     const std::size_t job_pool_reporting_interval_seconds,
-    const std::size_t art_job_executor_reporting_interval_seconds)
+    const std::size_t art_job_executor_reporting_interval_seconds, const am_rand_seed_t seed)
     : art_simulation_mode(art_simulation_mode)
     , art_lib_const_mode(art_lib_const_mode)
     , sep_flag(sep_flag)
@@ -52,6 +52,7 @@ ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode, const ART_LIB_CO
     , art_job_executor_reporting_interval_seconds(art_job_executor_reporting_interval_seconds)
     , err_prob(gen_err_prob_())
     , pe_dist_mean_minus_2_std(static_cast<am_read_len_t>(pe_frag_dist_mean - 2 * pe_frag_dist_std_dev))
+    , seed(seed)
 {
     if (art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
         contig_len_threshold = read_len_1;

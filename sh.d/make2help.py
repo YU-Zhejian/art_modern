@@ -18,10 +18,10 @@ def decode_variable_assignment(_l: str) -> Optional[str]:
     :param _l:
     :return:
     """
-    m = re.match(r"^([a-zA-Z0-9_\-]+)\s*(=|:=|\?=|\+=)\s*(.*)$", _l)
+    m = re.match(r"^(export ){0,1}([a-zA-Z0-9_\-]+)\s*(=|:=|\?=|\+=)\s*(.*)$", _l)
     if not m:
         return None
-    _var = m.group(1)
+    _var = m.group(2)
     return _var
 
 
@@ -53,7 +53,6 @@ if __name__ == "__main__":
         simple = decode_simple_target(line)
         variable = decode_variable_assignment(line)
         if simple:
-            # print("Detected simple target:", simple[0])
             target, deps = simple
             help_lines = []
             j = i - 1
@@ -63,7 +62,6 @@ if __name__ == "__main__":
             if help_lines:
                 target_docs.append({"target": target, "deps": deps, "help": "\n".join(help_lines)})
         if variable:
-            # print("Detected variable assignment:", variable)
             var = variable
             help_lines = []
             j = i - 1

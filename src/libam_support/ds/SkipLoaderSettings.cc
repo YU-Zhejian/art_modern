@@ -22,7 +22,7 @@ namespace labw::art_modern {
 SkipLoaderSettings SkipLoaderSettings::from_mpi()
 {
     if (have_mpi()) {
-        return SkipLoaderSettings(mpi_size(), mpi_rank());
+        return SkipLoaderSettings(static_cast<std::size_t>(mpi_size()), static_cast<std::size_t>(mpi_rank()));
     }
     return SkipLoaderSettings(1, 0);
 }
