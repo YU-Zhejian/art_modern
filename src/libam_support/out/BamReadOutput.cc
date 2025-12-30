@@ -85,10 +85,11 @@ void BamReadOutput::writeSE(const ProducerToken& token, const PairwiseAlignment&
             0, // Unset for SE reads
             0, // Unset for SE reads
             0, // Unset for SE reads
-            rlen, seq.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa.qual_vec.data()), tags.size()),
+            rlen, seq.c_str(), sam_options_.no_qual ? nullptr : reinterpret_cast<const char*>(pwa.qual_vec.data()),
+            tags.size()),
         USED_HTSLIB_NAME, "Failed to populate SAM/BAM record", false, CExceptionsProxy::EXPECTATION::NON_NEGATIVE);
     if (!pwa.is_plus_strand) {
-    if (!sam_options_.no_qual) {
+        if (!sam_options_.no_qual) {
             reverse(bam_get_qual(sam_record), rlen);
         }
         reverse(am_bam_get_cigar(sam_record.get()), sam_record->core.n_cigar);
@@ -235,10 +236,8 @@ void BamReadOutputFactory::patch_options(boost::program_options::options_descrip
     bam_desc.add_options()("o-sam-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in SAM/BAM output.");
-    bam_desc.add_options()("o-sam-without_tag_MD",
-        "Set to disable the MD tag in SAM/BAM output.");
-    bam_desc.add_options()("o-sam-without_tag_NM",
-        "Set to disable the NM tag in SAM/BAM output.");
+    bam_desc.add_options()("o-sam-without_tag_MD", "Set to disable the MD tag in SAM/BAM output.");
+    bam_desc.add_options()("o-sam-without_tag_NM", "Set to disable the NM tag in SAM/BAM output.");
     bam_desc.add_options()("o-sam-no_qual", "Set to disable writing quality scores in SAM/BAM output.");
     desc.add(bam_desc);
 }

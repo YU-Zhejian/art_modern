@@ -37,7 +37,7 @@ int main()
         times.emplace_back(std::chrono::duration_cast<std::chrono::nanoseconds>(duration).count());
     }
     BOOST_LOG_TRIVIAL(info) << "Empdist::get_read_qual  : " << describe(times, true);
-    // Intel: Empdist::get_read_qual  : gmean: 35,650,559; mean/sd: 35,743,146/2,945,319 
+    // Intel: Empdist::get_read_qual  : gmean: 35,650,559; mean/sd: 35,743,146/2,945,319
     // GCC:  Empdist::get_read_qual  : gmean: 57,546,368; mean/sd: 59,443,214/20,806,297
     return EXIT_SUCCESS;
 }

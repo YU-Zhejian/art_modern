@@ -18,7 +18,8 @@ dependencies:
   - numpy
   - pandas
   - scipy
-  - matplotlib=3.10
+  - matplotlib-base=3.10
+  - tabulate # Used in Pandas to markdown tables
 
   # Code formatter
   - cmake_format
