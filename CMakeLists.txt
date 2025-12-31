@@ -52,6 +52,10 @@ endif()
 if(NOT DEFINED WITH_MPI)
     set(WITH_MPI OFF)
 endif()
+
+if(NOT DEFINED WITH_NCBI_NGS)
+    set(WITH_NCBI_NGS OFF)
+endif()
 set(ART_MODERN_LINK_LIBS "")
 
 # Installation
@@ -94,6 +98,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
+if(DEFINED WITH_NCBI_NGS AND WITH_NCBI_NGS)
+    include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/sra.cmake")
+endif()
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.

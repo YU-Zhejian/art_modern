@@ -27,17 +27,18 @@ MODELS = [
     "onso",
 ]
 
+
 def fetch_ena_data(instrument_model="illumina novaseq 6000"):
     respt = "\t".join(FIELDS) + "\n"
     url = "https://www.ebi.ac.uk/ena/portal/api/search"
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     query_params = {
-            "result": "read_run",
-            "query": f'instrument_model="{instrument_model}" AND (library_strategy="wgs" OR library_strategy="wxs")',
-            "fields": ",".join(FIELDS),
-            "limit": "0",
-            "format": "tsv",
-        }
+        "result": "read_run",
+        "query": f'instrument_model="{instrument_model}" AND (library_strategy="wgs" OR library_strategy="wxs")',
+        "fields": ",".join(FIELDS),
+        "limit": "0",
+        "format": "tsv",
+    }
     data = urlencode(query_params)
     response = requests.post(url, headers=headers, data=data)
     if response.status_code == 200:

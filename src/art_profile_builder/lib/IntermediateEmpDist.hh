@@ -27,6 +27,7 @@ public:
 
     bool parse_read(const bam1_t* b);
     bool parse_read(const std::string& seq, const std::vector<am_qual_t>& qual);
+    bool parse_read_ngs_fragment(const std::string& seq, const std::string& qual_str);
 
     void accumulate();
 

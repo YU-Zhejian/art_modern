@@ -21,6 +21,7 @@
 - Support simulating BGI/MGISEQ reads?
 - Add new Illumina models.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
+- Add SRA format to art_profile_builder. Also add `--first` parameter to stop after reading a certain number of reads.
 
 ## Simulate Allele-Specific Expression
 
