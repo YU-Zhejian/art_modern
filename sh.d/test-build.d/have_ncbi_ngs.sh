@@ -2,10 +2,16 @@
 set -uex
 cd "$(readlink -f "$(dirname "$0")")"
 
-latf-load --no-readnames -p ILLUMINA 1_1.fq 1_2.fq -o out.sra.d -L info -q PHRED_33
+latf-load \
+    --no-readnames \
+    -p ILLUMINA \
+    -o out.sra.d \
+    -L info \
+    -q PHRED_33 \
+    1_1.fq 1_2.fq
 kar -f -c out.sra -d out.sra.d --md5
-kar --long-list --test out.sra
-fastq-dump ./out.sra -O out.sra.fastq.d --split-3
+# kar --long-list --test out.sra
+# fastq-dump ./out.sra -O out.sra.fastq.d --split-3
 
 g++ \
     test_ncbi_ngs.cc \

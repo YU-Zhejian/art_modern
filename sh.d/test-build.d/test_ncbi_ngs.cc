@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
         auto nreads = run.getReadCount();
         std::cout << "Total Reads: " << nreads << std::endl;
 
-        auto reads = ngs::ReadIterator(run.getReadRange(1, nreads, ngs::Read::all));
+        auto reads = run.getReadRange(1, nreads);
 
         while (reads.nextRead()) {
             std::cout << "Read ID: " << reads.getReadName() << std::endl;

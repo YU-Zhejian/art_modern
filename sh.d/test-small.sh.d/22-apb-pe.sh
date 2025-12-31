@@ -19,7 +19,14 @@ samtools fastq \
     "${OUT_DIR}"/out_pe.sam
 
 if [ -n ${WITH_SRA:-} ] && [ "${WITH_SRA}" -eq 1 ]; then
-    fastq-load --spots=paired "${OUT_DIR}"/out_pe.1.fq "${OUT_DIR}"/out_pe.2.fq -o "${OUT_DIR}"/out_pe.sra
+    latf-load \
+        --no-readnames \
+        -p ILLUMINA \
+        -o "${OUT_DIR}"/out_pe.sra.d \
+        -L info \
+        -q PHRED_33 \
+        "${OUT_DIR}"/out_pe.1.fq "${OUT_DIR}"/out_pe.2.fq
+    kar -f -c "${OUT_DIR}"/out_pe.sra -d "${OUT_DIR}"/out_pe.sra.d --md5
 fi
 
 art_profile_illumina "${OUT_DIR}"/out_pe_art_perl_ "${OUT_DIR}"/ fq

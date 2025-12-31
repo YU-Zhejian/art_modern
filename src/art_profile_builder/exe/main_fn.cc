@@ -271,7 +271,7 @@ private:
     {
         try {
             auto rcngs = ncbi::NGS::openReadCollection(config_.input_file_path);
-            auto reads = rcngs.getReadRange(start_, end_ - start_);
+            auto reads = rcngs.getReadRange(start_ + 1, end_ - start_);
             while (reads.nextRead()) {
                 auto nfrags = reads.getNumFragments();
                 num_total_reads_ += nfrags;
@@ -279,6 +279,7 @@ private:
                     if (nfrags != 2) {
                         continue;
                     }
+                    reads.nextFragment();
                     auto base1 = reads.getFragmentBases().toString();
                     auto qual1 = reads.getFragmentQualities().toString();
                     reads.nextFragment();

@@ -15,7 +15,14 @@ samtools fastq \
     -n \
     "${OUT_DIR}"/out_se.sam
 if [ -n ${WITH_SRA:-} ] && [ "${WITH_SRA}" -eq 1 ]; then
-    fastq-load --spots=sigle "${OUT_DIR}"/out_se.fq -o "${OUT_DIR}"/out_se.sra
+    latf-load \
+        --no-readnames \
+        -p ILLUMINA \
+        -o "${OUT_DIR}"/out_se.sra.d \
+        -L info \
+        -q PHRED_33 \
+        "${OUT_DIR}"/out_se.fq
+    kar -f -c "${OUT_DIR}"/out_se.sra -d "${OUT_DIR}"/out_se.sra.d --md5
 fi
 
 art_profile_illumina "${OUT_DIR}"/out_se_art_perl "${OUT_DIR}"/ fq
