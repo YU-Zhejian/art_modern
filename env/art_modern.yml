@@ -19,7 +19,9 @@ dependencies:
   - pandas
   - scipy
   - matplotlib-base=3.10
+  - seaborn
   - tabulate # Used in Pandas to markdown tables
+  - pyarrow # For Parquet file support
 
   # Code formatter
   - cmake_format

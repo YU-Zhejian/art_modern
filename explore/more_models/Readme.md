@@ -76,18 +76,35 @@ extracted from the EBI ENA database as of December 2025, using `fetch.sh`.
 
 NOTE: Here we do not distinguish `hiseq x five`, `hiseq x ten` and `illumina hiseq x`.
 
+## Collecting of read length data
+
+The read length data are collected in batch.
+
+Execute the following Python scripts in order:
+
+```shell
+python fetch_samples.py # Fetch sample metadata from ENA
+python jmp_query.py   # Subsample and filtering
+python fetch_rlen.py  # Fetch read length statistics
+```
+
+## Generating error profile files
+
 ### Illumina NovaSeq 6000
 
-Search cmdline:
+Up to 250bp PE.
 
 ```shell
-curl -X POST -H "Content-Type: application/x-www-form-urlencoded" -d 'result=read_run&query=tax_eq(562)%20AND%20instrument_model%3D%22illumina%20novaseq%206000%22%20AND%20library_strategy%3D%22wgs%22&fields=run_accession%2Cexperiment_title%2Ctax_id%2Cinstrument_model%2Cfastq_bytes%2Cfastq_ftp%2Cfastq_md5&format=tsv' "https://www.ebi.ac.uk/ena/portal/api/search"
+mkdir -p NovaSeq6000_250bp
+fasterq-dump --split-files --skip-technical --progress --threads 8 -A SRR30113744 -O NovaSeq6000_250bp/
+../../opt/build_release_install/bin/art_profile_builder \
+    --parallel 8 \
+    --i-file NovaSeq6000_250bp/SRR30113744_1.fastq \
+    --read_len 250 \
+    --o-file1 NovaSeq6000_250bp/EmpNovaSeq6000_250R1.txt
+../../opt/build_release_install/bin/art_profile_builder \
+    --parallel 8 \
+    --i-file NovaSeq6000_250bp/SRR30113744_2.fastq \
+    --read_len 250 \
+    --o-file1 NovaSeq6000_250bp/EmpNovaSeq6000_250R2.txt
 ```
-
-Get read length using CMDs like:
-
-```shell
-sra-info -f json -S DRR298151
-```
-
-Key `SPOTS` should have one and only one value.

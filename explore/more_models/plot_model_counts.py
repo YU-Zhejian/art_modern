@@ -24,7 +24,7 @@ if __name__ == "__main__":
     # Sort by count in descending order
     df_sorted = df.sort_values("count", ascending=False)
     df_sorted.to_markdown("instrument_model_counts.md", index=False)
-    df_sorted.to_csv( "instrument_model_counts.csv", index=False)
+    df_sorted.to_csv("instrument_model_counts.csv", index=False)
 
     # Create the plot
     plt.figure(figsize=(12, 8))
