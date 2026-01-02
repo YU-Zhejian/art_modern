@@ -138,6 +138,10 @@ function validate_template() {
     python "${SHDIR}"/test-small.sh.d/validate_template.py "${@}"
 }
 
+function validate_read_tags() {
+    python "${SHDIR}"/test-small.sh.d/validate_read_tags.py "${@}"
+}
+
 function art_profile_illumina() {
     env -C "${OUT_DIR}" \
         "${BASH_WRAPPER[@]}" \

@@ -360,6 +360,40 @@ mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
 - The simulator will not be able to support UNIX devices and/or redirections for input/output files. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
 - Logging issues: Only log messages from rank 0 process will be printed to standard error. Other ranks' log messages will be written to disk (If environment variable `ART_NO_LOG_DIR` is not set) or discarded (If environment variable `ART_NO_LOG_DIR` is set).
 
+## Building ART/`art_modern` Profiles
+
+The `art_profile_builder` is a new executable designed to replace the old art_profiler_illumina Shell/Perl scripts for building ART-compatible quality profiles. It supports input from FASTQ, SAM/BAM, and NCBI SRA (If configured) files. The generated files would be compatible with the original ART and `art_modern`.
+
+**NOTE** Currently runs only with single MPI slot (`mpiexec -n 1`)
+
+Examples using single-end FASTQ:
+
+```bash
+art_profile_builder \
+    --i-file input.fq \
+    --read_len 36 \
+    --o-file1 output_profile.txt \
+    --parallel 8 \
+    --i-num_threads 4
+```
+
+Examples using paired-end SAM/BAM:
+
+```bash
+art_profile_builder \
+    --i-file input.sam \
+    --read_len 36 \
+    --is_pe \
+    --o-file1 output_R1.txt \
+    --o-file2 output_R2.txt \
+    --parallel 10 \
+    --i-num_threads 4
+```
+
+For complete usage information, see the [full documentation](#art_profile_builder-usage-section).
+
+By default, the program would **NOT** support building profiles from NCBI short-read archive (SRA). Use `-DWITH_NCBI_NGS=ON` to enable it. Additional libraries (namely, `libncbi-ngs-c++.so`, `libncbi-ngs.so`, `libngs-c++.so`, and `libncbi-vdb.so`, with its development headers) are required.
+
 ## What's Next?
 
 The project provides diverse documentations to satisfy your needs.

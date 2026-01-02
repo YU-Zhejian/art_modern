@@ -320,9 +320,10 @@ Other SAM/BAM formatting parameters includes:
 - `--o-sam-use_m`: Computing CIGAR string using `M` (`BAM_CMATCH`) instead of `=`/`X` (`BAM_CEQUAL`/`BAM_CDIFF`). Rarely used in next-generation sequencing but common for long-read sequencing alignments.
 - `--o-sam-write_bam`: Write BAM instead of SAM.
 - `--o-sam-num_threads`: Number of threads used to compress BAM output.
-- `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream, 0 for uncompressed stream with `zlib` wrapping, and 1--9 for fastest to best compression ratio. Defaults to `4`.
-
-  Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
+- `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream, 0 for uncompressed stream with `zlib` wrapping, and 1--9 for fastest to best compression ratio. Defaults to `4`. Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
+- `--o-sam-without_tag_MD`: Do not write `MD` tag.
+- `--o-sam-without_tag_NM`: Do not write `NM` tag.
+- `--o-sam-no_qual`: Do not write quality string (Write quality string as `*`).
 
 See also: [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
 
@@ -339,6 +340,8 @@ Example:
 NM_069135:art_modern:1:nompi:0	4	*	1	0	*	*	1	0	AGCCAAACGGGCAACCAGACTCCGCC[...]	BCCCCGGGGGGGFGGGGGGGFGGGGG[...]	OA:Z:NM_069135,1,+,3=1D4=1I41=1X27=1I5=1X36=1D5=,255,6;	MD:Z:3^A45T32G36^T5	NM:i:6
 [...]
 ```
+
+An additional option: `--o-hl_sam-without_tag_OA`, setting such which will not write `OA` tag.
 
 This output writer supports other BAM formatting parameters.
 
