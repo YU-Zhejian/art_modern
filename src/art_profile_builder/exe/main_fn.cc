@@ -3,6 +3,7 @@
 #include "art_profile_builder/exe/main_fn.hh"
 
 #include "art_profile_builder/lib/APBConfig.hh"
+#include "art_profile_builder/lib/APBConstants.hh"
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include "libam_support/CExceptionsProxy.hh"
@@ -11,25 +12,26 @@
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
-#include <cstdint>
 
 #ifdef WITH_NCBI_NGS
 #include <ncbi-vdb/NGS.hpp>
+
 #include <ngs/ReadCollection.hpp>
 #include <ngs/itf/ErrorMsg.hpp>
 #endif
 
-#include <boost/log/trivial.hpp>
-
-#include <chrono>
 #include <concurrentqueue.h>
+
+#include <boost/log/trivial.hpp>
 
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 #include <htslib/thread_pool.h>
 
 #include <atomic>
+#include <chrono>
 #include <condition_variable>
+#include <cstdint>
 #include <cstdlib>
 #include <memory>
 #include <mutex>
@@ -145,9 +147,16 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     htsThreadPool tpool = { nullptr, 0 };
     tpool.pool = CExceptionsProxy::assert_not_null(
         hts_tpool_init(static_cast<int>(config.num_io_threads)), USED_HTSLIB_NAME, "Failed to init HTS thread pool.");
-
+        std::string modestr = "r";
+        if (config.format == APB_FORMAT::BAM) {
+            modestr += "b";
+        } else if (config.format == APB_FORMAT::CRAM) {
+            modestr += "c";
+        } else if (config.format == APB_FORMAT::FASTQ) {
+            modestr += "f";
+        }
     auto* in = CExceptionsProxy::assert_not_null(
-        hts_open(config.input_file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");
+        hts_open(config.input_file_path.c_str(), modestr.c_str()), USED_HTSLIB_NAME, "Failed to open HTS file.");
     auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
     auto* b = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
 
@@ -327,7 +336,8 @@ void view_sra_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
 {
     try {
         auto rcngs = ncbi::NGS::openReadCollection(config.input_file_path);
-        auto rc = am_min(rcngs.getReadCount(), static_cast<std::uint64_t>(config.first_n_reads));
+        auto const nreads = rcngs.getReadCount();
+        auto const rc = am_min(nreads, static_cast<std::uint64_t>(config.first_n_reads));
         // Split work
         std::uint64_t chunk_size = rc / n_threads;
         std::vector<std::unique_ptr<ViewSraMtChild>> workers;

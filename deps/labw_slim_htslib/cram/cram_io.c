@@ -2570,7 +2570,7 @@ static refs_t *refs_load_fai(refs_t *r_orig, const char *fn, int is_err) {
             snprintf(fai_fn, PATH_MAX, "%s", fn);
         } else {
         /* Only the reference file provided. Get the index file name from it */
-            if (!(r->fn = string_dup(r->pool, fn)))
+            if (!(r->fn = htslib_string_dup(r->pool, fn)))
                 goto err;
             snprintf(fai_fn, PATH_MAX, "%.*s.fai", PATH_MAX-5, fn);
         }
@@ -2600,7 +2600,7 @@ static refs_t *refs_load_fai(refs_t *r_orig, const char *fn, int is_err) {
         for (cp = line; *cp && !isspace_c(*cp); cp++)
             ;
         *cp++ = 0;
-        e->name = string_dup(r->pool, line);
+        e->name = htslib_string_dup(r->pool, line);
 
         // length
         while (*cp && isspace_c(*cp))
@@ -2808,14 +2808,14 @@ static int refs_from_header(cram_fd *fd) {
         if (!h->hrecs->ref[i].name)
             return -1;
 
-        r->ref_id[j]->name = string_dup(r->pool, h->hrecs->ref[i].name);
+        r->ref_id[j]->name = htslib_string_dup(r->pool, h->hrecs->ref[i].name);
         if (!r->ref_id[j]->name) return -1;
         r->ref_id[j]->length = 0; // marker for not yet loaded
 
         /* Initialise likely filename if known */
         if ((ty = sam_hrecs_find_type_id(h->hrecs, "SQ", "SN", h->hrecs->ref[i].name))) {
             if ((tag = sam_hrecs_find_key(ty, "M5", NULL)))
-                r->ref_id[j]->fn = string_dup(r->pool, tag->str+3);
+                r->ref_id[j]->fn = htslib_string_dup(r->pool, tag->str+3);
 
             if ((tag = sam_hrecs_find_key(ty, "LN", NULL))) {
                 // LN tag used when constructing consensus reference
@@ -3024,7 +3024,7 @@ static int cram_populate_ref(cram_fd *fd, int id, ref_entry *r) {
             r->length = sb.st_size;
             r->offset = r->line_length = r->bases_per_line = 0;
 
-            r->fn = string_dup(fd->refs->pool, path);
+            r->fn = htslib_string_dup(fd->refs->pool, path);
 
             if (fd->refs->fp)
                 if (bgzf_close(fd->refs->fp) != 0)

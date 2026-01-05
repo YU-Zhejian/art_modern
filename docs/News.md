@@ -5,8 +5,11 @@
 
 - Software Engineering:
   - Added NCBI SRA support to `art_profile_builder`. Not enabled by default; Add `-DWITH_NCBI_NGS=ON` to CMake options to enable this feature.
+  - Added CRAM support to `art_profile_builder`.
+  - `string_dup` in bundled HTSLib renamed to `htslib_string_dup` to avoid symbol conflicts with NCBI NGS library.
 - Implementation:
-  - `art_profile_builder`: Added `--first_n_reads` and `--i-format` options to control the number of reads to be processed and the input file format.
+  - `art_profile_builder`: Added `--first_n_reads` to control the number of reads to be processed.
+  - `art_profile_builder`: Added `--i-format` to control the input format.
   - `art_modern`: Added `--o-sam-without_tag_MD`, `--o-sam-without_tag_NM`, `--o-hl_sam-without_tag_OA`, and `--o-sam-no_qual`, to control tags of (Headless) SAM/BAM output.
 - Miscellaneous bug fixes.
 

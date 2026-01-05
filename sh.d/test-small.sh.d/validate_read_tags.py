@@ -14,7 +14,7 @@ if __name__ == "__main__":
     else:
         expected_tags = set(sys.argv[2:])
 
-    with pysam.AlignmentFile(bam_name, "r") as bam_file:
+    with pysam.AlignmentFile(bam_name, "r", check_sq=False) as bam_file:
         for aln in bam_file:
             tags = set(dict(aln.get_tags()).keys())
             assert tags == expected_tags, f"{aln.query_name} has unexpected tags: {tags} != {expected_tags}"

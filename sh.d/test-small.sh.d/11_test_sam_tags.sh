@@ -16,7 +16,7 @@ AM_EXEC \
 
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory.sam
 validate_read_tags "${OUT_DIR}"/test_small_se_wgs_memory.sam NM MD
-sam2bam "${OUT_DIR}"/test_small_se_wgs_memory.sam "${LAMBDA_PHAGE}"
+sam2bam "${OUT_DIR}"/test_small_se_wgs_memory "${LAMBDA_PHAGE}"
 
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory.hl.bam
 validate_read_tags "${OUT_DIR}"/test_small_se_wgs_memory.hl.bam OA NM MD
@@ -33,7 +33,7 @@ AM_EXEC \
 
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory.sam
 validate_read_tags "${OUT_DIR}"/test_small_se_wgs_memory.sam MD
-sam2bam "${OUT_DIR}"/test_small_se_wgs_memory.sam "${LAMBDA_PHAGE}"
+sam2bam "${OUT_DIR}"/test_small_se_wgs_memory "${LAMBDA_PHAGE}"
 
 AM_EXEC \
     --i-file "${LAMBDA_PHAGE}" \
@@ -47,7 +47,7 @@ AM_EXEC \
 
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory.sam
 validate_read_tags "${OUT_DIR}"/test_small_se_wgs_memory.sam NM
-sam2bam "${OUT_DIR}"/test_small_se_wgs_memory.sam "${LAMBDA_PHAGE}"
+sam2bam "${OUT_DIR}"/test_small_se_wgs_memory "${LAMBDA_PHAGE}"
 
 AM_EXEC \
     --i-file "${LAMBDA_PHAGE}" \
@@ -62,7 +62,7 @@ AM_EXEC \
 
 merge_file "${OUT_DIR}"/test_small_se_wgs_memory.sam
 validate_read_tags "${OUT_DIR}"/test_small_se_wgs_memory.sam
-sam2bam "${OUT_DIR}"/test_small_se_wgs_memory.sam "${LAMBDA_PHAGE}"
+sam2bam "${OUT_DIR}"/test_small_se_wgs_memory "${LAMBDA_PHAGE}"
 
 rm -fr "${OUT_DIR}"/test_small_se_wgs_memory.*
 assert_cleandir

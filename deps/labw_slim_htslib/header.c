@@ -1209,7 +1209,7 @@ static int sam_hrecs_refs_from_targets_array(sam_hrecs_t *hrecs,
     for (tid = 0; tid < bh->n_targets; tid++) {
         khint_t k;
         int r;
-        hrecs->ref[tid].name = string_dup(hrecs->str_pool, bh->target_name[tid]);
+        hrecs->ref[tid].name = htslib_string_dup(hrecs->str_pool, bh->target_name[tid]);
         if (!hrecs->ref[tid].name) goto fail;
         if (bh->target_len[tid] < UINT32_MAX || !bh->sdict) {
             hrecs->ref[tid].len  = bh->target_len[tid];

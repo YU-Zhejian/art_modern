@@ -23,7 +23,6 @@ fi
     ${CXXFLAGS} \
     test_ncbi_ngs.cc \
     -lncbi-ngs \
-    -lncbi-vdb \
     -o test_ncbi_ngs
 ./test_ncbi_ngs ./out.sra
 rm -fr test_ncbi_ngs out.sra out.sra.d out.sra.fastq.d

@@ -356,7 +356,6 @@ class BuildConfig:
 
         if self.WITH_NCBI_NGS:
             retl.append([re.compile("libncbi-ngs\\.so")])
-            retl.append([re.compile("libncbi-vdb.so")])
 
         if self.USE_HTSLIB is not None:
             retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])

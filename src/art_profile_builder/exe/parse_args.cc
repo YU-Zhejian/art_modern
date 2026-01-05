@@ -14,6 +14,10 @@
 #include "libam_support/utils/param_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
+#ifdef WITH_NCBI_NGS
+#include "libam_support/utils/sra_utils.hh"
+#endif
+
 #include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/program_options/options_description.hpp>
@@ -24,16 +28,8 @@
 #include <htslib/hts.h>
 #include <limits>
 
-#ifdef WITH_NCBI_NGS
-#include <ncbi-vdb/NGS.hpp>
-#include <ngs/ReadCollection.hpp>
-#include <ngs/itf/ErrorMsg.hpp>
-#endif
-
 #include <cstdlib>
 #include <cstring>
-#include <fstream>
-#include <ios>
 #include <string>
 #include <vector>
 
@@ -54,27 +50,6 @@ namespace {
     constexpr char ARG_QUEUE_SIZE[] = "queue_size";
     constexpr char ARG_INPUT_FORMAT[] = "i-format";
     constexpr char ARG_FIRST_N_READS[] = "first_n_reads";
-#ifdef WITH_NCBI_NGS
-    bool detect_sra(const std::string& file_path)
-    {
-        auto ifs = std::ifstream(file_path, std::ios::in | std::ios::binary);
-        char signature[8] = {};
-        ifs.read(signature, 8);
-        ifs.close();
-        return std::memcmp(signature, SRA_SIGNATURE, 8) == 0;
-    }
-
-    void assert_is_sra(const std::string& file_path)
-    {
-        // Assert that NGS can open the file
-        try {
-            ngs::ReadCollection const rcngs = ncbi::NGS::openReadCollection(file_path);
-        } catch (const ngs::ErrorMsg& e) {
-            BOOST_LOG_TRIVIAL(error) << "NGS error when opening SRA file: " << e.what();
-            abort_mpi();
-        }
-    }
-#endif
 
     APB_FORMAT valid_file(const std::string& file_path, const APB_FORMAT expected_format) noexcept
     {
@@ -92,69 +67,36 @@ namespace {
                 BOOST_LOG_TRIVIAL(error) << "Cannot proceed with MPI.";
                 abort_mpi();
             }
+            if (expected_format == APB_FORMAT::AUTO) {
+                BOOST_LOG_TRIVIAL(error) << "Cannot auto-detect format for non-regular files.";
+                abort_mpi();
+            }
         }
-        if (expected_format == APB_FORMAT::SRA) {
-#ifdef WITH_NCBI_NGS
-            assert_is_sra(file_path);
-            return APB_FORMAT::SRA;
-#else
-            BOOST_LOG_TRIVIAL(error) << "SRA format support is not compiled in.";
-            abort_mpi();
-#endif
+        if (expected_format != APB_FORMAT::AUTO)
+        {
+            return expected_format;
         }
-
 #ifdef WITH_NCBI_NGS
-        if (expected_format == APB_FORMAT::AUTO) {
             if (detect_sra(file_path)) {
                 assert_is_sra(file_path);
                 return APB_FORMAT::SRA;
             }
-        }
 #endif
-        std::string modestr = "r";
-        if (expected_format == APB_FORMAT::BAM) {
-            modestr += "b";
-        } else if (expected_format == APB_FORMAT::CRAM) {
-            modestr += "c";
-        } else if (expected_format == APB_FORMAT::FASTQ) {
-            modestr += "f";
-        }
-        modestr += "e";
         htsFile* file = CExceptionsProxy::assert_not_null(
-            hts_open(file_path.c_str(), modestr.c_str()), USED_HTSLIB_NAME, "Failed to open HTS file.");
+            hts_open(file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");
 
         const auto* format = hts_get_format(file);
         hts_close(file);
         if (format->format == fastq_format) {
-            if (expected_format != APB_FORMAT::AUTO && expected_format != APB_FORMAT::FASTQ) {
-                BOOST_LOG_TRIVIAL(error) << "Input file format mismatch. Expected format: "
-                                         << static_cast<int>(expected_format) << ", detected format: FASTQ.";
-                abort_mpi();
-            }
             return APB_FORMAT::FASTQ;
         }
         if (format->format == sam) {
-            if (expected_format != APB_FORMAT::AUTO && expected_format != APB_FORMAT::SAM) {
-                BOOST_LOG_TRIVIAL(error) << "Input file format mismatch. Expected format: "
-                                         << static_cast<int>(expected_format) << ", detected format: SAM.";
-                abort_mpi();
-            }
             return APB_FORMAT::SAM;
         }
         if (format->format == bam) {
-            if (expected_format != APB_FORMAT::AUTO && expected_format != APB_FORMAT::BAM) {
-                BOOST_LOG_TRIVIAL(error) << "Input file format mismatch. Expected format: "
-                                         << static_cast<int>(expected_format) << ", detected format: BAM.";
-                abort_mpi();
-            }
             return APB_FORMAT::BAM;
         }
         if (format->format == cram) {
-            if (expected_format != APB_FORMAT::AUTO && expected_format != APB_FORMAT::CRAM) {
-                BOOST_LOG_TRIVIAL(error) << "Input file format mismatch. Expected format: "
-                                         << static_cast<int>(expected_format) << ", detected format: CRAM.";
-                abort_mpi();
-            }
             return APB_FORMAT::CRAM;
         }
         BOOST_LOG_TRIVIAL(error) << "Unsupported file format.";

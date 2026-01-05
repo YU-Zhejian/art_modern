@@ -190,6 +190,7 @@ file(
 add_library(${AM_SUPPORT_LIB} ${AM_SUPPORT_LIB_SOURCE})
 target_compile_options(${AM_SUPPORT_LIB} BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(${AM_SUPPORT_LIB} PUBLIC ${ART_MODERN_LINK_LIBS})
+
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(${AM_SUPPORT_LIB})
 endif()

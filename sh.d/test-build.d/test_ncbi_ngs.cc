@@ -18,7 +18,7 @@ int main(int argc, char* argv[])
     const char* sra_path = argv[1];
     try {
         ngs::ReadCollection run = ncbi::NGS::openReadCollection(sra_path);
-        auto nreads = run.getReadCount();
+        auto const nreads = run.getReadCount();
         std::cout << "Total Reads: " << nreads << std::endl;
 
         auto reads = run.getReadRange(1, nreads);
