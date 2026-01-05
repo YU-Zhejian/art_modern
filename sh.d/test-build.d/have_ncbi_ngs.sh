@@ -15,8 +15,8 @@ if type latf-load >/dev/null 2>&1 && type kar >/dev/null 2>&1; then
         1_1.fq 1_2.fq
     kar -f -c out.sra -d out.sra.d
 else
-    echo "latf-load or kar not found, using base64 version of out.sra"
-    base64 -di out.sra.xz.base64 | xz -d >out.sra
+    echo "latf-load or kar not found"
+    exit 1
 fi
 
 "${CXX}" \
