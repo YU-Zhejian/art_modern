@@ -4,9 +4,10 @@
 #include <ngs/ReadCollection.hpp>
 #include <ngs/ReadIterator.hpp>
 
+#include <ncbi-vdb/NGS.hpp>
+
 #include <cstdlib>
 #include <iostream>
-#include <ncbi-vdb/NGS.hpp>
 
 int main(int argc, char* argv[])
 {

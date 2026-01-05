@@ -392,7 +392,7 @@ art_profile_builder \
 
 For complete usage information, see the [full documentation](#art_profile_builder-usage-section).
 
-By default, the program would **NOT** support building profiles from NCBI short-read archive (SRA). Use `-DWITH_NCBI_NGS=ON` to enable it. Additional libraries (namely, `libncbi-ngs-c++.so`, `libncbi-ngs.so`, `libngs-c++.so`, and `libncbi-vdb.so`, with its development headers) are required.
+By default, the program would **NOT** support building profiles from NCBI short-read archive (SRA). Use `-DWITH_NCBI_NGS=ON` to enable it. Additional libraries (namely, `libncbi-ngs.so`, and `libncbi-vdb.so`, with its development headers) are required.
 
 ## What's Next?
 

@@ -55,6 +55,10 @@
 #include <gperftools/tcmalloc.h>
 #endif
 
+#ifdef WITH_NCBI_NGS
+#include <ngs/Package.hpp>
+#endif
+
 // In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
 #include <fmt/format.h> // NOLINT
 
@@ -223,6 +227,16 @@ namespace {
             ceu_check_exe_main(), "libCEU", "libceu_check_exe_main returned non-zero value");
     }
 
+    void print_ncbi_ngs_version()
+    {
+#ifdef WITH_NCBI_NGS
+        auto const ver = ngs::Package::getPackageVersion();
+        std::cout << "NCBI NGS: " << ver << std::endl;
+#else
+        std::cout << "NCBI NGS: disabled" << std::endl;
+#endif
+    }
+
 } // namespace
 
 void print_version()
@@ -239,6 +253,7 @@ void print_version()
     print_mpi_version();
     print_bs_version();
     print_malloc_version();
+    print_ncbi_ngs_version();
     print_libceu_various_info();
 }
 } // namespace labw::art_modern

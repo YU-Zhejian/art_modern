@@ -356,17 +356,15 @@ class BuildConfig:
 
         if self.WITH_NCBI_NGS:
             retl.append([re.compile("libncbi-ngs\\.so")])
-            retl.append([re.compile("libncbi-ngs-c\+\+\\.so")])
             retl.append([re.compile("libncbi-vdb.so")])
-            retl.append([re.compile("libngs-c\+\+\\.so")])
 
         if self.USE_HTSLIB is not None:
-            retl.append([re.compile(rf"lib{self.USE_HTSLIB}\\.so")])
+            retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])
         else:
             retl.append([re.compile("liblabw_slim_htslib\\.so")])
 
         if self.USE_LIBFMT is not None:
-            retl.append([re.compile(rf"lib{self.USE_LIBFMT}\\.so")])
+            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
         else:
             retl.append([re.compile("libslim_libfmt\\.so")])
 
@@ -405,15 +403,14 @@ class BuildConfig:
 
 def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
-    build_dir = os.path.join(LOG_DIR, f"art_modern-test-build-{this_job_id}")
-    install_dir = os.path.join(LOG_DIR, f"art_modern-test-install-{this_job_id}")
+    os.makedirs(os.path.join(LOG_DIR, str(this_job_id)))
+    build_dir = os.path.join(LOG_DIR, str(this_job_id), f"build")
+    install_dir = os.path.join(LOG_DIR, str(this_job_id), f"install")
     art_modern_path = os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else ""))
-    apb_path = os.path.join(install_dir, "bin", "art_profile_builde" + ("-mpi" if WITH_MPI else ""))
-    os.makedirs(build_dir)
-    os.makedirs(install_dir)
+    apb_path = os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else ""))
     do_build_lh = logging.getLogger(f"DO_BUILD {this_job_id}/{num_total_jobs}")
     do_build_lh.handlers = []
-    log_path = os.path.join(LOG_DIR, f"{this_job_id}.log")
+    log_path = os.path.join(LOG_DIR, str(this_job_id), "main.log")
     do_build_lh.addHandler(logging.FileHandler(log_path, "w", "utf-8"))
     do_build_lh.setLevel(logging.INFO)
     for handler_ in do_build_lh.handlers:
@@ -423,6 +420,9 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     do_build_lh.info("B: %s, I: %s", build_dir, install_dir)
     do_build_lh.info("Build log for job %s", this_job_id)
     main_lh.info("%s/%s: Build options: %s", this_job_id, num_total_jobs, " ".join(cmake_opts))
+    if not DRY_RUN:
+        os.makedirs(build_dir)
+        os.makedirs(install_dir)
 
     def failed():
         with IO_MUTEX:
@@ -430,168 +430,181 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         main_lh.error("%s/%s: FAILED", this_job_id, num_total_jobs)
         do_build_lh.error("FAILED")
 
-    def run_wrapper(step_name_: str, cmdline: List[str], *args, timeout: Optional[float] = None, **kwargs) -> bool:
+    def run_wrapper(
+        step_name_: str,
+        cmdline: List[str],
+        *args,
+        additional_env: Optional[Dict[str, str]] = None,
+        timeout: Optional[float] = None,
+        **kwargs,
+    ) -> bool:
         do_build_lh.info("%s START", step_name_)
         do_build_lh.info("%s CMDLINE: %s", step_name_, " ".join(cmdline))
+        env = dict(os.environ)
+        if additional_env:
+            env.update(additional_env)
+        with open(
+            os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.env.sh"), "wt", encoding="utf-8"
+        ) as env_file:
+            for k, v in env.items():
+                env_file.write(f"{k}='{v}'\n")
         if DRY_RUN:
             do_build_lh.info("%s DRY RUN", step_name_)
         else:
-            try:
-                proc = subprocess.Popen(cmdline, *args, **kwargs)
-            except subprocess.SubprocessError as e:
-                do_build_lh.error("%s SUBPROCESS ERROR: %s", step_name_, str(e))
-                return False
-            try:
-                if timeout is not None:
-                    proc.wait(timeout=timeout)
-                else:
-                    proc.wait()
-            except subprocess.TimeoutExpired as e:
-                proc.terminate()
+            with open(
+                os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "wb", buffering=0
+            ) as log_file:
                 try:
-                    proc.wait(timeout=3)
-                except subprocess.TimeoutExpired:
-                    proc.kill()
-                    proc.wait()
-                do_build_lh.error("%s TIMEOUT: %s", step_name_, str(e))
-                return False
-            if proc.returncode != 0:
-                do_build_lh.error("%s FAILED with return code %s", step_name_, proc.returncode)
-                return False
+                    proc = subprocess.Popen(cmdline, *args, env=env, stdout=log_file, stderr=log_file, **kwargs)
+                except subprocess.SubprocessError as e:
+                    do_build_lh.error("%s SUBPROCESS ERROR: %s", step_name_, str(e))
+                    return False
+                try:
+                    if timeout is not None:
+                        proc.wait(timeout=timeout)
+                    else:
+                        proc.wait()
+                except subprocess.TimeoutExpired as e:
+                    proc.terminate()
+                    try:
+                        proc.wait(timeout=3)
+                    except subprocess.TimeoutExpired:
+                        proc.kill()
+                        proc.wait()
+                    do_build_lh.error("%s TIMEOUT: %s", step_name_, str(e))
+                    return False
+                if proc.returncode != 0:
+                    do_build_lh.error("%s FAILED with return code %s", step_name_, proc.returncode)
+                    return False
         do_build_lh.info("%s DONE", step_name_)
         return True
 
     def run_ldd() -> bool:
         step_name_ = "LDD"
         do_build_lh.info("%s START", step_name_)
+        ldd_lh = logging.getLogger(f"LDD {this_job_id}/{num_total_jobs}")
+        ldd_lh.handlers = []
+        ldd_lh.setLevel(logging.INFO)
+        ldd_lh.addHandler(
+            logging.FileHandler(os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "w", "utf-8")
+        )
+        for ldd_lh_handler_ in ldd_lh.handlers:
+            ldd_lh_handler_.setLevel(logging.INFO)
+            ldd_lh_handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
         link_patterns = config.generate_link_patterns()
         if DRY_RUN:
             do_build_lh.info("%s DRY RUN", step_name_)
-            do_build_lh.info(
+            ldd_lh.info(
                 "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
             )
         else:
-            led_flattened = set(
+            libs_flattened = set(
                 itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path))
             )
-            for lib, path in led_flattened:
-                do_build_lh.info("%s: %s => %s", step_name_, lib, path)
-            missing_libs = [lib for lib, path in led_flattened if path is None]
+            for lib, path in libs_flattened:
+                ldd_lh.info("LIB %s => %s", lib, path)
+            missing_libs = [lib for lib, path in libs_flattened if path is None]
             if missing_libs:
-                do_build_lh.info("%s MISSING LIBS: %s", step_name_, ", ".join(missing_libs))
+                ldd_lh.info("MISSING LIBS: %s", ", ".join(missing_libs))
                 return False
             link_patterns = config.generate_link_patterns()
             for link_pattern_group in link_patterns:
                 ldd_pattern_str = " | ".join(p.pattern for p in link_pattern_group)
-                do_build_lh.info("%s: Checking %s", step_name_, ldd_pattern_str)
                 found = False
-                for lib, path in led_flattened:
+                for lib, path in libs_flattened:
                     if found:
                         break
                     for p in link_pattern_group:
                         if p.search(path):
-                            do_build_lh.info("%s: FOUND: %s matches %s", step_name_, lib, p.pattern)
+                            ldd_lh.info("FOUND: %s matches %s", lib, p.pattern)
                             found = True
                             break
                 if not found:
-                    do_build_lh.info("%s: FAILED: Nothing match %s", step_name_, ldd_pattern_str)
+                    ldd_lh.info("FAILED: Nothing match %s", ldd_pattern_str)
                     return False
+        ldd_lh.info("DONE")
         do_build_lh.info("%s DONE", step_name_)
         return True
 
-    with open(os.path.join(LOG_DIR, f"{this_job_id}-config.log"), "wb", buffering=0) as config_log_file:
-        if not run_wrapper(
-            "CONFIG",
-            [
-                CMAKE,
-                "-G",
-                CMAKE_GENERATOR,
-                "-Wdev",
-                "-Wdeprecated",
-                "--warn-uninitialized",
-                "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
-                "-DCMAKE_VERBOSE_MAKEFILE=ON",
-                *cmake_opts,
-                f"-DCMAKE_INSTALL_PREFIX={install_dir}",
-                os.getcwd(),
-            ],
-            cwd=build_dir,
-            stdout=config_log_file,
-            stderr=config_log_file,
-        ):
-            failed()
-            return
+    if not run_wrapper(
+        "CONFIG",
+        [
+            CMAKE,
+            "-G",
+            CMAKE_GENERATOR,
+            "-Wdev",
+            "-Wdeprecated",
+            "--warn-uninitialized",
+            "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
+            "-DCMAKE_VERBOSE_MAKEFILE=ON",
+            *cmake_opts,
+            f"-DCMAKE_INSTALL_PREFIX={install_dir}",
+            os.getcwd(),
+        ],
+        cwd=build_dir,
+    ):
+        failed()
+        return
 
-    with open(os.path.join(LOG_DIR, f"{this_job_id}-build.log"), "wb", buffering=0) as build_log_file:
-        if not run_wrapper(
-            "BUILD",
-            [
-                CMAKE,
-                "--build",
-                build_dir,
-                "-j",
-                str(4),
-            ],
-            stdout=build_log_file,
-            stderr=build_log_file,
-            timeout=360,
-        ):
-            failed()
-            return
-    with open(os.path.join(LOG_DIR, f"{this_job_id}-ctest.log"), "wb", buffering=0) as ctest_log_file:
-        if not run_wrapper(
-            "CTEST",
-            [CTEST, "--output-on-failure"],
-            cwd=build_dir,
-            stdout=ctest_log_file,
-            stderr=ctest_log_file,
-            timeout=60,
-        ):
-            failed()
-            return
+    if not run_wrapper(
+        "BUILD",
+        [
+            CMAKE,
+            "--build",
+            build_dir,
+            "-j",
+            str(4),
+        ],
+        timeout=360,
+    ):
+        failed()
+        return
+    if not run_wrapper(
+        "CTEST",
+        [CTEST, "--output-on-failure"],
+        cwd=build_dir,
+        timeout=60,
+    ):
+        failed()
+        return
 
-    with open(os.path.join(LOG_DIR, f"{this_job_id}-install.log"), "wb", buffering=0) as install_log_file:
-        if not run_wrapper(
-            "INSTALL",
-            [CMAKE, "--install", build_dir],
-            stdout=install_log_file,
-            stderr=install_log_file,
-            timeout=60,
-        ):
-            failed()
-            return
+    if not run_wrapper(
+        "INSTALL",
+        [CMAKE, "--install", build_dir],
+        timeout=60,
+    ):
+        failed()
+        return
 
     if not run_ldd():
         failed()
         return
 
-    with open(os.path.join(LOG_DIR, f"{this_job_id}-testsmall.log"), "wb", buffering=0) as testsmall_log_file:
-        if not run_wrapper(
-            "TESTSMALL",
-            [BASH, os.path.join(SHDIR, "test-small.sh")],
-            stdout=testsmall_log_file,
-            stderr=testsmall_log_file,
-            env={
-                **os.environ,
-                "ART_MODERN_PATH": art_modern_path,
-                "APB_PATH": apb_path,
-                "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-                "MPIEXEC": MPIEXEC if WITH_MPI else "",
-                "SAMTOOLS_THREADS": "4",
-                "MPI_PARALLEL": "4",
-                "PARALLEL": "2",
-                "NO_FASTQC": "1",
-                "OUT_DI": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
-                "SET_X": "1",
-                "WITH_NCBI_NGS": "1" if config.WITH_NCBI_NGS else "0",
-            },
-            timeout=1200,
-        ):
-            failed()
-            return
-
-    shutil.rmtree(build_dir)
-    shutil.rmtree(install_dir)
+    if not run_wrapper(
+        "TESTSMALL",
+        [BASH, os.path.join(SHDIR, "test-small.sh")],
+        additional_env={
+            **os.environ,
+            "ART_MODERN_PATH": art_modern_path,
+            "APB_PATH": apb_path,
+            "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
+            "MPIEXEC": MPIEXEC if WITH_MPI else "",
+            "SAMTOOLS_THREADS": "4",
+            "MPI_PARALLEL": "4",
+            "PARALLEL": "2",
+            "NO_FASTQC": "1",
+            "OUT_DIR": os.path.join(LOG_DIR, str(this_job_id), f"testmall.out.d"),
+            "SET_X": "1",
+            "WITH_NCBI_NGS": "1" if config.WITH_NCBI_NGS else "0",
+        },
+        timeout=1200,
+    ):
+        failed()
+        return
+    if not DRY_RUN:
+        shutil.rmtree(build_dir)
+        shutil.rmtree(install_dir)
+        shutil.rmtree(os.path.join(LOG_DIR, str(this_job_id)))
     with IO_MUTEX:
         SUCCESS_ID.append(this_job_id)
     do_build_lh.info("SUCCESS")
@@ -790,10 +803,20 @@ if __name__ == "__main__":
             bcs.append(bc.copy())
             bc.WITH_NCBI_NGS = False
     num_total_jobs = len(bcs)
+    futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for job_id, bc in enumerate(bcs, 1):
-            executor.submit(do_build, bc, job_id)
-        executor.shutdown()
+            futures.append(executor.submit(do_build, bc, job_id))
+        for future in futures:
+            try:
+                _ = future.result()
+            except concurrent.futures.CancelledError:
+                # Ignore
+                pass
+            except Exception as e:
+                main_lh.error("Exception inside TPE: %s: %s", str(e.__class__.__name__), str(e))
+
+                executor.shutdown(cancel_futures=True)
     SUCCESS_ID = sorted(SUCCESS_ID)
     FAILED_ID = sorted(FAILED_ID)
     main_lh.info("Successful builds: %s", ", ".join(map(str, SUCCESS_ID)))

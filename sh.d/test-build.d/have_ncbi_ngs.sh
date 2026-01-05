@@ -22,9 +22,7 @@ fi
 "${CXX}" \
     ${CXXFLAGS} \
     test_ncbi_ngs.cc \
-    -lncbi-ngs-c++ \
     -lncbi-ngs \
-    -lngs-c++ \
     -lncbi-vdb \
     -o test_ncbi_ngs
 ./test_ncbi_ngs ./out.sra
