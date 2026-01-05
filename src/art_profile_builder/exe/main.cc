@@ -62,7 +62,12 @@ int main(int argc, char** argv)
     if (config.format != APB_FORMAT::SRA) {
         view_sam_mt(ieds_r1, ieds_r2, config.num_threads, config);
     } else {
+#ifdef WITH_NCBI_NGS
         view_sra_mt(ieds_r1, ieds_r2, config.num_threads, config);
+#else
+        BOOST_LOG_TRIVIAL(fatal) << "SRA format support not compiled in!";
+        abort_mpi();
+#endif
     }
 
     std::size_t total_reads = 0;

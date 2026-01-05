@@ -11,6 +11,7 @@
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
 # - OUT_DIR: If set, use this as the output directory (will be cleaned first)
 # - SET_X: If set to "1", enable bash -x for debugging
+# - WITH_NCBI_NGS: If set to "1", test with NCBI NGS toolkit support
 
 if [ "${SET_X:-0}" == "1" ]; then
     set -x
@@ -50,6 +51,7 @@ export IDRATE=0.01                                # Increase indel rate to fail 
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
+export WITH_NCBI_NGS="${WITH_NCBI_NGS:-0}"        # Whether to test with NCBI NGS toolkit
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR

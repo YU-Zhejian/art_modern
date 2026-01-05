@@ -14,7 +14,7 @@ samtools fastq \
     -0 "${OUT_DIR}"/out_se.fq \
     -n \
     "${OUT_DIR}"/out_se.sam
-if [ -n ${WITH_SRA:-} ] && [ "${WITH_SRA}" -eq 1 ]; then
+if [ -n ${WITH_NCBI_NGS:-} ] && [ "${WITH_NCBI_NGS}" -eq 1 ]; then
     latf-load \
         --no-readnames \
         -p ILLUMINA \
@@ -39,7 +39,7 @@ APB_EXEC \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam.txt \
     --parallel "${PARALLEL}" \
     --old_behavior
-if [ -n ${WITH_SRA:-} ] && [ "${WITH_SRA}" -eq 1 ]; then
+if [ -n ${WITH_NCBI_NGS:-} ] && [ "${WITH_NCBI_NGS}" -eq 1 ]; then
     APB_EXEC \
         --i-file "${OUT_DIR}"/out_se.sra \
         --read_len "${RLEN}" \
@@ -50,7 +50,7 @@ fi
 
 cmp "${OUT_DIR}"/out_se_art_cxx_fq.txt "${OUT_DIR}"/out_se_art_perl.txt
 cmp "${OUT_DIR}"/out_se_art_cxx_sam.txt "${OUT_DIR}"/out_se_art_perl.txt
-if [ -n ${WITH_SRA:-} ] && [ "${WITH_SRA}" -eq 1 ]; then
+if [ -n ${WITH_NCBI_NGS:-} ] && [ "${WITH_NCBI_NGS}" -eq 1 ]; then
     cmp "${OUT_DIR}"/out_se_art_cxx_sra.txt "${OUT_DIR}"/out_se_art_perl.txt
 fi
 

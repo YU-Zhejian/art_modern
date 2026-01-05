@@ -3,3 +3,4 @@
 *.sra*
 /test_ncbi_ngs
 /test_ncbi_ngs.exe
+!out.sra.xz.base64

@@ -66,4 +66,3 @@ sam2bam "${OUT_DIR}"/test_small_se_wgs_memory.sam "${LAMBDA_PHAGE}"
 
 rm -fr "${OUT_DIR}"/test_small_se_wgs_memory.*
 assert_cleandir
-

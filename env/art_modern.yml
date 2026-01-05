@@ -22,6 +22,7 @@ dependencies:
   - seaborn
   - tabulate # Used in Pandas to markdown tables
   - pyarrow # For Parquet file support
+  - pyelftools # For reading ELF files in test-build.py
 
   # Code formatter
   - cmake_format
