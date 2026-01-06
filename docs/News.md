@@ -7,6 +7,7 @@
   - Added NCBI SRA support to `art_profile_builder`. Not enabled by default; Add `-DWITH_NCBI_NGS=ON` to CMake options to enable this feature.
   - Added CRAM support to `art_profile_builder`.
   - `string_dup` in bundled HTSLib renamed to `htslib_string_dup` to avoid symbol conflicts with NCBI NGS library.
+  - Bumped bundled `BS::thread_pool` to [`v5.1.0`](https://github.com/bshoshany/thread-pool/releases/tag/v5.1.0).
 - Implementation:
   - `art_profile_builder`: Added `--first_n_reads` to control the number of reads to be processed.
   - `art_profile_builder`: Added `--i-format` to control the input format.
