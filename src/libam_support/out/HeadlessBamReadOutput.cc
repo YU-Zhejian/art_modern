@@ -268,6 +268,7 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
         so.with_tag_MD = params.vm.count("o-hl_sam-without_tag_MD") == 0;
         so.with_tag_NM = params.vm.count("o-hl_sam-without_tag_NM") == 0;
         so.no_qual = params.vm.count("o-hl_sam-no_qual") > 0;
+        so.log_("HeadlessBamReadOutput");
         return std::make_shared<HeadlessBamReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-hl_sam"].as<std::string>(), mpi_rank_s()), so, params.n_threads,
             params.vm["o-hl_sam-queue_size"].as<std::size_t>());

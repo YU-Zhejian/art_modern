@@ -8,6 +8,7 @@ import concurrent.futures
 import glob
 import itertools
 import os
+import platform
 import queue
 import re
 import shutil
@@ -21,7 +22,7 @@ import logging
 from elftools.elf.elffile import ELFFile
 from elftools.elf.dynamic import DynamicSection
 
-from typing import List, Optional, Tuple, Dict
+from typing import List, Optional, Tuple, Dict, Set, IO
 
 THIS_PID = os.getpid()
 
@@ -38,6 +39,7 @@ if PKG_CONFIG_PATH is None:
     PKG_CONFIG_PATH = shutil.which("pkgconf")
 if PKG_CONFIG_PATH is None:
     raise RuntimeError("pkg-config or pkgconf not found in PATH")
+ASSERT_USING_LLVM_CXXSTDLIB = os.environ.get("ASSERT_USING_LLVM_CXXSTDLIB", None) == "1"
 
 IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
@@ -133,6 +135,7 @@ def probe_ncbi_ngs() -> bool:
     )
     return p.returncode == 0
 
+LDD_CACHE=Dict[str, List[Tuple[str, Optional[str]]]]
 
 class PyLddSearch:
     ld_so_paths: List[str]
@@ -141,7 +144,7 @@ class PyLddSearch:
 
     lh: logging.Logger
 
-    def _filter_ld_path(self, ld_paths: List[str]) -> List[str]:
+    def _filter_ld_path(self, ld_paths: List[str], log_prefix: str) -> List[str]:
         ld_paths_filtered = []
         for p in ld_paths:
             p = p.strip()
@@ -152,25 +155,28 @@ class PyLddSearch:
                 if abspath not in ld_paths_filtered:
                     ld_paths_filtered.append(abspath)
                 else:
-                    self.lh.warning("LD path DUPLICATED: %s", abspath)
+                    self.lh.warning("%s: LD path DUPLICATED: %s", log_prefix, abspath)
             else:
-                self.lh.warning("LD path ENOENT: %s", p)
+                self.lh.warning("%s: LD path ENOENT: %s", log_prefix, p)
         return ld_paths_filtered
 
     def __init__(self, ld_so_conf_path: str = "/etc/ld.so.conf"):
         self.lh = logging.getLogger(self.__class__.__name__)
         self.lh.handlers = []
         self.lh.setLevel(logging.INFO)
-        self.lh.addHandler(logging.StreamHandler(sys.stderr))
-        self.lh.addHandler(logging.FileHandler(os.path.join(LOG_DIR, "pyldd.log"), "w", "utf-8"))
+        stream_handler = logging.StreamHandler(sys.stderr)
+        stream_handler.setLevel(logging.WARNING if not (_args.ldd_run or _args.ldd_run_sa) else logging.INFO)
+        self.lh.addHandler(stream_handler)
+        file_handler = logging.FileHandler(os.path.join(LOG_DIR, "pyldd.log"), "w", "utf-8")
+        file_handler.setLevel(logging.INFO)
+        self.lh.addHandler(file_handler)
 
         for handler_ in self.lh.handlers:
-            handler_.setLevel(logging.INFO)
             handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
         # Read /etc/ld.so.conf and parse it
-        self.ld_so_paths = self._filter_ld_path(self._parse_ld_so_conf(ld_so_conf_path))
+        self.ld_so_paths = self._filter_ld_path(self._parse_ld_so_conf(ld_so_conf_path), "ld.so.conf")
         # Read LD_LIBRARY_PATH
-        self.ld_library_path = self._filter_ld_path(os.environ.get("LD_LIBRARY_PATH", "").split(":"))
+        self.ld_library_path = self._filter_ld_path(os.environ.get("LD_LIBRARY_PATH", "").split(":"), "LD_LIBRARY_PATH")
         self.lh.info("Final Resolved and valid /etc/ld.so.conf: %s", ":".join(self.ld_so_paths))
         self.lh.info("Final Resolved and valid LD_LIBRARY_PATH: %s", ":".join(self.ld_library_path))
 
@@ -257,18 +263,20 @@ class PyLddSearch:
                         if tag.entry.d_tag == "DT_NEEDED":
                             required_libs.append(tag.needed)
                         elif tag.entry.d_tag == "DT_RPATH":
-                            dt_rpath.append(tag.rpath)
+                            dt_rpath.extend(tag.rpath.split(":"))
                         # RUNPATH (New style)
                         elif tag.entry.d_tag == "DT_RUNPATH":
-                            dt_runpath.append(tag.runpath)
-        dt_rpath = self._filter_ld_path(dt_rpath)
-        dt_runpath = self._filter_ld_path(dt_runpath)
+                            dt_runpath.extend(tag.runpath.split(":"))
+        dt_rpath = self._filter_ld_path(dt_rpath, f"{path}: RPATH")
+        dt_runpath = self._filter_ld_path(dt_runpath, f"{path}: RUNPATH")
+        self.lh.info("%s RPATH: %s", path, ":".join(dt_rpath))
+        self.lh.info("%s RUNPATH: %s", path, ":".join(dt_runpath))
         for lib in required_libs:
             resolved_path = self._search_library_in_paths(lib, dt_rpath, dt_runpath)
             resolved_libs.append((lib, resolved_path))
         return resolved_libs
 
-    def ldd_full(self, path: str) -> Dict[str, List[Tuple[str, Optional[str]]]]:
+    def ldd_full(self, path: str) -> LDD_CACHE:
         """
         Perform full recursive ldd on the given binary and return a list of resolved library paths.
         """
@@ -289,15 +297,50 @@ class PyLddSearch:
                     ld_dequeue.put(lib_path)
         return ldd_cache
 
-    def ldd_full_flattened(self, path: str) -> List[Tuple[str, Optional[str]]]:
+    def lddtree(
+            self,
+            path: str,
+            ldd_cache: Optional[LDD_CACHE]=None,
+            n_tabs: int=0,
+            already_printed : Optional[Set[str]] = None,
+            lib_name : str = None,
+            file: IO[str] = sys.stdout
+    ):
+        ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
+        already_printed = already_printed if already_printed is not None else set()
+        if lib_name is not None:
+            print("\t" * n_tabs + lib_name, "=>", path, file=file, end="")
+        else:
+            print("\t" * n_tabs + path, file=file, end="")
+        if path in already_printed:
+            print(" [ALREADY PRINTED]", file=file)
+            return
+        else:
+            print("", file=file)
+        for lib_name, lib_path in ldd_cache[path]:
+            if lib_path is not None:
+                self.lddtree(lib_path, ldd_cache, n_tabs + 1, already_printed, lib_name, file=file)
+            else:
+                print("\t" * n_tabs + lib_name, "=>", "NOT FOUND", file=file)
+            already_printed.add(path)
+
+    def ldd_full_flattened(self, path: str, ldd_cache: Optional[LDD_CACHE]=None) -> List[Tuple[str, Optional[str]]]:
         """
         Perform full recursive ldd on the given binary and return a flattened list of resolved library paths.
         """
-        ldd_cache = self.ldd_full(path)
+        ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
         flattened_list = []
         for libs in ldd_cache.values():
             flattened_list.extend(libs)
         return list(set(flattened_list))
+
+    def check_missing_libs(self, path: str, libs_flattened: List[Tuple[str, Optional[str]]]) -> None:
+        for lib, libpath in libs_flattened:
+            self.lh.info("%s: LIB %s => %s", path, lib, libpath)
+            missing_libs = [lib for lib, libpath in libs_flattened if libpath is None]
+            if missing_libs:
+                self.lh.error("%s: MISSING LIBS: %s", path, ":".join(missing_libs))
+                raise AssertionError()
 
 
 class BuildConfig:
@@ -337,7 +380,7 @@ class BuildConfig:
             cmake_flags.append(f"-DFIND_RANDOM_MKL_THROUGH_PKGCONF={self.FIND_RANDOM_MKL_THROUGH_PKGCONF}")
         return cmake_flags
 
-    def generate_link_patterns(self) -> List[List[re.Pattern]]:
+    def generate_link_patterns(self) -> Tuple[List[List[re.Pattern]], List[re.Pattern]]:
         """
         Generate link patterns for this build configuration.
         The 1st level of list is AND, the 2nd level is OR.
@@ -345,6 +388,7 @@ class BuildConfig:
         :return:
         """
         retl = []
+        blacklist = []
         if self.USE_MALLOC == "JEMALLOC":
             retl.append([re.compile("libjemalloc\\.so")])
         elif self.USE_MALLOC == "MIMALLOC":
@@ -382,7 +426,19 @@ class BuildConfig:
         retl.append([re.compile("libboost_timer\\.so")])
         retl.append([re.compile("libz\\.so")])
         retl.append([re.compile("libslim_libceu\\.so")])
-        return retl
+        if WITH_MPI:
+            retl.append([re.compile("libmpi\\.so")])
+        else:
+            blacklist.append(re.compile("libmpi\\.so"))
+
+        if ASSERT_USING_LLVM_CXXSTDLIB:
+            retl.append([re.compile("libc\\+\\+\\.so")])
+            # blacklist.append( re.compile("libstdc\\+\\+\\.so" ))
+            # Some dependencies of Boost still use libstdc++
+        else:
+            retl.append([re.compile("libstdc\\+\\+\\.so")])
+            blacklist.append(re.compile("libc\\+\\+\\.so"))
+        return retl, blacklist
 
     def copy(self) -> BuildConfig:
         new_config = BuildConfig(self.old_cmake_flags.copy())
@@ -428,6 +484,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             FAILED_ID.append(this_job_id)
         main_lh.error("%s/%s: FAILED", this_job_id, num_total_jobs)
         do_build_lh.error("FAILED")
+        if _args.fast_fail:
+            raise AssertionError(f"{this_job_id} FAILED")
 
     def run_wrapper(
         step_name_: str,
@@ -481,6 +539,10 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     def run_ldd() -> bool:
         step_name_ = "LDD"
         do_build_lh.info("%s START", step_name_)
+        if platform.system().lower() != 'linux':
+            do_build_lh.info("%s SKIPPED SINCE NOT LINUX", step_name_)
+            return True
+
         ldd_lh = logging.getLogger(f"LDD {this_job_id}/{num_total_jobs}")
         ldd_lh.handlers = []
         ldd_lh.setLevel(logging.INFO)
@@ -497,16 +559,16 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
             )
         else:
-            libs_flattened = set(
+            libs_flattened = list(set(
                 itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path))
-            )
-            for lib, path in libs_flattened:
-                ldd_lh.info("LIB %s => %s", lib, path)
-            missing_libs = [lib for lib, path in libs_flattened if path is None]
-            if missing_libs:
-                ldd_lh.info("MISSING LIBS: %s", ", ".join(missing_libs))
+            ))
+            try:
+                pls.check_missing_libs("art_modern+apb",libs_flattened)
+            except AssertionError:
                 return False
-            link_patterns = config.generate_link_patterns()
+            ldd_failed = False
+
+            link_patterns, link_blacklists = config.generate_link_patterns()
             for link_pattern_group in link_patterns:
                 ldd_pattern_str = " | ".join(p.pattern for p in link_pattern_group)
                 found = False
@@ -519,8 +581,26 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                             found = True
                             break
                 if not found:
-                    ldd_lh.info("FAILED: Nothing match %s", ldd_pattern_str)
-                    return False
+                    ldd_lh.error("Nothing match %s", ldd_pattern_str)
+                    ldd_failed =  True
+            for blacklist_pattern in link_blacklists:
+                found = False
+                for lib, path in libs_flattened:
+                    if found:
+                        break
+                    if blacklist_pattern.search(path):
+                        ldd_lh.error("%s matches %s", lib, blacklist_pattern.pattern)
+                        ldd_failed =  True
+                        found = True
+                        break
+                if not found:
+                    ldd_lh.info("PASSED: Nothing match %s", blacklist_pattern.pattern)
+            if ldd_failed:
+                with open( os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.lddtree.log"), "w", encoding="utf-8") as w:
+                    pls.lddtree(art_modern_path, file=w)
+                    pls.lddtree(apb_path, file=w)
+                ldd_lh.error("FAILED")
+                return False
         ldd_lh.info("DONE")
         do_build_lh.info("%s DONE", step_name_)
         return True
@@ -618,7 +698,7 @@ if __name__ == "__main__":
         help="Perform a dry run without executing commands.",
     )
     parser.add_argument(
-        "--ld-run",
+        "--ldd-run",
         action="store_true",
         help="Stop after parsing ld.so.conf and LD_LIBRARY_PATH.",
     )
@@ -637,6 +717,9 @@ if __name__ == "__main__":
         action="store_true",
         help="Do not automatically clear log dir on success.",
     )
+    parser.add_argument("--ldd-run-sa", action="append", help = "Run stand-alone Python LDD")
+    parser.add_argument("--fast-fail", action="store_true", help = "Fail if any job fails")
+
 
     _args, _old_cmake_flags = parser.parse_known_args()
     DRY_RUN = _args.dry_run
@@ -665,7 +748,13 @@ if __name__ == "__main__":
         handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
     main_lh.info("Log dir: %s", LOG_DIR)
     pls = PyLddSearch()
-    if _args.ld_run:
+    if _args.ldd_run:
+        exit(0)
+    if _args.ldd_run_sa:
+        for sa_ldd_run in _args.ldd_run_sa:
+            cache = pls.ldd_full( sa_ldd_run)
+            pls.lddtree( sa_ldd_run, ldd_cache=cache)
+            pls.check_missing_libs(sa_ldd_run, pls.ldd_full_flattened(sa_ldd_run, ldd_cache=cache))
         exit(0)
 
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
@@ -746,10 +835,15 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
+    print("Probing C++ stdlib type...", end="")
+    if ASSERT_USING_LLVM_CXXSTDLIB:
+        print("libc++ (LLVM)")
+    else:
+        print("libstdc++ (GNU)")
+
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
     max_workers = min(5, os.cpu_count() // 4)
     bcs = []
-
     for cmake_build_type in cmake_build_types:
         bc = BuildConfig(_old_cmake_flags)
 

@@ -69,9 +69,11 @@ public:
     char compress_level = ALLOWED_COMPRESSION_LEVELS[4]; // Default '4'
 
     /** For headless BAM only */
-    bool with_tag_OA = true;
-    bool with_tag_MD = true;
-    bool with_tag_NM = true;
+    bool with_tag_OA = false;
+    bool with_tag_MD = false;
+    bool with_tag_NM = false;
     bool no_qual = false;
+
+    void log_(const std::string& name) const;
 };
 } // namespace labw::art_modern

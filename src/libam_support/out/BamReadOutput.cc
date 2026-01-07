@@ -262,7 +262,10 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
         }
         so.with_tag_MD = params.vm.count("o-sam-without_tag_MD") == 0;
         so.with_tag_NM = params.vm.count("o-sam-without_tag_NM") == 0;
+        so.with_tag_OA = false; // OA tag is not supported in non-headless BAM
         so.no_qual = params.vm.count("o-sam-no_qual") > 0;
+        so.log_("BamReadOutput");
+
         return std::make_shared<BamReadOutput>(
             attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank_s()), params.fasta_fetch, so,
             params.n_threads, params.vm["o-sam-queue_size"].as<std::size_t>());

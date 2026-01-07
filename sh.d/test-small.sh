@@ -27,10 +27,11 @@ cd "${SHDIR}/../"
 PROJDIR="$(pwd)/"
 export PROJDIR
 
-if [ -z "${OPT_DIR}" ]; then
+if [ -z "${OPT_DIR:-}" ]; then
     OPT_DIR="${PROJDIR}/opt"
     mkdir -p "${OPT_DIR}"
 fi
+export OPT_DIR
 
 if [ ! -f "${PROJDIR}"/data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python "${SHDIR}"/test-small.sh.d/gen_cov.py data/raw_data/ce11.mRNA_head 5
@@ -92,10 +93,11 @@ function merge_file() {
     #   (With MPI)    Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.*.fastq
     #   (Without MPI) Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Merge into: "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
-    if [ -f "${1}" ]; then
+    if [ -z "${MPIEXEC:-}" ]; then
         # No MPI run, nothing to do
         return
     fi
+    rm -f "${1}" # Remove target file if exists
     # Only FASTQ, FASTA or SAM files can be merged. Get the extension.
     ext="${1##*.}"
     base="${1%.*}"
@@ -164,6 +166,8 @@ EXEC_ORDER=0
 TIMEOUT_CMD=("$(type -p timeout)" "-s" "TERM" "${TIMEOUT}"s)
 
 function AM_EXEC() {
+    # Clean previous logs
+    rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
     "${TIMEOUT_CMD[@]}" env \
@@ -182,6 +186,8 @@ function AM_EXEC() {
     fi
 }
 function AM_EXEC_SHOULD_FAIL() {
+    # Clean previous logs
+    rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
     set +e
@@ -202,6 +208,8 @@ function AM_EXEC_SHOULD_FAIL() {
     fi
 }
 function APB_EXEC() {
+    # Clean previous logs
+    rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${APB_CMD_ASSEMBLED[*]} $*"
     "${TIMEOUT_CMD[@]}" env \

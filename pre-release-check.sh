@@ -6,17 +6,19 @@ make clean
 make testbuild-small || true
 make testbuild-small-mpi || true
 
-LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
-    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}" \
+LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
+    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
     PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
     CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
+    ASSERT_USING_LLVM_CXXSTDLIB=1 \
     make testbuild-small \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
-LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
-    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}" \
+LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
+    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
     PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
     CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
+    ASSERT_USING_LLVM_CXXSTDLIB=1 \
     make testbuild-small-mpi \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
