@@ -276,3 +276,29 @@ cd build
 PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
     cmake ..
 ```
+
+### Installing NCBI NGS SDK from Source
+
+Install NCBI VDB first.
+
+```shell
+axel https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
+unzip ncbi-vdb-3.3.0.zip
+cd ncbi-vdb-3.3.0
+./configure --prefix=$HOME/opt/ncbi-vdb-3.3.0
+make -j $(nproc) all install
+make install
+cd ..
+```
+
+Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
+
+```shell
+axel https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
+unzip sra-tools-3.3.0.zip
+cd sra-tools-3.3.0
+./configure --prefix=$HOME/opt/sra-tools-3.3.0 --with-ncbi-vdb-prefix=$HOME/opt/ncbi-vdb-3.3.0 
+make clean install -j $(nproc) BUILD_TOOLS_LOADERS=ON # All important! Otherwise kar and latf-load will NOT be built.
+cd ..
+cp -r $HOME/opt/ncbi-vdb-3.3.0/include/ $HOME/opt/sra-tools-3.3.0/bin/ncbi/schema
+```

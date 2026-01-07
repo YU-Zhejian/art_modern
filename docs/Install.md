@@ -213,7 +213,7 @@ See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
 (optional-ncbi-ngs-components)=
 ### NCBI NGS Libraries
 
-For enabling NCBI Short Read Archive (SRA) support in `art_profile_builder`. Requires `libncbi-ngs.so`, with its development headers.
+For enabling NCBI Short Read Archive (SRA) support in `art_profile_builder`. Requires `libncbi-ngs.a`, with its development headers.
 
 Available at <https://github.com/ncbi/sra-tools>.
 

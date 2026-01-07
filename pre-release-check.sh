@@ -2,28 +2,40 @@
 # shellcheck disable=SC2317
 # shellcheck disable=SC1091
 
-make clean
-make testbuild-small || true
-make testbuild-small-mpi || true
+function run_gcc() {
+LD_LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_LIBRARY_PATH:-}" \
+    LD_RUN_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_RUN_PATH:-}" \
+    LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LIBRARY_PATH:-}" \
+    PATH="${HOME}/opt/sra-tools-3.3.0/bin/:${HOME}/opt/ncbi-vdb-3.3.0/bin/:${PATH:-}" \
+    C_INCLUDE_PATH="${HOME}/opt/sra-tools-3.3.0/include/:${HOME}/opt/ncbi-vdb-3.3.0/include/:${C_INCLUDE_PATH:-}" \
+    CPLUS_INCLUDE_PATH="${HOME}/opt/sra-tools-3.3.0/include/:${HOME}/opt/ncbi-vdb-3.3.0/include/:${CPLUS_INCLUDE_PATH:-}" \
+    "${@}"
+}
 
-LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
-    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
-    PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
-    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
-    ASSERT_USING_LLVM_CXXSTDLIB=1 \
-    make testbuild-small \
+function run_llvm() {
+  # SRA-Tools and NCBI-VDB are not yet built with LLVM, so we don't set those paths here.
+  LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
+      LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
+      PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
+      CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
+      ASSERT_USING_LLVM_CXXSTDLIB=1 \
+      "${@}"
+}
+
+make clean
+
+run_gcc make testbuild || true
+exit
+run_gcc make testbuild-small-mpi || true
+
+run_llvm  make testbuild-small \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
-LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
-    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
-    PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
-    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
-    ASSERT_USING_LLVM_CXXSTDLIB=1 \
-    make testbuild-small-mpi \
+run_llvm make testbuild-small-mpi \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
 . /opt/intel/oneapi/setvars.sh
-make testbuild-small \
+run_gcc make testbuild-small \
     CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx' || true
-make testbuild-small-mpi \
+run_gcc make testbuild-small-mpi \
     CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx' || true

@@ -11,7 +11,7 @@ if type latf-load >/dev/null 2>&1 && type kar >/dev/null 2>&1; then
         -p ILLUMINA \
         -o out.sra.d \
         -L info \
-        -q PHRED_33 \
+        --quality PHRED_33 \
         1_1.fq 1_2.fq
     kar -f -c out.sra -d out.sra.d
 else

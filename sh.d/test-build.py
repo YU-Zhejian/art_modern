@@ -135,7 +135,9 @@ def probe_ncbi_ngs() -> bool:
     )
     return p.returncode == 0
 
-LDD_CACHE=Dict[str, List[Tuple[str, Optional[str]]]]
+
+LDD_CACHE = Dict[str, List[Tuple[str, Optional[str]]]]
+
 
 class PyLddSearch:
     ld_so_paths: List[str]
@@ -298,13 +300,13 @@ class PyLddSearch:
         return ldd_cache
 
     def lddtree(
-            self,
-            path: str,
-            ldd_cache: Optional[LDD_CACHE]=None,
-            n_tabs: int=0,
-            already_printed : Optional[Set[str]] = None,
-            lib_name : str = None,
-            file: IO[str] = sys.stdout
+        self,
+        path: str,
+        ldd_cache: Optional[LDD_CACHE] = None,
+        n_tabs: int = 0,
+        already_printed: Optional[Set[str]] = None,
+        lib_name: str = None,
+        file: IO[str] = sys.stdout,
     ):
         ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
         already_printed = already_printed if already_printed is not None else set()
@@ -324,7 +326,7 @@ class PyLddSearch:
                 print("\t" * n_tabs + lib_name, "=>", "NOT FOUND", file=file)
             already_printed.add(path)
 
-    def ldd_full_flattened(self, path: str, ldd_cache: Optional[LDD_CACHE]=None) -> List[Tuple[str, Optional[str]]]:
+    def ldd_full_flattened(self, path: str, ldd_cache: Optional[LDD_CACHE] = None) -> List[Tuple[str, Optional[str]]]:
         """
         Perform full recursive ldd on the given binary and return a flattened list of resolved library paths.
         """
@@ -539,7 +541,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     def run_ldd() -> bool:
         step_name_ = "LDD"
         do_build_lh.info("%s START", step_name_)
-        if platform.system().lower() != 'linux':
+        if platform.system().lower() != "linux":
             do_build_lh.info("%s SKIPPED SINCE NOT LINUX", step_name_)
             return True
 
@@ -559,11 +561,11 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
             )
         else:
-            libs_flattened = list(set(
-                itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path))
-            ))
+            libs_flattened = list(
+                set(itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path)))
+            )
             try:
-                pls.check_missing_libs("art_modern+apb",libs_flattened)
+                pls.check_missing_libs("art_modern+apb", libs_flattened)
             except AssertionError:
                 return False
             ldd_failed = False
@@ -582,7 +584,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                             break
                 if not found:
                     ldd_lh.error("Nothing match %s", ldd_pattern_str)
-                    ldd_failed =  True
+                    ldd_failed = True
             for blacklist_pattern in link_blacklists:
                 found = False
                 for lib, path in libs_flattened:
@@ -590,13 +592,15 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                         break
                     if blacklist_pattern.search(path):
                         ldd_lh.error("%s matches %s", lib, blacklist_pattern.pattern)
-                        ldd_failed =  True
+                        ldd_failed = True
                         found = True
                         break
                 if not found:
                     ldd_lh.info("PASSED: Nothing match %s", blacklist_pattern.pattern)
             if ldd_failed:
-                with open( os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.lddtree.log"), "w", encoding="utf-8") as w:
+                with open(
+                    os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.lddtree.log"), "w", encoding="utf-8"
+                ) as w:
                     pls.lddtree(art_modern_path, file=w)
                     pls.lddtree(apb_path, file=w)
                 ldd_lh.error("FAILED")
@@ -717,9 +721,8 @@ if __name__ == "__main__":
         action="store_true",
         help="Do not automatically clear log dir on success.",
     )
-    parser.add_argument("--ldd-run-sa", action="append", help = "Run stand-alone Python LDD")
-    parser.add_argument("--fast-fail", action="store_true", help = "Fail if any job fails")
-
+    parser.add_argument("--ldd-run-sa", action="append", help="Run stand-alone Python LDD")
+    parser.add_argument("--fast-fail", action="store_true", help="Fail if any job fails")
 
     _args, _old_cmake_flags = parser.parse_known_args()
     DRY_RUN = _args.dry_run
@@ -752,8 +755,8 @@ if __name__ == "__main__":
         exit(0)
     if _args.ldd_run_sa:
         for sa_ldd_run in _args.ldd_run_sa:
-            cache = pls.ldd_full( sa_ldd_run)
-            pls.lddtree( sa_ldd_run, ldd_cache=cache)
+            cache = pls.ldd_full(sa_ldd_run)
+            pls.lddtree(sa_ldd_run, ldd_cache=cache)
             pls.check_missing_libs(sa_ldd_run, pls.ldd_full_flattened(sa_ldd_run, ldd_cache=cache))
         exit(0)
 
