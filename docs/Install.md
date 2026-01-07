@@ -210,6 +210,19 @@ The MPI installation with MPI C API should be locatable using CMake module [`Fin
 
 See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
 
+(optional-ncbi-ngs-components)=
+### NCBI NGS Libraries
+
+For enabling NCBI Short Read Archive (SRA) support in `art_profile_builder`. Requires `libncbi-ngs.so`, with its development headers.
+
+Available at <https://github.com/ncbi/sra-tools>.
+
+Available since [`1.3.3`](#v-1.3.3-section).
+
+See also: [CMake variable `WITH_NCBI_NGS`](#with-ncbi-ngs-section) below.
+
+**NOTE** If you would like to use NCBI NGS Library, you **MUST** use bundled HTSLib due to symbol conflicts.
+
 ## Required Bundled/External Libraries
 
 The following dependencies are bundled with the project. You do not need to install them manually. However, you may choose to use external ones if you have them installed in your system. Consult your system administrator if you do not know whether and where those libraries are installed.
@@ -401,10 +414,8 @@ The random number generator used.
 On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
 ```text
-    VSFMT19937BulkRandomDevice(32 bits): gmean:        241; mean/sd:           241/3 us
        MKL::VSL_BRNG_SFMT19937(32 bits): gmean:        286; mean/sd:           286/3 us
          MKL::VSL_BRNG_MT19937(32 bits): gmean:        435; mean/sd:         446/132 us
-        VSFMT19937RandomDevice(32 bits): gmean:        735; mean/sd:         743/133 us
                PCG::pcg32_fast(32 bits): gmean:        848; mean/sd:           848/5 us
           absl::InsecureBitGen(64 bits): gmean:      1,486; mean/sd:        1,486/33 us
       VMT19937BulkRandomDevice(32 bits): gmean:      1,635; mean/sd:       1,641/171 us
@@ -427,8 +438,6 @@ On another [OrangePi 3B](http://www.orangepi.org/html/hardWare/computerAndMicroc
 ```
 
 **NOTE** The performance may vary on different platforms.
-
-**NOTE** VSFMT is currently not available.
 
 (use-thread-parallel-section)=
 ### `USE_THREAD_PARALLEL`
@@ -534,7 +543,16 @@ Available since [1.3.0](#v-1.3.0-section).
 Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) set to `ONEMKL`.
 
 - **Unset (DEFAULT): Will not find Intel OneAPI MKL through pkgconf.**
-- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file. 
+- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file.
+
+(with-ncbi-ngs-section)=
+### `WITH_NCBI_NGS`
+
+Available since [`1.3.3`](#v-1.3.3-section).
+
+Enable NCBI SRA parsing to `art_profile_builder`.
+
+See also [NCBI NGS Libraries](#optional-ncbi-ngs-components) for requirements.
 
 ### Deprecated Options
 

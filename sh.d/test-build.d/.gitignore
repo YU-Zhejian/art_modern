@@ -1,0 +1,5 @@
+!1_1.fq
+!1_2.fq
+*.sra*
+/test_ncbi_ngs
+/test_ncbi_ngs.exe

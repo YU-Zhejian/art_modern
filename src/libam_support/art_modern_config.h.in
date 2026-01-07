@@ -43,4 +43,6 @@
 
 // Reverse
 #cmakedefine AM_NO_Q_REVERSE
+
+#cmakedefine WITH_NCBI_NGS
 #endif

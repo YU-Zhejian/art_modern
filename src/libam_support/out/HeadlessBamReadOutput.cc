@@ -239,12 +239,9 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
     bam_desc.add_options()("o-hl_sam-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in headless SAM/BAM output.");
-    bam_desc.add_options()("o-hl_sam-without_tag_OA",
-        "Set to disable the OA tag in headless SAM/BAM output.");
-    bam_desc.add_options()("o-hl_sam-without_tag_MD",
-        "Set to disable the MD tag in headless SAM/BAM output.");
-    bam_desc.add_options()("o-hl_sam-without_tag_NM",
-        "Set to disable the NM tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_OA", "Set to disable the OA tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_MD", "Set to disable the MD tag in headless SAM/BAM output.");
+    bam_desc.add_options()("o-hl_sam-without_tag_NM", "Set to disable the NM tag in headless SAM/BAM output.");
     bam_desc.add_options()("o-hl_sam-no_qual", "Set to disable writing quality scores in headless SAM/BAM output.");
     desc.add(bam_desc);
 }

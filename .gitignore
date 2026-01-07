@@ -145,3 +145,4 @@ perf.data*
 *.[sb]a[mi]
 *.csi
 *collect*
+*.sif

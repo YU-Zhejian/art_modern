@@ -11,10 +11,12 @@
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
 # - OUT_DIR: If set, use this as the output directory (will be cleaned first)
 # - SET_X: If set to "1", enable bash -x for debugging
+# - WITH_NCBI_NGS: If set to "1", test with NCBI NGS toolkit support
 
 if [ "${SET_X:-0}" == "1" ]; then
     set -x
     BASH_WRAPPER=("${SHELL}" "-x")
+    export PS4='+(${BASH_SOURCE}:${LINENO}): '
 else
     BASH_WRAPPER=("${SHELL}")
 fi
@@ -24,6 +26,11 @@ SHDIR="$(readlink -f "$(dirname "${0}")")"
 cd "${SHDIR}/../"
 PROJDIR="$(pwd)/"
 export PROJDIR
+
+if [ -z "${OPT_DIR}" ]; then
+    OPT_DIR="${PROJDIR}/opt"
+    mkdir -p "${OPT_DIR}"
+fi
 
 if [ ! -f "${PROJDIR}"/data/raw_data/ce11.mRNA_head.cov_stranded.tsv ]; then
     python "${SHDIR}"/test-small.sh.d/gen_cov.py data/raw_data/ce11.mRNA_head 5
@@ -36,7 +43,7 @@ if [ -n "${OUT_DIR:-}" ]; then
     mkdir -p "${OUT_DIR}"
 else
     echo "Creating temporary OUT_DIR."
-    OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir=/tmp)"
+    OUT_DIR="$(mktemp -d art_modern_test_small.d.XXXXXX --tmpdir="${OPT_DIR}")"
     echo "Created OUT_DIR=${OUT_DIR}"
 fi
 MRNA_HEAD="${PROJDIR}/data/raw_data/ce11.mRNA_head.fa"
@@ -50,6 +57,7 @@ export IDRATE=0.01                                # Increase indel rate to fail 
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
+export WITH_NCBI_NGS="${WITH_NCBI_NGS:-0}"        # Whether to test with NCBI NGS toolkit
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
@@ -136,6 +144,13 @@ function validate_cov() {
 
 function validate_template() {
     python "${SHDIR}"/test-small.sh.d/validate_template.py "${@}"
+}
+
+function validate_read_tags() {
+    python "${SHDIR}"/test-small.sh.d/validate_read_tags.py "${@}"
+}
+function validate_read_quals() {
+    python "${SHDIR}"/test-small.sh.d/validate_read_quals.py "${@}"
 }
 
 function art_profile_illumina() {
@@ -229,6 +244,7 @@ if [ -z "${MPIEXEC:-}" ]; then
     # In MPI mode, these tests are skipped since MPI termination may called early, preventing log generation
     . "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
 fi
-. "${SHDIR}"/test-small.sh.d/21-apb-se.sh # APB single-end test
-. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh # APB paired-end test
-rm -d "${OUT_DIR}"                        # Which should now be empty
+. "${SHDIR}"/test-small.sh.d/11_test_sam_tags.sh # Test SAM tags and qualities
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh        # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh        # APB paired-end test
+rm -d "${OUT_DIR}"                               # Which should now be empty
