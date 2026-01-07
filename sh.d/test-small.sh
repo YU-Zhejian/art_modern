@@ -149,6 +149,9 @@ function validate_template() {
 function validate_read_tags() {
     python "${SHDIR}"/test-small.sh.d/validate_read_tags.py "${@}"
 }
+function validate_read_quals() {
+    python "${SHDIR}"/test-small.sh.d/validate_read_quals.py "${@}"
+}
 
 function art_profile_illumina() {
     env -C "${OUT_DIR}" \
@@ -241,7 +244,7 @@ if [ -z "${MPIEXEC:-}" ]; then
     # In MPI mode, these tests are skipped since MPI termination may called early, preventing log generation
     . "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
 fi
-. "${SHDIR}"/test-small.sh.d/11_test_sam_tags.sh # TODO: Test more SAM tags
-. "${SHDIR}"/test-small.sh.d/21-apb-se.sh # APB single-end test
-. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh # APB paired-end test
-rm -d "${OUT_DIR}"                        # Which should now be empty
+. "${SHDIR}"/test-small.sh.d/11_test_sam_tags.sh # Test SAM tags and qualities
+. "${SHDIR}"/test-small.sh.d/21-apb-se.sh        # APB single-end test
+. "${SHDIR}"/test-small.sh.d/22-apb-pe.sh        # APB paired-end test
+rm -d "${OUT_DIR}"                               # Which should now be empty

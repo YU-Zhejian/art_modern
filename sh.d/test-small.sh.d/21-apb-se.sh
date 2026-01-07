@@ -70,7 +70,7 @@ APB_EXEC \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam_cat.txt \
     --parallel "${PARALLEL}" \
-    --old_behavior < "${OUT_DIR}"/out_se.sam
+    --old_behavior <"${OUT_DIR}"/out_se.sam
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam.gz \
     --read_len "${RLEN}" \
@@ -83,7 +83,7 @@ APB_EXEC \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_sam_gz_cat.txt \
     --parallel "${PARALLEL}" \
-    --old_behavior < "${OUT_DIR}"/out_se.sam.gz
+    --old_behavior <"${OUT_DIR}"/out_se.sam.gz
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam.bam \
     --read_len "${RLEN}" \
@@ -96,7 +96,7 @@ APB_EXEC \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_bam_cat.txt \
     --parallel "${PARALLEL}" \
-    --old_behavior < "${OUT_DIR}"/out_se.sam.bam
+    --old_behavior <"${OUT_DIR}"/out_se.sam.bam
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam.uncompressed.bam \
     --read_len "${RLEN}" \
@@ -109,7 +109,7 @@ APB_EXEC \
     --read_len "${RLEN}" \
     --o-file1 "${OUT_DIR}"/out_se_art_cxx_ubam_cat.txt \
     --parallel "${PARALLEL}" \
-    --old_behavior < "${OUT_DIR}"/out_se.sam.uncompressed.bam
+    --old_behavior <"${OUT_DIR}"/out_se.sam.uncompressed.bam
 APB_EXEC \
     --i-file "${OUT_DIR}"/out_se.sam.cram \
     --read_len "${RLEN}" \

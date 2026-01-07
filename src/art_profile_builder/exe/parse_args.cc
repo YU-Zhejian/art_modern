@@ -72,15 +72,14 @@ namespace {
                 abort_mpi();
             }
         }
-        if (expected_format != APB_FORMAT::AUTO)
-        {
+        if (expected_format != APB_FORMAT::AUTO) {
             return expected_format;
         }
 #ifdef WITH_NCBI_NGS
-            if (detect_sra(file_path)) {
-                assert_is_sra(file_path);
-                return APB_FORMAT::SRA;
-            }
+        if (detect_sra(file_path)) {
+            assert_is_sra(file_path);
+            return APB_FORMAT::SRA;
+        }
 #endif
         htsFile* file = CExceptionsProxy::assert_not_null(
             hts_open(file_path.c_str(), "r"), USED_HTSLIB_NAME, "Failed to open HTS file.");

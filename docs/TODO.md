@@ -15,7 +15,6 @@
 
 ## I/O Formats
 
-- Add flags to disable/enable diverse BAM tags; Add a "no qual" option to various SAM/BAM writers: Done, tests required.
 - Support circular genome or RNA?
 - Support simulating BGI/MGISEQ reads and new Illumina models: Started.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?

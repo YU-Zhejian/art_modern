@@ -147,14 +147,14 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     htsThreadPool tpool = { nullptr, 0 };
     tpool.pool = CExceptionsProxy::assert_not_null(
         hts_tpool_init(static_cast<int>(config.num_io_threads)), USED_HTSLIB_NAME, "Failed to init HTS thread pool.");
-        std::string modestr = "r";
-        if (config.format == APB_FORMAT::BAM) {
-            modestr += "b";
-        } else if (config.format == APB_FORMAT::CRAM) {
-            modestr += "c";
-        } else if (config.format == APB_FORMAT::FASTQ) {
-            modestr += "f";
-        }
+    std::string modestr = "r";
+    if (config.format == APB_FORMAT::BAM) {
+        modestr += "b";
+    } else if (config.format == APB_FORMAT::CRAM) {
+        modestr += "c";
+    } else if (config.format == APB_FORMAT::FASTQ) {
+        modestr += "f";
+    }
     auto* in = CExceptionsProxy::assert_not_null(
         hts_open(config.input_file_path.c_str(), modestr.c_str()), USED_HTSLIB_NAME, "Failed to open HTS file.");
     auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
