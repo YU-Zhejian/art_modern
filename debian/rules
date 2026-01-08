@@ -31,8 +31,6 @@ CONFIGURE_CMAKE_PARAMS = \
     -DUSE_CONCURRENT_QUEUE="$(USE_CONCURRENT_QUEUE_PATH)"
 
 %.1: %.1.md
-	# TODO: Supress: art-modern: wrong-manual-section 1 != 7 [usr/share/man/man1/art_modern.1.gz:2]
-	# Tried: sed -E 's;^\.TH "([^"]+)" "([^"]+)" "([^"]+)";.TH \1 \2 \3;'
 	lowdown -s -Tman -o /dev/stdout $< > $@
 
 %:
@@ -69,5 +67,8 @@ override_dh_installdocs: \
 	dh_installdocs
 
 override_dh_auto_test:
+ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
+	true
+endif
 	build-nompi/art_modern --help
 	mpiexec -n 1 build-openmpi/art_modern-mpi --version

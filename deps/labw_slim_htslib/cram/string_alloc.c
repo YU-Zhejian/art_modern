@@ -146,7 +146,7 @@ char *string_alloc(string_alloc_t *a_str, size_t length) {
 
 /* equivalent to strdup */
 
-char *string_dup(string_alloc_t *a_str, const char *instr) {
+char *htslib_string_dup(string_alloc_t *a_str, const char *instr) {
     return string_ndup(a_str, instr, strlen(instr));
 }
 

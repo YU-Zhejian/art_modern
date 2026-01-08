@@ -60,7 +60,7 @@ Dual-licensed under Simplified BSD License and Boost Software License.
 
 ## `BS::thread_pool` by Barak Shoshany
 
-Available from <https://github.com/bshoshany/thread-pool>, commit [`aa3fbfb`](https://github.com/bshoshany/thread-pool/commit/aa3fbfbe80762fe3ac90e2bf05e153b92536277a) at tag [`v5.0.0`](https://github.com/bshoshany/thread-pool/releases/tag/v5.0.0).
+Available from <https://github.com/bshoshany/thread-pool>, commit [`bd4533f`](https://github.com/bshoshany/thread-pool/commit/bd4533f1f70c2b975cbd5769a60d8eaaea1d2233) at tag [`v5.1.0`](https://github.com/bshoshany/thread-pool/releases/tag/v5.1.0).
   
 Affected files:
 

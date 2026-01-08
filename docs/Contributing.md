@@ -46,7 +46,7 @@ And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/ht
   - Update version number in `CMakeLists.txt`.
   - Ensure `make cleandoc` passes without errors.
 - Release: The `develop` branch is merged into the main branch, tagged with a new version number.
-- Generate artifact: Run `make packing` and `make cleandoc`.
+- Generate artifacts: Run `make packing` and `make cleandoc`.
 
 ## Get Engaged
 
@@ -71,33 +71,6 @@ You may also:
 
 - Use Valgrind to check for memory leaks.
 - Run the profilers.
-
-## Scripts for Testing
-
-### Pure LLVM/Clang Toolchain
-
-A LLVM toolchain file is provided in `sh.d/toolchain/host-llvm/llvm-toolchain.cmake` for users who want to use Clang/LLVM toolchain. This toolchain uses LLVM `libc++` as C++ standard library and LLVM `ld.lld` as linker.
-
-**NOTE** The Boost library shipped through your system may be compiled with GNU C++ ABI, which is not compatible with LLVM `libc++`. You may need to build Boost from source using Clang/LLVM toolchain. All C libraries do not have this issue since C ABI is generally compatible across different compilers under GNU/Linux.
-
-```shell
-LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
-    LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${LD_RUN_PATH:-}"\
-    PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
-    CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
-    make testbuild testbuild-mpi \
-    CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/"
-```
-
-Given that `{fmt}` and Boost are installed in `${HOME}/opt/fmt-12.0.0-clang` and `${HOME}/opt/boost-1.89.0-clang` respectively.
-
-### Intel DPCPP Toolchain
-
-```shell
-. /opt/intel/oneapi/setvars.sh
-make testbuild testbuild-mpi \
-    CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
-```
 
 ## Miscellaneous Developer-Oriented Documentation
 

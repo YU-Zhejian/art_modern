@@ -2,6 +2,7 @@
 
 ## Simulation
 
+(fastq-split-section)=
 ### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?
 
 This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `1.fq`:

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "libam_support/Dtypes.h"
+#include "art_profile_builder/lib/APBConstants.hh"
 
-#include <htslib/hts.h>
+#include "libam_support/Dtypes.h"
 
 #include <cstdlib>
 #include <string>
@@ -22,8 +22,9 @@ public:
     const bool is_ob;
     const std::string output_1_file_path;
     const std::string output_2_file_path;
-    const htsExactFormat input_file_format;
+    const APB_FORMAT format;
     const std::size_t queue_size;
+    const am_readnum_t first_n_reads;
 };
 
 } // namespace labw::art_modern

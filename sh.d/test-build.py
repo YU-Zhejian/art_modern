@@ -6,14 +6,23 @@ from __future__ import annotations
 
 import concurrent.futures
 import glob
+import itertools
 import os
+import platform
+import queue
+import re
 import shutil
 import subprocess
+import sys
 import tempfile
-from typing import List, Optional
 import threading
 import argparse
-from datetime import datetime
+import logging
+
+from elftools.elf.elffile import ELFFile
+from elftools.elf.dynamic import DynamicSection
+
+from typing import List, Optional, Tuple, Dict, Set, IO
 
 THIS_PID = os.getpid()
 
@@ -24,20 +33,17 @@ CTEST = shutil.which("ctest")
 BASH = shutil.which("bash")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
 SHDIR = os.path.dirname(os.path.abspath(__file__))
-LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
+LOG_DIR = os.environ.get("TEST_BUILD_LOG_DI", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
 PKG_CONFIG_PATH = shutil.which("pkg-config")
 if PKG_CONFIG_PATH is None:
     PKG_CONFIG_PATH = shutil.which("pkgconf")
 if PKG_CONFIG_PATH is None:
     raise RuntimeError("pkg-config or pkgconf not found in PATH")
+ASSERT_USING_LLVM_CXXSTDLIB = os.environ.get("ASSERT_USING_LLVM_CXXSTDLIB", None) == "1"
 
 IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
 FAILED_ID = []
-
-
-def time() -> str:
-    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
@@ -120,6 +126,225 @@ def peobe_mkl_using_pkgconf() -> List[str]:
     return retl
 
 
+def probe_ncbi_ngs() -> bool:
+    p = subprocess.run(
+        [BASH, os.path.join(SHDIR, "test-build.d", "have_ncbi_ngs.sh")],
+        stdin=subprocess.DEVNULL,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+    return p.returncode == 0
+
+
+LDD_CACHE = Dict[str, List[Tuple[str, Optional[str]]]]
+
+
+class PyLddSearch:
+    ld_so_paths: List[str]
+    ld_library_path: List[str]
+    ld_preload: List[str]
+
+    lh: logging.Logger
+
+    def _filter_ld_path(self, ld_paths: List[str], log_prefix: str) -> List[str]:
+        ld_paths_filtered = []
+        for p in ld_paths:
+            p = p.strip()
+            if not p:  # Ignore blank ones
+                continue
+            if os.path.exists(p):
+                abspath = os.path.abspath(p)
+                if abspath not in ld_paths_filtered:
+                    ld_paths_filtered.append(abspath)
+                else:
+                    self.lh.warning("%s: LD path DUPLICATED: %s", log_prefix, abspath)
+            else:
+                self.lh.warning("%s: LD path ENOENT: %s", log_prefix, p)
+        return ld_paths_filtered
+
+    def __init__(self, ld_so_conf_path: str = "/etc/ld.so.conf"):
+        self.lh = logging.getLogger(self.__class__.__name__)
+        self.lh.handlers = []
+        self.lh.setLevel(logging.INFO)
+        stream_handler = logging.StreamHandler(sys.stderr)
+        stream_handler.setLevel(logging.WARNING if not (_args.ldd_run or _args.ldd_run_sa) else logging.INFO)
+        self.lh.addHandler(stream_handler)
+        file_handler = logging.FileHandler(os.path.join(LOG_DIR, "pyldd.log"), "w", "utf-8")
+        file_handler.setLevel(logging.INFO)
+        self.lh.addHandler(file_handler)
+
+        for handler_ in self.lh.handlers:
+            handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+        # Read /etc/ld.so.conf and parse it
+        self.ld_so_paths = self._filter_ld_path(self._parse_ld_so_conf(ld_so_conf_path), "ld.so.conf")
+        # Read LD_LIBRARY_PATH
+        self.ld_library_path = self._filter_ld_path(os.environ.get("LD_LIBRARY_PATH", "").split(":"), "LD_LIBRARY_PATH")
+        self.lh.info("Final Resolved and valid /etc/ld.so.conf: %s", ":".join(self.ld_so_paths))
+        self.lh.info("Final Resolved and valid LD_LIBRARY_PATH: %s", ":".join(self.ld_library_path))
+
+        # Now parsing LD_PRELOAD
+        ld_preload = os.environ.get("LD_PRELOAD", "")
+        ld_preload_filtered = []
+        if ld_preload:
+            for p in ld_preload.split(":"):
+                p = p.strip()
+                if not p:
+                    continue
+                if os.path.exists(p):
+                    abspath = os.path.abspath(p)
+                    if abspath not in ld_preload_filtered:
+                        ld_preload_filtered.append(abspath)
+                    else:
+                        self.lh.warning("LD preload DUPLICATED: %s", abspath)
+                else:
+                    # Try to search in ld_paths
+                    found_path = self._search_library_in_paths(p, [], [])
+                    if found_path is not None:
+                        if found_path not in ld_preload_filtered:
+                            ld_preload_filtered.append(found_path)
+                        else:
+                            self.lh.warning("LD preload DUPLICATED: %s", found_path)
+                    else:
+                        self.lh.warning("LD preload ENOENT: %s", p)
+        self.ld_preload = ld_preload_filtered
+        self.lh.info("Final Resolved and valid LD preloads (LD_PRELOAD): %s", ":".join(self.ld_preload))
+
+        # We do NOT parse ld.so.cache.
+
+    def _parse_ld_so_conf(self, ld_so_conf_path: str) -> List[str]:
+        paths = []
+        if not os.path.exists(ld_so_conf_path):
+            return paths
+
+        with open(ld_so_conf_path, "r", encoding="UTF-8") as f:
+            for line in f:
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+
+                if line.startswith("include "):
+                    # Handle 'include /etc/ld.so.conf.d/*.conf'
+                    pattern = line.split(maxsplit=1)[1]
+                    for included_file in glob.glob(pattern):
+                        paths.extend(self._parse_ld_so_conf(included_file))
+                else:
+                    paths.append(line)
+        return paths
+
+    def _search_library_in_paths(
+        self,
+        lib_name: str,
+        dt_rpath: List[str],
+        dt_runpath: List[str],
+    ) -> Optional[str]:
+        """
+        Search for the given library name in the resolved ld_paths.
+        """
+        for dir_path in itertools.chain(dt_rpath, self.ld_library_path, dt_runpath, self.ld_so_paths):
+            candidate_path = os.path.join(dir_path, lib_name)
+            if os.path.exists(candidate_path):
+                return candidate_path
+        return None
+
+    def ldd_shallow(self, path: str) -> List[Tuple[str, Optional[str]]]:
+        """
+        Perform ldd on the given binary and return a list of resolved library paths.
+        """
+        required_libs = []
+        dt_rpath = []
+        dt_runpath = []
+        resolved_libs = []
+        with open(path, "rb") as f:
+            elffile = ELFFile(f)
+
+            # Look for the dynamic section
+            for section in elffile.iter_sections():
+                if isinstance(section, DynamicSection):
+                    # DT_NEEDED entries contain the names of required libraries
+                    for tag in section.iter_tags():
+                        if tag.entry.d_tag == "DT_NEEDED":
+                            required_libs.append(tag.needed)
+                        elif tag.entry.d_tag == "DT_RPATH":
+                            dt_rpath.extend(tag.rpath.split(":"))
+                        # RUNPATH (New style)
+                        elif tag.entry.d_tag == "DT_RUNPATH":
+                            dt_runpath.extend(tag.runpath.split(":"))
+        dt_rpath = self._filter_ld_path(dt_rpath, f"{path}: RPATH")
+        dt_runpath = self._filter_ld_path(dt_runpath, f"{path}: RUNPATH")
+        self.lh.info("%s RPATH: %s", path, ":".join(dt_rpath))
+        self.lh.info("%s RUNPATH: %s", path, ":".join(dt_runpath))
+        for lib in required_libs:
+            resolved_path = self._search_library_in_paths(lib, dt_rpath, dt_runpath)
+            resolved_libs.append((lib, resolved_path))
+        return resolved_libs
+
+    def ldd_full(self, path: str) -> LDD_CACHE:
+        """
+        Perform full recursive ldd on the given binary and return a list of resolved library paths.
+        """
+        ldd_cache = {}
+        # Perform a depth-first search to resolve all dependencies
+        ld_dequeue = queue.SimpleQueue()
+        ld_dequeue.put(path)
+        for ld_preload in self.ld_preload:
+            ld_dequeue.put(ld_preload)
+        while not ld_dequeue.empty():
+            current_path = ld_dequeue.get()
+            if current_path in ldd_cache:
+                continue
+            resolved_libs = self.ldd_shallow(current_path)
+            ldd_cache[current_path] = resolved_libs
+            for lib_name, lib_path in resolved_libs:
+                if lib_path is not None and lib_path not in ldd_cache:
+                    ld_dequeue.put(lib_path)
+        return ldd_cache
+
+    def lddtree(
+        self,
+        path: str,
+        ldd_cache: Optional[LDD_CACHE] = None,
+        n_tabs: int = 0,
+        already_printed: Optional[Set[str]] = None,
+        lib_name: str = None,
+        file: IO[str] = sys.stdout,
+    ):
+        ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
+        already_printed = already_printed if already_printed is not None else set()
+        if lib_name is not None:
+            print("\t" * n_tabs + lib_name, "=>", path, file=file, end="")
+        else:
+            print("\t" * n_tabs + path, file=file, end="")
+        if path in already_printed:
+            print(" [ALREADY PRINTED]", file=file)
+            return
+        else:
+            print("", file=file)
+        for lib_name, lib_path in ldd_cache[path]:
+            if lib_path is not None:
+                self.lddtree(lib_path, ldd_cache, n_tabs + 1, already_printed, lib_name, file=file)
+            else:
+                print("\t" * n_tabs + lib_name, "=>", "NOT FOUND", file=file)
+            already_printed.add(path)
+
+    def ldd_full_flattened(self, path: str, ldd_cache: Optional[LDD_CACHE] = None) -> List[Tuple[str, Optional[str]]]:
+        """
+        Perform full recursive ldd on the given binary and return a flattened list of resolved library paths.
+        """
+        ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
+        flattened_list = []
+        for libs in ldd_cache.values():
+            flattened_list.extend(libs)
+        return list(set(flattened_list))
+
+    def check_missing_libs(self, path: str, libs_flattened: List[Tuple[str, Optional[str]]]) -> None:
+        for lib, libpath in libs_flattened:
+            self.lh.info("%s: LIB %s => %s", path, lib, libpath)
+            missing_libs = [lib for lib, libpath in libs_flattened if libpath is None]
+            if missing_libs:
+                self.lh.error("%s: MISSING LIBS: %s", path, ":".join(missing_libs))
+                raise AssertionError()
+
+
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
         self.USE_RANDOM_GENERATOR = "PCG"
@@ -133,6 +358,7 @@ class BuildConfig:
         self.CMAKE_BUILD_TYPE = "Debug"
         self.AM_NO_Q_REVERSE = False
         self.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
+        self.WITH_NCBI_NGS = False
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
@@ -150,9 +376,71 @@ class BuildConfig:
             cmake_flags.append("-DAM_NO_Q_REVERSE=ON")
         if WITH_MPI:
             cmake_flags.append("-DWITH_MPI=ON")
+        if self.WITH_NCBI_NGS:
+            cmake_flags.append("-DWITH_NCBI_NGS=ON")
         if self.FIND_RANDOM_MKL_THROUGH_PKGCONF:
             cmake_flags.append(f"-DFIND_RANDOM_MKL_THROUGH_PKGCONF={self.FIND_RANDOM_MKL_THROUGH_PKGCONF}")
         return cmake_flags
+
+    def generate_link_patterns(self) -> Tuple[List[List[re.Pattern]], List[re.Pattern]]:
+        """
+        Generate link patterns for this build configuration.
+        The 1st level of list is AND, the 2nd level is OR.
+
+        :return:
+        """
+        retl = []
+        blacklist = []
+        if self.USE_MALLOC == "JEMALLOC":
+            retl.append([re.compile("libjemalloc\\.so")])
+        elif self.USE_MALLOC == "MIMALLOC":
+            retl.append([re.compile("libmimalloc\\.so")])
+        elif self.USE_MALLOC == "TCMALLOC":
+            retl.append([re.compile("libtcmalloc\\.so")])
+        elif self.USE_MALLOC == "TCMALLOC_MINIMAL":
+            retl.append([re.compile("libtcmalloc_minimal\\.so")])
+
+        if self.WITH_NCBI_NGS:
+            retl.append([re.compile("libncbi-ngs\\.so")])
+
+        if self.USE_HTSLIB is not None:
+            retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])
+        else:
+            retl.append([re.compile("liblabw_slim_htslib\\.so")])
+
+        if self.USE_LIBFMT is not None:
+            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
+        else:
+            retl.append([re.compile("libslim_libfmt\\.so")])
+
+        if self.USE_RANDOM_GENERATOR == "ONEMKL":
+            retl.append(
+                [
+                    re.compile("libmkl_rt\\.so"),
+                    re.compile("libmkl_intel_lp64\\.so"),
+                    re.compile("libmkl_intel_ilp64\\.so"),
+                ]
+            )
+
+        retl.append([re.compile("libboost_program_options\\.so")])
+        retl.append([re.compile("libboost_log\\.so")])
+        retl.append([re.compile("libboost_filesystem\\.so")])
+        retl.append([re.compile("libboost_timer\\.so")])
+        retl.append([re.compile("libz\\.so")])
+        retl.append([re.compile("libslim_libceu\\.so")])
+        if WITH_MPI:
+            retl.append([re.compile("libmpi\\.so")])
+        else:
+            blacklist.append(re.compile("libmpi\\.so"))
+
+        if ASSERT_USING_LLVM_CXXSTDLIB:
+            retl.append([re.compile("libc\\+\\+\\.so")])
+            # blacklist.append( re.compile("libstdc\\+\\+\\.so" ))
+            # Some dependencies of Boost still use libstdc++
+        else:
+            retl.append([re.compile("libstdc\\+\\+\\.so")])
+            blacklist.append(re.compile("libc\\+\\+\\.so"))
+        return retl, blacklist
 
     def copy(self) -> BuildConfig:
         new_config = BuildConfig(self.old_cmake_flags.copy())
@@ -166,169 +454,244 @@ class BuildConfig:
         new_config.AM_NO_Q_REVERSE = self.AM_NO_Q_REVERSE
         new_config.CMAKE_BUILD_TYPE = self.CMAKE_BUILD_TYPE
         new_config.FIND_RANDOM_MKL_THROUGH_PKGCONF = self.FIND_RANDOM_MKL_THROUGH_PKGCONF
+        new_config.WITH_NCBI_NGS = self.WITH_NCBI_NGS
         return new_config
 
 
 def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
-    build_dir = os.path.join(LOG_DIR, f"art_modern-test-build-{this_job_id}")
-    install_dir = os.path.join(LOG_DIR, f"art_modern-test-install-{this_job_id}")
-    os.makedirs(build_dir)
-    os.makedirs(install_dir)
-    with IO_MUTEX:
-        print(f"{time()} {this_job_id}/{num_total_jobs} {' '.join(cmake_opts)}")
-        print(f"{time()} {this_job_id}/{num_total_jobs} B: {build_dir}, I: {install_dir}")
-    log_path = os.path.join(LOG_DIR, f"{this_job_id}.log")
-    with open(log_path, "wb", buffering=0) as log_file:
-        log_file.write(f"{time()} Build log for job {this_job_id}\n".encode("utf-8"))
-        log_file.write(f"{time()} CMake options: {' '.join(cmake_opts)}\n".encode("utf-8"))
-        log_file.write(f"{time()} {this_job_id}/{num_total_jobs} B: {build_dir}, I: {install_dir}\n".encode("utf-8"))
-        # Invoke CMake to configure the build
+    os.makedirs(os.path.join(LOG_DIR, str(this_job_id)))
+    build_dir = os.path.join(LOG_DIR, str(this_job_id), f"build")
+    install_dir = os.path.join(LOG_DIR, str(this_job_id), f"install")
+    art_modern_path = os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else ""))
+    apb_path = os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else ""))
+    do_build_lh = logging.getLogger(f"DO_BUILD {this_job_id}/{num_total_jobs}")
+    do_build_lh.handlers = []
+    log_path = os.path.join(LOG_DIR, str(this_job_id), "main.log")
+    do_build_lh.addHandler(logging.FileHandler(log_path, "w", "utf-8"))
+    do_build_lh.setLevel(logging.INFO)
+    for handler_ in do_build_lh.handlers:
+        handler_.setLevel(logging.INFO)
+        handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+    do_build_lh.info("Build options: %s", {" ".join(cmake_opts)})
+    do_build_lh.info("B: %s, I: %s", build_dir, install_dir)
+    do_build_lh.info("Build log for job %s", this_job_id)
+    main_lh.info("%s/%s: Build options: %s", this_job_id, num_total_jobs, " ".join(cmake_opts))
+    if not DRY_RUN:
+        os.makedirs(build_dir)
+        os.makedirs(install_dir)
 
-        def run_wrapper(step_name: str, cmdline: List[str], *args, **kwargs) -> bool:
-            with IO_MUTEX:
-                print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START")
-            log_file.write(
-                f"{time()} {this_job_id}/{num_total_jobs} {step_name} CMDLINE: { ' '.join(cmdline) }\n".encode("utf-8")
-            )
+    def failed():
+        with IO_MUTEX:
+            FAILED_ID.append(this_job_id)
+        main_lh.error("%s/%s: FAILED", this_job_id, num_total_jobs)
+        do_build_lh.error("FAILED")
+        if _args.fast_fail:
+            raise AssertionError(f"{this_job_id} FAILED")
 
-            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} START\n".encode("utf-8"))
-
-            if DRY_RUN:
-                with IO_MUTEX:
-                    print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DRYRUN")
-                log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DRYRUN\n".encode("utf-8"))
-
-            else:
+    def run_wrapper(
+        step_name_: str,
+        cmdline: List[str],
+        *args,
+        additional_env: Optional[Dict[str, str]] = None,
+        timeout: Optional[float] = None,
+        **kwargs,
+    ) -> bool:
+        do_build_lh.info("%s START", step_name_)
+        do_build_lh.info("%s CMDLINE: %s", step_name_, " ".join(cmdline))
+        env = dict(os.environ)
+        if additional_env:
+            env.update(additional_env)
+        with open(
+            os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.env.sh"), "wt", encoding="utf-8"
+        ) as env_file:
+            for k, v in env.items():
+                env_file.write(f"{k}='{v}'\n")
+        if DRY_RUN:
+            do_build_lh.info("%s DRY RUN", step_name_)
+        else:
+            with open(
+                os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "wb", buffering=0
+            ) as log_file:
                 try:
-                    proc = subprocess.run(cmdline, *args, **kwargs)
+                    proc = subprocess.Popen(cmdline, *args, env=env, stdout=log_file, stderr=log_file, **kwargs)
+                except subprocess.SubprocessError as e:
+                    do_build_lh.error("%s SUBPROCESS ERROR: %s", step_name_, str(e))
+                    return False
+                try:
+                    if timeout is not None:
+                        proc.wait(timeout=timeout)
+                    else:
+                        proc.wait()
                 except subprocess.TimeoutExpired as e:
-                    # Kill the process first
                     proc.terminate()
                     try:
                         proc.wait(timeout=3)
                     except subprocess.TimeoutExpired:
                         proc.kill()
                         proc.wait()
-                    with IO_MUTEX:
-                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT")
-                    log_file.write(
-                        f"{time()} {this_job_id}/{num_total_jobs} {step_name} TIMEOUT: {e}\n".encode("utf-8")
-                    )
-                    return False
-                except subprocess.SubprocessError as e:
-                    with IO_MUTEX:
-                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED")
-                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED: {e}\n".encode("utf-8"))
+                    do_build_lh.error("%s TIMEOUT: %s", step_name_, str(e))
                     return False
                 if proc.returncode != 0:
-                    with IO_MUTEX:
-                        print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED")
-                    log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} FAILED\n".encode("utf-8"))
+                    do_build_lh.error("%s FAILED with return code %s", step_name_, proc.returncode)
                     return False
-            with IO_MUTEX:
-                print(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DONE")
-            log_file.write(f"{time()} {this_job_id}/{num_total_jobs} {step_name} DONE\n".encode("utf-8"))
+        do_build_lh.info("%s DONE", step_name_)
+        return True
+
+    def run_ldd() -> bool:
+        step_name_ = "LDD"
+        do_build_lh.info("%s START", step_name_)
+        if platform.system().lower() != "linux":
+            do_build_lh.info("%s SKIPPED SINCE NOT LINUX", step_name_)
             return True
 
-        with open(os.path.join(LOG_DIR, f"{this_job_id}-config.log"), "wb", buffering=0) as config_log_file:
-            if not run_wrapper(
-                "CONFIG",
-                [
-                    CMAKE,
-                    "-G",
-                    CMAKE_GENERATOR,
-                    "-Wdev",
-                    "-Wdeprecated",
-                    "--warn-uninitialized",
-                    "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
-                    "-DCMAKE_VERBOSE_MAKEFILE=ON",
-                    *cmake_opts,
-                    f"-DCMAKE_INSTALL_PREFIX={install_dir}",
-                    os.getcwd(),
-                ],
-                cwd=build_dir,
-                stdout=config_log_file,
-                stderr=config_log_file,
-            ):
-                with IO_MUTEX:
-                    FAILED_ID.append(this_job_id)
-                return
+        ldd_lh = logging.getLogger(f"LDD {this_job_id}/{num_total_jobs}")
+        ldd_lh.handlers = []
+        ldd_lh.setLevel(logging.INFO)
+        ldd_lh.addHandler(
+            logging.FileHandler(os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "w", "utf-8")
+        )
+        for ldd_lh_handler_ in ldd_lh.handlers:
+            ldd_lh_handler_.setLevel(logging.INFO)
+            ldd_lh_handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+        link_patterns = config.generate_link_patterns()
+        if DRY_RUN:
+            do_build_lh.info("%s DRY RUN", step_name_)
+            ldd_lh.info(
+                "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
+            )
+        else:
+            libs_flattened = list(
+                set(itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path)))
+            )
+            try:
+                pls.check_missing_libs("art_modern+apb", libs_flattened)
+            except AssertionError:
+                return False
+            ldd_failed = False
 
-        with open(os.path.join(LOG_DIR, f"{this_job_id}-build.log"), "wb", buffering=0) as build_log_file:
-            if not run_wrapper(
-                "BUILD",
-                [
-                    CMAKE,
-                    "--build",
-                    build_dir,
-                    "-j",
-                    str(4),
-                ],
-                stdout=build_log_file,
-                stderr=build_log_file,
-                timeout=360,
-            ):
-                with IO_MUTEX:
-                    FAILED_ID.append(this_job_id)
-                    return
-        with open(os.path.join(LOG_DIR, f"{this_job_id}-ctest.log"), "wb", buffering=0) as ctest_log_file:
-            if not run_wrapper(
-                "CTEST",
-                [CTEST, "--output-on-failure"],
-                cwd=build_dir,
-                stdout=ctest_log_file,
-                stderr=ctest_log_file,
-                timeout=60,
-            ):
-                with IO_MUTEX:
-                    FAILED_ID.append(this_job_id)
-                    return
+            link_patterns, link_blacklists = config.generate_link_patterns()
+            for link_pattern_group in link_patterns:
+                ldd_pattern_str = " | ".join(p.pattern for p in link_pattern_group)
+                found = False
+                for lib, path in libs_flattened:
+                    if found:
+                        break
+                    for p in link_pattern_group:
+                        if p.search(path):
+                            ldd_lh.info("FOUND: %s matches %s", lib, p.pattern)
+                            found = True
+                            break
+                if not found:
+                    ldd_lh.error("Nothing match %s", ldd_pattern_str)
+                    ldd_failed = True
+            for blacklist_pattern in link_blacklists:
+                found = False
+                for lib, path in libs_flattened:
+                    if found:
+                        break
+                    if blacklist_pattern.search(path):
+                        ldd_lh.error("%s matches %s", lib, blacklist_pattern.pattern)
+                        ldd_failed = True
+                        found = True
+                        break
+                if not found:
+                    ldd_lh.info("PASSED: Nothing match %s", blacklist_pattern.pattern)
+            if ldd_failed:
+                with open(
+                    os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.lddtree.log"), "w", encoding="utf-8"
+                ) as w:
+                    pls.lddtree(art_modern_path, file=w)
+                    pls.lddtree(apb_path, file=w)
+                ldd_lh.error("FAILED")
+                return False
+        ldd_lh.info("DONE")
+        do_build_lh.info("%s DONE", step_name_)
+        return True
 
-        with open(os.path.join(LOG_DIR, f"{this_job_id}-install.log"), "wb", buffering=0) as install_log_file:
-            if not run_wrapper(
-                "INSTALL",
-                [CMAKE, "--install", build_dir],
-                stdout=install_log_file,
-                stderr=install_log_file,
-                timeout=60,
-            ):
-                with IO_MUTEX:
-                    FAILED_ID.append(this_job_id)
-                    return
+    if not run_wrapper(
+        "CONFIG",
+        [
+            CMAKE,
+            "-G",
+            CMAKE_GENERATOR,
+            "-Wdev",
+            "-Wdeprecated",
+            "--warn-uninitialized",
+            "-DCEU_CM_SHOULD_ENABLE_TEST=ON",
+            "-DCMAKE_VERBOSE_MAKEFILE=ON",
+            *cmake_opts,
+            f"-DCMAKE_INSTALL_PREFIX={install_dir}",
+            os.getcwd(),
+        ],
+        cwd=build_dir,
+    ):
+        failed()
+        return
 
-        with open(os.path.join(LOG_DIR, f"{this_job_id}-testsmall.log"), "wb", buffering=0) as testsmall_log_file:
-            if not run_wrapper(
-                "TESTSMALL",
-                [BASH, os.path.join(SHDIR, "test-small.sh")],
-                stdout=testsmall_log_file,
-                stderr=testsmall_log_file,
-                env={
-                    **os.environ,
-                    "ART_MODERN_PATH": os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else "")),
-                    "APB_PATH": os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else "")),
-                    "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-                    "MPIEXEC": MPIEXEC if WITH_MPI else "",
-                    "SAMTOOLS_THREADS": "4",
-                    "MPI_PARALLEL": "4",
-                    "PARALLEL": "2",
-                    "NO_FASTQC": "1",
-                    "OUT_DIR": os.path.join(LOG_DIR, f"test-small-out-{this_job_id}"),
-                    "SET_X": "1",
-                },
-                timeout=1200,
-            ):
-                with IO_MUTEX:
-                    FAILED_ID.append(this_job_id)
-                    return
+    if not run_wrapper(
+        "BUILD",
+        [
+            CMAKE,
+            "--build",
+            build_dir,
+            "-j",
+            str(4),
+        ],
+        timeout=360,
+    ):
+        failed()
+        return
+    if not run_wrapper(
+        "CTEST",
+        [CTEST, "--output-on-failure"],
+        cwd=build_dir,
+        timeout=60,
+    ):
+        failed()
+        return
 
+    if not run_wrapper(
+        "INSTALL",
+        [CMAKE, "--install", build_dir],
+        timeout=60,
+    ):
+        failed()
+        return
+
+    if not run_ldd():
+        failed()
+        return
+
+    if not run_wrapper(
+        "TESTSMALL",
+        [BASH, os.path.join(SHDIR, "test-small.sh")],
+        additional_env={
+            **os.environ,
+            "ART_MODERN_PATH": art_modern_path,
+            "APB_PATH": apb_path,
+            "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
+            "MPIEXEC": MPIEXEC if WITH_MPI else "",
+            "SAMTOOLS_THREADS": "4",
+            "MPI_PARALLEL": "4",
+            "PARALLEL": "2",
+            "NO_FASTQC": "1",
+            "OUT_DIR": os.path.join(LOG_DIR, str(this_job_id), f"testmall.out.d"),
+            "SET_X": "1",
+            "WITH_NCBI_NGS": "1" if config.WITH_NCBI_NGS else "0",
+        },
+        timeout=1200,
+    ):
+        failed()
+        return
+    if not DRY_RUN:
         shutil.rmtree(build_dir)
         shutil.rmtree(install_dir)
-    os.remove(log_path)  # Remove log if successful.
-    for fn in glob.glob(os.path.join(LOG_DIR, f"{this_job_id}-*.log")):
-        os.remove(fn)
+        shutil.rmtree(os.path.join(LOG_DIR, str(this_job_id)))
     with IO_MUTEX:
         SUCCESS_ID.append(this_job_id)
+    do_build_lh.info("SUCCESS")
+    main_lh.info("%s/%s: SUCCESS", this_job_id, num_total_jobs)
 
 
 if __name__ == "__main__":
@@ -337,6 +700,11 @@ if __name__ == "__main__":
         "--dry-run",
         action="store_true",
         help="Perform a dry run without executing commands.",
+    )
+    parser.add_argument(
+        "--ldd-run",
+        action="store_true",
+        help="Stop after parsing ld.so.conf and LD_LIBRARY_PATH.",
     )
     parser.add_argument(
         "--mpi",
@@ -348,6 +716,13 @@ if __name__ == "__main__":
         action="store_true",
         help="Run test_small.",
     )
+    parser.add_argument(
+        "--no-clear-on-success",
+        action="store_true",
+        help="Do not automatically clear log dir on success.",
+    )
+    parser.add_argument("--ldd-run-sa", action="append", help="Run stand-alone Python LDD")
+    parser.add_argument("--fast-fail", action="store_true", help="Fail if any job fails")
 
     _args, _old_cmake_flags = parser.parse_known_args()
     DRY_RUN = _args.dry_run
@@ -367,17 +742,34 @@ if __name__ == "__main__":
     if os.path.exists(LOG_DIR):
         shutil.rmtree(LOG_DIR)
     os.makedirs(LOG_DIR)
-    print(f"{time()} LOG_DIR={LOG_DIR}")
+    main_lh = logging.getLogger("Main")
+    main_lh.setLevel(logging.INFO)
+    main_lh.addHandler(logging.StreamHandler(sys.stderr))
+    main_lh.addHandler(logging.FileHandler(os.path.join(LOG_DIR, "main.log")))
+    for handler in main_lh.handlers:
+        handler.setLevel(logging.INFO)
+        handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
+    main_lh.info("Log dir: %s", LOG_DIR)
+    pls = PyLddSearch()
+    if _args.ldd_run:
+        exit(0)
+    if _args.ldd_run_sa:
+        for sa_ldd_run in _args.ldd_run_sa:
+            cache = pls.ldd_full(sa_ldd_run)
+            pls.lddtree(sa_ldd_run, ldd_cache=cache)
+            pls.check_missing_libs(sa_ldd_run, pls.ldd_full_flattened(sa_ldd_run, ldd_cache=cache))
+        exit(0)
+
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
-    print(f"{time()} Probing for MKL through CMake...", end="")
+    print(f"Probing for MKL through CMake...", end="")
     if probe_using_cmake_project("test-mkl.cmake"):
         RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for concurrent queue...", end="")
+    print(f"Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
         print(concurrent_queue_path)
@@ -385,46 +777,46 @@ if __name__ == "__main__":
         print("FAIL")
 
     MALLOCS = ["NOP"]
-    print(f"{time()} Probing for jemalloc...", end="")
+    print(f"Probing for jemalloc...", end="")
     if probe_pkg_config("jemalloc"):
         MALLOCS.append("JEMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"{time()} Probing for mimalloc...", end="")
+    print(f"Probing for mimalloc...", end="")
     if probe_using_cmake_project("test-mimalloc.cmake"):
         MALLOCS.append("MIMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"{time()} Probing for tcmalloc...", end="")
+    print(f"Probing for tcmalloc...", end="")
     if probe_pkg_config("libtcmalloc"):
         MALLOCS.append("TCMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"{time()} Probing for tcmalloc_minimal...", end="")
+    print(f"Probing for tcmalloc_minimal...", end="")
     if probe_pkg_config("libtcmalloc_minimal"):
         MALLOCS.append("TCMALLOC_MINIMAL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for HTSLib...", end="")
+    print(f"Probing for HTSLib...", end="")
     is_htslib_exist = probe_pkg_config("htslib")
     if is_htslib_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for " + "{fmt}" + "...", end="")
+    print(f"Probing for " + "{fmt}" + "...", end="")
     is_libfmt_exist = probe_pkg_config("fmt")
     if is_libfmt_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for <pcg_random.hpp>...", end="")
+    print(f"Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
         RANDOM_GENERATORS.append("SYSTEM_PCG")
@@ -432,17 +824,29 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print(f"{time()} Probing for MKL found through pkg-config...", end="")
+    print(f"Probing for MKL found through pkg-config...", end="")
     mkl_pc = peobe_mkl_using_pkgconf()
     if mkl_pc:
         print(";".join(mkl_pc))
     else:
         print("FAIL")
 
+    print("Probing for NCBI NGS libraries...", end="")
+    have_ncbi_ngs = probe_ncbi_ngs()
+    if have_ncbi_ngs:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
+    print("Probing C++ stdlib type...", end="")
+    if ASSERT_USING_LLVM_CXXSTDLIB:
+        print("libc++ (LLVM)")
+    else:
+        print("libstdc++ (GNU)")
+
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
     max_workers = min(5, os.cpu_count() // 4)
     bcs = []
-
     for cmake_build_type in cmake_build_types:
         bc = BuildConfig(_old_cmake_flags)
 
@@ -489,15 +893,30 @@ if __name__ == "__main__":
             bc.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
 
         bc.USE_RANDOM_GENERATOR = "PCG"
+
+        if have_ncbi_ngs:
+            bc.WITH_NCBI_NGS = True
+            bcs.append(bc.copy())
+            bc.WITH_NCBI_NGS = False
     num_total_jobs = len(bcs)
+    futures = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for job_id, bc in enumerate(bcs, 1):
-            executor.submit(do_build, bc, job_id)
-        executor.shutdown()
+            futures.append(executor.submit(do_build, bc, job_id))
+        for future in futures:
+            try:
+                _ = future.result()
+            except concurrent.futures.CancelledError:
+                # Ignore
+                pass
+            except Exception as e:
+                main_lh.error("Exception inside TPE: %s: %s", str(e.__class__.__name__), str(e))
+
+                executor.shutdown(cancel_futures=True)
     SUCCESS_ID = sorted(SUCCESS_ID)
     FAILED_ID = sorted(FAILED_ID)
-    print(f"{time()} Successful builds: {', '.join(map(str, SUCCESS_ID))}")
-    print(f"{time()} Failed builds: {', '.join(map(str,FAILED_ID))}")
-    if not FAILED_ID:
+    main_lh.info("Successful builds: %s", ", ".join(map(str, SUCCESS_ID)))
+    main_lh.info("Failed builds: %s", ", ".join(map(str, FAILED_ID)))
+    if not FAILED_ID and not _args.no_clear_on_success:
         shutil.rmtree(LOG_DIR)
     exit(1 if FAILED_ID else 0)

@@ -3,6 +3,7 @@
 #include "art_profile_builder/exe/main_fn.hh"
 #include "art_profile_builder/exe/parse_args.hh"
 #include "art_profile_builder/lib/APBConfig.hh"
+#include "art_profile_builder/lib/APBConstants.hh"
 #include "art_profile_builder/lib/IntermediateEmpDist.hh"
 
 #include "libam_support/utils/dump_utils.hh"
@@ -58,7 +59,16 @@ int main(int argc, char** argv)
         auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length_2);
         ieds_r2.emplace_back(this_ied2);
     }
-    view_sam_mt(ieds_r1, ieds_r2, config.num_threads, config);
+    if (config.format != APB_FORMAT::SRA) {
+        view_sam_mt(ieds_r1, ieds_r2, config.num_threads, config);
+    } else {
+#ifdef WITH_NCBI_NGS
+        view_sra_mt(ieds_r1, ieds_r2, config.num_threads, config);
+#else
+        BOOST_LOG_TRIVIAL(fatal) << "SRA format support not compiled in!";
+        abort_mpi();
+#endif
+    }
 
     std::size_t total_reads = 0;
     std::size_t total_bases = 0;

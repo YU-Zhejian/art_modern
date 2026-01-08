@@ -32,8 +32,7 @@ std::string ceu_check_get_cxx_compiler_info()
 #endif
     date_time_str = date_str + ", " + time_str;
 #endif
-        oss
-        << "C++ Compiled at: " << date_time_str << std::endl;
+    oss << "C++ Compiled at: " << date_time_str << std::endl;
     oss << "C++ Compiler Identification: " << CEU_COMPILER_NAME << std::endl;
 
 #if defined(CEU_COMPILER_IS_TI)

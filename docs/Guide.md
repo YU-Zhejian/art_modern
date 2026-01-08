@@ -178,8 +178,6 @@ mingw-w64-x86_64-gcc-libs
 mingw-w64-x86_64-gdb
 mingw-w64-x86_64-headers-git
 mingw-w64-x86_64-htslib
-mingw-w64-x86_64-libgccjit
-mingw-w64-x86_64-libmangle-git
 mingw-w64-x86_64-libwinpthread
 mingw-w64-x86_64-pkgconf
 mingw-w64-x86_64-samtools
@@ -236,7 +234,10 @@ cd boost_1_89_0
     toolset=clang \
     cxxflags="-stdlib=libc++" \
     linkflags="-stdlib=libc++ -fuse-ld=lld" \
-    --prefix="${HOME}"/opt/boost-1.89.0-clang
+    --prefix="${HOME}"/opt/boost-1.89.0-clang \
+    --ignore-site-config \
+    variant=release \
+    threading=multi
 ```
 
 This should build all required Boost libraries and a majority of optional ones.
@@ -249,4 +250,59 @@ cd build
 # Set -DBoost_DIR accordingly.
 # Older CMake may have different behaviour.
 cmake .. -DBoost_DIR="${HOME}"/opt/boost-1.89.0-clang
+```
+
+### Installing `{fmt}` from Source
+
+```shell
+wget https://github.com/fmtlib/fmt/releases/download/12.0.0/fmt-12.0.0.zip
+unzip fmt-12.0.0.zip
+cd fmt-12.0.0
+mkdir -p build
+cd build
+# Build shared library. Set to OFF to build static library.
+cmake .. \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX="${HOME}/opt/fmt-12.0.0-clang"
+cmake --build . -j "$(nproc)" --target fmt
+cmake --install .
+```
+
+And then you may use CMake to build this project through:
+
+```shell
+mkdir -p build
+cd build
+PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
+    cmake ..
+```
+
+### Installing NCBI NGS SDK from Source
+
+Install NCBI VDB first.
+
+```shell
+axel https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
+unzip ncbi-vdb-3.3.0.zip
+cd ncbi-vdb-3.3.0
+./configure --prefix="${HOME}"/opt/ncbi-vdb-3.3.0
+make -j $(nproc) all install
+make install
+cd ..
+```
+
+Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
+
+```shell
+axel https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
+unzip sra-tools-3.3.0.zip
+cd sra-tools-3.3.0
+./configure \
+    --prefix="${HOME}"/opt/sra-tools-3.3.0 \
+    --with-ncbi-vdb-prefix="${HOME}"/opt/ncbi-vdb-3.3.0 
+make clean install -j $(nproc) BUILD_TOOLS_LOADERS=ON
+cd ..
+cp -r \
+    "${HOME}"/opt/ncbi-vdb-3.3.0/include/ \
+    "${HOME}"/opt/sra-tools-3.3.0/bin/ncbi/schema
 ```

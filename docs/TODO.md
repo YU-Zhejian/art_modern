@@ -5,10 +5,10 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-
-## Packing
-
-- Suppress all lintian issues.
+- `CEU_CM_SHOULD_ENABLE_TEST` seems not set by default. Correct it.
+- Find concurrent queue and fmt using CMake.
+- Supress unused args.
+- Change year to 2026.
 
 ## Performance
 
@@ -19,11 +19,8 @@
 
 ## I/O Formats
 
-- Support [Illumina Complete Long Read](https://www.illumina.com/products/by-brand/complete-long-reads-portfolio.html)?
-- Add flags to disable/enable diverse BAM tags.
-- Add a "no qual" option to various SAM/BAM writers?
 - Support circular genome or RNA?
-- Support simulating BGI/MGISEQ reads?
+- Support simulating BGI/MGISEQ reads and new Illumina models: Started.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
 ## Simulate Allele-Specific Expression

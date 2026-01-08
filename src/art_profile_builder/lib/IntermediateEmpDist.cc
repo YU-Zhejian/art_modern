@@ -2,6 +2,7 @@
 
 #include "IntermediateEmpDistPosition.hh"
 
+#include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
@@ -27,6 +28,16 @@ bool IntermediateEmpDist::parse_read(const std::string& seq, const std::vector<a
     const std::size_t effective_read_length = am_min(seq.size(), read_length_);
     for (std::size_t i = 0; i < effective_read_length; ++i) {
         positions_[i].add(seq[i], qual[i]);
+    }
+    total_reads_ += 1;
+    total_bases_ += effective_read_length;
+    return true;
+}
+bool IntermediateEmpDist::parse_read_ngs_fragment(const std::string& seq, const std::string& qual_str)
+{
+    const std::size_t effective_read_length = am_min(seq.size(), read_length_);
+    for (std::size_t i = 0; i < effective_read_length; ++i) {
+        positions_[i].add(seq[i], static_cast<am_qual_t>(qual_str[i] - PHRED_OFFSET));
     }
     total_reads_ += 1;
     total_bases_ += effective_read_length;

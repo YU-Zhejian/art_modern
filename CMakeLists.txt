@@ -20,7 +20,7 @@ endif()
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.3.2
+    VERSION 1.3.3
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_VERSION "${PROJECT_VERSION}")
@@ -51,6 +51,10 @@ endif()
 
 if(NOT DEFINED WITH_MPI)
     set(WITH_MPI OFF)
+endif()
+
+if(NOT DEFINED WITH_NCBI_NGS)
+    set(WITH_NCBI_NGS OFF)
 endif()
 set(ART_MODERN_LINK_LIBS "")
 
@@ -94,6 +98,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/concurrentqueue.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/mpi.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/rng.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/malloc.cmake")
+if(DEFINED WITH_NCBI_NGS AND WITH_NCBI_NGS)
+    include("${CMAKE_CURRENT_LIST_DIR}/src/cmake.d/sra.cmake")
+endif()
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency libs as subdirs.
@@ -183,6 +190,7 @@ file(
 add_library(${AM_SUPPORT_LIB} ${AM_SUPPORT_LIB_SOURCE})
 target_compile_options(${AM_SUPPORT_LIB} BEFORE PRIVATE ${AM_CC_FLAGS})
 target_link_libraries(${AM_SUPPORT_LIB} PUBLIC ${ART_MODERN_LINK_LIBS})
+
 if(NOT BUILD_SHARED_LIBS)
     ceu_cm_set_static_target(${AM_SUPPORT_LIB})
 endif()

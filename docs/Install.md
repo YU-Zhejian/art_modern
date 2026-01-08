@@ -2,9 +2,11 @@
 
 Here provides a detailed installation guide for `art_modern`.
 
+**NOTE** All "at least" in this guide are inclusive.
+
 ## Operating System
 
-The project assumes x86\_64 (aka., Intel 64, AMD64, x64, with chips manufactured by Intel, AMD, Zhaoxin, etc.) platforms. Support on other platforms (including 32-bit CPUs) are not guaranteed.
+The project assumes [x86\_64](https://en.wikipedia.org/wiki/X86-64) (aka., Intel 64, AMD64, x64, with chips manufactured by Intel, AMD, VIA, Zhaoxin, etc.) platforms. Support on other platforms (including 32-bit CPUs) are not guaranteed.
 
 The project assumes modern GNU/Linux distributions that are still under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus). Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
 
@@ -76,17 +78,15 @@ Although not tested, the following compilers can also theoretically be of use:
 
 ### CMake
 
-[CMake](https://cmake.org/) is a cross-platform build system. It is required to build the project. At least [3.17](https://cmake.org/cmake/help/latest/release/3.17.html)
+[CMake](https://cmake.org/) is a cross-platform build system. It is required to build the project. At least [3.17](https://cmake.org/cmake/help/latest/release/3.17.html) is required.
 
 **NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake officially-built binaries](https://cmake.org/files/v3.17/).
 
 ### Dependencies of CMake Build System
 
-CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` may not work.
+CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` will **NOT** work.
 
-This project requires [Python](https://www.python.org/) later than (inclusive) 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not required at runtime.
-
-This project also requires a POSIX-compliant shell (e.g., [Dash](http://gondor.apana.org.au/~herbert/dash/), [Bash](https://www.gnu.org/software/bash/), etc.) for several text processing functions.
+This project requires [Python](https://www.python.org/) at least 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not required at runtime.
 
 ### Linkers, Assemblers, Archivers, etc
 
@@ -160,9 +160,9 @@ The following dependencies are optional. You may choose to install them if you w
   - See also: [configuring Boost::StackTrace](https://www.boost.org/doc/libs/latest/doc/html/stacktrace/configuration_and_build.html) for platform-specific configuration instructions for this library.
 - [Test](https://www.boost.org/doc/libs/latest/libs/test/): For unit testing only. Can be absent for non-developers.
 - [Timer](https://www.boost.org/doc/libs/latest/libs/timer/): For displaying CPU time, wall-clock time, and average CPU utilization at the end of the program. Can be absent if you do not care about performance.
-- [Random](https://www.boost.org/doc/libs/latest/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See CMake variable [`USE_RANDOM_GENERATOR`](#use-random-generator-section) below). Can be absent if you do not choose to use Boost random number generators.
+- [Random](https://www.boost.org/doc/libs/latest/libs/random/index.html): For random number generation if you choose to use Boost random number generators (See [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) below). Can be absent if you do not choose to use Boost random number generators.
 
-If benchmarking (See [CMake flag `BUILD_ART_MODERN_BENCHMARKS`](#build-art-modern-benchmarks-section)) is required, you may also install:
+If benchmarking (See [CMake variable `BUILD_ART_MODERN_BENCHMARKS`](#build-art-modern-benchmarks-section)) is required, you may also install:
 
 - [Container](https://www.boost.org/doc/libs/latest/doc/html/container.html).
 - [LockFree](https://www.boost.org/doc/libs/latest/doc/html/lockfree.html).
@@ -176,7 +176,7 @@ Users on Intel/AMD CPUs are highly recommended to use [Intel OneAPI Math Kernel 
 
 OneMKL can be found through CMake. This requires you to install the Intel OneAPI Base Toolkit, which provides `MKLConfig.cmake`. See [official docs for 2025.2](https://www.intel.com/content/www/us/en/docs/onemkl/developer-guide-linux/2025-2/using-the-cmake-config-file.html) for more details.
 
-OneMKL can also be found through pkgconfig. For example, Debian packing of Intel MKL [`libmkl-dev`](https://packages.debian.org/sid/libmkl-dev) provides `mkl-sdl-lp64.pc`. Intel OneAPI MKL installation provides `mkl-sdl.pc`. To use MKL specified using pkgconfig instead of CMake, see [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
+OneMKL can also be found through `pkgconf`. For example, Debian packing of Intel MKL [`libmkl-dev`](https://packages.debian.org/sid/libmkl-dev) provides `mkl-sdl-lp64.pc`. Intel OneAPI MKL installation provides `mkl-sdl.pc`. To use MKL specified using `pkgconf` instead of CMake, see [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
 
 **NOTE** OneMKL is property software. Distributing binaries built with this library may require you to comply with Intel's license and/or breaking the GPL.
 
@@ -185,13 +185,15 @@ OneMKL can also be found through pkgconfig. For example, Debian packing of Intel
 (alt-malloc-section)=
 ### Alternate `malloc`/`free` Implementations
 
-Users may use either [mi-malloc](https://github.com/microsoft/mimalloc), [jemalloc](https://github.com/jemalloc/jemalloc), or [tcmalloc](https://github.com/gperftools/gperftools) to slightly improve the performance of memory allocation and deallocation.
+Users may use either [mi-malloc](https://github.com/microsoft/mimalloc), [jemalloc](https://github.com/jemalloc/jemalloc), or [tcmalloc](https://github.com/gperftools/gperftools) to slightly improve the performance of memory allocation and deallocation and check for potential memory leaks.
 
-For jemalloc, `jemalloc.pc` file is required. For mi-malloc, `mimalloc-config.cmake` file is required.
-
-For tcmalloc, `libtcmalloc.pc` or `libtcmalloc_minimal.pc` is required. Under Debian GNU/Linux, this file is provided by [`libgoogle-perftools-dev`](https://packages.debian.org/sid/libgoogle-perftools-dev) package.
+- For jemalloc, `jemalloc.pc` file is required.
+- For mi-malloc, `mimalloc-config.cmake` file is required.
+- For tcmalloc, `libtcmalloc.pc` or `libtcmalloc_minimal.pc` is required. Under Debian GNU/Linux, this file is provided by [`libgoogle-perftools-dev`](https://packages.debian.org/sid/libgoogle-perftools-dev) package.
 
 See also: [CMake variable `USE_MALLOC`](#use-malloc-section) below.
+
+**NOTE** If you already compiled the binary without those libraries, you may still link them at run-time using `LD_PRELOAD`.
 
 (mpi-section)=
 ### Message Passing Interface (MPI) Library
@@ -209,6 +211,19 @@ The system should theoretically support:
 The MPI installation with MPI C API should be locatable using CMake module [`FindMPI.cmake`](https://cmake.org/cmake/help/latest/module/FindMPI.html), which is shipped with CMake. We do **NOT** need the MPI C++ API, which is deprecated in later MPI standards.
 
 See also: [CMake variable `WITH_MPI`](#with-mpi-section) below.
+
+(optional-ncbi-ngs-components)=
+### NCBI NGS Libraries
+
+For enabling NCBI Short Read Archive (SRA) support in `art_profile_builder`. Requires `libncbi-ngs.so`/`libncbi-ngs.a`, with its development headers.
+
+Available at <https://github.com/ncbi/sra-tools>.
+
+Available since [`1.3.3`](#v-1.3.3-section).
+
+See also: [CMake variable `WITH_NCBI_NGS`](#with-ncbi-ngs-section) below.
+
+**NOTE** If you would like to use NCBI NGS Library, you **MUST** use bundled HTSLib due to symbol conflicts.
 
 ## Required Bundled/External Libraries
 
@@ -251,7 +266,7 @@ See [official HTSLib documentation](https://github.com/samtools/samtools/blob/ma
 (external-htslib-section)=
 #### External
 
-HTSLib later than [1.17](https://github.com/samtools/htslib/releases/tag/1.17) is required due to the use of `sam_flush` (1.14) and `faidx_seq_len64` (1.17).
+HTSLib at least [1.17](https://github.com/samtools/htslib/releases/tag/1.17) is required due to the use of `sam_flush` (1.14) and `faidx_seq_len64` (1.17).
 
 The project will firstly try to find HTSLib using pkgconf. That usually requires the presence of `htslib.pc` file. If failed, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes where `[val]` is the value of [CMake variable `USE_HTSLIB`](#use-htslib-section).
 
@@ -394,6 +409,8 @@ The random number generator used.
 
 - **`STL` (DEFAULT): Use STL random generators.**
 - `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
+  - Before [1.3.0](#v-1.3.0-section), this uses a bundled full-featured PCG random generators in C++.
+  - After [1.3.0](#v-1.3.0-section), this uses a minimal version of PCG random generators.
 - `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.3.0](#v-1.3.0-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
 - `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. See also [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
@@ -401,16 +418,12 @@ The random number generator used.
 On my system (13th Gen Intel(R) Core(TM) [i7-13700H](https://www.intel.com/content/www/us/en/products/sku/232128/intel-core-i713700h-processor-24m-cache-up-to-5-00-ghz/specifications.html), Intel OneAPI BaseKit 2025.2) for generating filling 1024 random 32-bit unsigned integers 1024 times with 200 replicate, the performance is:
 
 ```text
-    VSFMT19937BulkRandomDevice(32 bits): gmean:        241; mean/sd:           241/3 us
        MKL::VSL_BRNG_SFMT19937(32 bits): gmean:        286; mean/sd:           286/3 us
          MKL::VSL_BRNG_MT19937(32 bits): gmean:        435; mean/sd:         446/132 us
-        VSFMT19937RandomDevice(32 bits): gmean:        735; mean/sd:         743/133 us
                PCG::pcg32_fast(32 bits): gmean:        848; mean/sd:           848/5 us
           absl::InsecureBitGen(64 bits): gmean:      1,486; mean/sd:        1,486/33 us
-      VMT19937BulkRandomDevice(32 bits): gmean:      1,635; mean/sd:       1,641/171 us
         boost::random::mt19937(32 bits): gmean:      1,756; mean/sd:        1,756/19 us
                   std::mt19937(32 bits): gmean:      1,852; mean/sd:        1,853/59 us
-          VMT19937RandomDevice(32 bits): gmean:      2,062; mean/sd:        2,062/17 us
                   GSL::mt19937(32 bits): gmean:      2,420; mean/sd:       2,422/114 us
                   absl::BitGen(64 bits): gmean:      3,543; mean/sd:       3,548/202 us
 ```
@@ -428,7 +441,7 @@ On another [OrangePi 3B](http://www.orangepi.org/html/hardWare/computerAndMicroc
 
 **NOTE** The performance may vary on different platforms.
 
-**NOTE** VSFMT is currently not available.
+Benchmark code available at <https://github.com/YU-Zhejian/art_modern_bench_rand>.
 
 (use-thread-parallel-section)=
 ### `USE_THREAD_PARALLEL`
@@ -438,7 +451,7 @@ Available since [1.0.0](#v-1.0.0-section).
 The thread-level parallelism strategy.
 
 - **`ASIO` (DEFAULT): Will use Boost.ASIO for thread-based parallelism.**
-  - **NOTE** This is only available in Boost later than 1.66.
+  - **NOTE** This is only available in Boost at least 1.66.
 - `BS`: Will use `BS::thread_pool`. Available since [1.1.1](#v-1.1.1-section). See [`BS::thread_pool`](#bs-thread-pool-section) for requirements.
 - `NOP`: Will not use thread-based parallelism. Useful for debugging.
 
@@ -447,7 +460,7 @@ The thread-level parallelism strategy.
 
 Available since [1.1.3](#v-1.1.3-section).
 
-Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost earlier than 1.69 with CMake later than 3.30.
+Configures the behavior of CMake policy [`CMP0167`](https://cmake.org/cmake/help/latest/policy/CMP0167.html). There's usually no need to change this. You only need to set this switch to `OFF` if you have Boost earlier than 1.69 with CMake at least 3.30.
 
 - **`ON` (DEFAULT): Will use the set the policy to `NEW`.**
 - `OFF`: Will use the set the policy to `OLD`.
@@ -534,12 +547,21 @@ Available since [1.3.0](#v-1.3.0-section).
 Find Intel OneAPI MKL through pkgconf. Must be specified with [CMake variable `USE_RANDOM_GENERATOR`](#use-random-generator-section) set to `ONEMKL`.
 
 - **Unset (DEFAULT): Will not find Intel OneAPI MKL through pkgconf.**
-- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file. 
+- Any value `[val]`: Will find Intel OneAPI MKL through pkgconf with the name `[val]`. This requires the presence of `[val].pc` file.
+
+(with-ncbi-ngs-section)=
+### `WITH_NCBI_NGS`
+
+Available since [1.3.3](#v-1.3.3-section).
+
+Enable NCBI SRA parsing to `art_profile_builder`.
+
+See also [NCBI NGS Libraries](#optional-ncbi-ngs-components) for requirements.
 
 ### Deprecated Options
 
 - `USE_BTREE_MAP` was deprecated in [1.1.2](#v-1.1.2-section).
 - `USE_CCACHE` was deprecated in [1.1.7](#v-1.1.7-section).
 - `GSL` option of [`USE_RANDOM_GENERATOR`](#use-random-generator-section) was deprecated in [1.2.0](#v-1.2.0-section) and removed in [1.2.1](#v-1.2.1-section).
-- `USE_ABSL` was deprecated in [1.3.0](#v-1.3.0-section).
-- `USE_QUAL_GEN` was deprecated in [1.3.0](#v-1.3.0-section).
+- `USE_ABSL` was deprecated and removed in [1.3.0](#v-1.3.0-section).
+- `USE_QUAL_GEN` was deprecated and removed in [1.3.0](#v-1.3.0-section).

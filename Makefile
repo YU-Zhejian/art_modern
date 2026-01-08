@@ -24,7 +24,8 @@ PYTHON ?= python3
 MPIEXEC ?= mpiexec
 
 # Output directory for build artifacts
-OPT_DIR ?= $(CURDIR)/opt
+export OPT_DIR ?= $(CURDIR)/opt
+
 
 # System architecture
 ARCH ?= $(shell uname -m)
