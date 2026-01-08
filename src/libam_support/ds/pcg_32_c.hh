@@ -1,7 +1,7 @@
 /**
  * Copyright
  * 2014 M.E. O'Neill / pcg-random.org
- * 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * Licensed under Apache License 2.0 (NO WARRANTY, etc. see website)
  *

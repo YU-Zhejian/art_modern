@@ -2,7 +2,7 @@
  * @brief Constants specific to ART.
  *
  * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
