@@ -2,38 +2,6 @@
 
 Here records scripts and notes about additional models for `art_modern`.
 
-## Existing Models
-
-Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`.
-
-| Name | Name (`art_modern`)   | R1 `txt` file name    | R2 `txt` file name    | RLen1 | RLen2 | Model Name        |
-|------|-----------------------|-----------------------|-----------------------|-------|-------|-------------------|
-| GA1  | GA1Recalibrated_36bp  | `EmpR36R1`            | `EmpR36R2`            | 36    | 36    | GenomeAnalyzer I  |
-| GA1  | GA1Recalibrated_44bp  | `EmpR44R1`            | `EmpR44R2`            | 44    | 44    | GenomeAnalyzer I  |
-| GA2  | GA2Recalibrated_50bp  | `EmpR50R1`            | `EmpR50R2`            | 50    | 50    | GenomeAnalyzer II |
-| GA2  | GA2Recalibrated_75bp  | `EmpR75R1`            | `EmpR75R2`            | 75    | 75    | GenomeAnalyzer II |
-| HS10 | HiSeq1000_100bp       | `Emp100R1`            | `Emp100R2`            | 100   | 100   | HiSeq 1000        | 
-| MSv1 | MiSeq_250bp           | `EmpMiSeq250R1`       | `EmpMiSeq250R2`       | 250   | 250   | MiSeq             |
-| HS20 | HiSeq2000_100bp       | `HiSeq2kL100R1`       | `HiSeq2kL100R2`       | 100   | 100   | HiSeq 2000        |
-| HS25 | HiSeq2500_125bp       | `HiSeq2500L125R1`     | `HiSeq2500L125R2`     | 126   | 126   | HiSeq 2500        |
-| HS25 | HiSeq2500_150bp       | `HiSeq2500L150R1`     | `HiSeq2500L150R2`     | 150   | 150   | HiSeq 2500        |
-| HSXn | HiSeqX_PCR_Free_150bp | `HiSeqXPCRfreeL150R1` | `HiSeqXPCRfreeL150R2` | 151   | 151   | HiSeqX PCR free   |
-| HSXt | HiSeqX_TruSeq_150bp   | `HiSeqXtruSeqL150R1`  | `HiSeqXtruSeqL150R2`  | 151   | 151   | HiSeqX TruSeq     |
-| MinS | MiniSeq_TruSeq_50bp   | `MiniSeqTruSeqL50`    | N/A                   | 51    | N/A   | MiniSeq TruSeq    |
-| MSv3 | MiSeq_v3_250bp        | `MiSeqv3L250R1`       | `MiSeqv3L250R2`       | 251   | 251   | MiSeq v3          |
-| NS50 | NextSeq500_v2_75bp    | `NextSeq500v2L75R1`   | `NextSeq500v2L75R2`   | 76    | 76    | NextSeq500 v2     |
-| N/A  | GA1_36bp              | `Emp36R1`             | `Emp36R2`             | 36    | 36    | GenomeAnalyzer I  |
-
-Following profiles are only available in `art_modern` but not in the original ART as a built-in model. However, the
-model error files are provided in the original ART.
-
-| Name (`art_modern`)     | R1 `txt` file name      | R2 `txt` file name      | RLen1 | RLen2 | Model Name        |
-|-------------------------|-------------------------|-------------------------|-------|-------|-------------------|
-| GA1_44bp                | `Emp44R1`               | `Emp44R2`               | 44    | 44    | GenomeAnalyzer I  |
-| GA2_50bp                | `Emp50R1`               | `Emp50R2`               | 53    | 50    | GenomeAnalyzer II |
-| GA2_75bp                | `Emp75R1`               | `Emp75R2`               | 75    | 75    | GenomeAnalyzer II |
-| HiSeq2500Filtered_150bp | `HiSeq2500L150R1filter` | `HiSeq2500L150R2filter` | 150   | 150   | HiSeq 2500        |
-
 ## Adding New Models
 
 Following is a table of sequencing instrument models that are manufactured by Illumina, BGI/MGI, and PacBio (Onso)

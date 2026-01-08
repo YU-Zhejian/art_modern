@@ -30,6 +30,9 @@ Same as [`art_modern`'s environment variables](#am-environment-variables-section
   - Unaligned reads are included in the input SAM/BAM file;
   - All primary- and unaligned reads have quality information;
   - Secondary- or supplementary-aligned reads have no quality information.
+- Automatic format detection is supported. However:
+  - If the input file is not a regular file, `--i-format` must be specified.
+  - The program will firstly try to detect SRA format if supported. If not, the program will try to tell format using HTSLib. See also: [`htsfile(1)`](https://www.htslib.org/doc/htsfile.html).
 
 ## Example
 
@@ -79,4 +82,17 @@ art_profile_builder \
     --o-file2 out_pe_art_cxx_sam_R2.txt \
     --parallel 2 \
     --i-num_threads 4
+```
+
+Building profiles from paired-end SRA files:
+
+```shell
+art_profile_builder \
+    --i-file out_pe.sra \
+    --read_len 36 \
+    --is_pe \
+    --o-file1 out_pe_art_cxx_sra_R1.txt \
+    --o-file2 out_pe_art_cxx_sra_R2.txt \
+    --parallel 2 \
+    --old_behavior
 ```

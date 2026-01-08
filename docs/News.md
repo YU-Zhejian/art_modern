@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.3.3-section)=
-## 1.3.3 (Ongoing)
+## 1.3.3 (2026/01/08)
 
 - Software Engineering:
   - **EXPERIMENTAL** Added NCBI SRA support to `art_profile_builder`. Not enabled by default; Add `-DWITH_NCBI_NGS=ON` to CMake options to enable this feature.
@@ -24,9 +24,9 @@
 - Software Engineering:
   - Bumped bundled HTSLib to [`1.23`](https://github.com/samtools/htslib/releases/tag/1.23).
 - Implementation:
-  - The speed of `art_profile_builder` improved by using a single-producer-multi-consumer queue. The improvement will be more obvious for SAM/BAM files and would reduce computational burden when parsing FASTQ files.
+  - The speed of `art_profile_builder` improved by using a single-producer-multi-consumer queue. The improvement will be more obvious to SAM/BAM files and would reduce computational burden when parsing FASTQ files.
   - Queue size parameters added to `art_modern` and `art_profile_builder` to control the size of internal queues. Users may tune these parameters to achieve better performance or reduce memory usage.
-  - The performance of `art_modern` under Intel oneMKL random generator further improved by generating more random numbers in bulk.
+  - The performance of `art_modern` under Intel OneMKL random generator further improved by generating more random numbers in bulk.
   - A seed allocation algorithm is implemented; Flag `--i-seed` added to set a fixed seed for reproduction.
 - Miscellaneous bug fixes.
 
@@ -34,7 +34,7 @@
 ## 1.3.1 (2025/12/15)
 
 - **KNOWN BUGS**
-  - Non-reproducible stucks, with no clear reason. Currently seen in both MPI and non-MPI mode. Seen in LLVM and Intel C++/DPC++ compilers. Currently only seen in `pbsim3_transcripts`, `template` mode with unequal read1/read2 lengths specified. The author is working on fixing this issue.
+  - Non-reproducible stucks, with no clear reason. Currently seen in both MPI and non-MPI mode. Seen in LLVM and Intel C++/DPC++ compilers. Currently, only seen in `pbsim3_transcripts`, `template` mode with unequal read1/read2 lengths specified. The author is working on fixing this issue.
 - Software Engineering:
   - Update bundled `{fmt}` to [`12.1.0`](https://github.com/fmtlib/fmt/releases/tag/12.1.0).
   - A possibly unidentified bug in the CMake build system when trying to compile a static version of testing C source code while the project is being configured is fixed.
@@ -56,6 +56,7 @@
   - Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` in CMake options to disable this feature.
   - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.
   - Several low-level C++ features re-done in C to improve compilation speed.
+  - `PCG` random generator: CMake option `-DUSE_RANDOM_GENERATOR=PCG` now uses a minimal PCG random generator while `-DUSE_RANDOM_GENERATOR=SYSTEM_PCG` uses an external header-only PCG random generator in C++.
 - Interface:
   - **EXPERIMENTAL** `art_modern` and `art_profile_builder` now support different lengths of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options.
     - **NOTE** For `art_modern`: Currently, different read length works for PE Template mode only. Using such on SE/MP or other modes will generate an error message when you use it.
@@ -202,7 +203,7 @@
 ## 1.1.0 (2025/01/23)
 
 - `--builtin_qual_file` option added back. Python 3 is needed as a build dependency.
-- [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost <= 1.65.
+- [`BS::thread_pool`](https://github.com/bshoshany/thread-pool) added as an alternate thread pool implementation for Boost less than or equal with 1.65.
 - Tested Ubuntu 18.04 x86\_64 with GCC 7.4.0, Clang 5.0.1, and Boost 1.65.1.
 - Tested Mac OS X Sequoia 15.2 with Command Line Tools for Xcode 16.2 (Clang 16.0.0 for target `x86_64-apple-darwin24.2.0`), CMake 3.31.4, and Boost 1.87.0. Fixed #3.
 - Bumped bundled HTSLib to [`1.21`](https://github.com/samtools/htslib/releases/tag/1.21).

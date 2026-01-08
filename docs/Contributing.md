@@ -72,22 +72,6 @@ You may also:
 - Use Valgrind to check for memory leaks.
 - Run the profilers.
 
-## Scripts for Testing
-
-### Pure LLVM/Clang Toolchain
-
-A LLVM toolchain file is provided in `sh.d/toolchain/host-llvm/llvm-toolchain.cmake` for users who want to use Clang/LLVM toolchain. This toolchain uses LLVM `libc++` as C++ standard library and LLVM `ld.lld` as linker.
-
-**NOTE** The Boost library shipped through your system may be compiled with GNU C++ ABI, which is not compatible with LLVM `libc++`. You may need to build Boost from source code using Clang/LLVM toolchain.
-
-### Intel DPCPP Toolchain
-
-```shell
-. /opt/intel/oneapi/setvars.sh
-make testbuild testbuild-mpi \
-    CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx'
-```
-
 ## Miscellaneous Developer-Oriented Documentation
 
 ```{toctree}

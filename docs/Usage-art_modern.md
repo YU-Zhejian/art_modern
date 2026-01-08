@@ -79,7 +79,37 @@ Users may supply self-trained quality distribution files using `--qual_file_1` a
 
 Users may also use built-in quality distribution files using `--builtin_qual_file` (added in [1.1.0](#v-1.1.0-section).). The built-in quality distribution files are bundled with the simulator. Note that the built-in quality distribution files comes with different maximum read-length and different support over paired-end reads. So please make sure that the read length specified by `--read_len` is compatible with the built-in quality distribution file.
 
-Quality distributions bundled with the original ART can be found [here](https://github.com/YU-Zhejian/art_modern/tree/master/data/Illumina_profiles).
+Quality distributions bundled with the original ART can be found [here](https://github.com/YU-Zhejian/art_modern/tree/master/data/Illumina_profiles). In details:
+
+Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`.
+
+| Name   | Name (`art_modern`)     | R1 `txt` file name    | R2? | RLen1 | RLen2 | Model Name        |
+|--------|-------------------------|-----------------------|-----|-------|-------|-------------------|
+| `GA1`  | `GA1Recalibrated_36bp`  | `EmpR36R1`            | Y   | 36    | 36    | GenomeAnalyzer I  |
+| `GA1`  | `GA1Recalibrated_44bp`  | `EmpR44R1`            | Y   | 44    | 44    | GenomeAnalyzer I  |
+| `GA2`  | `GA2Recalibrated_50bp`  | `EmpR50R1`            | Y   | 50    | 50    | GenomeAnalyzer II |
+| `GA2`  | `GA2Recalibrated_75bp`  | `EmpR75R1`            | Y   | 75    | 75    | GenomeAnalyzer II |
+| `HS10` | `HiSeq1000_100bp`       | `Emp100R1`            | Y   | 100   | 100   | HiSeq 1000        |
+| `MSv1` | `MiSeq_250bp`           | `EmpMiSeq250R1`       | Y   | 250   | 250   | MiSeq             |
+| `HS20` | `HiSeq2000_100bp`       | `HiSeq2kL100R1`       | Y   | 100   | 100   | HiSeq 2000        |
+| `HS25` | `HiSeq2500_125bp`       | `HiSeq2500L125R1`     | Y   | 126   | 126   | HiSeq 2500        |
+| `HS25` | `HiSeq2500_150bp`       | `HiSeq2500L150R1`     | Y   | 150   | 150   | HiSeq 2500        |
+| `HSXn` | `HiSeqX_PCR_Free_150bp` | `HiSeqXPCRfreeL150R1` | Y   | 151   | 151   | HiSeqX PCR free   |
+| `HSXt` | `HiSeqX_TruSeq_150bp`   | `HiSeqXtruSeqL150R1`  | Y   | 151   | 151   | HiSeqX TruSeq     |
+| `MinS` | `MiniSeq_TruSeq_50bp`   | `MiniSeqTruSeqL50`    | N   | 51    | N/A   | MiniSeq TruSeq    |
+| `MSv3` | `MiSeq_v3_250bp`        | `MiSeqv3L250R1`       | Y   | 251   | 251   | MiSeq v3          |
+| `NS50` | `NextSeq500_v2_75bp`    | `NextSeq500v2L75R1`   | Y   | 76    | 76    | NextSeq500 v2     |
+
+Following profiles are only available in `art_modern` but not in the original ART as a built-in model. However, the
+model error files are provided in the original ART.
+
+| Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        |
+|---------------------------|-------------------------|-----|-------|-------|-------------------|
+| `GA1_36bp`                | `Emp36R1`               | Y   | 36    | 36    | GenomeAnalyzer I  |
+| `GA1_44bp`                | `Emp44R1`               | Y   | 44    | 44    | GenomeAnalyzer I  |
+| `GA2_50bp`                | `Emp50R1`               | Y   | 53    | 50    | GenomeAnalyzer II |
+| `GA2_75bp`                | `Emp75R1`               | Y   | 75    | 75    | GenomeAnalyzer II |
+| `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | Y   | 150   | 150   | HiSeq 2500        |
 
 #### Shift and Clip Parameters
 
@@ -304,14 +334,14 @@ Sequence Alignment/Map (SAM) and Binary Alignment/Map (BAM) format supports stor
 
 This writes canonical SAM/BAM format using [HTSLib](https://github.com/samtools/htslib). This output writer supports computing `NM` and `MD` tag. The mapping qualities for all reads are set to 255.
 
-Example:
+Example (Tabs replaced with spaces):
 
 ```text
 @HD	VN:1.4	SO:unsorted
 @PG	ID:01	PN:art_modern	CL:opt/build_debug/art_modern [...]
 @SQ	SN:NM_069135	LN:1718
 [...]
-NM_069135:art_modern:1:nompi:0	0	NM_069135	1	255	3=1D4=1I41=1X27=1I5=1X36=1D5=	=	1	0	AGCCAAACGGGCAACCAGACTCCGCC[...]	BCCCCGGGGGGGFGGGGGGGFGGGGG[...]	MD:Z:3^A45T32G36^T5	NM:i:6
+NM_069135:[...] 0 NM_069135 1 255 3=[...]5= = 1 0 AGCC[...] BCCC[...] MD:[...] NM:[...]
 [...]
 ```
 
@@ -332,12 +362,12 @@ See also: [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more
 
 This format is specially designed for the `stream` reference parser that allows handling of numerous contigs. As a side effect, the contig name and length information will not be written to SAM header. Each read will be written as unaligned with coordinate information populated in the `OA` tag.
 
-Example:
+Example (Tabs replaced with spaces):
 
 ```text
 @HD	VN:1.4	SO:unsorted
 @PG	ID:01	PN:art_modern	CL:opt/build_debug/art_modern [...]
-NM_069135:art_modern:1:nompi:0	4	*	1	0	*	*	1	0	AGCCAAACGGGCAACCAGACTCCGCC[...]	BCCCCGGGGGGGFGGGGGGGFGGGGG[...]	OA:Z:NM_069135,1,+,3=1D4=1I41=1X27=1I5=1X36=1D5=,255,6;	MD:Z:3^A45T32G36^T5	NM:i:6
+NM_069135:[...] 4 * 1 0 * * 1 0 AGCC[...] BCCC[...] OA:[...] MD:[...] NM:[...]
 [...]
 ```
 

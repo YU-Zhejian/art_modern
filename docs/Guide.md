@@ -178,8 +178,6 @@ mingw-w64-x86_64-gcc-libs
 mingw-w64-x86_64-gdb
 mingw-w64-x86_64-headers-git
 mingw-w64-x86_64-htslib
-mingw-w64-x86_64-libgccjit
-mingw-w64-x86_64-libmangle-git
 mingw-w64-x86_64-libwinpthread
 mingw-w64-x86_64-pkgconf
 mingw-w64-x86_64-samtools
@@ -263,7 +261,9 @@ cd fmt-12.0.0
 mkdir -p build
 cd build
 # Build shared library. Set to OFF to build static library.
-cmake .. -DBUILD_SHARED_LIBS=ON -DCMAKE_INSTALL_PREFIX="${HOME}/opt/fmt-12.0.0-clang"
+cmake .. \
+    -DBUILD_SHARED_LIBS=ON \
+    -DCMAKE_INSTALL_PREFIX="${HOME}/opt/fmt-12.0.0-clang"
 cmake --build . -j "$(nproc)" --target fmt
 cmake --install .
 ```
@@ -285,7 +285,7 @@ Install NCBI VDB first.
 axel https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
 unzip ncbi-vdb-3.3.0.zip
 cd ncbi-vdb-3.3.0
-./configure --prefix=$HOME/opt/ncbi-vdb-3.3.0
+./configure --prefix="${HOME}"/opt/ncbi-vdb-3.3.0
 make -j $(nproc) all install
 make install
 cd ..
@@ -297,8 +297,12 @@ Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
 axel https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
 unzip sra-tools-3.3.0.zip
 cd sra-tools-3.3.0
-./configure --prefix=$HOME/opt/sra-tools-3.3.0 --with-ncbi-vdb-prefix=$HOME/opt/ncbi-vdb-3.3.0 
-make clean install -j $(nproc) BUILD_TOOLS_LOADERS=ON # All important! Otherwise kar and latf-load will NOT be built.
+./configure \
+    --prefix="${HOME}"/opt/sra-tools-3.3.0 \
+    --with-ncbi-vdb-prefix="${HOME}"/opt/ncbi-vdb-3.3.0 
+make clean install -j $(nproc) BUILD_TOOLS_LOADERS=ON
 cd ..
-cp -r $HOME/opt/ncbi-vdb-3.3.0/include/ $HOME/opt/sra-tools-3.3.0/bin/ncbi/schema
+cp -r \
+    "${HOME}"/opt/ncbi-vdb-3.3.0/include/ \
+    "${HOME}"/opt/sra-tools-3.3.0/bin/ncbi/schema
 ```
