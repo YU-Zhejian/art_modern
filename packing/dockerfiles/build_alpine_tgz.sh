@@ -20,4 +20,4 @@ export LC_MEASUREMENT=C
 export LC_IDENTIFICATION=C
 
 cd "${DIST_TGZ_PATH}"
-make rel_with_dbg_alpine
+make rel_with_dbg_alpine OPT_DIR="${DIST_TGZ_PATH}/opt"

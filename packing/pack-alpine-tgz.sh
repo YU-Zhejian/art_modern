@@ -7,7 +7,7 @@ if [ -z "${PACKAGE_VERSION:-}" ]; then
     export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
 fi
 ./sh.d/prepare-master-dir-for-alpine.sh
-ALPINE_MASTER_DIR=artifacts/build_alpine_master
+ALPINE_MASTER_DIR="$(pwd)/artifacts/build_alpine_master"
 singularity exec \
     --bind "${ALPINE_MASTER_DIR}":/mnt/art_modern-master \
     dockerfiles/alpine-latest.sif \
