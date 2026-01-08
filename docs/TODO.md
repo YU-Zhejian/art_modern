@@ -7,7 +7,6 @@
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - `CEU_CM_SHOULD_ENABLE_TEST` seems not set by default. Correct it.
 - Find concurrent queue and fmt using CMake.
-- Change year to 2026.
 
 ## Performance
 

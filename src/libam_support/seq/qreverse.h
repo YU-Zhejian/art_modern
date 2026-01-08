@@ -3,7 +3,7 @@
  * @brief     Functions to reverse sequences of various element sizes, re-implemented in C.
  * @copyright
  * 			2017 Wunkolo
- * 			2025 YU Zhejian
+ * 			2025-2026 YU Zhejian
  * @license   MIT
  */
 
