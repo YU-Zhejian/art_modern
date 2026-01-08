@@ -408,7 +408,7 @@ class BuildConfig:
         else:
             retl.append([re.compile("liblabw_slim_htslib\\.so")])
 
-        if self.USE_LIBFMT is not None:
+        if self.USE_LIBFMT is not None and self.USE_LIBFMT != "CMAKE":
             retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
         else:
             retl.append([re.compile("libslim_libfmt\\.so")])
@@ -815,6 +815,13 @@ if __name__ == "__main__":
         print("SUCCESS")
     else:
         print("FAIL")
+    
+    print(f"Probing for " + "{fmt}" + " through CMake...", end="")
+    is_libfmt_cmake_exist = probe_using_cmake_project("test-libfmt.cmake")
+    if is_libfmt_cmake_exist:
+        print("SUCCESS")
+    else:
+        print("FAIL")
 
     print(f"Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
@@ -865,6 +872,10 @@ if __name__ == "__main__":
 
         if is_libfmt_exist:
             bc.USE_LIBFMT = "fmt"
+            bcs.append(bc.copy())
+            bc.USE_LIBFMT = None
+        if is_libfmt_cmake_exist:
+            bc.USE_LIBFMT = "CMAKE"
             bcs.append(bc.copy())
             bc.USE_LIBFMT = None
 

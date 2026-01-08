@@ -31,7 +31,7 @@
 #include <string>
 
 namespace labw::art_modern {
-bool detect_sra(const std::string& file_path)
+bool detect_sra([[maybe_unused]] const std::string& file_path)
 {
 #ifdef WITH_NCBI_NGS
     auto ifs = std::ifstream(file_path, std::ios::in | std::ios::binary);
@@ -46,7 +46,7 @@ bool detect_sra(const std::string& file_path)
 #endif
 }
 
-void assert_is_sra(const std::string& file_path)
+void assert_is_sra([[maybe_unused]] const std::string& file_path)
 {
 #ifdef WITH_NCBI_NGS
     // Assert that NGS can open the file

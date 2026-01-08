@@ -17,6 +17,7 @@
 // Names and versions
 
 #cmakedefine USED_HTSLIB_NAME "${USED_HTSLIB_NAME}"
+#cmakedefine USED_LIBFMT_NAME "${USED_LIBFMT_NAME}"
 #cmakedefine ART_MODERN_VERSION "${ART_MODERN_VERSION}"
 #cmakedefine ART_MODERN_LINK_LIBS "${ART_MODERN_LINK_LIBS}"
 #cmakedefine ART_MODERN_URL "${ART_MODERN_URL}"

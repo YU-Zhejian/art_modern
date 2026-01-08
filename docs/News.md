@@ -3,6 +3,8 @@
 (v-1.3.4-section)=
 ## 1.3.4 (Ongoing)
 
+- Software Engineering:
+  - `-DUSE_LIBFMT=CMAKE` added to CMake options to find `{fmt}` through CMake's `find_package`.
 - Miscellaneous bug fixes.
 
 (v-1.3.3-section)=

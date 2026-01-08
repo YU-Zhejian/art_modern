@@ -302,7 +302,9 @@ No additional dependency is required.
 (external-libfmt-section)=
 #### External
 
-The project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failefd, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
+If `USE_LIBFMT` CMake variable is set to CMake, the project will find `{fmt}` through CMake's `find_package`. This usually requires `fmt-config.cmake`.
+
+If `USE_LIBFMT` CMake variable is set to other value, the project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failed, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
 
 ## Optional Bundled/External Dependencies
 
@@ -489,6 +491,7 @@ Available since [1.1.7](#v-1.1.7-section).
 Whether to use bundled `{fmt}` library for formatting strings.
 
 - **Unset (DEFAULT): Will use bundled `{fmt}`.** See [Bundled `{fmt}`](#bundled-libfmt-section) for requirements.
+- `CMAKE`: Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements. Added in [1.3.4](#v-1.3.4-section).
 - `fmt`: Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 - Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 
