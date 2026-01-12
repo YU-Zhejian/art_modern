@@ -13,7 +13,7 @@ pkgs_to_highlight = [
 ]
 
 if __name__ == "__main__":
-    for name in ["median", "total"]:
+    for name in ["median", "total", "conda_velocity"]:
         df = pd.read_parquet(f"packing_status_{name}.parquet")
         for channel in ["conda-forge", "bioconda"]:
             pkgs_to_highlight_channel = {
