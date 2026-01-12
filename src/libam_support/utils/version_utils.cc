@@ -72,8 +72,7 @@ namespace {
     void print_htslib_version()
     {
         // NOLINTBEGIN
-        std::cout << "HTSLib: " << hts_version()
-        << " (" << USED_HTSLIB_NAME << ")" << std::endl;
+        std::cout << "HTSLib: " << hts_version() << " (" << USED_HTSLIB_NAME << ")" << std::endl;
         std::cout << "\tFeatures: " << hts_feature_string() << std::endl;
         std::cout << "\tCC: " << hts_test_feature(HTS_FEATURE_CC) << std::endl;
         std::cout << "\tCPPFLAGS: " << hts_test_feature(HTS_FEATURE_CPPFLAGS) << std::endl;
@@ -210,8 +209,7 @@ namespace {
     {
         // NOLINTNEXTLINE
         std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100
-        << " (" << USED_LIBFMT_NAME << ")"
-                  << std::endl;
+                  << " (" << USED_LIBFMT_NAME << ")" << std::endl;
     }
 
     void print_git_info()

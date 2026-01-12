@@ -7,9 +7,7 @@ import fastparquet as fp
 
 
 if __name__ == "__main__":
-    print("Versions: Pandas {}, PyArrow {}, Fastparquet {}".format(
-        pd.__version__, pa.__version__, fp.__version__
-    ))
+    print("Versions: Pandas {}, PyArrow {}, Fastparquet {}".format(pd.__version__, pa.__version__, fp.__version__))
 
     all_files = glob.glob("monthly/*/*.parquet")
     for fn in all_files:

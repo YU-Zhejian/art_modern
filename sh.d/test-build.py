@@ -815,7 +815,7 @@ if __name__ == "__main__":
         print("SUCCESS")
     else:
         print("FAIL")
-    
+
     print(f"Probing for " + "{fmt}" + " through CMake...", end="")
     is_libfmt_cmake_exist = probe_using_cmake_project("test-libfmt.cmake")
     if is_libfmt_cmake_exist:
