@@ -57,9 +57,7 @@ def get_file(
 
 if __name__ == "__main__":
     fetch_lru_ = {}
-    release = os.environ.get("PACKAGE_VERSION")
-    if not release:
-        release = "0.0.0-dev"
+    release = os.environ.get("PACKAGE_VERSION", "0.0.0-dev")
 
     CACHE_RELEASE_FILE = os.path.join(THIS_DIR, f"fetch_lru_{release}.txt")
     if os.path.exists(CACHE_RELEASE_FILE):

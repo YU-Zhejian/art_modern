@@ -28,10 +28,9 @@ ROOT_DIR = os.path.dirname(THIS_DIR)
 
 project = "art_modern"
 author = "YU Zhejian"
-copyright_string = f"2024-{datetime.datetime.now().year}, {author}"
-release = os.environ.get("PACKAGE_VERSION")
-if not release:
-    release = "0.0.0-dev"
+copyright = f"2024-{datetime.datetime.now().year}, {author}"
+release = os.environ.get("PACKAGE_VERSION", "0.0.0-dev")
+version = release
 
 # -- General configuration ---------------------------------------------------
 html_theme = "furo"
@@ -41,7 +40,6 @@ extensions = [
     "sphinx.ext.viewcode",
     "myst_parser",
     "sphinx_copybutton",
-    # Replaces "sphinx.ext.imgconverter",
     "sphinxcontrib.cairosvgconverter",
 ]
 

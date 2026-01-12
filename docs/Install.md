@@ -234,7 +234,7 @@ The following dependencies are bundled with the project. You do not need to inst
 See also: [Copying.md](./Copying.md) for the licenses and versions of those bundled dependencies.
 
 (htslib-section)=
-### [HTSLib](https://www.htslib.org/)
+### HTSLib
 
 [HTSLib](https://www.htslib.org/) is used for reading large FASTA files and generating SAM/BAM files.
 

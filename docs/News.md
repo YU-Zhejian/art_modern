@@ -5,6 +5,7 @@
 
 - Software Engineering:
   - `-DUSE_LIBFMT=CMAKE` added to CMake options to find `{fmt}` through CMake's `find_package`.
+  - Pre-built HTML docs now hosted at [GitHub Pages](https://yu-zhejian.github.io/art_modern_docs/index.html).
 - Miscellaneous bug fixes.
 
 (v-1.3.3-section)=
