@@ -387,7 +387,7 @@ Available since [1.0.0](#v-1.0.0-section).
 
 Whether test should be enabled.
 
-- **Unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
+- **Unset (DEFAULT): Set to `OFF`.**
 - `OFF`: Will disable test.
 - `ON`: Will enable test.
 

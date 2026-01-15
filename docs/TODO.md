@@ -5,8 +5,7 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-- `CEU_CM_SHOULD_ENABLE_TEST` seems not set by default. Correct it.
-- Find concurrent queue and fmt using CMake.
+- Benchmark: Use malloc should be set to NOP to avoid unfair advantage introduced by Jemalloc.
 
 ## Performance
 

@@ -152,6 +152,10 @@ if(NOT EXISTS "${CMAKE_BINARY_DIR}/gen/src/art/builtin_profiles.c")
     endif()
 endif()
 
+if(NOT DEFINED CEU_CM_SHOULD_ENABLE_TEST)
+    set(CEU_CM_SHOULD_ENABLE_TEST OFF)
+endif()
+
 if(CEU_CM_SHOULD_ENABLE_TEST)
     configure_file("${CMAKE_CURRENT_LIST_DIR}/src/test/test_adaptor.h.in" "${CMAKE_BINARY_DIR}/include/test_adaptor.h")
 endif()
