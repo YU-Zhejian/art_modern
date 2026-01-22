@@ -5,7 +5,6 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
-- Benchmark: Use malloc should be set to NOP to avoid unfair advantage introduced by Jemalloc.
 
 ## Performance
 
