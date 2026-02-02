@@ -102,7 +102,7 @@ function merge_file() {
     ext="${1##*.}"
     base="${1%.*}"
     files_to_merge=("${base}".*."${ext}")
-    if [ "${ext}" == "fastq" ] || [ "${ext}" == "fq" ] || [ "${ext}" == "fasta" ] || [ "${ext}" == "fa" ]; then
+    if [ "${ext}" == "fastq" ] || [ "${ext}" == "fq" ] || [ "${ext}" == "fasta" ] || [ "${ext}" == "fa" ] || [ "${ext}" == "gz" ]; then
         cat "${files_to_merge[@]}" >"${1}"
     elif [ "${ext}" == "sam" ] || [ "${ext}" == "bam" ]; then
         # Sort all files before merging

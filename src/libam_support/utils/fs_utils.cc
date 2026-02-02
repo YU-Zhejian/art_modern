@@ -82,10 +82,9 @@ void prepare_writer(const std::string& output_file_path)
             if (have_mpi()) {
                 BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
                 abort_mpi();
-            } else {
-                BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path
-                                           << "' exists but is not a regular file. Will be overwritten.";
             }
+            BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path
+                                           << "' exists but is not a regular file. Will be overwritten.";
         } else {
             BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path << "' exists and will be overwritten.";
         }

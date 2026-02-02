@@ -35,7 +35,26 @@ void BamOptions::log_(const std::string& name) const
     if (with_tag_OA) {
         tags.emplace_back("OA");
     }
-    BOOST_LOG_TRIVIAL(info) << name << ": SAM/BAM Output Options: use_m=" << use_m << ", write_bam=" << write_bam
+    std::string fmt_to_str;
+    switch (output_format)
+    {
+        case BamOutputFormat::BAM:
+            fmt_to_str = "BAM";
+            break;
+    case BamOutputFormat::FASTQ:
+        fmt_to_str = "FASTQ";
+        break;
+        case BamOutputFormat::SAM:
+            fmt_to_str = "SAM";
+            break;
+    case BamOutputFormat::FASTA:
+        fmt_to_str = "FASTA";
+        break;
+        default:
+            fmt_to_str = "UNKNOWN";
+            break;
+    }
+    BOOST_LOG_TRIVIAL(info) << name << ": SAM/BAM Output Options: use_m=" << use_m << ", fmt=" << fmt_to_str
                             << ", hts_io_threads=" << hts_io_threads << ", compress_level=" << compress_level
                             << ", tags=[" << join(tags, ",") << "], no_qual=" << no_qual << ".";
 }

@@ -20,6 +20,8 @@
 #include <string>
 
 namespace labw::art_modern {
+
+enum class BamOutputFormat : std::uint8_t { SAM, BAM, FASTA, FASTQ };
 class BamOptions {
 public:
     static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u', 0 };
@@ -54,10 +56,7 @@ public:
      */
     bool use_m = false;
 
-    /**
-     * If `false`, will write SAM instead.
-     */
-    bool write_bam = true;
+    BamOutputFormat output_format = BamOutputFormat::BAM;
     /**
      * Number of threads used by htslib.
      */

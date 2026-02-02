@@ -127,22 +127,49 @@ sam_hdr_t* BamUtils::init_header(const BamOptions& sam_options)
 samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_options)
 {
     std::string mode;
-    if (sam_options.write_bam) {
+    if (sam_options.output_format == BamOutputFormat::BAM) {
         if (!ends_with(filename, ".bam")) {
             BOOST_LOG_TRIVIAL(warning) << "BAM file name was not end with .bam: " << filename;
         }
         mode += "wb";
         mode += std::to_string(sam_options.compress_level);
-    } else {
+    } else if (sam_options.output_format == BamOutputFormat::SAM) {
         if (!ends_with(filename, ".sam")) {
             BOOST_LOG_TRIVIAL(warning) << "SAM file name was not end with .bam: " << filename;
         }
         mode += "wh";
+    } else if (sam_options.output_format == BamOutputFormat::FASTQ) {
+        bool const have_gz = ends_with(filename, ".gz");
+        if (have_gz && sam_options.compress_level == 'u')
+        {
+            BOOST_LOG_TRIVIAL( warning) << "FASTQ file name ends with .gz but compress level is set to uncompressed. Will not compress output.";
+        }
+        else if (! have_gz && sam_options.compress_level != 'u')
+        {
+            BOOST_LOG_TRIVIAL( warning) << "FASTQ file name does not end with .gz but compress level is set to compressed. Will compress output.";
+        }
+        if (
+            !ends_with(filename, ".fq")
+            && !ends_with(filename, ".fastq")
+            && !ends_with(filename, ".fq.gz")
+            && !ends_with(filename, ".fastq.gz")
+            ) {
+            BOOST_LOG_TRIVIAL(warning) << "FASTQ file name was not end with .fq or .fastq or .fq.gz or .fastq.gz: " << filename;
+        }
+        mode += "wf";
+        if (sam_options.compress_level != 'u') {
+            mode += sam_options.compress_level;
+            mode += 'g'; // gzip compression
+        }
+    } else {
+        BOOST_LOG_TRIVIAL(error) << "Unknown output format enum value: "
+                                 << static_cast<std::underlying_type_t<BamOutputFormat>>(sam_options.output_format);
+        abort_mpi();
     }
     prepare_writer(filename);
-
+    // mode += "ex"; // For O_CLOEXEC + O_EXCL
     auto* const retv = CExceptionsProxy::assert_not_null(
-        sam_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open SAM file");
+        hts_open(filename.c_str(), mode.c_str()), USED_HTSLIB_NAME, "Failed to open HTS file");
     CExceptionsProxy::assert_numeric(hts_set_threads(retv, sam_options.hts_io_threads), USED_HTSLIB_NAME,
         "Failed to set writer thread number", false, CExceptionsProxy::EXPECTATION::ZERO);
     return retv;

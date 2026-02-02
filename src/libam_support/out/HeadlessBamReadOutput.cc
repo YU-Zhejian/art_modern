@@ -255,7 +255,7 @@ std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutPa
         }
         auto so = BamOptions();
         so.use_m = params.vm.count("o-hl_sam-use_m") > 0;
-        so.write_bam = params.vm.count("o-hl_sam-write_bam") > 0;
+        so.output_format = params.vm.count("o-sam-write_bam") > 0 ? BamOutputFormat::BAM : BamOutputFormat::SAM;
         so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-hl_sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-hl_sam-compress_level"].as<char>();

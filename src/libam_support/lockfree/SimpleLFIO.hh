@@ -28,14 +28,14 @@ public:
     DELETE_MOVE(SimpleLFIO)
     DELETE_COPY(SimpleLFIO)
     ~SimpleLFIO() override = default;
-    void write(std::unique_ptr<std::string> value) override;
 
     SimpleLFIO(std::string name, std::string out_path);
 
     SimpleLFIO(std::string name, std::string out_path, const std::string& preamble);
 
+protected:
+    void write(std::unique_ptr<std::string> value) override;
     void flush_and_close() override;
-
 private:
     std::atomic<bool> closed_ { false };
     std::ofstream out_;
