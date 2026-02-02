@@ -312,6 +312,8 @@ Please wait for a while for the compression to finish.
 
 **NOTE** Pipelines and redirections are not supported in MPI mode mentioned below.
 
+**TIPS** You may find program [`pv(1)`](https://www.man7.org/linux/man-pages/man1/pv.1.html) useful when working with pipelines.
+
 ### Using MPI
 
 Message Passing Interface ([MPI](https://www.mpi-forum.org/)) is a standard for parallel computing on a high-performance cluster (HPC). It allows processes to communicate with each other through intranet. If you're working on a cluster with MPI installed, you can use the MPI version of `art_modern` to speed up the simulation by executing `art_modern` on different nodes in parallel.
