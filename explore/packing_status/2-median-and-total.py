@@ -30,7 +30,11 @@ if __name__ == "__main__":
     k = 0.15
     df_recent["decay_factor"] = (-k * df_recent["age_months"]).apply(lambda x: np.exp(x))
     df_recent["weighted_counts"] = df_recent["counts"] * df_recent["decay_factor"]
-    df_velocity = df_recent.groupby(["data_source", "pkg_name"], as_index=False, observed=False)["weighted_counts"].sum()
-    df_velocity = df_velocity.rename(columns={"weighted_counts": "counts"}).loc[:, ["data_source", "pkg_name", "counts"]]
+    df_velocity = df_recent.groupby(["data_source", "pkg_name"], as_index=False, observed=False)[
+        "weighted_counts"
+    ].sum()
+    df_velocity = df_velocity.rename(columns={"weighted_counts": "counts"}).loc[
+        :, ["data_source", "pkg_name", "counts"]
+    ]
     df_velocity.to_parquet("packing_status_conda_velocity.parquet", index=False)
     print("Wrote packing_status_conda_velocity.parquet with {} rows.".format(len(df_velocity)))
