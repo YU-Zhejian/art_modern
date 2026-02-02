@@ -14,6 +14,7 @@
 
 #include "libam_support/lockfree/SimpleLFIO.hh"
 
+#include "libam_support/lockfree/DeflateWriter.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/utils/fs_utils.hh"
 
@@ -34,7 +35,7 @@ void SimpleLFIO::write(const std::unique_ptr<std::string> value)
     if (closed_) {
         return;
     }
-    out_ << *value;
+    *out_ << *value;
     num_bytes_out_ += value->size();
 }
 
@@ -44,13 +45,13 @@ SimpleLFIO::SimpleLFIO(std::string name, std::string out_path)
 {
     prepare_writer(out_path_);
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' added.";
-    out_ = std::ofstream(out_path_, std::ios::out | std::ios::binary);
+    out_ = std::make_unique<std::ofstream>(out_path_, std::ios::out | std::ios::binary);
 }
 
 SimpleLFIO::SimpleLFIO(std::string name, std::string out_path, const std::string& preamble)
     : SimpleLFIO(std::move(name), std::move(out_path))
 {
-    out_ << preamble;
+    *out_ << preamble;
 }
 
 void SimpleLFIO::flush_and_close()
@@ -58,8 +59,8 @@ void SimpleLFIO::flush_and_close()
     if (closed_) {
         return;
     }
-    std::flush(out_);
-    out_.close();
+    std::flush(*out_);
+    out_->close();
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' closed.";
     closed_ = true;
 }

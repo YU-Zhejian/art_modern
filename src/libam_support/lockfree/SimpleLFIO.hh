@@ -38,7 +38,7 @@ protected:
     void flush_and_close() override;
 private:
     std::atomic<bool> closed_ { false };
-    std::ofstream out_;
+    std::unique_ptr<std::ofstream> out_;
     std::string out_path_;
 };
 } // namespace labw::art_modern
