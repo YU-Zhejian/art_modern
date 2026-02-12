@@ -69,6 +69,8 @@ Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to 
 
 **NOTE** SAM/BAM output writer is parallelized using its own thread pool. See parameter [`--o-sam-num_threads`](#out-sam-section) and [`--o-hl_sam-num_threads`](#out-hl_sam-section) for more information. For example, if you run `art_modern --parallel 4 --o-sam-num_threads 2 --o-hl_sam-num_threads 3 ...`, there will be 9 threads in total.
 
+**WARNING** Do not oversubscribe the number of threads. It impacts the performance of the program.
+
 ### Error-Profile Related Parameters
 
 #### Which Quality Distribution File to Use
