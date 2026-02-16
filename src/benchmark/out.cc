@@ -219,9 +219,9 @@ int main()
     }
     // Temporarily disable logging
     for (int i = 0; i < 5; i++) {
-        for (std::size_t const nthread : std::vector<std::size_t> {  1, 4, 16, 64  }) {
+        for (std::size_t const nthread : std::vector<std::size_t> { 1, 4, 16, 64 }) {
             bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo_l[3], nthread, LockFreeIO<void*>::QUEUE_SIZE),
-            get_bo_name("BamReadOutput", bo_l[3]), nthread, oss);
+                get_bo_name("BamReadOutput", bo_l[3]), nthread, oss);
             // for (auto& bo : bo_l) {
             //     bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
             //         get_bo_name("BamReadOutput", bo), nthread, oss);

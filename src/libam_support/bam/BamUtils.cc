@@ -140,21 +140,17 @@ samFile* BamUtils::open_file(const std::string& filename, const BamOptions& sam_
         mode += "wh";
     } else if (sam_options.output_format == BamOutputFormat::FASTQ) {
         bool const have_gz = ends_with(filename, ".gz");
-        if (have_gz && sam_options.compress_level == 'u')
-        {
-            BOOST_LOG_TRIVIAL( warning) << "FASTQ file name ends with .gz but compress level is set to uncompressed. Will not compress output.";
+        if (have_gz && sam_options.compress_level == 'u') {
+            BOOST_LOG_TRIVIAL(warning)
+                << "FASTQ file name ends with .gz but compress level is set to uncompressed. Will not compress output.";
+        } else if (!have_gz && sam_options.compress_level != 'u') {
+            BOOST_LOG_TRIVIAL(warning) << "FASTQ file name does not end with .gz but compress level is set to "
+                                          "compressed. Will compress output.";
         }
-        else if (! have_gz && sam_options.compress_level != 'u')
-        {
-            BOOST_LOG_TRIVIAL( warning) << "FASTQ file name does not end with .gz but compress level is set to compressed. Will compress output.";
-        }
-        if (
-            !ends_with(filename, ".fq")
-            && !ends_with(filename, ".fastq")
-            && !ends_with(filename, ".fq.gz")
-            && !ends_with(filename, ".fastq.gz")
-            ) {
-            BOOST_LOG_TRIVIAL(warning) << "FASTQ file name was not end with .fq or .fastq or .fq.gz or .fastq.gz: " << filename;
+        if (!ends_with(filename, ".fq") && !ends_with(filename, ".fastq") && !ends_with(filename, ".fq.gz")
+            && !ends_with(filename, ".fastq.gz")) {
+            BOOST_LOG_TRIVIAL(warning) << "FASTQ file name was not end with .fq or .fastq or .fq.gz or .fastq.gz: "
+                                       << filename;
         }
         mode += "wf";
         if (sam_options.compress_level != 'u') {

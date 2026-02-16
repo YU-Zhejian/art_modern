@@ -84,7 +84,7 @@ void prepare_writer(const std::string& output_file_path)
                 abort_mpi();
             }
             BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path
-                                           << "' exists but is not a regular file. Will be overwritten.";
+                                       << "' exists but is not a regular file. Will be overwritten.";
         } else {
             BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path << "' exists and will be overwritten.";
         }

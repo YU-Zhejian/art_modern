@@ -24,7 +24,6 @@
 #include <fstream>
 #include <ios>
 #include <memory>
-#include <ostream>
 #include <string>
 #include <utility>
 
@@ -35,7 +34,7 @@ void SimpleLFIO::write(const std::unique_ptr<std::string> value)
     if (closed_) {
         return;
     }
-    *out_ << *value;
+    out_->write(value->data());
     num_bytes_out_ += value->size();
 }
 
@@ -45,13 +44,13 @@ SimpleLFIO::SimpleLFIO(std::string name, std::string out_path)
 {
     prepare_writer(out_path_);
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' added.";
-    out_ = std::make_unique<std::ofstream>(out_path_, std::ios::out | std::ios::binary);
+    out_ = std::make_unique<SimpleWriter>(out_path_);
 }
 
 SimpleLFIO::SimpleLFIO(std::string name, std::string out_path, const std::string& preamble)
     : SimpleLFIO(std::move(name), std::move(out_path))
 {
-    *out_ << preamble;
+    out_->write(preamble);
 }
 
 void SimpleLFIO::flush_and_close()
@@ -59,7 +58,7 @@ void SimpleLFIO::flush_and_close()
     if (closed_) {
         return;
     }
-    std::flush(*out_);
+    out_->flush();
     out_->close();
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' closed.";
     closed_ = true;

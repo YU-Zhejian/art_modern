@@ -13,6 +13,7 @@
  **/
 
 #pragma once
+#include "libam_support/lockfree/DeflateWriter.hh"
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
@@ -36,9 +37,10 @@ public:
 protected:
     void write(std::unique_ptr<std::string> value) override;
     void flush_and_close() override;
+
 private:
     std::atomic<bool> closed_ { false };
-    std::unique_ptr<std::ofstream> out_;
+    std::unique_ptr<WriterInterface> out_;
     std::string out_path_;
 };
 } // namespace labw::art_modern
