@@ -440,3 +440,7 @@ This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com)
 - W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, DOI: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 
 Bundled libraries in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.
+
+## Stargazers Over Time
+
+[![Stargazers over time](https://starchart.cc/YU-Zhejian/art_modern.svg?variant=adaptive)](https://starchart.cc/YU-Zhejian/art_modern)
