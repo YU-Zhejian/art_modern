@@ -101,32 +101,32 @@ time bgzip -k -f -l 9 -@ "$(nproc)" SRR30113744_1.fastq
 # sys     0m1.468s
 
 time ../../../../opt/build_release_install/bin/am_compress \
-    --i-path SRR30113744_1.fastq \
-    --o-writer SRR30113744_1.fastq.gz \
-    --o-writer-compression_level 9 \
-    --o-writer-compression gzip \
-    --o-writer-num_threads 1
+    --i-file SRR30113744_1.fastq \
+    --o-compressed SRR30113744_1.fastq.gz \
+    --o-compressed-compression_level 9 \
+    --o-compressed-compression gzip \
+    --o-compressed-num_threads 1
 # With libdeflate as underlying implementation
 # real    1m6.822s
 # user    1m6.439s
 # sys     0m0.347s
 
 time ../../../../opt/build_release_install/bin/am_compress \
-    --i-path SRR30113744_1.fastq \
-    --o-writer SRR30113744_1.fastq.gz \
-    --o-writer-compression_level 9 \
-    --o-writer-compression gzip \
-    --o-writer-num_threads "$(nproc)"
+    --i-file SRR30113744_1.fastq \
+    --o-compressed SRR30113744_1.fastq.gz \
+    --o-compressed-compression_level 9 \
+    --o-compressed-compression gzip \
+    --o-compressed-num_threads "$(nproc)"
 # real    1m4.961s
 # user    1m4.545s
 # sys     0m0.412s
 
 time ../../../../opt/build_release_install/bin/am_compress \
-    --i-path SRR30113744_1.fastq \
-    --o-writer SRR30113744_1.fastq.bgz \
-    --o-writer-compression_level 9 \
-    --o-writer-compression bgzip \
-    --o-writer-num_threads "$(nproc)"
+    --i-file SRR30113744_1.fastq \
+    --o-compressed SRR30113744_1.fastq.bgz \
+    --o-compressed-compression_level 9 \
+    --o-compressed-compression bgzip \
+    --o-compressed-num_threads "$(nproc)"
 # real    1m4.701s
 # user    19m44.769s
 # sys     0m22.885s

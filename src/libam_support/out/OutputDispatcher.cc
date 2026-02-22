@@ -77,7 +77,7 @@ bool OutputDispatcher::require_alignment() const
     return retv;
 }
 
-OutputDispatcher::TokenRing OutputDispatcher::get_producer_tokens()
+OutputDispatcher::TokenRing OutputDispatcher::get_producer_tokens() const
 {
     TokenRing retv;
     for (const auto& output : outputs_) {

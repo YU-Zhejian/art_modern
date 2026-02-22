@@ -465,6 +465,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     install_dir = os.path.join(LOG_DIR, str(this_job_id), f"install")
     art_modern_path = os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else ""))
     apb_path = os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else ""))
+    amc_path = os.path.join(install_dir, "bin", "am_compress" + ("-mpi" if WITH_MPI else ""))
     do_build_lh = logging.getLogger(f"DO_BUILD {this_job_id}/{num_total_jobs}")
     do_build_lh.handlers = []
     log_path = os.path.join(LOG_DIR, str(this_job_id), "main.log")
@@ -603,6 +604,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 ) as w:
                     pls.lddtree(art_modern_path, file=w)
                     pls.lddtree(apb_path, file=w)
+                    pls.lddtree(amc_path, file=w)
                 ldd_lh.error("FAILED")
                 return False
         ldd_lh.info("DONE")
@@ -670,6 +672,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             **os.environ,
             "ART_MODERN_PATH": art_modern_path,
             "APB_PATH": apb_path,
+            "AMC_PATH": amc_path,
             "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
             "MPIEXEC": MPIEXEC if WITH_MPI else "",
             "SAMTOOLS_THREADS": "4",

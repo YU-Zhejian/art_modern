@@ -110,6 +110,44 @@ assert_cleandir
 
 # I suppose the FASTA format does not need to be tested here.
 
+# Assessing am_compress
+if [ -z "${MPIEXEC:-}" ]; then
+    AM_EXEC \
+        --i-file "${LAMBDA_PHAGE}" \
+        --mode wgs \
+        --lc se \
+        --i-parser memory \
+        --i-fcov 5 \
+        --parallel "${PARALLEL}" \
+        --o-fastq "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq
+    AMC_EXEC \
+        --i-file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq \
+        --o-compressed "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.amc \
+        --o-compressed-compression none
+    htsfile "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.amc | grep -q 'FASTQ sequence text'
+    AMC_EXEC \
+        --i-file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq \
+        --o-compressed "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.gz \
+        --o-compressed-compression gzip
+    htsfile "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.gz | grep -q 'FASTQ gzip-compressed sequence data'
+    AMC_EXEC \
+        --i-file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq \
+        --o-compressed "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.bgz \
+        --o-compressed-compression bgzip
+    htsfile "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.bgz | grep -q 'FASTQ BGZF-compressed sequence data'
+    AMC_EXEC \
+        --i-file "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq \
+        --o-compressed "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.GZ
+    htsfile "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.gz | grep -q 'FASTQ gzip-compressed sequence data'
+    rm -f \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.GZ \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.bgz \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.gz \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq.amc \
+        "${OUT_DIR}"/test_small_pe_wgs_memory_sep.fastq
+    assert_cleandir
+fi
+
 if [ "${FORMAT_ONLY:-}" = "1" ]; then
     exit 0
 fi

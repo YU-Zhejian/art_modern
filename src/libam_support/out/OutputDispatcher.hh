@@ -44,7 +44,7 @@ public:
     void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa);
     void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2);
     void close();
-    TokenRing get_producer_tokens();
+    TokenRing get_producer_tokens() const;
 
 private:
     std::vector<std::shared_ptr<BaseReadOutput>> outputs_;

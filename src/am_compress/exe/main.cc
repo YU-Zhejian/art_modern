@@ -60,9 +60,9 @@ int main(int argc, char** argv)
 
     boost::program_options::options_description od {};
 
-    WriterDispatcher::patch_options_for_fmt("writer", od);
+    WriterDispatcher::patch_options_for_fmt("compressed", od);
     od.add(general_options());
-    od.add_options()("i-path", boost::program_options::value<std::string>(), "Path to the input file.");
+    od.add_options()("i-file", boost::program_options::value<std::string>(), "Path to the input file.");
     boost::program_options::variables_map vm;
     try {
         vm = generate_vm_while_handling_help_version(od, argc, argv);
@@ -77,10 +77,10 @@ int main(int argc, char** argv)
         return EXIT_SUCCESS;
     }
 
-    const std::string o_file = vm["o-writer"].as<std::string>();
+    const std::string o_file = vm["o-compressed"].as<std::string>();
     prepare_writer(o_file);
-    auto writer = WriterDispatcher::parse_args_for_fmt("writer", vm, o_file);
-    std::string in_file = vm["i-path"].as<std::string>();
+    auto writer = WriterDispatcher::parse_args_for_fmt("compressed", vm, o_file);
+    std::string in_file = vm["i-file"].as<std::string>();
     if (in_file.empty()) {
         BOOST_LOG_TRIVIAL(fatal) << "Input file path is empty.";
         exit_mpi();
@@ -95,9 +95,9 @@ int main(int argc, char** argv)
         exit_mpi();
         return EXIT_FAILURE;
     }
-    std::fstream input_file(vm["i-path"].as<std::string>(), std::ios::in | std::ios::binary);
+    std::fstream input_file(vm["i-file"].as<std::string>(), std::ios::in | std::ios::binary);
     if (!input_file) {
-        BOOST_LOG_TRIVIAL(fatal) << "Failed to open input file '" << vm["i-path"].as<std::string>() << "'.";
+        BOOST_LOG_TRIVIAL(fatal) << "Failed to open input file '" << vm["i-file"].as<std::string>() << "'.";
         exit_mpi();
         return EXIT_FAILURE;
     }

@@ -159,7 +159,7 @@ void WriterDispatcher::patch_options_for_fmt(
     desc.add_options()(bsize_arg.c_str(), boost::program_options::value<std::size_t>()->default_value(1 << 20),
         "Buffer size in bytes for writing. Default is 1 MiB (1048576 bytes).");
     desc.add_options()(nthreads_arg.c_str(), boost::program_options::value<std::size_t>()->default_value(1),
-        "Number of threads to use for compression. Only applicable for gzip compression. Default is 1 (no "
+        "Number of threads to use for compression. Only applicable for bgzip compression. Default is 1 (no "
         "multithreading).");
 }
 } // namespace labw::art_modern
