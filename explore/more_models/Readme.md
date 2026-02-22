@@ -76,3 +76,58 @@ fasterq-dump --split-files --skip-technical --progress --threads 8 -A SRR3011374
     --read_len 250 \
     --o-file1 NovaSeq6000_250bp/EmpNovaSeq6000_250R2.txt
 ```
+
+## Side Experiments
+
+```shell
+time gzip -k -f -9 SRR30113744_1.fastq
+# real    5m21.201s
+# user    5m20.821s
+# sys     0m0.340s
+
+time libdeflate-gzip -k -f -9 SRR30113744_1.fastq
+# real    1m7.275s
+# user    1m6.885s
+# sys     0m0.292s
+
+time pigz -k -f -9 SRR30113744_1.fastq
+# real    0m16.392s
+# user    5m19.205s
+# sys     0m0.730s
+
+time bgzip -k -f -l 9 -@ "$(nproc)" SRR30113744_1.fastq
+# real    0m59.490s
+# user    19m23.586s
+# sys     0m1.468s
+
+time ../../../../opt/build_release_install/bin/am_compress \
+    --i-path SRR30113744_1.fastq \
+    --o-writer SRR30113744_1.fastq.gz \
+    --o-writer-compression_level 9 \
+    --o-writer-compression gzip \
+    --o-writer-num_threads 1
+# With libdeflate as underlying implementation
+# real    1m6.822s
+# user    1m6.439s
+# sys     0m0.347s
+
+time ../../../../opt/build_release_install/bin/am_compress \
+    --i-path SRR30113744_1.fastq \
+    --o-writer SRR30113744_1.fastq.gz \
+    --o-writer-compression_level 9 \
+    --o-writer-compression gzip \
+    --o-writer-num_threads "$(nproc)"
+# real    1m4.961s
+# user    1m4.545s
+# sys     0m0.412s
+
+time ../../../../opt/build_release_install/bin/am_compress \
+    --i-path SRR30113744_1.fastq \
+    --o-writer SRR30113744_1.fastq.bgz \
+    --o-writer-compression_level 9 \
+    --o-writer-compression bgzip \
+    --o-writer-num_threads "$(nproc)"
+# real    1m4.701s
+# user    19m44.769s
+# sys     0m22.885s
+```

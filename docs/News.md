@@ -6,7 +6,7 @@
 - Software Engineering:
   - `-DUSE_LIBFMT=CMAKE` added to CMake options to find `{fmt}` through CMake's `find_package`.
   - Pre-built HTML docs now hosted at [GitHub Pages](https://yu-zhejian.github.io/art_modern_docs/index.html).
-  - Compression of FASTA and FASTQ output using gzip supported. The build system will detect whether ZLib or libdeflate is available and use the one with better performance.
+  - Compression of FASTA and FASTQ output using gzip/bgzip supported using HTSLib.
 - Miscellaneous bug fixes.
 
 (v-1.3.3-section)=

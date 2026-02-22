@@ -45,6 +45,15 @@
 namespace labw::art_modern {
 
 namespace {
+    /**
+     * Decompresses a zlib-compressed data buffer into a string.
+     *
+     * Libdeflate not used as it does not support stream decompression.
+     *
+     * @param src Compressed data buffer
+     * @param slen Compressed data length
+     * @return Decompressed string
+     */
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
         constexpr int BUFF_SIZE = 4096;

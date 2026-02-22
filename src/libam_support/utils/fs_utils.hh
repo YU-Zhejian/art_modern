@@ -34,5 +34,6 @@ void ensure_directory_exists(const std::string& dir_path);
 void prepare_writer(const std::string& output_file_path);
 
 std::string attach_mpi_rank_to_path(const std::string& file_path, const std::string& rank_str);
+std::string attach_mpi_rank_to_path_impl(const std::string& file_path, const std::string& rank_str);
 
 } // namespace labw::art_modern

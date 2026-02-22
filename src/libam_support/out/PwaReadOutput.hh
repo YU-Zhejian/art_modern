@@ -20,6 +20,7 @@
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
+#include "libam_support/writer/WriterInterface.hh"
 
 #include <boost/program_options/options_description.hpp>
 
@@ -35,13 +36,13 @@ public:
     DELETE_MOVE(PwaReadOutput)
     DELETE_COPY(PwaReadOutput)
 
-    PwaReadOutput(const std::string& filename, const std::vector<std::string>& args, std::size_t n_threads,
+    PwaReadOutput(std::unique_ptr<WriterInterface> writer, const std::vector<std::string>& args, std::size_t n_threads,
         std::size_t queue_size);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;
 
-    bool require_alignment() const override;
+    [[nodiscard]] bool require_alignment() const override;
 
     void close() override;
 

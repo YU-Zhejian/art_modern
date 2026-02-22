@@ -21,6 +21,8 @@
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/writer/WriterDispatcher.hh"
+#include "libam_support/writer/WriterInterface.hh"
 
 #include <fmt/format.h>
 
@@ -65,8 +67,9 @@ void FastqReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastqReadOutput::~FastqReadOutput() { FastqReadOutput::close(); }
-FastqReadOutput::FastqReadOutput(const std::string& filename, const std::size_t n_threads, const std::size_t queue_size)
-    : lfio_("FASTQ", filename)
+FastqReadOutput::FastqReadOutput(
+    std::unique_ptr<WriterInterface> writer, const std::size_t n_threads, const std::size_t queue_size)
+    : lfio_("FASTQ", std::move(writer))
 {
     lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
@@ -88,8 +91,7 @@ ProducerToken FastqReadOutput::get_producer_token() { return lfio_.get_producer_
 void FastqReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fastq_desc("FASTQ Output");
-    fastq_desc.add_options()("o-fastq", boost::program_options::value<std::string>(),
-        "Destination of output FASTQ file. Unset to disable the writer.");
+    WriterDispatcher::patch_options_for_fmt("fastq", fastq_desc);
     fastq_desc.add_options()("o-fastq-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in FASTQ output.");
@@ -97,10 +99,11 @@ void FastqReadOutputFactory::patch_options(boost::program_options::options_descr
 }
 std::shared_ptr<BaseReadOutput> FastqReadOutputFactory::create(const OutParams& params) const
 {
-    if (params.vm.count("o-fastq") != 0) {
+    if (params.vm.count("o-fastq") != 0U) {
         return std::make_shared<FastqReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s()), params.n_threads,
-            params.vm["o-fastq-queue_size"].as<std::size_t>());
+            WriterDispatcher::parse_args_for_fmt(
+                "fastq", params.vm, attach_mpi_rank_to_path(params.vm["o-fastq"].as<std::string>(), mpi_rank_s())),
+            params.n_threads, params.vm["o-fastq-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

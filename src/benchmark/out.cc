@@ -41,6 +41,8 @@
 #include <utility>
 #include <vector>
 
+#include "libam_support/writer/WriterDispatcher.hh"
+
 using namespace labw::art_modern;
 
 class EmptyLFIO final : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
@@ -210,7 +212,7 @@ int main()
         fastq_o_t.back().compress_level = '4';
         fastq_o_t.back().output_format = BamOutputFormat::FASTQ;
     }
-    for (const auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
+    for (const auto& t : std::vector { '0', '1', '3', '5', '7', '9', 'u' }) {
         bo_l.emplace_back();
         bo_l.back().compress_level = t;
         fastq_o_l.emplace_back();
@@ -222,28 +224,28 @@ int main()
         for (std::size_t const nthread : std::vector<std::size_t> { 1, 4, 16, 64 }) {
             bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo_l[3], nthread, LockFreeIO<void*>::QUEUE_SIZE),
                 get_bo_name("BamReadOutput", bo_l[3]), nthread, oss);
-            // for (auto& bo : bo_l) {
-            //     bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-            //         get_bo_name("BamReadOutput", bo), nthread, oss);
-            // }
-            // for (auto& bo : bo_t) {
-            //     bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-            //         get_bo_name("BamReadOutput", bo), nthread, oss);
-            // }
-            bench(std::make_shared<HeadlessBamReadOutput>(
-                      OUT_FILENAME, bo_defaults, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                get_bo_name("HeadlessBamReadOutput", bo_defaults), nthread, oss);
-            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, so, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                get_bo_name("SamReadOutput", so), nthread, oss);
-            bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+            for (auto& bo : bo_l) {
+                bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                    get_bo_name("BamReadOutput", bo), nthread, oss);
+            }
+            for (auto& bo : bo_t) {
+                bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                    get_bo_name("BamReadOutput", bo), nthread, oss);
+            }
+            bench(std::make_shared<FastqReadOutput>(
+                      WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE), nthread,
+                      LockFreeIO<void*>::QUEUE_SIZE),
                 "FastqReadOutput", nthread, oss);
-            bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+            bench(std::make_shared<FastaReadOutput>(
+                      WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE), nthread,
+                      LockFreeIO<void*>::QUEUE_SIZE),
                 "FastaReadOutput", nthread, oss);
+            bench(
+                std::make_shared<PwaReadOutput>(WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE),
+                    std::vector<std::string> {}, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                "PwaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
-            bench(std::make_shared<PwaReadOutput>(
-                      OUT_FILENAME, std::vector<std::string> {}, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                "PwaReadOutput", nthread, oss);
         }
     }
 

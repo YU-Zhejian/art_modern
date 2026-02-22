@@ -13,12 +13,13 @@
  **/
 
 #pragma once
-#include "libam_support/lockfree/DeflateWriter.hh"
+
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
+#include "libam_support/writer/WriterInterface.hh"
+
 #include <atomic>
-#include <fstream>
 #include <memory>
 #include <string>
 
@@ -30,9 +31,9 @@ public:
     DELETE_COPY(SimpleLFIO)
     ~SimpleLFIO() override = default;
 
-    SimpleLFIO(std::string name, std::string out_path);
+    SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out);
 
-    SimpleLFIO(std::string name, std::string out_path, const std::string& preamble);
+    SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out, const std::string& preamble);
 
 protected:
     void write(std::unique_ptr<std::string> value) override;

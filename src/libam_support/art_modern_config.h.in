@@ -37,6 +37,7 @@
 #cmakedefine WITH_ONEMKL
 #cmakedefine WITH_BOOST_STACKTRACE
 #cmakedefine WITH_SYSTEM_PCG
+#cmakedefine WITH_LIBDEFLATE
 
 // Debug
 #cmakedefine CEU_CM_IS_DEBUG
