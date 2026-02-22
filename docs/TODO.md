@@ -5,6 +5,8 @@
 - For large-contigs test, the evenness of the coverage should be assessed.
 - Perform large contig, many contig, and ultra deep tests.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
+- Add support of compressed FASTA/FASTQ; Add support for PE FASTA/FASTQ.
+- Assess also Intel's ISA-L (igzip).
 
 ## Performance
 
