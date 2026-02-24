@@ -26,6 +26,8 @@
 
 [![Docs on GitHub Pages](https://img.shields.io/badge/docs-github--pages-blue?logo=github)](https://yu-zhejian.github.io/art_modern_docs/index.html)
 
+[bioRxiv Preprint](https://doi.org/10.64898/2026.02.20.707060)
+
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)
 
 ## Introduction
@@ -440,6 +442,25 @@ This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com)
 - W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, DOI: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 
 Bundled libraries in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.
+
+## Citing This Work
+
+Following is the bioRxiv preprint of this work.
+
+```bibtex
+@article {YU2026.02.20.707060,
+	author = {YU, Zhejian},
+	title = {art_modern: An Accelerated ART Simulator of Diverse Next-Generation Sequencing Reads},
+	elocation-id = {2026.02.20.707060},
+	year = {2026},
+	doi = {10.64898/2026.02.20.707060},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2026/02/23/2026.02.20.707060},
+	eprint = {https://www.biorxiv.org/content/early/2026/02/23/2026.02.20.707060.full.pdf},
+	journal = {bioRxiv}
+}
+
+```
 
 ## Stargazers Over Time
 
