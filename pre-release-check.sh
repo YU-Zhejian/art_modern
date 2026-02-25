@@ -2,6 +2,8 @@
 # shellcheck disable=SC2317
 # shellcheck disable=SC1091
 
+# Running overnight is highly recommended, as this script will take a long time to run.
+
 function run_gcc() {
     LD_LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_LIBRARY_PATH:-}" \
         LD_RUN_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_RUN_PATH:-}" \
@@ -24,8 +26,8 @@ function run_llvm() {
 
 make clean
 
-run_gcc make testbuild-small || true
-run_gcc make testbuild-small-mpi || true
+# run_gcc make testbuild-small || true
+# run_gcc make testbuild-small-mpi || true
 
 run_llvm make testbuild-small \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true

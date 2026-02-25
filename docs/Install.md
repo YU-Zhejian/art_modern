@@ -302,7 +302,7 @@ No additional dependency is required.
 (external-libfmt-section)=
 #### External
 
-If `USE_LIBFMT` CMake variable is set to CMake, the project will find `{fmt}` through `find_package` of CMake. This usually requires `fmt-config.cmake`.
+If `USE_LIBFMT` CMake variable is set to `CMAKE`, the project will find `{fmt}` through `find_package` of CMake. This usually requires `fmt-config.cmake`. Added in [1.3.4](#v-1.3.4-section).
 
 If `USE_LIBFMT` CMake variable is set to other value, the project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failed, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
 

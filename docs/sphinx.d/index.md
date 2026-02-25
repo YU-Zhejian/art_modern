@@ -14,6 +14,7 @@ src/README_NEW.md
 src/docs/Install.md
 src/docs/Usage-art_modern.md
 src/docs/Usage-apb.md
+src/docs/Usage-amc.md
 src/docs/Guide.md
 src/docs/FAQ.md
 src/docs/Design.md

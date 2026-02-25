@@ -5,7 +5,7 @@
 (fastq-split-section)=
 ### How to split produced pair-end/mate-pair sequencing results to 2 FASTQ files?
 
-This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `1.fq`:
+This can be done through [`seqtk`](https://github.com/lh3/seqtk). For example, to split `a.fq`:
 
 ```shell
 # Read 1
@@ -18,6 +18,8 @@ You may also generate SAM/BAM files and extract PE FASTQ from them using `samtoo
 
 ```shell
 samtools fastq -1 a_1.fq -2 a_2.fq -N a.sam
+seqkit sort a_1.fq > a_sorted_1.fq
+seqkit sort a_2.fq > a_sorted_2.fq
 ```
 
 **NOTE** Please sort the generated FASTQ files using `seqkit sort` to ensure reads with the same name are in the same order.

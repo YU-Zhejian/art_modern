@@ -9,7 +9,7 @@ This new executable is designed to suppress the old `art_profiler_illumina` Shel
 
 - `--i-file`: Input file path. FASTQ/SAM/BAM files are supported. We currently rely on HTSLib to determine file format automatically. See also: [`htsfile(1)`](https://www.htslib.org/doc/htsfile.html).
 - `--i-num_threads`: Number of threads used to decompress input.
-- `--i-format`: Input file format. **NOTE** Must specify the format if reading from irregular files, like `/dev/stdin`.
+- `--i-format`: Input file format. Added in [1.3.4](#v-1.3.4-section). **NOTE** Must specify the format if reading from irregular files, like `/dev/stdin`.
 - `--first_n_reads`: Number of reads to use.
 - `--read_len`: Read length. For each read, only the first `read_len` bases are used. If the read is shorter than `read_len`, only the available bases are used.
 - `--read_len_1` and `--read_len_2`: Read lengths for read 1 and read 2 respectively. They cannot be used together with `--read_len`.
