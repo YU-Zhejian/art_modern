@@ -100,6 +100,11 @@ time bgzip -k -f -l 9 -@ "$(nproc)" SRR30113744_1.fastq
 # user    19m23.586s
 # sys     0m1.468s
 
+time igzip -k -f -3 -T "$(nproc)" SRR30113744_1.fastq
+# real    0m6.299s
+# user    0m4.569s
+# sys     0m0.454s
+
 time ../../../../opt/build_release_install/bin/am_compress \
     --i-file SRR30113744_1.fastq \
     --o-compressed SRR30113744_1.fastq.gz \

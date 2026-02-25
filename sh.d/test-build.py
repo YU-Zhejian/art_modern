@@ -407,11 +407,13 @@ class BuildConfig:
             retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])
         else:
             retl.append([re.compile("liblabw_slim_htslib\\.so")])
-
-        if self.USE_LIBFMT is not None and self.USE_LIBFMT != "CMAKE":
-            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
-        else:
+        
+        if self.USE_LIBFMT is None:
             retl.append([re.compile("libslim_libfmt\\.so")])
+        elif self.USE_LIBFMT == "CMAKE":
+            pass # Do nothing!
+        else:
+            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
 
         if self.USE_RANDOM_GENERATOR == "ONEMKL":
             retl.append(
@@ -820,7 +822,7 @@ if __name__ == "__main__":
         print("FAIL")
 
     print(f"Probing for " + "{fmt}" + " through CMake...", end="")
-    is_libfmt_cmake_exist = probe_using_cmake_project("test-libfmt.cmake")
+    is_libfmt_cmake_exist = probe_using_cmake_project("test-fmt.cmake")
     if is_libfmt_cmake_exist:
         print("SUCCESS")
     else:

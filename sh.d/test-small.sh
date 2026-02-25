@@ -105,9 +105,18 @@ function merge_file() {
     ext="${1##*.}"
     base="${1%.*}"
     files_to_merge=("${base}".*."${ext}")
-    if [ "${ext}" == "fastq" ] || [ "${ext}" == "fq" ] || [ "${ext}" == "fasta" ] || [ "${ext}" == "fa" ] || [ "${ext}" == "gz" ]; then
+    if [ "${ext}" == "fastq" ] ||
+        [ "${ext}" == "fq" ] ||
+        [ "${ext}" == "fasta" ] ||
+        [ "${ext}" == "fa" ] ||
+        [ "${ext}" == "gz" ] ||
+        htsfile "${1}" | grep -q FASTQ ||
+        htsfile "${1}" | grep -q FASTA; then
         cat "${files_to_merge[@]}" >"${1}"
-    elif [ "${ext}" == "sam" ] || [ "${ext}" == "bam" ]; then
+    elif [ "${ext}" == "sam" ] ||
+        [ "${ext}" == "bam" ] ||
+        htsfile "${1}" | grep -q SAM ||
+        htsfile "${1}" | grep -q BAM; then
         # Sort all files before merging
         new_files_to_merge=()
         for fn in "${files_to_merge[@]}"; do
