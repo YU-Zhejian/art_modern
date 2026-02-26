@@ -26,8 +26,8 @@ function run_llvm() {
 
 make clean
 
-# run_gcc make testbuild-small || true
-# run_gcc make testbuild-small-mpi || true
+run_gcc make testbuild-small || true
+run_gcc make testbuild-small-mpi || true
 
 run_llvm make testbuild-small \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
