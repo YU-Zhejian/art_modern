@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -13,11 +13,13 @@
  **/
 
 #pragma once
+
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 
+#include "libam_support/writer/WriterInterface.hh"
+
 #include <atomic>
-#include <fstream>
 #include <memory>
 #include <string>
 
@@ -28,17 +30,18 @@ public:
     DELETE_MOVE(SimpleLFIO)
     DELETE_COPY(SimpleLFIO)
     ~SimpleLFIO() override = default;
+
+    SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out);
+
+    SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out, const std::string& preamble);
+
+protected:
     void write(std::unique_ptr<std::string> value) override;
-
-    SimpleLFIO(std::string name, std::string out_path);
-
-    SimpleLFIO(std::string name, std::string out_path, const std::string& preamble);
-
     void flush_and_close() override;
 
 private:
     std::atomic<bool> closed_ { false };
-    std::ofstream out_;
+    std::unique_ptr<WriterInterface> out_;
     std::string out_path_;
 };
 } // namespace labw::art_modern

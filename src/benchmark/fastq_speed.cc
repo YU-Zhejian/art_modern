@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -21,11 +21,13 @@
 #include "libam_support/out/FastqReadOutput.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
 #include "libam_support/utils/si_utils.hh"
+#include "libam_support/writer/WriterDispatcher.hh"
 
 #include <boost/filesystem/operations.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdlib>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <ostream>
@@ -107,10 +109,12 @@ int main()
     const auto ff = std::make_shared<InMemoryFastaFetch>(iss);
 
     // Temporarily disable logging
-    bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, NTHREAD, LockFreeIO<void*>::QUEUE_SIZE), "FastqReadOutput",
-        NTHREAD);
-    bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, NTHREAD, LockFreeIO<void*>::QUEUE_SIZE), "FastaReadOutput",
-        NTHREAD);
+    bench(std::make_shared<FastqReadOutput>(WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE),
+              NTHREAD, LockFreeIO<void*>::QUEUE_SIZE),
+        "FastqReadOutput", NTHREAD);
+    bench(std::make_shared<FastaReadOutput>(WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE),
+              NTHREAD, LockFreeIO<void*>::QUEUE_SIZE),
+        "FastaReadOutput", NTHREAD);
     boost::filesystem::remove(OUT_FILENAME);
 
     return EXIT_SUCCESS;

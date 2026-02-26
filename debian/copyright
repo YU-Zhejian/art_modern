@@ -18,7 +18,7 @@ Files-Excluded:
 Comment: Source files that are not used in this build are excluded.
 
 Files: *
-Copyright: 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+Copyright: 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
 Files: .gitignore
@@ -26,7 +26,7 @@ Copyright: GitHub, Inc.
 License: CC0-1.0
 
 Files: debian/*
-Copyright: 2025, YU Zhejian <yuzj25@seas.upenn.edu>
+Copyright: 2026, YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
 Files:
@@ -36,19 +36,19 @@ Copyright: 2008-2016 Weichun Huang <whduke@gmail.com>
 License: GPL-3+
 
 Files: deps/cmake_collections/* deps/slim_libceu/*
-Copyright: 2021-2025 YU Zhejian
+Copyright: 2021-2026 YU Zhejian
 License: MIT
 
 Files: src/art/exe/* src/art/lib/*
 Copyright:
  2008-2016 Weichun Huang <whduke@gmail.com>
- 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
 Files: src/libam_support/ds/GslDiscreteDistribution.hh
 Copyright:
  1996, 1997, 1998, 1999, 2000, 2007, 2009 James Theiler, Brian Gough
- 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
 License: GPL-3+
 
 License: GPL-3+

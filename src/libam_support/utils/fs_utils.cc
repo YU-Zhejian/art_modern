@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -17,6 +17,7 @@
 #include "libam_support/utils/fs_utils.hh"
 
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/compression_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/filesystem/exception.hpp>
@@ -24,6 +25,8 @@
 #include <boost/log/trivial.hpp>
 
 #include <string>
+
+#include "seq_utils.hh"
 
 namespace labw::art_modern {
 void validate_input_filename(const std::string& input_file_path, const std::string& arg_name)
@@ -82,44 +85,57 @@ void prepare_writer(const std::string& output_file_path)
             if (have_mpi()) {
                 BOOST_LOG_TRIVIAL(fatal) << "Irregular file is NOT allowed under MPI.";
                 abort_mpi();
-            } else {
-                BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path
-                                           << "' exists but is not a regular file. Will be overwritten.";
             }
+            BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path
+                                       << "' exists but is not a regular file. Will be overwritten.";
         } else {
             BOOST_LOG_TRIVIAL(warning) << "Output file at '" << output_file_path << "' exists and will be overwritten.";
         }
     }
 }
 
-std::string attach_mpi_rank_to_path(const std::string& file_path, [[maybe_unused]] const std::string& rank_str)
+std::string attach_mpi_rank_to_path_impl(const std::string& file_path, [[maybe_unused]] const std::string& rank_str)
 {
-    if (have_mpi()) {
-        // Firstly, extract the file name and path
-        const auto file_path_path = boost::filesystem::path(file_path);
-        const auto filename = file_path_path.filename().string();
-        const auto parent_path = file_path_path.parent_path();
-
-        // Find the last dot in the filename
-        const auto last_dot_pos = filename.find_last_of('.');
-
-        std::string new_filename;
-        if (last_dot_pos == std::string::npos || last_dot_pos == 0) {
-            // No dot found or dot is the first character, append rank at the end
-            new_filename = filename + "." + rank_str;
-        } else {
-            // Insert rank before the last dot
-            new_filename = filename.substr(0, last_dot_pos) + "." + rank_str + filename.substr(last_dot_pos);
+    std::string this_compress_extension;
+    std::string file_path_no_compress_extnsion = file_path;
+    for (const auto& ext : VALID_COMPRESS_EXTENSIONS) {
+        if (ends_with(file_path, ext)) {
+            this_compress_extension = ext;
+            file_path_no_compress_extnsion = file_path.substr(0, file_path.size() - ext.size());
+            break;
         }
-
-        // Reconstruct the full path
-        if (parent_path.empty()) {
-            return new_filename; // No parent path, return just the new filename
-        }
-        return (parent_path / new_filename).string(); // Combine parent path and new filename
     }
-    return file_path;
+    // Firstly, extract the file name and path
+    const auto file_path_path = boost::filesystem::path(file_path_no_compress_extnsion);
+    const auto filename = file_path_path.filename().string();
+    const auto parent_path = file_path_path.parent_path();
+
+    // Find the last dot in the filename
+    const auto last_dot_pos = filename.find_last_of('.');
+
+    std::string new_filename;
+    if (last_dot_pos == std::string::npos || last_dot_pos == 0) {
+        // No dot found or dot is the first character, append rank at the end
+        new_filename = filename + "." + rank_str + this_compress_extension;
+    } else {
+        // Insert rank before the last dot
+        new_filename = filename.substr(0, last_dot_pos) + "." + rank_str + filename.substr(last_dot_pos)
+            + this_compress_extension;
+    }
+
+    // Reconstruct the full path
+    if (parent_path.empty()) {
+        return new_filename; // No parent path, return just the new filename
+    }
+    return (parent_path / new_filename).string(); // Combine parent path and new filename
 }
 
+std::string attach_mpi_rank_to_path(const std::string& file_path, const std::string& rank_str)
+{
+    if (!have_mpi()) {
+        return file_path;
+    }
+    return attach_mpi_rank_to_path_impl(file_path, rank_str);
+}
 } // namespace labw::art_modern
 // labw

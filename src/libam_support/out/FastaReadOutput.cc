@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -21,6 +21,8 @@
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
+#include "libam_support/writer/WriterDispatcher.hh"
+#include "libam_support/writer/WriterInterface.hh"
 
 #include <fmt/format.h>
 
@@ -64,8 +66,9 @@ void FastaReadOutput::writePE(const ProducerToken& token, const PairwiseAlignmen
 }
 
 FastaReadOutput::~FastaReadOutput() { FastaReadOutput::close(); }
-FastaReadOutput::FastaReadOutput(const std::string& filename, const std::size_t n_threads, const std::size_t queue_size)
-    : lfio_("FASTA", filename)
+FastaReadOutput::FastaReadOutput(
+    std::unique_ptr<WriterInterface> writer, const std::size_t n_threads, const std::size_t queue_size)
+    : lfio_("FASTA", std::move(writer))
 {
     lfio_.init_queue(n_threads, 0, queue_size);
     lfio_.start();
@@ -87,8 +90,7 @@ ProducerToken FastaReadOutput::get_producer_token() { return lfio_.get_producer_
 void FastaReadOutputFactory::patch_options(boost::program_options::options_description& desc) const
 {
     boost::program_options::options_description fasta_desc("FASTA Output");
-    fasta_desc.add_options()("o-fasta", boost::program_options::value<std::string>(),
-        "Destination of output FASTA file. Unset to disable the writer.");
+    WriterDispatcher::patch_options_for_fmt("fasta", fasta_desc);
     fasta_desc.add_options()("o-fasta-queue_size",
         boost::program_options::value<std::size_t>()->default_value(LockFreeIO<void*>::QUEUE_SIZE),
         "Size of the lock-free queue used in FASTA output.");
@@ -96,10 +98,11 @@ void FastaReadOutputFactory::patch_options(boost::program_options::options_descr
 }
 std::shared_ptr<BaseReadOutput> FastaReadOutputFactory::create(const OutParams& params) const
 {
-    if (params.vm.count("o-fasta") != 0) {
+    if (params.vm.count("o-fasta") != 0U) {
         return std::make_shared<FastaReadOutput>(
-            attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank_s()), params.n_threads,
-            params.vm["o-fasta-queue_size"].as<std::size_t>());
+            WriterDispatcher::parse_args_for_fmt(
+                "fasta", params.vm, attach_mpi_rank_to_path(params.vm["o-fasta"].as<std::string>(), mpi_rank_s())),
+            params.n_threads, params.vm["o-fasta-queue_size"].as<std::size_t>());
     }
     throw OutputNotSpecifiedException {};
 }

@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -20,6 +20,8 @@
 #include <string>
 
 namespace labw::art_modern {
+
+enum class BamOutputFormat : std::uint8_t { SAM, BAM, FASTA, FASTQ };
 class BamOptions {
 public:
     static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u', 0 };
@@ -54,10 +56,7 @@ public:
      */
     bool use_m = false;
 
-    /**
-     * If `false`, will write SAM instead.
-     */
-    bool write_bam = true;
+    BamOutputFormat output_format = BamOutputFormat::BAM;
     /**
      * Number of threads used by htslib.
      */

@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -16,6 +16,7 @@
 
 #include "libam_support/lockfree/LockFreeIO.hh"
 #include "libam_support/utils/fs_utils.hh"
+#include "libam_support/writer/WriterInterface.hh"
 
 #include <boost/log/trivial.hpp>
 
@@ -23,7 +24,6 @@
 #include <fstream>
 #include <ios>
 #include <memory>
-#include <ostream>
 #include <string>
 #include <utility>
 
@@ -34,23 +34,23 @@ void SimpleLFIO::write(const std::unique_ptr<std::string> value)
     if (closed_) {
         return;
     }
-    out_ << *value;
+    out_->write(value->data());
     num_bytes_out_ += value->size();
 }
 
-SimpleLFIO::SimpleLFIO(std::string name, std::string out_path)
+SimpleLFIO::SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out)
     : LockFreeIO(std::move(name))
-    , out_path_(std::move(out_path))
+    , out_(std::move(out))
+    , out_path_(out_->get_filename())
 {
     prepare_writer(out_path_);
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' added.";
-    out_ = std::ofstream(out_path_, std::ios::out | std::ios::binary);
 }
 
-SimpleLFIO::SimpleLFIO(std::string name, std::string out_path, const std::string& preamble)
-    : SimpleLFIO(std::move(name), std::move(out_path))
+SimpleLFIO::SimpleLFIO(std::string name, std::unique_ptr<WriterInterface> out, const std::string& preamble)
+    : SimpleLFIO(std::move(name), std::move(out))
 {
-    out_ << preamble;
+    out_->write(preamble);
 }
 
 void SimpleLFIO::flush_and_close()
@@ -58,8 +58,8 @@ void SimpleLFIO::flush_and_close()
     if (closed_) {
         return;
     }
-    std::flush(out_);
-    out_.close();
+    out_->flush();
+    out_->close();
     BOOST_LOG_TRIVIAL(info) << name_ << " LockFreeIO: Writer to '" << out_path_ << "' closed.";
     closed_ = true;
 }

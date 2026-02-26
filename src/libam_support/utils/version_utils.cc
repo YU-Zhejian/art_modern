@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -59,6 +59,12 @@
 #include <ngs/Package.hpp>
 #endif
 
+#ifdef WITH_LIBDEFLATE
+#include <libdeflate.h>
+#endif
+
+#include <zlib.h>
+
 // In older versions it will be <fmt/core.h> with later versions <fmt/base.h>
 #include <fmt/format.h> // NOLINT
 
@@ -72,7 +78,7 @@ namespace {
     void print_htslib_version()
     {
         // NOLINTBEGIN
-        std::cout << "USING HTSLib: " << USED_HTSLIB_NAME << ", ver. " << hts_version() << std::endl;
+        std::cout << "HTSLib: " << hts_version() << " (" << USED_HTSLIB_NAME << ")" << std::endl;
         std::cout << "\tFeatures: " << hts_feature_string() << std::endl;
         std::cout << "\tCC: " << hts_test_feature(HTS_FEATURE_CC) << std::endl;
         std::cout << "\tCPPFLAGS: " << hts_test_feature(HTS_FEATURE_CPPFLAGS) << std::endl;
@@ -209,7 +215,7 @@ namespace {
     {
         // NOLINTNEXTLINE
         std::cout << "{fmt}: " << FMT_VERSION / 10000 << "." << FMT_VERSION / 100 % 100 << "." << FMT_VERSION % 100
-                  << std::endl;
+                  << " (" << USED_LIBFMT_NAME << ")" << std::endl;
     }
 
     void print_git_info()
@@ -237,6 +243,16 @@ namespace {
 #endif
     }
 
+    void print_zlib_version() { std::cout << "zlib: " << zlibVersion() << std::endl; }
+
+    void print_libdeflate_version()
+    {
+#ifdef WITH_LIBDEFLATE
+        std::cout << "libdeflate: " << LIBDEFLATE_VERSION_STRING << std::endl;
+#else
+        std::cout << "libdeflate: not used" << std::endl;
+#endif
+    }
 } // namespace
 
 void print_version()
@@ -245,6 +261,8 @@ void print_version()
     std::cout << "ART_MODERN_LINK_LIBS: " << ART_MODERN_LINK_LIBS << std::endl;
     print_git_info();
     print_htslib_version();
+    print_zlib_version();
+    print_libdeflate_version();
     print_fmt_version();
     print_boost_version();
     print_onemkl_version();

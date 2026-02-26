@@ -9,4 +9,4 @@ Based on the work of ART
 
 Current maintainers:
 
-2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>

@@ -1,0 +1,13 @@
+# Environment used for building bioconda packages
+name: packing_status
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.12
+  - pandas
+  - matplotlib
+  - seaborn
+  - pyarrow>=12
+  - awscli
+  - fastparquet

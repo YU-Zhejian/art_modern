@@ -1,5 +1,19 @@
 # News \& Release Notes
 
+(v-1.3.4-section)=
+## 1.3.4 (2026/02/28)
+
+- Software Engineering:
+  - `-DUSE_LIBFMT=CMAKE` added to CMake options to find `{fmt}` through CMake's `find_package`.
+  - Pre-built HTML docs now hosted at [GitHub Pages](https://yu-zhejian.github.io/art_modern_docs/index.html).
+  - Compression of FASTA and FASTQ output using gzip/bgzip supported using HTSLib. The following flags for each format are added (using FASTQ for example):
+    - `--o-fastq-compression`
+    - `--o-fastq-compression_level`
+    - `--o-fastq-buffer_size`
+    - `--o-fastq-num_threads`
+  - Added utility `am_compress` to compress files using gzip/bgzip. This utility can be used to assess the performance of those compressors on your own system to find optimized parameters.
+- Miscellaneous bug fixes.
+
 (v-1.3.3-section)=
 ## 1.3.3 (2026/01/08)
 

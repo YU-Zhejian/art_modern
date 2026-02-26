@@ -57,6 +57,7 @@ export SAMTOOLS_THREADS="${SAMTOOLS_THREADS:-16}" # Also used by fastqc
 export IDRATE=0.01                                # Increase indel rate to fail faster
 export ART_MODERN_PATH="${ART_MODERN_PATH}"       # Do NOT have a default, must be set from outside
 export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must be set from outside
+export AMC_PATH="${AMC_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
 export WITH_NCBI_NGS="${WITH_NCBI_NGS:-0}"        # Whether to test with NCBI NGS toolkit
 export LAMBDA_PHAGE
@@ -70,12 +71,14 @@ export MRNA_PBSIM3_TRANSCRIPT
 if [ -z "${MPIEXEC:-}" ]; then
     ART_CMD_ASSEMBLED=("${ART_MODERN_PATH}")
     APB_CMD_ASSEMBLED=("${APB_PATH}")
+    AMC_CMD_ASSEMBLED=("${AMC_PATH}")
     export PARALLEL="${PARALLEL:-4}" # Reduce parallelism overhead for small tests
 else
     export MPIEXEC
     export PARALLEL="${PARALLEL:-2}"
     ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART_MODERN_PATH}")
     APB_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${APB_PATH}")
+    AMC_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${AMC_PATH}")
 fi
 
 echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
@@ -102,9 +105,18 @@ function merge_file() {
     ext="${1##*.}"
     base="${1%.*}"
     files_to_merge=("${base}".*."${ext}")
-    if [ "${ext}" == "fastq" ] || [ "${ext}" == "fq" ] || [ "${ext}" == "fasta" ] || [ "${ext}" == "fa" ]; then
+    if [ "${ext}" == "fastq" ] ||
+        [ "${ext}" == "fq" ] ||
+        [ "${ext}" == "fasta" ] ||
+        [ "${ext}" == "fa" ] ||
+        [ "${ext}" == "gz" ] ||
+        htsfile "${1}" | grep -q FASTQ ||
+        htsfile "${1}" | grep -q FASTA; then
         cat "${files_to_merge[@]}" >"${1}"
-    elif [ "${ext}" == "sam" ] || [ "${ext}" == "bam" ]; then
+    elif [ "${ext}" == "sam" ] ||
+        [ "${ext}" == "bam" ] ||
+        htsfile "${1}" | grep -q SAM ||
+        htsfile "${1}" | grep -q BAM; then
         # Sort all files before merging
         new_files_to_merge=()
         for fn in "${files_to_merge[@]}"; do
@@ -164,6 +176,27 @@ function art_profile_illumina() {
 EXEC_ORDER=0
 
 TIMEOUT_CMD=("$(type -p timeout)" "-s" "TERM" "${TIMEOUT}"s)
+
+function AMC_EXEC() {
+    # Clean previous logs
+    rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
+    EXEC_ORDER=$((EXEC_ORDER + 1))
+    echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${AMC_CMD_ASSEMBLED[*]} $*"
+    "${TIMEOUT_CMD[@]}" env \
+        "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
+        "${AMC_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log
+    retval=${?}
+    if [ ${retval} -ne 0 ]; then
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log >&2
+        exit 1
+    else
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
+        if [ -z "${KEEPLOG:-}" ]; then
+            rm -f "${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log
+        fi
+    fi
+}
 
 function AM_EXEC() {
     # Clean previous logs

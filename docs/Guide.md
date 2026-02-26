@@ -80,7 +80,7 @@ Using empty file or `/dev/null` as input is allowed since [1.1.9](#v-1.1.9-secti
 
 ## Performance Hint
 
-When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system.  Please also make sure that your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [`libdeflate`](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines or `PCG` on other machines.
+When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system. Please also make sure your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [`libdeflate`](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines or `PCG`/`SYSTEM_PCG` on other machines.
 
 When executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.
 
@@ -240,7 +240,7 @@ cd boost_1_89_0
     threading=multi
 ```
 
-This should build all required Boost libraries and a majority of optional ones.
+This should build all required Boost libraries and most optional ones.
 
 And then you may use CMake to build this project through:
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -251,7 +251,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
         }
         auto so = BamOptions();
         so.use_m = params.vm.count("o-sam-use_m") > 0;
-        so.write_bam = params.vm.count("o-sam-write_bam") > 0;
+        so.output_format = params.vm.count("o-sam-write_bam") > 0 ? BamOutputFormat::BAM : BamOutputFormat::SAM;
         so.PG_CL = join(params.args, " ");
         so.hts_io_threads = params.vm["o-sam-num_threads"].as<int>();
         so.compress_level = params.vm["o-sam-compress_level"].as<char>();

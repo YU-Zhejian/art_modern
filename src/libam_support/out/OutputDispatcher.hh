@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -44,7 +44,7 @@ public:
     void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa);
     void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2);
     void close();
-    TokenRing get_producer_tokens();
+    TokenRing get_producer_tokens() const;
 
 private:
     std::vector<std::shared_ptr<BaseReadOutput>> outputs_;

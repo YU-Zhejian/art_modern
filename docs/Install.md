@@ -21,9 +21,9 @@ echo 'int main(){}' | gcc --std=c11 -x c - -o /dev/null
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features. In other words, if there's no error, the compiler **MIGHT** be supported. If there's an error, the compiler is definitely **NOT** supported.
+**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features. In other words, if there is no error, the compiler **MIGHT** be supported. If there is an error, the compiler is definitely **NOT** supported.
 
-**NOTE** The CMake build scripts inside this project contains a script that tests compiler compatibility which will be automatically executed when configuring the project.
+**NOTE** The CMake build scripts inside this project contains a script that tests compiler compatibility, which will be automatically executed when configuring the project.
 
 For a table of the minimum compiler version that supports those versions, see also:
 
@@ -234,7 +234,7 @@ The following dependencies are bundled with the project. You do not need to inst
 See also: [Copying.md](./Copying.md) for the licenses and versions of those bundled dependencies.
 
 (htslib-section)=
-### [HTSLib](https://www.htslib.org/)
+### HTSLib
 
 [HTSLib](https://www.htslib.org/) is used for reading large FASTA files and generating SAM/BAM files.
 
@@ -302,7 +302,9 @@ No additional dependency is required.
 (external-libfmt-section)=
 #### External
 
-The project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failefd, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
+If `USE_LIBFMT` CMake variable is set to `CMAKE`, the project will find `{fmt}` through `find_package` of CMake. This usually requires `fmt-config.cmake`. Added in [1.3.4](#v-1.3.4-section).
+
+If `USE_LIBFMT` CMake variable is set to other value, the project will firstly try to find `{fmt}` using pkgconf. That usually requires the presence of `fmt.pc` file. If failed, will fall back to `lib[val].so`/`lib[val].a` with optional version suffixes, where `[val]` is the value of `USE_LIBFMT` CMake variable. At least [7.1.3](https://github.com/fmtlib/fmt/releases/tag/7.1.3) is required.
 
 ## Optional Bundled/External Dependencies
 
@@ -353,7 +355,7 @@ See also: [Official CMake documentation](https://cmake.org/cmake/help/latest/var
 
 Available since [1.0.0](#v-1.0.0-section).
 
-This instructs CMake to build executables/libraries with different optimization and debugging levels.
+Build executables/libraries with different optimization and debugging levels.
 
 - **`Debug` (DEFAULT): For developers with debugging needs.**
   - **NOTE** Very, very slow with tons of extra checks.
@@ -385,7 +387,7 @@ Available since [1.0.0](#v-1.0.0-section).
 
 Whether test should be enabled.
 
-- **Unset (DEFAULT): Set to `ON` if the CMake variable `CMAKE_BUILD_TYPE` is not `Release`, `OFF` otherwise.**
+- **Unset (DEFAULT): Set to `OFF`.**
 - `OFF`: Will disable test.
 - `ON`: Will enable test.
 
@@ -411,7 +413,7 @@ The random number generator used.
 - `PCG`: PCG random generators. This uses a minimal version of PCG random generators. Available since [1.1.1](#v-1.1.1-section).
   - Before [1.3.0](#v-1.3.0-section), this uses a bundled full-featured PCG random generators in C++.
   - After [1.3.0](#v-1.3.0-section), this uses a minimal version of PCG random generators.
-- `SYSTEM_PCG`: Use PCG random generators found in the system. See See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.3.0](#v-1.3.0-section).
+- `SYSTEM_PCG`: Use PCG random generators found in the system. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. Available since [1.3.0](#v-1.3.0-section).
 - `BOOST`: Use Boost random generators. See [Optional Boost Components](#optional-boost-components) for requirements.
 - `ONEMKL`: Use Intel OneAPI MKL random generators. See [Accelerated Random Number Generators](#accelerated-random-number-generators) for requirements. See also [CMake variable `FIND_RANDOM_MKL_THROUGH_PKGCONF`](#find-random-mkl-through-pkgconf-section) below.
 
@@ -476,7 +478,7 @@ Whether to use alternative high-performance `malloc`/`free` implementations like
 - `JEMALLOC`: Find and use jemalloc, and fail if not found.
 - `MIMALLOC`: Find and use mi-malloc, and fail if not found.
 - `TCMALLOC`: Find and use tcmalloc, and fail if not found.
-- `TCMALLOC_MINIMAL`: Find and use minimal version of tcmalloc, and fail if not found.
+- `TCMALLOC_MINIMAL`: Find and use the minimal version of tcmalloc, and fail if not found.
 - `NOP`: Will not use alternative `malloc`/`free` implementations. I.e., use the system-provided `malloc`/`free` implementations.
 
 See [Alternate `malloc`/`free` Implementations](#alt-malloc-section) for requirements.
@@ -489,6 +491,7 @@ Available since [1.1.7](#v-1.1.7-section).
 Whether to use bundled `{fmt}` library for formatting strings.
 
 - **Unset (DEFAULT): Will use bundled `{fmt}`.** See [Bundled `{fmt}`](#bundled-libfmt-section) for requirements.
+- `CMAKE`: Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements. Added in [1.3.4](#v-1.3.4-section).
 - `fmt`: Will use the `{fmt}` found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 - Any other value `[val]`: Will use the `{fmt}` of other names (`lib[val].so`) found in the system. See [External `{fmt}`](#external-libfmt-section) for requirements.
 

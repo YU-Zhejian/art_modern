@@ -1,5 +1,5 @@
 /**
- * Copyright 2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2025-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -27,25 +27,43 @@ using namespace labw::art_modern;
 
 BOOST_AUTO_TEST_CASE(test_fs_utils_1)
 {
-    if (have_mpi()) {
-        BOOST_TEST(attach_mpi_rank_to_path("/dev/null", "1") == "/dev/null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("/dev/.null", "1") == "/dev/.null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("/dev/a.null", "1") == "/dev/a.1.null");
-        BOOST_TEST(attach_mpi_rank_to_path("/dev/.a.null", "1") == "/dev/.a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/null", "1") == "/dev/null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/.null", "1") == "/dev/.null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/a.null", "1") == "/dev/a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/.a.null", "1") == "/dev/.a.1.null");
 
-        BOOST_TEST(attach_mpi_rank_to_path("~/null", "1") == "~/null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("~/.null", "1") == "~/.null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("~/a.null", "1") == "~/a.1.null");
-        BOOST_TEST(attach_mpi_rank_to_path("~/.a.null", "1") == "~/.a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/null", "1") == "~/null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/.null", "1") == "~/.null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/a.null", "1") == "~/a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/.a.null", "1") == "~/.a.1.null");
 
-        BOOST_TEST(attach_mpi_rank_to_path("./null", "1") == "./null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("./.null", "1") == "./.null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("./a.null", "1") == "./a.1.null");
-        BOOST_TEST(attach_mpi_rank_to_path("./.a.null", "1") == "./.a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./null", "1") == "./null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./.null", "1") == "./.null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./a.null", "1") == "./a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./.a.null", "1") == "./.a.1.null");
 
-        BOOST_TEST(attach_mpi_rank_to_path("null", "1") == "null.1");
-        BOOST_TEST(attach_mpi_rank_to_path(".null", "1") == ".null.1");
-        BOOST_TEST(attach_mpi_rank_to_path("a.null", "1") == "a.1.null");
-        BOOST_TEST(attach_mpi_rank_to_path(".a.null", "1") == ".a.1.null");
-    }
+    BOOST_TEST(attach_mpi_rank_to_path_impl("null", "1") == "null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl(".null", "1") == ".null.1");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("a.null", "1") == "a.1.null");
+    BOOST_TEST(attach_mpi_rank_to_path_impl(".a.null", "1") == ".a.1.null");
+
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/null.gz", "1") == "/dev/null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/.null.gz", "1") == "/dev/.null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/a.null.gz", "1") == "/dev/a.1.null.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("/dev/.a.null.gz", "1") == "/dev/.a.1.null.gz");
+
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/null.gz", "1") == "~/null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/.null.gz", "1") == "~/.null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/a.null.gz", "1") == "~/a.1.null.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("~/.a.null.gz", "1") == "~/.a.1.null.gz");
+
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./null.gz", "1") == "./null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./.null.gz", "1") == "./.null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./a.null.gz", "1") == "./a.1.null.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("./.a.null.gz", "1") == "./.a.1.null.gz");
+
+    BOOST_TEST(attach_mpi_rank_to_path_impl("null.gz", "1") == "null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl(".null.gz", "1") == ".null.1.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl("a.null.gz", "1") == "a.1.null.gz");
+    BOOST_TEST(attach_mpi_rank_to_path_impl(".a.null.gz", "1") == ".a.1.null.gz");
 }

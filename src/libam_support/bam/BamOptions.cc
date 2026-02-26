@@ -1,3 +1,17 @@
+/**
+ * Copyright 2026 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "libam_support/bam/BamOptions.hh"
 
 #include "libam_support/utils/seq_utils.hh"
@@ -21,7 +35,25 @@ void BamOptions::log_(const std::string& name) const
     if (with_tag_OA) {
         tags.emplace_back("OA");
     }
-    BOOST_LOG_TRIVIAL(info) << name << ": SAM/BAM Output Options: use_m=" << use_m << ", write_bam=" << write_bam
+    std::string fmt_to_str;
+    switch (output_format) {
+    case BamOutputFormat::BAM:
+        fmt_to_str = "BAM";
+        break;
+    case BamOutputFormat::FASTQ:
+        fmt_to_str = "FASTQ";
+        break;
+    case BamOutputFormat::SAM:
+        fmt_to_str = "SAM";
+        break;
+    case BamOutputFormat::FASTA:
+        fmt_to_str = "FASTA";
+        break;
+    default:
+        fmt_to_str = "UNKNOWN";
+        break;
+    }
+    BOOST_LOG_TRIVIAL(info) << name << ": SAM/BAM Output Options: use_m=" << use_m << ", fmt=" << fmt_to_str
                             << ", hts_io_threads=" << hts_io_threads << ", compress_level=" << compress_level
                             << ", tags=[" << join(tags, ",") << "], no_qual=" << no_qual << ".";
 }

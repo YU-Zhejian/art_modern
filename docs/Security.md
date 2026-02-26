@@ -15,6 +15,7 @@ See [News.md](News.md) for details of the bugs fixed in each release.
 - GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system while building.
 - GCC would fail on Debian GNU/Hurd.
 - External HTSLib and NCBI NGS library incompatibilities: Both library defines `string_dup`.
+- Builds that uses Intel MKL or Intel C++/DPC++ compilers may be incompatible with [Citrix Workspace app](https://www.citrix.com/downloads/workspace-app/) 25.08.10.111 under Linux.
 
 ## Known Bugs in Original ART
 

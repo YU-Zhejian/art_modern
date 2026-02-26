@@ -69,6 +69,8 @@ Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to 
 
 **NOTE** SAM/BAM output writer is parallelized using its own thread pool. See parameter [`--o-sam-num_threads`](#out-sam-section) and [`--o-hl_sam-num_threads`](#out-hl_sam-section) for more information. For example, if you run `art_modern --parallel 4 --o-sam-num_threads 2 --o-hl_sam-num_threads 3 ...`, there will be 9 threads in total.
 
+**WARNING** Do not oversubscribe the number of threads. It impacts the performance of the program.
+
 ### Error-Profile Related Parameters
 
 #### Which Quality Distribution File to Use
@@ -294,6 +296,8 @@ BCCCCGGGGGGGFGGGGGGGFGGGGG[...]
 [...]
 ```
 
+This output format supports [`am_compress`](#am_compress-usage-section)-like compression arguments (Namely, `--o-pwa-compression`, `--o-pwa-compression_level`, `--o-pwa-buffer_size` and `--o-pwa-num_threads`). Added in [1.3.4](#v-1.3.4-section).
+
 ### FASTQ Format (`--o-fastq`)
 
 The good old FASTQ format. The qualities are Phread encoded in ASCII with an offset of 33.
@@ -311,6 +315,17 @@ FASTQ files can be easily converted to FASTA using [`seqtk`](https://github.com/
 cat in.fq | seqtk seq -A > out.fa
 ```
 
+For PE/MP simulation: The generated file is interleaved FASTQ. Split to 2 FASTQ files using [`seqtk`](https://github.com/lh3/seqtk):
+
+```shell
+# Read 1
+seqtk seq a.fq -1 > a_1.fq
+# Read 2
+seqtk seq a.fq -2 > a_2.fq
+```
+
+This output format supports [`am_compress`](#am_compress-usage-section)-like compression arguments. Added in [1.3.4](#v-1.3.4-section).
+
 See also:
 
 - [Specifications of Common File Formats Used by the ENCODE Consortium at UCSC](https://genome.ucsc.edu/ENCODE/fileFormats.html#FASTQ).
@@ -326,6 +341,8 @@ AGCCAAACGGGCAACCAGACTCCGCC[...]
 ```
 
 This simulator generates one-line FASTA files. That is, each sequence occupies only one line.
+
+This output format supports [`am_compress`](#am_compress-usage-section)-like compression arguments. Added in [1.3.4](#v-1.3.4-section).
 
 (out-sam-section)=
 ### SAM/BAM Format (`--o-sam`)
@@ -351,9 +368,11 @@ Other SAM/BAM formatting parameters includes:
 - `--o-sam-write_bam`: Write BAM instead of SAM.
 - `--o-sam-num_threads`: Number of threads used to compress BAM output.
 - `--o-sam-compress_level`: [`zlib`](https://www.zlib.net/) compression level. Supports `[u0-9]` with `u` for uncompressed BAM stream, 0 for uncompressed stream with `zlib` wrapping, and 1--9 for fastest to best compression ratio. Defaults to `4`. Please note that both `u` and `0` generates uncompressed output. However, `0` generates BAM stream with `zlib` wrapping while `u` generates raw BAM stream.
-- `--o-sam-without_tag_MD`: Do not write `MD` tag.
-- `--o-sam-without_tag_NM`: Do not write `NM` tag.
-- `--o-sam-no_qual`: Do not write quality string (Write quality string as `*`).
+- `--o-sam-without_tag_MD`: Do not write `MD` tag. Added in [1.3.3](#v-1.3.3-section).
+- `--o-sam-without_tag_NM`: Do not write `NM` tag. Added in [1.3.3](#v-1.3.3-section).
+- `--o-sam-no_qual`: Do not write quality string (Write quality string as `*`). Added in [1.3.3](#v-1.3.3-section).
+
+**NOTE** For PE/MP simulation, the 2 reads from one fragment may **NOT** appear together.
 
 See also: [`SAMv1.pdf`](https://samtools.github.io/hts-specs/SAMv1.pdf) for more information on SAM/BAM format.
 
@@ -371,7 +390,7 @@ NM_069135:[...] 4 * 1 0 * * 1 0 AGCC[...] BCCC[...] OA:[...] MD:[...] NM:[...]
 [...]
 ```
 
-An additional option: `--o-hl_sam-without_tag_OA`, setting such which will not write `OA` tag.
+An additional option: `--o-hl_sam-without_tag_OA`, setting such which will not write `OA` tag. Added in [1.3.3](#v-1.3.3-section).
 
 This output writer supports other BAM formatting parameters.
 

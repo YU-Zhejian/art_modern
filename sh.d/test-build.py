@@ -407,11 +407,13 @@ class BuildConfig:
             retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])
         else:
             retl.append([re.compile("liblabw_slim_htslib\\.so")])
-
-        if self.USE_LIBFMT is not None:
-            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
-        else:
+        
+        if self.USE_LIBFMT is None:
             retl.append([re.compile("libslim_libfmt\\.so")])
+        elif self.USE_LIBFMT == "CMAKE":
+            pass # Do nothing!
+        else:
+            retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
 
         if self.USE_RANDOM_GENERATOR == "ONEMKL":
             retl.append(
@@ -465,6 +467,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     install_dir = os.path.join(LOG_DIR, str(this_job_id), f"install")
     art_modern_path = os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else ""))
     apb_path = os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else ""))
+    amc_path = os.path.join(install_dir, "bin", "am_compress" + ("-mpi" if WITH_MPI else ""))
     do_build_lh = logging.getLogger(f"DO_BUILD {this_job_id}/{num_total_jobs}")
     do_build_lh.handlers = []
     log_path = os.path.join(LOG_DIR, str(this_job_id), "main.log")
@@ -603,6 +606,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 ) as w:
                     pls.lddtree(art_modern_path, file=w)
                     pls.lddtree(apb_path, file=w)
+                    pls.lddtree(amc_path, file=w)
                 ldd_lh.error("FAILED")
                 return False
         ldd_lh.info("DONE")
@@ -670,6 +674,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             **os.environ,
             "ART_MODERN_PATH": art_modern_path,
             "APB_PATH": apb_path,
+            "AMC_PATH": amc_path,
             "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
             "MPIEXEC": MPIEXEC if WITH_MPI else "",
             "SAMTOOLS_THREADS": "4",
@@ -816,6 +821,13 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
+    print(f"Probing for " + "{fmt}" + " through CMake...", end="")
+    is_libfmt_cmake_exist = probe_using_cmake_project("test-fmt.cmake")
+    if is_libfmt_cmake_exist:
+        print("SUCCESS")
+    else:
+        print("FAIL")
+
     print(f"Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
@@ -865,6 +877,10 @@ if __name__ == "__main__":
 
         if is_libfmt_exist:
             bc.USE_LIBFMT = "fmt"
+            bcs.append(bc.copy())
+            bc.USE_LIBFMT = None
+        if is_libfmt_cmake_exist:
+            bc.USE_LIBFMT = "CMAKE"
             bcs.append(bc.copy())
             bc.USE_LIBFMT = None
 

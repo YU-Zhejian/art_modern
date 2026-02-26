@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -34,5 +34,6 @@ void ensure_directory_exists(const std::string& dir_path);
 void prepare_writer(const std::string& output_file_path);
 
 std::string attach_mpi_rank_to_path(const std::string& file_path, const std::string& rank_str);
+std::string attach_mpi_rank_to_path_impl(const std::string& file_path, const std::string& rank_str);
 
 } // namespace labw::art_modern

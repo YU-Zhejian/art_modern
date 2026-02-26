@@ -8,14 +8,15 @@ channels:
   - conda-forge
 
 dependencies:
-  - python=3.11
+  - python=3.13
 
   # Sphinx documentation
-  - conda-forge::sphinx=8.2
+  - conda-forge::sphinx=9.1
+  - request>=2.83
   - sphinx-copybutton=0.5
   - sphinxcontrib-svg2pdfconverter # Failed under Windows
-  - furo=2024.8.6
-  - myst-parser=4.0.1
+  - furo=2025.12.19
+  - myst-parser=5.0.0
   - perl
   - cairosvg
   - jinja2=3.1

@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -40,6 +40,8 @@
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include "libam_support/writer/WriterDispatcher.hh"
 
 using namespace labw::art_modern;
 
@@ -127,7 +129,7 @@ private:
 };
 
 namespace {
-const std::string OUT_FILENAME = "/dev/null";
+const std::string OUT_FILENAME = "out.tmp";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
 const std::vector<am_qual_t> QUALS(150, 0);
@@ -165,7 +167,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
     auto start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
-        std::thread t(working_thread, bro, M_SIZE / nthread);
+        std::thread t(working_thread, bro, (M_SIZE * 2ULL) / nthread);
         threads.emplace_back(std::move(t));
     }
     for (auto& t : threads) {
@@ -193,21 +195,35 @@ int main()
     const auto ff = std::make_shared<InMemoryFastaFetch>(iss);
     BamOptions so;
     BamOptions const bo_defaults;
-    so.write_bam = false;
+    so.output_format = BamOutputFormat::SAM;
     std::vector<BamOptions> bo_t;
     std::vector<BamOptions> bo_l;
+    BamOptions fastq_o_defaults;
+    fastq_o_defaults.output_format = BamOutputFormat::FASTQ;
+    fastq_o_defaults.compress_level = 'u';
+    std::vector<BamOptions> fastq_o_t;
+    std::vector<BamOptions> fastq_o_l;
 
-    for (const auto& t : std::vector { 1, 2, 4, 8, 16, 32, 64 }) {
+    for (const auto& t : std::vector { 1, 4, 16, 64 }) {
         bo_t.emplace_back();
         bo_t.back().hts_io_threads = t;
+        fastq_o_t.emplace_back();
+        fastq_o_t.back().hts_io_threads = t;
+        fastq_o_t.back().compress_level = '4';
+        fastq_o_t.back().output_format = BamOutputFormat::FASTQ;
     }
-    for (const auto& t : std::vector { '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', 'u' }) {
+    for (const auto& t : std::vector { '0', '1', '3', '5', '7', '9', 'u' }) {
         bo_l.emplace_back();
         bo_l.back().compress_level = t;
+        fastq_o_l.emplace_back();
+        fastq_o_l.back().compress_level = t;
+        fastq_o_l.back().output_format = BamOutputFormat::FASTQ;
     }
     // Temporarily disable logging
     for (int i = 0; i < 5; i++) {
-        for (std::size_t const nthread : std::vector<std::size_t> { 1, 2, 4, 8, 16, 32, 64 }) {
+        for (std::size_t const nthread : std::vector<std::size_t> { 1, 4, 16, 64 }) {
+            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo_l[3], nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                get_bo_name("BamReadOutput", bo_l[3]), nthread, oss);
             for (auto& bo : bo_l) {
                 bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
                     get_bo_name("BamReadOutput", bo), nthread, oss);
@@ -216,20 +232,20 @@ int main()
                 bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, bo, nthread, LockFreeIO<void*>::QUEUE_SIZE),
                     get_bo_name("BamReadOutput", bo), nthread, oss);
             }
-            bench(std::make_shared<HeadlessBamReadOutput>(
-                      OUT_FILENAME, bo_defaults, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                get_bo_name("HeadlessBamReadOutput", bo_defaults), nthread, oss);
-            bench(std::make_shared<BamReadOutput>(OUT_FILENAME, ff, so, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                get_bo_name("SamReadOutput", so), nthread, oss);
-            bench(std::make_shared<FastqReadOutput>(OUT_FILENAME, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+            bench(std::make_shared<FastqReadOutput>(
+                      WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE), nthread,
+                      LockFreeIO<void*>::QUEUE_SIZE),
                 "FastqReadOutput", nthread, oss);
-            bench(std::make_shared<FastaReadOutput>(OUT_FILENAME, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+            bench(std::make_shared<FastaReadOutput>(
+                      WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE), nthread,
+                      LockFreeIO<void*>::QUEUE_SIZE),
                 "FastaReadOutput", nthread, oss);
+            bench(
+                std::make_shared<PwaReadOutput>(WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE),
+                    std::vector<std::string> {}, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                "PwaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);
-            bench(std::make_shared<PwaReadOutput>(
-                      OUT_FILENAME, std::vector<std::string> {}, nthread, LockFreeIO<void*>::QUEUE_SIZE),
-                "PwaReadOutput", nthread, oss);
         }
     }
 

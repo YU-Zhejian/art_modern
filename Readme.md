@@ -4,7 +4,7 @@
 [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern.svg)](https://github.com/YU-Zhejian/art_modern/releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern/total.svg?style=social&logo=github&label=Download)](https://github.com/YU-Zhejian/art_modern/releases/)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
-[![Code style: black](https://img.shields.io/badge/code%20style-webkit-blue.svg)](https://webkit.org/code-style-guidelines/)
+[![Code style: WebKit](https://img.shields.io/badge/code%20style-webkit-blue.svg)](https://webkit.org/code-style-guidelines/)
 
 `art_modern` on BioConda: [![Install with BioConda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/recipes/art_modern/README.html)
 [![Conda Version](https://img.shields.io/conda/vn/bioconda/art_modern)](https://anaconda.org/bioconda/art_modern)
@@ -16,7 +16,6 @@
 
 `art-modern-utils` badges:
 [![GitHub Release](https://img.shields.io/github/v/release/YU-Zhejian/art_modern_utils.svg)](https://github.com/YU-Zhejian/art_modern_utils/releases)
-[![GitHub Downloads](https://img.shields.io/github/downloads/YU-Zhejian/art_modern_utils/total.svg?style=social&logo=github&label=Download)](https://github.com/YU-Zhejian/art_modern_utils/releases)
 [![License](https://img.shields.io/badge/licence-GPL_3.0-blue.svg)](https://www.gnu.org/licenses/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
@@ -24,6 +23,9 @@
 [![Python version](https://img.shields.io/badge/python-3.9-blue)](https://www.python.org/downloads/)
 [![PyPI - Version](https://img.shields.io/pypi/v/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
+
+[![Docs on GitHub Pages](https://img.shields.io/badge/docs-github--pages-blue?logo=github)](https://yu-zhejian.github.io/art_modern_docs/index.html)
+[![bioRxiv](https://img.shields.io/static/v1?label=preprint&message=bioRxiv&color=ee4d2d)](https://doi.org/10.64898/2026.02.20.707060)
 
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)
 
@@ -41,7 +43,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked libraries and executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
 
 **WARNING** Static builds may lead to compromised security.
 
@@ -311,6 +313,8 @@ Please wait for a while for the compression to finish.
 
 **NOTE** Pipelines and redirections are not supported in MPI mode mentioned below.
 
+**TIPS** You may find program [`pv(1)`](https://www.man7.org/linux/man-pages/man1/pv.1.html) useful when working with pipelines.
+
 ### Using MPI
 
 Message Passing Interface ([MPI](https://www.mpi-forum.org/)) is a standard for parallel computing on a high-performance cluster (HPC). It allows processes to communicate with each other through intranet. If you're working on a cluster with MPI installed, you can use the MPI version of `art_modern` to speed up the simulation by executing `art_modern` on different nodes in parallel.
@@ -437,3 +441,26 @@ This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com)
 - W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, DOI: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 
 Bundled libraries in this project are distributed under their own licenses. See [Copying](docs/Copying.md) for details.
+
+## Citing This Work
+
+Following is the bioRxiv preprint of this work.
+
+```bibtex
+@article {YU2026.02.20.707060,
+	author = {YU, Zhejian},
+	title = {art_modern: An Accelerated ART Simulator of Diverse Next-Generation Sequencing Reads},
+	elocation-id = {2026.02.20.707060},
+	year = {2026},
+	doi = {10.64898/2026.02.20.707060},
+	publisher = {Cold Spring Harbor Laboratory},
+	URL = {https://www.biorxiv.org/content/early/2026/02/23/2026.02.20.707060},
+	eprint = {https://www.biorxiv.org/content/early/2026/02/23/2026.02.20.707060.full.pdf},
+	journal = {bioRxiv}
+}
+
+```
+
+## Stargazers Over Time
+
+[![Stargazers over time](https://starchart.cc/YU-Zhejian/art_modern.svg?variant=adaptive)](https://starchart.cc/YU-Zhejian/art_modern)

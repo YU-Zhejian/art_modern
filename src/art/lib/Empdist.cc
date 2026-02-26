@@ -1,6 +1,6 @@
 /**
  * Copyright 2008-2016 Weichun Huang <whduke@gmail.com>
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -45,6 +45,15 @@
 namespace labw::art_modern {
 
 namespace {
+    /**
+     * Decompresses a zlib-compressed data buffer into a string.
+     *
+     * Libdeflate not used as it does not support stream decompression.
+     *
+     * @param src Compressed data buffer
+     * @param slen Compressed data length
+     * @return Decompressed string
+     */
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
         constexpr int BUFF_SIZE = 4096;

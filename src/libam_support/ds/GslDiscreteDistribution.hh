@@ -7,7 +7,7 @@
  * Original license as follows:
  *
  * 1996, 1997, 1998, 1999, 2000, 2007, 2009 James Theiler, Brian Gough
- * 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

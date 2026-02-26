@@ -31,7 +31,7 @@ export OPT_DIR ?= $(CURDIR)/opt
 ARCH ?= $(shell uname -m)
 
 # Package version, derived from the latest git tag if not set
-export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
+export PACKAGE_VERSION ?= $(shell cat version.txt | tr -d '[:space:]')
 
 $(info Using $(JOBS) parallel jobs for building)
 $(info Building for version $(PACKAGE_VERSION))
@@ -146,7 +146,8 @@ rel_with_dbg_alpine:
 	env -C $(OPT_DIR)/build_rel_with_dbg_alpine_install/bin \
 		tar cvzf $(OPT_DIR)/build_rel_with_dbg_alpine-$(ARCH).tar.gz \
 		art_modern \
-		art_profile_builder
+		art_profile_builder \
+		am_compress
 
 .PHONY: fmt
 # Run code formatting checks and auto-formatting
@@ -178,6 +179,7 @@ testsmall-debug: debug raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
+		AMC_PATH=$(OPT_DIR)/build_debug_install/bin/am_compress \
 		MPIEXEC="" \
 		$(BASH) sh.d/test-small.sh
 
@@ -187,6 +189,7 @@ testsmall-debug-mpi: debug-mpi raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
+		AMC_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/am_compress-mpi \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 
@@ -196,6 +199,7 @@ testsmall-release: release raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_release_install/bin/art_profile_builder \
+		AMC_PATH=$(OPT_DIR)/build_release_install/bin/am_compress \
 		MPIEXEC="" \
 		$(BASH) sh.d/test-small.sh
 
@@ -205,6 +209,7 @@ testsmall-release-mpi: release-mpi raw_data
 	env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_profile_builder-mpi \
+		AMC_PATH=$(OPT_DIR)/build_release_install-mpi/bin/am_compress-mpi \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 
@@ -216,6 +221,7 @@ testsmall-conda: raw_data
 	env \
 		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern)" \
 		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder)" \
+		AMC_PATH="$(shell conda run -n _art_modern_bioconda type -p am_compress)" \
 		MPIEXEC="" \
 		$(BASH) sh.d/test-small.sh
 
@@ -227,6 +233,7 @@ testsmall-conda-mpi: raw_data
 	env \
 		ART_MODERN_PATH="$(shell conda run -n _art_modern_bioconda type -p art_modern-mpi)" \
 		APB_PATH="$(shell conda run -n _art_modern_bioconda type -p art_profile_builder-mpi)" \
+		AMC_PATH="$(shell conda run -n _art_modern_bioconda type -p am_compress-mpi)" \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 

@@ -1,5 +1,5 @@
 /**
- * Copyright 2024-2025 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -20,6 +20,7 @@
 #include "libam_support/out/BaseReadOutput.hh"
 #include "libam_support/out/OutParams.hh"
 #include "libam_support/utils/class_macros_utils.hh"
+#include "libam_support/writer/WriterInterface.hh"
 
 #include <boost/program_options/options_description.hpp>
 
@@ -33,14 +34,14 @@ class FastqReadOutput final : public BaseReadOutput {
 public:
     DELETE_MOVE(FastqReadOutput)
     DELETE_COPY(FastqReadOutput)
-    explicit FastqReadOutput(const std::string& filename, std::size_t n_threads, std::size_t queue_size);
+    explicit FastqReadOutput(std::unique_ptr<WriterInterface> writer, std::size_t n_threads, std::size_t queue_size);
     void writeSE(const ProducerToken& token, const PairwiseAlignment& pwa) override;
     void writePE(const ProducerToken& token, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2) override;
     ProducerToken get_producer_token() override;
     void close() override;
     ~FastqReadOutput() override;
 
-    bool require_alignment() const override;
+    [[nodiscard]] bool require_alignment() const override;
 
 private:
     SimpleLFIO lfio_;
