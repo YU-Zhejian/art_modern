@@ -78,10 +78,11 @@ BOOST_AUTO_TEST_CASE(test_writer)
     boost::filesystem::create_directory(temp_dir);
     // Generate 2K data
     pcg32_c rng(42);
-    std::uniform_int_distribution<char> dist(std::numeric_limits<char>::min(), std::numeric_limits<char>::max());
+    // Clang does not support std::uniform_int_distribution<char>.
+    std::uniform_int_distribution<int> dist(std::numeric_limits<char>::min(), std::numeric_limits<char>::max());
     std::string data(2048, '\0');
     for (auto& c : data) {
-        c = dist(rng);
+        c = static_cast<char>(dist(rng));
     }
     for (const auto& buffer_size : { 0, 1, 1024, 2048, 4096 }) {
         assess(data,

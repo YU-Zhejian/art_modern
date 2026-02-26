@@ -35,7 +35,6 @@ extracted from the EBI ENA database as of December 2025, using `fetch.sh`.
 | illumina hiseq 1000          | 60,101     | Y          |
 | illumina genome analyzer     | 53,061     | Y          |
 | hiseq x five                 | 29,912     | Y          |
-| illumina hiscansq            | 12,770     | N/A        |
 | dnbseq-g50                   | 6,544      | N          |
 | bgiseq-50                    | 2,537      | N          |
 | dnbseq-g400 fast             | 1,375      | N          |

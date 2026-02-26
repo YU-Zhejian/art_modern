@@ -1,5 +1,5 @@
 /**
- * Copyright 2025-2026 YU Zhejian <yuzj25@seas.upenn.edu>
+ * Copyright 2026 YU Zhejian <yuzj25@seas.upenn.edu>
  *
  * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
  * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
@@ -101,6 +101,7 @@ int main(int argc, char** argv)
         exit_mpi();
         return EXIT_FAILURE;
     }
+    // TODO: Add option to specify input buffer size
     std::vector<char> buffer(4096);
     while (input_file.read(buffer.data(), buffer.size()) || input_file.gcount() > 0) {
         writer->write(std::string(buffer.data(), input_file.gcount()));
