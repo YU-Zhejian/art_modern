@@ -25,8 +25,7 @@
 [![PyPI - Downloads](https://img.shields.io/pypi/dm/art-modern-utils)](https://pypi.org/project/art-modern-utils/)
 
 [![Docs on GitHub Pages](https://img.shields.io/badge/docs-github--pages-blue?logo=github)](https://yu-zhejian.github.io/art_modern_docs/index.html)
-
-[bioRxiv Preprint](https://doi.org/10.64898/2026.02.20.707060)
+[![bioRxiv](https://img.shields.io/static/v1?label=preprint&message=bioRxiv&color=ee4d2d)](https://doi.org/10.64898/2026.02.20.707060)
 
 [![Catalogued on GSR](https://surveillance.cancer.gov/gsr/static/img/gsr_tile.jpg)](https://surveillance.cancer.gov/genetic-simulation-resources/packages/art_modern/)
 
