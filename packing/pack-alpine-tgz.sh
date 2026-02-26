@@ -3,9 +3,6 @@ set -ue
 ARCH="$(uname -m)"
 mkdir -p artifacts/RELEASE
 
-if [ -z "${PACKAGE_VERSION:-}" ]; then
-    export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
-fi
 ./sh.d/prepare-master-dir-for-alpine.sh
 ALPINE_MASTER_DIR="$(pwd)/artifacts/build_alpine_master"
 singularity exec \

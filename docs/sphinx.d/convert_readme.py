@@ -2,6 +2,7 @@ import io
 import re
 import os
 import hashlib
+import sys
 import time
 from typing import Mapping
 
@@ -20,9 +21,10 @@ def get_file(
     fetch_lru: Mapping[str, str],
 ):
     try:
-        response = requests.get(img_url, timeout=60)
-        print(f"Fetched image URL: {img_url}")
+        print(f"Fetching image URL: {img_url}...", end="")
+        response = requests.get(img_url, timeout=10)
         if response.status_code == 200:
+            print("SUCCESS")
             # Get the SHA256 hash of the image content
             img_data = response.content
             # Tell whether the data is SVG
@@ -45,9 +47,19 @@ def get_file(
                 # Wait on each successful fetch to avoid rate limiting
                 time.sleep(10)
             else:
-                # For non-SVG images, just write the original line
-                w.write(f"[![{alt_text}]({img_url})]({link_url})\n")
+                # For non-SVG images, determine file extension from the URL
+                ext = os.path.splitext(img_url)[1]
+                if ext in {".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp"}:
+                    new_file_name = f"{hashlib.sha256(img_data).hexdigest()}{ext}"
+                    fetch_lru[img_url] = new_file_name
+                    new_path = os.path.join(THIS_DIR, "src", new_file_name)
+                    with open(new_path, "wb") as img_file:
+                        img_file.write(img_data)
+                    w.write(f"[![{alt_text}]({new_file_name})]({link_url})\n")
+                else:
+                    w.write(f"[![{alt_text}]({img_url})]({link_url})\n")
         else:
+            print("FAILED")
             print(f"Failed to fetch image URL: {img_url} with status code {response.status_code}")
             w.write(f"[{alt_text}]({link_url})\n")
     except requests.RequestException as e:
@@ -56,6 +68,8 @@ def get_file(
 
 
 if __name__ == "__main__":
+    # Turn off buffering of print
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, write_through=True) 
     fetch_lru_ = {}
     release = os.environ.get("PACKAGE_VERSION", "0.0.0-dev")
 
@@ -81,12 +95,12 @@ if __name__ == "__main__":
                     if img_url_ in fetch_lru_:
                         file_name_ = fetch_lru_[img_url_]
                         if os.path.exists(os.path.join(THIS_DIR, "src", file_name_)):
+                            print(f"LRU Cache hit for image URL: {img_url_}, using cached file: {file_name_}")
                             # Write the line with the cached image file
                             w.write(f"[![{alt_text_}]({fetch_lru_[img_url_]})]({link_url_})\n")
                             continue
-                        else:
-                            print(f"LRU Cache miss for image URL: {img_url_}, refetching.")
                     # Try to fetch the image to see if it's valid
+                    print(f"LRU Cache miss for image URL: {img_url_}, fetching.")
                     get_file(w, img_url_, alt_text_, link_url_, fetch_lru_)
                 else:
                     w.write(l)

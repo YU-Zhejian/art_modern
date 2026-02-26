@@ -17,13 +17,16 @@ else()
     unset(CEU_REPRODUCIBLE_BUILDS)
 endif()
 
+# Read VERSION from version.txt
+file(READ "${CMAKE_CURRENT_LIST_DIR}/version.txt" ART_MODERN_VERSION)
+string(STRIP "${ART_MODERN_VERSION}" ART_MODERN_VERSION)
+
 project(
     art_modern
     LANGUAGES C CXX
-    VERSION 1.3.4
+    VERSION "${ART_MODERN_VERSION}"
     DESCRIPTION "Modernized ART Simulator of Diverse Next-Generation Sequencing Reads"
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
-set(ART_MODERN_VERSION "${PROJECT_VERSION}")
 set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
 set(CMAKE_C_STANDARD 11)

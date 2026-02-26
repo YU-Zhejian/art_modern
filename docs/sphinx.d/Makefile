@@ -1,4 +1,4 @@
-SPHINX_OPTS := -j auto
+SPHINX_OPTS := -j auto --verbose
 
 BUILD_DIR := $(CURDIR)/_build
 

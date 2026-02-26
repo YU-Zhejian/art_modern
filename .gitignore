@@ -15,6 +15,7 @@ bin/
 
 
 *.txt
+!version.txt
 !requirements.txt
 *.tsv
 *.csv

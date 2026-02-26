@@ -31,7 +31,7 @@ export OPT_DIR ?= $(CURDIR)/opt
 ARCH ?= $(shell uname -m)
 
 # Package version, derived from the latest git tag if not set
-export PACKAGE_VERSION ?= $(shell git describe --tags --abbrev=0)
+export PACKAGE_VERSION ?= $(shell cat version.txt | tr -d '[:space:]')
 
 $(info Using $(JOBS) parallel jobs for building)
 $(info Building for version $(PACKAGE_VERSION))

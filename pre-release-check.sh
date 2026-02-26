@@ -18,6 +18,7 @@ function run_llvm() {
     # SRA-Tools and NCBI-VDB are not yet built with LLVM, so we don't set those paths here.
     LD_LIBRARY_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_LIBRARY_PATH:-}" \
         LD_RUN_PATH="${HOME}/opt/boost-1.89.0-clang/lib/:${HOME}/opt/fmt-12.0.0-clang/lib/:${LD_RUN_PATH:-}" \
+        CMAKE_PREFIX_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/cmake/:${CMAKE_PREFIX_PATH:-}" \
         PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-}" \
         CMAKE_TOOLCHAIN_FILE="$(pwd)/sh.d/toolchain/host-llvm/llvm-toolchain.cmake" \
         ASSERT_USING_LLVM_CXXSTDLIB=1 \

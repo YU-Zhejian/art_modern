@@ -2,9 +2,7 @@
 set -ue
 mkdir -p artifacts/RELEASE
 ARCH="$(dpkg --print-architecture)"
-if [ -z "${PACKAGE_VERSION:-}" ]; then
-    export PACKAGE_VERSION="$(git describe --tags --abbrev=0)"
-fi
+
 export PACKAGE_FULL_NAME="art-modern_${PACKAGE_VERSION}+dfsg"
 export OPENMPI_PACKAGE_FULL_NAME="art-modern-openmpi_${PACKAGE_VERSION}+dfsg"
 

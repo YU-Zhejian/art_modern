@@ -44,16 +44,6 @@ dependencies:
   - conda-forge::pkg-config
   - docker-squash
 
-  # Sphinx documentation
-  - conda-forge::sphinx=8.2
-  - sphinx-copybutton=0.5
-  - sphinxcontrib-svg2pdfconverter # Failed under Windows
-  - furo=2024.8.6
-  - myst-parser=4.0.1
-  - perl # For Windows MikTeX users
-  - cairosvg
-  - jinja2=3.1
-
   - pip
   - pip:
     - art-modern-utils==0.1.0
