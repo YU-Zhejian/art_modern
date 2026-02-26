@@ -1,5 +1,10 @@
 # News \& Release Notes
 
+(v-1.3.5-section)=
+## v1.3.5 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 (v-1.3.4-section)=
 ## 1.3.4 (2026/02/28)
 
