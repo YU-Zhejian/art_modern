@@ -146,7 +146,8 @@ rel_with_dbg_alpine:
 	env -C $(OPT_DIR)/build_rel_with_dbg_alpine_install/bin \
 		tar cvzf $(OPT_DIR)/build_rel_with_dbg_alpine-$(ARCH).tar.gz \
 		art_modern \
-		art_profile_builder
+		art_profile_builder \
+		am_compress
 
 .PHONY: fmt
 # Run code formatting checks and auto-formatting
