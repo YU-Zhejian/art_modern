@@ -3,6 +3,10 @@
 (v-1.3.5-section)=
 ## v1.3.5 (Ongoing)
 
+- Software Engineering:
+  - Update bundled HTSLib to [`1.23.1`](https://github.com/samtools/htslib/releases/1.23.1).
+  - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`593df78`](https://github.com/cameron314/concurrentqueue/commit/593df78ec309be7a7b456b3334025ccade1d2d66)).
+  - 
 - Miscellaneous bug fixes.
 
 (v-1.3.4-section)=

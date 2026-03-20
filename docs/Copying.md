@@ -19,7 +19,7 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrieved from [GitHub 1.23 Release Tarball](https://github.com/samtools/htslib/releases/download/1.23/htslib-1.23.tar.bz2).
+**NOTE** This project uses the source code retrieved from [GitHub 1.23.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.23.1/htslib-1.23.1.tar.bz2).
 
 ## `gitignore` by GitHub
 
@@ -48,7 +48,7 @@ With MIT License.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
-Available from <https://github.com/cameron314/concurrentqueue>, commit [`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03).
+Available from <https://github.com/cameron314/concurrentqueue>, commit [`593df78`](https://github.com/cameron314/concurrentqueue/commit/593df78ec309be7a7b456b3334025ccade1d2d66).
 
 Affected files:
 
