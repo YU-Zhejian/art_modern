@@ -125,9 +125,10 @@ Download _E. coli_ reference genome from NCBI. Here, we'll use the K-12 strand M
 mkdir -p opt/data/
 ACCESSION="GCF_000005845.2_ASM584v2"
 BASEURL="https://ftp.ncbi.nlm.nih.gov/genomes/all"
-wget -O opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz -4 \
+curl -L  \
     "${BASEURL}"/GCF/000/005/845/"${ACCESSION}"/"${ACCESSION}"_genomic.fna.gz \
-    
+    > opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
+
 gunzip -n -k opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
 # -n used to supress restoration of original timestamp.
 ```

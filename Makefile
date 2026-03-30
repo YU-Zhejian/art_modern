@@ -153,7 +153,7 @@ rel_with_dbg_alpine:
 # Run code formatting checks and auto-formatting
 # Format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [Black](https://black.readthedocs.io/en/stable/), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
 fmt:
-	$(BASH) sh.d/fmt.sh
+	pixi run --frozen -e fmt $(BASH) sh.d/fmt.sh
 
 .PHONY: scc
 # Run source code counting

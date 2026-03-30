@@ -1,7 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 if __name__ == "__main__":
     # Load the data from the JSON file
     df = pd.read_json("ena_model.json")

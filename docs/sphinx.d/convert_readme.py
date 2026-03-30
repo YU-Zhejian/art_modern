@@ -69,7 +69,7 @@ def get_file(
 
 if __name__ == "__main__":
     # Turn off buffering of print
-    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, write_through=True) 
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, write_through=True)
     fetch_lru_ = {}
     release = os.environ.get("PACKAGE_VERSION", "0.0.0-dev")
 

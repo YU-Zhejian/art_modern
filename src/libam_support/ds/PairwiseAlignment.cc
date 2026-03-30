@@ -58,7 +58,7 @@ PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& cont
 PairwiseAlignment::PairwiseAlignment(const std::string& read_name, const std::string& contig_name,
     const std::string& query, const std::string& ref, const std::string& qual_str,
     const std::vector<am_qual_t>& qual_vec, const std::string& aligned_query, const std::string& aligned_ref,
-  const  hts_pos_t pos_on_contig,const bool is_plus_strand)
+    const hts_pos_t pos_on_contig, const bool is_plus_strand)
     : aln_query(aligned_query)
     , aln_ref(aligned_ref)
     , query(query)

@@ -1,0 +1,61 @@
+[workspace]
+authors = ["YU Zhejian <yuzj25@seas.upenn.edu>"]
+channels = ["conda-forge", "bioconda"]
+name = "art_modern"
+platforms = ["linux-64"]
+
+[tasks]
+
+[dependencies]
+python = "3.12.*"
+samtools = ">=1.23.1,<2"
+pysam = ">=0.23.3,<0.24"
+tqdm = ">=4.67.3,<5"
+seqtk = ">=1.5,<2"
+seqkit = ">=2.13.0,<3"
+pyfastx = ">=2.3.0,<3"
+fastqc = ">=0.12.1,<0.13"
+numpy = ">=2.4.3,<3"
+pandas = ">=3.0.1,<4"
+matplotlib-base = ">=3.10.8,<4"
+seaborn = ">=0.13.2,<0.14"
+tabulate = ">=0.10.0,<0.11"
+pyarrow = ">=23.0.1,<24"
+pyelftools = ">=0.32,<0.33"
+curl = ">=8.19.0,<9"
+entrez-direct = ">=24.0,<25"
+sra-tools = ">=3.4.1,<4"
+ninja = { version = ">=1.13.2,<2", channel = "conda-forge" }
+cmake = { version = ">=4.3.1,<5", channel = "conda-forge" }
+make = { version = ">=4.4.1,<5", channel = "conda-forge" }
+coreutils = { version = ">=9.5,<10", channel = "conda-forge" }
+bash = { version = ">=5.2.37,<6", channel = "conda-forge" }
+pkg-config = { version = ">=0.29.2,<0.30", channel = "conda-forge" }
+docker-squash = ">=1.2.2,<2"
+pip = ">=26.0.1,<27"
+
+[pypi-dependencies]
+art-modern-utils = ">=1.0.0, <2"
+
+[feature.doc.dependencies]
+python = "3.13.*"
+sphinx = { version = ">=9.1.0,<10", channel = "conda-forge" }
+request = ">=2.83.1,<3"
+sphinx-copybutton = ">=0.5.2,<0.6"
+sphinxcontrib-svg2pdfconverter = ">=2.1.0,<3"
+furo = ">=2025.12.19,<2026"
+myst-parser = ">=5.0.0,<6"
+perl = ">=5.32.1,<5.33"
+cairosvg = ">=2.9.0,<3"
+jinja2 = ">=3.1.6,<4"
+
+[feature.fmt.dependencies]
+cmake_format = ">=0.6.11,<0.7"
+black = ">=26.3.1,<27"
+go-shfmt = ">=3.13.0,<4"
+clang-format = { version = ">=22.1.0,<23", channel = "conda-forge" }
+python = ">=3.13.12,<3.14"
+
+[environments]
+doc = { features = ["doc"], no-default-feature = true }
+fmt = { features = ["fmt"], no-default-feature = true }

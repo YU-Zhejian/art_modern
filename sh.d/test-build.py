@@ -407,11 +407,11 @@ class BuildConfig:
             retl.append([re.compile(f"lib{self.USE_HTSLIB}\\.so")])
         else:
             retl.append([re.compile("liblabw_slim_htslib\\.so")])
-        
+
         if self.USE_LIBFMT is None:
             retl.append([re.compile("libslim_libfmt\\.so")])
         elif self.USE_LIBFMT == "CMAKE":
-            pass # Do nothing!
+            pass  # Do nothing!
         else:
             retl.append([re.compile(f"lib{self.USE_LIBFMT}\\.so")])
 

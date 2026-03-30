@@ -282,7 +282,7 @@ PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-
 Install NCBI VDB first.
 
 ```shell
-axel https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
+wget https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
 unzip ncbi-vdb-3.3.0.zip
 cd ncbi-vdb-3.3.0
 ./configure --prefix="${HOME}"/opt/ncbi-vdb-3.3.0
@@ -294,7 +294,7 @@ cd ..
 Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
 
 ```shell
-axel https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
+wget https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
 unzip sra-tools-3.3.0.zip
 cd sra-tools-3.3.0
 ./configure \

@@ -147,3 +147,6 @@ perf.data*
 *.csi
 *collect*
 *.sif
+# pixi environments
+.pixi/*
+!.pixi/config.toml

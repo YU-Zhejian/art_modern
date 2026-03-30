@@ -382,7 +382,7 @@ namespace {
 
         double tp = 0;
         double p_cdf = 0;
-        constexpr  double p_cdf_ub = 1 - std::numeric_limits<double>::epsilon();
+        constexpr double p_cdf_ub = 1 - std::numeric_limits<double>::epsilon();
         for (auto i = 0; i < read_len; i++) {
             // Using boost math is intentional here to avoid precision issues
             // Do not try to optimize this unless you have a better solution
@@ -474,7 +474,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Generate suffix docs for builtin profiles
     std::stringstream ss;
     ss << "Builtin profiles:\n";
-    for (const auto *builtin_profile_name : BUILTIN_PROFILE_NAMES) {
+    for (const auto* builtin_profile_name : BUILTIN_PROFILE_NAMES) {
         const auto& profile = Empdist(builtin_profile_name, false, false, true);
         const bool supports_pe = profile.get_read_2_max_length() > 0;
         const auto r1_max_rlen = profile.get_read_1_max_length();
