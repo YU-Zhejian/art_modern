@@ -31,7 +31,6 @@
 #include <htslib/sam.h>
 
 #include <cstdio>
-#include <cstring>
 #include <string>
 #include <vector>
 
@@ -61,7 +60,7 @@ void str_to_qual(std::vector<am_qual_t>& qual, const std::string& str)
     str_to_qual(qual.data(), str.c_str(), str.size());
 }
 
-void str_to_qual(am_qual_t* qual, const char* str, size_t qlen)
+void str_to_qual(am_qual_t* qual, const char* str, size_t const qlen)
 {
 #if !defined(IN_COMPILER_WE_TRUST)
     str_to_qual_comb(qual, str, qlen);
@@ -70,7 +69,7 @@ void str_to_qual(am_qual_t* qual, const char* str, size_t qlen)
 #endif
 }
 
-void qual_to_str(const am_qual_t* qual, char* str, size_t qlen)
+void qual_to_str(const am_qual_t* qual, char* str, const size_t qlen)
 {
 #if !defined(IN_COMPILER_WE_TRUST)
     qual_to_str_comb(qual, str, qlen);

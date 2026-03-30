@@ -227,7 +227,7 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     }
     // Send stop signals
     for (std::size_t i = 0; i < n_threads; ++i) {
-        std::vector<bam1_t*> batch {};
+        std::vector<bam1_t*> batch { };
         bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         if (!success) {
             num_push_waits++;

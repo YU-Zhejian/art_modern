@@ -15,7 +15,7 @@ void worker(int id, int num_to_sqrt, int num_of_rounds, int* retv)
 int main()
 {
     // Print ID of this thread
-    const auto hash_this_thread = std::hash<std::thread::id> {}(std::this_thread::get_id());
+    const auto hash_this_thread = std::hash<std::thread::id> { }(std::this_thread::get_id());
     printf("Main thread ID: %zu\n", hash_this_thread);
     parallel_params_type parallel_params = parse_args();
     std::vector<std::thread> thread_vector;

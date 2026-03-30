@@ -34,7 +34,7 @@ namespace {
 
     std::array<double, HIGHEST_QUAL> gen_err_prob_()
     {
-        std::array<double, HIGHEST_QUAL> tmp_err_prob {};
+        std::array<double, HIGHEST_QUAL> tmp_err_prob { };
         for (int i = 0; i < HIGHEST_QUAL; i++) {
             tmp_err_prob[i] = std::pow(10, -i / 10.0);
         }

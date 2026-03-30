@@ -164,7 +164,7 @@ void working_thread(const std::shared_ptr<BaseReadOutput>& bro, const std::size_
 void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, std::size_t nthread, std::ostream& oss)
 {
     std::cout << "Benchmarking " << name << " with " << nthread << " threads" << std::endl;
-    auto start = std::chrono::high_resolution_clock::now();
+    auto const start = std::chrono::high_resolution_clock::now();
     std::vector<std::thread> threads;
     for (std::size_t i = 0; i < nthread; i++) {
         std::thread t(working_thread, bro, (M_SIZE * 2ULL) / nthread);
@@ -174,7 +174,7 @@ void bench(const std::shared_ptr<BaseReadOutput>& bro, const std::string& name, 
         t.join();
     }
     bro->close();
-    auto end = std::chrono::high_resolution_clock::now();
+    auto const end = std::chrono::high_resolution_clock::now();
     oss << fmt::format(
         "{}\t{}\t{}\n", name, nthread, std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count());
     std::flush(oss);
@@ -242,7 +242,7 @@ int main()
                 "FastaReadOutput", nthread, oss);
             bench(
                 std::make_shared<PwaReadOutput>(WriterDispatcher::writer_dispatch(OUT_FILENAME, CompressionType::NONE),
-                    std::vector<std::string> {}, nthread, LockFreeIO<void*>::QUEUE_SIZE),
+                    std::vector<std::string> { }, nthread, LockFreeIO<void*>::QUEUE_SIZE),
                 "PwaReadOutput", nthread, oss);
             bench(std::make_shared<EmptyLFIOReadOutput>(nthread), "EmptyLFIOReadOutput", nthread, oss);
             bench(std::make_shared<EmptyImplicitLFIOReadOutput>(nthread), "EmptyImplicitLFIOReadOutput", nthread, oss);

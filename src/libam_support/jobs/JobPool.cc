@@ -141,7 +141,7 @@ JobPool::~JobPool()
 
 JobPool::JobPool(const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)
-    {}
+    { }
 #else
     : pool_(pool_size)
     , pool_size_(pool_size)

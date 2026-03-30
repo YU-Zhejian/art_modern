@@ -42,7 +42,6 @@
 #include <limits>
 
 #include <cstdlib>
-#include <cstring>
 #include <string>
 #include <vector>
 
@@ -170,9 +169,9 @@ namespace {
     }
 } // namespace
 
-APBConfig parse_args(int argc, char** argv)
+APBConfig parse_args(int const argc, char** argv)
 {
-    auto po_desc_ = option_parser();
+    auto const po_desc_ = option_parser();
     std::vector<std::string> const args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
 
@@ -218,7 +217,7 @@ APBConfig parse_args(int argc, char** argv)
     const auto queue_size = get_param<std::size_t>(vm_, ARG_QUEUE_SIZE);
     const auto first_n_reads = get_param<am_readnum_t>(vm_, ARG_FIRST_N_READS);
     const auto input_format_str = get_param<std::string>(vm_, ARG_INPUT_FORMAT);
-    APB_FORMAT input_format {};
+    APB_FORMAT input_format { };
     if (input_format_str == APB_FORMAT_AUTO_STR) {
         input_format = APB_FORMAT::AUTO;
     } else if (input_format_str == APB_FORMAT_FASTQ_STR) {

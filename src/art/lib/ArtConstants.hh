@@ -18,8 +18,6 @@
 #pragma once
 #include "libam_support/Dtypes.h"
 
-#include <cstdint>
-
 namespace labw::art_modern {
 
 constexpr am_qual_t HIGHEST_QUAL = 80;

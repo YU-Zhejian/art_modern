@@ -2,7 +2,6 @@
 
 #include "libam_support/utils/class_macros_utils.hh"
 
-#include <iostream>
 #include <string>
 #include <utility>
 

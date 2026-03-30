@@ -6,7 +6,7 @@ channels:
   - bioconda
 
 dependencies:
-  - python=3.11
+  - python=3.12
   - samtools
   - pysam
   - tqdm
@@ -18,7 +18,7 @@ dependencies:
   - numpy
   - pandas
   - scipy
-  - matplotlib-base=3.10
+  - matplotlib-base >=3.10
   - seaborn
   - tabulate # Used in Pandas to markdown tables
   - pyarrow # For Parquet file support
@@ -28,12 +28,12 @@ dependencies:
   - cmake_format
   - black
   - go-shfmt
-  - conda-forge::clang-format>=21
+  - conda-forge::clang-format >=21
 
   # Downloader
   - curl
   - entrez-direct
-  - sra-tools=3.2.1
+  - sra-tools >=3.2.1
 
   # Build tools
   - conda-forge::ninja
@@ -46,4 +46,4 @@ dependencies:
 
   - pip
   - pip:
-    - art-modern-utils==0.1.0
+    - art-modern-utils==1.0.0

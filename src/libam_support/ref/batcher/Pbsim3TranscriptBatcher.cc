@@ -25,7 +25,7 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <iostream>
+#include <istream>
 #include <limits>
 #include <memory>
 #include <mutex>

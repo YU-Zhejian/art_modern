@@ -142,7 +142,7 @@ namespace test_rvalue_references {
 namespace test_uniform_initialization {
 
     struct test {
-        static const int zero {};
+        static const int zero { };
         static const int one { 1 };
     };
 

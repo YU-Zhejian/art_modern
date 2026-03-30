@@ -35,7 +35,7 @@ bool detect_sra([[maybe_unused]] const std::string& file_path)
 {
 #ifdef WITH_NCBI_NGS
     auto ifs = std::ifstream(file_path, std::ios::in | std::ios::binary);
-    char signature[8] = {};
+    char signature[8] = { };
     ifs.read(signature, 8);
     ifs.seekg(0);
     ifs.close();

@@ -22,7 +22,7 @@
 #include <cstdlib>
 
 namespace labw::art_modern {
-JobPoolReporter::JobPoolReporter(JobPool& jp, std::size_t reporting_interval_seconds)
+JobPoolReporter::JobPoolReporter(JobPool& jp, std::size_t const reporting_interval_seconds)
     : Scheduler(std::chrono::seconds(reporting_interval_seconds), std::chrono::seconds(reporting_interval_seconds))
     , jp_(jp)
 {

@@ -58,7 +58,7 @@ std::string read_gzip(const std::string& file_name)
     return result;
 }
 
-void assess(const std::string& data, std::unique_ptr<WriterInterface> writer,
+void assess(const std::string& data, const std::unique_ptr<WriterInterface>& writer,
     const std::function<std::string(const std::string&)>& read_fn)
 {
     const auto file_name = writer->get_filename();

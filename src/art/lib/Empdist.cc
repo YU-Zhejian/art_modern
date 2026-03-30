@@ -57,7 +57,7 @@ namespace {
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
         constexpr int BUFF_SIZE = 4096;
-        z_stream zs = {};
+        z_stream zs = { };
 
         // Initialize zlib stream for decompression
         if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
@@ -131,7 +131,7 @@ SlimEmpDistGslDiscrete::SlimEmpDistGslDiscrete(const dist_map_type& dist)
     rd_ = GslDiscreteDistribution(init_list);
 }
 
-am_qual_t SlimEmpDistGslDiscrete::gen_qual(double u) const { return qual_[rd_(u)]; }
+am_qual_t SlimEmpDistGslDiscrete::gen_qual(double const u) const { return qual_[rd_(u)]; }
 Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
