@@ -19,7 +19,7 @@ set -ueo pipefail
 prefetch --progress -O raw_data ERR15423{880..929}
 
 for fn in raw_data/*/*.sra; do
-    fastq-dump  --split-files --outdir raw_data/fastq "$fn"
+    fastq-dump --split-files --outdir raw_data/fastq "$fn"
 done
 
 echo "DONE"

@@ -36,8 +36,10 @@ public:
     const std::string output_1_file_path;
     const std::string output_2_file_path;
     const APB_FORMAT format;
-    const std::size_t queue_size;
+    const am_readnum_t queue_size;
     const am_readnum_t first_n_reads;
+    const am_readnum_t report_size;
+    const am_readnum_t batch_size;
 };
 
 } // namespace labw::art_modern
