@@ -50,8 +50,7 @@ if __name__ == "__main__":
             continue
         df["fastq_bytes_total"] = list(map(lambda x: sum([int(i) for i in x.split(";")]), df["fastq_bytes"]))
         df = (
-            df.query(f"fastq_bytes_total >= ({1 * (1<<10)})")  # 1KB
-            .query(f"fastq_bytes_total <= ({1 * (1<<30)})")  # 1GB
+            df.query(f"fastq_bytes_total >= ({10 * (1<<30)})")  # 10GB
             .groupby("study_accession")
             .agg(np.random.choice)
             .reset_index(drop=True)

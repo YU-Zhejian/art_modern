@@ -113,6 +113,14 @@ model error files are provided in the original ART.
 | `GA2_75bp`                | `Emp75R1`               | Y   | 75    | 75    | GenomeAnalyzer II |
 | `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | Y   | 150   | 150   | HiSeq 2500        |
 
+The following profiles are built and distributed by `art_modern` maintainers:
+
+| Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        | Added in | Source   |
+|---------------------------|-------------------------|-----|-------|-------|-------------------|----------|----------|
+| `PacbOnso_150bp`          | `PacbOnsoL150R1`        | Y   | 150   | 150   | PacBio Onso       | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)    |
+| `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013)  |
+
+
 #### Shift and Clip Parameters
 
 `--q_shift_1` and `--q_shift_2`: Shift the base quality of the quality distribution by the specified value. Please note that the shifted quality distribution will be bounded to `--min_qual` and `--max_qual`.

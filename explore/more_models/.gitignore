@@ -1,4 +1,6 @@
 /instrument_model_counts.md
 /fetch_samples.d
 /*bp
-
+*/raw_data/
+*/log/
+*.png

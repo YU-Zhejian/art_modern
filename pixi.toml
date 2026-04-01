@@ -19,12 +19,12 @@ numpy = ">=2.4.3,<3"
 pandas = ">=3.0.1,<4"
 matplotlib-base = ">=3.10.8,<4"
 seaborn = ">=0.13.2,<0.14"
-tabulate = ">=0.10.0,<0.11"
 pyarrow = ">=23.0.1,<24"
 pyelftools = ">=0.32,<0.33"
+request = ">=2.83.1,<3"
 curl = ">=8.19.0,<9"
 entrez-direct = ">=24.0,<25"
-sra-tools = ">=3.4.1,<4"
+sra-tools = "==3.2.1"
 ninja = { version = ">=1.13.2,<2", channel = "conda-forge" }
 cmake = { version = ">=4.3.1,<5", channel = "conda-forge" }
 make = { version = ">=4.4.1,<5", channel = "conda-forge" }
@@ -33,6 +33,7 @@ bash = { version = ">=5.2.37,<6", channel = "conda-forge" }
 pkg-config = { version = ">=0.29.2,<0.30", channel = "conda-forge" }
 docker-squash = ">=1.2.2,<2"
 pip = ">=26.0.1,<27"
+axel = ">=2.17.13,<3"
 
 [pypi-dependencies]
 art-modern-utils = ">=1.0.0, <2"
@@ -56,6 +57,10 @@ go-shfmt = ">=3.13.0,<4"
 clang-format = { version = ">=22.1.0,<23", channel = "conda-forge" }
 python = ">=3.13.12,<3.14"
 
+[feature.prev.dependencies]
+art_modern = "*"
+
 [environments]
 doc = { features = ["doc"], no-default-feature = true }
 fmt = { features = ["fmt"], no-default-feature = true }
+prev = { features = ["prev"], no-default-feature = true }

@@ -20,6 +20,10 @@
 - Support simulating BGI/MGISEQ reads and new Illumina models: Started.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
+## Profiles
+
+- Check data availability of [Illumina MiSeq i100](https://www.illumina.com/systems/sequencing-platforms/miseq-i100.html), which claimed to be able to generate 500bp PE DNA-Seq data.
+
 ## Simulate Allele-Specific Expression
 
 The simulator will accept a genome, a variation VCF file, and a gene annotation GTF file.

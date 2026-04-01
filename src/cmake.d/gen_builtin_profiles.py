@@ -23,6 +23,7 @@ SNAME_FILE_MAPPING = {
     "MiniSeq_TruSeq_50bp": ("MiniSeqTruSeqL50.txt",),
     "MiSeq_v3_250bp": ("MiSeqv3L250R1.txt", "MiSeqv3L250R2.txt"),
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
+    "MiSeq_v3_300bp": ("MiSeqv3L300R1.txt", "MiSeqv3L300R2.txt"),
 }
 
 DTYPE = "unsigned char"
