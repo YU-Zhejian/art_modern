@@ -22,6 +22,7 @@
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -52,9 +53,8 @@
 #include <utility>
 #include <vector>
 
-#include "libam_support/utils/arithmetic_utils.hh"
-
 namespace labw::art_modern {
+// FIXME: Move the following 2 constants to APBConfig.
 constexpr std::size_t REPORT_SIZE = 10000000; // 10 Million reads
 constexpr std::size_t APB_BATCH_SIZE = K_SIZE;
 
@@ -320,13 +320,11 @@ private:
                         num_valid_reads_++;
                     }
                 }
-
                 if (num_total_reads_ % REPORT_SIZE == 0) {
                     log_();
                 }
             }
             log_();
-
         } catch (const ngs::ErrorMsg& e) {
             BOOST_LOG_TRIVIAL(error) << "NGS error in thread " << thread_id_ << ": " << e.what();
             abort_mpi();
