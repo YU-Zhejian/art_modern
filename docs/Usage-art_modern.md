@@ -120,15 +120,15 @@ New models from MGI and PacBio are added.
 |---------------------------|-------------------------|-----|-------|-------|-------------------|----------|----------|
 | `PacbOnso_150bp`          | `PacbOnsoL150R1`        | Y   | 150   | 150   | PacBio Onso       | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)    |
 | `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013)  |
-| `BGISeq500_150bp`          | `BgiSeq500L150R1`      | Y   | 150   | 150   | MGI BGISeq-500    | v1.3.5   | [SRR3680243](https://www.ebi.ac.uk/ena/browser/view/SRR3680243)  |
+| `GA2X_150bp`          | `GA2XL150R1`      | Y   | 150   | 150   | GenomeAnalyzer IIx   | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223)  |
+| `GA2X_100bp`          | `GA2XL100R1`      | Y   | 100   | 100   | GenomeAnalyzer IIx    | v1.3.5   | [SRR5006202](https://www.ebi.ac.uk/ena/browser/view/SRR5006202)  |
 
 List of all models by distinghished NGS sequencer manufacturers:
 
 - Illumina (By production lane):
   - [X] Genome Analyzer (PE44)
   - [X] Genome Analyzer II (PE75)
-  - [ ] Genome Analyzer IIx (PE150)
-    - In progress: SRR22439416 for PE150, SRR5006202 for PE100.
+  - [X] Genome Analyzer IIx (PE150)
   - [ ] Genome Analyzer IIe (PE100)
     - This model is rare.
   - [X] HiSeq 1000 (PE100)
@@ -154,7 +154,7 @@ List of all models by distinghished NGS sequencer manufacturers:
   - [ ] iSeq 100 (PE150)
 - BGI/MGI:
   - [ ] BGISEQ-500 (PE200)
-    - Status: We found PE150 only.
+    - Status: We now have PE150 only.
   - [ ] DNBSEQ-E5 (SE100)
   - [ ] DNBSEQ-E25 (PE150)
   - [ ] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50 (PE150)
@@ -167,7 +167,7 @@ List of all models by distinghished NGS sequencer manufacturers:
   - [ ] DNBSEQ-T10x4 (PE150)
   - [ ] DNBSEQ-T20x2 (PE150)
 - PacBio:
-  - [ ] Onso (PE150/SE200)
+  - [X] Onso (PE150/SE200)
 
 Note:
 

@@ -26,6 +26,8 @@ SNAME_FILE_MAPPING = {
     "MiSeq_v3_300bp": ("MiSeqv3L300R1.txt", "MiSeqv3L300R2.txt"),
     "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
     "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
+    "GA2X_150bp": ("GA2XL150R1.txt", "GA2XL150R2.txt"),
+    "GA2X_100bp": ("GA2XL100R1.txt", "GA2XL100R2.txt"),
 }
 
 DTYPE = "unsigned char"
@@ -51,6 +53,7 @@ if __name__ == "__main__":
             snames_constructed = []
             slengths_constructed = []
             for sname, files in SNAME_FILE_MAPPING.items():
+                print(f"Processing {sname}...", file=sys.stderr)
                 slengths = []
                 snames.append(sname)
                 for i, file in enumerate(files):
