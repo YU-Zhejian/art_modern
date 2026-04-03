@@ -28,6 +28,8 @@ SNAME_FILE_MAPPING = {
     "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
     "GA2X_150bp": ("GA2XL150R1.txt", "GA2XL150R2.txt"),
     "GA2X_100bp": ("GA2XL100R1.txt", "GA2XL100R2.txt"),
+    "HiSeq1500_150bp": ("HiSeq1500L150R1.txt", "HiSeq1500L150R2.txt"),
+    "HiSeq1500_250bp": ("HiSeq1500L250R1.txt", "HiSeq1500L250R2.txt"),
 }
 
 DTYPE = "unsigned char"

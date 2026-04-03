@@ -122,6 +122,8 @@ New models from MGI and PacBio are added.
 | `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013)  |
 | `GA2X_150bp`          | `GA2XL150R1`      | Y   | 150   | 150   | GenomeAnalyzer IIx   | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223)  |
 | `GA2X_100bp`          | `GA2XL100R1`      | Y   | 100   | 100   | GenomeAnalyzer IIx    | v1.3.5   | [SRR5006202](https://www.ebi.ac.uk/ena/browser/view/SRR5006202)  |
+| `HiSeq1500_150bp` | `HiSeq1500L150R1` | Y | 150   | 150   | HiSeq 1500   | v1.3.5   | [SRR35131961](https://www.ebi.ac.uk/ena/browser/view/SRR35131961)  |
+| `HiSeq1500_250bp` | `HiSeq1500L250R1` | Y | 250   | 250   | HiSeq 1500   | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785)  |
 
 List of all models by distinghished NGS sequencer manufacturers:
 
@@ -134,8 +136,7 @@ List of all models by distinghished NGS sequencer manufacturers:
   - [X] HiSeq 1000 (PE100)
   - [X] HiSeq 2000 (PE100)
   - [X] HiSeq X (PE150)
-  - [ ] HiSeq 1500 (PE250)
-    - In progress: SRR35131961 (PE150), ERR3322785 (PE250)
+  - [X] HiSeq 1500 (PE250)
   - [ ] HiSeq 2500 (PE250)
   - [ ] HiSeq 3000 (PE150)
   - [ ] HiSeq 4000 (PE150)

@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 #SBATCH -n 1
-#SBATCH -c 32
+#SBATCH -c 4
 #SBATCH -N 1
-#SBATCH --mem=32G
+#SBATCH --mem=4G
 #SBATCH --time=24:00:00
 #SBATCH --job-name=build
 #SBATCH --output=log/%x.%j.out
@@ -17,18 +17,35 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 pixi run -e prev art_profile_builder \
-    --i-file <(cat raw_data/fastq/*_1.fastq) \
+    --i-file raw_data/SRR35131961_1.fastq \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 MiSeqv3L300R1.txt \
-    --parallel 32
+    --read_len 150 \
+    --o-file1 HiSeq1500L150R1.txt \
+    --parallel 4
 
 pixi run -e prev art_profile_builder \
-    --i-file <(cat raw_data/fastq/*_2.fastq) \
+    --i-file raw_data/SRR35131961_2.fastq \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 MiSeqv3L300R2.txt \
-    --parallel 32
-art-profile-fastqc --input MiSeqv3L300R1.txt --output MiSeqv3L300R1.png
-art-profile-fastqc --input MiSeqv3L300R2.txt --output MiSeqv3L300R2.png
+    --read_len 150 \
+    --o-file1 HiSeq1500L150R2.txt \
+    --parallel 4
+art-profile-fastqc --input HiSeq1500L150R1.txt --output HiSeq1500L150R1.png
+art-profile-fastqc --input HiSeq1500L150R2.txt --output HiSeq1500L150R2.png
+
+pixi run -e prev art_profile_builder \
+    --i-file raw_data/ERR3322785_1.fastq \
+    --i-format FASTQ \
+    --read_len 250 \
+    --o-file1 HiSeq1500L250R1.txt \
+    --parallel 4
+
+pixi run -e prev art_profile_builder \
+    --i-file raw_data/ERR3322785_2.fastq \
+    --i-format FASTQ \
+    --read_len 250 \
+    --o-file1 HiSeq1500L250R2.txt \
+    --parallel 4
+art-profile-fastqc --input HiSeq1500L250R1.txt --output HiSeq1500L250R1.png
+art-profile-fastqc --input HiSeq1500L250R2.txt --output HiSeq1500L250R2.png
+
 echo "DONE"
