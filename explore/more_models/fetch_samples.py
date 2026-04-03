@@ -34,14 +34,13 @@ def fetch_ena_data(instrument_model="illumina novaseq 6000"):
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
     query_params = {
         "result": "read_run",
-        "query": f'instrument_model="{instrument_model}"' +
-        ' AND ' +
-        '(library_strategy="wgs" OR library_strategy="wxs")' +
-        ' AND ' +
-        '(library_source="genomic")' +
-        ' AND ' +
-        '(host_tax_id=9606 OR host_tax_id=10090)'
-        ,
+        "query": f'instrument_model="{instrument_model}"'
+        + " AND "
+        + '(library_strategy="wgs" OR library_strategy="wxs")'
+        + " AND "
+        + '(library_source="genomic")'
+        + " AND "
+        + "(host_tax_id=9606 OR host_tax_id=10090)",
         "fields": ",".join(FIELDS),
         "limit": "0",
         "format": "tsv",
