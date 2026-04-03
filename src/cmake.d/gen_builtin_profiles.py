@@ -24,6 +24,8 @@ SNAME_FILE_MAPPING = {
     "MiSeq_v3_250bp": ("MiSeqv3L250R1.txt", "MiSeqv3L250R2.txt"),
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
     "MiSeq_v3_300bp": ("MiSeqv3L300R1.txt", "MiSeqv3L300R2.txt"),
+    "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
+    "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
 }
 
 DTYPE = "unsigned char"

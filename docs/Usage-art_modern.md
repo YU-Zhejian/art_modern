@@ -113,13 +113,66 @@ model error files are provided in the original ART.
 | `GA2_75bp`                | `Emp75R1`               | Y   | 75    | 75    | GenomeAnalyzer II |
 | `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | Y   | 150   | 150   | HiSeq 2500        |
 
-The following profiles are built and distributed by `art_modern` maintainers:
+The following profiles are built and distributed by `art_modern` maintainers.
+New models from MGI and PacBio are added.
 
 | Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        | Added in | Source   |
 |---------------------------|-------------------------|-----|-------|-------|-------------------|----------|----------|
 | `PacbOnso_150bp`          | `PacbOnsoL150R1`        | Y   | 150   | 150   | PacBio Onso       | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)    |
 | `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013)  |
+| `BGISeq500_150bp`          | `BgiSeq500L150R1`      | Y   | 150   | 150   | MGI BGISeq-500    | v1.3.5   | [SRR3680243](https://www.ebi.ac.uk/ena/browser/view/SRR3680243)  |
 
+List of all models by distinghished NGS sequencer manufacturers:
+
+- Illumina (By production lane):
+  - [X] Genome Analyzer (PE44)
+  - [X] Genome Analyzer II (PE75)
+  - [ ] Genome Analyzer IIx (PE150)
+    - In progress: SRR22439416 for PE150, SRR5006202 for PE100.
+  - [ ] Genome Analyzer IIe (PE100)
+    - This model is rare.
+  - [X] HiSeq 1000 (PE100)
+  - [X] HiSeq 2000 (PE100)
+  - [X] HiSeq X (PE150)
+  - [ ] HiSeq 1500 (PE250)
+    - In progress: SRR35131961 (PE150), ERR3322785 (PE250)
+  - [ ] HiSeq 2500 (PE250)
+  - [ ] HiSeq 3000 (PE150)
+  - [ ] HiSeq 4000 (PE150)
+  - [ ] MiniSeq (PE150 on High/Mid Output Kit, and PE100 on Rapid Kit)
+  - [X] MiSeq (PE250)
+  - [X] MiSeqv3 (PE300)
+  - [ ] MiSeq i100 (PE500)
+  - [ ] NextSeq 500 (PE150)
+  - [ ] NextSeq 550 (PE150)
+  - [ ] NextSeq 2000 (PE300)
+  - [ ] NextSeq 1000 (PE300)
+  - [ ] NovaSeq 5000 (PE150)
+  - [ ] NovaSeq 6000 (PE250)
+  - [ ] NovaSeq X (PE150)
+  - [ ] NovaSeq X Plus (PE150)
+  - [ ] iSeq 100 (PE150)
+- BGI/MGI:
+  - [ ] BGISEQ-500 (PE200)
+    - Status: We found PE150 only.
+  - [ ] DNBSEQ-E5 (SE100)
+  - [ ] DNBSEQ-E25 (PE150)
+  - [ ] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50 (PE150)
+  - [ ] DNBSEQ-G99 (PE300)
+  - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
+  - [ ] DNBSEQ-G400ER (PE150)
+  - [ ] DNBSEQ-T7 (PE150)
+  - [ ] DNBSEQ-T7 Plus (PE150)
+  - [ ] DNBSEQ-T10 (PE150)
+  - [ ] DNBSEQ-T10x4 (PE150)
+  - [ ] DNBSEQ-T20x2 (PE150)
+- PacBio:
+  - [ ] Onso (PE150/SE200)
+
+Note:
+
+- For Illumina, Dx models (e.g., MiSeqDx) with locked software for forensics and diagnostics are treated as those without Dx.
+- For BGI/MGI models, we do not distinguish Rs (Research-only) models with non-RS models.
 
 #### Shift and Clip Parameters
 
