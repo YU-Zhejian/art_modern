@@ -114,16 +114,16 @@ model error files are provided in the original ART.
 | `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | Y   | 150   | 150   | HiSeq 2500        |
 
 The following profiles are built and distributed by `art_modern` maintainers.
-New models from MGI and PacBio are added.
+New models from Illumina, BGI/MGI, and PacBio are added.
 
 | Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        | Added in | Source   |
 |---------------------------|-------------------------|-----|-------|-------|-------------------|----------|----------|
 | `PacbOnso_150bp`          | `PacbOnsoL150R1`        | Y   | 150   | 150   | PacBio Onso       | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)    |
-| `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013)  |
+| `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013), pooled.  |
 | `GA2X_150bp`          | `GA2XL150R1`      | Y   | 150   | 150   | GenomeAnalyzer IIx   | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223)  |
-| `GA2X_100bp`          | `GA2XL100R1`      | Y   | 100   | 100   | GenomeAnalyzer IIx    | v1.3.5   | [SRR5006202](https://www.ebi.ac.uk/ena/browser/view/SRR5006202)  |
-| `HiSeq1500_150bp` | `HiSeq1500L150R1` | Y | 150   | 150   | HiSeq 1500   | v1.3.5   | [SRR35131961](https://www.ebi.ac.uk/ena/browser/view/SRR35131961)  |
-| `HiSeq1500_250bp` | `HiSeq1500L250R1` | Y | 250   | 250   | HiSeq 1500   | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785)  |
+| `GA2X_100bp`          | `GA2XL100R1`      | Y   | 100   | 100   | GenomeAnalyzer IIx    | v1.3.5   | [SRR5006202](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR5006202)  |
+| `HiSeq1500_150bp` | `HiSeq1500L150R1` | Y | 150   | 150   | HiSeq 1500   | v1.3.5   | [SRR35131961](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR35131961)  |
+| `HiSeq1500_250bp` | `HiSeq1500L250R1` | Y | 250   | 250   | HiSeq 1500   | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)  |
 
 List of all models by distinghished NGS sequencer manufacturers:
 
@@ -157,6 +157,7 @@ List of all models by distinghished NGS sequencer manufacturers:
   - [ ] BGISEQ-500 (PE200)
     - Status: We now have PE150 only.
   - [ ] DNBSEQ-E5 (SE100)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-E25 (PE150)
   - [ ] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50 (PE150)
   - [ ] DNBSEQ-G99 (PE300)
