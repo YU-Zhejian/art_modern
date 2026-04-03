@@ -16,6 +16,5 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-# prefetch --progress -O raw_data SRR36802437 --max-size 0
 fasterq-dump --progress -O raw_data SRR36802437 --split-files
 echo "DONE"

@@ -116,16 +116,22 @@ model error files are provided in the original ART.
 The following profiles are built and distributed by `art_modern` maintainers.
 New models from Illumina, BGI/MGI, and PacBio are added.
 
-| Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        | Added in | Source   |
-|---------------------------|-------------------------|-----|-------|-------|-------------------|----------|----------|
-| `PacbOnso_150bp`          | `PacbOnsoL150R1`        | Y   | 150   | 150   | PacBio Onso       | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)    |
-| `MiSeq_v3_300bp`          | `MiSeqv3L300R1`         | Y   | 300   | 300   | MiSeq v3          | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013), pooled.  |
-| `GA2X_150bp`          | `GA2XL150R1`      | Y   | 150   | 150   | GenomeAnalyzer IIx   | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223)  |
-| `GA2X_100bp`          | `GA2XL100R1`      | Y   | 100   | 100   | GenomeAnalyzer IIx    | v1.3.5   | [SRR5006202](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR5006202)  |
-| `HiSeq1500_150bp` | `HiSeq1500L150R1` | Y | 150   | 150   | HiSeq 1500   | v1.3.5   | [SRR35131961](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR35131961)  |
-| `HiSeq1500_250bp` | `HiSeq1500L250R1` | Y | 250   | 250   | HiSeq 1500   | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)  |
+| Name (`art_modern`)  | R1 `txt` file name | R2? | RLen1 | RLen2 | Model Name         | Added in | Source                                                                                                                               |
+|----------------------|--------------------|-----|-------|-------|--------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `PacbOnso_150bp`     | `PacbOnsoL150R1`   | Y   | 150   | 150   | PacBio Onso        | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
+| `MiSeq_v3_300bp`**   | `MiSeqv3L300R1`    | Y   | 300   | 300   | MiSeq v3           | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013), pooled.                                                             |
+| `GA2X_150bp`         | `GA2XL150R1`       | Y   | 150   | 150   | GenomeAnalyzer IIx | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
+| `GA2X_100bp`*        | `GA2XL100R1`       | Y   | 100   | 100   | GenomeAnalyzer IIx | v1.3.5   | [SRR5006202](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR5006202); [DOI](https://doi.org/10.1016/j.onehlt.2023.100518)             |
+| `HiSeq1500_150bp`    | `HiSeq1500L150R1`  | Y   | 150   | 150   | HiSeq 1500         | v1.3.5   | [SRR35131961](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR35131961), unpublished                                                   |
+| `HiSeq1500_250bp`    | `HiSeq1500L250R1`  | Y   | 250   | 250   | HiSeq 1500         | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
+| `BGISeq500_150bp`*** | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [SRR36802437](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR36802437), unpublished                                                   |
 
-List of all models by distinghished NGS sequencer manufacturers:
+
+\*: May have metadata error.
+\*\*: This data may not be usable due to privacy issues.
+\*\*\*: The metadata is wrong. They used NovaSeq in paper.
+
+List of all models by distinguished NGS sequencer manufacturers:
 
 - Illumina (By production lane):
   - [X] Genome Analyzer (PE44)
