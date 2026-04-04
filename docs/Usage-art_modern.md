@@ -127,6 +127,7 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `BGISeq500_150bp` | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)    |
 | `DNBSeqT7_150bp` | `DNBSeqT7L150R1` | Y | 150 | 150 | DNBSeq-T7 | v1.3.5 | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099) |
 
+
 List of all models by distinguished NGS sequencer manufacturers:
 
 - Illumina (By production lane):
@@ -146,7 +147,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] MiSeq (PE250)
   - [X] MiSeqv3 (PE300)
   - [ ] MiSeq i100 (PE500)
-    - Status: No publicly-available data found.
+    - Status: No publicly-available data found for PE500.
   - [ ] NextSeq 500 (PE150)
   - [ ] NextSeq 550 (PE150)
   - [ ] NextSeq 2000 (PE300)
@@ -156,6 +157,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] NovaSeq X (PE150)
   - [ ] NovaSeq X Plus (PE150)
   - [ ] iSeq 100 (PE150)
+    - Status: The current available datasets uses Quality Score Binning -- Only 2, 11, 25, 37 are shown. See [Illumina Whitepaper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf).
 - BGI/MGI:
   - [ ] BGISEQ-500 (PE200)
     - Status: We now have PE150 only.
