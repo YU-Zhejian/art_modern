@@ -16,6 +16,6 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-fasterq-dump --progress -O raw_data SRR29636774
+pixi run -e moremodels fasterq-dump --progress -O raw_data SRR29636774
 
 echo "DONE"

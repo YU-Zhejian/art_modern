@@ -1,27 +1,42 @@
-#!/usr/bin/env bash
-CFLAGS=(-O3 -mtune=native -march=native -Wall -Wextra -Wpedantic)
-CC="${CC:-cc}"
-set -ue
-SHDIR="$(readlink -f "$(dirname "${0}")")"
-cd "${SHDIR}/../"
-make -C "${SHDIR}"/test-am-many-contigs.d/
+#!/usr/bin/bash
+#SBATCH -n 1
+#SBATCH -c 32
+#SBATCH -N 1
+#SBATCH --mem=16G
+#SBATCH --time=24:00:00
+#SBATCH --job-name=test-am-many-contigs
+#SBATCH --output=log/%x.%j.out
+#SBATCH --error=log/%x.%j.err
 
-"${SHDIR}"/test-am-many-contigs.d/generate_many_contigs |
-    opt/build_release_install/bin/art_modern \
-        --builtin_qual_file HiSeq2500_125bp \
+# FIXME: OOM Killed.
+
+module purge
+module load petagene
+
+export PATH="${HOME}/.pixi/bin:${PATH}"
+eval "$(pixi shell-hook)"
+
+set -ueo pipefail
+
+NJOBS=32
+FCOV=20
+
+pixi run -e testextreme \
+    ./c/bin/generate_many_contigs |
+    pixi run -e prev art_modern \
         --i-file /dev/stdin \
         --i-type fasta \
         --mode template \
         --lc se \
         --i-parser stream \
-        --i-fcov 2 \
+        --i-fcov "${FCOV}" \
         --i-batch_size 1048576 \
-        --parallel 0 \
-        --o-hl_sam /dev/null \
-        --o-hl_sam-num_threads 4 \
-        --o-hl_sam-compress_level u \
+        --parallel "${NJOBS}" \
+        --o-hl_sam generated/many_contigs.bam \
+        --o-hl_sam-num_threads "${NJOBS}" \
+        --o-hl_sam-compress_level 9 \
         --o-hl_sam-write_bam \
-        --o-fastq /dev/null \
         --reporting_interval-job_executor 10 \
         --reporting_interval-job_pool 50
+samtools fasta generated/many_contigs.bam > generated/many_contigs.fa
 # This generates 10G reads.

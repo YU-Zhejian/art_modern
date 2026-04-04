@@ -24,7 +24,7 @@ All FASTQ read IDs will firstly be separated based on their first 2 hex digits o
 
 ## Dependencies
 
-Requires zlib and libdeflate. Also requires `libxxhash-dev`.
+Requires zlib and libdeflate. Also requires `libxxhash-dev` and Intel MKL library.
 
 ## TODO
 

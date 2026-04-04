@@ -17,6 +17,6 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 mkdir -p raw_data
-fasterq-dump --split-files --progress --outdir raw_data/ ERR3322785
+pixi run -e moremodels fasterq-dump --split-files --progress --outdir raw_data/ ERR3322785
 
 echo "DONE"

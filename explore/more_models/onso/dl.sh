@@ -17,9 +17,9 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 mkdir -p raw_data
-env -C raw_data axel \
+env -C raw_data pixi run -e moremodels axel \
     https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/Onso_hg002_PCR_free_WGS_OSQ_R1.fastq.gz
-env -C raw_data axel \
+env -C raw_data pixi run -e moremodels axel \
     https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/Onso_hg002_PCR_free_WGS_OSQ_R2.fastq.gz
 
 echo "DONE"

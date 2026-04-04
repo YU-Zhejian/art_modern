@@ -16,5 +16,5 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-fasterq-dump --progress -O raw_data ERR14979854 --split-files
+pixi run -e moremodels fasterq-dump --progress -O raw_data ERR14979854 --split-files
 echo "DONE"
