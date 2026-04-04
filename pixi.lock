@@ -204,7 +204,7 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-1.3.2-h25fd6f3_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zlib-ng-2.3.3-hceb46e0_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/zstd-1.5.7-hb78ec9c_6.conda
-      - pypi: https://files.pythonhosted.org/packages/98/e8/eb89d956503ede1d6af16c1c4c0ebc3f016fdd5bd7bf36b7d0d8b6d5d6ba/art_modern_utils-1.0.1-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/0a/fd/84ea9e21aed54ac13a35c641b66f0ac99c1bf609b5d0d091a3b75e935169/art_modern_utils-1.0.2-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/df/a6/c100df6c8118b4ce1f9c086bb9cf5bccd4f71d05ceb2ecf474f3b0ea87b8/pysam-0.23.3-cp312-cp312-manylinux_2_28_x86_64.whl
   doc:
     channels:
@@ -453,10 +453,10 @@ packages:
   purls: []
   size: 584660
   timestamp: 1768327524772
-- pypi: https://files.pythonhosted.org/packages/98/e8/eb89d956503ede1d6af16c1c4c0ebc3f016fdd5bd7bf36b7d0d8b6d5d6ba/art_modern_utils-1.0.1-py3-none-any.whl
+- pypi: https://files.pythonhosted.org/packages/0a/fd/84ea9e21aed54ac13a35c641b66f0ac99c1bf609b5d0d091a3b75e935169/art_modern_utils-1.0.2-py3-none-any.whl
   name: art-modern-utils
-  version: 1.0.1
-  sha256: 25ab9e6b85773e89fb16bd3594d6595359c30efd30bddca1ddc96f24d7d52787
+  version: 1.0.2
+  sha256: e65f358a4f80fa8c88fc0ecbe136c2dc14869b12780fbaeb24fc792292d5732e
   requires_dist:
   - pysam
   - tqdm

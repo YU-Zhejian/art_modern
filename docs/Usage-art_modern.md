@@ -83,24 +83,24 @@ Users may also use built-in quality distribution files using `--builtin_qual_fil
 
 Quality distributions bundled with the original ART can be found [here](https://github.com/YU-Zhejian/art_modern/tree/master/data/Illumina_profiles). In details:
 
-Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`.
+Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`. **The (8B)/(6B) means that the quality scores may be binned.**
 
-| Name   | Name (`art_modern`)     | R1 `txt` file name    | RLen1 | RLen2 | Model Name        |
-|--------|-------------------------|-----------------------|-------|-------|-------------------|
-| `GA1`  | `GA1Recalibrated_36bp`  | `EmpR36R1`            | 36    | 36    | GenomeAnalyzer I  |
-| `GA1`  | `GA1Recalibrated_44bp`  | `EmpR44R1`            | 44    | 44    | GenomeAnalyzer I  |
-| `GA2`  | `GA2Recalibrated_50bp`  | `EmpR50R1`            | 50    | 50    | GenomeAnalyzer II |
-| `GA2`  | `GA2Recalibrated_75bp`  | `EmpR75R1`            | 75    | 75    | GenomeAnalyzer II |
-| `HS10` | `HiSeq1000_100bp`       | `Emp100R1`            | 100   | 100   | HiSeq 1000        |
-| `MSv1` | `MiSeq_250bp`           | `EmpMiSeq250R1`       | 250   | 250   | MiSeq             |
-| `HS20` | `HiSeq2000_100bp`       | `HiSeq2kL100R1`       | 100   | 100   | HiSeq 2000        |
-| `HS25` | `HiSeq2500_125bp`       | `HiSeq2500L125R1`     | 126   | 126   | HiSeq 2500        |
-| `HS25` | `HiSeq2500_150bp`       | `HiSeq2500L150R1`     | 150   | 150   | HiSeq 2500        |
-| `HSXn` | `HiSeqX_PCR_Free_150bp` | `HiSeqXPCRfreeL150R1` | 151   | 151   | HiSeqX PCR free   |
-| `HSXt` | `HiSeqX_TruSeq_150bp`   | `HiSeqXtruSeqL150R1`  | 151   | 151   | HiSeqX TruSeq     |
-| `MinS` | `MiniSeq_TruSeq_50bp`   | `MiniSeqTruSeqL50`    | 51    | N/A   | MiniSeq TruSeq    |
-| `MSv3` | `MiSeq_v3_250bp`        | `MiSeqv3L250R1`       | 251   | 251   | MiSeq v3          |
-| `NS50` | `NextSeq500_v2_75bp`    | `NextSeq500v2L75R1`   | 76    | 76    | NextSeq500 v2     |
+| Name   | Name (`art_modern`)     | R1 `txt` file name    | RLen1 | RLen2 | Model Name           |
+|--------|-------------------------|-----------------------|-------|-------|----------------------|
+| `GA1`  | `GA1Recalibrated_36bp`  | `EmpR36R1`            | 36    | 36    | GenomeAnalyzer I     |
+| `GA1`  | `GA1Recalibrated_44bp`  | `EmpR44R1`            | 44    | 44    | GenomeAnalyzer I     |
+| `GA2`  | `GA2Recalibrated_50bp`  | `EmpR50R1`            | 50    | 50    | GenomeAnalyzer II    |
+| `GA2`  | `GA2Recalibrated_75bp`  | `EmpR75R1`            | 75    | 75    | GenomeAnalyzer II    |
+| `HS10` | `HiSeq1000_100bp`       | `Emp100R1`            | 100   | 100   | HiSeq 1000           |
+| `MSv1` | `MiSeq_250bp`           | `EmpMiSeq250R1`       | 250   | 250   | MiSeq                |
+| `HS20` | `HiSeq2000_100bp`       | `HiSeq2kL100R1`       | 100   | 100   | HiSeq 2000           |
+| `HS25` | `HiSeq2500_125bp`       | `HiSeq2500L125R1`     | 126   | 126   | HiSeq 2500           |
+| `HS25` | `HiSeq2500_150bp`       | `HiSeq2500L150R1`     | 150   | 150   | HiSeq 2500 (8B)      |
+| `HSXn` | `HiSeqX_PCR_Free_150bp` | `HiSeqXPCRfreeL150R1` | 151   | 151   | HiSeqX PCR free (8B) |
+| `HSXt` | `HiSeqX_TruSeq_150bp`   | `HiSeqXtruSeqL150R1`  | 151   | 151   | HiSeqX TruSeq  (8B)  |
+| `MinS` | `MiniSeq_TruSeq_50bp`   | `MiniSeqTruSeqL50`    | 51    | N/A   | MiniSeq TruSeq  (6B) |
+| `MSv3` | `MiSeq_v3_250bp`        | `MiSeqv3L250R1`       | 251   | 251   | MiSeq v3             |
+| `NS50` | `NextSeq500_v2_75bp`    | `NextSeq500v2L75R1`   | 76    | 76    | NextSeq500 v2 (6B)   |
 
 Following profiles are only available in `art_modern` but not in the original ART as a built-in model. However, the
 model error files are provided in the original ART.
@@ -111,7 +111,7 @@ model error files are provided in the original ART.
 | `GA1_44bp`                | `Emp44R1`               | 44    | 44    | GenomeAnalyzer I  |
 | `GA2_50bp`                | `Emp50R1`               | 53    | 50    | GenomeAnalyzer II |
 | `GA2_75bp`                | `Emp75R1`               | 75    | 75    | GenomeAnalyzer II |
-| `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | 150   | 150   | HiSeq 2500        |
+| `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | 150   | 150   | HiSeq 2500 (8B)   |
 
 The following profiles are built and distributed by `art_modern` maintainers.
 New models from Illumina, BGI/MGI, and PacBio are added.
@@ -128,8 +128,8 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | v1.3.5   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
 | `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | v1.3.5   | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
 | `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 150   | N/A   | DNBSeq-G400        | v1.3.5   | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
-| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000         | v1.3.5   | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
-| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500        | v1.3.5   | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
+| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)      | v1.3.5   | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
+| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)       | v1.3.5   | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
 
 List of all models by distinguished NGS sequencer manufacturers:
 

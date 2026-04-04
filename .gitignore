@@ -150,3 +150,10 @@ perf.data*
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.svg
+*.ico
