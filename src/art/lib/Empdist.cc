@@ -38,6 +38,7 @@
 #include <fstream>
 #include <istream>
 #include <limits>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -466,6 +467,35 @@ void Empdist::validate_() const
                 BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
             }
         }
+    }
+    std::set<am_qual_t> possible_quals;
+    if (sep_qual_)
+    {
+        for (const auto& p: a_qual_dist_first_) {
+            for (const auto& [_, qual] : p) {
+                possible_quals.insert(qual);
+            }
+        }
+    } else
+    {
+        for (const auto& p: qual_dist_first_)
+        {
+            for (const auto& [_, qual] : p)
+            {
+                possible_quals.insert(qual);
+            }
+        }
+    }
+    if (possible_quals.size() <= 4)
+    {
+        BOOST_LOG_TRIVIAL(error) << "The number of distinct quality scores in the profile is less than 4. "
+                                    << "This may due to binning and lead to unrealistic quality profiles -- Profile rejected.";
+        abort_mpi();
+    }
+    if (possible_quals.size() <= 10)
+    {
+        BOOST_LOG_TRIVIAL(warning) << "The number of distinct quality scores in the profile is less than 10. "
+                                    << "This may due to binning and lead to unrealistic quality profiles.";
     }
 }
 

@@ -9,9 +9,18 @@
   - Moved `explore/packing_status` to [new repo](https://github.com/YU-Zhejian/packing_status).
 - Implementation:
   - `art_profile_builder`: Added `--report_size` and `--batch_size` option to control reporting intervals.
+  - The programs would now warn on quality profiles with less or equal to 10 quality levels, and reject those with less or equal to 4 quality levels. This would, unfortunately, reject most of the latest Illumina models, which have only 4 quality levels. Use `art-profile-fastqc` from [`art_modern_utils`](https://github.com/YU-Zhejian/art_modern_utils) to check the quality levels of your profiles.
 - New profiles:
   - Illumina MiSeq v3 PE 300bp.
   - PacBio Onso PE 150bp.
+  - Illumina GenomeAnalyzer IIx PE 100bp and 150bp.
+  - Illumina HiSeq 1500 PE 250bp.
+  - BGISEQ-500 PE 150bp.
+  - DNBSEQ-T7 PE 150bp.
+  - DNBSEQ-G50 PE 150bp.
+  - DNBSEQ-G400 PE 150bp, SE 400bp.
+  - Illumina HiSeq 4000 PE 150bp (8-bin quality compression).
+  - Illumina NextSeq 400 PE 150bp (8-bin quality compression).
 - Miscellaneous bug fixes.
 
 (v-1.3.4-section)=

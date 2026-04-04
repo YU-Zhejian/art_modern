@@ -127,7 +127,7 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | DNBSeq-T7          | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
 | `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
 | `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | v1.4.0   | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
-| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 150   | N/A   | DNBSeq-G400        | v1.4.0   | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
+| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | v1.4.0   | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
 | `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)      | v1.4.0   | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
 | `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)       | v1.4.0   | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
 

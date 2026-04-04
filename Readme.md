@@ -433,7 +433,14 @@ The project provides diverse documentations to satisfy your needs.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
   - [News](docs/News.md) for changes over the project.
 - For a comparison of this project with other simulators, see [Benchmark](https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators).
-- The original ART documentation is copied to [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).
+- The original ART documentation is copied to [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).'
+
+## Limitations
+
+`art_modern` is an accelerated version of ART -- It does not revise ART's algorithms. This would led `art_modern` inferior in the following:
+
+- `art_modern` cannot simulate the Indel bias and GC bias of Illumina sequencers.
+- The latest Illumina models uses **Quality Score Binning.** See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf) and [Illumina documentation for quality binning on NovaSeq 6000 systems](https://www.illumina.com/content/dam/illumina-marketing/documents/products/appnotes/novaseq-hiseq-q30-app-note-770-2017-010.pdf) for more details. **WE ARE CURRENTLY UNSURE WHETHER THE PROGRAM CAN RELIABLY SIMULATE SUCH DATA.** Our current policy on such is to warn user if the provided quality profile have less than 10 bins, and reject the profile with less than 4 bins.
 
 ## Acknowledgements
 
