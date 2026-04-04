@@ -32,4 +32,4 @@ pixi run -e prev art_profile_builder \
 art-profile-fastqc --input ISeq100L100R1.txt --output ISeq100L100R1.png
 art-profile-fastqc --input ISeq100L100R2.txt --output ISeq100L100R2.png
 echo "DONE"
-# | `ISeq100_150bp` | `ISeq100L100R1` | Y | 150 | 150 | iSeq100 | v1.3.5 | [SRR8791276](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR8791276), [DOI](https://doi.org/10.1371/journal.pmed.1002823) |
+# | `ISeq100_150bp` | `ISeq100L100R1` | Y | 150 | 150 | iSeq100 | v1.4.0 | [SRR8791276](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR8791276), [DOI](https://doi.org/10.1371/journal.pmed.1002823) |

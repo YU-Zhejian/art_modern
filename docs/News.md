@@ -1,7 +1,7 @@
 # News \& Release Notes
 
-(v-1.3.5-section)=
-## v1.3.5 (Ongoing)
+(v-1.4.0-section)=
+## v1.4.0 (Ongoing)
 
 - Software Engineering:
   - Update bundled HTSLib to [`1.23.1`](https://github.com/samtools/htslib/releases/1.23.1).
