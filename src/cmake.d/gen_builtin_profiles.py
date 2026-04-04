@@ -28,10 +28,14 @@ SNAME_FILE_MAPPING = {
     "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
     "GA2X_150bp": ("GA2XL150R1.txt", "GA2XL150R2.txt"),
     "GA2X_100bp": ("GA2XL100R1.txt", "GA2XL100R2.txt"),
-    "HiSeq1500_150bp": ("HiSeq1500L150R1.txt", "HiSeq1500L150R2.txt"),
     "HiSeq1500_250bp": ("HiSeq1500L250R1.txt", "HiSeq1500L250R2.txt"),
-    "BGISeq500_150bp": ("BgiSeq500L150R1", "BgiSeq500L150R2"),
-    "DNBSeqG50_150bp": ("DNBSG50L150R1", "DNBSG50L150R2"),
+    "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
+    "DNBSeqG50_150bp": ("DNBSG50L150R1.txt", "DNBSG50L150R2.txt"),
+    "DNBSeqG400_400bp": ("DNBSeqG400L400R1.txt",),
+    "DNBSeqG400_150bp": ("DNBSeqG400L150R1.txt", "DNBSeqG400L150R2.txt"),
+    # "DNBSeqT7_150bp": ("DNBSeqT7L150R1.txt", "DNBSeqT7L150R2.txt"),
+    "HiSeq4000_150bp": ("HiSeq4kL150R1.txt", "HiSeq4kL150R2.txt"),
+    "NextSeq500_150bp": ("NextSeq500L150R1.txt", "NextSeq500L150R2.txt"),
 }
 
 DTYPE = "unsigned char"
