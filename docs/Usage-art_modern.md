@@ -127,6 +127,8 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `BGISeq500_150bp` | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)    |
 | `DNBSeqT7_150bp` | `DNBSeqT7L150R1` | Y | 150 | 150 | DNBSeq-T7 | v1.3.5 | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099) |
 | `DNBSeqG50_150bp` | `DNBSG50L150R1` | Y | 150 | 150 | DNBSeq-G50 | v1.3.5 | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y) |
+| `DNBSeqG400_150bp` | `DNBSeqG400L150R1` | Y | 150 | 150 | DNBSeq-G400 | v1.3.5 | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/) |
+| `DNBSeqG400_400bp` | `DNBSeqG400L400R1` | N | 150 | N/A | DNBSeq-G400 | v1.3.5 | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w) |
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -165,10 +167,13 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Status: No publicly-available data found.
   - [ ] DNBSEQ-E25 (PE150)
     - Status: No publicly-available data found.
-  - [ ] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150)
+  - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150)
     - Yes they are the same model.
   - [ ] DNBSEQ-G99 (PE300)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
+    - Status: We now have PE150 and SE400 only.
+    - [ERR4894594](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4894594) is a trimmed PE200 data, while [ERR4886095](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4886095) is a trimmed SE400 data. [DOI](https://doi.org/10.46471/gigabyte.16).
   - [ ] DNBSEQ-T7 (PE150)
     - In Progress.
   - [ ] DNBSEQ-T7 Plus (PE150)
