@@ -39,4 +39,4 @@ ce11_chr1.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/chromosomes/chrI.fa.gz  | gunzip -cdf > ce11_chr1.fa
 
 lambda_phage.fa:
-	efetch -db nuccore -id 9626243 -format fasta > output.fa > lambda_phage.fa
+	efetch -db nuccore -id 9626243 -format fasta > lambda_phage.fa
