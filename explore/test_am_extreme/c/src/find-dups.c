@@ -12,6 +12,7 @@
 
 #define _POSIX_C_SOURCE 200809L // NOLINT: For getline, CLOCK_MONOTONIC
 
+#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -24,7 +25,7 @@ KHASH_INIT(dup_set, kh_cstr_t, char, 0, kh_str_hash_func, kh_str_hash_equal)
 const size_t BLOOM_FILTER_SIZE = 10ULL * 1024 * 1024 * 1024; // 10GiB
 const size_t REPORT_INTERVAL = 1000000ULL;
 
-HEDLEY_ALWAYS_INLINE hash_type xxh64_wrapper(const void* data, size_t len) { return XXH64(data, len, 0); }
+hash_type xxh64_wrapper(const void* data, size_t len) { return XXH64(data, len, 0); }
 
 hash_type rapidhash_wrapper(const void* data, size_t len) { return rapidhashMicro(data, len); }
 

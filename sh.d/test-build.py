@@ -34,9 +34,9 @@ BASH = shutil.which("bash")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
 SHDIR = os.path.dirname(os.path.abspath(__file__))
 LOG_DIR = os.environ.get("TEST_BUILD_LOG_DI", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
-PKG_CONFIG_PATH = shutil.which("pkg-config")
+PKG_CONFIG_PATH = shutil.which("pkgconf")
 if PKG_CONFIG_PATH is None:
-    PKG_CONFIG_PATH = shutil.which("pkgconf")
+    PKG_CONFIG_PATH = shutil.which("pkg-config")
 if PKG_CONFIG_PATH is None:
     raise RuntimeError("pkg-config or pkgconf not found in PATH")
 ASSERT_USING_LLVM_CXXSTDLIB = os.environ.get("ASSERT_USING_LLVM_CXXSTDLIB", None) == "1"
@@ -560,9 +560,10 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         link_patterns = config.generate_link_patterns()
         if DRY_RUN:
             do_build_lh.info("%s DRY RUN", step_name_)
-            ldd_lh.info(
-                "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
-            )
+            # FIXME
+            # ldd_lh.info(
+            #     "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
+            # )
         else:
             libs_flattened = list(
                 set(itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path)))

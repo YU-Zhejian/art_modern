@@ -26,7 +26,6 @@ MPIEXEC ?= mpiexec
 # Output directory for build artifacts
 export OPT_DIR ?= $(CURDIR)/opt
 
-
 # System architecture
 ARCH ?= $(shell uname -m)
 

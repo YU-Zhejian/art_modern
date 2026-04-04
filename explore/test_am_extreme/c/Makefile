@@ -1,16 +1,30 @@
 .SUFFIXES: # Remove default suffixes
 
+PKGCONF ?= pkgconf
+
+# Test whether MKL provides mkl-sdl.pc or mkl-sdl-lp64.pc
+MKL_SDL_PC := $(shell \
+	if $(PKGCONF) --exists mkl-sdl; then \
+		echo mkl-sdl; \
+	elif $(PKGCONF) --exists mkl-sdl-lp64; then \
+		echo mkl-sdl-lp64; \
+	fi)
+
+ifeq ($(strip $(MKL_SDL_PC)),)
+$(error pkg-config could not find mkl-sdl.pc or mkl-sdl-lp64.pc)
+endif
+
 CFLAGS ?= \
 	-O3 -mtune=native -march=native \
 	-Wall -Wextra -Wpedantic \
 	-std=gnu11 \
-	$(shell pkg-config --cflags zlib libxxhash libdeflate mkl-sdl-lp64) \
+	$(shell $(PKGCONF) --cflags zlib libxxhash libdeflate $(MKL_SDL_PC)) \
 	-isystem src/
 CC ?= gcc
 
-LIBS ?= $(shell pkg-config --libs zlib libxxhash libdeflate mkl-sdl-lp64) -lm -lc -fopenmp
+LIBS ?= $(shell $(PKGCONF) --libs zlib libxxhash libdeflate $(MKL_SDL_PC)) -lm -lc -fopenmp
 
-.PNONY: all
+.PHONY: all
 all: bin
 
 .PHONY: bin
@@ -39,18 +53,6 @@ src/generate_large_contigs: src/generate_large_contigs.o
 
 src/generate_rand_large_contigs: src/generate_rand_large_contigs.o src/twobit.o
 	$(CC) -o $@ $^ $(LIBS)
-
-data/large_contigs.fa.gz: bin/generate_large_contigs
-	bin/generate_large_contigs | bgzip --threads 20 --force --index -l 9 -o data/large_contigs.fa.gz
-
-data/large_contigs.fa.gz.fai: data/large_contigs.fa.gz
-	samtools faidx data/large_contigs.fa.gz
-
-data/rand_large_contigs.fa: bin/generate_rand_large_contigs
-	bin/generate_rand_large_contigs >data/rand_large_contigs.fa
-
-data/rand_large_contigs.fa.fai: data/rand_large_contigs.fa
-	samtools faidx rand_large_contigs.fa
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
