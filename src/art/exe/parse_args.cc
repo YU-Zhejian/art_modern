@@ -480,7 +480,7 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
         const auto r1_max_rlen = profile.get_read_1_max_length();
         const auto r2_max_rlen = profile.get_read_2_max_length();
         ss << "\t" << builtin_profile_name << ": " << (supports_pe ? "PE" : "SE")
-           << ", max read length :" << r1_max_rlen
+           << ", max read length: " << r1_max_rlen
            << (supports_pe ? (std::string(", ") + std::to_string(r2_max_rlen)) : "") << "\n";
     }
 

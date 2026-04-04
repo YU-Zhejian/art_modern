@@ -18,6 +18,8 @@
 #pragma once
 #include "libam_support/Dtypes.h"
 
+#include <cstdint> // NOLINT: for std::uint_8
+
 namespace labw::art_modern {
 
 constexpr am_qual_t HIGHEST_QUAL = 80;
