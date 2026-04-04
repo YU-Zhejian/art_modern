@@ -162,9 +162,9 @@ namespace {
         parallel_opts.add_options()(
             ARG_NUM_IO_THREADS, po::value<std::size_t>()->default_value(4), io_thread_description.c_str());
         parallel_opts.add_options()(ARG_QUEUE_SIZE, po::value<am_readnum_t>()->default_value(K_SIZE),
-        "# reads of the lock-free queue used in reading input HTS files.");
+            "# reads of the lock-free queue used in reading input HTS files.");
         parallel_opts.add_options()(ARG_BATCH_SIZE, po::value<am_readnum_t>()->default_value(K_SIZE),
-        "# reads of the batches in lock-free queue used in reading input HTS files.");
+            "# reads of the batches in lock-free queue used in reading input HTS files.");
         parallel_opts.add_options()(ARG_REPORT_SIZE, po::value<am_readnum_t>()->default_value(M_SIZE),
             "# reads to process before reporting in each worker thread.");
 

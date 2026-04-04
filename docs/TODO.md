@@ -22,7 +22,7 @@
 
 ## Profiles
 
-- Check data availability of [Illumina MiSeq i100](https://www.illumina.com/systems/sequencing-platforms/miseq-i100.html), which claimed to be able to generate 500bp PE DNA-Seq data.
+- The program should reject quality score profiles with less than 4 bins, and emit a warning if the quality score have less than 10 bins.
 
 ## Simulate Allele-Specific Expression
 

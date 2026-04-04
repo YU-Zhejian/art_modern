@@ -35,7 +35,9 @@ int main()
             auto qdist = Empdist(builtin_profile_name, sep_flag, is_pe, true);
             qdist.shift_all_emp(0, 0, MIN_QUAL, MAX_QUAL);
             qdist.index();
-            BOOST_LOG_TRIVIAL(info) << "Builtin profile " << i << ": " << builtin_profile_name << " RLEN1: " << qdist.get_read_1_max_length()  << "; RLEN2: " << qdist.get_read_2_max_length();
+            BOOST_LOG_TRIVIAL(info) << "Builtin profile " << i << ": " << builtin_profile_name
+                                    << " RLEN1: " << qdist.get_read_1_max_length()
+                                    << "; RLEN2: " << qdist.get_read_2_max_length();
         }
     }
     BOOST_LOG_TRIVIAL(info) << "All builtin profiles can be loaded successfully.";

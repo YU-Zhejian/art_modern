@@ -154,13 +154,19 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] NextSeq 500 (PE150)
   - [ ] NextSeq 550 (PE150)
   - [ ] NextSeq 1000 (PE300)
+    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] NextSeq 2000 (PE300)
+    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] NovaSeq 5000 (PE150)
+    - Status: No publicly-available data found.
   - [ ] NovaSeq 6000 (PE250)
+    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] NovaSeq X (PE150)
+    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] NovaSeq X Plus (PE150)
+    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] iSeq 100 (PE150)
-    - Status: The current available datasets use quality score binning.
+    - Status: The current available datasets use quality score binning of 3- or 4-bins.
 - BGI/MGI:
   - [ ] BGISEQ-500 (PE200)
     - Status: We now have PE150 only.
@@ -187,6 +193,8 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200)
+- [GeneMind](https://en.genemind.com/)
+  - Status: All GeneMind models uses quality binning.
 
 Note:
 
