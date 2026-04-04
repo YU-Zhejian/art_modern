@@ -75,7 +75,7 @@ Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to 
 
 #### Which Quality Distribution File to Use
 
-Quality distribution files specify the base quality distribution at each position of the read. They are used to simulate sequencing errors.
+Quality distribution files specify the base quality distribution at each position of the read. They are used to simulating sequencing errors.
 
 Users may supply self-trained quality distribution files using `--qual_file_1` and `--qual_file_2` for read 1 and read 2 respectively. The format of quality distribution files is compatible with the original ART. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode.
 
@@ -127,7 +127,6 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `BGISeq500_150bp` | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)    |
 | `DNBSeqT7_150bp` | `DNBSeqT7L150R1` | Y | 150 | 150 | DNBSeq-T7 | v1.3.5 | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099) |
 
-
 List of all models by distinguished NGS sequencer manufacturers:
 
 - Illumina (By production lane):
@@ -157,17 +156,17 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] NovaSeq X (PE150)
   - [ ] NovaSeq X Plus (PE150)
   - [ ] iSeq 100 (PE150)
-    - Status: The current available datasets uses Quality Score Binning -- Only 2, 11, 25, 37 are shown. See [Illumina Whitepaper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf).
+    - Status: The current available datasets use quality score binning.
 - BGI/MGI:
   - [ ] BGISEQ-500 (PE200)
     - Status: We now have PE150 only.
   - [ ] DNBSEQ-E5 (SE100)
     - Status: No publicly-available data found.
   - [ ] DNBSEQ-E25 (PE150)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50 (PE150)
   - [ ] DNBSEQ-G99 (PE300)
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
-  - [ ] DNBSEQ-G400ER (PE150)
   - [ ] DNBSEQ-T7 (PE150)
     - In Progress.
   - [ ] DNBSEQ-T7 Plus (PE150)
@@ -185,6 +184,8 @@ Note:
 
 - For Illumina, Dx models (e.g., MiSeqDx) with locked software for forensics and diagnostics are treated as those without Dx.
 - For BGI/MGI models, we do not distinguish Rs (Research-only) models with non-RS models.
+  - DNBSEQ-G400ER is a nanopore-based long read sequencer, so not included.
+- For Illumina Models: Latest Illumina models uses Quality Score Binning -- Only 2, 11, 25, 37 are shown. See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf).
 
 #### Shift and Clip Parameters
 
