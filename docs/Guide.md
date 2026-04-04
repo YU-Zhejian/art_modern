@@ -226,7 +226,8 @@ If your system Boost library does not exist (e.g., on brand-new Apple Mac OS X),
 
 ```shell
 # Assume we're using Boost 1.89.0
-wget https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
+curl -L -O boost_1_89_0.tar.gz \
+    https://archives.boost.io/release/1.89.0/source/boost_1_89_0.tar.gz
 tar xvzf boost_1_89_0.tar.gz
 cd boost_1_89_0
 ./bootstrap.sh # Build b2. There's no point to build b2 using Clang.
@@ -255,7 +256,8 @@ cmake .. -DBoost_DIR="${HOME}"/opt/boost-1.89.0-clang
 ### Installing `{fmt}` from Source
 
 ```shell
-wget https://github.com/fmtlib/fmt/releases/download/12.0.0/fmt-12.0.0.zip
+curl -L -O fmt-12.0.0.zip \
+    https://github.com/fmtlib/fmt/releases/download/12.0.0/fmt-12.0.0.zip
 unzip fmt-12.0.0.zip
 cd fmt-12.0.0
 mkdir -p build
@@ -282,7 +284,8 @@ PKG_CONFIG_PATH="${HOME}/opt/fmt-12.0.0-clang/lib/pkgconfig/:${PKG_CONFIG_PATH:-
 Install NCBI VDB first.
 
 ```shell
-wget https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
+curl -L -O ncbi-vdb-3.3.0.zip \
+    https://github.com/ncbi/ncbi-vdb/archive/refs/tags/3.3.0.zip
 unzip ncbi-vdb-3.3.0.zip
 cd ncbi-vdb-3.3.0
 ./configure --prefix="${HOME}"/opt/ncbi-vdb-3.3.0
@@ -294,7 +297,8 @@ cd ..
 Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
 
 ```shell
-wget https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
+curl -L -O sra-tools-3.3.0.zip \
+    https://github.com/ncbi/sra-tools/archive/refs/tags/3.3.0.zip
 unzip sra-tools-3.3.0.zip
 cd sra-tools-3.3.0
 ./configure \
