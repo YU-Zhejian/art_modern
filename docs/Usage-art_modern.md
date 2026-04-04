@@ -119,17 +119,13 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | Name (`art_modern`)  | R1 `txt` file name | R2? | RLen1 | RLen2 | Model Name         | Added in | Source                                                                                                                               |
 |----------------------|--------------------|-----|-------|-------|--------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
 | `PacbOnso_150bp`     | `PacbOnsoL150R1`   | Y   | 150   | 150   | PacBio Onso        | v1.3.5   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
-| `MiSeq_v3_300bp`**   | `MiSeqv3L300R1`    | Y   | 300   | 300   | MiSeq v3           | v1.3.5   | [PRJEB96013](https://www.ebi.ac.uk/ena/browser/view/PRJEB96013), pooled.                                                             |
+| `MiSeq_v3_300bp`   | `MiSeqv3L300R1`    | Y   | 300   | 300   | MiSeq v3           | v1.3.5   | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)                                             |
 | `GA2X_150bp`         | `GA2XL150R1`       | Y   | 150   | 150   | GenomeAnalyzer IIx | v1.3.5   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
-| `GA2X_100bp`*        | `GA2XL100R1`       | Y   | 100   | 100   | GenomeAnalyzer IIx | v1.3.5   | [SRR5006202](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR5006202); [DOI](https://doi.org/10.1016/j.onehlt.2023.100518)             |
+| `GA2X_100bp`         | `GA2XL100R1`       | Y   | 100   | 100   | GenomeAnalyzer IIx | v1.3.5   | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)             |
 | `HiSeq1500_150bp`    | `HiSeq1500L150R1`  | Y   | 150   | 150   | HiSeq 1500         | v1.3.5   | [SRR35131961](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR35131961), unpublished                                                   |
 | `HiSeq1500_250bp`    | `HiSeq1500L250R1`  | Y   | 250   | 250   | HiSeq 1500         | v1.3.5   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
-| `BGISeq500_150bp`*** | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [SRR36802437](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR36802437), unpublished                                                   |
-
-
-\*: May have metadata error.
-\*\*: This data may not be usable due to privacy issues.
-\*\*\*: The metadata is wrong. They used NovaSeq in paper.
+| `BGISeq500_150bp` | `BgiSeq500L150R1`  | Y   | 150   | 150   | BGISeq-500         | v1.3.5   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)    |
+| `DNBSeqT7_150bp` | `DNBSeqT7L150R1` | Y | 150 | 150 | DNBSeq-T7 | v1.3.5 | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099) |
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -150,6 +146,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] MiSeq (PE250)
   - [X] MiSeqv3 (PE300)
   - [ ] MiSeq i100 (PE500)
+    - Status: No publicly-available data found.
   - [ ] NextSeq 500 (PE150)
   - [ ] NextSeq 550 (PE150)
   - [ ] NextSeq 2000 (PE300)
@@ -170,10 +167,15 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
   - [ ] DNBSEQ-G400ER (PE150)
   - [ ] DNBSEQ-T7 (PE150)
+    - In Progress.
   - [ ] DNBSEQ-T7 Plus (PE150)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-T10 (PE150)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-T10x4 (PE150)
+    - Status: No publicly-available data found.
   - [ ] DNBSEQ-T20x2 (PE150)
+    - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200)
 

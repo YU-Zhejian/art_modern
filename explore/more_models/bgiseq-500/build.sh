@@ -17,14 +17,14 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/SRR36802437_1.fastq \
+    --i-file raw_data/ERR14979854_1.fastq \
     --i-format FASTQ \
     --read_len 150 \
     --o-file1 BgiSeq500L150R1.txt \
     --parallel 4
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/SRR36802437_2.fastq \
+    --i-file raw_data/ERR14979854_2.fastq \
     --i-format FASTQ \
     --read_len 150 \
     --o-file1 BgiSeq500L150R2.txt \

@@ -33,14 +33,14 @@ art-profile-fastqc --input GA2XL150R1.txt --output GA2XL150R1.png
 art-profile-fastqc --input GA2XL150R2.txt --output GA2XL150R2.png
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/SRR5006202_1.fastq \
+    --i-file raw_data/SRR933371_1.fastq \
     --i-format FASTQ \
     --read_len 100 \
     --o-file1 GA2XL100R1.txt \
     --parallel 4
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/SRR5006202_2.fastq \
+    --i-file raw_data/SRR933371_2.fastq \
     --i-format FASTQ \
     --read_len 100 \
     --o-file1 GA2XL100R2.txt \

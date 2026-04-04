@@ -16,10 +16,5 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-prefetch --progress -O raw_data ERR15423{880..929}
-
-for fn in raw_data/*/*.sra; do
-    fastq-dump --split-files --outdir raw_data/fastq "$fn"
-done
-
+fasterq-dump --progress -O raw_data SRR30016282 --split-files
 echo "DONE"

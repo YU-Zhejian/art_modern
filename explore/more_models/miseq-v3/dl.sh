@@ -16,5 +16,6 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-fasterq-dump --progress -O raw_data ERR14979854 --split-files
+fasterq-dump --progress -O raw_data SRR29636774
+
 echo "DONE"
