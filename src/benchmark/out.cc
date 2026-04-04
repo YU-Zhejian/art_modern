@@ -45,6 +45,7 @@
 
 using namespace labw::art_modern;
 
+namespace{
 class EmptyLFIO final : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)
@@ -128,7 +129,6 @@ private:
     EmptyLFIO lfio_;
 };
 
-namespace {
 const std::string OUT_FILENAME = "out.tmp";
 const std::string fasta = ">chr1\nGGGCGTGTTCCTGTCGGGTAACACCACCATAGCAAAGCGATTGTTTATTTGACGAGTAAGGGAGGTCATTTCTATGACGGGGGGA"
                           "CCAGAGCCGCGGTGCATCACTCTAGAACTCCAGCTTATTTACAACATGGTGAGATGATTAGATGG";
