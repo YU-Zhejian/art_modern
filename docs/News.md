@@ -1,5 +1,10 @@
 # News \& Release Notes
 
+(v-1.4.1-section)=
+## v1.4.1 (Ongoing)
+
+- Miscellaneous bug fixes.
+
 (v-1.4.0-section)=
 ## v1.4.0 (2026/04/05)
 
