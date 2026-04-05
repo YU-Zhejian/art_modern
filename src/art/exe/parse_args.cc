@@ -53,7 +53,6 @@
 #include <cstdlib>
 #include <fstream>
 #include <ios>
-#include <iostream>
 #include <limits>
 #include <sstream>
 #include <stdexcept>
@@ -383,7 +382,7 @@ namespace {
 
         double tp = 0;
         double p_cdf = 0;
-        const double p_cdf_ub = 1 - std::numeric_limits<double>::epsilon();
+        constexpr double p_cdf_ub = 1 - std::numeric_limits<double>::epsilon();
         for (auto i = 0; i < read_len; i++) {
             // Using boost math is intentional here to avoid precision issues
             // Do not try to optimize this unless you have a better solution
@@ -456,7 +455,7 @@ namespace {
         }
     }
 
-    void validate_batch_size(am_readnum_t batch_size)
+    void validate_batch_size(am_readnum_t const batch_size)
     {
         if (batch_size < 1) {
             BOOST_LOG_TRIVIAL(fatal) << "Batch size (" << batch_size << ") must be greater than 1";
@@ -475,13 +474,13 @@ std::tuple<ArtParams, ArtIOParams> parse_args(const int argc, char** argv)
     // Generate suffix docs for builtin profiles
     std::stringstream ss;
     ss << "Builtin profiles:\n";
-    for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
-        const auto& profile = Empdist(BUILTIN_PROFILE_NAMES[i], false, false, true);
+    for (const auto* builtin_profile_name : BUILTIN_PROFILE_NAMES) {
+        const auto& profile = Empdist(builtin_profile_name, false, false, true);
         const bool supports_pe = profile.get_read_2_max_length() > 0;
         const auto r1_max_rlen = profile.get_read_1_max_length();
         const auto r2_max_rlen = profile.get_read_2_max_length();
-        ss << "\t" << BUILTIN_PROFILE_NAMES[i] << ": " << (supports_pe ? "PE" : "SE")
-           << ", max read length :" << r1_max_rlen
+        ss << "\t" << builtin_profile_name << ": " << (supports_pe ? "PE" : "SE")
+           << ", max read length: " << r1_max_rlen
            << (supports_pe ? (std::string(", ") + std::to_string(r2_max_rlen)) : "") << "\n";
     }
 

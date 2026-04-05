@@ -22,6 +22,7 @@
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -44,7 +45,7 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#include <cstdint>
+#include <cstdint> // NOLINT: ViewSraMtChild
 #include <cstdlib>
 #include <memory>
 #include <mutex>
@@ -52,104 +53,201 @@
 #include <utility>
 #include <vector>
 
-#include "libam_support/utils/arithmetic_utils.hh"
-
 namespace labw::art_modern {
-constexpr std::size_t REPORT_SIZE = 10000000; // 10 Million reads
-constexpr std::size_t APB_BATCH_SIZE = K_SIZE;
 
-class ViewSamMtChild {
-
-public:
-    ViewSamMtChild(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::shared_ptr<IntermediateEmpDist>& ied2,
-        const std::size_t thread_id, APBConfig config, moodycamel::ConcurrentQueue<std::vector<bam1_t*>>& read_queue)
-        : ied1_(ied1)
-        , ied2_(ied2)
-        , thread_id_(thread_id)
-        , config_(std::move(config))
-        , read_queue_(read_queue)
-    {
-    }
-    DELETE_COPY(ViewSamMtChild)
-    DELETE_MOVE(ViewSamMtChild)
-    void start() { worker_thread_ = std::thread(&ViewSamMtChild::run_, this); }
-    ~ViewSamMtChild()
-    {
-        stop_();
-        join();
-    }
-    void join()
-    {
-        if (worker_thread_.joinable()) {
-            worker_thread_.join();
+namespace {
+    class ViewMtChildbase {
+    public:
+        ViewMtChildbase(const std::shared_ptr<IntermediateEmpDist>& ied1,
+            const std::shared_ptr<IntermediateEmpDist>& ied2, const std::size_t thread_id, APBConfig config)
+            : ied1_(ied1)
+            , ied2_(ied2)
+            , thread_id_(thread_id)
+            , config_(std::move(config))
+        {
         }
-    }
-
-private:
-    std::shared_ptr<IntermediateEmpDist> ied1_;
-    std::shared_ptr<IntermediateEmpDist> ied2_;
-    std::size_t thread_id_;
-    APBConfig config_;
-    moodycamel::ConcurrentQueue<std::vector<bam1_t*>>& read_queue_;
-    std::atomic<bool> should_stop_ { false };
-    std::condition_variable should_stop_cv_;
-    std::mutex should_stop_mutex_;
-    std::thread worker_thread_;
-    am_readnum_t num_valid_reads_ = 0;
-    am_readnum_t num_total_reads_ = 0;
-    am_readnum_t num_total_in_ = 0;
-    am_readnum_t num_wait_in_ = 0;
-
-    void run_()
-    {
-        while (!should_stop_) {
-            std::vector<bam1_t*> reads;
-            if (read_queue_.try_dequeue(reads)) {
-                if (reads.empty()) {
-                    stop_();
-                    break;
-                }
-                num_total_in_++;
-                for (auto* b : reads) {
-                    if (((config_.is_pe && ((b->core.flag & BAM_FREAD2) != 0)) ? ied2_ : ied1_)->parse_read(b)) {
-                        num_valid_reads_++;
-                    }
-                    num_total_reads_++;
-                    if (num_total_reads_ % REPORT_SIZE == 0) {
-                        log_();
-                    }
-                    bam_destroy1(b);
-                }
-            } else {
-                num_wait_in_++;
-                std::unique_lock lk(should_stop_mutex_);
-                should_stop_cv_.wait_for(lk, std::chrono::milliseconds(100), [this]() { return should_stop_.load(); });
+        DELETE_COPY(ViewMtChildbase)
+        DELETE_MOVE(ViewMtChildbase)
+        virtual void start() { worker_thread_ = std::thread(&ViewMtChildbase::run_, this); }
+        virtual ~ViewMtChildbase()
+        {
+            stop_();
+            join();
+        }
+        void join()
+        {
+            if (worker_thread_.joinable()) {
+                worker_thread_.join();
             }
         }
-        log_();
 
-        BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id_
-                                << ": Processed read batches: N. (IRetried/IAll): " << format_with_commas(num_wait_in_)
-                                << "/" << format_with_commas(num_total_in_) << " ("
-                                << (100.0 * static_cast<double>(num_wait_in_) / static_cast<double>(num_total_in_))
-                                << "%).";
-    }
+    protected:
+        std::shared_ptr<IntermediateEmpDist> ied1_;
+        std::shared_ptr<IntermediateEmpDist> ied2_;
+        std::size_t thread_id_;
+        APBConfig config_;
+        std::atomic<bool> should_stop_ { false };
+        std::condition_variable should_stop_cv_;
+        std::mutex should_stop_mutex_;
+        std::thread worker_thread_;
+        am_readnum_t num_valid_reads_ = 0;
+        am_readnum_t num_total_reads_ = 0;
+        am_readnum_t num_total_in_ = 0;
+        am_readnum_t num_wait_in_ = 0;
 
-    void stop_()
-    {
-        should_stop_.store(true);
-        should_stop_cv_.notify_all();
-    }
-    void log_()
-    {
-        BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id_ << ": Processed "
-                                << to_si(num_total_reads_, 2, static_cast<decltype(num_total_reads_)>(1000))
-                                << " reads, "
-                                << to_si(num_valid_reads_, 2, static_cast<decltype(num_total_reads_)>(1000)) << " ("
-                                << static_cast<double>(num_valid_reads_) / static_cast<double>(num_total_reads_) * 100.0
-                                << ")% valid reads.";
-    }
-};
+        virtual void run_() = 0;
+
+        void stop_()
+        {
+            should_stop_.store(true);
+            should_stop_cv_.notify_all();
+        }
+        void log_()
+        {
+            BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id_ << ": Processed "
+                                    << to_si(num_total_reads_, 2, static_cast<decltype(num_total_reads_)>(1000))
+                                    << " reads, "
+                                    << to_si(num_valid_reads_, 2, static_cast<decltype(num_total_reads_)>(1000)) << " ("
+                                    << static_cast<double>(num_valid_reads_) / static_cast<double>(num_total_reads_)
+                    * 100.0 << ")% valid reads.";
+        }
+        void endlog_() const
+        {
+
+            BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id_ << ": Processed read batches: N. (IRetried/IAll): "
+                                    << format_with_commas(num_wait_in_) << "/" << format_with_commas(num_total_in_)
+                                    << " ("
+                                    << (100.0 * static_cast<double>(num_wait_in_) / static_cast<double>(num_total_in_))
+                                    << "%).";
+        }
+    };
+    class ViewSamMtChild final : public ViewMtChildbase {
+
+    public:
+        ViewSamMtChild(const std::shared_ptr<IntermediateEmpDist>& ied1,
+            const std::shared_ptr<IntermediateEmpDist>& ied2, const std::size_t thread_id, APBConfig config,
+            moodycamel::ConcurrentQueue<std::vector<bam1_t*>>& read_queue)
+            : ViewMtChildbase(ied1, ied2, thread_id, std::move(config))
+            , read_queue_(read_queue)
+        {
+        }
+
+        DELETE_COPY(ViewSamMtChild)
+        DELETE_MOVE(ViewSamMtChild)
+        void start() override { worker_thread_ = std::thread(&ViewSamMtChild::run_, this); }
+        ~ViewSamMtChild() override
+        {
+            stop_();
+            join();
+        }
+
+    private:
+        moodycamel::ConcurrentQueue<std::vector<bam1_t*>>& read_queue_;
+
+    protected:
+        void run_() override
+        {
+            while (!should_stop_) {
+                std::vector<bam1_t*> reads;
+                if (read_queue_.try_dequeue(reads)) {
+                    if (reads.empty()) {
+                        stop_();
+                        break;
+                    }
+                    num_total_in_++;
+                    for (auto* b : reads) {
+                        if (((config_.is_pe && ((b->core.flag & BAM_FREAD2) != 0)) ? ied2_ : ied1_)->parse_read(b)) {
+                            num_valid_reads_++;
+                        }
+                        num_total_reads_++;
+                        if (num_total_reads_ % config_.report_size == 0) {
+                            log_();
+                        }
+                        bam_destroy1(b);
+                    }
+                } else {
+                    num_wait_in_++;
+                    std::unique_lock lk(should_stop_mutex_);
+                    should_stop_cv_.wait_for(
+                        lk, std::chrono::milliseconds(100), [this]() { return should_stop_.load(); });
+                }
+            }
+            log_();
+            endlog_();
+        }
+    };
+#ifdef WITH_NCBI_NGS
+
+    class ViewSraMtChild final : public ViewMtChildbase {
+
+    public:
+        ViewSraMtChild(const std::shared_ptr<IntermediateEmpDist>& ied1,
+            const std::shared_ptr<IntermediateEmpDist>& ied2, const std::size_t thread_id, APBConfig config,
+            const std::uint64_t start, const std::uint64_t end)
+            : ViewMtChildbase(ied1, ied2, thread_id, std::move(config))
+            , start_(start)
+            , end_(end)
+        {
+        }
+
+        DELETE_COPY(ViewSraMtChild)
+        DELETE_MOVE(ViewSraMtChild)
+        void start() override { worker_thread_ = std::thread(&ViewSraMtChild::run_, this); }
+
+        ~ViewSraMtChild() override { join(); }
+
+    private:
+        std::uint64_t start_;
+        std::uint64_t end_;
+
+    protected:
+        void run_() override
+        {
+            try {
+                auto rcngs = ncbi::NGS::openReadCollection(config_.input_file_path);
+                auto reads = rcngs.getReadRange(start_ + 1, end_ - start_);
+                while (reads.nextRead()) {
+                    auto nfrags = reads.getNumFragments();
+                    num_total_reads_ += nfrags;
+                    if (config_.is_pe) {
+                        if (nfrags != 2) {
+                            continue;
+                        }
+                        reads.nextFragment();
+                        auto base1 = reads.getFragmentBases().toString();
+                        auto qual1 = reads.getFragmentQualities().toString();
+                        reads.nextFragment();
+                        auto base2 = reads.getFragmentBases().toString();
+                        auto qual2 = reads.getFragmentQualities().toString();
+                        if (ied1_->parse_read_ngs_fragment(base1, qual1)
+                            && ied2_->parse_read_ngs_fragment(base2, qual2)) {
+                            num_valid_reads_ += 2;
+                        }
+                    } else {
+                        if (nfrags != 1) {
+                            continue;
+                        }
+                        auto base = reads.getReadBases().toString();
+                        auto qual = reads.getReadQualities().toString();
+                        if (ied1_->parse_read_ngs_fragment(base, qual)) {
+                            num_valid_reads_++;
+                        }
+                    }
+                    if (num_total_reads_ % config_.report_size == 0) {
+                        log_();
+                    }
+                }
+                log_();
+                endlog_();
+            } catch (const ngs::ErrorMsg& e) {
+                BOOST_LOG_TRIVIAL(error) << "NGS error in thread " << thread_id_ << ": " << e.what();
+                abort_mpi();
+            }
+        }
+    };
+#endif
+
+} // namespace
 
 void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied2s, const std::size_t n_threads,
@@ -173,7 +271,7 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     auto* hdr = CExceptionsProxy::assert_not_null(sam_hdr_read(in), USED_HTSLIB_NAME, "Failed to read SAM header.");
     auto* b = CExceptionsProxy::assert_not_null(bam_init1(), USED_HTSLIB_NAME, "Failed to init BAM record.");
 
-    moodycamel::ConcurrentQueue<std::vector<bam1_t*>> read_queue { config.queue_size, 1, 0 };
+    moodycamel::ConcurrentQueue<std::vector<bam1_t*>> read_queue { static_cast<std::size_t>(config.queue_size), 1, 0 };
     moodycamel::ProducerToken const read_producer_token { read_queue };
 
     hts_set_opt(in, HTS_OPT_THREAD_POOL, &tpool);
@@ -191,8 +289,8 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     bool at_eof = false;
     while (!at_eof) {
         std::vector<bam1_t*> batch;
-        batch.reserve(APB_BATCH_SIZE);
-        for (std::size_t i = 0; i < APB_BATCH_SIZE; ++i) {
+        batch.reserve(config.batch_size);
+        for (am_readnum_t i = 0; i < config.batch_size; ++i) {
             batch.emplace_back(bam_init1());
             retv = sam_read1(in, hdr, batch.back());
             num_parsed_reads += 1;
@@ -227,7 +325,7 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     }
     // Send stop signals
     for (std::size_t i = 0; i < n_threads; ++i) {
-        std::vector<bam1_t*> batch {};
+        std::vector<bam1_t*> batch { };
         bool success = read_queue.try_enqueue(read_producer_token, std::move(batch));
         if (!success) {
             num_push_waits++;
@@ -251,97 +349,6 @@ void view_sam_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     hts_tpool_destroy(tpool.pool);
 }
 #ifdef WITH_NCBI_NGS
-
-class ViewSraMtChild {
-
-public:
-    ViewSraMtChild(const std::shared_ptr<IntermediateEmpDist>& ied1, const std::shared_ptr<IntermediateEmpDist>& ied2,
-        const std::size_t thread_id, APBConfig config, const std::uint64_t start, const std::uint64_t end)
-        : ied1_(ied1)
-        , ied2_(ied2)
-        , thread_id_(thread_id)
-        , config_(std::move(config))
-        , start_(start)
-        , end_(end)
-    {
-    }
-    DELETE_COPY(ViewSraMtChild)
-    DELETE_MOVE(ViewSraMtChild)
-    void start() { worker_thread_ = std::thread(&ViewSraMtChild::run_, this); }
-
-    ~ViewSraMtChild() { join(); }
-    void join()
-    {
-        if (worker_thread_.joinable()) {
-            worker_thread_.join();
-        }
-    }
-
-private:
-    std::shared_ptr<IntermediateEmpDist> ied1_;
-    std::shared_ptr<IntermediateEmpDist> ied2_;
-    std::size_t thread_id_;
-    APBConfig config_;
-    std::uint64_t start_;
-    std::uint64_t end_;
-
-    std::thread worker_thread_;
-    am_readnum_t num_valid_reads_ = 0;
-    am_readnum_t num_total_reads_ = 0;
-
-    void run_()
-    {
-        try {
-            auto rcngs = ncbi::NGS::openReadCollection(config_.input_file_path);
-            auto reads = rcngs.getReadRange(start_ + 1, end_ - start_);
-            while (reads.nextRead()) {
-                auto nfrags = reads.getNumFragments();
-                num_total_reads_ += nfrags;
-                if (config_.is_pe) {
-                    if (nfrags != 2) {
-                        continue;
-                    }
-                    reads.nextFragment();
-                    auto base1 = reads.getFragmentBases().toString();
-                    auto qual1 = reads.getFragmentQualities().toString();
-                    reads.nextFragment();
-                    auto base2 = reads.getFragmentBases().toString();
-                    auto qual2 = reads.getFragmentQualities().toString();
-                    if (ied1_->parse_read_ngs_fragment(base1, qual1) && ied2_->parse_read_ngs_fragment(base2, qual2)) {
-                        num_valid_reads_ += 2;
-                    }
-                } else {
-                    if (nfrags != 1) {
-                        continue;
-                    }
-                    auto base = reads.getReadBases().toString();
-                    auto qual = reads.getReadQualities().toString();
-                    if (ied1_->parse_read_ngs_fragment(base, qual)) {
-                        num_valid_reads_++;
-                    }
-                }
-
-                if (num_total_reads_ % REPORT_SIZE == 0) {
-                    log_();
-                }
-            }
-            log_();
-
-        } catch (const ngs::ErrorMsg& e) {
-            BOOST_LOG_TRIVIAL(error) << "NGS error in thread " << thread_id_ << ": " << e.what();
-            abort_mpi();
-        }
-    }
-    void log_()
-    {
-        BOOST_LOG_TRIVIAL(info) << "Thread " << thread_id_ << ": Processed "
-                                << to_si(num_total_reads_, 2, static_cast<decltype(num_total_reads_)>(1000))
-                                << " reads, "
-                                << to_si(num_valid_reads_, 2, static_cast<decltype(num_total_reads_)>(1000)) << " ("
-                                << static_cast<double>(num_valid_reads_) / static_cast<double>(num_total_reads_) * 100.0
-                                << ")% valid reads.";
-    }
-};
 
 void view_sra_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied2s, const std::size_t n_threads,

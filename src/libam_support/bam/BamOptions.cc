@@ -25,7 +25,7 @@ namespace labw::art_modern {
 
 void BamOptions::log_(const std::string& name) const
 {
-    std::vector<std::string> tags = {};
+    std::vector<std::string> tags = { };
     if (with_tag_MD) {
         tags.emplace_back("MD");
     }

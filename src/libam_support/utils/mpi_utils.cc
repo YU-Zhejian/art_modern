@@ -94,7 +94,7 @@ void exit_mpi() noexcept
 #endif
 }
 
-am_mpi_size_t mpi_size()
+am_mpi_size_t mpi_size() // NOLINT: Default value for non-MPI build
 {
     am_mpi_size_t size = 1; // NOLINT: Default value for non-MPI build
 #ifdef WITH_MPI

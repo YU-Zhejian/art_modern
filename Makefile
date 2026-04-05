@@ -26,11 +26,10 @@ MPIEXEC ?= mpiexec
 # Output directory for build artifacts
 export OPT_DIR ?= $(CURDIR)/opt
 
-
 # System architecture
 ARCH ?= $(shell uname -m)
 
-# Package version, derived from the latest git tag if not set
+# Package version.
 export PACKAGE_VERSION ?= $(shell cat version.txt | tr -d '[:space:]')
 
 $(info Using $(JOBS) parallel jobs for building)
@@ -153,7 +152,7 @@ rel_with_dbg_alpine:
 # Run code formatting checks and auto-formatting
 # Format the code using [`clang-format`](https://clang.llvm.org/docs/ClangFormat.html), [`sh`](https://github.com/mvdan/sh), [Black](https://black.readthedocs.io/en/stable/), [`cmake-format`](https://cmake-format.readthedocs.io/), and [`dos2unix`](https://www.freebsd.org/cgi/man.cgi?query=dos2unix&sektion=1).
 fmt:
-	$(BASH) sh.d/fmt.sh
+	pixi run --frozen -e fmt $(BASH) sh.d/fmt.sh
 
 .PHONY: scc
 # Run source code counting
@@ -271,13 +270,13 @@ testbuild-small-mpi:
 # Build documentation
 doc:
 	$(PYTHON) $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
-	$(MAKE) -C docs/sphinx.d
+	pixi run --frozen -e doc $(MAKE) -C docs/sphinx.d
 
 .PHONY: cleandoc
 # Clean and build documentation
 cleandoc:
-	$(MAKE) -C docs/sphinx.d clean
-	$(MAKE) -C docs/sphinx.d
+	pixi run --frozen -e doc $(MAKE) -C docs/sphinx.d clean
+	$(MAKE) doc
 
 .PHONY: serve-doc
 # Serve built documentation at <http://localhost:8000>
@@ -292,4 +291,4 @@ packing:
 .PHONY: packing-update-containers
 # Update Docker and Singularity containers used for packing
 packing-update-containers:
-	$(MAKE) -C packing update-containers
+	pixi run --frozen -e pack $(MAKE) -C packing update-containers

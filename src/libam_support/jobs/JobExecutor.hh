@@ -32,7 +32,7 @@ public:
     /** Default destructor */
     virtual ~JobExecutor() = default;
     DELETE_COPY(JobExecutor)
-    DELETE_MOVE(JobExecutor)
+    DEFAULT_MOVE(JobExecutor)
 
     /**
      * Implement the job execution logic here.
@@ -46,6 +46,17 @@ public:
      * Implement to provide thread info for logging.
      */
     [[nodiscard]] virtual std::string thread_info() const = 0;
+};
+
+class EmptyJobExecutor final : public JobExecutor {
+public:
+    EmptyJobExecutor() = default;
+    ~EmptyJobExecutor() override = default;
+    DELETE_COPY(EmptyJobExecutor)
+    DEFAULT_MOVE(EmptyJobExecutor)
+    void operator()() override { }
+    [[nodiscard]] bool is_running() const override { return false; }
+    [[nodiscard]] std::string thread_info() const override { return "EmptyJobExecutor"; }
 };
 
 } // namespace labw::art_modern

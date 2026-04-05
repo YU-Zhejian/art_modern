@@ -59,7 +59,6 @@ constexpr am_readnum_t READ_LEN = K_SIZE;
 pcg32_c gen { 123456L }; // Fixed seed for reproducibility
 std::uniform_int_distribution<am_qual_count_t> one_to_dist_end(1, DIST_END);
 std::uniform_int_distribution<am_qual_count_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
-} // namespace
 
 class SlimEmpDist {
 public:
@@ -340,7 +339,6 @@ private:
     std::map<am_qual_count_t, am_qual_t, std::less<>> dist_;
 };
 
-namespace {
 void bench(const std::unique_ptr<SlimEmpDist>& empdist, const std::string& name)
 {
     std::vector<double> acc;

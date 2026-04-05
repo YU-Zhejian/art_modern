@@ -75,7 +75,7 @@ Number of threads to use. Use `-1` to disable parallelism. Use `0` (default) to 
 
 #### Which Quality Distribution File to Use
 
-Quality distribution files specify the base quality distribution at each position of the read. They are used to simulate sequencing errors.
+Quality distribution files specify the base quality distribution at each position of the read. They are used to simulating sequencing errors.
 
 Users may supply self-trained quality distribution files using `--qual_file_1` and `--qual_file_2` for read 1 and read 2 respectively. The format of quality distribution files is compatible with the original ART. The first parameter is required while the second parameter is required only for `pe` and `mp` library construction mode.
 
@@ -83,35 +83,125 @@ Users may also use built-in quality distribution files using `--builtin_qual_fil
 
 Quality distributions bundled with the original ART can be found [here](https://github.com/YU-Zhejian/art_modern/tree/master/data/Illumina_profiles). In details:
 
-Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`.
+Here lists existing Illumina models supported by the original ART, which is still available in `art_modern`. **The (8B)/(6B) means that the quality scores may be binned.**
 
-| Name   | Name (`art_modern`)     | R1 `txt` file name    | R2? | RLen1 | RLen2 | Model Name        |
-|--------|-------------------------|-----------------------|-----|-------|-------|-------------------|
-| `GA1`  | `GA1Recalibrated_36bp`  | `EmpR36R1`            | Y   | 36    | 36    | GenomeAnalyzer I  |
-| `GA1`  | `GA1Recalibrated_44bp`  | `EmpR44R1`            | Y   | 44    | 44    | GenomeAnalyzer I  |
-| `GA2`  | `GA2Recalibrated_50bp`  | `EmpR50R1`            | Y   | 50    | 50    | GenomeAnalyzer II |
-| `GA2`  | `GA2Recalibrated_75bp`  | `EmpR75R1`            | Y   | 75    | 75    | GenomeAnalyzer II |
-| `HS10` | `HiSeq1000_100bp`       | `Emp100R1`            | Y   | 100   | 100   | HiSeq 1000        |
-| `MSv1` | `MiSeq_250bp`           | `EmpMiSeq250R1`       | Y   | 250   | 250   | MiSeq             |
-| `HS20` | `HiSeq2000_100bp`       | `HiSeq2kL100R1`       | Y   | 100   | 100   | HiSeq 2000        |
-| `HS25` | `HiSeq2500_125bp`       | `HiSeq2500L125R1`     | Y   | 126   | 126   | HiSeq 2500        |
-| `HS25` | `HiSeq2500_150bp`       | `HiSeq2500L150R1`     | Y   | 150   | 150   | HiSeq 2500        |
-| `HSXn` | `HiSeqX_PCR_Free_150bp` | `HiSeqXPCRfreeL150R1` | Y   | 151   | 151   | HiSeqX PCR free   |
-| `HSXt` | `HiSeqX_TruSeq_150bp`   | `HiSeqXtruSeqL150R1`  | Y   | 151   | 151   | HiSeqX TruSeq     |
-| `MinS` | `MiniSeq_TruSeq_50bp`   | `MiniSeqTruSeqL50`    | N   | 51    | N/A   | MiniSeq TruSeq    |
-| `MSv3` | `MiSeq_v3_250bp`        | `MiSeqv3L250R1`       | Y   | 251   | 251   | MiSeq v3          |
-| `NS50` | `NextSeq500_v2_75bp`    | `NextSeq500v2L75R1`   | Y   | 76    | 76    | NextSeq500 v2     |
+| Name   | Name (`art_modern`)     | R1 `txt` file name    | RLen1 | RLen2 | Model Name           |
+|--------|-------------------------|-----------------------|-------|-------|----------------------|
+| `GA1`  | `GA1Recalibrated_36bp`  | `EmpR36R1`            | 36    | 36    | GenomeAnalyzer I     |
+| `GA1`  | `GA1Recalibrated_44bp`  | `EmpR44R1`            | 44    | 44    | GenomeAnalyzer I     |
+| `GA2`  | `GA2Recalibrated_50bp`  | `EmpR50R1`            | 50    | 50    | GenomeAnalyzer II    |
+| `GA2`  | `GA2Recalibrated_75bp`  | `EmpR75R1`            | 75    | 75    | GenomeAnalyzer II    |
+| `HS10` | `HiSeq1000_100bp`       | `Emp100R1`            | 100   | 100   | HiSeq 1000           |
+| `MSv1` | `MiSeq_250bp`           | `EmpMiSeq250R1`       | 250   | 250   | MiSeq                |
+| `HS20` | `HiSeq2000_100bp`       | `HiSeq2kL100R1`       | 100   | 100   | HiSeq 2000           |
+| `HS25` | `HiSeq2500_125bp`       | `HiSeq2500L125R1`     | 126   | 126   | HiSeq 2500           |
+| `HS25` | `HiSeq2500_150bp`       | `HiSeq2500L150R1`     | 150   | 150   | HiSeq 2500 (8B)      |
+| `HSXn` | `HiSeqX_PCR_Free_150bp` | `HiSeqXPCRfreeL150R1` | 151   | 151   | HiSeqX PCR free (8B) |
+| `HSXt` | `HiSeqX_TruSeq_150bp`   | `HiSeqXtruSeqL150R1`  | 151   | 151   | HiSeqX TruSeq  (8B)  |
+| `MinS` | `MiniSeq_TruSeq_50bp`   | `MiniSeqTruSeqL50`    | 51    | N/A   | MiniSeq TruSeq  (6B) |
+| `MSv3` | `MiSeq_v3_250bp`        | `MiSeqv3L250R1`       | 251   | 251   | MiSeq v3             |
+| `NS50` | `NextSeq500_v2_75bp`    | `NextSeq500v2L75R1`   | 76    | 76    | NextSeq500 v2 (6B)   |
 
 Following profiles are only available in `art_modern` but not in the original ART as a built-in model. However, the
 model error files are provided in the original ART.
 
-| Name (`art_modern`)       | R1 `txt` file name      | R2? | RLen1 | RLen2 | Model Name        |
-|---------------------------|-------------------------|-----|-------|-------|-------------------|
-| `GA1_36bp`                | `Emp36R1`               | Y   | 36    | 36    | GenomeAnalyzer I  |
-| `GA1_44bp`                | `Emp44R1`               | Y   | 44    | 44    | GenomeAnalyzer I  |
-| `GA2_50bp`                | `Emp50R1`               | Y   | 53    | 50    | GenomeAnalyzer II |
-| `GA2_75bp`                | `Emp75R1`               | Y   | 75    | 75    | GenomeAnalyzer II |
-| `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | Y   | 150   | 150   | HiSeq 2500        |
+| Name (`art_modern`)       | R1 `txt` file name      | RLen1 | RLen2 | Model Name        |
+|---------------------------|-------------------------|-------|-------|-------------------|
+| `GA1_36bp`                | `Emp36R1`               | 36    | 36    | GenomeAnalyzer I  |
+| `GA1_44bp`                | `Emp44R1`               | 44    | 44    | GenomeAnalyzer I  |
+| `GA2_50bp`                | `Emp50R1`               | 53    | 50    | GenomeAnalyzer II |
+| `GA2_75bp`                | `Emp75R1`               | 75    | 75    | GenomeAnalyzer II |
+| `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | 150   | 150   | HiSeq 2500 (8B)   |
+
+The following profiles are built and distributed by `art_modern` maintainers.
+New models from Illumina, BGI/MGI, and PacBio are added.
+
+| Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name         | Added in | Source                                                                                                                               |
+|---------------------|--------------------|-----|-------|-------|--------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `PacbOnso_150bp`    | `PacbOnsoL150R1`   | 150   | 150   | PacBio Onso        | v1.4.0   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
+| `MiSeq_v3_300bp`    | `MiSeqv3L300R1`    | 300   | 300   | MiSeq v3           | v1.4.0   | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)          |
+| `GA2X_150bp`        | `GA2XL150R1`       | 150   | 150   | GenomeAnalyzer IIx | v1.4.0   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
+| `GA2X_100bp`        | `GA2XL100R1`       | 100   | 100   | GenomeAnalyzer IIx | v1.4.0   | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)                      |
+| `HiSeq1500_250bp`   | `HiSeq1500L250R1`  | 250   | 250   | HiSeq 1500         | v1.4.0   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
+| `BGISeq500_150bp`   | `BgiSeq500L150R1`  | 150   | 150   | BGISeq-500         | v1.4.0   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)                |
+| `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | DNBSeq-T7          | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
+| `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
+| `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | v1.4.0   | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
+| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | v1.4.0   | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
+| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)      | v1.4.0   | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
+| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)       | v1.4.0   | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
+
+List of all models by distinguished NGS sequencer manufacturers:
+
+- Illumina (By production lane):
+  - [X] Genome Analyzer (PE44)
+  - [X] Genome Analyzer II (PE75)
+  - [X] Genome Analyzer IIx (PE150)
+  - [ ] Genome Analyzer IIe (PE100)
+    - This model is rarely used. We cannot find any publicly-available data for it.
+  - [X] HiSeq 1000 (PE100)
+  - [X] HiSeq 2000 (PE100)
+  - [X] HiSeq X (PE150)
+  - [X] HiSeq 1500 (PE250)
+  - [ ] HiSeq 2500 (PE250)
+  - [ ] HiSeq 3000 (PE150)
+  - [X] HiSeq 4000 (PE150)
+  - [ ] MiniSeq (PE150 on High/Mid Output Kit, and PE100 on Rapid Kit)
+  - [X] MiSeq (PE250)
+  - [X] MiSeqv3 (PE300)
+  - [ ] MiSeq i100 (PE500)
+    - Status: No publicly-available data found for PE500.
+  - [X] NextSeq 500 (PE150)
+  - [ ] NextSeq 550 (PE150)
+  - [ ] NextSeq 1000 (PE300)
+    - Status: The current available datasets use quality score binning of 4-bins.
+  - [ ] NextSeq 2000 (PE300)
+    - Status: The current available datasets use quality score binning of 4-bins.
+  - [ ] NovaSeq 5000 (PE150)
+    - Status: No publicly-available data found.
+  - [ ] NovaSeq 6000 (PE250)
+    - Status: The current available datasets use quality score binning of 4-bins.
+  - [ ] NovaSeq X (PE150)
+    - Status: The current available datasets use quality score binning of 4-bins.
+  - [ ] NovaSeq X Plus (PE150)
+    - Status: The current available datasets use quality score binning of 4-bins.
+  - [ ] iSeq 100 (PE150)
+    - Status: The current available datasets use quality score binning of 3- or 4-bins.
+- BGI/MGI:
+  - [ ] BGISEQ-500 (PE200)
+    - Status: We now have PE150 only.
+  - [ ] DNBSEQ-E5 (SE100)
+    - Status: No publicly-available data found.
+  - [ ] DNBSEQ-E25 (PE150)
+    - Status: No publicly-available data found.
+  - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150)
+    - Yes they are the same model.
+  - [ ] DNBSEQ-G99 (PE300)
+    - Status: No publicly-available data found.
+  - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
+    - Status: We now have PE150 and SE400 only.
+    - [ERR4894594](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4894594) is a trimmed PE200 data, while [ERR4886095](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4886095) is a trimmed SE400 data. [DOI](https://doi.org/10.46471/gigabyte.16).
+  - [ ] DNBSEQ-T7 (PE150)
+    - In Progress.
+  - [ ] DNBSEQ-T7 Plus (PE150)
+    - Status: No publicly-available data found.
+  - [ ] DNBSEQ-T10 (PE150)
+    - Status: No publicly-available data found.
+  - [ ] DNBSEQ-T10x4 (PE150)
+    - Status: No publicly-available data found.
+  - [ ] DNBSEQ-T20x2 (PE150)
+    - Status: No publicly-available data found.
+- PacBio:
+  - [X] Onso (PE150/SE200)
+- [GeneMind](https://en.genemind.com/)
+  - Status: All GeneMind models uses quality binning.
+
+Note:
+
+- For Illumina, Dx models (e.g., MiSeqDx) with locked software for forensics and diagnostics are treated as those without Dx.
+- For BGI/MGI models, we do not distinguish Rs (Research-only) models with non-RS models.
+  - DNBSEQ-G400ER is a nanopore-based long read sequencer, so not included.
+- For Illumina Models: Latest Illumina models uses Quality Score Binning -- Only 2, 11, 25, 37 are shown. See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf).
 
 #### Shift and Clip Parameters
 

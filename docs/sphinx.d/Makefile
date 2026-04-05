@@ -20,6 +20,7 @@ cp:
 .PHONY: html
 html: cp # apidoc  refs.bibtex.bib
 	sphinx-build -M html $(CURDIR) $(BUILD_DIR) $(SPHINX_OPTS)
+	touch $(BUILD_DIR)/html/.nojekyll
 
 .PHONY: pdf
 pdf: cp # apidoc  refs.bibtex.bib

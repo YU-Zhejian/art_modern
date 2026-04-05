@@ -42,7 +42,6 @@
 #include <limits>
 
 #include <cstdlib>
-#include <cstring>
 #include <string>
 #include <vector>
 
@@ -61,6 +60,8 @@ namespace {
     constexpr char ARG_OUT2[] = "o-file2";
     constexpr char ARG_OB[] = "old_behavior";
     constexpr char ARG_QUEUE_SIZE[] = "queue_size";
+    constexpr char ARG_REPORT_SIZE[] = "report_size";
+    constexpr char ARG_BATCH_SIZE[] = "batch_size";
     constexpr char ARG_INPUT_FORMAT[] = "i-format";
     constexpr char ARG_FIRST_N_READS[] = "first_n_reads";
 
@@ -160,8 +161,12 @@ namespace {
             + " will create " + ARG_NUM_IO_THREADS + " threads for I/O. ";
         parallel_opts.add_options()(
             ARG_NUM_IO_THREADS, po::value<std::size_t>()->default_value(4), io_thread_description.c_str());
-        parallel_opts.add_options()(ARG_QUEUE_SIZE, po::value<std::size_t>()->default_value(K_SIZE),
-            "Size of the lock-free queue used in reading input HTS files.");
+        parallel_opts.add_options()(ARG_QUEUE_SIZE, po::value<am_readnum_t>()->default_value(K_SIZE),
+            "# reads of the lock-free queue used in reading input HTS files.");
+        parallel_opts.add_options()(ARG_BATCH_SIZE, po::value<am_readnum_t>()->default_value(K_SIZE),
+            "# reads of the batches in lock-free queue used in reading input HTS files.");
+        parallel_opts.add_options()(ARG_REPORT_SIZE, po::value<am_readnum_t>()->default_value(M_SIZE),
+            "# reads to process before reporting in each worker thread.");
 
         po::options_description po_desc;
         po_desc.add(general_opts).add(required_opts).add(input_flags).add(parallel_opts);
@@ -170,9 +175,9 @@ namespace {
     }
 } // namespace
 
-APBConfig parse_args(int argc, char** argv)
+APBConfig parse_args(int const argc, char** argv)
 {
-    auto po_desc_ = option_parser();
+    auto const po_desc_ = option_parser();
     std::vector<std::string> const args { argv, argv + argc };
     BOOST_LOG_TRIVIAL(info) << "ARGS: " << join(args, " ");
 
@@ -215,10 +220,12 @@ APBConfig parse_args(int argc, char** argv)
     const auto num_threads = n_threads_from_parallel(get_param<int>(vm_, ARG_PARALLEL));
     const auto out1 = get_param<std::string>(vm_, ARG_OUT1);
     const auto out2 = is_pe ? get_param<std::string>(vm_, ARG_OUT2) : "";
-    const auto queue_size = get_param<std::size_t>(vm_, ARG_QUEUE_SIZE);
+    const auto queue_size = get_param<am_readnum_t>(vm_, ARG_QUEUE_SIZE);
+    const auto batch_size = get_param<am_readnum_t>(vm_, ARG_BATCH_SIZE);
+    const auto report_size = get_param<am_readnum_t>(vm_, ARG_REPORT_SIZE);
     const auto first_n_reads = get_param<am_readnum_t>(vm_, ARG_FIRST_N_READS);
     const auto input_format_str = get_param<std::string>(vm_, ARG_INPUT_FORMAT);
-    APB_FORMAT input_format {};
+    APB_FORMAT input_format { };
     if (input_format_str == APB_FORMAT_AUTO_STR) {
         input_format = APB_FORMAT::AUTO;
     } else if (input_format_str == APB_FORMAT_FASTQ_STR) {
@@ -245,6 +252,6 @@ APBConfig parse_args(int argc, char** argv)
     }
 
     return { input_file_name, read_len_1, read_len_2, num_threads, num_io_threads, is_pe, is_ob, out1, out2, format,
-        queue_size, first_n_reads };
+        queue_size, first_n_reads, report_size, batch_size };
 }
 } // namespace labw::art_modern

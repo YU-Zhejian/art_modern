@@ -119,7 +119,7 @@ std::string ceu_check_get_run_time_os_info()
     oss << "Run-time OS info:" << std::endl;
 #ifdef CEU_ON_POSIX
 #if defined(CEU_HAVE_INCLUDE_SYS_UTSNAME_H) && CEU_HAVE_INCLUDE_SYS_UTSNAME_H == 1
-    struct utsname ceu_utsname {};
+    struct utsname ceu_utsname { };
     uname(&ceu_utsname);
     oss << "\tPOSIX UTSINFO:" << std::endl;
     oss << "\t\tsysname=" << ceu_utsname.sysname << std::endl;
@@ -137,7 +137,7 @@ std::string ceu_check_get_run_time_os_info()
     ZeroMemory(&osvi, sizeof(OSVERSIONINFOEX));
     osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
     oss << "\t\tPlatform ID: ";
-    std::string platform_id {};
+    std::string platform_id { };
     if (GetVersionEx((OSVERSIONINFO*)&osvi)) {
         switch (osvi.dwPlatformId) {
         case VER_PLATFORM_WIN32_WINDOWS:

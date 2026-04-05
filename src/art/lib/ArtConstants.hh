@@ -18,7 +18,7 @@
 #pragma once
 #include "libam_support/Dtypes.h"
 
-#include <cstdint>
+#include <cstdint> // NOLINT: for std::uint_8
 
 namespace labw::art_modern {
 

@@ -1,3 +1,4 @@
 # Code of Conduct
 
-Placeholder.
+- Respect the others.
+- File an issue before working on the PR.

@@ -58,7 +58,7 @@ void BGZipWriter::flush()
 void BGZipWriter::write(std::string&& data)
 {
     if (gz_file_ != nullptr) {
-        std::string data_copy = std::move(data);
+        auto const data_copy = std::move(data);
         const auto errorno = bgzf_write(gz_file_, data_copy.data(), data_copy.size());
         if (errorno < 0) {
             BOOST_LOG_TRIVIAL(error) << "Failed to write to BGZF file: " << get_filename()

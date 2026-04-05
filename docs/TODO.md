@@ -20,6 +20,10 @@
 - Support simulating BGI/MGISEQ reads and new Illumina models: Started.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
+## Profiles
+
+- The program should reject quality score profiles with less than 4 bins, and emit a warning if the quality score have less than 10 bins.
+
 ## Simulate Allele-Specific Expression
 
 The simulator will accept a genome, a variation VCF file, and a gene annotation GTF file.

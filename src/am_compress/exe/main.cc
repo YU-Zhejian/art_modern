@@ -58,7 +58,7 @@ int main(int argc, char** argv)
     BOOST_LOG_TRIVIAL(warning) << "Boost::timer not found! Resource consumption statistics disabled.";
 #endif
 
-    boost::program_options::options_description od {};
+    boost::program_options::options_description od { };
 
     WriterDispatcher::patch_options_for_fmt("compressed", od);
     od.add(general_options());

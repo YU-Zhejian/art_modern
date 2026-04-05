@@ -92,8 +92,8 @@ namespace test_extended_aggregate_initialization {
         int d;
     };
 
-    derived d1 { { 1, 2 }, {}, 4 }; // full initialization
-    derived d2 { {}, {}, 4 }; // value-initialized bases
+    derived d1 { { 1, 2 }, { }, 4 }; // full initialization
+    derived d2 { { }, { }, 4 }; // value-initialized bases
 
 }
 
@@ -129,7 +129,7 @@ namespace test_general_range_based_for_loop {
 
     void f()
     {
-        range r {};
+        range r { };
 
         for (auto i : r) {
             [[maybe_unused]] auto v = i;
@@ -232,7 +232,7 @@ namespace test_structured_bindings {
         volatile double y1;
     };
 
-    S f3() { return {}; }
+    S f3() { return { }; }
 
     auto [x1, y1] = f1();
     auto& [xr1, yr1] = f1();
@@ -262,7 +262,7 @@ namespace test_inline_variables {
 
     template <class T> void f(T) { }
 
-    template <class T> inline T g(T) { return T {}; }
+    template <class T> inline T g(T) { return T { }; }
 
     template <> inline void f<>(int) { }
 

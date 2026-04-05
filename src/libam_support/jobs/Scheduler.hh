@@ -68,14 +68,14 @@ template <typename Duration> void Scheduler<Duration>::run_()
 {
     std::mutex mtx;
     std::unique_lock lock(mtx);
-    condition_.wait_for(lock, start_delay_, [this]() { return this->should_stop_.load(); });
+    condition_.wait_for(lock, start_delay_, [this] { return this->should_stop_.load(); });
 
     while (!should_stop_.load()) {
         // Execute the callback
         callback();
 
         // Wait for 1 second or until stop signal
-        condition_.wait_for(lock, interval_, [this]() { return this->should_stop_.load(); });
+        condition_.wait_for(lock, interval_, [this] { return this->should_stop_.load(); });
     }
 }
 } // namespace labw::art_modern

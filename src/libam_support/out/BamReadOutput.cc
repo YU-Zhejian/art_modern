@@ -270,7 +270,7 @@ std::shared_ptr<BaseReadOutput> BamReadOutputFactory::create(const OutParams& pa
             attach_mpi_rank_to_path(params.vm["o-sam"].as<std::string>(), mpi_rank_s()), params.fasta_fetch, so,
             params.n_threads, params.vm["o-sam-queue_size"].as<std::size_t>());
     }
-    throw OutputNotSpecifiedException {};
+    throw OutputNotSpecifiedException { };
 }
 std::string BamReadOutputFactory::name() const { return "BAM"; }
 } // namespace labw::art_modern

@@ -69,13 +69,13 @@ po::variables_map generate_vm_while_handling_help_version(const po::options_desc
         if (is_on_mpi_main_process_or_nompi()) {
             print_version();
         }
-        return {};
+        return { };
     }
     if (vm_.count(ARG_HELP) != 0U) {
         if (is_on_mpi_main_process_or_nompi()) {
             print_help(po_desc, prefix, suffix);
         }
-        return {};
+        return { };
     }
     return vm_;
 }

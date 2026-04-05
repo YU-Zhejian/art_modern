@@ -8,7 +8,6 @@ Format boost imports.
 import sys
 from collections import defaultdict
 
-
 if __name__ == "__main__":
     # The entries will be like
     # #include <boost/algorithm/string/join.hpp> // src/libam_support/out/HeadlessBamReadOutput.cc

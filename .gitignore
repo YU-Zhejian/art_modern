@@ -147,3 +147,13 @@ perf.data*
 *.csi
 *collect*
 *.sif
+# pixi environments
+.pixi/*
+!.pixi/config.toml
+
+*.png
+*.jpg
+*.jpeg
+*.bmp
+*.svg
+*.ico

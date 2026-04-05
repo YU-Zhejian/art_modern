@@ -38,6 +38,7 @@
 #include <fstream>
 #include <istream>
 #include <limits>
+#include <set>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -57,7 +58,7 @@ namespace {
     std::string decompress(const unsigned char* src, const std::size_t slen)
     {
         constexpr int BUFF_SIZE = 4096;
-        z_stream zs = {};
+        z_stream zs = { };
 
         // Initialize zlib stream for decompression
         if (inflateInit2(&zs, 16 + MAX_WBITS) != Z_OK) {
@@ -131,7 +132,7 @@ SlimEmpDistGslDiscrete::SlimEmpDistGslDiscrete(const dist_map_type& dist)
     rd_ = GslDiscreteDistribution(init_list);
 }
 
-am_qual_t SlimEmpDistGslDiscrete::gen_qual(double u) const { return qual_[rd_(u)]; }
+am_qual_t SlimEmpDistGslDiscrete::gen_qual(double const u) const { return qual_[rd_(u)]; }
 Empdist::Empdist(const std::string& builtin_profile_name, const bool sep_qual, const bool is_pe, const bool silence)
     : sep_qual_(sep_qual)
     , is_pe_(is_pe)
@@ -466,6 +467,30 @@ void Empdist::validate_() const
                 BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
             }
         }
+    }
+    std::set<am_qual_t> possible_quals;
+    if (sep_qual_) {
+        for (const auto& p : a_qual_dist_first_) {
+            for (const auto& [_, qual] : p) {
+                possible_quals.insert(qual);
+            }
+        }
+    } else {
+        for (const auto& p : qual_dist_first_) {
+            for (const auto& [_, qual] : p) {
+                possible_quals.insert(qual);
+            }
+        }
+    }
+    if (possible_quals.size() <= 4) {
+        BOOST_LOG_TRIVIAL(error)
+            << "The number of distinct quality scores in the profile is less than 4. "
+            << "This may due to binning and lead to unrealistic quality profiles -- Profile rejected.";
+        abort_mpi();
+    }
+    if (possible_quals.size() <= 10) {
+        BOOST_LOG_TRIVIAL(warning) << "The number of distinct quality scores in the profile is less than 10. "
+                                   << "This may due to binning and lead to unrealistic quality profiles.";
     }
 }
 

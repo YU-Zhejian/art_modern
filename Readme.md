@@ -117,7 +117,7 @@ opt/build_release/art_modern --help
 opt/build_release/art_modern --version
 ```
 
-### Simulating WGS Data using _E. Coli_ Genome
+### Simulating WGS Data using _E. coli_ Genome
 
 Download _E. coli_ reference genome from NCBI. Here, we'll use the K-12 strand MG1655 sub-strand as an example.
 
@@ -125,9 +125,10 @@ Download _E. coli_ reference genome from NCBI. Here, we'll use the K-12 strand M
 mkdir -p opt/data/
 ACCESSION="GCF_000005845.2_ASM584v2"
 BASEURL="https://ftp.ncbi.nlm.nih.gov/genomes/all"
-wget -O opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz -4 \
+curl -L  \
     "${BASEURL}"/GCF/000/005/845/"${ACCESSION}"/"${ACCESSION}"_genomic.fna.gz \
-    
+    > opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
+
 gunzip -n -k opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
 # -n used to supress restoration of original timestamp.
 ```
@@ -285,7 +286,7 @@ Please note that the mean and standard deviation of fragment length is not speci
 
 - If a unified coverage file is provided, the coverage will be interpreted as positive coverage instead of being divided equally into both strands.
 - If a 2-column (unstranded) coverage file is provided, the coverage will be interpreted as positive coverage.
-- If a 3-column (stranded) coverage file or input in format of `pvsim3_transcripts` is provided, the coverage will be interpreted as-is.
+- If a 3-column (stranded) coverage file or input in a format of `pvsim3_transcripts` is provided, the coverage will be interpreted as-is.
 
 ## Advanced Topics
 
@@ -433,6 +434,13 @@ The project provides diverse documentations to satisfy your needs.
   - [News](docs/News.md) for changes over the project.
 - For a comparison of this project with other simulators, see [Benchmark](https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators).
 - The original ART documentation is copied to [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).
+
+## Limitations
+
+`art_modern` is an accelerated version of ART -- It does not revise ART's algorithms. This would lead `art_modern` inferior in the following:
+
+- `art_modern` cannot simulate the Indel bias and GC bias of Illumina sequencers.
+- The latest Illumina models uses **Quality Score Binning.** See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf) and [Illumina documentation for quality binning on NovaSeq 6000 systems](https://www.illumina.com/content/dam/illumina-marketing/documents/products/appnotes/novaseq-hiseq-q30-app-note-770-2017-010.pdf) for more details. **WE ARE UNSURE WHETHER THE PROGRAM CAN RELIABLY SIMULATE SUCH DATA.** Our current policy on such is to warn user if the provided quality profile have less than 10 bins, and reject the profile with less than 4 bins.
 
 ## Acknowledgements
 

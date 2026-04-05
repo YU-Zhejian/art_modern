@@ -4,25 +4,44 @@ import os
 import sys
 
 SNAME_FILE_MAPPING = {
+    # Genome Analyzers
     "GA1_36bp": ("Emp36R1.txt", "Emp36R2.txt"),
     "GA1_44bp": ("Emp44R1.txt", "Emp44R2.txt"),
     "GA2_50bp": ("Emp50R1.txt", "Emp50R2.txt"),
     "GA2_75bp": ("Emp75R1.txt", "Emp75R2.txt"),
-    "HiSeq1000_100bp": ("Emp100R1.txt", "Emp100R2.txt"),
-    "MiSeq_250bp": ("EmpMiSeq250R1.txt", "EmpMiSeq250R2.txt"),
     "GA1Recalibrated_36bp": ("EmpR36R1.txt", "EmpR36R2.txt"),
     "GA1Recalibrated_44bp": ("EmpR44R1.txt", "EmpR44R2.txt"),
     "GA2Recalibrated_50bp": ("EmpR50R1.txt", "EmpR50R2.txt"),
     "GA2Recalibrated_75bp": ("EmpR75R1.txt", "EmpR75R2.txt"),
+    "GA2X_150bp": ("GA2XL150R1.txt", "GA2XL150R2.txt"),
+    "GA2X_100bp": ("GA2XL100R1.txt", "GA2XL100R2.txt"),
+    # HiSeq Models
+    "HiSeq1000_100bp": ("Emp100R1.txt", "Emp100R2.txt"),
+    "HiSeq1500_250bp": ("HiSeq1500L250R1.txt", "HiSeq1500L250R2.txt"),
     "HiSeq2000_100bp": ("HiSeq2kL100R1.txt", "HiSeq2kL100R2.txt"),
     "HiSeq2500_125bp": ("HiSeq2500L125R1.txt", "HiSeq2500L125R2.txt"),
     "HiSeq2500_150bp": ("HiSeq2500L150R1.txt", "HiSeq2500L150R2.txt"),
     "HiSeq2500Filtered_150bp": ("HiSeq2500L150R1filter.txt", "HiSeq2500L150R2filter.txt"),
+    "HiSeq4000_150bp": ("HiSeq4kL150R1.txt", "HiSeq4kL150R2.txt"),
     "HiSeqX_PCR_Free_150bp": ("HiSeqXPCRfreeL150R1.txt", "HiSeqXPCRfreeL150R2.txt"),
     "HiSeqX_TruSeq_150bp": ("HiSeqXtruSeqL150R1.txt", "HiSeqXtruSeqL150R2.txt"),
-    "MiniSeq_TruSeq_50bp": ("MiniSeqTruSeqL50.txt",),
+    # MiSeq
+    "MiSeq_250bp": ("EmpMiSeq250R1.txt", "EmpMiSeq250R2.txt"),
     "MiSeq_v3_250bp": ("MiSeqv3L250R1.txt", "MiSeqv3L250R2.txt"),
+    "MiSeq_v3_300bp": ("MiSeqv3L300R1.txt", "MiSeqv3L300R2.txt"),
+    # MiniSeq
+    "MiniSeq_TruSeq_50bp": ("MiniSeqTruSeqL50.txt",),
+    # NextSeq
+    "NextSeq500_150bp": ("NextSeq500L150R1.txt", "NextSeq500L150R2.txt"),
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
+    # DNBSeq Models
+    "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
+    "DNBSeqG50_150bp": ("DNBSG50L150R1.txt", "DNBSG50L150R2.txt"),
+    "DNBSeqG400_400bp": ("DNBSeqG400L400R1.txt",),
+    "DNBSeqG400_150bp": ("DNBSeqG400L150R1.txt", "DNBSeqG400L150R2.txt"),
+    "DNBSeqT7_150bp": ("DNBSeqT7L150R1.txt", "DNBSeqT7L150R2.txt"),
+    # PacBio Onso
+    "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
 }
 
 DTYPE = "unsigned char"
@@ -48,6 +67,7 @@ if __name__ == "__main__":
             snames_constructed = []
             slengths_constructed = []
             for sname, files in SNAME_FILE_MAPPING.items():
+                print(f"Processing {sname}...", file=sys.stderr)
                 slengths = []
                 snames.append(sname)
                 for i, file in enumerate(files):
