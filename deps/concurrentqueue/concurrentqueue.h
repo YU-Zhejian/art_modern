@@ -355,6 +355,12 @@ struct ConcurrentQueueDefaultTraits
 	
 	// How many full blocks can be expected for a single implicit producer? This should
 	// reflect that number's maximum for optimal performance. Must be a power of 2.
+	// Note: This impacts the maximum number of elements that can be enqueued by a
+	// single implicit producer when using try_enqueue/try_enqeue_bulk exclusively (which
+	// cannot allocate), since it limits the number of blocks that the producer can hold to
+	// store elements. When pre-allocating blocks for use with try-enqueueing, configure
+	// this initial size to the desired maximum number of blocks per implicit producer.
+	// Alternately, use the regular enqueue methods, which can grow the index as needed.
 	static const size_t IMPLICIT_INITIAL_INDEX_SIZE = 32;
 	
 	// The initial size of the hash table mapping thread IDs to implicit producers.
@@ -469,8 +475,15 @@ namespace details
 	static inline size_t hash_thread_id(thread_id_t id)
 	{
 		static_assert(sizeof(thread_id_t) <= 8, "Expected a platform where thread IDs are at most 64-bit values");
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#endif
 		return static_cast<size_t>(hash_32_or_64<sizeof(thread_id_converter<thread_id_t>::thread_id_hash_t)>::hash(
 			thread_id_converter<thread_id_t>::prehash(id)));
+#if defined(__GNUC__) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
 	}
 	
 	template<typename T>
@@ -1056,6 +1069,9 @@ public:
 	// Does not allocate memory. Fails if not enough room to enqueue (or implicit
 	// production is disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE
 	// is 0).
+	// Note: If using only try_enqueue/try_enqueue_bulk with pre-allocated blocks, configure
+	// Traits::IMPLICIT_INITIAL_INDEX_SIZE appropriately to ensure the index has sufficient
+	// capacity for the number of blocks each producer may need.
 	// Thread-safe.
 	inline bool try_enqueue(T const& item)
 	{
@@ -1067,6 +1083,9 @@ public:
 	// Does not allocate memory (except for one-time implicit producer).
 	// Fails if not enough room to enqueue (or implicit production is
 	// disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE is 0).
+	// Note: If using only try_enqueue/try_enqueue_bulk with pre-allocated blocks, configure
+	// Traits::IMPLICIT_INITIAL_INDEX_SIZE appropriately to ensure the index has sufficient
+	// capacity for the number of blocks each producer may need.
 	// Thread-safe.
 	inline bool try_enqueue(T&& item)
 	{
@@ -1094,6 +1113,9 @@ public:
 	// Does not allocate memory (except for one-time implicit producer).
 	// Fails if not enough room to enqueue (or implicit production is
 	// disabled because Traits::INITIAL_IMPLICIT_PRODUCER_HASH_SIZE is 0).
+	// Note: If using only try_enqueue/try_enqueue_bulk with pre-allocated blocks, configure
+	// Traits::IMPLICIT_INITIAL_INDEX_SIZE appropriately to ensure the index has sufficient
+	// capacity for the number of blocks each producer may need.
 	// Note: Use std::make_move_iterator if the elements should be moved
 	// instead of copied.
 	// Thread-safe.

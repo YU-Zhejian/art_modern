@@ -3,6 +3,8 @@
 (v-1.4.1-section)=
 ## v1.4.1 (Ongoing)
 
+- Software Engineering:
+  - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`1.0.5`](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.5)).
 - Miscellaneous bug fixes.
 
 (v-1.4.0-section)=
