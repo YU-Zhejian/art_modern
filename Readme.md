@@ -31,9 +31,11 @@
 
 ## Introduction
 
-Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used for anyone who wants to simulate sequencing data for their own research, like benchmarking of DNA- or RNA-Seq alignment algorithms, test whether the RNA-Seq pipeline built by your lab performs well or perform pressure testing of pipelines on a cluster.
+Here we introduce `art_modern`, a modern re-implementation of the popular [ART](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) simulator with enhanced performance and functionality. It can be used by anyone who wants to simulate sequencing data for their own research, such as benchmarking DNA- or RNA-Seq alignment algorithms, testing whether the RNA-Seq pipeline built by your lab performs well, or performing pressure testing of pipelines on a cluster.
 
-`art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that creates ART-compatible profiles out of FASTQ, SAM, and BAM files.
+`art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that generates ART-compatible profiles from FASTQ, SAM, and BAM files.
+
+The program comes with new profiles for Illumina models, as well as error profiles from other NGS sequencers such as BGI/MGI DNBSeq and PacBio Onso.
 
 ## Quick Start
 
@@ -43,17 +45,17 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 #### Using Fully Static Build
 
-In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static linked executable binaries built under x86\_64 Alpine Linux, which should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
+In each release, there will be a file named `build_rel_with_dbg_alpine-x86_64.tar.gz` in the [Releases](https://github.com/YU-Zhejian/art_modern/releases) section. The file contains fully static, linked executable binaries built on x86_64 Alpine Linux and should work on most x86\_64 Linux distributions. Unzip it, and you're good to go.
 
-**WARNING** Static builds may lead to compromised security.
+**WARNING:** Static builds may compromise security.
 
-**NOTE** The fully static build supports **NEITHER** MPI **NOR** NCBI SRA files.
+**NOTE:** The fully static build supports **NEITHER** MPI **NOR** NCBI SRA files.
 
 #### Using `dpkg`
 
 If you use specific versions of Debian or Ubuntu, you can install `art_modern` through pre-built DEB packages available with each release. Root privileges are required.
 
-**NOTE** The DEB build does **NOT** support NCBI SRA files.
+**NOTE:** The DEB build does **NOT** support NCBI SRA files.
 
 #### Using Docker/Podman/Singularity
 
@@ -77,7 +79,7 @@ conda run --no-capture-output --live-stream -n art_modern_bioconda art_modern --
 
 Or, use `art_modern-openmpi` to install the MPI-enabled version.
 
-**NOTE** The Conda build does **NOT** support NCBI SRA files.
+**NOTE:** The Conda build does **NOT** support NCBI SRA files.
 
 #### Compiling the Source Code
 
@@ -98,9 +100,9 @@ unzip art_modern-master.zip
 cd art_modern-master
 ```
 
-**STRONGLY DISCOURAGED** Change `master` to `devel` to compile the development version
+**STRONGLY DISCOURAGED:** Change `master` to `devel` to compile the development version
 
-Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [Python 3](https://www.python.org/), and minimal HTSLib dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
+Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also,suppress check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [Python 3](https://www.python.org/), and minimal HTSLib dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
 
 Build the project using:
 
@@ -117,9 +119,9 @@ opt/build_release/art_modern --help
 opt/build_release/art_modern --version
 ```
 
-### Simulating WGS Data using _E. coli_ Genome
+### Simulating WGS Data using the _E. coli_ Genome
 
-Download _E. coli_ reference genome from NCBI. Here, we'll use the K-12 strand MG1655 sub-strand as an example.
+Download the _E. coli_ reference genome from NCBI. Here, we'll use the K-12 strand MG1655 sub-strand as an example.
 
 ```shell
 mkdir -p opt/data/
@@ -133,7 +135,7 @@ gunzip -n -k opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz
 # -n used to supress restoration of original timestamp.
 ```
 
-Now we can simulate WGS data using _E. coli_ reference genome. Let's start with single-end sequencing using HiSeq 2500 (which is the default `art_modern` profile and can be set explicitly through `--builtin_qual_file HiSeq2500_150bp`) with 250 bp read length (which is the longest read lengths supported by the profile and can be set explicitly through `--read_len 250`), 10X coverage, and all available threads (can be set explicitly through `--parallel`).
+Now we can simulate WGS data using the _E. coli_ reference genome. Let's start with single-end sequencing using HiSeq 2500 (which is the default `art_modern` profile and can be set explicitly through `--builtin_qual_file HiSeq2500_150bp`) with 250 bp read length (which is the longest read lengths supported by the profile and can be set explicitly through `--read_len 250`), 10X coverage, and all available threads (can be set explicitly through `--parallel`).
 
 ```shell
 opt/build_release/art_modern \
@@ -159,19 +161,19 @@ opt/build_release/art_modern \
     --pe_frag_dist_std_dev 50
 ```
 
-Please note that we have additionally specified a quality file for read 2 with the mean and standard deviation of fragment lengths, which are required for paired-end sequencing. The generated fragment length should follow a normal (Gaussian) distribution with desired mean and standard deviation.
+Please note that we have additionally specified a quality file for read 2 with the mean and standard deviation of fragment lengths, which are required for paired-end sequencing. The generated fragment length should follow a normal (Gaussian) distribution with the desired mean and standard deviation.
 
-**NOTE** The generated FASTQ file needed to be split into two FASTQ files and sorted for most pipelines. See [this section in the FAQ](#fastq-split-section) for more details.
+**NOTE:** The generated FASTQ file needed to be split into two FASTQ files and sorted for most pipelines. See [this section in the FAQ](#fastq-split-section) for more details.
 
 ### Simulating RNA-Seq Data using _C. Elegans_ Transcriptome
 
-Simulating transcriptome is a little more complicated since each cDNA molecule has different counts. Strand-specific library technologies also generate RNA-Seq data on one strand only. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate expression for each cDNA molecule. You can also convert transcript quantification results generated by [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kallisto](https://pachterlab.github.io/kallisto/) or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
+Simulating the transcriptome is a bit more complicated, since each cDNA molecule has a different count. Strand-specific library technologies also generate RNA-Seq data from only one strand. You're recommended to use [YASIM](https://pypi.org/project/YASIM) or other high-level simulators to generate an expression for each cDNA molecule. You can also convert transcript quantification results generated by [featureCounts](https://subread.sourceforge.net/featureCounts.html), [htseq-count](https://htseq.readthedocs.io/en/latest/), [Salmon](https://salmon.readthedocs.io/en/latest/), [Kallisto](https://pachterlab.github.io/kallisto/), or [STAR](https://github.com/alexdobin/STAR) to the format supported by `art_modern`. The unified coverage model (i.e., like WGS) is also supported.
 
 Please note that cDNAs with insufficient length will be ignored. We also do not support circular RNA simulation.
 
 #### Unified Coverage
 
-Following example samples 1000 long transcripts from reference _C. Elegans_ transcriptome from [UCSC Genome Browser](https://genome.ucsc.edu/) and performs a simulation using 10X unified coverage. You need to install [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://bioinf.shenwei.me/seqkit) to run this example:
+Following example: samples 1000 long transcripts from the _C. elegans_ transcriptome in the [UCSC Genome Browser](https://genome.ucsc.edu/), and performs a simulation using 10X unified coverage. You need to install [seqtk](https://github.com/lh3/seqtk) and [seqkit](https://bioinf.shenwei.me/seqkit) to run this example:
 
 ```shell
 curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/bigZips/mrna.fa.gz | \
@@ -189,7 +191,7 @@ opt/build_release/art_modern \
 
 #### Unstranded Coverage
 
-To simulate data with unstranded coverage information (i.e., same coverage on both strands), you need to provide an additional TSV file with one column of transcript ID and another column of coverage (in floating points). Please note that lines started by `#` will be ignored. An example of the coverage file (Depth rounded to 2 decimal for simplicity):
+To simulate data with unstranded coverage information (i.e., same coverage on both strands), you need to provide an additional TSV file with one column of transcript ID and another column of coverage (in floating points). Please note that lines started by `#` will be ignored. An example of the coverage file (Depth rounded to 2 decimal places for simplicity):
 
 ```text
 NM_069135	6.69
@@ -198,7 +200,7 @@ NR_051843	3.45
 NR_066512	4.73
 ```
 
-The following example generates a coverage file using [GNU AWK](https://www.gnu.org/software/gawk/) with random coverage ranging between 0 and 10 assigned to each cDNA molecule.
+The following example generates a coverage file using [GNU AWK](https://www.gnu.org/software/gawk/), with random coverage values ranging from 0 to 10 assigned to each cDNA molecule.
 
 ```shell
 samtools faidx opt/build_release/ce11_mrna_1000.fa
@@ -216,7 +218,7 @@ opt/build_release/art_modern \
 
 #### Stranded Coverage
 
-To simulate data with stranded coverage information (i.e., coverage on one strand is different from the other), you need to provide an additional TSV file with one column of transcript ID and two other columns of coverage in positive and negative strand (in floating points). An example of the coverage file:
+To simulate data with stranded coverage information (i.e., coverage on one strand is different from the other), you need to provide an additional TSV file with one column of transcript ID and two other columns of coverage on the positive and negative strands (in floating points). An example of the coverage file:
 
 ```text
 NM_069135	2.31	4.38
@@ -242,7 +244,7 @@ opt/build_release/art_modern \
 
 #### The PBSIM3 Transcripts Input Format
 
-The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarly, sequences with insufficient length and lines started with `#` will be ignored. An example of the transcript input file is as follows (Sequences represented as `aaaa`):
+The PBSIM3 Transcripts input format is a 4-column tab-delimited text file with transcript ID, sequence, and coverage on both strands. This file includes both sequence and coverage, so no additional coverage parameter is required. Similarly, sequences that are too short and lines that start with `#` will be ignored. An example of the transcript input file is as follows (Sequences represented as `aaaa`):
 
 ```text
 NR_056112	3.47	1.72	aaaa
@@ -252,7 +254,7 @@ NM_061905	0.96	1.39	aaaa
 NR_054174	3.59	4.92	aaaa
 ```
 
-The following example converts the FASTA file to the PBSIM3 Transcripts input format with the help of [seqkit](https://bioinf.shenwei.me/seqkit) with random coverage generated using GNU AWK. Note that the `--i-type` parameter is required.
+The following example converts a FASTA file to the PBSIM3 Transcripts input format using [seqkit](https://bioinf.shenwei.me/seqkit), with random coverage generated using GNU AWK. Note that the `--i-type` parameter is required.
 
 ```shell
 seqkit fx2tab opt/build_release/ce11_mrna_1000.fa | \
@@ -269,7 +271,7 @@ opt/build_release/art_modern \
 
 ### Template-Based Simulation
 
-Template-based simulation is often used to introduce Illumina specific errors to cDNA molecules generated from some upstream simulator like [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will be started from the first base of the template while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports the PBSIM3 Transcripts format. For example:
+Template-based simulation is often used to introduce Illumina-specific errors into cDNA molecules generated by an upstream simulator such as [CAMPAREE](https://camparee.readthedocs.io/en/latest/). In this mode, single-end reads will start at the first base of the template, while paired-end/mate-pair reads will span the entire template. The template-based simulation mode also supports the PBSIM3 Transcripts format. For example:
 
 ```shell
 opt/build_release/art_modern \
@@ -280,21 +282,21 @@ opt/build_release/art_modern \
    --i-type pbsim3_transcripts
 ```
 
-Please note that the mean and standard deviation of fragment length is not specified since in template-based simulation, a template is considered a fragment.
+Please note that the mean and standard deviation of fragment length are not specified since in template-based simulation, a template is considered a fragment.
 
-**NOTE** For coverage of the template mode:
+**NOTE:** For coverage of the template mode:
 
-- If a unified coverage file is provided, the coverage will be interpreted as positive coverage instead of being divided equally into both strands.
-- If a 2-column (unstranded) coverage file is provided, the coverage will be interpreted as positive coverage.
+- If a unified coverage file is provided, the coverage will be interpreted as positive coverage rather than split equally between the strands.
+- If a 2-column (unstranded) coverage file is provided, the coverage will be treated as positive.
 - If a 3-column (stranded) coverage file or input in a format of `pvsim3_transcripts` is provided, the coverage will be interpreted as-is.
 
 ## Advanced Topics
 
 ### Using UNIX Pipelines
 
-With UNIX pipelines, we can redirect the input and output of `art_modern` from/to another file/processes. Following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, FASTA, and sorted BAM files.
+With UNIX pipelines, we can redirect the input and output of `art_modern`. Redirection can be done at both the input and output ends, with both files and processes. The following example reads FASTA reference from `/dev/stdin` (Standard Input), and writes compressed FASTQ, FASTA, and sorted BAM files.
 
-This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [XZ Utils](https://tukaani.org/xz/). Note that the `--i-type` parameter is required since now, the simulator cannot tell the file format through its file extension.
+This example requires [gzip](https://www.gnu.org/software/gzip/), [pigz](https://zlib.net/pigz/), [SAMtools](https://github.com/samtools/samtools), and [XZ Utils](https://tukaani.org/xz/). Note that the `--i-type` parameter is required, since the simulator now cannot infer the file format from its file extension.
 
 ```shell
 zcat opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
@@ -312,15 +314,15 @@ zcat opt/data/GCF_000005845.2_ASM584v2_genomic.fna.gz | \
 
 Please wait for a while for the compression to finish.
 
-**NOTE** Pipelines and redirections are not supported in MPI mode mentioned below.
+**NOTE** Pipelines and redirections are not supported in the MPI mode mentioned below.
 
-**TIPS** You may find program [`pv(1)`](https://www.man7.org/linux/man-pages/man1/pv.1.html) useful when working with pipelines.
+**TIPS** You may find the [`pv(1)`](https://www.man7.org/linux/man-pages/man1/pv.1.html) program useful when working with pipelines.
 
 ### Using MPI
 
-Message Passing Interface ([MPI](https://www.mpi-forum.org/)) is a standard for parallel computing on a high-performance cluster (HPC). It allows processes to communicate with each other through intranet. If you're working on a cluster with MPI installed, you can use the MPI version of `art_modern` to speed up the simulation by executing `art_modern` on different nodes in parallel.
+The Message Passing Interface ([MPI](https://www.mpi-forum.org/)) is a standard for parallel computing on high-performance clusters (HPCs). It allows processes to communicate with each other through the intranet. If you're working on a cluster with MPI installed, you can use the MPI version of `art_modern` to speed up the simulation by executing `art_modern` on different nodes in parallel.
 
-**NOTE** Please consult your cluster administrator/cluster documentation before using MPI version, since some clusters may have special configurations and/or quota limitations.
+**NOTE:** Please consult your cluster administrator/cluster documentation before using the MPI version, since some clusters may have special configurations and/or quota limitations.
 
 See also:
 
@@ -328,7 +330,7 @@ See also:
 
 Documentations from MPI vendors:
 
-- [Open MPI Documentation](https://www.open-mpi.org/doc/), especially [Launching MPI applications](https://docs.open-mpi.org/en/v5.0.x/launching-apps/index.html) section.
+- [Open MPI Documentation](https://www.open-mpi.org/doc/), especially its [Launching MPI applications](https://docs.open-mpi.org/en/v5.0.x/launching-apps/index.html) section.
 - [MPICH Documentation](https://www.mpich.org/documentation/).
 - [Intel MPI Documentation](https://www.intel.com/content/www/us/en/developer/tools/oneapi/mpi-library.html?wapkw=MPI).
 
@@ -386,8 +388,8 @@ mpiexec -n 4 opt/build_release-mpi/art_modern-mpi \
 
 #### Other Differences Between MPI and Non-MPI Versions
 
-- The simulator will not be able to support UNIX devices and/or redirections for input/output files. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
-- Logging issues: Only log messages from rank 0 process will be printed to standard error. Other ranks' log messages will be written to disk (If environment variable `ART_NO_LOG_DIR` is not set) or discarded (If environment variable `ART_NO_LOG_DIR` is set).
+- The simulator will not support UNIX devices or input/output file redirection. So, even if your input is enormous, you have to write it to a physical file first. However, as most HPC clusters use distributed file systems, this should not be a big problem.
+- Logging issues: Only log messages from the rank 0 process will be printed to standard error. Other ranks' log messages will be written to disk (If environment variable `ART_NO_LOG_DIR` is not set) or discarded (If environment variable `ART_NO_LOG_DIR` is set).
 
 ## Building ART/`art_modern` Profiles
 
@@ -419,32 +421,32 @@ art_profile_builder \
 
 For complete usage information, see the [full documentation](#art_profile_builder-usage-section).
 
-By default, the program would **NOT** support building profiles from NCBI short-read archive (SRA). Use `-DWITH_NCBI_NGS=ON` to enable it. Additional libraries are required. See [this section in Installation instruction](#optional-ncbi-ngs-components) for details.
+By default, the program would **NOT** support building profiles from the NCBI short-read archive (SRA). Use `-DWITH_NCBI_NGS=ON` to enable it. Additional libraries are required. See [this section in the installation instructions](#optional-ncbi-ngs-components) for details.
 
 ## What's Next?
 
-The project provides diverse documentations to satisfy your needs.
+The project provides diverse documentation to satisfy your needs.
 
 - If you want to build the software with different options, see [Install](docs/Install.md).
-- For a detailed guide on parameters and their combinations, see [Usage for `art_modern`](docs/Usage-art_modern.md), [Usage for `art_profile_builder`](docs/Usage-apb.md) and [FAQ](docs/FAQ.md).
+- For a detailed guide on parameters and their combinations, see [Usage for `art_modern`](docs/Usage-art_modern.md), [Usage for `art_profile_builder`](docs/Usage-apb.md), and [FAQ](docs/FAQ.md).
 - For developers, please refer to:
-  - [Contributing](docs/Contributing.md) for software engineering tasks and contribution guidelines. See also [Code of Conduct](docs/CODE_OF_CONDUCT.md).
-  - [Design](docs/Design.md) for the latest design of the software.
+  - [Contributing](docs/Contributing.md) to software engineering tasks and contribution guidelines. See also [Code of Conduct](docs/CODE_OF_CONDUCT.md).
+  - [Design](docs/Design.md) for the latest software design topics.
   - [Copying](docs/Copying.md) for third-party libraries and codes used in this project.
-  - [News](docs/News.md) for changes over the project.
+  - [News](docs/News.md) for changes to the project.
 - For a comparison of this project with other simulators, see [Benchmark](https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators).
-- The original ART documentation is copied to [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).
+- The original ART documentation is copied [here](https://github.com/YU-Zhejian/art_modern/tree/master/docs/original_art_docs).
 
 ## Limitations
 
-`art_modern` is an accelerated version of ART -- It does not revise ART's algorithms. This would lead `art_modern` inferior in the following:
+`art_modern` is an accelerated version of ART -- It does not revise ART's algorithms, which were published more than 10 years ago. This would lead `art_modern` to be inferior in the following:
 
 - `art_modern` cannot simulate the Indel bias and GC bias of Illumina sequencers.
-- The latest Illumina models uses **Quality Score Binning.** See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf) and [Illumina documentation for quality binning on NovaSeq 6000 systems](https://www.illumina.com/content/dam/illumina-marketing/documents/products/appnotes/novaseq-hiseq-q30-app-note-770-2017-010.pdf) for more details. **WE ARE UNSURE WHETHER THE PROGRAM CAN RELIABLY SIMULATE SUCH DATA.** Our current policy on such is to warn user if the provided quality profile have less than 10 bins, and reject the profile with less than 4 bins.
+- The latest Illumina models use **Quality Score Binning.** See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf) and [Illumina documentation for quality binning on NovaSeq 6000 systems](https://www.illumina.com/content/dam/illumina-marketing/documents/products/appnotes/novaseq-hiseq-q30-app-note-770-2017-010.pdf) for more details. **WE ARE UNSURE WHETHER THE PROGRAM CAN RELIABLY SIMULATE SUCH DATA.** Our current policy on this is to warn the user if the provided quality profile has fewer than 10 bins and to reject the profile with fewer than 4 bins.
 
 ## Acknowledgements
 
-This simulator is based on the works of [Weichun Huang](mailto:whduke@gmail.com) _et al._, under [GNU GPL v3](https://www.gnu.org/licenses/) license. The software is originally distributed [here](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) with the following reference:
+This simulator is based on the work of [Weichun Huang](mailto:whduke@gmail.com) _et al._, under the [GNU GPL v3](https://www.gnu.org/licenses/) license. The software is originally distributed [here](https://www.niehs.nih.gov/research/resources/software/biostatistics/art) with the following reference:
 
 - W. Huang, L. Li, J. R. Myers, and G. T. Marth, _ART: a next-generation sequencing read simulator_, Bioinformatics (Oxford, England), vol. 28, no. 4, pp. 593--594, Feb. 2012, DOI: [10.1093/bioinformatics/btr708](https://doi.org/10.1093/bioinformatics/btr708).
 

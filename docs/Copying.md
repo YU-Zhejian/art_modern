@@ -1,6 +1,6 @@
 # Copyright
 
-This project uses GPL v3 License, a copy of which is available at [License.md](../License.md).
+This project uses the GPL v3 License, a copy of which is available at [License.md](../License.md).
 
 ---
 
@@ -19,7 +19,7 @@ Affected files:
 - `/deps/labw_slim_htslib/cram/**`, under the MIT/Expat License.
 - `/deps/labw_slim_htslib/**`, under The Modified-BSD License.
 
-**NOTE** This project uses the source code retrieved from [GitHub 1.23.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.23.1/htslib-1.23.1.tar.bz2).
+**NOTE:** This project uses the source code retrieved from [GitHub 1.23.1 Release Tarball](https://github.com/samtools/htslib/releases/download/1.23.1/htslib-1.23.1.tar.bz2).
 
 ## `gitignore` by GitHub
 
@@ -40,11 +40,12 @@ Affected files:
 - `/deps/cmake_collections/**`
 - `/deps/slim_libceu/**`
   
-With MIT License.
 
-**NOTE** Added in [1.0.0](#v-1.0.0-section).
+  With MIT License.
 
-**NOTE** This project was dead. New projects should consider [Boost::Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
+  **NOTE** Added in [1.0.0](#v-1.0.0-section).
+
+  **NOTE:** This project was dead. New projects should consider [Boost::Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
@@ -54,6 +55,7 @@ Affected files:
 
 - `/deps/concurrentqueue/**`
 
+
 Dual-licensed under Simplified BSD License and Boost Software License.
 
 **NOTE** Added in [1.0.0](#v-1.0.0-section).
@@ -61,14 +63,15 @@ Dual-licensed under Simplified BSD License and Boost Software License.
 ## `BS::thread_pool` by Barak Shoshany
 
 Available from <https://github.com/bshoshany/thread-pool>, commit [`bd4533f`](https://github.com/bshoshany/thread-pool/commit/bd4533f1f70c2b975cbd5769a60d8eaaea1d2233) at tag [`v5.1.0`](https://github.com/bshoshany/thread-pool/releases/tag/v5.1.0).
-  
+
 Affected files:
 
 - `/deps/thread-pool/**`
   
-Under the MIT License.
 
-**NOTE** Added in [1.1.0](#v-1.1.0-section).
+  Under the MIT License.
+
+  **NOTE** Added in [1.1.0](#v-1.1.0-section).
 
 ## `{fmt}` by Victor Zverovich
 
@@ -77,6 +80,7 @@ Available from <https://github.com/fmtlib/fmt>, release [`12.1.0`](https://githu
 Affected files:
 
 - `/deps/slim_fmt/**`
+
 
 Under an MIT-like License.
 
@@ -90,17 +94,19 @@ Affected files:
 
 - `src/libam_support/ds/pcg_32_c.hh`
 
+
 Licensed under the Apache 2.0 License.
 
 **NOTE** Added in [1.3.0](#v-1.3.0-section).
 
 ## GNU Scientific Library by M. Galassi _et al._
 
-Available from <https://www.gnu.org/software/gsl/>. The code used were adapted from the C version of [GSL 2.8 source tarball](https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz).
+Available from <https://www.gnu.org/software/gsl/>. The code used was adapted from the C version of the [GSL 2.8 source tarball](https://ftp.gnu.org/gnu/gsl/gsl-2.8.tar.gz).
 
 Affected files:
 
 - `src/libam_support/ds/GslDiscreteDistribution.hh`, which is a re-implemented in C++ from [`randist/discrete.c`](https://cgit.git.savannah.gnu.org/cgit/gsl.git/tree/randist/discrete.c) in GSL 2.8.
+
 
 Licensed under the GPL 3.0 license.
 
@@ -114,6 +120,7 @@ Affected files:
 
 - `src/libam_support/seq/qreverse.c`
 - `src/libam_support/seq/qreverse.h`
+
 
 Licensed under the MIT license.
 

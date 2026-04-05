@@ -12,13 +12,13 @@ conda env create -f env/art_modern.yml
 
 ### Testing
 
-Some individual modules can be tested using CMake CTest system. Execute `ctest` in your building directory to test them.
+Some individual modules can be tested using CMake's CTest system. Execute `ctest` in your building directory to test them.
 
 Run `make testsmall` or `make testsmall-release` to run the integration tests using executables produced in `make debug` and `make release`.
 
 ### Profiling
 
-We have `./profile.sh ${PROFILER}` to perform profiling of the software with profiler `${PROFILER}`. Profilers may include:
+We have `./profile.sh ${PROFILER}` to profile the software with profiler `${PROFILER}`. Profilers may include:
 
 - `intel-advisor` for Intel Advisor. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
 - `intel-vtune` for Intel VTune Profiler. Intel compilers with `-mtune=native` and `-O3` with `RelWithDebInfo` mode will be used.
@@ -39,7 +39,7 @@ And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/ht
 ## Release Cycle
 
 - Feature freeze: All new features merged into the `develop` branch.
-- Code freeze: All **production** code changes (including bug fixes) merged into the `develop` branch. Run `make fmt` to format the code. Ensure that integration test passes.
+- Code freeze: All **production** code changes (including bug fixes) merged into the `develop` branch. Run `make fmt` to format the code. Ensure that the integration test passes.
 - Integration test: `make testbuild` and `make testbuild-mpi` are executed using GCC, pure LLVM/Clang, and Intel OneAPI C++/DPC++ toolchain to ensure compatibility. Ensure `make packing` passes without errors.
 - Documentation freeze: All documentation changes merged into the `develop` branch. Note:
   - Update `News.md`.
@@ -52,11 +52,11 @@ And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/ht
 
 ### Issues
 
-You're welcome to submit issues on GitHub if you've encountered any problems while using this software. You're recommended to take advantage of the bug report templates, which will help us to understand your problem better. You may also submit issues if you're unclear about the docs or have some ideas for improving the software itself.
+You're welcome to submit issues on GitHub if you've encountered any problems while using this software. You're recommended to use the bug report templates to help us better understand your problems. You may also submit issues if you're unclear about the docs or have some ideas for improving the software itself.
 
 ### Pull Requests (PRs)
 
-You're welcomed to send pull requests (PRs) to this project using the standard fork-and-pull-request workflow. However, please send an issue first to discuss the changes you're going to make (except spelling \& punctuation \& grammar issues). Otherwise, we may not be able to accept your PR.
+You're welcome to send pull requests (PRs) to this project using the standard fork-and-pull-request workflow. However, please send an issue first to discuss the changes you're going to make (except spelling \& punctuation \& grammar issues). Otherwise, we may not be able to accept your PR.
 
 Before you send a PR, please make sure that:
 

@@ -4,7 +4,7 @@ This guide covers several miscellaneous topics that may be of interest to users 
 
 ## Guide on FASTA Format
 
-FASTA format can be parsed by all parsers. However, please keep in mind that for `memory` parser, the following kinds of FASTA files are supported:
+FASTA format can be parsed by all parsers. However, please keep in mind that for the `memory` parser, the following kinds of FASTA files are supported:
 
 ```text
 >one_line_fasta
@@ -33,7 +33,7 @@ AAAAAAAA
 
 Also, note that all characters other than `ACGTacgt` will be regarded as `N`. We do **NOT** support IUPAC codes.
 
-**NOTE** For `htslib` parser, identical line lengths (except the last line) inside a contig is assumed. That means the following FASTA file is legal for `htslib` parser:
+**NOTE:** For the `htslib` parser, identical line lengths (except the last line) inside a contig are assumed. That means the following FASTA file is legal for `htslib` parser:
 
 ```text
 >chr1
@@ -58,7 +58,7 @@ AAAAAAAA
 AA
 ```
 
-**NOTE** For read names, only characters before the first whitespace characters (space ` `, tabs `\t`, etc.) are read. That is, the FASTA file:
+**NOTE:** For read names, only characters before the first whitespace characters (space ` `, tabs `\t`, etc.) are read. That is, the FASTA file:
 
 ```text
 >chr1 some attrs
@@ -67,7 +67,7 @@ AAAAAATTTTTT
 AAAAAATTTTTT
 ```
 
-Will be parsed into identical data structure with:
+Will be parsed into an identical data structure with:
 
 ```text
 >chr1
@@ -76,13 +76,13 @@ AAAAAATTTTTT
 AAAAAATTTTTT
 ```
 
-Using empty file or `/dev/null` as input is allowed since [1.1.9](#v-1.1.9-section). It will generate empty FASTA/FASTQ/PWA files as output. Remember to specify `memory` or `stream` as `--i-parser` `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
+Using an empty file or `/dev/null` as input is allowed since [1.1.9](#v-1.1.9-section). It will generate empty FASTA/FASTQ/PWA files as output. Remember to specify `memory` or `stream` as `--i-parser` `--i_type` and do **NOT** use SAM/BAM output writer in this case (as SAM/BAM output writer will think you're using streamed input and raise an exception).
 
 ## Performance Hint
 
 When building `art_modern`, set [`USE_HTSLIB`](#use-htslib-section) to the latest HTSLib available on your system. Please also make sure your HTSLib has been compiled with `-O3 -mtune=native -march=native` and linked with [`libdeflate`](https://github.com/ebiggers/libdeflate). Set [`CMAKE_BUILD_TYPE`](#cmake-build-type-section) to `Release` or `RelWithDebInfo`, and [`USE_RANDOM_GENERATOR`](#use-random-generator-section) to `ONEMKL` on Intel/AMD machines or `PCG`/`SYSTEM_PCG` on other machines.
 
-When executing `art_modern`, please use `memory` for FASTA parser. Use solid state drive (SSDs) whenever possible. Also use as fewer output writers as possible.
+When executing `art_modern`, please use `memory` for the FASTA parser. Use solid state drive (SSDs) whenever possible. Also, use as few output writers as possible.
 
 SAM/BAM output writers are memory- and time-consuming due to compression. If you don't need SAM/BAM output, please don't enable it.
 
@@ -90,7 +90,7 @@ SAM/BAM output writers are memory- and time-consuming due to compression. If you
 
 ### Debian, Ubuntu, Linux Mint, or Other Debian-Based Distributions
 
-For minimal build, install the following packages using APT:
+For a minimal build, install the following packages using APT:
 
 ```shell
 apt-get install -y \
@@ -99,9 +99,9 @@ apt-get install -y \
     make python3 cmake sed grep coreutils
 ```
 
-Then work using `cmake` as usual. CMake will use bundled source codes for missing dependencies.
+Then work using `cmake` as usual. CMake will use bundled source code for missing dependencies.
 
-For full-featured build (with external libraries and MPI support), install the following additional packages using APT:
+For a full-featured build (with external libraries and MPI support), install the following additional packages using APT:
 
 ```shell
 apt-get install --no-install-recommends -y \
@@ -131,9 +131,9 @@ apk add g++ binutils \
 
 Here, `icu-static` is added to support Boost when performing static linking.
 
-**NOTE** Please install the correct version of Boost static library.
+**NOTE**: Please install the correct version of the Boost static library.
 
-**NOTE** `coreutils` is **MANDATORY** -- Those shipped with BusyBox will **NOT** work.
+**NOTE:** `coreutils` is **MANDATORY** -- Those shipped with BusyBox will **NOT** work.
 
 ### Apple Mac OS X
 
@@ -145,11 +145,11 @@ xcode-select --install
 
 Alternatively, you may get the latest version [here](https://developer.apple.com/download/all). An Apple account is required.
 
-Download CMake from [here](https://cmake.org/download/). You should modify PATH in `~/.bashrc` or `~/.zshrc` to include the `bin` directory of the CMake installation. If you install the DMG image, it will commonly be located in `/Applications/CMake.app/Contents/bin/cmake`.
+Download CMake from [here](https://cmake.org/download/). You should modify PATH in `~/.bashrc` or `~/.zshrc` to include the `bin` directory of the CMake installation. If you install the DMG image, it is typically located in `/Applications/CMake.app/Contents/bin/cmake`.
 
 See the following section to build Boost from source.
 
-Apple Mac OS X comes with zlib and its development headers pre-installed.
+Apple macOS comes with zlib and its development headers pre-installed.
 
 You may also set up dependencies using [Conda](https://docs.conda.io), [MacPorts](https://www.macports.org/) or [HomeBrew](https://brew.sh).
 
@@ -222,7 +222,7 @@ mingw-w64-clang-x86_64-samtools
 
 ### Installing Boost from Source
 
-If your system Boost library does not exist (e.g., on brand-new Apple Mac OS X), is too old (e.g., older than 1.65.0) or ABI incompatible (e.g., compiled with GCC, but you want to use Clang/LLVM), you may install Boost from source. Here is an example of installing Boost 1.89.0 using Clang/LLVM toolchain to `"${HOME}"/opt/boost-1.89.0-clang`:
+If your system Boost library does not exist (e.g., on brand-new Apple Mac OS X), is too old (e.g., older than 1.65.0), or ABI incompatible (e.g., compiled with GCC, but you want to use Clang/LLVM), you may install Boost from source. Here is an example of installing Boost 1.89.0 using Clang/LLVM toolchain to `"${HOME}"/opt/boost-1.89.0-clang`:
 
 ```shell
 # Assume we're using Boost 1.89.0
@@ -249,7 +249,7 @@ And then you may use CMake to build this project through:
 mkdir -p build
 cd build
 # Set -DBoost_DIR accordingly.
-# Older CMake may have different behaviour.
+# Older CMake may have different behavior.
 cmake .. -DBoost_DIR="${HOME}"/opt/boost-1.89.0-clang
 ```
 
@@ -294,7 +294,7 @@ make install
 cd ..
 ```
 
-Install NCBI NGS SDK as a part of NCBI SRA Toolkit.
+Install NCBI NGS SDK as a part of the NCBI SRA Toolkit.
 
 ```shell
 curl -L -O sra-tools-3.3.0.zip \

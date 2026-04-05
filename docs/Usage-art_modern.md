@@ -1,6 +1,6 @@
 # Usage of `art_modern`
 
-This is the detailed usage of `art_modern`. Every parameter and their combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
+This is the detailed usage of `art_modern`. Every parameter and its combinations are introduced in detail. In this documentation, commands will be represented as `ls -lFh` with in-line or block omission represented as `[...]`.
 
 ## Parameter Controlling Simulation Behavior
 
@@ -116,20 +116,20 @@ model error files are provided in the original ART.
 The following profiles are built and distributed by `art_modern` maintainers.
 New models from Illumina, BGI/MGI, and PacBio are added.
 
-| Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name         | Added in | Source                                                                                                                               |
-|---------------------|--------------------|-----|-------|-------|--------------------|----------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `PacbOnso_150bp`    | `PacbOnsoL150R1`   | 150   | 150   | PacBio Onso        | v1.4.0   | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
-| `MiSeq_v3_300bp`    | `MiSeqv3L300R1`    | 300   | 300   | MiSeq v3           | v1.4.0   | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)          |
-| `GA2X_150bp`        | `GA2XL150R1`       | 150   | 150   | GenomeAnalyzer IIx | v1.4.0   | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
-| `GA2X_100bp`        | `GA2XL100R1`       | 100   | 100   | GenomeAnalyzer IIx | v1.4.0   | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)                      |
-| `HiSeq1500_250bp`   | `HiSeq1500L250R1`  | 250   | 250   | HiSeq 1500         | v1.4.0   | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
-| `BGISeq500_150bp`   | `BgiSeq500L150R1`  | 150   | 150   | BGISeq-500         | v1.4.0   | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)                |
-| `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | DNBSeq-T7          | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
-| `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | v1.4.0   | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
-| `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | v1.4.0   | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
-| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | v1.4.0   | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
-| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)      | v1.4.0   | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
-| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)       | v1.4.0   | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
+| Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name         | Added in                  | Source                                                                                                                               |
+|---------------------|--------------------|-------|-------|--------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `PacbOnso_150bp`    | `PacbOnsoL150R1`   | 150   | 150   | PacBio Onso        | [1.4.0](#v-1.4.0-section) | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
+| `MiSeq_v3_300bp`    | `MiSeqv3L300R1`    | 300   | 300   | MiSeq v3           | [1.4.0](#v-1.4.0-section) | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)          |
+| `GA2X_150bp`        | `GA2XL150R1`       | 150   | 150   | GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
+| `GA2X_100bp`        | `GA2XL100R1`       | 100   | 100   | GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)                      |
+| `HiSeq1500_250bp`   | `HiSeq1500L250R1`  | 250   | 250   | HiSeq 1500         | [1.4.0](#v-1.4.0-section) | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
+| `BGISeq500_150bp`   | `BgiSeq500L150R1`  | 150   | 150   | BGISeq-500         | [1.4.0](#v-1.4.0-section) | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)                |
+| `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | DNBSeq-T7          | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
+| `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
+| `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
+| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
+| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)    | [1.4.0](#v-1.4.0-section) | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
+| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)   | [1.4.0](#v-1.4.0-section) | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
 
 List of all models by distinguished NGS sequencer manufacturers:
 

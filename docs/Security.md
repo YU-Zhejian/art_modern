@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-Send an E-mail to maintainer in private if vulnerabilities were found.
+Send a private email to the maintainer if vulnerabilities were found.
 
 ## Known Bugs in `art_modern`
 
@@ -10,12 +10,12 @@ See [News.md](News.md) for details of the bugs fixed in each release.
 
 ### Known Build-Time Incompatibilities
 
-- Clang earlier than 9 with Boost later than 1.78 may raise bug when using headers from `boost/math` as boost may misidentify Clang as GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
-- Boost earlier than 1.65 does not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under this circumstance, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
-- GCC 13.3.0 on Haiku OS hrev58590 may generate a kernel panic that jam the entire system while building.
+- Clang earlier than 9 with Boost later than 1.78 may raise bugs when using headers from `boost/math`, since Boost may misidentify Clang as an older GCC that does not support C++11. See [here](https://www.boost.org/doc/libs/1_87_0/libs/math/doc/html/math_toolkit/history2.html#math_toolkit.history2.math_3_0_0_boost_1_76) for more details.
+- Boost versions earlier than 1.65 do not contain `boost/asio/thread_pool.hpp` or `boost/asio/post.hpp`. See [here](https://www.boost.org/doc/libs/1_66_0/doc/html/boost_asio/reference/thread_pool.html) for its first introduction. Under these circumstances, try `-DUSE_THREAD_PARALLEL=BS` in CMake options (introduced below) as an alternative.
+- GCC 13.3.0 on Haiku OS hrev58590 may cause a kernel panic that locks up the entire system during builds.
 - GCC would fail on Debian GNU/Hurd.
 - External HTSLib and NCBI NGS library incompatibilities: Both library defines `string_dup`.
-- Builds that uses Intel MKL or Intel C++/DPC++ compilers may be incompatible with [Citrix Workspace app](https://www.citrix.com/downloads/workspace-app/) 25.08.10.111 under Linux.
+- Builds that use Intel MKL or Intel C++/DPC++ compilers may be incompatible with [Citrix Workspace app](https://www.citrix.com/downloads/workspace-app/) 25.08.10.111 under Linux.
 
 ## Known Bugs in Original ART
 
@@ -53,7 +53,7 @@ and file `opt/noqual_test/ref.fa`:
 AGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACAGCTAGCTACTGATCG
 ```
 
-Create a profile with command:
+Create a profile with the command:
 
 ```shell
 art_profiler_illumina opt/noqual_test/noqual_test_ opt/noqual_test fq
@@ -82,4 +82,4 @@ CGTAATTATACGCGCATGAG
 """"""""""""""""""""
 ```
 
-The qualities of generated file will be `"` (Phred-score 1), instead of `!` (Phred-score 0) in the files where the profile is generated from.
+The qualities of the generated file will be `"` (Phred-score 1), instead of `!` (Phred-score 0) in the files that generate the profile.
