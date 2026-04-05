@@ -4,10 +4,10 @@
 
 ### Create Development Environment
 
-Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also require other dependencies. Install [Conda](https://docs.conda.io/en/latest/) (Or [Mamba](https://mamba.readthedocs.io/en/latest/)/[MicroMamba](https://mamba.readthedocs.io/en/latest/micromamba.html)), and then execute:
+Except [CMake](https://cmake.org) and other dependencies specified in [Install](Install.md), the development scripts also require other dependencies. Install [Pixi](https://pixi.prefix.dev/), and then execute:
 
 ```shell
-conda env create -f env/art_modern.yml
+pixi s
 ```
 
 ### Testing
@@ -30,8 +30,8 @@ We have `./profile.sh ${PROFILER}` to profile the software with profiler `${PROF
 Create the development environment and make the documentation through:
 
 ```shell
-conda activate art_modern
 make doc
+make doc PYTHON=python SHELL=bash # under Windows
 ```
 
 And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/html` and `doc/sphinx.d/_build/latex` respectively. Note that for PDF output, you may need [latexmk](https://www.ctan.org/pkg/latexmk) and a working up-to-date [LaTeX](https://www.latex-project.org) distribution (e.g., [TeXLive](https://www.tug.org/texlive/), [MiKTeX](https://miktex.org/), [MacTeX](https://tug.org/mactex/)) installed.
