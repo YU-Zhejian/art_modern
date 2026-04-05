@@ -291,4 +291,4 @@ packing:
 .PHONY: packing-update-containers
 # Update Docker and Singularity containers used for packing
 packing-update-containers:
-	$(MAKE) -C packing update-containers
+	pixi run --frozen -e pack $(MAKE) -C packing update-containers

@@ -1,12 +1,13 @@
 # News \& Release Notes
 
 (v-1.4.0-section)=
-## v1.4.0 (Ongoing)
+## v1.4.0 (2026/04/05)
 
 - Software Engineering:
   - Update bundled HTSLib to [`1.23.1`](https://github.com/samtools/htslib/releases/1.23.1).
   - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`593df78`](https://github.com/cameron314/concurrentqueue/commit/593df78ec309be7a7b456b3334025ccade1d2d66)).
   - Moved `explore/packing_status` to [new repo](https://github.com/YU-Zhejian/packing_status).
+  - `BS::thread_pool` set as default thread pool implementation.
 - Implementation:
   - `art_profile_builder`: Added `--report_size` and `--batch_size` option to control reporting intervals.
   - The programs would now warn on quality profiles with less or equal to 10 quality levels, and reject those with less or equal to 4 quality levels. This would, unfortunately, reject most of the latest Illumina models, which have only 4 quality levels. Use `art-profile-fastqc` from [`art_modern_utils`](https://github.com/YU-Zhejian/art_modern_utils) to check the quality levels of your profiles.
