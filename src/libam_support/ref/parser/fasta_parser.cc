@@ -45,7 +45,14 @@ FastaIterator::FastaRecord FastaIterator::next()
                     "Record ID of FASTA must start with '>' at line " + std::to_string(_lineno));
             }
             // Directly extract the record ID without splitting the whole line
-            next_record_id = next_line.substr(/**Exclude > **/ 1, next_line.find_first_of(" \t\f") - 1);
+            const auto first_blank_pos = next_line.find_first_of(" \t\f");
+            if (first_blank_pos != std::string::npos) {
+                next_record_id = next_line.substr(/**Exclude > **/ 1, first_blank_pos - 1);
+            } else {
+                next_record_id = next_line.substr(/**Exclude > **/ 1);
+            }
+            next_line.clear();
+            next_line.shrink_to_fit();
             if (next_record_id.empty()) {
                 throw MalformedFastaException("Record ID is empty at line " + std::to_string(_lineno));
             }
@@ -68,13 +75,20 @@ FastaIterator::FastaRecord FastaIterator::next()
         }
         if (next_line[0] == '>') {
             // Directly extract the record ID without splitting the whole line
-            staged_next_record_id_ = next_line.substr(/**Exclude > **/ 1, next_line.find_first_of(" \t\f") - 1);
+            const auto first_blank_pos = next_line.find_first_of(" \t\f");
+            if (first_blank_pos != std::string::npos) {
+                staged_next_record_id_ = next_line.substr(/**Exclude > **/ 1, first_blank_pos - 1);
+            } else {
+                staged_next_record_id_ = next_line.substr(/**Exclude > **/ 1);
+            }
             if (staged_next_record_id_.empty()) {
                 throw MalformedFastaException("Record ID is empty at line " + std::to_string(_lineno));
             }
             return { std::move(next_record_id), std::move(next_record_sequence) };
         }
         next_record_sequence += next_line;
+        next_line.clear();
+        next_line.shrink_to_fit();
     }
 }
 FastaIterator::FastaIterator(std::istream& istream)

@@ -38,5 +38,5 @@ pixi run -e testextreme \
         --o-hl_sam-write_bam \
         --reporting_interval-job_executor 10 \
         --reporting_interval-job_pool 50
-samtools fasta generated/many_contigs.bam > generated/many_contigs.fa
+samtools fasta generated/many_contigs.bam >generated/many_contigs.fa
 # This generates 10G reads.

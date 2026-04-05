@@ -45,7 +45,7 @@
 
 using namespace labw::art_modern;
 
-namespace{
+namespace {
 class EmptyLFIO final : public LockFreeIO<std::unique_ptr<std::nullptr_t>> {
 public:
     DELETE_COPY(EmptyLFIO)

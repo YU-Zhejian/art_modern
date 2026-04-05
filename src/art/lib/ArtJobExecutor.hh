@@ -61,7 +61,7 @@ private:
     std::shared_ptr<OutputDispatcher> output_dispatcher_;
     const am_readnum_t num_reads_to_reduce_;
     const bool require_alignment_;
-    std::atomic<bool> is_running_ = false;
+    std::atomic<bool> is_running_ = true;
     std::string current_contig_name_;
     std::atomic<am_readnum_t> current_n_reads_left_ = 0;
     std::atomic<am_readnum_t> current_n_fails_ = 0;

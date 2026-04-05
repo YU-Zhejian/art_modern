@@ -65,7 +65,7 @@ public:
      *
      * @param job_executor Job to add.
      */
-    void add(const std::shared_ptr<JobExecutor>& job_executor);
+    void add(std::shared_ptr<JobExecutor>&& job_executor);
 
     /**
      * Stop the pool.
@@ -103,7 +103,7 @@ private:
     std::mutex add_mutex_;
     void* supervisor_;
     std::size_t add_spin_waits_ms_ = 1000;
-    std::size_t supervisor_interval_ms_ = 500;
+    std::size_t supervisor_interval_ms_ = 5;
 #endif
 };
 

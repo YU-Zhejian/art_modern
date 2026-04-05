@@ -165,7 +165,6 @@ bool ArtJobExecutor::is_running() const { return is_running_; }
 
 void ArtJobExecutor::operator()()
 {
-    is_running_ = true;
     const auto num_contigs = job_.fasta_fetch->num_seqs();
     if (num_contigs == 0) {
         is_running_ = false;

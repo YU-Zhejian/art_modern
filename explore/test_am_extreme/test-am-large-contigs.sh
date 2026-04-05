@@ -45,9 +45,8 @@ printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\
 
 for fn in \
     generated/large_contigs.fa.gz.bam \
-    generated/large_contigs.fa.bam \
-    ; do
+    generated/large_contigs.fa.bam; do
     samtools sort -@ "${NJOBS}" --write-index -o "${fn%.bam}.sorted.bam" "${fn}"
     samtools depth -@ "${NJOBS}" -aa "${fn%.bam}.sorted.bam" \
-        xz -9 -T"${NJOBS}" -vvvv > "${fn%.bam}.depth.tsv.xz"
+        xz -9 -T"${NJOBS}" -vvvv >"${fn%.bam}.depth.tsv.xz"
 done

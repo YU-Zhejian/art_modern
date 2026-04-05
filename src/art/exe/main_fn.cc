@@ -73,9 +73,9 @@ public:
     void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
     {
         SimulationJob sj { fetch, coverage_info, ++job_id_ };
-        const auto aje
+        auto aje
             = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_, seed_alloc_->nextseed());
-        job_pool_.add(aje);
+        job_pool_.add(std::move(aje));
     }
 
     void wait()

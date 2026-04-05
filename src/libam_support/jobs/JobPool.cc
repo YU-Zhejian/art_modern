@@ -35,6 +35,7 @@
 
 #if !defined(USE_NOP_PARALLEL)
 #include <chrono>
+#include <memory>
 #include <mutex>
 #include <thread>
 #include <utility>
@@ -78,6 +79,7 @@ void JobPool::prune_finished_jobs()
             passed_ajes_.emplace_back(std::move(aje));
         }
     }
+    executors_.clear();
     executors_ = std::move(passed_ajes_);
     cached_n_running_executors_ = executors_.size();
     cached_n_running_executors_cv_.notify_all();
@@ -105,11 +107,13 @@ void JobPool::stop()
 #endif
 }
 
-void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
+void JobPool::add(std::shared_ptr<JobExecutor>&& job_executor)
 {
+    auto job_executor_moved = std::move(job_executor);
+
 #if defined(USE_NOP_PARALLEL)
     cached_n_running_executors_ = 1;
-    job_executor->operator()();
+    job_executor_moved->operator()();
     cached_n_running_executors_ = 0;
 #else
     // Lock for adding jobs
@@ -121,23 +125,22 @@ void JobPool::add(const std::shared_ptr<JobExecutor>& job_executor)
     }
     // Start the job first
 #if defined(USE_BS_PARALLEL)
-    [[maybe_unused]] auto future = pool_.submit_task([this_aje = job_executor]() mutable { this_aje->operator()(); });
+    pool_.detach_task(
 #elif defined(USE_ASIO_PARALLEL)
-    post(pool_, [this_aje = job_executor]() mutable { this_aje->operator()(); });
+    post(pool_,
+#endif
+#if defined(USE_BS_PARALLEL) || defined(USE_ASIO_PARALLEL)
+        [this_aje = job_executor_moved] { this_aje->operator()(); });
 #endif
     // Then add to the list
     {
         const std::scoped_lock op_lock(operation_mutex_);
-        executors_.emplace_back(job_executor);
+        executors_.emplace_back(std::move(job_executor_moved));
     }
 #endif
 }
 
-JobPool::~JobPool()
-{
-    stop();
-    // No idea how to free supervisor.
-}
+JobPool::~JobPool() { stop(); }
 
 JobPool::JobPool(const std::size_t pool_size)
 #if defined(USE_NOP_PARALLEL)

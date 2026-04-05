@@ -60,7 +60,6 @@ pcg32_c gen { 123456L }; // Fixed seed for reproducibility
 std::uniform_int_distribution<am_qual_count_t> one_to_dist_end(1, DIST_END);
 std::uniform_int_distribution<am_qual_count_t> one_to_max_dist_number(1, MAX_DIST_NUMBER);
 
-
 class SlimEmpDist {
 public:
     virtual void gen_qualities(std::vector<am_qual_t>& qual) = 0;
