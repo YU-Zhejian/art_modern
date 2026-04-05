@@ -269,7 +269,7 @@ testbuild-small-mpi:
 .PHONY: doc
 # Build documentation
 doc:
-	$(PYTHON) $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
+	pixi run --frozen -e doc $(PYTHON) $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
 	pixi run --frozen -e doc $(MAKE) -C docs/sphinx.d
 
 .PHONY: cleandoc
@@ -281,7 +281,7 @@ cleandoc:
 .PHONY: serve-doc
 # Serve built documentation at <http://localhost:8000>
 serve-doc:
-	$(PYTHON) -m http.server -d docs/sphinx.d/_build/html
+	pixi run --frozen -e doc $(PYTHON) -m http.server -d docs/sphinx.d/_build/html
 
 .PHONY: packing
 # Create binary packages
