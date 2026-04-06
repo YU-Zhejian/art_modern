@@ -193,7 +193,7 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200)
-- [GeneMind](https://en.genemind.com/)
+- [GeneMind](https://en.genemind.com/):
   - Status: All GeneMind models uses quality binning.
 
 Note:
@@ -201,7 +201,6 @@ Note:
 - For Illumina, Dx models (e.g., MiSeqDx) with locked software for forensics and diagnostics are treated as those without Dx.
 - For BGI/MGI models, we do not distinguish Rs (Research-only) models with non-RS models.
   - DNBSEQ-G400ER is a nanopore-based long read sequencer, so not included.
-- For Illumina Models: Latest Illumina models uses Quality Score Binning -- Only 2, 11, 25, 37 are shown. See [Illumina White paper](https://www.illumina.com/documents/products/whitepapers/whitepaper_datacompression.pdf).
 
 #### Shift and Clip Parameters
 
