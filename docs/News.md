@@ -6,22 +6,22 @@
 - Software Engineering:
   - Update bundled HTSLib to [`1.23.1`](https://github.com/samtools/htslib/releases/1.23.1).
   - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`593df78`](https://github.com/cameron314/concurrentqueue/commit/593df78ec309be7a7b456b3334025ccade1d2d66)).
-  - Moved `explore/packing_status` to [new repo](https://github.com/YU-Zhejian/packing_status).
+  - Moved `explore/packing_status` to a [new repo](https://github.com/YU-Zhejian/packing_status).
   - `BS::thread_pool` set as default thread pool implementation.
 - Implementation:
   - `art_profile_builder`: Added `--report_size` and `--batch_size` option to control reporting intervals.
-  - The programs would now warn on quality profiles with less or equal to 10 quality levels, and reject those with less or equal to 4 quality levels. This would, unfortunately, reject most of the latest Illumina models, which have only 4 quality levels. Use `art-profile-fastqc` from [`art_modern_utils`](https://github.com/YU-Zhejian/art_modern_utils) to check the quality levels of your profiles.
+  - The programs would now warn on quality profiles with fewer than or equal to 10 quality levels, and reject those with fewer than or equal to 4 quality levels. Unfortunately, this would reject most of the latest Illumina models, which have only 4 quality levels. Use `art-profile-fastqc` from [`art_modern_utils`](https://github.com/YU-Zhejian/art_modern_utils) to check the quality levels of your profiles.
 - New profiles:
-  - Illumina MiSeq v3 PE 300bp.
-  - PacBio Onso PE 150bp.
-  - Illumina GenomeAnalyzer IIx PE 100bp and 150bp.
-  - Illumina HiSeq 1500 PE 250bp.
-  - BGISEQ-500 PE 150bp.
-  - DNBSEQ-T7 PE 150bp.
-  - DNBSEQ-G50 PE 150bp.
-  - DNBSEQ-G400 PE 150bp, SE 400bp.
-  - Illumina HiSeq 4000 PE 150bp (8-bin quality compression).
-  - Illumina NextSeq 400 PE 150bp (8-bin quality compression).
+  - Illumina MiSeq v3 PE 300 bp.
+  - PacBio Onso PE 150 bp.
+  - Illumina GenomeAnalyzer IIx PE 100 bp and 150 bp.
+  - Illumina HiSeq 1500 PE 250 bp.
+  - BGISEQ-500 PE 150 bp.
+  - DNBSEQ-T7 PE 150 bp.
+  - DNBSEQ-G50 PE 150 bp.
+  - DNBSEQ-G400 PE 150 bp, SE 400 bp.
+  - Illumina HiSeq 4000 PE 150 bp (8-bin quality compression).
+  - Illumina NextSeq 400 PE 150 bp (8-bin quality compression).
 - Miscellaneous bug fixes.
 
 (v-1.3.4-section)=
@@ -30,12 +30,12 @@
 - Software Engineering:
   - `-DUSE_LIBFMT=CMAKE` added to CMake options to find `{fmt}` through CMake's `find_package`.
   - Pre-built HTML docs now hosted at [GitHub Pages](https://yu-zhejian.github.io/art_modern_docs/index.html).
-  - Compression of FASTA and FASTQ output using gzip/bgzip supported using HTSLib. The following flags for each format are added (using FASTQ for example):
+  - Compression of FASTA and FASTQ output using gzip/bgzip is supported using HTSLib. The following flags for each format are added (using FASTQ for example):
     - `--o-fastq-compression`
     - `--o-fastq-compression_level`
     - `--o-fastq-buffer_size`
     - `--o-fastq-num_threads`
-  - Added utility `am_compress` to compress files using gzip/bgzip. This utility can be used to assess the performance of those compressors on your own system to find optimized parameters.
+  - Added utility `am_compress` to compress files using gzip/bgzip. This utility can be used to assess the performance of compressors in your system and find optimized parameters.
 - Miscellaneous bug fixes.
 
 (v-1.3.3-section)=
@@ -64,7 +64,7 @@
 - Implementation:
   - The speed of `art_profile_builder` improved by using a single-producer-multi-consumer queue. The improvement will be more obvious to SAM/BAM files and would reduce computational burden when parsing FASTQ files.
   - Queue size parameters added to `art_modern` and `art_profile_builder` to control the size of internal queues. Users may tune these parameters to achieve better performance or reduce memory usage.
-  - The performance of `art_modern` under Intel OneMKL random generator further improved by generating more random numbers in bulk.
+  - The performance of `art_modern` under Intel OneMKL random generator was further improved by generating more random numbers in bulk.
   - A seed allocation algorithm is implemented; Flag `--i-seed` added to set a fixed seed for reproduction.
 - Miscellaneous bug fixes.
 
@@ -75,12 +75,12 @@
   - Non-reproducible stucks, with no clear reason. Currently seen in both MPI and non-MPI mode. Seen in LLVM and Intel C++/DPC++ compilers. Currently, only seen in `pbsim3_transcripts`, `template` mode with unequal read1/read2 lengths specified. The author is working on fixing this issue.
 - Software Engineering:
   - Update bundled `{fmt}` to [`12.1.0`](https://github.com/fmtlib/fmt/releases/tag/12.1.0).
-  - A possibly unidentified bug in the CMake build system when trying to compile a static version of testing C source code while the project is being configured is fixed.
-  - The minimal test code for libdeflate, zlib, libbz2, and liblzma is reimplemented in a unified style. The new behavior is more robust, as it would generate random strings, compress them, decompress them, and check whether the decompressed strings are identical to the original ones.
+  - A possibly unidentified bug in the CMake build system, which occurred when trying to compile a static version of test C source code while the project was being configured, has been fixed.
+  - The minimal test code for libdeflate, zlib, libbz2, and liblzma is reimplemented in a unified style. The new behavior is more robust, as it generates random strings, compresses them, decompresses them, and checks whether the decompressed strings are identical to the originals.
   - Bundled LibCEU routines can recognize more compilers \& architectures \& libraries.
 - Implementation:
   - A possibly unidentified bug that would emerge when generating quality below 10 (for N bases) using Intel OneMKL random generator is fixed.
-  - Several changes were made to the reporting system, increasing CPU utilization rate.
+  - Several changes to the reporting system increased CPU utilization.
 - Miscellaneous bug fixes.
 
 (v-1.3.0-section)=
@@ -92,18 +92,18 @@
   - The MPI mode may suffer from non-reproducible stucks, with no clear reason. This issue is not seen in non-MPI mode. The author is working on fixing this issue.
 - Algorithm:
   - Introduced <https://github.com/Wunkolo/qreverse> to accelerate array reversing. Use `-DAM_NO_Q_REVERSE=ON` in CMake options to disable this feature.
-  - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now `WALKER` is the only quality generation algorithm available.
-  - Several low-level C++ features re-done in C to improve compilation speed.
-  - `PCG` random generator: CMake option `-DUSE_RANDOM_GENERATOR=PCG` now uses a minimal PCG random generator while `-DUSE_RANDOM_GENERATOR=SYSTEM_PCG` uses an external header-only PCG random generator in C++.
+  - `STL` quality generation algorithm deprecated and removed. Also deprecated CMake option `USE_QUAL_GEN`. Now, `WALKER` is the only quality-generation algorithm available.
+  - Several low-level C++ features were re-done in C to improve compilation speed.
+  - `PCG` random generator: CMake option `-DUSE_RANDOM_GENERATOR=PCG` now uses a minimal PCG random generator, while `-DUSE_RANDOM_GENERATOR=SYSTEM_PCG` uses an external header-only PCG random generator in C++.
 - Interface:
   - **EXPERIMENTAL** `art_modern` and `art_profile_builder` now support different lengths of read 1 and 2 in paired-end simulation using `--read_len_1` and `--read_len_2` options.
     - **NOTE** For `art_modern`: Currently, different read length works for PE Template mode only. Using such on SE/MP or other modes will generate an error message when you use it.
   - `art_modern`: Some defaults added to options. `--builtin_qual_file` now default to `HiSeq2500_150bp`; `--lc` now default to `se`; `--mode` now default to `wgs`.
 - Packing:
   - **EXPERIMENTAL** `-DFIND_RANDOM_MKL_THROUGH_PKGCONF` added to CMake options to find Intel OneMKL through `pkg-config`.
-  - `libtcmalloc` and `libtcmalloc_minimal` supported as an alternative `malloc`/`free` implementation.
+  - `libtcmalloc` and `libtcmalloc_minimal` are supported as an alternative `malloc`/`free` implementation.
   - Google Abseil removed from dependencies. Also deprecated CMake option `USE_ABSL`.
-  - `--help`, `--version` and ctest minitests removed from `debug`/`release` Makefile quick build targets and their MPI-enabled variant. Use `make testsmall`/variants instead.
+  - `--help`, `--version` and ctest minitests removed from `debug`/`release` Makefile, quick build targets and their MPI-enabled variant. Use `make testsmall`/variants instead.
 - Miscellaneous bug fixes.
 
 (v-1.2.1-section)=
@@ -111,11 +111,11 @@
 
 - The GNU Scientific Library (GSL) random generator was removed.
 - For Intel OneMKL random generator: The bit generation routine changed to `VSL_BRNG_SFMT19937`, which is faster. Also, more random numbers are generated in bulk to reduce overhead.
-- Makefile integration test targets `testbuild` and `testbuild-mpi` reimplemented in Python to make them run faster.
+- Makefile integration test targets `testbuild` and `testbuild-mpi` were reimplemented in Python to make them run faster.
 - `art_profile_builder` would now raise an error if the input SAM/BAM/FASTQ files are malformed.
 - `art_modern`:
   - Option `--reporting_interval-job_executor` and `--reporting_interval-job_pool` added to control the reporting interval of job executor and job pool status.
-  - Memory performance of `stream` FASTA parser largely improved.
+  - The memory performance of the `stream` FASTA parser has largely improved.
 - **EXPERIMENTAL** Packing: DEB package variant using OpenMPI added.
 - Documentation largely revised.
 - Miscellaneous bug fixes.
@@ -124,7 +124,7 @@
 ## 1.2.0 (2025/10/21)
 
 - Main repo slimmed.
-  - Random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
+  - The random number benchmark module moved to <https://github.com/YU-Zhejian/art_modern_bench_rand>.
   - Benchmark of other simulators moved to <https://github.com/YU-Zhejian/art_modern_benchmark_other_simulators>.
 - The GNU Scientific Library (GSL) random generator is marked deprecated due to performance issues. They will be removed in the next release.
 - **EXPERIMENTAL** Support over MPI added.
@@ -132,20 +132,20 @@
     - Debian OpenMPI, `ident: 4.1.6, repo rev: v4.1.6, Sep 30, 2023`, std. 3.1.
     - Intel(R) MPI Library `2021.16 for Linux* OS`, std. 4.1.
   - MPI-related revisions:
-    - Seeding of random number generators revised to avoid seed collision across different threads and processes.
-    - The number of reads generated from each contig is now calculated using complicated rounding instead of flooring.
+    - Seeding of random number generators has been revised to avoid seed collision across different threads and processes.
+    - The number of reads generated from each contig is now calculated using a more complex rounding method rather than flooring.
     - Makefile quick build targets `debug`, `release` have their MPI counterparts: `debug-mpi` and `release-mpi`.
     - Makefile integration test targets `testsmall`, `testsmall-release`, `testbuild` have their MPI counterparts: `testsmall-mpi`, `testsmall-release-mpi`, and `testbuild-mpi`.
     - Integration test `testbuild` revised to make it run faster.
     - CMake option `WITH_MPI` added to enable MPI support. This option is by default `OFF`.
-  - **NOTE** The author currently has no access to computing clusters with MPI, so the MPI parallelization on an actual multi-node cluster may be problematic and suboptimal. Users are welcome to report bugs or tell the author how to simulate an MPI-enabled cluster using a laptop to improve the MPI support.
+  - **NOTE:** The author currently has no access to computing clusters with MPI, so the MPI parallelization on an actual multi-node cluster may be problematic and suboptimal. Users are welcome to report bugs or to tell the author how to simulate an MPI-enabled cluster on a laptop to improve MPI support.
 - Miscellaneous bug fixes.
 
 (v-1.1.10-section)=
 ## 1.1.10 (2025/10/12)
 
 - Fixed #7. In details:
-  - Some build failures under Mac OS X using Apple Clang 18 have been fixed.
+  - Some build failures under macOS using Apple Clang 18 have been fixed.
   - More tests added to pure-Clang/LLVM build.
 - Update bundled `{fmt}` to [`12.0.0`](https://github.com/fmtlib/fmt/releases/tag/12.0.0).
 - Update bundled Abseil to [`20250814.1`](https://github.com/abseil/abseil-cpp/releases/tag/20250814.1).
@@ -167,7 +167,7 @@
 ## 1.1.8 (2025/09/29)
 
 - Fixed issue #5. In details:
-  - On prior versions, the program will crash when trying to create simulated output in the current working directory without the `./` prefix.
+  - In prior versions, the program will crash when trying to create simulated output in the current working directory without the `./` prefix.
   - Duplicated read IDs observed in prior versions.
   - Inconsistencies in read quality between SAM/BAM and FASTQ output were observed in prior versions.
   - Missing `/1` and `/2` suffixes in read IDs of paired-end reads observed in prior versions.
@@ -182,8 +182,8 @@
 - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`c680721`](https://github.com/cameron314/concurrentqueue/commit/c68072129c8a5b4025122ca5a0c82ab14b30cb03)).
 - Updated bundled `{fmt}` to [11.2.0](https://github.com/fmtlib/fmt/releases/tag/11.2.0).
 - Some files without a clear license were removed. Unused files from bundled `{fmt}`, `moodycamel::ConcurrentQueue<T>`, and HTSLib removed.
-- CMake options to use system shipped dependencies instead of bundled ones are added to comply with Debian policies. Namely, `USE_LIBFMT`, `USE_CONCURRENT_QUEUE`, `USE_ABSL`, and `REPRODUCIBLE_BUILDS`.
-- Separated CMake flag that controls building of mini benchmarks to `BUILD_ART_MODERN_BENCHMARKS`.
+- CMake options to use system-shipped dependencies instead of bundled ones are added to comply with Debian policies. Namely, `USE_LIBFMT`, `USE_CONCURRENT_QUEUE`, `USE_ABSL`, and `REPRODUCIBLE_BUILDS`.
+- Creates a CMake flag that controls building of mini benchmarks, `BUILD_ART_MODERN_BENCHMARKS`.
 - Miscellaneous bug fixes.
 
 (v-1.1.6-section)=
@@ -203,7 +203,7 @@
 
 - 2 environment variables, `ART_NO_LOG_DIR` and `ART_LOG_DIR`, now control the behavior of log directory creation.
 - Some files without a clear license were removed.
-- Add support for `cmake --install`. **NOTE** Currently, only built libraries and binaries will be installed. Documentation and header files are not included yet.
+- Add support for `cmake --install`. **NOTE:** Currently, only built libraries and binaries will be installed. Documentation and header files are not included yet.
 - The package is published on BioConda. See [here](https://bioconda.github.io/recipes/art_modern/README.html) for details.
 - Miscellaneous bug fixes.
 

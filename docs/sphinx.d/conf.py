@@ -43,7 +43,8 @@ extensions = [
     "sphinxcontrib.cairosvgconverter",
 ]
 
-myst_enable_extensions = ["deflist", "dollarmath"]
+myst_enable_extensions = ["deflist", "dollarmath", "tasklist", "strikethrough"]
+myst_enable_checkboxes = True
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", ".virtualenv/**"]
 
 # html_static_path = ['_static']
