@@ -138,6 +138,8 @@ New models from Illumina, MGI Tech, and PacBio are added.
 | `DNBSeqG400_200bp`   | `DNBSeqG400L200R1` | 200   | 200  | MGI Tech DNBSeq-G400      | [1.4.1](#v-1.4.1-section) | [CNR0117149](https://db.cngb.org/data_resources/run/CNR0117149), [MGI Tech](https://global-mgitech.com/resources/demonstration-data/)|
 | `DNBSeqT1Plus_150bp` | `DNBSeqT1PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T1 Plus | [1.4.1](#v-1.4.1-section) | [CNR1513487](https://db.cngb.org/data_resources/run/CNR1513487), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
 | `DNBSeqT7Plus_150bp` | `DNBSeqT7PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T7 Plus | [1.4.1](#v-1.4.1-section) | [CNR1433837](https://db.cngb.org/data_resources/run/CNR1433837), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
+| `HiSeq3000_150bp`    | `HiSeq3000L150R1`    | 150   | 150  | Illumina HiSeq 3000 (8B) | [1.4.1](#v-1.4.1-section) | [ERR10705258](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.5808/gi.23072)                  |
+| `NextSeq550_150bp`   | `NextSeq550L150R1`   | 150   | 150  | Illumina NextSeq 550 (6B) |[1.4.1](#v-1.4.1-section) | [SRR19308002](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR23002282), [DOI](https://doi.org/10.1093/jhered/esad033)|
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -152,17 +154,16 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] HiSeq X (PE150)
   - [X] HiSeq 1500 (PE250)
   - [ ] HiSeq 2500 (PE250)
+    - Status: We have only PE150.
+    - Data [SRR11183119](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR11183119), [DOI](https://doi.org/10.1002/ece3.7788) is 248-bp.
   - [ ] HiSeq 3000 (PE150)
+    - In progress
   - [X] HiSeq 4000 (PE150)
   - [ ] MiniSeq (PE150 on High/Mid Output Kit, and PE100 on Rapid Kit)
   - [X] MiSeq (PE250)
   - [X] MiSeqv3 (PE300)
-  - [ ] MiSeq i100 (PE500)
-    - Status: No publicly-available data found for PE500.
   - [X] NextSeq 500 (PE150)
-  - [ ] NextSeq 550 (PE150)
-  - [ ] NovaSeq 5000 (PE150)
-    - Status: No publicly-available data found.
+  - [X] NextSeq 550 (PE150)
 - MGI Tech:
   - [X] BGISEQ-500 (PE150)
   - [ ] DNBSEQ-E5 (SE100)
@@ -199,10 +200,12 @@ Note:
   - The following models use 3- or 4-bin quality score compression, so not included:
     - NextSeq 1000 (PE300)
     - NextSeq 2000 (PE300)
+    - NovaSeq 5000 (PE150)
     - NovaSeq 6000 (PE250)
     - NovaSeq X (PE150)
     - NovaSeq X Plus (PE150)
     - iSeq 100 (PE150)
+    - MiSeq i100 (PE500)
 - For MGI Tech models:
   - We do not distinguish Rs (Research-only) models with non-RS models.
   - DNBSEQ-G400ER is a nanopore-based long read sequencer, so not included.

@@ -22,6 +22,7 @@ SNAME_FILE_MAPPING = {
     "HiSeq2500_125bp": ("HiSeq2500L125R1.txt", "HiSeq2500L125R2.txt"),
     "HiSeq2500_150bp": ("HiSeq2500L150R1.txt", "HiSeq2500L150R2.txt"),
     "HiSeq2500Filtered_150bp": ("HiSeq2500L150R1filter.txt", "HiSeq2500L150R2filter.txt"),
+    # "HiSeq3000_150bp": ("HiSeq3kL150R1.txt", "HiSeq3kL150R2.txt"),
     "HiSeq4000_150bp": ("HiSeq4kL150R1.txt", "HiSeq4kL150R2.txt"),
     "HiSeqX_PCR_Free_150bp": ("HiSeqXPCRfreeL150R1.txt", "HiSeqXPCRfreeL150R2.txt"),
     "HiSeqX_TruSeq_150bp": ("HiSeqXtruSeqL150R1.txt", "HiSeqXtruSeqL150R2.txt"),
@@ -34,6 +35,7 @@ SNAME_FILE_MAPPING = {
     # NextSeq
     "NextSeq500_150bp": ("NextSeq500L150R1.txt", "NextSeq500L150R2.txt"),
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
+    "NextSeq550_150bp": ("NextSeq550L150R1.txt", "NextSeq550L150R2.txt"),
     # DNBSeq Models
     "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
     "DNBSeqG50_150bp": ("DNBSG50L150R1.txt", "DNBSG50L150R2.txt"),
