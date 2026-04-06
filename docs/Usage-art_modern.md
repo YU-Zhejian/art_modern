@@ -130,6 +130,7 @@ New models from Illumina, BGI/MGI, and PacBio are added.
 | `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
 | `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)    | [1.4.0](#v-1.4.0-section) | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
 | `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)   | [1.4.0](#v-1.4.0-section) | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
+| `EBAviti_300bp`     | `EBAvitiL300R1`    | 300   | 300   | Element Biosciences Aviti | [1.4.1](#v-1.4.1-section) | [Element Biosciences](http://elementbiosciences.com/resources/long-insert-human-wgs-with-the-adept-workflow)       |
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -196,7 +197,7 @@ List of all models by distinguished NGS sequencer manufacturers:
 - [GeneMind](https://en.genemind.com/):
   - Status: All GeneMind models uses quality binning.
 - [Element Biosciences](https://www.elementbiosciences.com/):
-  - AVITI : [Dataset](http://elementbiosciences.com/resources/long-insert-human-wgs-with-the-adept-workflow) [R1](https://element-public-data.s3.us-west-2.amazonaws.com/20231031-2x300/human_wgs/DVT-0070/Samples/GAT-GEM-C001/GAT-GEM-C001_R1.fastq.gz), [R2](https://element-public-data.s3.us-west-2.amazonaws.com/20231031-2x300/human_wgs/DVT-0070/Samples/GAT-GEM-C001/GAT-GEM-C001_R2.fastq.gz)
+  - [ ] AVITI (PE300)
 
 Note:
 
