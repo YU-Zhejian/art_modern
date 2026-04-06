@@ -1,26 +1,28 @@
 (am_compress-usage-section)=
 # Usage of `am_compress`
 
-`am_compress` is a compression tool that allows the user to compress arbitrary files to GZip and BGZip. Added in [1.3.4](#v-1.3.4-section).
+`am_compress` is a compression tool that allows users to compress arbitrary files to GZip and BGZip. Added in [1.3.4](#v-1.3.4-section).
 
 ## Implementation
 
-This program in fact provides a user interface to `bgzf` data structure in HTSLib. Further compression algorithms can be added on request.
+This program, in fact, provides a user interface to the `bgzf` data structure in HTSLib. Further compression algorithms can be added on request.
 
-The input buffer size is always 4kb.
+The input buffer size is always 4 KB.
 
 ## Options
 
 - `--o-compressed`: Output file name of the compressed data stream.
-- `--o-compressed-compression`: Compression algorithm. Can be `gzip`, `bgzip` or `none`. If not set, will infer from extension.
+- `--o-compressed-compression`: Compression algorithm. Can be `gzip`, `bgzip`, or `none`. If not set, will infer from extension.
 - `--o-compressed-compression_level`: Compression level. Can be 1 (fastest) to 9 (best compression).
 - `--o-compressed-buffer_size`: Buffer used for compression.
-- `--o-compressed-num_threads`: Number of threads used in compression. Only used for BGZip algorithm.
+- `--o-compressed-num_threads`: Number of threads used in compression. **Only used for the BGZip algorithm.**
 - `--i-file`: Input file.
 
-The program would emit warning if the output file extension does not match the desired algorithm.
+The program would emit a warning if the output file extension does not match the desired algorithm.
 
-## Usage Example
+## Performance Metrics
+
+The following code compares `am_compress`, `pigz`, `bgzip`, and Intel's `igzip`.
 
 ```shell
 gzip --version

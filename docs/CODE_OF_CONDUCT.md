@@ -1,4 +1,4 @@
 # Code of Conduct
 
-- Respect the others.
+- Respect others.
 - File an issue before working on the PR.

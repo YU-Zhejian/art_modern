@@ -16,7 +16,6 @@ git ls-files |
     grep -v '^.idea/' |
     grep -v '^.github/' |
     grep -v '^.vscode/' |
-    grep -v '^bioconda/' |
     grep -v '^chroot/' |
     grep -v '^debian/' |
     grep -v '^deps/concurrentqueue/' |

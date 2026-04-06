@@ -1,29 +1,29 @@
 # Installing `art_modern`
 
-Here provides a detailed installation guide for `art_modern`.
+Here is a detailed installation guide for `art_modern`.
 
-**NOTE** All "at least" in this guide are inclusive.
+**NOTE:** All "at least" in this guide are inclusive.
 
 ## Operating System
 
-The project assumes [x86\_64](https://en.wikipedia.org/wiki/X86-64) (aka., Intel 64, AMD64, x64, with chips manufactured by Intel, AMD, VIA, Zhaoxin, etc.) platforms. Support on other platforms (including 32-bit CPUs) are not guaranteed.
+The project assumes [x86\_64](https://en.wikipedia.org/wiki/X86-64) (aka Intel 64, AMD64, x64, with chips manufactured by Intel, AMD, VIA, Zhaoxin, etc.) platforms. Support on other platforms (including 32-bit CPUs) is not guaranteed.
 
-The project assumes modern GNU/Linux distributions that are still under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus). Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
+The project assumes modern GNU/Linux distributions that are still under official support. For example, Ubuntu 16.04 LTS (Xenial Xerus) had already reached its end-of-life in [Apr. 2021](https://help.ubuntu.com/community/EOL#Ubuntu_16.04_Xenial_Xerus). Other POSIX platforms like \*BSD, and patent UNIX are theoretically supported but not tested. POSIX-on-Windows platforms like [Cygwin](https://cygwin.com/), [MSYS2](https://www.msys2.org/), [MinGW](https://sourceforge.net/projects/mingw/), and [MinGW-w64](https://www.mingw-w64.org/) are neither supported nor tested.
 
 ## C/C++ Compilers
 
 ### Checking C11 and C++17 Compatibility
 
-This project requires a working C++ compiler that supports C++17 and a working C compiler that supports C11. You may test whether your compiler (GCC, for example) supports such standard using:
+This project requires a working C++ compiler supporting C++17 and a working C compiler supporting C11. You may test whether your compiler (GCC, for example) supports this using:
 
 ```shell
 echo 'int main(){}' | gcc --std=c11 -x c - -o /dev/null
 echo 'int main(){}' | g++ --std=c++17 -x c++ - -o /dev/null
 ```
 
-**NOTE** This is a very rough test. The compiler may still fail to compile the project due to the lack of support of some specific features. In other words, if there is no error, the compiler **MIGHT** be supported. If there is an error, the compiler is definitely **NOT** supported.
+**NOTE:** This is a very rough test. The compiler may still fail to compile the project due to the lack of support for some specific features. In other words, if there is no error, the compiler **MIGHT** be supported. If there is an error, the compiler is definitely **NOT** supported.
 
-**NOTE** The CMake build scripts inside this project contains a script that tests compiler compatibility, which will be automatically executed when configuring the project.
+**NOTE:** The CMake build scripts in this project include a test of compiler compatibility, which is automatically executed during project configuration.
 
 For a table of the minimum compiler version that supports those versions, see also:
 
@@ -32,9 +32,9 @@ For a table of the minimum compiler version that supports those versions, see al
 
 ### GCC
 
-GNU Compiler Collections (GCC) ([homepage](https://gcc.gnu.org/)) is the most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance. At least [7.4.0](https://gcc.gnu.org/gcc-7/changes.html#GCC7.4) is required.
+GNU Compiler Collection (GCC) ([homepage](https://gcc.gnu.org/)) is the most widely used compiler for GNU/Linux that provides the best compatibility and error-tolerance. At least [7.4.0](https://gcc.gnu.org/gcc-7/changes.html#GCC7.4) is required.
 
-**NOTE** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library ([`libstdc++`](https://gcc.gnu.org/onlinedocs/libstdc++/)).
+**NOTE:** GCC supports diverse programming languages. Please ensure that your GCC installation comes with C++ support. You need at least the `g++` program (Test with `g++ --version`) and a working GNU C++ Standard Library ([`libstdc++`](https://gcc.gnu.org/onlinedocs/libstdc++/)).
 
 See also:
 
@@ -43,9 +43,9 @@ See also:
 
 ### Clang
 
-[Clang](https://clang.llvm.org/) is another popular compiler for GNU/Linux that uses Low-Level Virtual Machine ([LLVM](https://llvm.org/)) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X. At least [5.0.1](https://releases.llvm.org/5.0.1/tools/clang/docs/ReleaseNotes.html) is required.
+[Clang](https://clang.llvm.org/) is another popular compiler for GNU/Linux that uses the Low-Level Virtual Machine ([LLVM](https://llvm.org/)) toolchain. Also, the default C++ compiler for FreeBSD and Apple Mac OS X. At least [5.0.1](https://releases.llvm.org/5.0.1/tools/clang/docs/ReleaseNotes.html) is required.
 
-**NOTE** Clang may need GCC to work properly due to the need of the compiler runtime library (e.g., [`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [this LLVM article](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
+**NOTE**: Clang may need GCC to work properly due to the need for the compiler runtime library (e.g., [`libgcc`/`libgcc_s`](https://gcc.gnu.org/onlinedocs/gccint/Libgcc.html) and [`libatomic`](https://gcc.gnu.org/wiki/Atomic/GCCMM)). See [this LLVM article](https://clang.llvm.org/docs/Toolchain.html) for detailed instructions on selecting GNU- or LLVM-based variants of each toolchain component for Clang.
 
 See also:
 
@@ -56,11 +56,11 @@ See also:
 
 The compiler ([homepage](https://www.intel.com/content/www/us/en/developer/tools/oneapi/dpc-compiler.html)) can build accelerated binaries on Intel CPUs. Compatibilities on the latest version of this compiler will be tested.
 
-**NOTE** Here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (ICC, with programs named `icc` and `icpc`).
+**NOTE:** Here we refer to the LLVM-based one (with programs named `icx` and `icpx`) instead of the old Intel C++ Compiler Classic (ICC, with programs named `icc` and `icpc`).
 
-**NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
+**NOTE:** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
 
-**NOTE** Distributing binaries built with this compiler may require you to comply with Intel's license and/or breaking the GPL.
+**NOTE**: Distributing binaries built with this compiler may require you to comply with Intel's license and/or break the GPL.
 
 ### Other Compilers
 
@@ -68,7 +68,7 @@ Although not tested, the following compilers can also theoretically be of use:
 
 - Intel C++ Compiler Classic (ICC) **MAY** work with legacy systems and Boost libraries.
 - [NVIDIA HPC compilers](https://developer.nvidia.com/hpc-compilers) should work as all versions of this compiler support C++17.
-  - **NOTE** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
+  - **NOTE:** CMake version higher than [3.20.0](https://cmake.org/cmake/help/latest/release/3.20.html#compilers) is required to support this compiler.
 - [AMD Optimizing C/C++ and Fortran Compilers (AOCC)](https://www.amd.com/en/developer/aocc.html) should work as all versions of this compiler support C++17. Specifically,
   - Its first version, 3.2.0 (`AMD Clang 13.0.0 (CLANG: AOCC_3.2.0-Build#128 2021_11_12)`), was tested.
   - Its latest version, 5.0.0 (`AMD Clang 17.0.6 (CLANG: AOCC_5.0.0-Build#1377 2024_09_24)`), was tested.
@@ -80,13 +80,13 @@ Although not tested, the following compilers can also theoretically be of use:
 
 [CMake](https://cmake.org/) is a cross-platform build system. It is required to build the project. At least [3.17](https://cmake.org/cmake/help/latest/release/3.17.html) is required.
 
-**NOTE** Lots of EOL distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake officially-built binaries](https://cmake.org/files/v3.17/).
+**NOTE:** Lots of End-of-Life distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake's officially-built binaries](https://cmake.org/files/v3.17/).
 
-### Dependencies of CMake Build System
+### Dependencies of the CMake Build System
 
 CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` will **NOT** work.
 
-This project requires [Python](https://www.python.org/) at least 3.7 when building the package, for embedding bundled Illumina profiles and `make help`. Python is not required at runtime.
+This project requires [Python](https://www.python.org/) at least 3.7 when building the package, for embedding bundled Illumina profiles, and `make help`. Python is not required at runtime.
 
 ### Linkers, Assemblers, Archivers, etc
 
@@ -94,64 +94,66 @@ You need either [GNU BinUtils](https://www.gnu.org/software/binutils/) or [LLVM 
 
 ### C Library
 
-This project were tested working using [GNU C Library](https://www.gnu.org/software/libc/) and [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 and C11 should work.
+This project was tested using the [GNU C Library](https://www.gnu.org/software/libc/) and the [MUSL C Library](https://musl.libc.org/). Other C libraries are not tested. However, C libraries that satisfy POSIX.1-2008 and C11 should work.
 
-**NOTE** [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
+**NOTE:** The [LLVM C Library](https://libc.llvm.org/) is neither supported nor tested.
 
-**NOTE** Most C libraries bundles a copy of POSIX threads library ([pthread(7)](https://www.man7.org/linux/man-pages/man7/pthreads.7.html), usually named `libpthread.so` or `libpthread.a` if statically linked) and math library (Usually named `libm.so` or `libm.a`). Those libraries are required by this project.
+**NOTE:** Most C libraries bundle a copy of the POSIX threads library ([pthread(7)](https://www.man7.org/linux/man-pages/man7/pthreads.7.html), usually named `libpthread.so` or `libpthread.a` if statically linked) and math library (Usually named `libm.so` or `libm.a`). Those libraries are required by this project.
 
-**NOTE** Here, we assume that [`FindThread`](https://cmake.org/cmake/help/latest/module/FindThreads.html) of CMake will find pthread.
+**NOTE:** Here, we assume that [`FindThread`](https://cmake.org/cmake/help/latest/module/FindThreads.html) of CMake will find pthread.
 
 ### `pkgconf` or `pkg-config`
 
-The project may take advantage [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/) or its modern replacement (**RECOMMENDED**) [`pkgconf`](https://github.com/pkgconf/pkgconf) to locate the dependencies. Installing such is **HIGHLY** recommended.
+The project may take advantage of [`pkg-config`](https://www.freedesktop.org/wiki/Software/pkg-config/) or its modern replacement (**RECOMMENDED**) [`pkgconf`](https://github.com/pkgconf/pkgconf), to locate the dependencies. Installing such is **HIGHLY** recommended.
 
-**NOTE** You may need to set up environment variable `PKG_CONFIG_PATH` to allow those tools to find the dependencies.
+**NOTE:** You may need to set the environment variable `PKG_CONFIG_PATH` to allow those tools to find the dependencies.
 
 ### Command-Line Utilities
 
 For Apple Mac OS X, FreeBSD, Alpine Linux, and other GNU/Linux distributions with obsolete packages, please consider checking the version of the following tools:
 
 - [GNU CoreUtils](https://www.gnu.org/software/coreutils/) (At least 8.28) for the use of `env -C` (introduced in 8.28) and `readlink -f` (introduced in 8.0).
-  - **NOTE** CMake may have its own requirements on the version of GNU CoreUtils.
+  - **NOTE:** CMake may have its own requirements on the version of GNU CoreUtils.
 - [GNU Bash](https://www.gnu.org/software/bash/) (At least 4.2) for the possible use of advanced array operations.
-  - **NOTE** CMake may have its own requirements on the version of GNU Bash.
-- [GNU Make](https://www.gnu.org/software/make) as the BSD variant is known to be incompatible.
-  - **NOTE** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
+  
+  - **NOTE:** CMake may have its own requirements on the version of GNU Bash.
+- [GNU Make](https://www.gnu.org/software/make), as the BSD variant is known to be incompatible.
+  
+  - **NOTE:** CMake may have its own requirements on the version of GNU Make if you use GNU Make as CMake Generator.
 
-As your original system tools shipped with the operating system/BusyBox may **NOT** work.
+  As your original system tools shipped with the operating system/BusyBox may **NOT** work.
 
 ## Required External Libraries
 
-Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [DNF](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/) etc. Otherwise, contact your system administrator for where to find them or build them from source.
+Dependencies are those libraries or tools that should be installed on your system before building the project. If you're using a personal computer with root privilege, consider installing them using your system's package manager like [APT](https://wiki.debian.org/Apt), [YUM](https://fedoraproject.org/wiki/Yum), [DNF](https://fedoraproject.org/wiki/Dnf), [`pacman`](https://wiki.archlinux.org/title/Pacman), and [Conda](https://docs.conda.io/), etc. Otherwise, contact your system administrator for where to find them or build them from source.
 
 ### Boost C++ Library
 
-[Boost](https://www.boost.org/) is an umbrella project of diverse small modules that can be used independently. Except Boost header-only libraries, the compiled modules used in this project are:
+[Boost](https://www.boost.org/) is an umbrella project of diverse small modules that can be used independently. Except for Boost header-only libraries, the compiled modules used in this project are:
 
 - Essential header-only modules, including:
   - `boost/version.hpp`.
-  - [Math](https://www.boost.org/doc/libs/latest/libs/math/doc/html/index.html). For calculation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
+  - [Math](https://www.boost.org/doc/libs/latest/libs/math/doc/html/index.html). For the calculation of the probability density function (PDF), cumulative distribution function (CDF), and inverse CDFs.
   - [Exception](https://www.boost.org/doc/libs/latest/libs/exception/doc/boost-exception.html). For better exception handling.
-  - [Algorithm](https://www.boost.org/doc/libs/latest/libs/algorithm/doc/html/index.html). For simple string algorithm used in non-performance-critical situations.
+  - [Algorithm](https://www.boost.org/doc/libs/latest/libs/algorithm/doc/html/index.html). For simple string algorithms used in non-performance-critical situations.
 - Essential modules that would be linked to the final executable:
-  - [FileSystem](https://www.boost.org/doc/libs/latest/libs/filesystem/). See [this Design section](#filesystem-section) for why this module instead of C++17 `<filesystem>` is required.
+  - [FileSystem](https://www.boost.org/doc/libs/latest/libs/filesystem/). See [this Design section](#filesystem-section) for why this module, instead of C++17 `<filesystem>`, is required.
   - [Program Options](https://www.boost.org/doc/libs/latest/libs/program_options/). For parsing command-line options.
   - [Log](https://www.boost.org/doc/libs/latest/libs/log/). For logging support.
 
-**NOTE** A boost module may depend on other boost modules in either header-only or compiled form. CMake should be able to find those dependencies automatically.
+  **NOTE:** A boost module may depend on other boost modules in either header-only or compiled form. CMake should be able to find those dependencies automatically.
 
-Boost modules are found through `find_package(Boost ...)` command of CMake. This usually requires the presence of `BoostConfig.cmake` (Provided by Boost) or [`FindBoost.cmake`](https://cmake.org/cmake/help/latest/module/FindBoost.html) (provided by CMake) file. See [`BOOST_CONFIG_PROVIDED_BY_BOOST` CMake variable](#boost-config-provided-by-boost-section) mentioned below for details.
+  Boost modules are found through `find_package(Boost ...)` command of CMake. This usually requires the `BoostConfig.cmake` (Provided by Boost) or [`FindBoost.cmake`](https://cmake.org/cmake/help/latest/module/FindBoost.html) (provided by CMake) file. See [`BOOST_CONFIG_PROVIDED_BY_BOOST` CMake variable](#boost-config-provided-by-boost-section) mentioned below for details.
 
 ### zlib
 
-[zlib](https://www.zlib.net/) performs compression and decompression bundled ART error profiles. At least [1.2.0](#v-1.2.0-section) is required. zlib is also required by [bundled HTSLib](#htslib-section).
+[zlib](https://www.zlib.net/) performs compression and decompression of bundled ART error profiles. At least [1.2.0](#v-1.2.0-section) is required. zlib is also required by [bundled HTSLib](#htslib-section).
 
-The project will firstly try to find zlib using `pkgconf`. That usually requires the presence of `zlib.pc` file. If failed, will fall back to `libz.so`/`libz.a` with optional version suffixes.
+The project will first try to find zlib using `pkgconf`. That usually requires `zlib.pc` file. If failed, will fall back to `libz.so`/`libz.a` with optional version suffixes.
 
 ## Optional External Libraries
 
-The following dependencies are optional. You may choose to install them if you want to improve the performance, adaptability, or user-friendliness of the program.
+The following dependencies are optional. You may choose to install them to improve the program's performance, adaptability, or user-friendliness.
 
 (optional-boost-components)=
 ### Optional Boost Components
