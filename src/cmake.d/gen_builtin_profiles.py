@@ -22,7 +22,7 @@ SNAME_FILE_MAPPING = {
     "HiSeq2500_125bp": ("HiSeq2500L125R1.txt", "HiSeq2500L125R2.txt"),
     "HiSeq2500_150bp": ("HiSeq2500L150R1.txt", "HiSeq2500L150R2.txt"),
     "HiSeq2500Filtered_150bp": ("HiSeq2500L150R1filter.txt", "HiSeq2500L150R2filter.txt"),
-    # "HiSeq3000_150bp": ("HiSeq3kL150R1.txt", "HiSeq3kL150R2.txt"),
+    "HiSeq3000_150bp": ("HiSeq3kL150R1.txt", "HiSeq3kL150R2.txt"),
     "HiSeq4000_150bp": ("HiSeq4kL150R1.txt", "HiSeq4kL150R2.txt"),
     "HiSeqX_PCR_Free_150bp": ("HiSeqXPCRfreeL150R1.txt", "HiSeqXPCRfreeL150R2.txt"),
     "HiSeqX_TruSeq_150bp": ("HiSeqXtruSeqL150R1.txt", "HiSeqXtruSeqL150R2.txt"),

@@ -114,7 +114,7 @@ model error files are provided in the original ART.
 | `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | 150   | 150   | HiSeq 2500 (8B)   |
 
 The following profiles are built and distributed by `art_modern` maintainers.
-New models from Illumina, MGI Tech, and PacBio are added.
+New models from Illumina, MGI Tech, Elements Biosciences, and PacBio are added. Sorted in the order of discovery of data.
 
 | Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name                  | Added in                  | Source                                                                                                                               |
 |---------------------|--------------------|-------|-------|-----------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
@@ -138,7 +138,7 @@ New models from Illumina, MGI Tech, and PacBio are added.
 | `DNBSeqG400_200bp`   | `DNBSeqG400L200R1` | 200   | 200  | MGI Tech DNBSeq-G400      | [1.4.1](#v-1.4.1-section) | [CNR0117149](https://db.cngb.org/data_resources/run/CNR0117149), [MGI Tech](https://global-mgitech.com/resources/demonstration-data/)|
 | `DNBSeqT1Plus_150bp` | `DNBSeqT1PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T1 Plus | [1.4.1](#v-1.4.1-section) | [CNR1513487](https://db.cngb.org/data_resources/run/CNR1513487), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
 | `DNBSeqT7Plus_150bp` | `DNBSeqT7PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T7 Plus | [1.4.1](#v-1.4.1-section) | [CNR1433837](https://db.cngb.org/data_resources/run/CNR1433837), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
-| `HiSeq3000_150bp`    | `HiSeq3000L150R1`    | 150   | 150  | Illumina HiSeq 3000 (8B) | [1.4.1](#v-1.4.1-section) | [ERR10705258](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.5808/gi.23072)                  |
+| `HiSeq3000_150bp`    | `HiSeq3kL150R1`      | 150   | 150  | Illumina HiSeq 3000 (8B) | [1.4.1](#v-1.4.1-section) | [ERR10705258](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.5808/gi.23072)                  |
 | `NextSeq550_150bp`   | `NextSeq550L150R1`   | 150   | 150  | Illumina NextSeq 550 (6B) |[1.4.1](#v-1.4.1-section) | [SRR19308002](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR23002282), [DOI](https://doi.org/10.1093/jhered/esad033)|
 
 List of all models by distinguished NGS sequencer manufacturers:
@@ -156,10 +156,10 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] HiSeq 2500 (PE250)
     - Status: We have only PE150.
     - Data [SRR11183119](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR11183119), [DOI](https://doi.org/10.1002/ece3.7788) is 248-bp.
-  - [ ] HiSeq 3000 (PE150)
-    - In progress
+  - [X] HiSeq 3000 (PE150)
   - [X] HiSeq 4000 (PE150)
   - [ ] MiniSeq (PE150 on High/Mid Output Kit, and PE100 on Rapid Kit)
+    - [ERR2283039](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR2283039), [DOI](https://doi.org/10.1002/mbo3.611) is PE150, but have 6 bins only (8 bins considered normal), with data sized 24.9 MB.
   - [X] MiSeq (PE250)
   - [X] MiSeqv3 (PE300)
   - [X] NextSeq 500 (PE150)
@@ -168,12 +168,12 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] BGISEQ-500 (PE150)
   - [ ] DNBSEQ-E5 (SE100)
     - Status: No publicly-available data found.
-  - [ ] DNBSEQ-E25 (PE150)
+  - [ ] DNBSEQ-E25 (SE100/PE150)
     - Status: No publicly-available data found.
   - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150) (Same model, lots of names)
   - [X] DNBSEQ-G99 (PE300)
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
-    - In progress
+    - In progress.
   - [ ] DNBSEQ-G800 (SE600/PE150)
     - In progress.
   - [ ] DNBSEQ-T1 Plus (PE300)
@@ -181,7 +181,7 @@ List of all models by distinguished NGS sequencer manufacturers:
     - In progress.
   - [X] DNBSEQ-T7 (PE150)
   - [ ] DNBSEQ-T7 Plus (PE150)
-    - UPDATE: [CNP0008217](https://db.cngb.org/data_resources/project/CNP0008217), from [MGI Tech](https://www.mgi-tech.com/demo-data.html)
+    - In progress.
   - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
     - Status: We have only PE100.
     - In progress.
