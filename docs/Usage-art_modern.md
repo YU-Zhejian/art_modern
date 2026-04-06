@@ -192,9 +192,11 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] DNBSEQ-T20x2 (PE150)
     - Status: No publicly-available data found.
 - PacBio:
-  - [X] Onso (PE150/SE200)
+  - [X] Onso (PE150/SE200) (Discontinued)
 - [GeneMind](https://en.genemind.com/)
   - Status: All GeneMind models uses quality binning.
+- [Element Biosciences](https://www.elementbiosciences.com/):
+  - AVITI : [Dataset](http://elementbiosciences.com/resources/long-insert-human-wgs-with-the-adept-workflow) [R1](https://element-public-data.s3.us-west-2.amazonaws.com/20231031-2x300/human_wgs/DVT-0070/Samples/GAT-GEM-C001/GAT-GEM-C001_R1.fastq.gz), [R2](https://element-public-data.s3.us-west-2.amazonaws.com/20231031-2x300/human_wgs/DVT-0070/Samples/GAT-GEM-C001/GAT-GEM-C001_R2.fastq.gz)
 
 Note:
 
