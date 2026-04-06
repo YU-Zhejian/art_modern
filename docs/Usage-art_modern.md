@@ -189,8 +189,7 @@ List of all models by distinguished NGS sequencer manufacturers:
 - PacBio:
   - [X] Onso (PE150/SE200) (Discontinued)
 - [Element Biosciences](https://www.elementbiosciences.com/):
-  - [ ] AVITI (PE300)
-    - Build in progress.
+  - [X] AVITI (PE300)
 
 Note:
 
