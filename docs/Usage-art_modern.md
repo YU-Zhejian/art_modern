@@ -158,7 +158,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] HiSeq 3000 (PE150)
   - [X] HiSeq 4000 (PE150)
   - [ ] MiniSeq (PE150 on High/Mid Output Kit, and PE100 on Rapid Kit)
-    - [ERR2283039](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR2283039), [DOI](https://doi.org/10.1002/mbo3.611) is PE150, but have 6 bins only (8 bins considered normal), with data sized 24.9 MB.
+    - Data [ERR2283039](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR2283039), [DOI](https://doi.org/10.1002/mbo3.611) is PE150, but have 6 bins only (8 bins considered normal), with data sized 24.9 MB.
   - [X] MiSeq (PE250)
   - [X] MiSeqv3 (PE300)
   - [X] NextSeq 500 (PE150)
@@ -172,25 +172,25 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150) (Same model, lots of names)
   - [X] DNBSEQ-G99 (PE300)
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
-    - In progress.
+    - Dl in progress.
   - [ ] DNBSEQ-G800 (SE600/PE150)
-    - In progress.
+    - Build in progress.
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
-    - In progress.
+    - Dl in progress.
   - [X] DNBSEQ-T7 (PE150)
   - [ ] DNBSEQ-T7 Plus (PE150)
-    - In progress.
+    - Dl in progress.
   - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
     - Status: We have only PE100.
-    - In progress.
+    - Dl in progress.
   - [ ] DNBSEQ-T20x2 (PE150)
     - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200) (Discontinued)
 - [Element Biosciences](https://www.elementbiosciences.com/):
   - [ ] AVITI (PE300)
-    - In progress.
+    - Build in progress.
 
 Note:
 
