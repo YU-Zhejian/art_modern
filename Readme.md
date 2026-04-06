@@ -35,7 +35,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 `art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that generates ART-compatible profiles from FASTQ, SAM, and BAM files.
 
-The program comes with new profiles for Illumina models, as well as error profiles from other NGS sequencers such as BGI/MGI DNBSeq and PacBio Onso.
+The program comes with new profiles for Illumina models, as well as error profiles from other NGS sequencers such as MGI Tech DNBSeq, Element Biosciences AVITI, and PacBio Onso.
 
 ## Quick Start
 

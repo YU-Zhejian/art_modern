@@ -114,23 +114,30 @@ model error files are provided in the original ART.
 | `HiSeq2500Filtered_150bp` | `HiSeq2500L150R1filter` | 150   | 150   | HiSeq 2500 (8B)   |
 
 The following profiles are built and distributed by `art_modern` maintainers.
-New models from Illumina, BGI/MGI, and PacBio are added.
+New models from Illumina, MGI Tech, and PacBio are added.
 
-| Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name         | Added in                  | Source                                                                                                                               |
-|---------------------|--------------------|-------|-------|--------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
-| `PacbOnso_150bp`    | `PacbOnsoL150R1`   | 150   | 150   | PacBio Onso        | [1.4.0](#v-1.4.0-section) | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
-| `MiSeq_v3_300bp`    | `MiSeqv3L300R1`    | 300   | 300   | MiSeq v3           | [1.4.0](#v-1.4.0-section) | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)          |
-| `GA2X_150bp`        | `GA2XL150R1`       | 150   | 150   | GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
-| `GA2X_100bp`        | `GA2XL100R1`       | 100   | 100   | GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)                      |
-| `HiSeq1500_250bp`   | `HiSeq1500L250R1`  | 250   | 250   | HiSeq 1500         | [1.4.0](#v-1.4.0-section) | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
-| `BGISeq500_150bp`   | `BgiSeq500L150R1`  | 150   | 150   | BGISeq-500         | [1.4.0](#v-1.4.0-section) | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)                |
-| `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | DNBSeq-T7          | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
-| `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | DNBSeq-G50         | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
-| `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
-| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
-| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | HiSeq 4000 (8B)    | [1.4.0](#v-1.4.0-section) | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
-| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | NextSeq 500 (8B)   | [1.4.0](#v-1.4.0-section) | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
+| Name (`art_modern`) | R1 `txt` file name | RLen1 | RLen2 | Model Name                  | Added in                  | Source                                                                                                                               |
+|---------------------|--------------------|-------|-------|-----------------------------|---------------------------|--------------------------------------------------------------------------------------------------------------------------------------|
+| `PacbOnso_150bp`    | `PacbOnsoL150R1`   | 150   | 150   | PacBio Onso                 | [1.4.0](#v-1.4.0-section) | [PacBio](https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/)                                                      |
+| `MiSeq_v3_300bp`    | `MiSeqv3L300R1`    | 300   | 300   | Illumina MiSeq v3           | [1.4.0](#v-1.4.0-section) | [SRR29636774](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR29636774), [DOI](https://doi.org/10.1093/jac/dkaf130)          |
+| `GA2X_150bp`        | `GA2XL150R1`       | 150   | 150   | Illumina GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [ERR038223](https://www.ebi.ac.uk/ena/browser/view/ERR038223); [1KG](https://www.internationalgenome.org/data-portal/sample/HG00864) |
+| `GA2X_100bp`        | `GA2XL100R1`       | 100   | 100   | Illumina GenomeAnalyzer IIx | [1.4.0](#v-1.4.0-section) | [SRR933371](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR933371); [DOI](https://doi.org/10.1128/mbio.00377-13)                      |
+| `HiSeq1500_250bp`   | `HiSeq1500L250R1`  | 250   | 250   | Illumina HiSeq 1500         | [1.4.0](#v-1.4.0-section) | [ERR3322785](https://www.ebi.ac.uk/ena/browser/view/ERR3322785); [DOI](https://doi.org/10.1128/JCM.00768-19)                         |
+| `BGISeq500_150bp`   | `BgiSeq500L150R1`  | 150   | 150   | MGI Tech BGISeq-500         | [1.4.0](#v-1.4.0-section) | [ERR14979854](https://www.ebi.ac.uk/ena/browser/view/ERR14979854), [DOI](https://doi.org/10.21203/rs.3.rs-6673441/v1)                |
+| `DNBSeqT7_150bp`    | `DNBSeqT7L150R1`   | 150   | 150   | MGI Tech DNBSeq-T7          | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1093/gigascience/giae099)         |
+| `DNBSeqG50_150bp`   | `DNBSG50L150R1`    | 150   | 150   | MGI Tech DNBSeq-G50         | [1.4.0](#v-1.4.0-section) | [SRR30016282](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR30016282), [DOI](https://doi.org/10.1038/s41598-025-27556-y)          |
+| `DNBSeqG400_150bp`  | `DNBSeqG400L150R1` | 150   | 150   | MGI Tech DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [GIAB](https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/)                                      |
+| `DNBSeqG400_400bp`  | `DNBSeqG400L400R1` | 400   | N/A   | MGI Tech DNBSeq-G400        | [1.4.0](#v-1.4.0-section) | [ERR2888331](https://www.ebi.ac.uk/ena/browser/view/ERR2888331), [DOI](https://doi.org/10.1186/s12864-020-07255-w)                   |
+| `HiSeq4000_150bp`   | `HiSeq4kL150R1`    | 150   | 150   | Illumina HiSeq 4000 (8B)    | [1.4.0](#v-1.4.0-section) | [SRR2664950](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.1155/2016/4169587)                  |
+| `NextSeq500_150bp`  | `NextSeq500L150R1` | 150   | 150   | Illumina NextSeq 500 (8B)   | [1.4.0](#v-1.4.0-section) | [SRR9733244](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=SRR9733244), [DOI](https://doi.org/10.3389/fbioe.2020.00817)       |
 | `EBAviti_300bp`     | `EBAvitiL300R1`    | 300   | 300   | Element Biosciences Aviti | [1.4.1](#v-1.4.1-section) | [Element Biosciences](http://elementbiosciences.com/resources/long-insert-human-wgs-with-the-adept-workflow)       |
+| `DNBSeqG800_600bp`  | `DNBSeqG800L600R1` | 600   | N/A   | MGI Tech DNBSeq-G800      | [1.4.1](#v-1.4.1-section) | [R1.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_SE600_HG001_Read1.fq.gz), [Complete Genomics](https://www.completegenomics.com/learn/demo-data) |
+| `DNBSeqG800_150bp`  | `DNBSeqG800L150R1` | 150   | 150   | MGI Tech DNBSeq-G800      | [1.4.1](#v-1.4.1-section) | [R1.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_PE150_Ecoli_Read1.fq.gz), [R2.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_PE150_Ecoli_Read2.fq.gz), [Complete Genomics](https://www.completegenomics.com/learn/demo-data) |
+| `DNBSeqG99_300bp`   | `DNBSeqG99L300R1`  | 300   | 300   | MGI Tech DNBSeq-G800      | [1.4.1](#v-1.4.1-section) | [CNR1261865](https://db.cngb.org/data_resources/run/CNR1261865/), [MGI Tech](https://www.mgi-tech.com/demo-data.html) |
+| `DNBSeqT10X4_100bp` | `DNBSeqT10X4L100R1` | 100  | 100   | MGI Tech DNBSeq-T10X4     | [1.4.1](#v-1.4.1-section) |[CNR0117350](https://db.cngb.org/data_resources/run/CNR0117350), [MGI Tech](https://www.mgi-tech.com/demo-data.html) |
+| `DNBSeqG400_200bp`   | `DNBSeqG400L200R1` | 200   | 200  | MGI Tech DNBSeq-G400      | [1.4.1](#v-1.4.1-section) | [CNR0117149](https://db.cngb.org/data_resources/run/CNR0117149), [MGI Tech](https://global-mgitech.com/resources/demonstration-data/)|
+| `DNBSeqT1Plus_150bp` | `DNBSeqT1PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T1 Plus | [1.4.1](#v-1.4.1-section) | [CNR1513487](https://db.cngb.org/data_resources/run/CNR1513487), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
+| `DNBSeqT7Plus_150bp` | `DNBSeqT7PlusL150R1` | 150   | 150  | MGI Tech DNBSeq-T7 Plus | [1.4.1](#v-1.4.1-section) | [CNR1433837](https://db.cngb.org/data_resources/run/CNR1433837), [MGI Tech](https://www.mgi-tech.com/demo-data.html)|
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -154,56 +161,56 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Status: No publicly-available data found for PE500.
   - [X] NextSeq 500 (PE150)
   - [ ] NextSeq 550 (PE150)
-  - [ ] NextSeq 1000 (PE300)
-    - Status: The current available datasets use quality score binning of 4-bins.
-  - [ ] NextSeq 2000 (PE300)
-    - Status: The current available datasets use quality score binning of 4-bins.
   - [ ] NovaSeq 5000 (PE150)
     - Status: No publicly-available data found.
-  - [ ] NovaSeq 6000 (PE250)
-    - Status: The current available datasets use quality score binning of 4-bins.
-  - [ ] NovaSeq X (PE150)
-    - Status: The current available datasets use quality score binning of 4-bins.
-  - [ ] NovaSeq X Plus (PE150)
-    - Status: The current available datasets use quality score binning of 4-bins.
-  - [ ] iSeq 100 (PE150)
-    - Status: The current available datasets use quality score binning of 3- or 4-bins.
-- BGI/MGI:
-  - [ ] BGISEQ-500 (PE200)
-    - Status: We now have PE150 only.
+- MGI Tech:
+  - [X] BGISEQ-500 (PE150)
   - [ ] DNBSEQ-E5 (SE100)
     - Status: No publicly-available data found.
   - [ ] DNBSEQ-E25 (PE150)
     - Status: No publicly-available data found.
-  - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150)
-    - Yes they are the same model.
-  - [ ] DNBSEQ-G99 (PE300)
-    - Status: No publicly-available data found.
+  - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150) (Same model, lots of names)
+  - [X] DNBSEQ-G99 (PE300)
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
-    - Status: We now have PE150 and SE400 only.
-    - [ERR4894594](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4894594) is a trimmed PE200 data, while [ERR4886095](https://trace.ncbi.nlm.nih.gov/Traces/index.html?run=ERR4886095) is a trimmed SE400 data. [DOI](https://doi.org/10.46471/gigabyte.16).
-  - [ ] DNBSEQ-T7 (PE150)
-    - In Progress.
+    - In progress
+  - [ ] DNBSEQ-G800 (SE600/PE150)
+    - In progress.
+  - [ ] DNBSEQ-T1 Plus (PE300)
+    - Status: We have only PE150.
+    - In progress.
+  - [X] DNBSEQ-T7 (PE150)
   - [ ] DNBSEQ-T7 Plus (PE150)
-    - Status: No publicly-available data found.
-  - [ ] DNBSEQ-T10 (PE150)
-    - Status: No publicly-available data found.
-  - [ ] DNBSEQ-T10x4 (PE150)
-    - Status: No publicly-available data found.
+    - UPDATE: [CNP0008217](https://db.cngb.org/data_resources/project/CNP0008217), from [MGI Tech](https://www.mgi-tech.com/demo-data.html)
+  - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
+    - Status: We have only PE100.
+    - In progress.
   - [ ] DNBSEQ-T20x2 (PE150)
     - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200) (Discontinued)
-- [GeneMind](https://en.genemind.com/):
-  - Status: All GeneMind models uses quality binning.
 - [Element Biosciences](https://www.elementbiosciences.com/):
   - [ ] AVITI (PE300)
+    - In progress.
 
 Note:
 
-- For Illumina, Dx models (e.g., MiSeqDx) with locked software for forensics and diagnostics are treated as those without Dx.
-- For BGI/MGI models, we do not distinguish Rs (Research-only) models with non-RS models.
+- For Illumina models:
+  - We do not distinguish Dx (forensics and diagnostics) models with non-Dx models.
+  - The following models use 3- or 4-bin quality score compression, so not included:
+    - NextSeq 1000 (PE300)
+    - NextSeq 2000 (PE300)
+    - NovaSeq 6000 (PE250)
+    - NovaSeq X (PE150)
+    - NovaSeq X Plus (PE150)
+    - iSeq 100 (PE150)
+- For MGI Tech models:
+  - We do not distinguish Rs (Research-only) models with non-RS models.
   - DNBSEQ-G400ER is a nanopore-based long read sequencer, so not included.
+  - The following platforms are "haunted" -- We cannot find authentic information of those models:
+    - BGISEQ-1000
+    - DNBSEQ-T1
+    - DNBSEQ-T5
+- For [GeneMind](https://en.genemind.com/): All GeneMind models uses 4-bin quality score compression, so not used.
 
 #### Shift and Clip Parameters
 
