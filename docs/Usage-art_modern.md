@@ -173,8 +173,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] DNBSEQ-G99 (PE300)
   - [ ] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
     - Dl in progress.
-  - [ ] DNBSEQ-G800 (SE600/PE150)
-    - Build in progress.
+  - [X] DNBSEQ-G800 (SE600/PE150)
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
     - Dl in progress.
