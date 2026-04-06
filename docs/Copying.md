@@ -41,11 +41,11 @@ Affected files:
 - `/deps/slim_libceu/**`
   
 
-  With MIT License.
+With MIT License.
 
-  **NOTE** Added in [1.0.0](#v-1.0.0-section).
+**NOTE** Added in [1.0.0](#v-1.0.0-section).
 
-  **NOTE:** This project was dead. New projects should consider [Boost::Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
+**NOTE:** This project was dead. New projects should consider [Boost::Predef](https://www.boost.org/doc/libs/1_87_0/libs/predef/doc/index.html) instead.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
@@ -69,9 +69,9 @@ Affected files:
 - `/deps/thread-pool/**`
   
 
-  Under the MIT License.
+Under the MIT License.
 
-  **NOTE** Added in [1.1.0](#v-1.1.0-section).
+**NOTE** Added in [1.1.0](#v-1.1.0-section).
 
 ## `{fmt}` by Victor Zverovich
 
