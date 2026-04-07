@@ -1,9 +1,8 @@
 #!/usr/bin/bash
-#SBATCH -n 1
-#SBATCH -c 32
-#SBATCH -N 1
+#SBATCH --nodes=2
+#SBATCH --ntasks=32
 #SBATCH --mem=16G
-#SBATCH --time=24:00:00
+#SBATCH --time=1:00:00
 #SBATCH --job-name=test-am-large-contigs
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
@@ -14,7 +13,7 @@ module load petagene
 export PATH="${HOME}/.pixi/bin:${PATH}"
 eval "$(pixi shell-hook)"
 
-set -ueo pipefail
+set -ueo pipefail -x
 
 NJOBS=32
 FCOV=20
@@ -22,13 +21,11 @@ FCOV=20
 # Set locale to C
 export LC_ALL=C
 export LANG=C
-
-
-printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\n' >time.tsv
+export I_MPI_PMI_LIBRARY=/cm/shared/apps/slurm/current/lib64/libpmi2.so
 
 # Only test whether the SAM output can be generated from such large contigs
-"$(which time)" -a -o time.tsv -f '\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' \
-    ../../opt/build_release_install/bin/art_modern \
+pixi run -e buildoncluster \
+    ../../opt/build_release_install-mpi/bin/art_modern-mpi \
     --i-file generated/large_contigs.fa \
     --i-type fasta \
     --i-parser htslib \
@@ -37,6 +34,8 @@ printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\
     --o-hl_sam generated/large_contigs.fa.bam \
     --o-hl_sam-num_threads "${NJOBS}" \
     --o-hl_sam-write_bam
+
+exit
 
 mkdir -p tmp
 samtools view "generated/large_contigs.fa.bam" | \

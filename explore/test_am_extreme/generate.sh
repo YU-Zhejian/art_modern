@@ -3,7 +3,7 @@
 #SBATCH -c 1
 #SBATCH -N 1
 #SBATCH --mem=2G
-#SBATCH --time=24:00:00
+#SBATCH --time=4:00:00
 #SBATCH --job-name=generate
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
