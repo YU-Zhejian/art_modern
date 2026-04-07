@@ -197,9 +197,7 @@ List of all models by distinguished NGS sequencer manufacturers:
 - [Element Biosciences](https://www.elementbiosciences.com/):
   - [X] AVITI (PE300)
   - [ ] AVITI with Cloudbreak UltraQ (PE150)
-    - [Data](https://www.elementbiosciences.com/resources/human-whole-genome-sequencing-chm13-cell-line-cloudbreak-ultraq)
-    - [R1](https://element-public-data.s3.us-west-2.amazonaws.com/20240621-CloudbreakUltraQ/bases2fastq/MAXQ-0607__0fd9a6c2029c4f4fb6bf981f8a02c60f/Samples/GAT-ULTRAQ-L013/GAT-ULTRAQ-L013_R1.fastq.gz)
-    - [R2](https://element-public-data.s3.us-west-2.amazonaws.com/20240621-CloudbreakUltraQ/bases2fastq/MAXQ-0607__0fd9a6c2029c4f4fb6bf981f8a02c60f/Samples/GAT-ULTRAQ-L013/GAT-ULTRAQ-L013_R2.fastq.gz)
+    - In progress.
 
 Note:
 
