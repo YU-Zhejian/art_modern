@@ -2,8 +2,11 @@
 
 ## Limitations of BAM format
 
-1. BAM uses `uint32t` to record number of contigs (whose actual range should be -1 to $2^31-1$ inclusive), so aligned BAM cannot pass Many Contigs test.
-2. 
+1. BAM uses `uint32t` to record number of contigs and uses `int32_t` for contig ID, whose actual range should be -1 to $2^31-1$ inclusive.
+2. BAI cannot handle contigs larger than 512Mbp. CSI may handle 2Gbp contigs.
+3. BAM `POS` field is `int32_t`, whose actual range should be -1 to $2^31-1$ inclusive.
+
+See [this](https://github.com/samtools/hts-specs/issues/240), [this](https://github.com/samtools/hts-specs/issues/40), and [this](https://github.com/samtools/hts-specs/issues/735) discussion in HTSLib-related repos.
 
 ## Many Contigs
 
