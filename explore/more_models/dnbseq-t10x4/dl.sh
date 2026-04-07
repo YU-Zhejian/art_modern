@@ -3,7 +3,7 @@
 #SBATCH -c 4
 #SBATCH -N 1
 # Default mem 4GiB
-#SBATCH --time=24:00:00
+#SBATCH --time=3-00:00:00
 #SBATCH --job-name=raw_data-dl
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
