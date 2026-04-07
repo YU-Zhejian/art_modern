@@ -48,7 +48,7 @@ SNAME_FILE_MAPPING = {
     # "DNBSeqT1Plus_150bp": ("DNBSeqT1PlusL150R1.txt", "DNBSeqT1PlusL150R2.txt"),
     # "DNBSeqT7Plus_150bp": ("DNBSeqT7PlusL150R1.txt", "DNBSeqT7PlusL150R2.txt"),
     "DNBSeqT7_150bp": ("DNBSeqT7L150R1.txt", "DNBSeqT7L150R2.txt"),
-    "DNBSeqT10X4_100bp": ("DNBSeqT10X4L100R1.txt", "DNBSeqT10X4L100R2.txt"),
+    # "DNBSeqT10X4_100bp": ("DNBSeqT10X4L100R1.txt", "DNBSeqT10X4L100R2.txt"),
     # PacBio Onso
     "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
     # Element Bioscience

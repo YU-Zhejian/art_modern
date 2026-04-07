@@ -30,6 +30,8 @@
 
 #include <htslib/sam.h>
 
+#include <charconv>
+#include <cstdint>
 #include <cstdio>
 #include <string>
 #include <vector>
@@ -94,12 +96,16 @@ std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr)
 std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::string result;
-    result.reserve(n << 1); // Rough estimate: each CIGAR op is at least 2 chars
-    for (size_t i = 0; i < n; ++i) {
-        result += std::to_string(cigar_arr[i] >> BAM_CIGAR_SHIFT);
-        result += BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
+    result.reserve(n << 2);
+    char buf[12]; // Sufficient for any 32-bit uint
+    for (std::size_t i = 0; i < n; ++i) {
+        std::uint32_t len = cigar_arr[i] >> BAM_CIGAR_SHIFT;
+        auto [ptr, ec] = std::to_chars(buf, buf + 10, len);
+        if (ec == std::errc()) {
+            result.append(buf, ptr - buf);
+        }
+        result.push_back(BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK]);
     }
-    result.shrink_to_fit();
     return result;
 }
 
