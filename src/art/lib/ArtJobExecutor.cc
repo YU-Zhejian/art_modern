@@ -101,7 +101,7 @@ bool ArtJobExecutor::generate_pe_(
     ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads, Rprob& rprob_)
 {
     const std::string read_name = fmt::format(
-        "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
+        "{}:{}:JOB{#x}:RANK{#x}:READ{#x}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, true, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, false, rprob_);
@@ -130,7 +130,7 @@ bool ArtJobExecutor::generate_se_(
     ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads, Rprob& rprob_)
 {
     auto read_id = fmt::format(
-        "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
+        "{}:{}:JOB{#x}:RANK{#x}:READ{#x}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
     ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), true, rprob_);
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
