@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 #SBATCH -n 1
-#SBATCH -c 32
+#SBATCH -c 1
 #SBATCH -N 1
-#SBATCH --mem=16G
+#SBATCH --mem=2G
 #SBATCH --time=24:00:00
 #SBATCH --job-name=generate
 #SBATCH --output=log/%x.%j.out
@@ -16,7 +16,6 @@ eval "$(pixi shell-hook)"
 
 set -ueo pipefail
 
-NJOBS=32
 mkdir -p generated
 
 echo "Generating large contigs..."
