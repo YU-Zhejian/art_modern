@@ -8,7 +8,7 @@
 - Performance:
   - Accelerated CIGAR-to-string conversion.
 - New profiles:
-  - Element Biosciences AVITI PE 300 bp.
+  - Element Biosciences AVITI (Plain ABC) PE 300 bp.
   - MGI Tech DNBSeq-G800 SE 600 bp.
   - MGI Tech DNBSeq-G800 PE 150 bp.
   - MGI Tech DNBSeq-G99 PE 300 bp.
@@ -18,6 +18,7 @@
   - MGI Tech DNBSeq-T7 Plus PE 150 bp.
   - Illumina HiSeq 3000 PE 150 bp (8-bin quality compression).
   - Illumina NextSeq 550 PE 150 bp (6-bin quality compression).
+  - Element Biosciences AVITI (Cloudbreak UltraQ) PE 150 bp.
 - Miscellaneous bug fixes.
 
 (v-1.4.0-section)=
