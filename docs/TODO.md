@@ -16,7 +16,6 @@
 ## I/O Formats
 
 - Support circular genome or RNA?
-- Support simulating MGI TechSEQ reads and new Illumina models: Started.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
 ## Simulate Allele-Specific Expression

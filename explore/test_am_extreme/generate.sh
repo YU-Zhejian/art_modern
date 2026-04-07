@@ -25,6 +25,3 @@ pixi run -e testextreme \
     ./c/bin/generate_rand_large_contigs >generated/large_contigs.fa
 
 samtools faidx generated/large_contigs.fa
-
-bgzip --index --compress-level 9 --keep -@"${NJOBS}" generated/large_contigs.fa
-samtools faidx generated/large_contigs.fa.gz

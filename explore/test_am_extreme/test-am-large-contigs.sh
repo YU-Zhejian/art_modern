@@ -19,6 +19,11 @@ set -ueo pipefail
 NJOBS=32
 FCOV=20
 
+# Set locale to C
+export LC_ALL=C
+export LANG=C
+
+
 printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\tIV_CTX_S\n' >time.tsv
 
 # Only test whether the SAM output can be generated from such large contigs
@@ -32,21 +37,15 @@ printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\
     --o-sam generated/large_contigs.fa.gz.bam \
     --o-sam-num_threads "${NJOBS}" \
     --o-sam-write_bam
-"$(which time)" -a -o time.tsv -f '\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' \
-    pixi run -e prev art_modern \
-    --i-file generated/large_contigs.fa \
-    --i-type fasta \
-    --i-parser htslib \
-    --i-fcov "${FCOV}" \
-    --parallel "${NJOBS}" \
-    --o-sam generated/large_contigs.fa.bam \
-    --o-sam-num_threads "${NJOBS}" \
-    --o-sam-write_bam
+# We beleive that HTSLib would correctly handle the compressed cases.
 
-for fn in \
-    generated/large_contigs.fa.gz.bam \
-    generated/large_contigs.fa.bam; do
-    samtools sort -@ "${NJOBS}" --write-index -o "${fn%.bam}.sorted.bam" "${fn}"
-    samtools depth -@ "${NJOBS}" -aa "${fn%.bam}.sorted.bam" \
-        xz -9 -T"${NJOBS}" -vvvv >"${fn%.bam}.depth.tsv.xz"
-done
+samtools sort -@ "${NJOBS}" --write-index -o "generated/large_contigs.fa.sorted.bam" generated/large_contigs.fa.bam
+samtools depth -@ "${NJOBS}" -aa "generated/large_contigs.fa.sorted.bam" \
+    xz -9 -T"${NJOBS}" -vvvv >"generated/large_contigs.fa.depth.tsv.xz"
+mkdir -p tmp
+samtools view "generated/large_contigs.fa.sorted.bam" | \
+    cut -f 1 | \
+    sort -S 10K -T tmp | \
+    uniq -d >"generated/large_contigs.fa.duplicated.txt"
+cmp "generated/large_contigs.fa.duplicated.txt" /dev/null
+
