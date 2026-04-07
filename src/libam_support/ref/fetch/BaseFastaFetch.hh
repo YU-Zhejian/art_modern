@@ -97,7 +97,7 @@ public:
      *
      * @return As described.
      */
-    [[nodiscard]] size_t num_seqs() const;
+    [[nodiscard]] std::size_t num_seqs() const;
 
     [[nodiscard]] bool empty() const;
 

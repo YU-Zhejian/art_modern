@@ -21,6 +21,7 @@ mkdir -p generated
 echo "Generating large contigs..."
 
 pixi run -e testextreme \
-    ./c/bin/generate_rand_large_contigs >generated/large_contigs.fa
+    ./c/bin/generate_rand_large_contigs | \
+    pv >generated/large_contigs.fa
 
 samtools faidx generated/large_contigs.fa

@@ -28,22 +28,18 @@ printf 'TEST_CASE\tWALL_CLOCK\tSYSTEM\tUSER\tRSS\tMAJ_PG_F\tMIN_PG_F\tVOL_CTX_S\
 
 # Only test whether the SAM output can be generated from such large contigs
 "$(which time)" -a -o time.tsv -f '\t%e\t%S\t%U\t%M\t%F\t%R\t%w\t%c' \
-    pixi run -e prev art_modern \
-    --i-file generated/large_contigs.fa.gz \
+    ../../opt/build_release_install/bin/art_modern \
+    --i-file generated/large_contigs.fa \
     --i-type fasta \
     --i-parser htslib \
     --i-fcov "${FCOV}" \
     --parallel "${NJOBS}" \
-    --o-sam generated/large_contigs.fa.gz.bam \
-    --o-sam-num_threads "${NJOBS}" \
-    --o-sam-write_bam
-# We beleive that HTSLib would correctly handle the compressed cases.
+    --o-hl_sam generated/large_contigs.fa.bam \
+    --o-hl_sam-num_threads "${NJOBS}" \
+    --o-hl_sam-write_bam
 
-samtools sort -@ "${NJOBS}" --write-index -o "generated/large_contigs.fa.sorted.bam" generated/large_contigs.fa.bam
-samtools depth -@ "${NJOBS}" -aa "generated/large_contigs.fa.sorted.bam" \
-    xz -9 -T"${NJOBS}" -vvvv >"generated/large_contigs.fa.depth.tsv.xz"
 mkdir -p tmp
-samtools view "generated/large_contigs.fa.sorted.bam" | \
+samtools view "generated/large_contigs.fa.bam" | \
     cut -f 1 | \
     sort -S 10K -T tmp | \
     uniq -d >"generated/large_contigs.fa.duplicated.txt"
