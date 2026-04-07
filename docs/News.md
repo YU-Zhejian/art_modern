@@ -7,6 +7,15 @@
   - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`1.0.5`](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.5)).
 - New profiles:
   - Element Biosciences AVITI PE 300 bp.
+  - MGI Tech DNBSeq-G800 SE 600 bp.
+  - MGI Tech DNBSeq-G800 PE 150 bp.
+  - MGI Tech DNBSeq-G99 PE 300 bp.
+  - MGI Tech DNBSeq-T10x4 PE 100 bp.
+  - MGI Tech DNBSeq-G400 PE 200 bp.
+  - MGI Tech DNBSeq-T1 Plus PE 150 bp.
+  - MGI Tech DNBSeq-T7 Plus PE 150 bp.
+  - Illumina HiSeq 3000 PE 150 bp (8-bin quality compression).
+  - Illumina NextSeq 550 PE 150 bp (6-bin quality compression).
 - Miscellaneous bug fixes.
 
 (v-1.4.0-section)=
@@ -25,10 +34,10 @@
   - PacBio Onso PE 150 bp.
   - Illumina GenomeAnalyzer IIx PE 100 bp and 150 bp.
   - Illumina HiSeq 1500 PE 250 bp.
-  - BGISEQ-500 PE 150 bp.
-  - DNBSEQ-T7 PE 150 bp.
-  - DNBSEQ-G50 PE 150 bp.
-  - DNBSEQ-G400 PE 150 bp, SE 400 bp.
+  - MGI Tech BGISEQ-500 PE 150 bp.
+  - MGI Tech DNBSEQ-T7 PE 150 bp.
+  - MGI Tech DNBSEQ-G50 PE 150 bp.
+  - MGI Tech DNBSEQ-G400 PE 150 bp, SE 400 bp.
   - Illumina HiSeq 4000 PE 150 bp (8-bin quality compression).
   - Illumina NextSeq 400 PE 150 bp (8-bin quality compression).
 - Miscellaneous bug fixes.

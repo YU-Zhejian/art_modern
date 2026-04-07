@@ -23,6 +23,7 @@
 #include <htslib/sam.h>
 
 #include <chrono>
+#include <charconv>
 #include <cstring>
 #include <iomanip>
 #include <iostream>
@@ -45,6 +46,27 @@ std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
         oss << BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
     }
     return oss.str();
+}
+std::string cigar_arr_to_str_tochars(const am_cigar_t* cigar_arr, const size_t n)
+{
+    std::string result;
+    result.reserve(n <<2); 
+
+    char buf[12]; // Sufficient for any 32-bit uint
+    for (size_t i = 0; i < n; ++i) {
+        // 1. Convert the length (the high 28 bits)
+        uint32_t len = cigar_arr[i] >> BAM_CIGAR_SHIFT;
+        auto [ptr, ec] = std::to_chars(buf, buf + 10, len);
+        
+        if (ec == std::errc()) {
+            result.append(buf, ptr - buf);
+        }
+
+        // 2. Append the operation character (the low 4 bits)
+        // Directly append the char from the lookup table
+        result.push_back(BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK]);
+    }
+    return result;
 }
 } // namespace
 
@@ -87,4 +109,16 @@ int main()
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
     std::cout << std::setw(25) << "new: " << describe(times) << std::endl;
+    times.clear();
+    for (std::size_t j = 0; j < N_REPLICA; j++) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (const auto& cigar : cigars) {
+            volatile auto s = cigar_arr_to_str_tochars(cigar.data(), cigar.size()); // NOLINT
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+    }
+    std::cout << std::setw(25) << "tochars: " << describe(times) << std::endl;
+
+
 }
