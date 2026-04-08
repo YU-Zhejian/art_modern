@@ -23,7 +23,7 @@ FCOV=20
 pixi run -e testextreme \
     ./c/bin/generate_many_contigs |
     mpirun -bootstrap=slurm -n "${SLURM_NTASKS}" \
-    ../../opt/build_release_install-mpi/bin/art_modern-mpi \
+        ../../opt/build_release_install-mpi/bin/art_modern-mpi \
         --i-file /dev/stdin \
         --i-type fasta \
         --mode template \

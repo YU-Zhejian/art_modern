@@ -46,9 +46,8 @@ srun --mpi=pmi2 \
 exit
 
 mkdir -p tmp
-samtools view "generated/large_contigs.fa.bam" | \
-    cut -f 1 | \
-    sort -S 10K -T tmp | \
+samtools view "generated/large_contigs.fa.bam" |
+    cut -f 1 |
+    sort -S 10K -T tmp |
     uniq -d >"generated/large_contigs.fa.duplicated.txt"
 cmp "generated/large_contigs.fa.duplicated.txt" /dev/null
-

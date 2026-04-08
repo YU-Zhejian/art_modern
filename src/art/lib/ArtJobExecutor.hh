@@ -57,6 +57,7 @@ private:
      * Cached MPI rank in string.
      */
     const std::string mpi_rank_str_;
+    const std::string mpi_rank_str_hex_;
     std::atomic<am_readnum_t> total_num_reads_generated_ = 0;
     std::shared_ptr<OutputDispatcher> output_dispatcher_;
     const am_readnum_t num_reads_to_reduce_;

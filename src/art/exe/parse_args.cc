@@ -145,8 +145,8 @@ namespace {
             "The reporting interval (in seconds) for JobPool.");
 
         po::options_description art_opts("ART-specific options");
-        art_opts.add_options()(ARG_ID, po::value<std::string>()->default_value(ART_PROGRAM_NAME),
-            "the prefix identification tag for read ID");
+        art_opts.add_options()(
+            ARG_ID, po::value<std::string>()->default_value("AM"), "the prefix identification tag for read ID");
 
         const std::string arg_builtin_qual_file_desc
             = std::string("name of some built-in quality profile. See below for valid values. Set this to avoid ")

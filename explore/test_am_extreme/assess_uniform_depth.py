@@ -17,4 +17,3 @@ if __name__ == "__main__":
         # Calculate and print the mean depth for the chunk
         mean_depth = np.mean(depths)
         print(f"Mean Depth: {mean_depth}")
-
