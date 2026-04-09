@@ -183,7 +183,6 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] DNBSEQ-G800 (SE600/PE150)
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
-    - Dl in progress.
   - [X] DNBSEQ-T7 (PE150)
   - [ ] DNBSEQ-T7 Plus (PE150)
     - Dl in progress.
@@ -196,8 +195,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] Onso (PE150/SE200) (Discontinued)
 - [Element Biosciences](https://www.elementbiosciences.com/):
   - [X] AVITI (PE300)
-  - [ ] AVITI with Cloudbreak UltraQ (PE150)
-    - In progress.
+  - [X] AVITI with Cloudbreak UltraQ (PE150)
 
 Note:
 

@@ -53,6 +53,7 @@ SNAME_FILE_MAPPING = {
     "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
     # Element Bioscience
     "EBAviti_300bp": ("EBAvitiL300R1.txt", "EBAvitiL300R2.txt"),
+    "EBAvitiUltraQ_150bp": ("EBAvitiUltraQL150R1.txt", "EBAvitiUltraQL150R2.txt"),
 }
 
 DTYPE = "unsigned char"
