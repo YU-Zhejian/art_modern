@@ -188,7 +188,6 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Dl in progress.
   - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
     - Status: We have only PE100.
-    - Dl in progress.
   - [ ] DNBSEQ-T20x2 (PE150)
     - Status: No publicly-available data found.
 - PacBio:

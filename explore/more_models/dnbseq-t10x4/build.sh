@@ -2,8 +2,8 @@
 #SBATCH -n 1
 #SBATCH -c 5
 #SBATCH -N 1
-#SBATCH --mem=32G
-#SBATCH --time=24:00:00
+#SBATCH --mem=16G
+#SBATCH --time=2:00:00
 #SBATCH --job-name=build
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
@@ -17,17 +17,17 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/GAT-GEM-C001_R1.fastq.gz \
+    --i-file raw_data/T10_NA24695-2_1.fq.gz \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 EBAvitiL300R1.txt \
+    --read_len 100 \
+    --o-file1 DNBSeqT10X4L100R1.txt \
     --parallel 4
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/GAT-GEM-C001_R2.fastq.gz \
+    --i-file raw_data/T10_NA24695-2_2.fq.gz \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 EBAvitiL300R2.txt \
+    --read_len 100 \
+    --o-file1 DNBSeqT10X4L100R2.txt \
     --parallel 4
-art-profile-fastqc --input EBAvitiL300R1.txt --output EBAvitiL300R1.png
-art-profile-fastqc --input EBAvitiL300R2.txt --output EBAvitiL300R2.png
+art-profile-fastqc --input DNBSeqT10X4L100R1.txt --output DNBSeqT10X4L100R1.png
+art-profile-fastqc --input DNBSeqT10X4L100R2.txt --output DNBSeqT10X4L100R2.png
 echo "DONE"
