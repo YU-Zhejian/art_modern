@@ -42,7 +42,7 @@ SNAME_FILE_MAPPING = {
     "DNBSeqG99_300bp": ("DNBSeqG99L300R1.txt", "DNBSeqG99L300R2.txt"),
     "DNBSeqG400_400bp": ("DNBSeqG400L400R1.txt",),
     "DNBSeqG400_150bp": ("DNBSeqG400L150R1.txt", "DNBSeqG400L150R2.txt"),
-    # "DNBSeqG400_200bp": ("DNBSeqG400L200R1.txt", "DNBSeqG400L200R2.txt"),
+    "DNBSeqG400_200bp": ("DNBSeqG400L200R1.txt", "DNBSeqG400L200R2.txt"),
     "DNBSeqG800_600bp": ("DNBSeqG800L600R1.txt",),
     "DNBSeqG800_150bp": ("DNBSeqG800L150R1.txt", "DNBSeqG800L150R2.txt"),
     "DNBSeqT1Plus_150bp": ("DNBSeqT1PlusL150R1.txt", "DNBSeqT1PlusL150R2.txt"),

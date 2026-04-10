@@ -21,8 +21,7 @@ env -C raw_data pixi run -e moremodels axel \
     https://ftp.cngb.org/pub/CNSA/data2/CNP0000668/CNS0001678/CNX0094921/CNR0117149/NA12878_PE200_1.fq.gz
 env -C raw_data pixi run -e moremodels axel \
     https://ftp.cngb.org/pub/CNSA/data2/CNP0000668/CNS0001678/CNX0094921/CNR0117149/NA12878_PE200_2.fq.gz
-echo "DONE"
-exit
+
 env -C raw_data pixi run -e moremodels axel \
     https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/data/NA12878/MGISEQ/NA12878_1/MGISEQ2000_PCR-free_NA12878_1_V100003043_L01_1.fq.gz
 env -C raw_data pixi run -e moremodels axel \
