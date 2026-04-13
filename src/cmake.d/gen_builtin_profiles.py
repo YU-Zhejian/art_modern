@@ -46,7 +46,7 @@ SNAME_FILE_MAPPING = {
     "DNBSeqG800_600bp": ("DNBSeqG800L600R1.txt",),
     "DNBSeqG800_150bp": ("DNBSeqG800L150R1.txt", "DNBSeqG800L150R2.txt"),
     "DNBSeqT1Plus_150bp": ("DNBSeqT1PlusL150R1.txt", "DNBSeqT1PlusL150R2.txt"),
-    # "DNBSeqT7Plus_150bp": ("DNBSeqT7PlusL150R1.txt", "DNBSeqT7PlusL150R2.txt"),
+    "DNBSeqT7Plus_150bp": ("DNBSeqT7PlusL150R1.txt", "DNBSeqT7PlusL150R2.txt"),
     "DNBSeqT7_150bp": ("DNBSeqT7L150R1.txt", "DNBSeqT7L150R2.txt"),
     "DNBSeqT10X4_100bp": ("DNBSeqT10X4L100R1.txt", "DNBSeqT10X4L100R2.txt"),
     # PacBio Onso

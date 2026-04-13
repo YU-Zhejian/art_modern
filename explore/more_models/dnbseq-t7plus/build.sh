@@ -17,17 +17,17 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/GAT-GEM-C001_R1.fastq.gz \
+    --i-file raw_data/ML150002521_L01_UDB-386_1.fq.gz \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 EBAvitiL300R1.txt \
+    --read_len 150 \
+    --o-file1 DNBSeqT7PlusL150R1.txt \
     --parallel 4
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/GAT-GEM-C001_R2.fastq.gz \
+    --i-file raw_data/ML150002521_L01_UDB-386_2.fq.gz \
     --i-format FASTQ \
-    --read_len 300 \
-    --o-file1 EBAvitiL300R2.txt \
+    --read_len 150 \
+    --o-file1 DNBSeqT7PlusL150R2.txt \
     --parallel 4
-art-profile-fastqc --input EBAvitiL300R1.txt --output EBAvitiL300R1.png
-art-profile-fastqc --input EBAvitiL300R2.txt --output EBAvitiL300R2.png
+art-profile-fastqc --input DNBSeqT7PlusL150R1.txt --output DNBSeqT7PlusL150R1.png
+art-profile-fastqc --input DNBSeqT7PlusL150R2.txt --output DNBSeqT7PlusL150R2.png
 echo "DONE"

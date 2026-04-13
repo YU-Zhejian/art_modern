@@ -183,8 +183,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
   - [X] DNBSEQ-T7 (PE150)
-  - [ ] DNBSEQ-T7 Plus (PE150)
-    - Dl in progress.
+  - [X] DNBSEQ-T7 Plus (PE150)
   - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
     - Status: We have only PE100.
   - [ ] DNBSEQ-T20x2 (PE150)
