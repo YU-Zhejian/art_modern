@@ -19,7 +19,6 @@
   - MGI Tech DNBSeq-T10x4 PE 100 bp.
   - MGI Tech DNBSeq-G400 PE 200 bp.
   - MGI Tech DNBSeq-T1 Plus PE 150 bp.
-  - MGI Tech DNBSeq-T7 Plus PE 150 bp.
   - Illumina HiSeq 3000 PE 150 bp (8-bin quality compression).
   - Illumina NextSeq 550 PE 150 bp (6-bin quality compression).
   - Element Biosciences AVITI (Cloudbreak UltraQ) PE 150 bp.

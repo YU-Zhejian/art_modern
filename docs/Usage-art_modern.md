@@ -142,7 +142,6 @@ The following models are added in [1.4.1](#v-1.4.1-section):
 | `DNBSeqT10X4_100bp`   | `DNBSeqT10X4L100R1`   | 100   | 100   | MGI Tech DNBSeq-T10x4                         | [CNR0117350](https://db.cngb.org/data_resources/run/CNR0117350), [MGI Tech](https://www.mgi-tech.com/demo-data.html)                                                                                                                                                                          |
 | `DNBSeqG400_200bp`    | `DNBSeqG400L200R1`    | 200   | 200   | MGI Tech DNBSeq-G400                          | [CNR0117149](https://db.cngb.org/data_resources/run/CNR0117149), [MGI Tech](https://global-mgitech.com/resources/demonstration-data/)                                                                                                                                                         |
 | `DNBSeqT1Plus_150bp`  | `DNBSeqT1PlusL150R1`  | 150   | 150   | MGI Tech DNBSeq-T1 Plus                       | [CNR1513487](https://db.cngb.org/data_resources/run/CNR1513487), [MGI Tech](https://www.mgi-tech.com/demo-data.html)                                                                                                                                                                          |
-| `DNBSeqT7Plus_150bp`  | `DNBSeqT7PlusL150R1`  | 150   | 150   | MGI Tech DNBSeq-T7 Plus                       | [CNR1433837](https://db.cngb.org/data_resources/run/CNR1433837), [MGI Tech](https://www.mgi-tech.com/demo-data.html)                                                                                                                                                                          |
 | `HiSeq3000_150bp`     | `HiSeq3kL150R1`       | 150   | 150   | Illumina HiSeq 3000 (8B)                      | [ERR10705258](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=SRR2664950), [DOI](https://doi.org/10.5808/gi.23072)                                                                                                                                                                              |
 | `NextSeq550_150bp`    | `NextSeq550L150R1`    | 150   | 150   | Illumina NextSeq 550 (6B)                     | [SRR19308002](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR23002282), [DOI](https://doi.org/10.1093/jhered/esad033)                                                                                                                                                                          |
 | `EBAvitiUltraQ_150bp` | `EBAvitiUltraQL150R1` | 150   | 150   | Element Biosciences AVITI (Cloudbreak UltraQ) | [Element Biosciences](http://elementbiosciences.com/resources/human-whole-genome-sequencing-chm13-cell-line-cloudbreak-ultraq)                                                                                                                                                                |
@@ -183,7 +182,8 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
   - [X] DNBSEQ-T7 (PE150)
-  - [X] DNBSEQ-T7 Plus (PE150)
+  - [ ] DNBSEQ-T7 Plus (PE150)
+    - Status: Existing data uses 3-bin quality binning!
   - [ ] DNBSEQ-T10/DNBSEQ-T10x4 (PE150)
     - Status: We have only PE100.
   - [ ] DNBSEQ-T20x2 (PE150)
