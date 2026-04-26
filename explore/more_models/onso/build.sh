@@ -17,13 +17,13 @@ eval "$(pixi shell-hook)"
 set -ueo pipefail
 
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/Onso_hg002_PCR_free_WGS_OSQ_R1.fastq.gz \
+    --i-file raw_data/WS2442508A01_100_R1.fastq.gz \
     --i-format FASTQ \
     --read_len 150 \
     --o-file1 PacbOnsoL150R1.txt \
     --parallel 4
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/Onso_hg002_PCR_free_WGS_OSQ_R2.fastq.gz \
+    --i-file raw_data/WS2442508A01_100_R2.fastq.gz \
     --i-format FASTQ \
     --read_len 150 \
     --o-file1 PacbOnsoL150R2.txt \
