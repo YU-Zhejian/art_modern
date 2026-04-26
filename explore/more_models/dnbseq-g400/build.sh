@@ -54,5 +54,4 @@ pixi run -e prev art_profile_builder \
     --parallel 4
 art-profile-fastqc --input DNBSeqG400L200R2.txt --output DNBSeqG400L200R2.png
 
-
 echo "DONE"
