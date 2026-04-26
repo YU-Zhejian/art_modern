@@ -24,6 +24,12 @@
   - Illumina NextSeq 550 PE 150 bp (6-bin quality compression).
 - Miscellaneous bug fixes.
 
+(v-1.4.1-section)=
+## v1.4.1 (2026/04/26)
+
+- Profiles:
+  - Changed data of PacBio Onso to a CC-BY 4.0 one.
+
 (v-1.4.0-section)=
 ## v1.4.0 (2026/04/05)
 

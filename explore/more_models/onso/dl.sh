@@ -18,8 +18,8 @@ set -ueo pipefail
 
 mkdir -p raw_data
 env -C raw_data pixi run -e moremodels axel \
-    https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/Onso_hg002_PCR_free_WGS_OSQ_R1.fastq.gz
+    https://prod-dcd-datasets-public-files-eu-west-1.s3.eu-west-1.amazonaws.com/81c1b971-ec7e-4097-9ef7-dbc61d5c5b9f -o WS2442508A01_100_R1.fastq.gz
 env -C raw_data pixi run -e moremodels axel \
-    https://downloads.pacbcloud.com/public/onso/2023Q3/WGS/hg002_30x_WGS/Onso_hg002_PCR_free_WGS_OSQ_R2.fastq.gz
+    https://prod-dcd-datasets-public-files-eu-west-1.s3.eu-west-1.amazonaws.com/00079839-a531-4086-82b8-8e0ba3c6b9f0 -o WS2442508A01_100_R2.fastq.gz
 
 echo "DONE"
