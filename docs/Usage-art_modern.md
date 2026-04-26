@@ -135,16 +135,12 @@ The following models are added in [1.5.0](#v-1.5.0-section):
 
 | Name (`art_modern`)   | R1 `txt` file name    | RLen1 | RLen2 | Model Name                                    | Source                                                                                                                                                                                                                                                                                        |
 |-----------------------|-----------------------|-------|-------|-----------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `EBAviti_300bp`       | `EBAvitiL300R1`       | 300   | 300   | Element Biosciences AVITI (Plain ABC)         | [Element Biosciences](http://elementbiosciences.com/resources/long-insert-human-wgs-with-the-adept-workflow)                                                                                                                                                                                  |
-| `DNBSeqG800_600bp`    | `DNBSeqG800L600R1`    | 600   | N/A   | MGI Tech DNBSeq-G800                          | [R1.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_SE600_HG001_Read1.fq.gz), [Complete Genomics](https://www.completegenomics.com/learn/demo-data)                                                                                                             |
-| `DNBSeqG800_150bp`    | `DNBSeqG800L150R1`    | 150   | 150   | MGI Tech DNBSeq-G800                          | [R1.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_PE150_Ecoli_Read1.fq.gz), [R2.fq](https://demodata.completegenomics.mgiamericas.com/Demo_Data/G800/G800_WGS_PE150_Ecoli_Read2.fq.gz), [Complete Genomics](https://www.completegenomics.com/learn/demo-data) |
 | `DNBSeqG99_300bp`     | `DNBSeqG99L300R1`     | 300   | 300   | MGI Tech DNBSeq-G99                           | [CNR1261865](https://db.cngb.org/data_resources/run/CNR1261865/), [MGI Tech](https://www.mgi-tech.com/demo-data.html) , [CC-BY 4.0](http://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by.svg)                                                                                     |
 | `DNBSeqT10X4_100bp`   | `DNBSeqT10X4L100R1`   | 100   | 100   | MGI Tech DNBSeq-T10x4                         | [CNR0117350](https://db.cngb.org/data_resources/run/CNR0117350), [MGI Tech](https://www.mgi-tech.com/demo-data.html) , ![CC-BY 4.0](http://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by.svg)                                                                                     |
 | `DNBSeqG400_200bp`    | `DNBSeqG400L200R1`    | 200   | 200   | MGI Tech DNBSeq-G400                          | [CNR0117149](https://db.cngb.org/data_resources/run/CNR0117149), [MGI Tech](https://global-mgitech.com/resources/demonstration-data/) , ![CC-BY 4.0](http://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by.svg)                                                                    |
 | `DNBSeqT1Plus_150bp`  | `DNBSeqT1PlusL150R1`  | 150   | 150   | MGI Tech DNBSeq-T1 Plus                       | [CNR1513487](https://db.cngb.org/data_resources/run/CNR1513487), [MGI Tech](https://www.mgi-tech.com/demo-data.html) , ![CC-BY 4.0](http://mirrors.creativecommons.org/presskit/buttons/80x15/svg/by.svg)                                                                                     |
-| `HiSeq3000_150bp`     | `HiSeq3kL150R1`       | 150   | 150   | Illumina HiSeq 3000 (8B)                      | [ERR10705258](https://trace.ncbi.nlm.nih.gov/Traces/sra?run=ERR10705258), [DOI](https://doi.org/10.5808/gi.23072)                                                                                                                                                                             |
-| `NextSeq550_150bp`    | `NextSeq550L150R1`    | 150   | 150   | Illumina NextSeq 550 (6B)                     | [SRR19308002](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR23002282), [DOI](https://doi.org/10.1093/jhered/esad033)                                                                                                                                                                          |
-| `EBAvitiUltraQ_150bp` | `EBAvitiUltraQL150R1` | 150   | 150   | Element Biosciences AVITI (Cloudbreak UltraQ) | [Element Biosciences](http://elementbiosciences.com/resources/human-whole-genome-sequencing-chm13-cell-line-cloudbreak-ultraq)                                                                                                                                                                |
+| `HiSeq3000_150bp`     | `HiSeq3kL150R1`       | 150   | 150   | Illumina HiSeq 3000 (8B)                      | [ERR10705258](https://www.ebi.ac.uk/ena/browser/view/ERR10705258), [DOI](https://doi.org/10.5808/gi.23072)                                                                                                                                                                             |
+| `NextSeq550_150bp`    | `NextSeq550L150R1`    | 150   | 150   | Illumina NextSeq 550 (6B)                     | [SRR19308002](https://trace.ncbi.nlm.nih.gov/Traces/?run=SRR19308002), [DOI](https://doi.org/10.1093/jhered/esad033)                                                                                                                                                                          |
 
 List of all models by distinguished NGS sequencer manufacturers:
 
@@ -178,7 +174,7 @@ List of all models by distinguished NGS sequencer manufacturers:
   - [X] DNBSEQ-G50/BGISEQ-G50/BGISEQ-50/MGISEQ-200 (PE150) (Same model, lots of names)
   - [X] DNBSEQ-G99 (PE300)
   - [X] DNBSEQ-G400/MGISEQ-2000 (PE200/SE400)
-  - [X] DNBSEQ-G800 (SE600/PE150)
+  - [ ] DNBSEQ-G800 (SE600/PE150)
   - [ ] DNBSEQ-T1 Plus (PE300)
     - Status: We have only PE150.
   - [X] DNBSEQ-T7 (PE150)
@@ -190,9 +186,6 @@ List of all models by distinguished NGS sequencer manufacturers:
     - Status: No publicly-available data found.
 - PacBio:
   - [X] Onso (PE150/SE200) (Discontinued)
-- [Element Biosciences](https://www.elementbiosciences.com/):
-  - [X] AVITI (PE300)
-  - [X] AVITI with Cloudbreak UltraQ (PE150)
 
 Note:
 
