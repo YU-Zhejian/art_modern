@@ -38,14 +38,14 @@ And the built documentations (HTML and PDF) should be in `doc/sphinx.d/_build/ht
 
 ## Release Cycle
 
-- Feature freeze: All new features merged into the `develop` branch.
-- Code freeze: All **production** code changes (including bug fixes) merged into the `develop` branch. Run `make fmt` to format the code. Ensure that the integration test passes.
+- Feature freeze: All new features merged into the `devel` branch.
+- Code freeze: All **production** code changes (including bug fixes) merged into the `devel` branch. Run `make fmt` to format the code. Ensure that the integration test passes.
 - Integration test: `make testbuild` and `make testbuild-mpi` are executed using GCC, pure LLVM/Clang, and Intel OneAPI C++/DPC++ toolchain to ensure compatibility. Ensure `make packing` passes without errors.
-- Documentation freeze: All documentation changes merged into the `develop` branch. Note:
+- Documentation freeze: All documentation changes merged into the `devel` branch. Note:
   - Update `News.md`.
   - Update version number in `CMakeLists.txt`.
   - Ensure `make cleandoc` passes without errors.
-- Release: The `develop` branch is merged into the main branch, tagged with a new version number.
+- Release: The `devel` branch is merged into the main branch, tagged with a new version number.
 - Generate artifacts: Run `make packing` and `make cleandoc`.
 
 ## Get Engaged
