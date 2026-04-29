@@ -25,7 +25,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/jobs/Scheduler.hh"
 #include "libam_support/out/OutputDispatcher.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/depth_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -72,7 +71,7 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
     current_contig_name_ = art_contig.seq_name;
     current_n_fails_ = 0;
     current_n_reads_generated_ = 0;
-    current_max_tolerence_ = am_max(static_cast<am_readnum_t>(5),
+    current_max_tolerence_ = std::max(static_cast<am_readnum_t>(5),
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {

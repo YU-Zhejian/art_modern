@@ -28,7 +28,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/out/OutputDispatcher.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/frontend_utils.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -424,7 +423,7 @@ namespace {
             abort_mpi();
         }
 
-        if (pe_frag_dist_mean <= am_max(read_len_1, read_len_2)) {
+        if (pe_frag_dist_mean <= std::max(read_len_1, read_len_2)) {
             BOOST_LOG_TRIVIAL(fatal) << "The maximum read length must be shorter than the "
                                         "pe_frag_dist_mean fragment length specified.";
             abort_mpi();

@@ -22,7 +22,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 
 #include <htslib/hts.h>
 
@@ -125,7 +124,7 @@ ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const s
     const ArtParams& art_params, Rprob& rprob)
     : seq_name(fasta_fetch->seq_name(seq_id))
     , seq_size(fasta_fetch->seq_len(seq_id))
-    , longer_size_between_r1_r2_(static_cast<hts_pos_t>(am_max(art_params.read_len_1, art_params.read_len_2)))
+    , longer_size_between_r1_r2_(static_cast<hts_pos_t>(std::max(art_params.read_len_1, art_params.read_len_2)))
     , art_params_(art_params)
     , fasta_fetch_(fasta_fetch)
     , rprob_(rprob)

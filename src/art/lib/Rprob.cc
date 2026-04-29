@@ -19,7 +19,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
-#include "libam_support/utils/arithmetic_utils.hh"
 
 #if defined(USE_ONEMKL_RANDOM)
 #include <mkl.h>
@@ -46,7 +45,7 @@ namespace labw::art_modern {
 
 void Rprob::public_init_()
 {
-    read_len_max_ = am_max(read_len_1_, read_len_2_);
+    read_len_max_ = std::max(read_len_1_, read_len_2_);
     tmp_probs.resize(read_len_max_);
 }
 

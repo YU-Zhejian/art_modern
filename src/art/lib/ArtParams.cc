@@ -19,7 +19,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
-#include "libam_support/utils/arithmetic_utils.hh"
 
 #include <array>
 #include <cmath>
@@ -74,9 +73,9 @@ ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode, const ART_LIB_CO
     }
     if (art_lib_const_mode == ART_LIB_CONST_MODE::PE || art_lib_const_mode == ART_LIB_CONST_MODE::MP) {
         if (art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-            contig_len_threshold = am_max(read_len_1, read_len_2);
+            contig_len_threshold = std::max(read_len_1, read_len_2);
         } else {
-            contig_len_threshold = am_max(pe_dist_mean_minus_2_std, am_max(read_len_1, read_len_2));
+            contig_len_threshold = std::max(pe_dist_mean_minus_2_std, std::max(read_len_1, read_len_2));
         }
         return;
     }
