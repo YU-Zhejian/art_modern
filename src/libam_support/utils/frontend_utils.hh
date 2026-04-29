@@ -29,8 +29,8 @@ void print_help(
  * An empty variables_map is returned if help or version is requested.
  */
 boost::program_options::variables_map generate_vm_while_handling_help_version(
-    const boost::program_options::options_description& po_desc, int argc, char** argv, const std::string& prefix = "",
-    const std::string& suffix = "");
+    const boost::program_options::options_description& po_desc, int argc, char* const* argv,
+    const std::string& prefix = "", const std::string& suffix = "");
 
 boost::program_options::options_description general_options();
 /**

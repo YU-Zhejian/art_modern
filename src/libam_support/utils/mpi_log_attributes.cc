@@ -24,13 +24,22 @@
 
 namespace labw::art_modern {
 
-class MPIRankLoggerAttributeImpl final : public boost::log::attribute::impl {
-public:
-    boost::log::attribute_value get_value() override
-    {
-        return boost::log::attributes::make_attribute_value(mpi_rank_s());
-    }
-};
+namespace {
+    class MPIRankLoggerAttributeImpl final : public boost::log::attribute::impl {
+    public:
+        boost::log::attribute_value get_value() override
+        {
+            return boost::log::attributes::make_attribute_value(mpi_rank_s());
+        }
+    };
+    class MPIHostNameLoggerAttributeImpl final : public boost::log::attribute::impl {
+    public:
+        boost::log::attribute_value get_value() override
+        {
+            return boost::log::attributes::make_attribute_value(mpi_hostname());
+        }
+    };
+} // namespace
 
 [[maybe_unused]] MPIRankLoggerAttribute::MPIRankLoggerAttribute(const boost::log::attributes::cast_source& source)
     : attribute(source.as<MPIRankLoggerAttributeImpl>())
@@ -40,14 +49,6 @@ MPIRankLoggerAttribute::MPIRankLoggerAttribute()
     : attribute(new MPIRankLoggerAttributeImpl())
 {
 }
-
-class MPIHostNameLoggerAttributeImpl final : public boost::log::attribute::impl {
-public:
-    boost::log::attribute_value get_value() override
-    {
-        return boost::log::attributes::make_attribute_value(mpi_hostname());
-    }
-};
 
 MPIHostNameLoggerAttribute::MPIHostNameLoggerAttribute(const boost::log::attributes::cast_source& source)
     : attribute(source.as<MPIHostNameLoggerAttributeImpl>())

@@ -32,7 +32,6 @@
 
 #include <charconv>
 #include <cstdint>
-#include <cstdio>
 #include <string>
 #include <vector>
 

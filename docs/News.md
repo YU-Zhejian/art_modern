@@ -3,6 +3,8 @@
 (v-1.5.1-section)=
 ## v1.5.1 (Ongoing)
 
+- Software Engineering:
+  - `Previous run crashed` removed from error messages. This message is not informative.
 - Miscellaneous bug fixes.
 
 (v-1.5.0-section)=
