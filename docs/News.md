@@ -8,7 +8,7 @@
 - Miscellaneous bug fixes.
 
 (v-1.5.0-section)=
-## v1.5.0 (2026/04/26)
+## v1.5.0 (2026/05/01)
 
 - Software Engineering:
   - Update bundled `moodycamel::ConcurrentQueue<T>` to the current latest version ([`1.0.5`](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.5)).
