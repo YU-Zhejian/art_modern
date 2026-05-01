@@ -112,7 +112,7 @@ add_subdirectory("${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 
 # -----------------------------------------------------------------------------
 # Dealing with dependency includes.
-include_directories(BEFORE "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
+include_directories(BEFORE SYSTEM "${CMAKE_CURRENT_LIST_DIR}/deps/slim_libceu")
 
 set(WITH_LIBDEFLATE OFF)
 if(BUILD_SHARED_LIBS)

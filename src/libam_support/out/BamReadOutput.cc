@@ -200,6 +200,22 @@ BamReadOutput::BamReadOutput(const std::string& filename, const std::shared_ptr<
     , sam_options_(sam_options)
     , lfio_("BAM", sam_file_, sam_header_)
 {
+    // Assess whether header size exceeds SAM/BAM allowed maximum.
+    for (std::size_t i = 0; i < fasta_fetch->num_seqs(); ++i) {
+        const auto this_seq_len = fasta_fetch->seq_len(i);
+        if (this_seq_len >= std::numeric_limits<int32_t>::max()) {
+            BOOST_LOG_TRIVIAL(error)
+                << "Contig '" << fasta_fetch->seq_name(i) << "' has length " << fasta_fetch->seq_len(i)
+                << ", which exceeds the maximum allowed length of " << std::numeric_limits<int32_t>::max()
+                << " for SAM/BAM format. Please remove or truncate this contig, or use HeadlessBam";
+            abort_mpi();
+        }
+        if (this_seq_len >= static_cast<hts_pos_t>(M_SIZE) * 512) {
+            BOOST_LOG_TRIVIAL(warning)
+                << "Contig '" << fasta_fetch->seq_name(i) << "' has length " << fasta_fetch->seq_len(i)
+                << ", which is larger than allowed size for BAI index. CSI index should be used instead.";
+        }
+    }
     fasta_fetch->update_sam_header(sam_header_);
     CExceptionsProxy::assert_numeric(
         sam_hdr_write(sam_file_, sam_header_), USED_HTSLIB_NAME, "Failed to write SAM/BAM record");

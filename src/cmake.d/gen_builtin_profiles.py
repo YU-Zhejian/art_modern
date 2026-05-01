@@ -22,6 +22,7 @@ SNAME_FILE_MAPPING = {
     "HiSeq2500_125bp": ("HiSeq2500L125R1.txt", "HiSeq2500L125R2.txt"),
     "HiSeq2500_150bp": ("HiSeq2500L150R1.txt", "HiSeq2500L150R2.txt"),
     "HiSeq2500Filtered_150bp": ("HiSeq2500L150R1filter.txt", "HiSeq2500L150R2filter.txt"),
+    "HiSeq3000_150bp": ("HiSeq3kL150R1.txt", "HiSeq3kL150R2.txt"),
     "HiSeq4000_150bp": ("HiSeq4kL150R1.txt", "HiSeq4kL150R2.txt"),
     "HiSeqX_PCR_Free_150bp": ("HiSeqXPCRfreeL150R1.txt", "HiSeqXPCRfreeL150R2.txt"),
     "HiSeqX_TruSeq_150bp": ("HiSeqXtruSeqL150R1.txt", "HiSeqXtruSeqL150R2.txt"),
@@ -34,12 +35,17 @@ SNAME_FILE_MAPPING = {
     # NextSeq
     "NextSeq500_150bp": ("NextSeq500L150R1.txt", "NextSeq500L150R2.txt"),
     "NextSeq500_v2_75bp": ("NextSeq500v2L75R1.txt", "NextSeq500v2L75R2.txt"),
+    "NextSeq550_150bp": ("NextSeq550L150R1.txt", "NextSeq550L150R2.txt"),
     # DNBSeq Models
     "BGISeq500_150bp": ("BgiSeq500L150R1.txt", "BgiSeq500L150R2.txt"),
-    "DNBSeqG50_150bp": ("DNBSG50L150R1.txt", "DNBSG50L150R2.txt"),
+    "DNBSeqG50_150bp": ("DNBSeqG50L150R1.txt", "DNBSeqG50L150R2.txt"),
+    "DNBSeqG99_300bp": ("DNBSeqG99L300R1.txt", "DNBSeqG99L300R2.txt"),
     "DNBSeqG400_400bp": ("DNBSeqG400L400R1.txt",),
     "DNBSeqG400_150bp": ("DNBSeqG400L150R1.txt", "DNBSeqG400L150R2.txt"),
+    "DNBSeqG400_200bp": ("DNBSeqG400L200R1.txt", "DNBSeqG400L200R2.txt"),
+    "DNBSeqT1Plus_150bp": ("DNBSeqT1PlusL150R1.txt", "DNBSeqT1PlusL150R2.txt"),
     "DNBSeqT7_150bp": ("DNBSeqT7L150R1.txt", "DNBSeqT7L150R2.txt"),
+    "DNBSeqT10X4_100bp": ("DNBSeqT10X4L100R1.txt", "DNBSeqT10X4L100R2.txt"),
     # PacBio Onso
     "PacbOnso_150bp": ("PacbOnsoL150R1.txt", "PacbOnsoL150R2.txt"),
 }

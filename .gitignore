@@ -44,6 +44,7 @@ _skbuild
 venv
 MANIFEST.in
 *.log
+*.err
 !build_with_intel_compiler.sh
 _cmake_test_compile/
 /expr/

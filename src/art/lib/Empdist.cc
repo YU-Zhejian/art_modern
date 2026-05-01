@@ -458,13 +458,15 @@ void Empdist::validate_() const
         if (a_qual_dist_first_.size() != g_qual_dist_first_.size()
             || g_qual_dist_first_.size() != c_qual_dist_first_.size()
             || c_qual_dist_first_.size() != t_qual_dist_first_.size()) {
-            BOOST_LOG_TRIVIAL(warning) << "The length of 1st read in each qual dist is not equal!";
+            BOOST_LOG_TRIVIAL(error) << "The length of 1st read in each qual dist is not equal!";
+            abort_mpi();
         }
         if (is_pe_) {
             if (a_qual_dist_second_.size() != g_qual_dist_second_.size()
                 || g_qual_dist_second_.size() != c_qual_dist_second_.size()
                 || c_qual_dist_second_.size() != t_qual_dist_second_.size()) {
-                BOOST_LOG_TRIVIAL(warning) << "The length of 2nd read in each qual dist is not equal!";
+                BOOST_LOG_TRIVIAL(error) << "The length of 2nd read in each qual dist is not equal!";
+                abort_mpi();
             }
         }
     }
@@ -489,8 +491,10 @@ void Empdist::validate_() const
         abort_mpi();
     }
     if (possible_quals.size() <= 10) {
-        BOOST_LOG_TRIVIAL(warning) << "The number of distinct quality scores in the profile is less than 10. "
-                                   << "This may due to binning and lead to unrealistic quality profiles.";
+        if (!silence_) {
+            BOOST_LOG_TRIVIAL(warning) << "The number of distinct quality scores in the profile is less than 10. "
+                                       << "This may due to binning and lead to unrealistic quality profiles.";
+        }
     }
 }
 

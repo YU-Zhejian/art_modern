@@ -27,17 +27,17 @@ using namespace labw::art_modern;
 
 int main()
 {
-    for (const bool sep_flag : { true, false }) {
-        for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
-            const auto is_pe = ENCODED_BUILTIN_PROFILES[i][1][0] != '\0';
-            const auto& builtin_profile_name = BUILTIN_PROFILE_NAMES[i];
-            BOOST_LOG_TRIVIAL(info) << "Loading builtin profile " << i << ": " << builtin_profile_name;
+    for (int i = 0; i < N_BUILTIN_PROFILE; i++) {
+        const auto is_pe = ENCODED_BUILTIN_PROFILES[i][1][0] != '\0';
+        const auto& builtin_profile_name = BUILTIN_PROFILE_NAMES[i];
+        BOOST_LOG_TRIVIAL(info) << "Loading builtin profile " << i << ": " << builtin_profile_name;
+        for (const bool sep_flag : { true, false }) {
             auto qdist = Empdist(builtin_profile_name, sep_flag, is_pe, true);
             qdist.shift_all_emp(0, 0, MIN_QUAL, MAX_QUAL);
             qdist.index();
             BOOST_LOG_TRIVIAL(info) << "Builtin profile " << i << ": " << builtin_profile_name
                                     << " RLEN1: " << qdist.get_read_1_max_length()
-                                    << "; RLEN2: " << qdist.get_read_2_max_length();
+                                    << "; RLEN2: " << qdist.get_read_2_max_length() << "; sep_qual: " << sep_flag;
         }
     }
     BOOST_LOG_TRIVIAL(info) << "All builtin profiles can be loaded successfully.";

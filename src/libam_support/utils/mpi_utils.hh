@@ -87,6 +87,8 @@ bool is_on_mpi_main_process_or_nompi();
  */
 std::string mpi_rank_s();
 
+std::string mpi_rank_s_hex();
+
 /**
  * Get the current MPI rank in string.
  *

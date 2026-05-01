@@ -29,7 +29,7 @@ namespace labw::art_modern {
 
 void BaseFastaFetch::update_sam_header(sam_hdr_t* header) const
 {
-    for (size_t i = 0; i < seq_lengths_.size(); ++i) {
+    for (std::size_t i = 0; i < seq_lengths_.size(); ++i) {
         auto seq_len_str = std::to_string(seq_lengths_[i]);
         CExceptionsProxy::assert_numeric(
             sam_hdr_add_line(header, "SQ", "SN", seq_names_[i].c_str(), "LN", seq_len_str.c_str(), NULL),
@@ -42,7 +42,7 @@ hts_pos_t BaseFastaFetch::seq_len(const std::size_t seq_id) const { return seq_l
 
 std::string BaseFastaFetch::seq_name(const std::size_t seq_id) const { return seq_names_[seq_id]; }
 
-size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
+std::size_t BaseFastaFetch::num_seqs() const { return seq_lengths_.size(); }
 
 BaseFastaFetch::BaseFastaFetch(std::vector<std::string>&& seq_names, std::vector<hts_pos_t>&& seq_lengths)
     : seq_names_(std::move(seq_names))

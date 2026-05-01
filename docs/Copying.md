@@ -49,7 +49,7 @@ With MIT License.
 
 ## `moodycamel::ConcurrentQueue<T>` by Cameron Desrochers
 
-Available from <https://github.com/cameron314/concurrentqueue>, commit [`593df78`](https://github.com/cameron314/concurrentqueue/commit/593df78ec309be7a7b456b3334025ccade1d2d66).
+Available from <https://github.com/cameron314/concurrentqueue>, commit [`9afb997`](https://github.com/cameron314/concurrentqueue/commit/9afb99746f0f5fc94ac8aef737053ae0481ba8d1) at tag [`1.0.5`](https://github.com/cameron314/concurrentqueue/releases/tag/v1.0.5).
 
 Affected files:
 

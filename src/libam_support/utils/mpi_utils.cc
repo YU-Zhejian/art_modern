@@ -20,6 +20,8 @@
 #include "libam_support/Dtypes.h" // NOLINT: Used in MPI functions
 #include "libam_support/utils/log_utils.hh"
 
+#include <fmt/format.h>
+
 #include <boost/log/trivial.hpp>
 
 #ifdef WITH_MPI
@@ -136,6 +138,20 @@ std::string mpi_rank_s()
     return std::to_string(rank);
 #else
     return "nompi";
+#endif
+}
+
+std::string mpi_rank_s_hex()
+{
+#ifdef WITH_MPI
+    if (is_mpi_finalized()) {
+        return "x";
+    }
+    int rank = MPI_UNAVAILABLE_RANK;
+    MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+    return fmt::format("{:x}", rank);
+#else
+    return "n";
 #endif
 }
 

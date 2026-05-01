@@ -1,9 +1,8 @@
 #!/usr/bin/bash
-#SBATCH -n 1
-#SBATCH -c 32
-#SBATCH -N 1
+#SBATCH --nodes=2
+#SBATCH --ntasks=32
 #SBATCH --mem=16G
-#SBATCH --time=24:00:00
+#SBATCH --time=5:00:00
 #SBATCH --job-name=test-am-many-contigs
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
@@ -23,7 +22,8 @@ FCOV=20
 
 pixi run -e testextreme \
     ./c/bin/generate_many_contigs |
-    pixi run -e prev art_modern \
+    mpirun -bootstrap=slurm -n "${SLURM_NTASKS}" \
+        ../../opt/build_release_install-mpi/bin/art_modern-mpi \
         --i-file /dev/stdin \
         --i-type fasta \
         --mode template \
@@ -38,5 +38,3 @@ pixi run -e testextreme \
         --o-hl_sam-write_bam \
         --reporting_interval-job_executor 10 \
         --reporting_interval-job_pool 50
-samtools fasta generated/many_contigs.bam >generated/many_contigs.fa
-# This generates 10G reads.

@@ -31,6 +31,7 @@
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
 
+#include <fmt/compile.h>
 #include <fmt/format.h>
 
 #include <boost/log/trivial.hpp>
@@ -100,8 +101,12 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
 bool ArtJobExecutor::generate_pe_(
     ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads, Rprob& rprob_)
 {
-    const std::string read_name = fmt::format(
-        "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
+    const std::string read_name = fmt::format(FMT_COMPILE("{0}:{1}:J{2:x}M{3}R{4:x}"), art_contig.seq_name,
+        art_params_.id, job_.job_id, mpi_rank_str_hex_, current_num_reads);
+    if (read_name.length() > 252) {
+        BOOST_LOG_TRIVIAL(warning) << "Read name " << read_name
+                                   << " is larger than 252; Will FAIL for SAM/BAM formats.";
+    }
 
     ArtRead read_1(art_params_, art_contig.seq_name, read_name, true, rprob_);
     ArtRead read_2(art_params_, art_contig.seq_name, read_name, false, rprob_);
@@ -129,9 +134,14 @@ bool ArtJobExecutor::generate_pe_(
 bool ArtJobExecutor::generate_se_(
     ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads, Rprob& rprob_)
 {
-    auto read_id = fmt::format(
-        "{}:{}:{}:{}:{}", art_contig.seq_name, art_params_.id, job_.job_id, mpi_rank_str_, current_num_reads);
-    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_id), true, rprob_);
+    auto read_name = fmt::format(FMT_COMPILE("{0}:{1}:J{2:x}M{3}R{4:x}"), art_contig.seq_name, art_params_.id,
+        job_.job_id, mpi_rank_str_hex_, current_num_reads);
+    if (read_name.length() > 252) {
+        BOOST_LOG_TRIVIAL(warning) << "Read name " << read_name
+                                   << " is larger than 252; Will FAIL for SAM/BAM formats.";
+    }
+
+    ArtRead art_read(art_params_, art_contig.seq_name, std::move(read_name), true, rprob_);
     try {
         art_contig.generate_read_se(is_plus_strand, art_read);
     } catch (const ArtGenerationFailure&) {
@@ -153,6 +163,7 @@ ArtJobExecutor::ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
     : art_params_(art_params)
     , job_(std::move(job))
     , mpi_rank_str_(mpi_rank_s())
+    , mpi_rank_str_hex_(mpi_rank_s_hex())
     , output_dispatcher_(output_dispatcher)
     , num_reads_to_reduce_(art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE ? 1 : 2)
     , require_alignment_(output_dispatcher->require_alignment())
@@ -248,6 +259,7 @@ ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
     : art_params_(other.art_params_)
     , job_(std::move(other.job_))
     , mpi_rank_str_(other.mpi_rank_str_)
+    , mpi_rank_str_hex_(other.mpi_rank_str_hex_)
     , output_dispatcher_(std::move(other.output_dispatcher_))
     , num_reads_to_reduce_(other.num_reads_to_reduce_)
     , require_alignment_(other.require_alignment_)

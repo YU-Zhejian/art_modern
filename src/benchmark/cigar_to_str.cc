@@ -22,6 +22,7 @@
 
 #include <htslib/sam.h>
 
+#include <charconv>
 #include <chrono>
 #include <cstring>
 #include <iomanip>
@@ -46,6 +47,19 @@ std::string cigar_arr_to_str_old(const am_cigar_t* cigar_arr, const size_t n)
     }
     return oss.str();
 }
+
+std::string cigar_arr_to_str_new(const am_cigar_t* cigar_arr, const size_t n)
+{
+    std::string result;
+    result.reserve(n << 1); // Rough estimate: each CIGAR op is at least 2 chars
+    for (size_t i = 0; i < n; ++i) {
+        result += std::to_string(cigar_arr[i] >> BAM_CIGAR_SHIFT);
+        result += BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK];
+    }
+    result.shrink_to_fit();
+    return result;
+}
+
 } // namespace
 
 int main()
@@ -59,6 +73,9 @@ int main()
         cigars.emplace_back();
         cigars.back().resize(b->core.n_cigar);
         std::memcpy(cigars.back().data(), am_bam_get_cigar(b), b->core.n_cigar * sizeof(am_cigar_t));
+        if (cigars.size() > 10000) {
+            break;
+        }
     }
     bam_destroy1(b);
     bam_hdr_destroy(header);
@@ -81,10 +98,20 @@ int main()
     for (std::size_t j = 0; j < N_REPLICA; j++) {
         auto start = std::chrono::high_resolution_clock::now();
         for (const auto& cigar : cigars) {
-            volatile auto s = cigar_arr_to_str(cigar.data(), cigar.size()); // NOLINT
+            volatile auto s = cigar_arr_to_str_new(cigar.data(), cigar.size()); // NOLINT
         }
         auto end = std::chrono::high_resolution_clock::now();
         times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
     }
     std::cout << std::setw(25) << "new: " << describe(times) << std::endl;
+    times.clear();
+    for (std::size_t j = 0; j < N_REPLICA; j++) {
+        auto start = std::chrono::high_resolution_clock::now();
+        for (const auto& cigar : cigars) {
+            volatile auto s = cigar_arr_to_str(cigar.data(), cigar.size()); // NOLINT
+        }
+        auto end = std::chrono::high_resolution_clock::now();
+        times.emplace_back(std::chrono::duration_cast<std::chrono::microseconds>(end - start).count());
+    }
+    std::cout << std::setw(25) << "tochars: " << describe(times) << std::endl;
 }

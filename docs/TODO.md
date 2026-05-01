@@ -3,6 +3,7 @@
 ## IMPORTANT
 
 - For large-contigs test, the evenness of the coverage should be assessed.
+- As BAM cannot accommodate contigs larger than 2GiB, should check this when initializing BAM writer. Suggest users to use unaligned BAM instead.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - Add support for PE FASTA/FASTQ.
 
@@ -16,7 +17,7 @@
 ## I/O Formats
 
 - Support circular genome or RNA?
-- Support simulating BGI/MGISEQ reads and new Illumina models: Started.
+  - Search for new discussions in HTSLib, hts-specs, etc.
 - Add `--i-nreads` to accurately specify the number of reads to simulate?
 
 ## Simulate Allele-Specific Expression

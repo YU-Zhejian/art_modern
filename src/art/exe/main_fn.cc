@@ -24,6 +24,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/ds/CoverageInfo.hh"
+#include "libam_support/ds/SeedAlloc.hh"
 #include "libam_support/ds/SkipLoaderSettings.hh"
 #include "libam_support/jobs/JobPool.hh"
 #include "libam_support/jobs/JobPoolReporter.hh"
@@ -46,57 +47,56 @@
 #include <memory>
 #include <utility>
 
-#include "libam_support/ds/SeedAlloc.hh"
-
 namespace labw::art_modern {
+namespace {
+    class Generator {
+    public:
+        const OutputDispatcherFactory out_dispatcher_factory;
 
-class Generator {
-public:
-    const OutputDispatcherFactory out_dispatcher_factory;
+        Generator(ArtParams art_params, const ArtIOParams& art_io_params, std::unique_ptr<SeedAlloc>&& seed_alloc)
+            : art_params_(std::move(art_params))
+            , art_io_params_(art_io_params)
+            , job_pool_(art_io_params.parallel)
+            , reporter_(job_pool_, art_params_.job_pool_reporting_interval_seconds)
+            , seed_alloc_(std::move(seed_alloc))
+        {
+            reporter_.start();
+        }
 
-    Generator(ArtParams art_params, const ArtIOParams& art_io_params, std::unique_ptr<SeedAlloc>&& seed_alloc)
-        : art_params_(std::move(art_params))
-        , art_io_params_(art_io_params)
-        , job_pool_(art_io_params.parallel)
-        , reporter_(job_pool_, art_params_.job_pool_reporting_interval_seconds)
-        , seed_alloc_(std::move(seed_alloc))
-    {
-        reporter_.start();
-    }
+        void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
+        {
+            OutParams const params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
+            out_dispatcher_ = out_dispatcher_factory.create(params);
+        }
 
-    void init_dispatcher(const std::shared_ptr<BaseFastaFetch>& fetch)
-    {
-        OutParams const params { art_io_params_.parallel, art_io_params_.vm, art_io_params_.args, fetch };
-        out_dispatcher_ = out_dispatcher_factory.create(params);
-    }
+        void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
+        {
+            SimulationJob sj { fetch, coverage_info, ++job_id_ };
+            auto aje = std::make_shared<ArtJobExecutor>(
+                std::move(sj), art_params_, out_dispatcher_, seed_alloc_->nextseed());
+            job_pool_.add(std::move(aje));
+        }
 
-    void add(const std::shared_ptr<BaseFastaFetch>& fetch, const std::shared_ptr<CoverageInfo>& coverage_info)
-    {
-        SimulationJob sj { fetch, coverage_info, ++job_id_ };
-        auto aje
-            = std::make_shared<ArtJobExecutor>(std::move(sj), art_params_, out_dispatcher_, seed_alloc_->nextseed());
-        job_pool_.add(std::move(aje));
-    }
+        void wait()
+        {
+            BOOST_LOG_TRIVIAL(info) << "All jobs submitted. Waiting for job pool to stop...";
+            job_pool_.stop();
+            reporter_.stop();
+            BOOST_LOG_TRIVIAL(info) << "Job pool stopped.";
+            out_dispatcher_->close();
+            BOOST_LOG_TRIVIAL(info) << "Output dispatchers cleared.";
+        }
 
-    void wait()
-    {
-        BOOST_LOG_TRIVIAL(info) << "All jobs submitted. Waiting for job pool to stop...";
-        job_pool_.stop();
-        reporter_.stop();
-        BOOST_LOG_TRIVIAL(info) << "Job pool stopped.";
-        out_dispatcher_->close();
-        BOOST_LOG_TRIVIAL(info) << "Output dispatchers cleared.";
-    }
-
-private:
-    std::size_t job_id_ = 0;
-    const ArtParams art_params_;
-    const ArtIOParams art_io_params_;
-    JobPool job_pool_;
-    JobPoolReporter reporter_;
-    std::shared_ptr<OutputDispatcher> out_dispatcher_;
-    std::unique_ptr<SeedAlloc> seed_alloc_;
-};
+    private:
+        std::size_t job_id_ = 0;
+        const ArtParams art_params_;
+        const ArtIOParams art_io_params_;
+        JobPool job_pool_;
+        JobPoolReporter reporter_;
+        std::shared_ptr<OutputDispatcher> out_dispatcher_;
+        std::unique_ptr<SeedAlloc> seed_alloc_;
+    };
+} // namespace
 
 void print_banner()
 {

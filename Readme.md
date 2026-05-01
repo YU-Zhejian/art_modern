@@ -35,7 +35,7 @@ Here we introduce `art_modern`, a modern re-implementation of the popular [ART](
 
 `art_modern` supports ART-compatible error profiles. We also implemented a high-performance profile creator that generates ART-compatible profiles from FASTQ, SAM, and BAM files.
 
-The program comes with new profiles for Illumina models, as well as error profiles from other NGS sequencers such as BGI/MGI DNBSeq and PacBio Onso.
+The program comes with new profiles for Illumina models, as well as error profiles from other NGS sequencers such as MGI Tech DNBSeq, Element Biosciences AVITI, and PacBio Onso.
 
 ## Quick Start
 
@@ -100,8 +100,6 @@ curl -L -o art_modern-master.zip \
 unzip art_modern-master.zip
 cd art_modern-master
 ```
-
-**STRONGLY DISCOURAGED:** Change `master` to `devel` to compile the development version
 
 Ensure you have a C++ compiler that supports [C++17](https://en.cppreference.com/w/cpp/17) installed on your computer (Preferably [GCC](https://gcc.gnu.org/) >= 9.5.0). Also,suppress check whether your [CMake](https://cmake.org/), [GNU Make](https://www.gnu.org/software/make/), [Boost C++ Library](https://www.boost.org/), [GNU BinUtils](https://www.gnu.org/software/binutils/), [GNU Bash](https://www.gnu.org/software/bash/), [GNU CoreUtils](https://www.gnu.org/software/coreutils/), [Python 3](https://www.python.org/), and minimal HTSLib dependencies (namely, [zlib](https://www.zlib.net/) and [pthread](https://www.man7.org/linux/man-pages/man7/pthreads.7.html)) are working.
 

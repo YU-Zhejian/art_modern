@@ -6,6 +6,7 @@ SINGULARITY ?= singularity
 all: \
 	 debian-13.sif \
 	 ubuntu-2404.sif \
+	 ubuntu-2604.sif \
 	 alpine-latest.sif
 
 clean:

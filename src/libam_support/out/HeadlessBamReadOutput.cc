@@ -249,10 +249,6 @@ void HeadlessBamReadOutputFactory::patch_options(boost::program_options::options
 std::shared_ptr<BaseReadOutput> HeadlessBamReadOutputFactory::create(const OutParams& params) const
 {
     if (params.vm.count("o-hl_sam") != 0U) {
-        if (params.fasta_fetch->num_seqs() != 0) {
-            BOOST_LOG_TRIVIAL(warning) << "Sequences presented in the reference file. Use SAM/BAM instead of this "
-                                          "headless one for better compatibility.";
-        }
         auto so = BamOptions();
         so.use_m = params.vm.count("o-hl_sam-use_m") > 0;
         so.output_format = params.vm.count("o-sam-write_bam") > 0 ? BamOutputFormat::BAM : BamOutputFormat::SAM;

@@ -5,4 +5,4 @@ all: $(PNGS)
 
 
 %.png: %.txt
-	art-profile-fastqc -i $< -o $@ 2> $<.log
+	art-profile-fastqc -i $< -o $@ 2> $<.log --figwidth 10

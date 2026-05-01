@@ -262,7 +262,7 @@ serve-doc:
 .PHONY: packing
 # Create binary packages
 packing:
-	$(MAKE) -C packing
+	pixi run --frozen -e pack $(MAKE) -C packing
 
 .PHONY: packing-update-containers
 # Update Docker and Singularity containers used for packing

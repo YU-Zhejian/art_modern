@@ -20,15 +20,15 @@ pixi run -e prev art_profile_builder \
     --i-file raw_data/SRR32263914_1.fastq \
     --i-format FASTQ \
     --read_len 150 \
-    --o-file1 DNBSG50L150R1.txt \
+    --o-file1 DNBSeqG50L150R1.txt \
     --parallel 4
 
 pixi run -e prev art_profile_builder \
     --i-file raw_data/SRR32263914_2.fastq \
     --i-format FASTQ \
     --read_len 150 \
-    --o-file1 DNBSG50L150R2.txt \
+    --o-file1 DNBSeqG50L150R2.txt \
     --parallel 4
-art-profile-fastqc --input DNBSG50L150R1.txt --output DNBSG50L150R1.png
-art-profile-fastqc --input DNBSG50L150R2.txt --output DNBSG50L150R2.png
+art-profile-fastqc --input DNBSeqG50L150R1.txt --output DNBSeqG50L150R1.png
+art-profile-fastqc --input DNBSeqG50L150R2.txt --output DNBSeqG50L150R2.png
 echo "DONE"

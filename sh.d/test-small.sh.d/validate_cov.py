@@ -7,9 +7,8 @@ import sys
 from enum import IntEnum
 from typing import Union, Mapping, Tuple
 
-import pyfastx
-
 import matplotlib.pyplot as plt
+import pysam
 
 
 class FileType(IntEnum):
@@ -31,16 +30,18 @@ def parse_fq(
                 ls = l.strip().split("\t")
                 contig_lengths[ls[0]] = len(ls[3])
     else:
-        contig_lengths = {s.name: len(s) for s in pyfastx.Fasta(in_fa)}
+        with pysam.FastxFile(in_fa) as fasta_file:
+            contig_lengths = {entry.name: len(entry.sequence) for entry in fasta_file}
     if is_template:
         contig_lengths = {contig_name: 1 for contig_name in contig_lengths}
     contig_bases = {contig_name: 0 for contig_name in contig_lengths}
     contig_coverage = {contig_name: 0.0 for contig_name in contig_lengths}
     contig_nreads = {contig_name: 0 for contig_name in contig_lengths}
-    for seq_name, seq, _ in pyfastx.Fastx(in_fq):
-        contig_name = seq_name.split(":")[0]
-        contig_bases[contig_name] += len(seq) if not is_template else 1
-        contig_nreads[contig_name] += 1
+    with pysam.FastxFile(in_fq) as fq_file:
+        for entry in fq_file:
+            contig_name = entry.name.split(":")[0]
+            contig_bases[contig_name] += len(entry.sequence) if not is_template else 1
+            contig_nreads[contig_name] += 1
     for contig_name in contig_bases:
         contig_coverage[contig_name] = contig_bases[contig_name] / contig_lengths[contig_name]
     return contig_coverage, contig_bases, contig_lengths, contig_nreads
@@ -48,7 +49,8 @@ def parse_fq(
 
 def parse_design(in_fa: str, in_cov: Union[float, str], file_type: FileType) -> Mapping[str, float]:
     if file_type == FileType.CONST_COV:
-        contig_lengths = {s.name: len(s) for s in pyfastx.Fasta(in_fa)}
+        with pysam.FastxFile(in_fa) as fasta_file:
+            contig_lengths = {entry.name: len(entry.sequence) for entry in fasta_file}
         return {contig_name: in_cov for contig_name in contig_lengths}
     elif file_type == FileType.COV_TSV:
         design_cov = {}

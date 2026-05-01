@@ -24,18 +24,34 @@ set -ueo pipefail
 #     --parallel 4
 # art-profile-fastqc --input DNBSeqG400L400R1.txt --output DNBSeqG400L400R1.png
 
+# pixi run -e prev art_profile_builder \
+#     --i-file raw_data/MGISEQ2000_PCR-free_NA12878_1_V100003043_L01_1.fq.gz \
+#     --i-format FASTQ \
+#     --read_len 150 \
+#     --o-file1 DNBSeqG400L150R1.txt \
+#     --parallel 4
+# art-profile-fastqc --input DNBSeqG400L150R1.txt --output DNBSeqG400L150R1.png
+# pixi run -e prev art_profile_builder \
+#     --i-file raw_data/MGISEQ2000_PCR-free_NA12878_1_V100003043_L01_2.fq.gz \
+#     --i-format FASTQ \
+#     --read_len 150 \
+#     --o-file1 DNBSeqG400L150R2.txt \
+#     --parallel 4
+# art-profile-fastqc --input DNBSeqG400L150R2.txt --output DNBSeqG400L150R2.png
+
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/MGISEQ2000_PCR-free_NA12878_1_V100003043_L01_1.fq.gz \
+    --i-file raw_data/NA12878_PE200_1.fq.gz \
     --i-format FASTQ \
-    --read_len 150 \
-    --o-file1 DNBSeqG400L150R1.txt \
+    --read_len 200 \
+    --o-file1 DNBSeqG400L200R1.txt \
     --parallel 4
-art-profile-fastqc --input DNBSeqG400L150R1.txt --output DNBSeqG400L150R1.png
+art-profile-fastqc --input DNBSeqG400L200R1.txt --output DNBSeqG400L200R1.png
 pixi run -e prev art_profile_builder \
-    --i-file raw_data/MGISEQ2000_PCR-free_NA12878_1_V100003043_L01_2.fq.gz \
+    --i-file raw_data/NA12878_PE200_2.fq.gz \
     --i-format FASTQ \
-    --read_len 150 \
-    --o-file1 DNBSeqG400L150R2.txt \
+    --read_len 200 \
+    --o-file1 DNBSeqG400L200R2.txt \
     --parallel 4
-art-profile-fastqc --input DNBSeqG400L150R2.txt --output DNBSeqG400L150R2.png
+art-profile-fastqc --input DNBSeqG400L200R2.txt --output DNBSeqG400L200R2.png
+
 echo "DONE"
