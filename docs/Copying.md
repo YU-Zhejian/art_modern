@@ -75,7 +75,7 @@ Under the MIT License.
 
 ## `{fmt}` by Victor Zverovich
 
-Available from <https://github.com/fmtlib/fmt>, release [`12.1.0`](https://github.com/fmtlib/fmt/releases/tag/12.1.0).
+Available from <https://github.com/fmtlib/fmt>, release [`12.2.0`](https://github.com/fmtlib/fmt/releases/tag/12.2.0).
 
 Affected files:
 

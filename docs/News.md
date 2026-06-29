@@ -5,6 +5,8 @@
 
 - Software Engineering:
   - `Previous run crashed` removed from error messages. This message is not informative.
+  - Bundled `{fmt}` and HTSLib deprecated; Will be removed in the next release.
+  - Update bundled `{fmt}` to [`12.2.0`](https://github.com/fmtlib/fmt/releases/tag/12.2.0).
 - Miscellaneous bug fixes.
 
 (v-1.5.0-section)=
