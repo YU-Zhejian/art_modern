@@ -29,6 +29,11 @@ project(
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
+# Warn if CMake version <3.25
+if(${CMAKE_VERSION} VERSION_LESS 3.25)
+    message(WARNING "Support for CMake version <3.25 is deprecated. Please upgrade to CMake >=3.25.")
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF) # To make C standard conformance stricter.

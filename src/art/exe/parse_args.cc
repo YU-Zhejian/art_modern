@@ -160,7 +160,7 @@ namespace {
         art_opts.add_options()(
             ARG_INS_RATE_2, po::value<double>()->default_value(DEFAULT_INS_RATE_2), "the second-read insertion rate");
         art_opts.add_options()(
-            ARG_DEL_RATE_1, po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the second-read deletion rate");
+            ARG_DEL_RATE_1, po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the first-read deletion rate");
         art_opts.add_options()(
             ARG_DEL_RATE_2, po::value<double>()->default_value(DEFAULT_DEL_RATE_2), "the second-read deletion rate");
         art_opts.add_options()(ARG_SEP_FLAG,

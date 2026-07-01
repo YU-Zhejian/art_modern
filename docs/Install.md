@@ -82,6 +82,8 @@ Although not tested, the following compilers can also theoretically be of use:
 
 **NOTE:** Lots of End-of-Life distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake's officially-built binaries](https://cmake.org/files/v3.17/).
 
+**NOTE:** In [1.5.1](#v-1.5.0-section), support over CMake earlier than [3.25](https://cmake.org/cmake/help/latest/release/3.25.html) is deprecated and will be removed in the next release.
+
 ### Dependencies of the CMake Build System
 
 CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` will **NOT** work.

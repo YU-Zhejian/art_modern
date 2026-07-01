@@ -22,7 +22,6 @@
 #include "libam_support/CExceptionsProxy.hh"
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/si_utils.hh"
@@ -357,7 +356,7 @@ void view_sra_mt(const std::vector<std::shared_ptr<IntermediateEmpDist>>& ied1s,
     try {
         auto rcngs = ncbi::NGS::openReadCollection(config.input_file_path);
         auto const nreads = rcngs.getReadCount();
-        auto const rc = am_min(nreads, static_cast<std::uint64_t>(config.first_n_reads));
+        auto const rc = std::min(nreads, static_cast<std::uint64_t>(config.first_n_reads));
         // Split work
         std::uint64_t chunk_size = rc / n_threads;
         std::vector<std::unique_ptr<ViewSraMtChild>> workers;

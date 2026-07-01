@@ -110,8 +110,8 @@ std::unique_ptr<WriterInterface> WriterDispatcher::parse_args_for_fmt(
             }
             ctype = CompressionType::NONE;
         } else {
-            throw std::runtime_error(
-                fmt::format("Invalid compression type '{}'. Supported types are 'gzip' and 'none'.", ctype_str));
+            throw std::runtime_error(fmt::format(
+                "Invalid compression type '{}'. Supported types are 'bgzip', 'gzip' and 'none'.", ctype_str));
         }
     } else {
         BOOST_LOG_TRIVIAL(warning) << "Compression type for format '" << fmt_name

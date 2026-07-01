@@ -17,7 +17,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
 #include <htslib/hts.h>
@@ -38,7 +37,7 @@ IntermediateEmpDist::IntermediateEmpDist(const std::size_t read_length)
 
 bool IntermediateEmpDist::parse_read(const std::string& seq, const std::vector<am_qual_t>& qual)
 {
-    const std::size_t effective_read_length = am_min(seq.size(), read_length_);
+    const std::size_t effective_read_length = std::min(seq.size(), read_length_);
     for (std::size_t i = 0; i < effective_read_length; ++i) {
         positions_[i].add(seq[i], qual[i]);
     }
@@ -48,7 +47,7 @@ bool IntermediateEmpDist::parse_read(const std::string& seq, const std::vector<a
 }
 bool IntermediateEmpDist::parse_read_ngs_fragment(const std::string& seq, const std::string& qual_str)
 {
-    const std::size_t effective_read_length = am_min(seq.size(), read_length_);
+    const std::size_t effective_read_length = std::min(seq.size(), read_length_);
     for (std::size_t i = 0; i < effective_read_length; ++i) {
         positions_[i].add(seq[i], static_cast<am_qual_t>(qual_str[i] - PHRED_OFFSET));
     }
@@ -61,7 +60,7 @@ bool IntermediateEmpDist::parse_read(const bam1_t* b)
 {
     const auto* seq = bam_get_seq(b);
     std::string seq_str;
-    const std::size_t effective_read_length = am_min(static_cast<std::size_t>(b->core.l_qseq), read_length_);
+    const std::size_t effective_read_length = std::min(static_cast<std::size_t>(b->core.l_qseq), read_length_);
     seq_str.resize(effective_read_length);
     for (std::size_t i = 0; i < effective_read_length; ++i) {
         seq_str[i] = (seq_nt16_str[bam_seqi(seq, i)]);

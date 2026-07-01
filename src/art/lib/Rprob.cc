@@ -115,7 +115,7 @@ void Rprob::r_probs_cached(const std::size_t n, std::vector<double>& external_tm
             vdRngUniform(VSL_RNG_METHOD_UNIFORM_STD, stream_, CACHE_SIZE_, cached_tmp_probs_.data(), 0.0, 1.0);
             cached_tmp_probs_index_ = CACHE_SIZE_;
         }
-        n_elements_to_copy = am_min(n - n_elements_copied, cached_tmp_probs_index_);
+        n_elements_to_copy = std::min(n - n_elements_copied, cached_tmp_probs_index_);
         std::memcpy(external_tmp_probs.data() + n_elements_copied,
             cached_tmp_probs_.data() + (cached_tmp_probs_index_ - n_elements_to_copy),
             n_elements_to_copy * sizeof(double));

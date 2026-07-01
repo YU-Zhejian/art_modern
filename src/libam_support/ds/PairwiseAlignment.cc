@@ -116,16 +116,18 @@ void PairwiseAlignment::check_() const
     if (this->aln_ref.length() != this->aln_query.length()) {
         BOOST_LOG_TRIVIAL(error) << "aln_ref len (" << this->aln_ref.length() << ") does not match query len ("
                                  << this->aln_query.length() << ")";
+        abort_mpi();
     }
     if (this->qual_str.length() != this->query.length()) {
         BOOST_LOG_TRIVIAL(error) << "qual_str len (" << this->qual_str.length() << ") does not match query len ("
                                  << this->query.length() << ")";
+        abort_mpi();
     }
     if (this->qual_vec.size() != this->query.length()) {
         BOOST_LOG_TRIVIAL(error) << "qual_vec len (" << this->qual_vec.size() << ") does not match query len ("
                                  << this->query.length() << ")";
+        abort_mpi();
     }
-    abort_mpi();
 #endif
 }
 
