@@ -23,15 +23,18 @@ def parse_fq(
     file_type: FileType,
     is_template: bool,
 ) -> Tuple[Mapping[str, float], Mapping[str, int], Mapping[str, int], Mapping[str, int]]:
+    contig_lengths: dict[str, int] = {}
     if file_type == FileType.PBSIM3_TRANSCRIPT:
-        contig_lengths = {}
         with open(in_fa) as fin:
             for l in fin:
                 ls = l.strip().split("\t")
                 contig_lengths[ls[0]] = len(ls[3])
     else:
         with pysam.FastxFile(in_fa) as fasta_file:
-            contig_lengths = {entry.name: len(entry.sequence) for entry in fasta_file}
+            for entry in fasta_file:
+                assert entry.name is not None, "Contig name is None"
+                assert entry.sequence is not None, f"Contig sequence for {entry.name} is None"
+                contig_lengths[entry.name] = len(entry.sequence)
     if is_template:
         contig_lengths = {contig_name: 1 for contig_name in contig_lengths}
     contig_bases = {contig_name: 0 for contig_name in contig_lengths}
@@ -39,6 +42,8 @@ def parse_fq(
     contig_nreads = {contig_name: 0 for contig_name in contig_lengths}
     with pysam.FastxFile(in_fq) as fq_file:
         for entry in fq_file:
+            assert entry.name is not None, "Contig name is None"
+            assert entry.sequence is not None, f"Contig sequence for {entry.name} is None"
             contig_name = entry.name.split(":")[0]
             contig_bases[contig_name] += len(entry.sequence) if not is_template else 1
             contig_nreads[contig_name] += 1
@@ -49,10 +54,16 @@ def parse_fq(
 
 def parse_design(in_fa: str, in_cov: Union[float, str], file_type: FileType) -> Mapping[str, float]:
     if file_type == FileType.CONST_COV:
+        assert isinstance(in_cov, float), "in_cov must be a float for CONST_COV"
         with pysam.FastxFile(in_fa) as fasta_file:
-            contig_lengths = {entry.name: len(entry.sequence) for entry in fasta_file}
+            contig_lengths: dict[str, int] = {}
+            for entry in fasta_file:
+                assert entry.name is not None, "Contig name is None"
+                assert entry.sequence is not None, f"Contig sequence for {entry.name} is None"
+                contig_lengths[entry.name] = len(entry.sequence)
         return {contig_name: in_cov for contig_name in contig_lengths}
     elif file_type == FileType.COV_TSV:
+        assert isinstance(in_cov, str), "in_cov must be a string for COV_TSV"
         design_cov = {}
         with open(in_cov) as fin:
             for line in fin:
@@ -63,6 +74,8 @@ def parse_design(in_fa: str, in_cov: Union[float, str], file_type: FileType) -> 
                 elif len(ls) == 3:
                     contig_name, cov_pos, cov_neg = ls
                     cov = float(cov_pos) + float(cov_neg)
+                else:
+                    raise ValueError(f"Invalid line in coverage file: {line}")
                 design_cov[contig_name] = cov
         return design_cov
     elif file_type == FileType.PBSIM3_TRANSCRIPT:
@@ -94,7 +107,7 @@ def validate(in_fq: str, in_fa: str, in_cov: Union[float, str], file_type: FileT
     else:
         diff_threshold = 0.1
     if (diff_mean) > diff_threshold:
-        plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01)
+        plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01) # type: ignore
         plt.show()
         plt.clf()
         raise ValueError("Mean coverage difference is greater than 10%.")

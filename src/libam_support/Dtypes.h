@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+// This is a C header included from C sources, so `using` is not available here.
+// NOLINTBEGIN(modernize-use-using)
+
 /**
  * Phred quality score.
  *
@@ -64,5 +67,7 @@ typedef int am_mpi_rank_t;
 typedef int am_mpi_size_t;
 typedef uint64_t am_rand_seed_t;
 typedef uint16_t am_bam_flag_t;
+
+// NOLINTEND(modernize-use-using)
 
 #endif // ART_MODERN_LIBAM_SUPPORT_DTYPES_H

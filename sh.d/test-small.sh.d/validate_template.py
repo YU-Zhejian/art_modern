@@ -19,6 +19,8 @@ def assess_pe(aln: pysam.AlignedSegment, contig_length: int) -> bool:
     if aln.is_read1:
         return not aln.is_reverse and aln.reference_start < 5 and aln.query_alignment_start < 5
     else:
+        assert aln.reference_end is not None, "Reference end is None"
+        assert aln.query_sequence is not None, "Query sequence is None"
         return (
             aln.is_reverse
             and abs(aln.reference_end - contig_length) < 5
@@ -28,6 +30,8 @@ def assess_pe(aln: pysam.AlignedSegment, contig_length: int) -> bool:
 
 def assess_mp(aln: pysam.AlignedSegment, contig_length: int) -> bool:
     if aln.is_read1:
+        assert aln.reference_end is not None, "Reference end is None"
+        assert aln.query_sequence is not None, "Query sequence is None"
         return (
             not aln.is_reverse
             and abs(aln.reference_end - contig_length) < 5
@@ -45,6 +49,7 @@ if __name__ == "__main__":
             if aln.is_unmapped:
                 print(f"Found unmapped read {aln.query_name}")
                 sys.exit(1)
+            assert aln.reference_name is not None, "Reference name is None"
             contig_length = bam_file.get_reference_length(aln.reference_name)
             if mode == "SE":
                 if not assess_se(aln, contig_length):

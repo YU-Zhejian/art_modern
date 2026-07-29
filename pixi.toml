@@ -54,6 +54,7 @@ pv = ">=1.6.6,<2"
 pkgconf = ">=3.0.4,<4"
 clang-tools = ">=22.1.8,<23"
 pyright = ">=1.1.411,<2"
+shellcheck = ">=0.11.0,<0.12"
 
 [pypi-dependencies]
 art-modern-utils = ">=1.0.3, <2"

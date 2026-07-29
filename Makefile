@@ -154,6 +154,16 @@ rel_with_dbg_alpine:
 fmt:
 	pixi run --frozen -e fmt $(BASH) sh.d/fmt.sh
 
+.PHONY: lint
+# Run static analysis using [`clang-tidy`](https://clang.llvm.org/extra/clang-tidy/), [Pyright](https://microsoft.github.io/pyright/) and [ShellCheck](https://www.shellcheck.net/).
+# Configures `cmake-build-clangd` for the compilation database, which is also what `clangd` reads.
+lint:
+	pixi run --frozen cmake -S $(CURDIR) -B $(CURDIR)/cmake-build-clangd \
+		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		$(CMAKE_FLAGS)
+	pixi run --frozen $(BASH) sh.d/lint.sh
+
 .PHONY: scc
 # Run source code counting
 # Note that this excludes third-party codes so should be preferred over pure `scc` in project root.

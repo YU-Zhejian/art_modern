@@ -48,6 +48,7 @@ FAILED_ID = []
 
 def probe_using_cmake_script(cmake_file_path: str) -> bool:
     # Dummy implementation for MKL probing
+    assert CMAKE is not None, "CMake not found in PATH"
     with open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file:
         result = subprocess.run(
             [CMAKE, "-P", os.path.join(SHDIR, "test-build.d", cmake_file_path)],
@@ -58,6 +59,7 @@ def probe_using_cmake_script(cmake_file_path: str) -> bool:
 
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
+    assert CMAKE is not None, "CMake not found in PATH"
     log_path = os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log")
     with (
         tempfile.TemporaryDirectory() as proj_dir,
@@ -80,6 +82,7 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
 
 
 def probe_pkg_config(package_name: str) -> bool:
+    assert PKG_CONFIG_PATH is not None, "pkg-config or pkgconf not found in PATH"
     result = subprocess.run(
         [PKG_CONFIG_PATH, "--exists", package_name],
         stdout=subprocess.DEVNULL,
@@ -125,8 +128,8 @@ def peobe_mkl_using_pkgconf() -> List[str]:
             retl.append(p)
     return retl
 
-
 def probe_ncbi_ngs() -> bool:
+    assert BASH is not None, "Bash not found in PATH"
     p = subprocess.run(
         [BASH, os.path.join(SHDIR, "test-build.d", "have_ncbi_ngs.sh")],
         stdin=subprocess.DEVNULL,
@@ -263,12 +266,12 @@ class PyLddSearch:
                     # DT_NEEDED entries contain the names of required libraries
                     for tag in section.iter_tags():
                         if tag.entry.d_tag == "DT_NEEDED":
-                            required_libs.append(tag.needed)
+                            required_libs.append(tag.needed)  # type: ignore
                         elif tag.entry.d_tag == "DT_RPATH":
-                            dt_rpath.extend(tag.rpath.split(":"))
+                            dt_rpath.extend(tag.rpath.split(":")) # type: ignore
                         # RUNPATH (New style)
                         elif tag.entry.d_tag == "DT_RUNPATH":
-                            dt_runpath.extend(tag.runpath.split(":"))
+                            dt_runpath.extend(tag.runpath.split(":")) # type: ignore
         dt_rpath = self._filter_ld_path(dt_rpath, f"{path}: RPATH")
         dt_runpath = self._filter_ld_path(dt_runpath, f"{path}: RUNPATH")
         self.lh.info("%s RPATH: %s", path, ":".join(dt_rpath))
@@ -305,7 +308,7 @@ class PyLddSearch:
         ldd_cache: Optional[LDD_CACHE] = None,
         n_tabs: int = 0,
         already_printed: Optional[Set[str]] = None,
-        lib_name: str = None,
+        lib_name: Optional[str] = None,
         file: IO[str] = sys.stdout,
     ):
         ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
@@ -347,18 +350,18 @@ class PyLddSearch:
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
-        self.USE_RANDOM_GENERATOR = "PCG"
-        self.USE_MALLOC = "AUTO"
-        self.USE_THREAD_PARALLEL = "ASIO"
-        self.USE_LIBFMT = None
-        self.USE_HTSLIB = None
-        self.USE_CONCURRENT_QUEUE = None
-        self.HELP_VERSION_ONLY = True
-        self.old_cmake_flags = old_cmake_flags
-        self.CMAKE_BUILD_TYPE = "Debug"
-        self.AM_NO_Q_REVERSE = False
-        self.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
-        self.WITH_NCBI_NGS = False
+        self.USE_RANDOM_GENERATOR : str = "PCG"
+        self.USE_MALLOC:str = "AUTO"
+        self.USE_THREAD_PARALLEL:str  = "ASIO"
+        self.USE_LIBFMT : Optional[str] = None
+        self.USE_HTSLIB : Optional[str] = None
+        self.USE_CONCURRENT_QUEUE : Optional[str] = None
+        self.HELP_VERSION_ONLY : bool = True
+        self.old_cmake_flags : List[str] = old_cmake_flags
+        self.CMAKE_BUILD_TYPE: str = "Debug"
+        self.AM_NO_Q_REVERSE: bool = False
+        self.FIND_RANDOM_MKL_THROUGH_PKGCONF : Optional[str] = None
+        self.WITH_NCBI_NGS: bool = False
 
     def generate_cmake_opts(self) -> List[str]:
         cmake_flags = self.old_cmake_flags
@@ -614,6 +617,10 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         do_build_lh.info("%s DONE", step_name_)
         return True
 
+    assert CMAKE is not None, "CMake not found in PATH"
+    assert BASH is not None, "Bash not found in PATH"
+    assert MAKE is not None, "make not found in PATH"
+    assert CTEST is not None, "ctest not found in PATH"
     if not run_wrapper(
         "CONFIG",
         [
@@ -668,6 +675,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         failed()
         return
 
+    mpiexec_pass = MPIEXEC if WITH_MPI else ""
+    assert mpiexec_pass is not None, "MPIEXEC not found in environment and mpiexec not in PATH"
     if not run_wrapper(
         "TESTSMALL",
         [BASH, os.path.join(SHDIR, "test-small.sh")],
@@ -677,7 +686,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             "APB_PATH": apb_path,
             "AMC_PATH": amc_path,
             "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-            "MPIEXEC": MPIEXEC if WITH_MPI else "",
+            "MPIEXEC": mpiexec_pass,
             "SAMTOOLS_THREADS": "4",
             "MPI_PARALLEL": "4",
             "PARALLEL": "2",
@@ -739,11 +748,6 @@ if __name__ == "__main__":
             MPIEXEC = shutil.which("mpiexec")
         if MPIEXEC is None:
             raise RuntimeError("MPIEXEC not found in environment and mpiexec not in PATH")
-
-    assert MAKE is not None, "make not found in PATH"
-    assert CMAKE is not None, "cmake not found in PATH"
-    assert CTEST is not None, "ctest not found in PATH"
-    assert BASH is not None, "bash not found in PATH"
 
     if os.path.exists(LOG_DIR):
         shutil.rmtree(LOG_DIR)
@@ -858,7 +862,12 @@ if __name__ == "__main__":
         print("libstdc++ (GNU)")
 
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
-    max_workers = min(5, os.cpu_count() // 4)
+    cpu_count = os.cpu_count()
+    if cpu_count is None:
+        cpu_count = 1
+    else:
+        cpu_count //= 4
+    max_workers = min(5, cpu_count)
     bcs = []
     for cmake_build_type in cmake_build_types:
         bc = BuildConfig(_old_cmake_flags)

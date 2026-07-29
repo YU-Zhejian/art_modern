@@ -130,12 +130,19 @@ Checks:
   - -*-use-concise-preprocessor-directives
 
 WarningsAsErrors: ''
-HeaderFilterRegex: ''
-FormatStyle: webkit
+# Report diagnostics from our own headers too. Much of this project lives in .hh files (class definitions,
+# templates, constants), so leaving this empty would discard the majority of what the checks have to say.
+# Vendored third-party code under deps/ is excluded rather than filtered in.
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: '.*/deps/.*|.*/cmake-build-.*'
+# Use the project's .clang-format rather than plain webkit, so that clang-tidy's fixes agree with `make fmt`.
+# Plain webkit differs from our .clang-format in ColumnLimit (0 vs. 120) and InsertNewlineAtEOF (false vs. true).
+FormatStyle: file
 
 CheckOptions:
+  # Semicolon-separated list of regexes.
   - key: misc-include-cleaner.IgnoreHeaders
-    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*.cstdint;cstddef;fmt/format.h'
+    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*;cstdint;cstddef;fmt/format.h'
   # Types whose member variables are all public are plain data carriers (e.g. PairwiseAlignment); making them
   # private would only add getters. Protected members, which this still reports, are the actual concern.
   - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
