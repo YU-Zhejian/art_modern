@@ -10,6 +10,7 @@
   - Support over CMake earlier than [3.25](https://cmake.org/cmake/help/latest/release/3.25.html) is deprecated and will be removed in the next release.
 - New features:
   - `am_compress` gained `--i-buffer_size`, which sets the size of the input read buffer. It was previously fixed at 4 KB.
+  - CMake variable [`AM_MPI_POSTFIX`](#am-mpi-postfix-section) added, which overrides the `-mpi` suffix appended to target names in MPI-enabled builds.
 - Bug fixes:
   - The `mean depth` reported at the end of each job in `template` simulation mode was the job-wide read count instead of a mean, so it grew with the number of templates in the job. It is now averaged over the templates actually simulated. This affects logging only; the simulated data was always correct.
   - Integer (`i`) BAM/SAM tags were byte-swapped before being handed to HTSLib, which performs that conversion itself. This was a no-op on little-endian hosts, but broke the build on big-endian ones.

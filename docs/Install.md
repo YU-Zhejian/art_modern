@@ -546,6 +546,18 @@ Whether to enable MPI-based parallelization.
 
 See [MPI Library](#mpi-section) for requirements.
 
+(am-mpi-postfix-section)=
+### `AM_MPI_POSTFIX`
+
+Available since [1.5.1](#v-1.5.1-section).
+
+Suffix appended to the name of every library, executable, test, and benchmark target, so that an MPI-enabled build can be installed alongside a non-MPI one. For example, the `art_modern` executable is named `art_modern-mpi` by default when [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`.
+
+- **Unset (DEFAULT): `-mpi` if [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`, empty otherwise.**
+- Any value `[val]`: Will use `[val]` as the suffix. A CMake warning is emitted to confirm that the default was overridden.
+
+This variable is only used when [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`. Non-MPI builds always use an empty suffix, and any value set here is ignored.
+
 (find-random-mkl-through-pkgconf-section)=
 ### `FIND_RANDOM_MKL_THROUGH_PKGCONF`
 
