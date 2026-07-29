@@ -132,7 +132,7 @@ void normalize_inplace(std::string& dna)
     }
 }
 
-bool ends_with(const std::string& str, const std::string& suffix)
+bool ends_with(const std::string_view str, const std::string_view suffix)
 {
     if (str.length() < suffix.length()) {
         return false;

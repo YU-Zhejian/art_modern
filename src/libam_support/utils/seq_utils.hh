@@ -26,6 +26,7 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace labw::art_modern {
@@ -42,7 +43,7 @@ void str_to_qual(am_qual_t* qual, const char* str, size_t qlen);
 std::string cigar_arr_to_str(const std::vector<am_cigar_t>& cigar_arr);
 std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, size_t n);
 
-bool ends_with(const std::string& str, const std::string& suffix);
+bool ends_with(std::string_view str, std::string_view suffix);
 
 /**
  * Reverse an arbitrary sequence.

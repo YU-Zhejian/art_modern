@@ -25,10 +25,12 @@
 #include <cstdint>
 #include <cstring>
 #include <sstream>
-#include <string>
+#include <string_view>
 
 namespace labw::art_modern {
-static const std::string UNKNOWN_C_EXCEPTION = "UNKNOWN";
+// constexpr so that this carries no dynamic initialization; the assert_* parameters below take
+// std::string_view so that it can serve as a zero-cost default argument.
+constexpr std::string_view UNKNOWN_C_EXCEPTION = "UNKNOWN";
 
 /**
  * An exception proxy for C exceptions.
@@ -67,8 +69,8 @@ public:
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_numeric(t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
-        const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false,
+    static t assert_numeric(t c_value, std::string_view c_lib_name = UNKNOWN_C_EXCEPTION,
+        std::string_view details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false,
         EXPECTATION expectation = EXPECTATION::ZERO, bool log = true);
 
     /**
@@ -83,12 +85,12 @@ public:
      * @return The `c_value`.
      */
     template <typename t>
-    static t assert_not_null(t c_value, const std::string& c_lib_name = UNKNOWN_C_EXCEPTION,
-        const std::string& details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false, bool log = true);
+    static t assert_not_null(t c_value, std::string_view c_lib_name = UNKNOWN_C_EXCEPTION,
+        std::string_view details = UNKNOWN_C_EXCEPTION, bool explain_using_strerror = false, bool log = true);
 };
 
 template <typename t>
-t CExceptionsProxy::assert_numeric(const t c_value, const std::string& c_lib_name, const std::string& details,
+t CExceptionsProxy::assert_numeric(const t c_value, std::string_view c_lib_name, std::string_view details,
     const bool explain_using_strerror, const EXPECTATION expectation, const bool log)
 {
     if ((expectation == EXPECTATION::ZERO && c_value != 0) || (expectation == EXPECTATION::POSITIVE && c_value <= 0)
@@ -110,7 +112,7 @@ t CExceptionsProxy::assert_numeric(const t c_value, const std::string& c_lib_nam
 }
 
 template <typename t>
-t CExceptionsProxy::assert_not_null(const t c_value, const std::string& c_lib_name, const std::string& details,
+t CExceptionsProxy::assert_not_null(const t c_value, std::string_view c_lib_name, std::string_view details,
     const bool explain_using_strerror, const bool log)
 {
     if (c_value == nullptr) {
