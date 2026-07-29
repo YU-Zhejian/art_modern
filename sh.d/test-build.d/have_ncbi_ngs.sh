@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2086
 set -uex
 cd "$(readlink -f "$(dirname "$0")")"
 CXX="${CXX:-g++}"

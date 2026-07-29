@@ -14,9 +14,16 @@
 
 #pragma once
 
+#include "libam_support/utils/class_macros_utils.hh"
 #include <exception>
 
 namespace labw::art_modern {
 
-class ArtGenerationFailure : public std::exception { };
+class ArtGenerationFailure : public std::exception {
+public:
+    DEFAULT_CONSTRUCTOR(ArtGenerationFailure)
+    DEFAULT_COPY(ArtGenerationFailure)
+    DEFAULT_MOVE(ArtGenerationFailure)
+    DEFAULT_DESTRUCTOR(ArtGenerationFailure)
+};
 } // namespace labw::art_modern

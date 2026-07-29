@@ -1,4 +1,5 @@
 #!/usr/bin/bash
+# shellcheck disable=SC1091
 
 export PATH="${HOME}/.pixi/bin:${PATH}"
 eval "$(pixi shell-hook)"

@@ -16,6 +16,7 @@
 #include "art_profile_builder/lib/APBConstants.hh"
 
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <cstdlib>
 #include <string>
@@ -26,6 +27,10 @@ namespace labw::art_modern {
  */
 class APBConfig {
 public:
+    DEFAULT_CONSTRUCTOR(APBConfig)
+    DEFAULT_COPY(APBConfig)
+    DEFAULT_MOVE(APBConfig)
+    DEFAULT_DESTRUCTOR(APBConfig)
     const std::string input_file_path;
     const am_read_len_t read_length_1;
     const am_read_len_t read_length_2;

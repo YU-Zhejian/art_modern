@@ -13,6 +13,7 @@
  **/
 
 #pragma once
+#include "libam_support/utils/class_macros_utils.hh"
 #include <boost/log/attributes/attribute.hpp>
 #include <boost/log/attributes/attribute_cast.hpp>
 
@@ -23,6 +24,9 @@ namespace labw::art_modern {
  */
 class MPIRankLoggerAttribute : public boost::log::attribute {
 public:
+    DEFAULT_COPY(MPIRankLoggerAttribute)
+    DEFAULT_MOVE(MPIRankLoggerAttribute)
+    DEFAULT_DESTRUCTOR(MPIRankLoggerAttribute)
     MPIRankLoggerAttribute();
     [[maybe_unused]] explicit MPIRankLoggerAttribute(boost::log::attributes::cast_source const& source);
 };
@@ -32,6 +36,9 @@ public:
  */
 class MPIHostNameLoggerAttribute : public boost::log::attribute {
 public:
+    DEFAULT_COPY(MPIHostNameLoggerAttribute)
+    DEFAULT_MOVE(MPIHostNameLoggerAttribute)
+    DEFAULT_DESTRUCTOR(MPIHostNameLoggerAttribute)
     MPIHostNameLoggerAttribute();
     [[maybe_unused]] explicit MPIHostNameLoggerAttribute(boost::log::attributes::cast_source const& source);
 };

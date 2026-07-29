@@ -15,6 +15,7 @@
 #pragma once
 
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/variables_map.hpp>
 
@@ -26,6 +27,10 @@ namespace labw::art_modern {
 
 class OutParams {
 public:
+    DEFAULT_CONSTRUCTOR(OutParams)
+    DEFAULT_COPY(OutParams)
+    DEFAULT_MOVE(OutParams)
+    DEFAULT_DESTRUCTOR(OutParams)
     const std::size_t n_threads;
     const boost::program_options::variables_map vm;
     const std::vector<std::string> args;

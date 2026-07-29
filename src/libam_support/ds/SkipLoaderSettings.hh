@@ -13,11 +13,15 @@
  **/
 #pragma once
 
+#include "libam_support/utils/class_macros_utils.hh"
 #include <cstdlib>
 
 namespace labw::art_modern {
 class SkipLoaderSettings {
 public:
+    DEFAULT_COPY(SkipLoaderSettings)
+    DEFAULT_MOVE(SkipLoaderSettings)
+    DEFAULT_DESTRUCTOR(SkipLoaderSettings)
     explicit SkipLoaderSettings(std::size_t num_parallel_jobs = 1, std::size_t job_id = 0);
 
     static SkipLoaderSettings from_mpi();

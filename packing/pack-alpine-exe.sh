@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2016
 set -ue
-ARCH="$(uname -m)"
 
 ./sh.d/prepare-master-dir-for-alpine.sh
 ALPINE_MASTER_DIR=artifacts/build_alpine_master
@@ -21,4 +21,4 @@ singularity exec \
     -DCMAKE_INSTALL_LIBDIR=bin \
     -DCMAKE_INSTALL_INCLUDEDIR=bin \
     -DCMAKE_INSTALL_PREFIX=${OPT_DIR}/build_rel_with_dbg_alpine_install /mnt/art_modern-master && \
-    cmake --build ${OPT_DIR}/build_rel_with_dbg_alpine --target '"${@}"' -- -j $(nproc)'
+    cmake --build ${OPT_DIR}/build_rel_with_dbg_alpine --target '"${*}"' -- -j $(nproc)'

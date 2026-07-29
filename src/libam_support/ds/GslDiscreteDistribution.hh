@@ -25,6 +25,7 @@
  */
 #pragma once
 
+#include "libam_support/utils/class_macros_utils.hh"
 #include <cstdlib>
 #include <numeric> // for std::accumulate
 #include <stack>
@@ -37,6 +38,9 @@ template <typename FloatType> class GslDiscreteDistribution {
     std::vector<std::size_t> A;
 
 public:
+    DEFAULT_COPY(GslDiscreteDistribution)
+    DEFAULT_MOVE(GslDiscreteDistribution)
+    DEFAULT_DESTRUCTOR(GslDiscreteDistribution)
     GslDiscreteDistribution();
     explicit GslDiscreteDistribution(const std::vector<FloatType>& prob_array);
 

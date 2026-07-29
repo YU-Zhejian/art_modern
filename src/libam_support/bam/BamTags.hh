@@ -14,6 +14,7 @@
 
 #pragma once
 
+#include "libam_support/utils/class_macros_utils.hh"
 #include <htslib/sam.h>
 
 #include <cstddef>
@@ -26,6 +27,9 @@
 namespace labw::art_modern {
 class BamTags {
 public:
+    DEFAULT_COPY(BamTags)
+    DEFAULT_MOVE(BamTags)
+    DEFAULT_DESTRUCTOR(BamTags)
     explicit BamTags(int est_num_tags = 16);
     /**
      * The type of the data stored in the tag.

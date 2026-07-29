@@ -14,6 +14,7 @@
 
 #include "art_modern_config.h" // NOLINT: For WITH_MPI
 
+#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_log_attributes.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
@@ -27,6 +28,10 @@ namespace labw::art_modern {
 namespace {
     class MPIRankLoggerAttributeImpl final : public boost::log::attribute::impl {
     public:
+        DEFAULT_CONSTRUCTOR(MPIRankLoggerAttributeImpl)
+        DEFAULT_COPY(MPIRankLoggerAttributeImpl)
+        DEFAULT_MOVE(MPIRankLoggerAttributeImpl)
+        DEFAULT_DESTRUCTOR(MPIRankLoggerAttributeImpl)
         boost::log::attribute_value get_value() override
         {
             return boost::log::attributes::make_attribute_value(mpi_rank_s());
@@ -34,6 +39,10 @@ namespace {
     };
     class MPIHostNameLoggerAttributeImpl final : public boost::log::attribute::impl {
     public:
+        DEFAULT_CONSTRUCTOR(MPIHostNameLoggerAttributeImpl)
+        DEFAULT_COPY(MPIHostNameLoggerAttributeImpl)
+        DEFAULT_MOVE(MPIHostNameLoggerAttributeImpl)
+        DEFAULT_DESTRUCTOR(MPIHostNameLoggerAttributeImpl)
         boost::log::attribute_value get_value() override
         {
             return boost::log::attributes::make_attribute_value(mpi_hostname());

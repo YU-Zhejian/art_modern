@@ -37,6 +37,7 @@
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
 #include "libam_support/ref/fetch/FaidxFetch.hh"
 #include "libam_support/ref/fetch/InMemoryFastaFetch.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 
 #include <boost/log/trivial.hpp>
@@ -51,6 +52,9 @@ namespace labw::art_modern {
 namespace {
     class Generator {
     public:
+        DEFAULT_COPY(Generator)
+        DEFAULT_MOVE(Generator)
+        DEFAULT_DESTRUCTOR(Generator)
         const OutputDispatcherFactory out_dispatcher_factory;
 
         Generator(ArtParams art_params, const ArtIOParams& art_io_params, std::unique_ptr<SeedAlloc>&& seed_alloc)

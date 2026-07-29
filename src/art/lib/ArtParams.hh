@@ -19,6 +19,7 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <array>
 #include <cmath>
@@ -30,6 +31,9 @@ namespace labw::art_modern {
 
 class ArtParams {
 public:
+    DEFAULT_COPY(ArtParams)
+    DEFAULT_MOVE(ArtParams)
+    DEFAULT_DESTRUCTOR(ArtParams)
     const SIMULATION_MODE art_simulation_mode;
     const ART_LIB_CONST_MODE art_lib_const_mode;
     const bool sep_flag;

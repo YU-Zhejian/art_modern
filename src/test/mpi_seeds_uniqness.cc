@@ -18,6 +18,7 @@ int main() { return EXIT_SUCCESS; }
 #else
 
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/log_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/rand_utils.hh"
@@ -42,6 +43,9 @@ using namespace labw::art_modern;
 
 class GeneratedSeeds {
 public:
+    DEFAULT_COPY(GeneratedSeeds)
+    DEFAULT_MOVE(GeneratedSeeds)
+    DEFAULT_DESTRUCTOR(GeneratedSeeds)
     GeneratedSeeds()
         : hostname_(mpi_hostname())
         , thread_id_(std::hash<std::thread::id> { }(std::this_thread::get_id())) { };

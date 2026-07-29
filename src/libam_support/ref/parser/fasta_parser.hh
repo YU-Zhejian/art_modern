@@ -29,7 +29,13 @@ namespace labw::art_modern {
 /**
  * Indicates the end of the FASTA file.
  */
-class FastaEOFException final : public std::exception { };
+class FastaEOFException final : public std::exception {
+public:
+    DEFAULT_CONSTRUCTOR(FastaEOFException)
+    DEFAULT_COPY(FastaEOFException)
+    DEFAULT_MOVE(FastaEOFException)
+    DEFAULT_DESTRUCTOR(FastaEOFException)
+};
 
 class MalformedFastaException final : public std::runtime_error {
 public:

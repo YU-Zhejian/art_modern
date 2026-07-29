@@ -59,4 +59,19 @@
 
 #define DEFAULT_DESTRUCTOR(classname) ~classname() = default;
 #define DELETE_DESTRUCTOR(classname) ~classname() = delete;
+
+/**
+ * @brief Macro to default the default constructor for a class.
+ *
+ * Declaring any copy or move member suppresses the implicitly-declared default constructor, so classes that
+ * rely on one must declare it alongside the other special members.
+ *
+ * @param classname  The name of the class for which to default the default constructor.
+ */
+#define DEFAULT_CONSTRUCTOR(classname) classname() = default;
+/**
+ * @brief Macro to delete the default constructor for a class.
+ * @param classname  The name of the class for which to delete the default constructor.
+ */
+#define DELETE_CONSTRUCTOR(classname) classname() = delete;
 // NOLINTEND

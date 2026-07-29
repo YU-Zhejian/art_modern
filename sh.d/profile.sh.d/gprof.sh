@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck disable=SC2317
 # shellcheck disable=SC1091
+# shellcheck disable=SC2086
 
 # See: <https://cygwin.com/cygwin-ug-net/gprof.html>
 set -uex
