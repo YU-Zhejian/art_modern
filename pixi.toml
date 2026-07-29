@@ -14,9 +14,9 @@ axel = ">=2.17.13,<3"
 sra-tools = ">=3.4.1,<4"
 
 [feature.testextreme.dependencies]
-mkl = ">=2026.0.0,<2027"
-mkl-devel = ">=2026.0.0,<2027"
-polars = ">=1.42.0,<2"
+mkl = ">=2026.1.0,<2027"
+mkl-devel = ">=2026.1.0,<2027"
+polars = ">=1.43.1,<2"
 bedtools = ">=2.31.1,<3"
 
 [feature.buildoncluster]
@@ -25,33 +25,33 @@ channels = ["https://software.repos.intel.com/python/conda/", "conda-forge", "bi
 [feature.buildoncluster.dependencies]
 dpcpp_linux-64 = ">=2025.3.3,<2026"
 mkl-devel = ">=2025.3.1,<2026"
-impi-devel = ">=2021.17.2,<2022"
+impi-devel = ">=2021.18.1,<2022"
 intel-openmp = ">=2025.3.3,<2026"
 jemalloc = ">=5.3.0,<6"
 libdeflate = ">=1.25,<2"
-libboost-devel = ">=1.90.0,<2"
+libboost-devel = ">=1.91.0,<2"
 zlib = ">=1.3.2,<2"
 
 [dependencies]
 python = "3.13.*"
-samtools = ">=1.23.1,<2"
+samtools = ">=1.24,<2"
 pysam = ">=0.24.0,<0.25"
-tqdm = ">=4.68.3,<5"
+tqdm = ">=4.70.0,<5"
 seqtk = ">=1.5,<2"
 seqkit = ">=2.13.0,<3"
 fastqc = ">=0.12.1,<0.13"
 numpy = ">=2.3.2,<3"
-matplotlib-base = ">=3.11.0,<4"
+matplotlib-base = ">=3.11.1,<4"
 pyelftools = ">=0.33,<0.34"
 curl = ">=8.21.0,<9"
 ninja = { version = ">=1.13.2,<2", channel = "conda-forge" }
-cmake = { version = ">=4.3.4,<5", channel = "conda-forge" }
+cmake = { version = ">=4.4.1,<5", channel = "conda-forge" }
 make = { version = ">=4.4.1,<5", channel = "conda-forge" }
 coreutils = { version = ">=9.5,<10", channel = "conda-forge" }
 bash = { version = ">=5.2.37,<6", channel = "conda-forge" }
 pip = ">=26.1.2,<27"
 pv = ">=1.6.6,<2"
-pkgconf = ">=2.9.95,<3"
+pkgconf = ">=3.0.4,<4"
 
 [pypi-dependencies]
 art-modern-utils = ">=1.0.3, <2"
