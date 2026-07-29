@@ -7,7 +7,7 @@
 
 This program, in fact, provides a user interface to the `bgzf` data structure in HTSLib. Further compression algorithms can be added on request.
 
-The input buffer size is always 4 KB.
+The input buffer size defaults to 4 KB and can be changed with `--i-buffer_size`.
 
 ## Options
 
@@ -17,6 +17,7 @@ The input buffer size is always 4 KB.
 - `--o-compressed-buffer_size`: Buffer used for compression.
 - `--o-compressed-num_threads`: Number of threads used in compression. **Only used for the BGZip algorithm.**
 - `--i-file`: Input file.
+- `--i-buffer_size`: Size (in bytes) of the buffer used to read the input file. Defaults to 4096. Must be greater than zero.
 
 The program would emit a warning if the output file extension does not match the desired algorithm.
 

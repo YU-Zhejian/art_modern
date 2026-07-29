@@ -184,6 +184,7 @@ void ArtJobExecutor::operator()()
     AJEReporter reporter(*this, art_params_.art_job_executor_reporting_interval_seconds);
     reporter.start();
     hts_pos_t accumulated_contig_len = 0;
+    std::size_t num_contigs_simulated = 0;
 
     Rprob rprob_(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len_1,
         art_params_.read_len_2, seed_);
@@ -200,6 +201,7 @@ void ArtJobExecutor::operator()()
             continue;
         }
         accumulated_contig_len += contig_size;
+        num_contigs_simulated += 1;
 
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
 
@@ -235,8 +237,13 @@ void ArtJobExecutor::operator()()
         // Calculate real coverage
         double real_coverage = 0;
         if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-            // TODO: Still needs checking
-            real_coverage = total_num_reads_generated_;
+            // In TEMPLATE mode the requested coverage is a number of reads per template rather than a number of
+            // bases per position: calculate_num_reads_template() picks read counts summing to the requested
+            // coverage directly. The mean depth is therefore the read count averaged over the templates that
+            // were actually simulated, with no read-length term. Note that PE reads are counted individually
+            // here, matching how calculate_num_reads_template() rounds to a multiple of num_reads_to_reduce_.
+            real_coverage
+                = static_cast<double>(total_num_reads_generated_) / static_cast<double>(num_contigs_simulated);
         } else {
             if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
                 real_coverage = static_cast<double>(total_num_reads_generated_) * art_params_.read_len_1

@@ -8,6 +8,11 @@
   - Bundled `{fmt}` and HTSLib deprecated; Will be removed in the next release.
   - Update bundled `{fmt}` to [`12.2.0`](https://github.com/fmtlib/fmt/releases/tag/12.2.0).
   - Support over CMake earlier than [3.25](https://cmake.org/cmake/help/latest/release/3.25.html) is deprecated and will be removed in the next release.
+- New features:
+  - `am_compress` gained `--i-buffer_size`, which sets the size of the input read buffer. It was previously fixed at 4 KB.
+- Bug fixes:
+  - The `mean depth` reported at the end of each job in `template` simulation mode was the job-wide read count instead of a mean, so it grew with the number of templates in the job. It is now averaged over the templates actually simulated. This affects logging only; the simulated data was always correct.
+  - Integer (`i`) BAM/SAM tags were byte-swapped before being handed to HTSLib, which performs that conversion itself. This was a no-op on little-endian hosts, but broke the build on big-endian ones.
 - Miscellaneous bug fixes.
 
 (v-1.5.0-section)=

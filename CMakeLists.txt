@@ -198,9 +198,12 @@ endif()
 
 # -----------------------------------------------------------------------------
 # Dealing with ${AM_SUPPORT_LIB}.
-# TODO: Make AM_MPI_POSTFIX adjustable.
 if(WITH_MPI)
-    set(AM_MPI_POSTFIX "-mpi")
+    if(NOT DEFINED AM_MPI_POSTFIX)
+        set(AM_MPI_POSTFIX "-mpi")
+    else()
+        message(WARNING "AM_MPI_POSTFIX is already defined. Using the existing value: ${AM_MPI_POSTFIX}")
+    endif()
 else()
     set(AM_MPI_POSTFIX "")
 endif()
