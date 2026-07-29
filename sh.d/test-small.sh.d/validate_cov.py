@@ -107,7 +107,7 @@ def validate(in_fq: str, in_fa: str, in_cov: Union[float, str], file_type: FileT
     else:
         diff_threshold = 0.1
     if (diff_mean) > diff_threshold:
-        plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01) # type: ignore
+        plt.scatter(fq_cov.values(), design_cov.values(), alpha=0.01)  # type: ignore
         plt.show()
         plt.clf()
         raise ValueError("Mean coverage difference is greater than 10%.")

@@ -97,8 +97,12 @@ if __name__ == "__main__":
                     slengths.append(len(data))
 
                     wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
-                snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if len(files) == 0 else f"{sname}_1") + "}")
-                slengths_constructed.append("{" + f"{slengths[0]}, " + ("0" if len(files) == 0 else f"{slengths[1]}") + "}")
+                snames_constructed.append(
+                    "{" + f"{sname}_0, " + ("NULL_PROFILE" if len(files) == 0 else f"{sname}_1") + "}"
+                )
+                slengths_constructed.append(
+                    "{" + f"{slengths[0]}, " + ("0" if len(files) == 0 else f"{slengths[1]}") + "}"
+                )
 
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
             wh.write("static " + DTYPE + "* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")

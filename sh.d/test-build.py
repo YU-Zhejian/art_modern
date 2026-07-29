@@ -128,6 +128,7 @@ def peobe_mkl_using_pkgconf() -> List[str]:
             retl.append(p)
     return retl
 
+
 def probe_ncbi_ngs() -> bool:
     assert BASH is not None, "Bash not found in PATH"
     p = subprocess.run(
@@ -268,10 +269,10 @@ class PyLddSearch:
                         if tag.entry.d_tag == "DT_NEEDED":
                             required_libs.append(tag.needed)  # type: ignore
                         elif tag.entry.d_tag == "DT_RPATH":
-                            dt_rpath.extend(tag.rpath.split(":")) # type: ignore
+                            dt_rpath.extend(tag.rpath.split(":"))  # type: ignore
                         # RUNPATH (New style)
                         elif tag.entry.d_tag == "DT_RUNPATH":
-                            dt_runpath.extend(tag.runpath.split(":")) # type: ignore
+                            dt_runpath.extend(tag.runpath.split(":"))  # type: ignore
         dt_rpath = self._filter_ld_path(dt_rpath, f"{path}: RPATH")
         dt_runpath = self._filter_ld_path(dt_runpath, f"{path}: RUNPATH")
         self.lh.info("%s RPATH: %s", path, ":".join(dt_rpath))
@@ -350,17 +351,17 @@ class PyLddSearch:
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
-        self.USE_RANDOM_GENERATOR : str = "PCG"
-        self.USE_MALLOC:str = "AUTO"
-        self.USE_THREAD_PARALLEL:str  = "ASIO"
-        self.USE_LIBFMT : Optional[str] = None
-        self.USE_HTSLIB : Optional[str] = None
-        self.USE_CONCURRENT_QUEUE : Optional[str] = None
-        self.HELP_VERSION_ONLY : bool = True
-        self.old_cmake_flags : List[str] = old_cmake_flags
+        self.USE_RANDOM_GENERATOR: str = "PCG"
+        self.USE_MALLOC: str = "AUTO"
+        self.USE_THREAD_PARALLEL: str = "ASIO"
+        self.USE_LIBFMT: Optional[str] = None
+        self.USE_HTSLIB: Optional[str] = None
+        self.USE_CONCURRENT_QUEUE: Optional[str] = None
+        self.HELP_VERSION_ONLY: bool = True
+        self.old_cmake_flags: List[str] = old_cmake_flags
         self.CMAKE_BUILD_TYPE: str = "Debug"
         self.AM_NO_Q_REVERSE: bool = False
-        self.FIND_RANDOM_MKL_THROUGH_PKGCONF : Optional[str] = None
+        self.FIND_RANDOM_MKL_THROUGH_PKGCONF: Optional[str] = None
         self.WITH_NCBI_NGS: bool = False
 
     def generate_cmake_opts(self) -> List[str]:

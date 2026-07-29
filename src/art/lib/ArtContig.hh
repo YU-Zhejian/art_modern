@@ -33,8 +33,8 @@ namespace labw::art_modern {
 class ArtContig {
 
 public:
-    ArtContig(std::shared_ptr<BaseFastaFetch> fasta_fetch, std::size_t seq_id, const ArtParams& art_params,
-        Rprob& rprob);
+    ArtContig(
+        std::shared_ptr<BaseFastaFetch> fasta_fetch, std::size_t seq_id, const ArtParams& art_params, Rprob& rprob);
 
     // This type borrows art_params_ and rprob_ by reference, so it is only ever valid for as long as the job
     // that owns them. Copying or moving it is never wanted and would silently be assignment-less anyway.
