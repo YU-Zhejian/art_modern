@@ -39,9 +39,10 @@ Affected files:
 
 - `/deps/cmake_collections/**`
 - `/deps/slim_libceu/**`
-  
 
 With MIT License.
+
+**NOTE:** Parts of `/deps/cmake_collections/` are adapted from CMake, GNU Autoconf and the GNU Autoconf Archive, and are under their own licenses. That directory's `Readme.md` is authoritative: it lists the affected files and reproduces the full copyright notices.
 
 **NOTE** Added in [1.0.0](#v-1.0.0-section).
 
