@@ -30,7 +30,16 @@
 
 #include <htslib/sam.h>
 
+/*
+ * std::to_chars() lives in <charconv>, which libstdc++ only provides from 8.1. Detect it rather than assume it,
+ * so that the documented minimum compiler is not silently raised. __has_include is itself C++17, so it is always
+ * available here. Define AM_NO_CHARCONV to force the fallback.
+ */
+#if !defined(AM_NO_CHARCONV) && __has_include(<charconv>)
+#define AM_HAVE_CHARCONV
 #include <charconv>
+#endif
+
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -96,13 +105,19 @@ std::string cigar_arr_to_str(const am_cigar_t* cigar_arr, const size_t n)
 {
     std::string result;
     result.reserve(n << 2);
+#ifdef AM_HAVE_CHARCONV
     char buf[12]; // Sufficient for any 32-bit uint
+#endif
     for (std::size_t i = 0; i < n; ++i) {
-        std::uint32_t len = cigar_arr[i] >> BAM_CIGAR_SHIFT;
-        auto [ptr, ec] = std::to_chars(buf, buf + 10, len);
+        const std::uint32_t len = cigar_arr[i] >> BAM_CIGAR_SHIFT;
+#ifdef AM_HAVE_CHARCONV
+        auto [ptr, ec] = std::to_chars(buf, buf + sizeof(buf), len);
         if (ec == std::errc()) {
             result.append(buf, ptr - buf);
         }
+#else
+        result.append(std::to_string(len));
+#endif
         result.push_back(BAM_CIGAR_STR[cigar_arr[i] & BAM_CIGAR_MASK]);
     }
     return result;

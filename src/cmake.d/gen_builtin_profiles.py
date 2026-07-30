@@ -97,11 +97,13 @@ if __name__ == "__main__":
                     slengths.append(len(data))
 
                     wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
+                # Single-end profiles have exactly one file, so there is no `_1` array to refer to. The test must
+                # be on whether a second file exists, not on whether the profile has no files at all.
                 snames_constructed.append(
-                    "{" + f"{sname}_0, " + ("NULL_PROFILE" if len(files) == 0 else f"{sname}_1") + "}"
+                    "{" + f"{sname}_0, " + ("NULL_PROFILE" if len(files) < 2 else f"{sname}_1") + "}"
                 )
                 slengths_constructed.append(
-                    "{" + f"{slengths[0]}, " + ("0" if len(files) == 0 else f"{slengths[1]}") + "}"
+                    "{" + f"{slengths[0]}, " + ("0" if len(files) < 2 else f"{slengths[1]}") + "}"
                 )
 
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")

@@ -13,16 +13,6 @@
   - Consider using the method implemented in `pigz`. That is, create a ring buffer that stores raw pointers to record datagrams, which allows reusing.
   - The current implementation passes too many small objects across the concurrent queue and I/O handlers, which is inefficient. This problem will be considerably worse if POSIX AIO is used.
 
-## Restore the Documented Compiler Minimum by Dropping the Hard `<charconv>` Dependency
-
-`docs/Install.md` claims GCC at least 7.4.0 and Clang at least 5.0.1, but the project cannot be built with either. `cigar_arr_to_str()` in `src/libam_support/utils/seq_utils.cc` calls `std::to_chars()` from `<charconv>`, which `libstdc++` only provides from 8.1; `libstdc++` 7 has no such header. This is core `libam_support`, not an optional component, so the build fails at the `#include`. Clang is affected identically, since on GNU/Linux it uses `libstdc++` by default and the standard library, not the compiler, sets the floor. Introduced together with the accelerated CIGAR-to-string conversion in [1.5.0](#v-1.5.0-section).
-
-Either raise the documented minimum to GCC 9.1 (where C++17 library support is complete, and the same boundary as [the `<filesystem>` discussion](Design.md)), or keep the current minimum by making `<charconv>` optional:
-
-- Guard the `#include` with `#if defined(__cpp_lib_to_chars) || __has_include(<charconv>)`, or set a macro from CMake, and provide a fallback that appends `std::to_string(len)` instead. That variant is already implemented and benchmarked as `cigar_arr_to_str_new` in `src/benchmark/cigar_to_str.cc`, so its cost relative to `std::to_chars()` is known rather than assumed.
-- Keep both paths behind one function so that only `cigar_arr_to_str()` differs; nothing else in the project uses `<charconv>`.
-- Whichever route is taken, add a compile check for the library features actually used. `deps/cmake_collections/test_cxx17.cmake` only probes generic C++17 and would not have caught this.
-
 ## Job Executor Lifetime Under the ASIO Backend
 
 **Symptom:** with `USE_THREAD_PARALLEL=ASIO`, objects owned by a job appear not to be released once the job is done; `BS` does not show this.

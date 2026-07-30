@@ -14,13 +14,13 @@ char* ceu_interpret_c_stdlib_version(void)
     }
 
     char* ptr = buffer;
-    int remaining = 1024;
+    size_t remaining = 1024;
     int written = 0;
 
     written = CEU_SNPRINTF(ptr, remaining, "Compile-time C stdlib: %s\n", CEU_LIBC_NAME);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -32,9 +32,9 @@ char* ceu_interpret_c_stdlib_version(void)
 #else
     written = CEU_SNPRINTF(ptr, remaining, "\tglibc version number: %s\n", CEU_UNDEFINED);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -47,9 +47,9 @@ char* ceu_interpret_c_stdlib_version(void)
 #else
     written = CEU_SNPRINTF(ptr, remaining, "\tuClibc version number: %s\n", CEU_UNDEFINED);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -62,9 +62,9 @@ char* ceu_interpret_c_stdlib_version(void)
 #else
     written = CEU_SNPRINTF(ptr, remaining, "\tNewlib version number: %s\n", CEU_UNDEFINED);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;

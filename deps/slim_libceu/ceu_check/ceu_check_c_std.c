@@ -13,13 +13,13 @@ char* ceu_interpret_c_std_version(void)
     }
 
     char* ptr = buffer;
-    int remaining = 1024;
+    size_t remaining = 1024;
     int written = 0;
 
     written = CEU_SNPRINTF(ptr, remaining, "C compile-time std.: ver. %s", CEU_C_STD);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -30,9 +30,9 @@ char* ceu_interpret_c_std_version(void)
 #else
     written = CEU_SNPRINTF(ptr, remaining, " (%s)\n", CEU_UNDEFINED);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
