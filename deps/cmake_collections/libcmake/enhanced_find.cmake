@@ -1,6 +1,6 @@
 # Finds packages.
 
-if(NOT DEFINED PKGCONF_FOUND)
+if(NOT DEFINED PKG_CONFIG_FOUND)
     find_package(PkgConfig)
 endif()
 
