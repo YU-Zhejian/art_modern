@@ -5,10 +5,9 @@
 # - NO_FASTQC: If set to "1", skip fastqc tests
 # - HELP_VERSION_ONLY: If set to "1", only test help and version outputs
 # - FORMAT_ONLY: If set to "1", only test output formats
-# - WITH_MPI: "1" if the executables were built with -DWITH_MPI=ON. Must be set from outside; this
-#   is the same flag CMake and test-build.py use, not something inferred from MPIEXEC.
-# - MPIEXEC: The MPI launcher to run the executables with. Required when WITH_MPI=1, ignored
-#   otherwise. It selects the launcher only; it does NOT decide whether this is an MPI build.
+# - WITH_MPI: "1" if built with -DWITH_MPI=ON. Must be set from outside; same flag as CMake uses.
+# - MPIEXEC: The MPI launcher. Required when WITH_MPI=1, ignored otherwise. Selects the launcher
+#   only; it does NOT decide whether this is an MPI build.
 # - ART_MODERN_PATH/APB_PATH/AMC_PATH: If set, use this path for the executables
 # - MPI_PARALLEL: If set, use this many MPI processes
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
@@ -189,9 +188,8 @@ function AMC_EXEC() {
     rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${AMC_CMD_ASSEMBLED[*]} $*"
-    # The call must stay in a tested context, otherwise 'set -e' would abort the script before the
-    # diagnostics below could run. The success branch comes first on purpose: with 'if ! cmd' the
-    # '${?}' seen inside the branch would be the negated status (always 0), not the real one.
+    # Tested context, else 'set -e' aborts before the diagnostics run. Success branch first because
+    # under 'if ! cmd' the branch's '${?}' would be the negated status, always 0.
     if "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
         "${AMC_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log; then

@@ -7,8 +7,7 @@ RETV=0
 # Compilation database used by clang-tidy. Shared with clangd; see .clangd.
 BUILD_DIR="${AM_LINT_BUILD_DIR:-cmake-build-clangd}"
 
-# A missing tool must not be mistaken for a clean run. All of these come from
-# '[feature.lint.dependencies]' in pixi.toml, which 'make lint' selects with '-e lint'.
+# Checked up front: a missing tool must not look like a lint-clean tree.
 MISSING=0
 for tool in run-clang-tidy pyright shellcheck; do
     if ! command -v "${tool}" &>/dev/null; then
@@ -22,7 +21,6 @@ if [ ! -e "${BUILD_DIR}/compile_commands.json" ]; then
         "configured with -DCMAKE_EXPORT_COMPILE_COMMANDS=ON." >&2
     MISSING=1
 fi
-# Bail out here so that a broken environment is never reported as a lint-clean tree.
 if [ "${MISSING}" -ne 0 ]; then
     exit 1
 fi

@@ -9,8 +9,7 @@ else
     exit 1
 fi
 
-# A missing formatter must not be mistaken for a clean run, so check up front rather than skipping
-# silently. All of these come from '[feature.fmt.dependencies]' in pixi.toml.
+# Checked up front: a missing formatter must not look like a clean run.
 MISSING=0
 for tool in shfmt black clang-format cmake-format dos2unix; do
     if ! command -v "${tool}" &>/dev/null; then
@@ -24,14 +23,9 @@ fi
 
 NPROC="$(nproc)"
 
-# Runs "${@:2}" over the file list read from stdin, at most NPROC invocations at a time. Files that
-# Git still tracks but that no longer exist are skipped.
-#
-# Do not go back to backgrounding the formatters with '&' from inside a 'while read' loop: such a
-# loop is the last element of a pipeline and therefore runs in a subshell, so a 'wait' placed after
-# the pipeline has no children of its own to wait for. The stages then overlap, and dos2unix can
-# rewrite a file while clang-format is still working on it. xargs also reports a non-zero status
-# when an invocation fails, which a bare 'wait' never does.
+# Runs "${@:2}" over the file list on stdin, NPROC at a time; tracked-but-deleted files are skipped.
+# Not '&' inside a 'while read' loop: that loop is a pipeline subshell, so a following 'wait' has no
+# children and the stages overlap. xargs also fails loudly, where a bare 'wait' returns 0.
 function run_formatter() {
     local label="${1}"
     shift

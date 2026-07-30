@@ -10,13 +10,22 @@ CMAKE_FLAGS ?=
 
 # Number of parallel jobs for building.
 # Defaults to number of CPU cores detected using `nproc`.
-JOBS ?= $(shell nproc)
+# Guarded ':=' not '?=': '?=' is recursive, re-running `nproc` on every reference.
+ifeq ($(origin JOBS),undefined)
+JOBS := $(shell nproc)
+endif
 
 # Shell to use for shell scripts
 BASH ?= bash
 
-# Python interpreter to use for Python scripts
-PIXI_PYTHON ?= $(shell pixi run --frozen which python)
+# Python interpreter to use for Python scripts.
+ifeq ($(origin PIXI_PYTHON),undefined)
+PIXI_PYTHON := $(shell pixi run --frozen which python)
+endif
+
+# Prefix for recipes needing the interpreter: an empty PIXI_PYTHON would otherwise leave them
+# running the script as a bare command.
+REQUIRE_PIXI_PYTHON = $(if $(strip $(PIXI_PYTHON)),,$(error PIXI_PYTHON is empty: 'pixi run --frozen which python' produced no output. Is pixi installed, and is the default environment solved?))
 
 # MPI launcher command. Used in MPI-related tests only
 # NOTE: Setting this target does NOT enable MPI build!
@@ -27,10 +36,15 @@ MPIEXEC ?= mpiexec
 export OPT_DIR ?= $(CURDIR)/opt
 
 # System architecture
-ARCH ?= $(shell uname -m)
+ifeq ($(origin ARCH),undefined)
+ARCH := $(shell uname -m)
+endif
 
 # Package version.
-export PACKAGE_VERSION ?= $(shell cat version.txt | tr -d '[:space:]')
+ifeq ($(origin PACKAGE_VERSION),undefined)
+PACKAGE_VERSION := $(shell tr -d '[:space:]' < version.txt)
+endif
+export PACKAGE_VERSION
 
 $(info Using $(JOBS) parallel jobs for building)
 $(info Building for version $(PACKAGE_VERSION))
@@ -44,7 +58,7 @@ endif
 .PHONY: help
 # Generate help message from Makefile comments
 help:
-	$(PIXI_PYTHON) $(CURDIR)/sh.d/make2help.py txt < $(CURDIR)/Makefile
+	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) $(CURDIR)/sh.d/make2help.py txt < $(CURDIR)/Makefile
 
 .PHONY: dumpvar
 # List all variables using .VARIABLES
@@ -71,6 +85,7 @@ debug:
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug -j$(JOBS)
+	env -C $(OPT_DIR)/build_debug ctest --output-on-failure
 	cmake --install $(OPT_DIR)/build_debug
 
 .PHONY: debug-mpi
@@ -89,6 +104,7 @@ debug-mpi:
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_debug-mpi -j$(JOBS)
+	env -C $(OPT_DIR)/build_debug-mpi ctest --output-on-failure
 	cmake --install $(OPT_DIR)/build_debug-mpi
 
 .PHONY: release
@@ -108,6 +124,7 @@ release:
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release -j$(JOBS)
+	env -C $(OPT_DIR)/build_release ctest --output-on-failure
 	cmake --install $(OPT_DIR)/build_release
 
 .PHONY: release-mpi
@@ -119,6 +136,8 @@ release-mpi:
 		-DCMAKE_BUILD_TYPE=RelWithDebInfo \
 		-DCMAKE_VERBOSE_MAKEFILE=ON \
 		-DCEU_CM_SHOULD_USE_NATIVE=ON \
+		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
+		-DBUILD_ART_MODERN_BENCHMARKS=ON \
 		-DCMAKE_INSTALL_LIBDIR=lib/art_modern/lib \
 		-DCMAKE_INSTALL_INCLUDEDIR=include/art_modern/include \
 		-DCMAKE_INSTALL_PREFIX=$(OPT_DIR)/build_release_install-mpi/ \
@@ -126,6 +145,7 @@ release-mpi:
 		$(CMAKE_FLAGS) \
 		$(CURDIR)
 	cmake --build $(OPT_DIR)/build_release-mpi -j$(JOBS)
+	env -C $(OPT_DIR)/build_release-mpi ctest --output-on-failure
 	cmake --install $(OPT_DIR)/build_release-mpi
 
 .PHONY: rel_with_dbg_alpine
@@ -242,25 +262,26 @@ clean:
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	$(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
-	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small
 # Test building using diverse conditions with testsmall configurations
 testbuild-small:
-	$(PIXI_PYTHON) sh.d/test-build.py --small $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py --small $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small-mpi
 # testbuild with MPI with testsmall configurations
 testbuild-small-mpi:
-	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation
+# Deliberately not $(PIXI_PYTHON): Sphinx below needs the `doc` env, so both lines stay in it.
 doc:
 	pixi run --frozen -e doc python $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
 	pixi run --frozen -e doc $(MAKE) -C docs/sphinx.d

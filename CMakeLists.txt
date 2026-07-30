@@ -75,11 +75,8 @@ if(NOT DEFINED CMAKE_INSTALL_PREFIX)
         CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
 endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
-# Also record the directories of external libraries that were linked by absolute path, e.g. an MKL
-# resolved through pkg-config into a prefix such as /opt/intel/oneapi that is not registered with
-# ldconfig. Without this the installed binary keeps a DT_NEEDED entry (libmkl_rt.so.2) that the
-# loader cannot resolve. Directories in CMAKE_PLATFORM_IMPLICIT_LINK_DIRECTORIES are skipped by
-# CMake, so ordinary system libraries add nothing here and distribution packaging is unaffected.
+# Also RPATH externals linked by absolute path (e.g. MKL from pkg-config under /opt/intel), whose
+# DT_NEEDED the loader could not otherwise resolve. Implicit system dirs are skipped by CMake.
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Macros from LibCEU.
