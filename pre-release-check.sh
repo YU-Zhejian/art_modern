@@ -27,17 +27,19 @@ function run_llvm() {
 
 make clean
 
-run_gcc make testbuild-small || true
-run_gcc make testbuild-small-mpi || true
+TB_TARGET="testbuild" # -small
 
-run_llvm make testbuild-small \
+run_gcc make "${TB_TARGET}" || true
+run_gcc make "${TB_TARGET}"-mpi || true
+
+run_llvm make "${TB_TARGET}" \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
-run_llvm make testbuild-small-mpi \
+run_llvm make "${TB_TARGET}"-mpi \
     CMAKE_FLAGS="-DBoost_DIR=${HOME}/opt/boost-1.89.0-clang/lib/cmake/Boost-1.89.0/" || true
 
 . /opt/intel/oneapi/setvars.sh
-run_gcc make testbuild-small \
+run_gcc make "${TB_TARGET}" \
     CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx' || true
-run_gcc make testbuild-small-mpi \
+run_gcc make "${TB_TARGET}"-mpi \
     CMAKE_FLAGS='-DCMAKE_C_COMPILER=icx -DCMAKE_CXX_COMPILER=icpx' || true

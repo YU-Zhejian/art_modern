@@ -97,6 +97,19 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
     }
 }
 
+ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
+    : art_params_(other.art_params_)
+    , job_(std::move(other.job_))
+    , mpi_rank_str_(other.mpi_rank_str_)
+    , mpi_rank_str_hex_(other.mpi_rank_str_hex_)
+    , output_dispatcher_(std::move(other.output_dispatcher_))
+    , num_reads_to_reduce_(other.num_reads_to_reduce_)
+    , require_alignment_(other.require_alignment_)
+    , seed_(other.seed_)
+    , token_ring_(std::move(other.token_ring_))
+{
+}
+
 bool ArtJobExecutor::generate_pe_(
     ArtContig& art_contig, const bool is_plus_strand, const am_readnum_t current_num_reads, Rprob& rprob_)
 {
