@@ -2,7 +2,7 @@
 # Suffix rules disabled
 .SUFFIXES:
 
-# Add -R to make to clear buitin variables
+# Propagate -R (--no-builtin-variables) to the sub-makes
 MAKEFLAGS += -R
 
 # Additional CMake flags for CMake-related tasks
@@ -10,7 +10,6 @@ CMAKE_FLAGS ?=
 
 # Number of parallel jobs for building.
 # Defaults to number of CPU cores detected using `nproc`.
-# Guarded ':=' not '?=': '?=' is recursive, re-running `nproc` on every reference.
 ifeq ($(origin JOBS),undefined)
 JOBS := $(shell nproc)
 endif
@@ -33,7 +32,10 @@ REQUIRE_PIXI_PYTHON = $(if $(strip $(PIXI_PYTHON)),,$(error PIXI_PYTHON is empty
 MPIEXEC ?= mpiexec
 
 # Output directory for build artifacts
-export OPT_DIR ?= $(CURDIR)/opt
+ifeq ($(strip $(OPT_DIR)),)
+override OPT_DIR := $(CURDIR)/opt
+endif
+export OPT_DIR
 
 # System architecture
 ifeq ($(origin ARCH),undefined)
@@ -252,32 +254,33 @@ testsmall-release-mpi: release-mpi raw_data
 .PHONY: raw_data
 # Download raw data required for tests
 raw_data:
-	$(MAKE) -C data/raw_data
+	pixi run --frozen $(MAKE) -C data/raw_data
 
 .PHONY: clean
 # Clean all build artifacts
 clean:
-	rm -fr $(OPT_DIR) tmp build
+	rm -fr $(OPT_DIR) tmp build art_modern-log.d test-build-*.log.d
+	rm -fr $(CURDIR)/cmake-build-clangd
 
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py -- $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
-	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
+	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --mpi -- $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small
 # Test building using diverse conditions with testsmall configurations
-testbuild-small:
-	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py --small $(CMAKE_FLAGS)
+testbuild-small: raw_data
+	$(REQUIRE_PIXI_PYTHON)$(PIXI_PYTHON) sh.d/test-build.py --small -- $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small-mpi
 # testbuild with MPI with testsmall configurations
-testbuild-small-mpi:
-	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
+testbuild-small-mpi: raw_data
+	$(REQUIRE_PIXI_PYTHON)env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small --mpi -- $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation

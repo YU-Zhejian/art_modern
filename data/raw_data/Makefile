@@ -16,6 +16,9 @@ all: \
 	err.fa.fai \
 	err.fa.gz \
 	err.fa.gz.fai \
+	ce11.mRNA_head.cov_stranded.tsv \
+	ce11.mRNA_head.cov_strandless.tsv \
+	ce11.mRNA_head.pbsim3.transcript \
 
 
 .SUFFIXES:
@@ -34,6 +37,12 @@ ce11.mRNA.fa:
 
 ce11.mRNA_head.fa:
 	seqkit grep -s -v -p N ce11.mRNA.fa | seqkit seq -m 200 | seqtk sample /dev/stdin 1000 > ce11.mRNA_head.fa
+
+# Grouped target: one gen_cov.py run writes all three. Generated here rather than on demand from
+# test-small.sh, where up to 5 concurrent test-build.py workers raced to create the same files.
+ce11.mRNA_head.cov_stranded.tsv ce11.mRNA_head.cov_strandless.tsv ce11.mRNA_head.pbsim3.transcript &: \
+		ce11.mRNA_head.fa
+	python ../../sh.d/test-small.sh.d/gen_cov.py ce11.mRNA_head 5
 
 ce11_chr1.fa:
 	curl https://hgdownload.soe.ucsc.edu/goldenPath/ce11/chromosomes/chrI.fa.gz  | gunzip -cdf > ce11_chr1.fa
