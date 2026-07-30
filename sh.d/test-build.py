@@ -676,8 +676,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         failed()
         return
 
-    mpiexec_pass = MPIEXEC if WITH_MPI else ""
-    assert mpiexec_pass is not None, "MPIEXEC not found in environment and mpiexec not in PATH"
+    # WITH_MPI carries the flag; MPIEXEC only names the launcher and is read only when WITH_MPI=1.
+    # MPIEXEC is guaranteed non-None here, having been resolved in __main__ whenever WITH_MPI.
     if not run_wrapper(
         "TESTSMALL",
         [BASH, os.path.join(SHDIR, "test-small.sh")],
@@ -687,7 +687,8 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             "APB_PATH": apb_path,
             "AMC_PATH": amc_path,
             "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-            "MPIEXEC": mpiexec_pass,
+            "WITH_MPI": "1" if WITH_MPI else "0",
+            "MPIEXEC": MPIEXEC if WITH_MPI else "",
             "SAMTOOLS_THREADS": "4",
             "MPI_PARALLEL": "4",
             "PARALLEL": "2",

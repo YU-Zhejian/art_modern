@@ -425,15 +425,18 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/linux-64/clang_impl_linux-64-22.1.8-default_h6d37801_3.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/compiler-rt-22.1.8-ha770c72_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/compiler-rt22-22.1.8-hb700be7_1.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/dos2unix-7.5.5-ha4b6fd6_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/go-shfmt-3.13.1-hfc2019e_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/icu-78.3-h33c6efd_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/ld_impl_linux-64-2.45.1-default_hbd61a6d_102.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libasprintf-0.25.1-h3f43e3d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libclang-cpp22.1-22.1.8-default_h6c227bf_3.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libclang13-22.1.8-default_h9692865_3.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libcompiler-rt-22.1.8-hb700be7_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libexpat-2.7.5-hecca717_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libffi-3.5.2-h3435931_0.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libgcc-15.2.0-he0feb66_18.conda
+      - conda: https://conda.anaconda.org/conda-forge/linux-64/libgettextpo-0.25.1-h3f43e3d_1.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libgomp-15.2.0-he0feb66_18.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libiconv-1.18-h3b78370_2.conda
       - conda: https://conda.anaconda.org/conda-forge/linux-64/libllvm22-22.1.8-hf7376ad_1.conda
@@ -1822,6 +1825,19 @@ packages:
   run_exports: {}
   size: 194776
   timestamp: 1782911792708
+- conda: https://conda.anaconda.org/conda-forge/linux-64/dos2unix-7.5.5-ha4b6fd6_1.conda
+  sha256: d9289541357e098f6c9fb4b5093c3b968285ef3ca33db7594a42e1b1e078c61e
+  md5: ca0a3afc80f902d224d7a230ed5b5fb3
+  depends:
+  - __glibc >=2.17,<3.0.a0
+  - libasprintf >=0.25.1,<1.0a0
+  - libgcc >=15
+  - libgettextpo >=0.25.1,<1.0a0
+  license: BSD-2-Clause
+  license_family: BSD
+  run_exports: {}
+  size: 361242
+  timestamp: 1777140024020
 - conda: https://conda.anaconda.org/conda-forge/linux-64/fmt-12.0.0-h2b0788b_0.conda
   sha256: b546c4eb5e11c2d8eab0685593e078fd0cd483e467d5d6e307d60d887488230f
   md5: d90bf58b03d9a958cb4f9d3de539af17
@@ -2108,6 +2124,9 @@ packages:
   - libstdcxx >=14
   license: LGPL-2.1-or-later
   purls: []
+  run_exports:
+    weak:
+    - libasprintf >=0.25.1,<1.0a0
   size: 53582
   timestamp: 1753342901341
 - conda: https://conda.anaconda.org/conda-forge/linux-64/libblas-3.11.0-6_h4a7cf45_openblas.conda
@@ -2534,6 +2553,9 @@ packages:
   license: GPL-3.0-or-later
   license_family: GPL
   purls: []
+  run_exports:
+    weak:
+    - libgettextpo >=0.25.1,<1.0a0
   size: 188293
   timestamp: 1753342911214
 - conda: https://conda.anaconda.org/conda-forge/linux-64/libgfortran-15.2.0-h69a702a_18.conda

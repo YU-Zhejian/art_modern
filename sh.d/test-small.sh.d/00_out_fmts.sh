@@ -111,7 +111,7 @@ assert_cleandir
 # I suppose the FASTA format does not need to be tested here.
 
 # Assessing am_compress
-if [ -z "${MPIEXEC:-}" ]; then
+if [ "${WITH_MPI}" != "1" ]; then
     AM_EXEC \
         --i-file "${LAMBDA_PHAGE}" \
         --mode wgs \

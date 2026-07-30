@@ -8,6 +8,7 @@ function run_gcc() {
     LD_LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_LIBRARY_PATH:-}" \
         LD_RUN_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LD_RUN_PATH:-}" \
         LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${LIBRARY_PATH:-}" \
+        CMAKE_LIBRARY_PATH="${HOME}/opt/sra-tools-3.3.0/lib64/:${HOME}/opt/ncbi-vdb-3.3.0/lib64/:${CMAKE_LIBRARY_PATH:-}" \
         PATH="${HOME}/opt/sra-tools-3.3.0/bin/:${HOME}/opt/ncbi-vdb-3.3.0/bin/:${PATH:-}" \
         C_INCLUDE_PATH="${HOME}/opt/sra-tools-3.3.0/include/:${HOME}/opt/ncbi-vdb-3.3.0/include/:${C_INCLUDE_PATH:-}" \
         CPLUS_INCLUDE_PATH="${HOME}/opt/sra-tools-3.3.0/include/:${HOME}/opt/ncbi-vdb-3.3.0/include/:${CPLUS_INCLUDE_PATH:-}" \

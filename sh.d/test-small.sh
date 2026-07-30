@@ -5,8 +5,11 @@
 # - NO_FASTQC: If set to "1", skip fastqc tests
 # - HELP_VERSION_ONLY: If set to "1", only test help and version outputs
 # - FORMAT_ONLY: If set to "1", only test output formats
-# - MPIEXEC: If set, use this command to run ART in MPI mode
-# - ART: If set, use this path as the art_modern executable
+# - WITH_MPI: "1" if the executables were built with -DWITH_MPI=ON. Must be set from outside; this
+#   is the same flag CMake and test-build.py use, not something inferred from MPIEXEC.
+# - MPIEXEC: The MPI launcher to run the executables with. Required when WITH_MPI=1, ignored
+#   otherwise. It selects the launcher only; it does NOT decide whether this is an MPI build.
+# - ART_MODERN_PATH/APB_PATH/AMC_PATH: If set, use this path for the executables
 # - MPI_PARALLEL: If set, use this many MPI processes
 # - SAMTOOLS_THREADS: If set, use this many threads for samtools operations
 # - OUT_DIR: If set, use this as the output directory (will be cleaned first)
@@ -24,7 +27,7 @@ fi
 set -ue
 SHDIR="$(readlink -f "$(dirname "${0}")")"
 cd "${SHDIR}/../"
-PROJDIR="$(pwd)/"
+PROJDIR="$(pwd)"
 export PROJDIR
 
 if [ -z "${OPT_DIR:-}" ]; then
@@ -60,20 +63,24 @@ export APB_PATH="${APB_PATH}"                     # Do NOT have a default, must 
 export AMC_PATH="${AMC_PATH}"                     # Do NOT have a default, must be set from outside
 export TIMEOUT="${TIMEOUT:-240}"                  # Default timeout for each test command
 export WITH_NCBI_NGS="${WITH_NCBI_NGS:-0}"        # Whether to test with NCBI NGS toolkit
+export WITH_MPI="${WITH_MPI}"                     # Do NOT have a default, must be set from outside
 export LAMBDA_PHAGE
 export CE11_CHR1
 export OUT_DIR
 export MRNA_HEAD
 export MRNA_PBSIM3_TRANSCRIPT
 
-# Assemble the ART command
-# If MPIEXEC is set, use it to run ART in parallel using MPI
-if [ -z "${MPIEXEC:-}" ]; then
+# Assemble the ART command. An MPI build is launched through MPIEXEC; a serial one is not.
+if [ "${WITH_MPI}" != "1" ]; then
     ART_CMD_ASSEMBLED=("${ART_MODERN_PATH}")
     APB_CMD_ASSEMBLED=("${APB_PATH}")
     AMC_CMD_ASSEMBLED=("${AMC_PATH}")
     export PARALLEL="${PARALLEL:-4}" # Reduce parallelism overhead for small tests
 else
+    if [ -z "${MPIEXEC:-}" ]; then
+        echo "WITH_MPI=1 requires MPIEXEC to be set to the MPI launcher." >&2
+        exit 1
+    fi
     export MPIEXEC
     export PARALLEL="${PARALLEL:-2}"
     ART_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${ART_MODERN_PATH}")
@@ -81,7 +88,7 @@ else
     AMC_CMD_ASSEMBLED=("${MPIEXEC}" -n "${MPI_PARALLEL}" "${AMC_PATH}")
 fi
 
-echo "ART_MODERN_PATH=${ART_MODERN_PATH} MPIEXEC=${MPIEXEC} OUT_DIR=${OUT_DIR}"
+echo "ART_MODERN_PATH=${ART_MODERN_PATH} WITH_MPI=${WITH_MPI} MPIEXEC=${MPIEXEC:-} OUT_DIR=${OUT_DIR}"
 
 function sam2bam() {
     # Single-threaded sorting should be fast enough
@@ -96,7 +103,7 @@ function merge_file() {
     #   (With MPI)    Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.*.fastq
     #   (Without MPI) Files like "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
     # Merge into: "${OUT_DIR}"/test_small_se_wgs_memory_sep.fastq
-    if [ -z "${MPIEXEC:-}" ]; then
+    if [ "${WITH_MPI}" != "1" ]; then
         # No MPI run, nothing to do
         return
     fi
@@ -105,18 +112,18 @@ function merge_file() {
     ext="${1##*.}"
     base="${1%.*}"
     files_to_merge=("${base}".*."${ext}")
+    if [ ! -e "${files_to_merge[0]}" ]; then
+        echo "merge_file: No file matches ${base}.*.${ext}" >&2
+        exit 1
+    fi
     if [ "${ext}" == "fastq" ] ||
         [ "${ext}" == "fq" ] ||
         [ "${ext}" == "fasta" ] ||
         [ "${ext}" == "fa" ] ||
-        [ "${ext}" == "gz" ] ||
-        htsfile "${1}" | grep -q FASTQ ||
-        htsfile "${1}" | grep -q FASTA; then
+        [ "${ext}" == "gz" ]; then
         cat "${files_to_merge[@]}" >"${1}"
     elif [ "${ext}" == "sam" ] ||
-        [ "${ext}" == "bam" ] ||
-        htsfile "${1}" | grep -q SAM ||
-        htsfile "${1}" | grep -q BAM; then
+        [ "${ext}" == "bam" ]; then
         # Sort all files before merging
         new_files_to_merge=()
         for fn in "${files_to_merge[@]}"; do
@@ -182,19 +189,21 @@ function AMC_EXEC() {
     rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${AMC_CMD_ASSEMBLED[*]} $*"
-    "${TIMEOUT_CMD[@]}" env \
+    # The call must stay in a tested context, otherwise 'set -e' would abort the script before the
+    # diagnostics below could run. The success branch comes first on purpose: with 'if ! cmd' the
+    # '${?}' seen inside the branch would be the negated status (always 0), not the real one.
+    if "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
-        "${AMC_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log
-    retval=${?}
-    if [ ${retval} -ne 0 ]; then
-        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
-        cat "${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log >&2
-        exit 1
-    else
+        "${AMC_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log; then
         echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
         if [ -z "${KEEPLOG:-}" ]; then
             rm -f "${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log
         fi
+    else
+        retval=${?}
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/amc_exec_"${EXEC_ORDER}".log >&2
+        exit 1
     fi
 }
 
@@ -203,19 +212,19 @@ function AM_EXEC() {
     rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${ART_CMD_ASSEMBLED[*]} $*"
-    "${TIMEOUT_CMD[@]}" env \
+    # See AMC_EXEC for why this is an 'if' with the success branch first.
+    if "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
-        "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
-    retval=${?}
-    if [ ${retval} -ne 0 ]; then
-        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
-        cat "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log >&2
-        exit 1
-    else
+        "${ART_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log; then
         echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
         if [ -z "${KEEPLOG:-}" ]; then
             rm -f "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log
         fi
+    else
+        retval=${?}
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/am_exec_"${EXEC_ORDER}".log >&2
+        exit 1
     fi
 }
 function AM_EXEC_SHOULD_FAIL() {
@@ -245,19 +254,19 @@ function APB_EXEC() {
     rm -fr "${OUT_DIR}/log_${EXEC_ORDER}.d"
     EXEC_ORDER=$((EXEC_ORDER + 1))
     echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): ${APB_CMD_ASSEMBLED[*]} $*"
-    "${TIMEOUT_CMD[@]}" env \
+    # See AMC_EXEC for why this is an 'if' with the success branch first.
+    if "${TIMEOUT_CMD[@]}" env \
         "ART_LOG_DIR=${OUT_DIR}/log_${EXEC_ORDER}.d" \
-        "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
-    retval=${?}
-    if [ ${retval} -ne 0 ]; then
-        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
-        cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
-        exit 1
-    else
+        "${APB_CMD_ASSEMBLED[@]}" "$@" &>>"${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log; then
         echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Succeeded."
         if [ -z "${KEEPLOG:-}" ]; then
             rm -f "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log
         fi
+    else
+        retval=${?}
+        echo "EXEC ${EXEC_ORDER}: $(date '+%Y-%m-%d %H:%M:%S'): Failed with exit code ${retval}" >&2
+        cat "${OUT_DIR}"/apb_exec_"${EXEC_ORDER}".log >&2
+        exit 1
     fi
 }
 
@@ -281,7 +290,7 @@ fi
 . "${SHDIR}"/test-small.sh.d/07_tmpl_pbsim3.sh    # Transcript mode with pbsim3-formatted coverage
 . "${SHDIR}"/test-small.sh.d/08_trans_pbsim3.sh   # Template mode with pbsim3-formatted coverage
 . "${SHDIR}"/test-small.sh.d/09_test_seedalloc.sh # Test seed allocation consistency
-if [ -z "${MPIEXEC:-}" ]; then
+if [ "${WITH_MPI}" != "1" ]; then
     # In MPI mode, these tests are skipped since MPI termination may called early, preventing log generation
     . "${SHDIR}"/test-small.sh.d/10_test_qual_file_arg.sh # Test quality profile arguments
 fi

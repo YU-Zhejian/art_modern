@@ -194,7 +194,7 @@ testsmall-debug: debug raw_data
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
 		AMC_PATH=$(OPT_DIR)/build_debug_install/bin/am_compress \
-		MPIEXEC="" \
+		WITH_MPI=0 \
 		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-debug-mpi
@@ -204,6 +204,7 @@ testsmall-debug-mpi: debug-mpi raw_data
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
 		AMC_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/am_compress-mpi \
+		WITH_MPI=1 \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 
@@ -214,7 +215,7 @@ testsmall-release: release raw_data
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_release_install/bin/art_profile_builder \
 		AMC_PATH=$(OPT_DIR)/build_release_install/bin/am_compress \
-		MPIEXEC="" \
+		WITH_MPI=0 \
 		$(BASH) sh.d/test-small.sh
 
 .PHONY: testsmall-release-mpi
@@ -224,6 +225,7 @@ testsmall-release-mpi: release-mpi raw_data
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_profile_builder-mpi \
 		AMC_PATH=$(OPT_DIR)/build_release_install-mpi/bin/am_compress-mpi \
+		WITH_MPI=1 \
 		MPIEXEC=$(MPIEXEC) \
 		$(BASH) sh.d/test-small.sh
 
@@ -240,7 +242,7 @@ clean:
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
+	$(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
@@ -250,7 +252,7 @@ testbuild-mpi:
 .PHONY: testbuild-small
 # Test building using diverse conditions with testsmall configurations
 testbuild-small:
-	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small  $(CMAKE_FLAGS)
+	$(PIXI_PYTHON) sh.d/test-build.py --small $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small-mpi
 # testbuild with MPI with testsmall configurations

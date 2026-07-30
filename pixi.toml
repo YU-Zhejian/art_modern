@@ -82,6 +82,7 @@ jinja2 = ">=3.1.6,<4"
 #m2-bash = "*"
 
 [feature.fmt.dependencies]
+dos2unix = "*"
 cmake_format = ">=0.6.11,<0.7"
 black = ">=26.5.1,<27"
 go-shfmt = ">=3.13.1,<4"
@@ -93,10 +94,16 @@ art_modern = ">=1.5.0,<2"
 
 [environments]
 doc = { features = ["doc"], no-default-feature = true }
-fmt = { features = ["fmt"], no-default-feature = true }
 prev = { features = ["prev"], no-default-feature = true }
 pack = { features = ["pack"] }
 moremodels = { features = ["moremodels"] }
 testextreme = { features = ["testextreme"] }
 buildoncluster = { features = ["buildoncluster"] }
 lint = { features = ["lint"], no-default-feature = true }
+
+[environments.fmt]
+features = ["fmt"]
+no-default-feature = true
+
+[environments.fmt.dependencies]
+dos2unix = ">=7.5.5,<8"
