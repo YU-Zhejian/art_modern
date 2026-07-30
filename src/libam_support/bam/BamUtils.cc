@@ -117,10 +117,10 @@ sam_hdr_t* BamUtils::init_header(const BamOptions& sam_options)
         = CExceptionsProxy::assert_not_null(sam_hdr_init(), USED_HTSLIB_NAME, "Faield to initialize SAM header");
 
     CExceptionsProxy::assert_numeric(
-        sam_hdr_add_line(sam_header, "HD", "VN", sam_options.HD_VN.c_str(), "SO", sam_options.HD_SO.c_str(), NULL),
+        sam_hdr_add_line(sam_header, "HD", "VN", sam_options.HD_VN.c_str(), "SO", sam_options.HD_SO.c_str(), nullptr),
         USED_HTSLIB_NAME, "Failed to add HD header line");
     CExceptionsProxy::assert_numeric(sam_hdr_add_line(sam_header, "PG", "ID", sam_options.PG_ID.c_str(), "PN",
-                                         sam_options.PG_PN.c_str(), "CL", sam_options.PG_CL.c_str(), NULL),
+                                         sam_options.PG_PN.c_str(), "CL", sam_options.PG_CL.c_str(), nullptr),
         USED_HTSLIB_NAME, "Failed to add PG header line", false, CExceptionsProxy::EXPECTATION::ZERO);
     return sam_header;
 }

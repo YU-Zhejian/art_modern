@@ -14,6 +14,9 @@
 #ifndef LIBAM_SUPPORT_CONSTANTS_H
 #define LIBAM_SUPPORT_CONSTANTS_H
 
+// This is a C header; the macro is consumed from C sources (see src/libam_support/seq/str_to_qual.c, where it is
+// cast and fed to SIMD intrinsics), so it cannot become a C++ enum.
+// NOLINTNEXTLINE(modernize-macro-to-enum,cppcoreguidelines-macro-to-enum)
 #define AM_PHRED_OFFSET 33
 
 #endif // LIBAM_SUPPORT_CONSTANTS_H

@@ -66,11 +66,11 @@ int main(int argc, char** argv)
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r1;
     std::vector<std::shared_ptr<IntermediateEmpDist>> ieds_r2;
 
+    ieds_r1.reserve(config.num_threads);
+    ieds_r2.reserve(config.num_threads);
     for (std::size_t thread_id = 0; thread_id < config.num_threads; ++thread_id) {
-        auto this_ied1 = std::make_shared<IntermediateEmpDist>(config.read_length_1);
-        ieds_r1.emplace_back(this_ied1);
-        auto this_ied2 = std::make_shared<IntermediateEmpDist>(config.read_length_2);
-        ieds_r2.emplace_back(this_ied2);
+        ieds_r1.emplace_back(std::make_shared<IntermediateEmpDist>(config.read_length_1));
+        ieds_r2.emplace_back(std::make_shared<IntermediateEmpDist>(config.read_length_2));
     }
     if (config.format != APB_FORMAT::SRA) {
         view_sam_mt(ieds_r1, ieds_r2, config.num_threads, config);

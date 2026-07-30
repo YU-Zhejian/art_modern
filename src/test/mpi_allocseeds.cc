@@ -42,6 +42,7 @@ int main(int argc, char** argv)
     SeedAlloc seed_alloc;
     seed_alloc.run_seedalloc(0);
     std::vector<am_rand_seed_t> seeds;
+    seeds.reserve(n_threads);
     for (std::size_t i = 0; i < n_threads; ++i) {
         seeds.emplace_back(seed_alloc.nextseed());
     }

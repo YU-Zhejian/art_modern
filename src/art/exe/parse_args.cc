@@ -276,7 +276,7 @@ namespace {
         }
         if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
             const auto file_size = get_file_size(input_file_path);
-            const auto file_too_large = file_size == -1 || file_size > G_SIZE;
+            const auto file_too_large = !file_size.has_value() || file_size.value() > G_SIZE;
             if (simulation_mode == SIMULATION_MODE::WGS) {
                 if (file_too_large) {
                     return INPUT_FILE_PARSER::HTSLIB;

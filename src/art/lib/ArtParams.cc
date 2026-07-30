@@ -75,7 +75,7 @@ ArtParams::ArtParams(const SIMULATION_MODE art_simulation_mode, const ART_LIB_CO
         if (art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
             contig_len_threshold = std::max(read_len_1, read_len_2);
         } else {
-            contig_len_threshold = std::max(pe_dist_mean_minus_2_std, std::max(read_len_1, read_len_2));
+            contig_len_threshold = std::max({ pe_dist_mean_minus_2_std, read_len_1, read_len_2 });
         }
         return;
     }

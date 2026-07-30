@@ -27,6 +27,7 @@
 #include <iostream>
 #include <random>
 #include <string>
+#include <utility>
 #include <vector>
 
 using namespace labw::art_modern; // NOLINT
@@ -104,7 +105,7 @@ void bench(const int rlen)
         for (int j = 0; j < rlen; j++) {
             q.emplace_back(dis(gen));
         }
-        qs.emplace_back(q);
+        qs.emplace_back(std::move(q));
     }
 
     bech_impl(qual_to_str_for_loop, str_to_qual_for_loop, "Scala (for loop)", run_times, rlen, qs);

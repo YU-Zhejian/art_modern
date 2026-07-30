@@ -133,7 +133,6 @@ namespace {
 
         DELETE_COPY(ViewSamMtChild)
         DELETE_MOVE(ViewSamMtChild)
-        void start() override { worker_thread_ = std::thread(&ViewSamMtChild::run_, this); }
         ~ViewSamMtChild() override
         {
             stop_();
@@ -191,7 +190,6 @@ namespace {
 
         DELETE_COPY(ViewSraMtChild)
         DELETE_MOVE(ViewSraMtChild)
-        void start() override { worker_thread_ = std::thread(&ViewSraMtChild::run_, this); }
 
         ~ViewSraMtChild() override { join(); }
 

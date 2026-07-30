@@ -50,10 +50,16 @@ PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& cont
     check_();
 }
 
+// This copying overload is deliberate and complements the by-rvalue-reference one above. Merging them into a
+// single by-value constructor as modernize-pass-by-value suggests would add a move of every string to
+// ArtRead::to_pwa(), which runs once per simulated read, and callers passing `const` lvalues (see
+// src/test/seq_utils.cc) cannot bind to the rvalue overload at all.
+// NOLINTBEGIN(modernize-pass-by-value)
 PairwiseAlignment::PairwiseAlignment(const std::string& read_name, const std::string& contig_name,
     const std::string& query, const std::string& ref, const std::string& qual_str,
     const std::vector<am_qual_t>& qual_vec, const std::string& aligned_query, const std::string& aligned_ref,
     const hts_pos_t pos_on_contig, const bool is_plus_strand)
+    // NOLINTEND(modernize-pass-by-value)
     : aln_query(aligned_query)
     , aln_ref(aligned_ref)
     , query(query)

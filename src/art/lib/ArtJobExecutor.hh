@@ -35,9 +35,7 @@ public:
     ArtJobExecutor(SimulationJob&& job, const ArtParams& art_params,
         const std::shared_ptr<OutputDispatcher>& output_dispatcher, am_rand_seed_t seed);
 
-    // Move constructor
-    ArtJobExecutor(ArtJobExecutor&& other) noexcept;
-    DELETE_MOVE_ASSIGNMENT(ArtJobExecutor)
+    DELETE_MOVE(ArtJobExecutor)
     DELETE_COPY(ArtJobExecutor)
     DEFAULT_DESTRUCTOR(ArtJobExecutor)
 

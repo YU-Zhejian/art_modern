@@ -78,11 +78,6 @@ InMemoryFastaFetch::InMemoryFastaFetch(const std::string& file_name)
 {
 }
 
-InMemoryFastaFetch::InMemoryFastaFetch(std::istream& iss)
-    : InMemoryFastaFetch(get_seq_map_ss(iss))
-{
-}
-
 std::string InMemoryFastaFetch::fetch(const size_t seq_id, const hts_pos_t start, const hts_pos_t end)
 {
 #ifdef CEU_CM_IS_DEBUG

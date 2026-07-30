@@ -261,18 +261,6 @@ void ArtJobExecutor::operator()()
     reporter.stop();
     is_running_ = false;
 }
-ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : art_params_(other.art_params_)
-    , job_(std::move(other.job_))
-    , mpi_rank_str_(other.mpi_rank_str_)
-    , mpi_rank_str_hex_(other.mpi_rank_str_hex_)
-    , output_dispatcher_(std::move(other.output_dispatcher_))
-    , num_reads_to_reduce_(other.num_reads_to_reduce_)
-    , require_alignment_(other.require_alignment_)
-    , seed_(other.seed_)
-    , token_ring_(std::move(other.token_ring_))
-{
-}
 std::string ArtJobExecutor::thread_info() const
 {
     return fmt::format("{}:{} | ON: '{}' | SUCCESS: current={}, left={} | FAIL: current={}, max={} | TOTAL: {}",

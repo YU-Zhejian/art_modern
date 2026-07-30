@@ -37,12 +37,7 @@ enum class FastaFetchType : std::uint8_t {
  */
 class BaseFastaFetch {
 public:
-    BaseFastaFetch(BaseFastaFetch&& other) noexcept
-        : BaseFastaFetch(std::move(other.seq_names_), std::move(other.seq_lengths_))
-    {
-    }
-
-    DELETE_MOVE_ASSIGNMENT(BaseFastaFetch)
+    DELETE_MOVE(BaseFastaFetch)
 
     DELETE_COPY(BaseFastaFetch)
 
