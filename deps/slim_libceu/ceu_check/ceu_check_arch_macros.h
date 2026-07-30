@@ -31,7 +31,11 @@
 
 /* clang-format off */
 
-#if defined(__x86_64__) || defined(__x86_64) || defined(_M_AMD64) || defined(__amd64__) || defined(__amd64)
+/* ARM64EC must be tested first: it is AArch64, but MSVC defines _M_AMD64/_M_X64 for its x64-compatible ABI. */
+#if defined(_M_ARM64EC)
+#define CEU_ARCHITECTURE_AARCH64
+#define CEU_ARCH_NAME "aarch64 (ARM64EC)"
+#elif defined(__x86_64__) || defined(__x86_64) || defined(_M_AMD64) || defined(__amd64__) || defined(__amd64)
 #define CEU_ARCHITECTURE_X86_64
 #define CEU_ARCH_NAME "x86_64"
 #elif 0                                                                                                                \
@@ -105,7 +109,7 @@
 
 #if 0                                                                                                                  \
     || /* Known 64-bit */ defined(__ARM_64BIT_STATE)                                                                   \
-    || /* Known 32-bit */ defined(__sparc_v9__) || defined(__sparcv9)                                                  \
+    || /* Known 64-bit */ defined(__sparc_v9__) || defined(__sparcv9)                                                  \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_AARCH64)                                                            \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_X86_64)                                                             \
     || /* Known 64-bit */ defined(CEU_ARCHITECTURE_LOONGARCH64)                                                        \
@@ -163,7 +167,7 @@
     || /* Clang */ (defined(CEU_COMPILER_IS_CLANG) && defined(__LITTLE_ENDIAN__) && (__LITTLE_ENDIAN__ == 1))          \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__little_endian__) && (__little_endian__ == 1))          \
     || /* TI CL6X */ (defined(CEU_COMPILER_IS_TI) && defined(_LITTLE_ENDIAN) && (_LITTLE_ENDIAN == 1))                 \
-    || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && (!defined(__ARM_BIG_ENDIAN)))                                  \
+    || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && defined(__clang__) && (!defined(__ARM_BIG_ENDIAN)))            \
     || /* ARM Embedded */ (defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED) && (!defined(__BIG_ENDIAN)))                 \
     || 0
 #define CEU_COMPILE_TIME_IS_LITTLE_ENDIAN
@@ -177,7 +181,7 @@
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ == 1))                \
     || /* Clang */ (defined(CEU_COMPILER_IS_CLANG) && defined(__BIG_ENDIAN__) && (__BIG_ENDIAN__ == 1))                \
     || /* TI ARMCL */ (defined(CEU_COMPILER_IS_TI) && defined(__big_endian__) && (__big_endian__ == 1))                \
-    || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && defined(__ARM_BIG_ENDIAN))                                     \
+    || /* TIARMCLANG */ (defined(CEU_COMPILER_IS_TI) && defined(__clang__) && defined(__ARM_BIG_ENDIAN))               \
     || /* ARM Embedded */ (defined(CEU_COMPILER_IS_ARM_COMPILER_EMBEDDED) && defined(__BIG_ENDIAN))                    \
     || 0
 #define CEU_COMPILE_TIME_IS_BIG_ENDIAN

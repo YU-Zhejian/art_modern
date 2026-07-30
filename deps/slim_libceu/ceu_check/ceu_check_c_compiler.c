@@ -79,7 +79,7 @@ char* ceu_check_get_c_compiler_info(void)
 #endif
         ;
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %ld.%ld.%ld\n", CEU_COMPILER_NAME_TI,
-        ti_version / 1000000L, (ti_version / 1000000L) % 1000L, ti_version % 1000L);
+        ti_version / 1000000L, (ti_version % 1000000L) / 1000L, ti_version % 1000L);
     if (written > 0 && (size_t)written < remaining) {
         ptr += written;
         remaining -= (size_t)written;
@@ -308,10 +308,18 @@ char* ceu_check_get_c_compiler_info(void)
 #endif
 
 #if defined(CEU_COMPILER_IS_BORLAND)
-    int borland_major = __BORLANDC__ / 256;
-    int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
-    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d, with %s\n",
-        CEU_COMPILER_NAME_BORLAND, borland_major, borland_revision, CEU_CPPB_VERSION);
+/* Detection may trigger from __TURBOC__/__BCPLUSPLUS__ alone, where __BORLANDC__ is undeclared. */
+#ifdef __BORLANDC__
+    /* __BORLANDC__ packs the version as nibbles: 0x0551 is 5.5.1. */
+    int borland_major = (__BORLANDC__ >> 8) & 0xFF;
+    int borland_minor = (__BORLANDC__ >> 4) & 0xF;
+    int borland_patch = __BORLANDC__ & 0xF;
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d, with %s\n",
+        CEU_COMPILER_NAME_BORLAND, borland_major, borland_minor, borland_patch, CEU_CPPB_VERSION);
+#else
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %s, with %s\n",
+        CEU_COMPILER_NAME_BORLAND, CEU_UNDEFINED, CEU_CPPB_VERSION);
+#endif
     if (written > 0 && (size_t)written < remaining) {
         ptr += written;
         remaining -= (size_t)written;
@@ -332,7 +340,7 @@ char* ceu_check_get_c_compiler_info(void)
     written = CEU_SNPRINTF(ptr, remaining, "%X.%X.%d\n", ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24),
         ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16), ((__CODEGEARC_VERSION__ & 0x0000FFFF)));
 #else
-    written = CEU_SNPRINTF(ptr, remaining, "=UNDEFINED\n");
+    written = CEU_SNPRINTF(ptr, remaining, "UNDEFINED\n");
 #endif
 
     if (written > 0 && (size_t)written < remaining) {

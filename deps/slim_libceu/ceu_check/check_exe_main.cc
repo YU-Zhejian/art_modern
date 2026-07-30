@@ -27,10 +27,8 @@ int ceu_check_exe_main()
 #else
         if (ceu_is_little_endian()) {
             std::cout << "Little Endian (Run-time)";
-        } else if (ceu_is_big_endian()) {
-            std::cout << "Big Endian (Run-time)";
         } else {
-            std::cout << "Unknown (Run-time)";
+            std::cout << "Big Endian (Run-time)";
         }
 #endif
         std::cout << std::endl;

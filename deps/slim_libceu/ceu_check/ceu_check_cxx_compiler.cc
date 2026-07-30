@@ -139,17 +139,25 @@ std::string ceu_check_get_cxx_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_BORLAND)
-    int borland_major = __BORLANDC__ / 256;
-    int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
-    oss << "\t" << CEU_COMPILER_NAME_BORLAND << "compatible version number: " << borland_major << '.'
-        << borland_revision << ", with " << CEU_CPPB_VERSION << std::endl;
+/* Detection may trigger from __TURBOC__/__BCPLUSPLUS__ alone, where __BORLANDC__ is undeclared. */
+#ifdef __BORLANDC__
+    /* __BORLANDC__ packs the version as nibbles: 0x0551 is 5.5.1. */
+    int borland_major = (__BORLANDC__ >> 8) & 0xFF;
+    int borland_minor = (__BORLANDC__ >> 4) & 0xF;
+    int borland_patch = __BORLANDC__ & 0xF;
+    oss << "\t" << CEU_COMPILER_NAME_BORLAND << " compatible version number: " << borland_major << '.' << borland_minor
+        << '.' << borland_patch << ", with " << CEU_CPPB_VERSION << std::endl;
+#else
+    oss << "\t" << CEU_COMPILER_NAME_BORLAND << " compatible version number: " << CEU_UNDEFINED << ", with "
+        << CEU_CPPB_VERSION << std::endl;
+#endif
     oss << "\t\t__CODEGEARC_VERSION__="
 #ifdef __CODEGEARC_VERSION__
         << std::hex << ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24) << '.'
         << ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16) << '.' << std::dec << ((__CODEGEARC_VERSION__ & 0x0000FFFF))
         << std::endl;
 #else
-        << "=UNDEFINED" << std::endl;
+        << "UNDEFINED" << std::endl;
 #endif
 #endif
 #if defined(CEU_COMPILER_IS_CLANG)

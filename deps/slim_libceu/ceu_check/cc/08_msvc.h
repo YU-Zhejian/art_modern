@@ -9,7 +9,7 @@
 #define CEU_COMPILER_IS_MSVC
 #ifndef CEU_COMPILER_NAME
 #ifdef __clang__
-#define CEU_COMPILER_NAME "Microsoft Visual Studio Clang Compiler"
+#define CEU_COMPILER_NAME CEU_COMPILER_NAME_MSVC_CLANG
 #else
 #define CEU_COMPILER_NAME CEU_COMPILER_NAME_MSVC
 #endif
@@ -19,8 +19,9 @@
 #define CEU_VISUAL_STUDIO_VER "unknown before 1"
 #elif _MSC_VER == 800
 #define CEU_VISUAL_STUDIO_VER "1"
+/* 900 is Visual C++ 2.0; version 3.0 never shipped, the line went 1.0 -> 2.0 -> 4.0. */
 #elif _MSC_VER == 900
-#define CEU_VISUAL_STUDIO_VER "3"
+#define CEU_VISUAL_STUDIO_VER "2"
 #elif _MSC_VER == 1000
 #define CEU_VISUAL_STUDIO_VER "4"
 #elif _MSC_VER == 1100
@@ -107,12 +108,26 @@
 #define CEU_VISUAL_STUDIO_VER "17.13 (VS 2022 Update 13)"
 #elif _MSC_VER == 1944
 #define CEU_VISUAL_STUDIO_VER "17.14 (VS 2022 Update 14)"
-#elif _MSC_VER > 1940 && _MSC_VER < 1950
-#define CEU_VISUAL_STUDIO_VER "unknown later than 17.10 (VS 2022 Update 14)"
+/* 1941..1944 are matched by the explicit branches above, so this covers 1945..1949 only. */
+#elif _MSC_VER > 1944 && _MSC_VER < 1950
+#define CEU_VISUAL_STUDIO_VER "unknown later than 17.14 (VS 2022 Update 14)"
+/*
+ * From _MSC_VER 1950 on, MSVC versioning is decoupled from Visual Studio versioning: VS 2026 and later ship
+ * several MSVC toolsets side by side (a preview, the current default, and older in-support ones), and a new
+ * toolset lands every six months. One _MSC_VER therefore no longer identifies a VS product version, so these
+ * branches report the MSVC Build Tools version instead -- that is what _MSC_VER actually encodes, via
+ * 14.(_MSC_VER % 100). Toolset 14.50 shipped in November 2025 as a long-term release, not as an Insider build.
+ */
 #elif _MSC_VER == 1950
-#define CEU_VISUAL_STUDIO_VER "18.0 (VS 2026 Insider)"
-#elif _MSC_VER > 1950
-#define CEU_VISUAL_STUDIO_VER "unknown later than 18.0 (VS 2026 Insider)"
+#define CEU_VISUAL_STUDIO_VER "2026 or later (MSVC Build Tools 14.50)"
+#elif _MSC_VER == 1951
+#define CEU_VISUAL_STUDIO_VER "2026 or later (MSVC Build Tools 14.51)"
+#elif _MSC_VER == 1952
+#define CEU_VISUAL_STUDIO_VER "2026 or later (MSVC Build Tools 14.52)"
+#elif _MSC_VER > 1952 && _MSC_VER < 2000
+#define CEU_VISUAL_STUDIO_VER "2026 or later (unknown MSVC Build Tools later than 14.52)"
+#elif _MSC_VER >= 2000
+#define CEU_VISUAL_STUDIO_VER "unknown (_MSC_VER major version beyond 19)"
 #else
 #define CEU_VISUAL_STUDIO_VER "unknown"
 #endif
