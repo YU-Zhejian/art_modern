@@ -16,7 +16,7 @@ JOBS ?= $(shell nproc)
 BASH ?= bash
 
 # Python interpreter to use for Python scripts
-PYTHON ?= python3
+PIXI_PYTHON ?= $(shell pixi run --frozen which python)
 
 # MPI launcher command. Used in MPI-related tests only
 # NOTE: Setting this target does NOT enable MPI build!
@@ -36,10 +36,15 @@ $(info Using $(JOBS) parallel jobs for building)
 $(info Building for version $(PACKAGE_VERSION))
 $(info Using following additional CMake flags: $(CMAKE_FLAGS))
 
+# Abort if we're inside a PIXI environment, as this Makefile is not intended to be used inside PIXI.
+ifneq ($(PIXI_ENVIRONMENT_NAME),)
+$(error This Makefile is not intended to be used inside PIXI. Please run it outside of PIXI environment.)
+endif
+
 .PHONY: help
 # Generate help message from Makefile comments
 help:
-	$(PYTHON) $(CURDIR)/sh.d/make2help.py txt < $(CURDIR)/Makefile
+	$(PIXI_PYTHON) $(CURDIR)/sh.d/make2help.py txt < $(CURDIR)/Makefile
 
 .PHONY: dumpvar
 # List all variables using .VARIABLES
@@ -158,11 +163,11 @@ fmt:
 # Run static analysis using [`clang-tidy`](https://clang.llvm.org/extra/clang-tidy/), [Pyright](https://microsoft.github.io/pyright/) and [ShellCheck](https://www.shellcheck.net/).
 # Configures `cmake-build-clangd` for the compilation database, which is also what `clangd` reads.
 lint:
-	pixi run --frozen cmake -S $(CURDIR) -B $(CURDIR)/cmake-build-clangd \
+	cmake -S $(CURDIR) -B $(CURDIR)/cmake-build-clangd \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
 		-DCEU_CM_SHOULD_ENABLE_TEST=ON \
 		$(CMAKE_FLAGS)
-	pixi run --frozen $(BASH) sh.d/lint.sh
+	pixi run --frozen -e lint $(BASH) sh.d/lint.sh
 
 .PHONY: scc
 # Run source code counting
@@ -185,7 +190,7 @@ testsmall-mpi: testsmall-debug-mpi
 #     - FORMAT_ONLY=1: Stop after testing all output formats is working
 #     - NO_FASTQC=1: Do not run FASTQC
 testsmall-debug: debug raw_data
-	env \
+	pixi run --frozen env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_debug_install/bin/art_profile_builder \
 		AMC_PATH=$(OPT_DIR)/build_debug_install/bin/am_compress \
@@ -195,7 +200,7 @@ testsmall-debug: debug raw_data
 .PHONY: testsmall-debug-mpi
 # testsmall with MPI
 testsmall-debug-mpi: debug-mpi raw_data
-	env \
+	pixi run --frozen env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/art_profile_builder-mpi \
 		AMC_PATH=$(OPT_DIR)/build_debug_install-mpi/bin/am_compress-mpi \
@@ -205,7 +210,7 @@ testsmall-debug-mpi: debug-mpi raw_data
 .PHONY: testsmall-release
 # Run small tests with release build
 testsmall-release: release raw_data
-	env \
+	pixi run --frozen env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install/bin/art_modern \
 		APB_PATH=$(OPT_DIR)/build_release_install/bin/art_profile_builder \
 		AMC_PATH=$(OPT_DIR)/build_release_install/bin/am_compress \
@@ -215,7 +220,7 @@ testsmall-release: release raw_data
 .PHONY: testsmall-release-mpi
 # testsmall-release with MPI
 testsmall-release-mpi: release-mpi raw_data
-	env \
+	pixi run --frozen env \
 		ART_MODERN_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_modern-mpi \
 		APB_PATH=$(OPT_DIR)/build_release_install-mpi/bin/art_profile_builder-mpi \
 		AMC_PATH=$(OPT_DIR)/build_release_install-mpi/bin/am_compress-mpi \
@@ -235,27 +240,27 @@ clean:
 .PHONY: testbuild
 # Test building using diverse conditions
 testbuild:
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
+	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py $(CMAKE_FLAGS)
 
 .PHONY: testbuild-mpi
 # testbuild with MPI
 testbuild-mpi:
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
+	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --mpi $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small
 # Test building using diverse conditions with testsmall configurations
 testbuild-small:
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small  $(CMAKE_FLAGS)
+	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small  $(CMAKE_FLAGS)
 
 .PHONY: testbuild-small-mpi
 # testbuild with MPI with testsmall configurations
 testbuild-small-mpi:
-	env MPIEXEC="$(MPIEXEC)" $(PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
+	env MPIEXEC="$(MPIEXEC)" $(PIXI_PYTHON) sh.d/test-build.py --small --mpi $(CMAKE_FLAGS)
 
 .PHONY: doc
 # Build documentation
 doc:
-	pixi run --frozen -e doc $(PYTHON) $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
+	pixi run --frozen -e doc python $(CURDIR)/sh.d/make2help.py md < $(CURDIR)/Makefile > docs/MakefileTargets.md
 	pixi run --frozen -e doc $(MAKE) -C docs/sphinx.d
 
 .PHONY: cleandoc
@@ -267,7 +272,7 @@ cleandoc:
 .PHONY: serve-doc
 # Serve built documentation at <http://localhost:8000>
 serve-doc:
-	pixi run --frozen -e doc $(PYTHON) -m http.server -d docs/sphinx.d/_build/html
+	pixi run --frozen -e doc python -m http.server -d docs/sphinx.d/_build/html
 
 .PHONY: packing
 # Create binary packages

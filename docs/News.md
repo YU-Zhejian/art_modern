@@ -5,7 +5,7 @@
 
 - Software Engineering:
   - `Previous run crashed` removed from error messages. This message is not informative.
-  - Bundled `{fmt}` and HTSLib deprecated; Will be removed in the next release.
+  - Bundled `{fmt}`; Will be removed in the next release.
   - Update bundled `{fmt}` to [`12.2.0`](https://github.com/fmtlib/fmt/releases/tag/12.2.0).
   - Support over CMake earlier than [3.25](https://cmake.org/cmake/help/latest/release/3.25.html) is deprecated and will be removed in the next release.
 - New features:

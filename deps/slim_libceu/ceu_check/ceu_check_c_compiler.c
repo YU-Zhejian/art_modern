@@ -317,8 +317,8 @@ char* ceu_check_get_c_compiler_info(void)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d, with %s\n",
         CEU_COMPILER_NAME_BORLAND, borland_major, borland_minor, borland_patch, CEU_CPPB_VERSION);
 #else
-    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %s, with %s\n",
-        CEU_COMPILER_NAME_BORLAND, CEU_UNDEFINED, CEU_CPPB_VERSION);
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %s, with %s\n", CEU_COMPILER_NAME_BORLAND,
+        CEU_UNDEFINED, CEU_CPPB_VERSION);
 #endif
     if (written > 0 && (size_t)written < remaining) {
         ptr += written;
