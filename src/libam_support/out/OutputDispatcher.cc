@@ -108,11 +108,11 @@ std::shared_ptr<OutputDispatcher> OutputDispatcherFactory::create(const OutParam
 
 OutputDispatcherFactory::OutputDispatcherFactory()
 {
-    factories_.emplace_back(std::make_shared<PwaReadOutputFactory>());
-    factories_.emplace_back(std::make_shared<FastaReadOutputFactory>());
-    factories_.emplace_back(std::make_shared<FastqReadOutputFactory>());
-    factories_.emplace_back(std::make_shared<BamReadOutputFactory>());
-    factories_.emplace_back(std::make_shared<HeadlessBamReadOutputFactory>());
+    factories_.emplace_back(std::make_unique<PwaReadOutputFactory>());
+    factories_.emplace_back(std::make_unique<FastaReadOutputFactory>());
+    factories_.emplace_back(std::make_unique<FastqReadOutputFactory>());
+    factories_.emplace_back(std::make_unique<BamReadOutputFactory>());
+    factories_.emplace_back(std::make_unique<HeadlessBamReadOutputFactory>());
 }
 
 OutputDispatcherFactory::~OutputDispatcherFactory() = default;

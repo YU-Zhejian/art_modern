@@ -469,7 +469,3 @@ Following is the bioRxiv preprint of this work.
 }
 
 ```
-
-## Stargazers Over Time
-
-[![Stargazers over time](https://starchart.cc/YU-Zhejian/art_modern.svg?variant=adaptive)](https://starchart.cc/YU-Zhejian/art_modern)

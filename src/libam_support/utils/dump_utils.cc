@@ -31,7 +31,8 @@
 
 #ifdef CEU_ON_POSIX
 #include <pthread.h>
-// NOLINTNEXTLINE(modernize-deprecated-headers): <csignal> does not provide the POSIX sigaction/sigemptyset used below.
+// <csignal> does not provide the POSIX sigaction/sigemptyset used below.
+// NOLINTNEXTLINE(modernize-deprecated-headers,hicpp-deprecated-headers)
 #include <signal.h>
 #endif
 

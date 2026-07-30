@@ -63,7 +63,7 @@ public:
     ~OutputDispatcherFactory();
 
 private:
-    std::vector<std::shared_ptr<BaseReadOutputFactory>> factories_;
+    std::vector<std::unique_ptr<BaseReadOutputFactory>> factories_;
 };
 
 } // namespace labw::art_modern

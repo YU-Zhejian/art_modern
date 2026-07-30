@@ -369,8 +369,30 @@ char* ceu_check_get_c_compiler_info()
 
 #ifdef __clang_version__
     written = CEU_SNPRINTF(ptr, remaining, " (%s)", __clang_version__);
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
 #endif
     written = CEU_SNPRINTF(ptr, remaining, "\n");
+    if (written > 0 && written < remaining) {
+        ptr += written;
+        remaining -= written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
+
+#if defined(CEU_COMPILER_IS_APPLE_CLANG)
+    /* Apple numbers its Clang releases independently of upstream LLVM, so the version reported above does not
+     * identify an upstream LLVM release. */
+    written = CEU_SNPRINTF(ptr, remaining,
+        "\t%s build version: %d (the version number above follows Apple's numbering, not upstream LLVM's)\n",
+        CEU_COMPILER_NAME_APPLE_CLANG, __apple_build_version__);
     if (written > 0 && written < remaining) {
         ptr += written;
         remaining -= written;

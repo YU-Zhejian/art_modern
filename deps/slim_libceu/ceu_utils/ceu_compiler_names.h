@@ -2,6 +2,7 @@
 #define CEU_COMPILER_NAMES_H
 
 #define CEU_COMPILER_NAME_AOCC "AMD Optimizing C/C++ and Fortran Compilers (AOCC)"
+#define CEU_COMPILER_NAME_APPLE_CLANG "Apple Clang"
 #define CEU_COMPILER_NAME_ARM_COMPILER_EMBEDDED "Arm Compiler for Embedded (ACOMPE)"
 #define CEU_COMPILER_NAME_ARM_COMPILER_LINUX "Arm Compiler for Linux"
 #define CEU_COMPILER_NAME_CLANG "LLVM Clang"

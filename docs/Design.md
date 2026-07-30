@@ -80,9 +80,14 @@ A majority of the time was spent generating quality scores, which extensively ca
 (filesystem-section)=
 ### File System Support
 
-We use `boost::filesystem` to handle file system operations, such as creating directories, since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific file system APIs. The `std::filesystem` implementation across compilers is inconsistent. Some may require additional linker flags (`-lstdc++fs` for GCC prior to or equal to 9.1; `-lc++fs` for Clang prior to or equal to 9.0; `-lc++experimental` for Clang prior to or equal to 7.0). There are also various reports on how those implementations deal with the terminating `/` when invoking the `std::filesystem::creare_directories()`. So for simplicity, we use `boost::filesystem` instead.
+We use `boost::filesystem` to handle file system operations, such as creating directories, since it provides a consistent interface across different platforms. This also allows us to avoid dealing with platform-specific file system APIs. C++17 `<filesystem>` is not a viable replacement at the compiler versions supported by this project:
 
-See [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem), [this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem), and [this AskUbuntu question](https://askubuntu.com/questions/1256440/how-to-get-libstdc-with-c17-filesystem-headers-on-ubuntu-18-bionic).
+- It does not exist before GCC 8.1, while our minimum is [GCC 7.4.0](Install.md), which offers only `<experimental/filesystem>`.
+- It requires an extra linker flag on older standard libraries: `-lstdc++fs` on GCC 8.x, no longer needed from GCC 9.1 ([`libstdc++` C++17 status](https://gcc.gnu.org/onlinedocs/libstdc++/manual/status.html#status.iso.2017)); `-lc++fs` on `libc++` before LLVM 9.0 ([Using `libc++`](https://releases.llvm.org/9.0.0/projects/libcxx/docs/UsingLibcxx.html)).
+- On Apple platforms it is annotated as introduced in macOS 10.15, so any lower deployment target fails to build regardless of how recent the compiler is ([`libc++` vendor documentation](https://libcxx.llvm.org/VendorDocumentation.html)).
+- Implementations also differ over how `std::filesystem::create_directories()` treats a terminating `/` ([this StackOverflow question](https://stackoverflow.com/questions/53365538/how-to-determine-whether-to-use-filesystem-or-experimental-filesystem)).
+
+Boost is already a required dependency, so `boost::filesystem` introduces no new one. See also [this note in `cppreference`](https://en.cppreference.com/w/cpp/filesystem).
 
 ### Thread Pool Implementation
 

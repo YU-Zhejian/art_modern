@@ -165,6 +165,13 @@ std::string ceu_check_get_cxx_compiler_info()
     oss << std::endl;
 #endif
 
+#if defined(CEU_COMPILER_IS_APPLE_CLANG)
+    /* Apple numbers its Clang releases independently of upstream LLVM, so the version reported above does not
+     * identify an upstream LLVM release. */
+    oss << "\t" << CEU_COMPILER_NAME_APPLE_CLANG << " build version: " << __apple_build_version__
+        << " (the version number above follows Apple's numbering, not upstream LLVM's)" << std::endl;
+#endif
+
 #if defined(CEU_COMPILER_IS_GCC)
     oss << "\t" << CEU_COMPILER_NAME_GCC << " compatible version number: ";
 #ifdef __GNUC_PATCHLEVEL__

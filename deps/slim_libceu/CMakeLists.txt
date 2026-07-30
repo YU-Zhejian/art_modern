@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-set(CEU_VERSION "2025.12.08")
+set(CEU_VERSION "2026.07.29")
 project(
     slim_libceu
     LANGUAGES C CXX

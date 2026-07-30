@@ -43,11 +43,15 @@ size_t am_hts_tell(htsFile* fp);
  lower 4 bits gives a CIGAR operation and the higher 28 bits keep the
  length of a CIGAR.
  */
+// This is a C header, so the constexpr template function suggested by cppcoreguidelines-macro-usage is not
+// available. Mirrors HTSLib's own bam_get_cigar macro.
+// NOLINTBEGIN(cppcoreguidelines-macro-usage)
 #ifdef __cplusplus
 #define am_bam_get_cigar(b) (reinterpret_cast<am_cigar_t*>((b)->data + (b)->core.l_qname))
 #else
 #define am_bam_get_cigar(b) ((am_cigar_t*)((b)->data + (b)->core.l_qname))
 #endif
+// NOLINTEND(cppcoreguidelines-macro-usage)
 
 ART_MODERN_END_C_DECLS
 
