@@ -3,9 +3,19 @@
 ## IMPORTANT
 
 - For large-contigs test, the evenness of the coverage should be assessed.
-- As BAM cannot accommodate contigs larger than 2GiB, should check this when initializing BAM writer. Suggest users to use unaligned BAM instead.
 - `make release` would fail on platforms without pkg-config, especially on Haiku OS and Debian GNU/Hurd.
 - Add support for PE FASTA/FASTQ.
+
+## Possible Simplifications
+
+- Drop `USE_MALLOC` from CMake entirely. jemalloc, mimalloc and tcmalloc can all be `LD_PRELOAD`ed at
+  run time, so selecting one at link time buys little for a shared build. Removing it would delete
+  `src/cmake.d/malloc.cmake` (146 lines), the `USE_MALLOC` axis of the `test-build.py` matrix and its
+  `lib{je,mi,tc}malloc*.so` link assertions, the `USE_MALLOC` section of `docs/Install.md`, and the
+  `-DUSE_MALLOC=NOP` in `Makefile` and `packing/pack-alpine-exe.sh`.
+  - Caveats to weigh first: `LD_PRELOAD` does not work for the fully static Alpine build, though that
+    one already uses `NOP`; and under MPI the variable has to reach every rank, which depends on the
+    launcher forwarding the environment.
 
 ## Performance
 

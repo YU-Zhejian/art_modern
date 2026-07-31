@@ -83,7 +83,7 @@ if [ -n "${WITH_NCBI_NGS:-}" ] && [ "${WITH_NCBI_NGS}" -eq 1 ]; then
         --old_behavior
 fi
 
-if [ -z "${MPIEXEC:-}" ]; then
+if [ "${WITH_MPI}" != "1" ]; then
     APB_EXEC \
         --i-format FASTQ \
         --i-file /dev/stdin \
@@ -135,7 +135,7 @@ cmp "${OUT_DIR}"/out_se_art_cxx_bam.txt "${OUT_DIR}"/out_se_art_perl.txt
 cmp "${OUT_DIR}"/out_se_art_cxx_bam.txt "${OUT_DIR}"/out_se_art_perl.txt
 cmp "${OUT_DIR}"/out_se_art_cxx_cram.txt "${OUT_DIR}"/out_se_art_perl.txt
 
-if [ -z "${MPIEXEC:-}" ]; then
+if [ "${WITH_MPI}" != "1" ]; then
     cmp "${OUT_DIR}"/out_se_art_cxx_fq_cat.txt "${OUT_DIR}"/out_se_art_perl.txt
     cmp "${OUT_DIR}"/out_se_art_cxx_fq_gz_cat.txt "${OUT_DIR}"/out_se_art_perl.txt
     cmp "${OUT_DIR}"/out_se_art_cxx_sam_cat.txt "${OUT_DIR}"/out_se_art_perl.txt

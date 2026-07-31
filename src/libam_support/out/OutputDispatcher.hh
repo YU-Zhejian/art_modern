@@ -44,7 +44,7 @@ public:
     void writeSE(const TokenRing& tokens, const PairwiseAlignment& pwa);
     void writePE(const TokenRing& tokens, const PairwiseAlignment& pwa1, const PairwiseAlignment& pwa2);
     void close();
-    TokenRing get_producer_tokens() const;
+    [[nodiscard]] TokenRing get_producer_tokens() const;
 
 private:
     std::vector<std::shared_ptr<BaseReadOutput>> outputs_;
@@ -63,7 +63,7 @@ public:
     ~OutputDispatcherFactory();
 
 private:
-    std::vector<std::shared_ptr<BaseReadOutputFactory>> factories_;
+    std::vector<std::unique_ptr<BaseReadOutputFactory>> factories_;
 };
 
 } // namespace labw::art_modern

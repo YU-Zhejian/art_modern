@@ -16,21 +16,21 @@
 
 #include <stdlib.h>
 
-char* ceu_check_get_c_compiler_info()
+char* ceu_check_get_c_compiler_info(void)
 {
     char* buffer = calloc(40960, sizeof(char));
     if (buffer == NULL) {
         return NULL;
     }
     char* ptr = buffer;
-    int remaining = 40960 * sizeof(char);
+    size_t remaining = 40960 * sizeof(char);
     int written = 0;
 
 #if defined(CEU_REPRODUCIBLE_BUILDS) && (CEU_REPRODUCIBLE_BUILDS == 1)
     written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: N/A due to reproducible build\n");
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -51,9 +51,9 @@ char* ceu_check_get_c_compiler_info()
 #endif
 
     written = CEU_SNPRINTF(ptr, remaining, "C Compiled at: %s, %s\n", date_str, time_str);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -61,9 +61,9 @@ char* ceu_check_get_c_compiler_info()
 #endif
 
     written = CEU_SNPRINTF(ptr, remaining, "C Compiler Identification: %s\n", CEU_COMPILER_NAME);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -79,10 +79,10 @@ char* ceu_check_get_c_compiler_info()
 #endif
         ;
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %ld.%ld.%ld\n", CEU_COMPILER_NAME_TI,
-        ti_version / 1000000L, (ti_version / 1000000L) % 1000L, ti_version % 1000L);
-    if (written > 0 && written < remaining) {
+        ti_version / 1000000L, (ti_version % 1000000L) / 1000L, ti_version % 1000L);
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -93,9 +93,9 @@ char* ceu_check_get_c_compiler_info()
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n",
         CEU_COMPILER_NAME_INTEL_ONEAPI_DPCPP, __INTEL_CLANG_COMPILER / 10000, __INTEL_CLANG_COMPILER % 10000 / 100,
         __INTEL_CLANG_COMPILER % 100);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -106,9 +106,9 @@ char* ceu_check_get_c_compiler_info()
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d (%s) build %d\n",
         CEU_COMPILER_NAME_ARM_COMPILER_LINUX, __armclang_major__, __armclang_minor__, __armclang_version__,
         __ARM_LINUX_COMPILER_BUILD__);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -125,9 +125,9 @@ char* ceu_check_get_c_compiler_info()
     written = CEU_SNPRINTF(
         ptr, remaining, "\t%s compatible version number: %s\n", CEU_COMPILER_NAME_ARM_COMPILER_EMBEDDED, "UNDEFINED");
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -136,9 +136,9 @@ char* ceu_check_get_c_compiler_info()
 
 #if defined(CEU_COMPILER_IS_AOCC)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_AOCC);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -149,9 +149,9 @@ char* ceu_check_get_c_compiler_info()
 #else
     written = CEU_SNPRINTF(ptr, remaining, "%s\n", CEU_UNDEFINED);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -164,9 +164,9 @@ char* ceu_check_get_c_compiler_info()
  */
 #if defined(CEU_COMPILER_IS_ICC)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d", CEU_COMPILER_NAME_ICC, __ICC);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -174,18 +174,18 @@ char* ceu_check_get_c_compiler_info()
 
 #ifdef __INTEL_COMPILER_UPDATE
     written = CEU_SNPRINTF(ptr, remaining, ".%d", __INTEL_COMPILER_UPDATE);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
     }
 #endif
     written = CEU_SNPRINTF(ptr, remaining, "\n");
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -245,9 +245,9 @@ char* ceu_check_get_c_compiler_info()
     free(msc_major_ver);
     free(msc_minor_ver);
 
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -257,9 +257,9 @@ char* ceu_check_get_c_compiler_info()
 #if defined(CEU_COMPILER_IS_NVHPC)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_NVHPC,
         __NVCOMPILER_MAJOR__, __NVCOMPILER_MINOR__, __NVCOMPILER_PATCHLEVEL__);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -269,9 +269,9 @@ char* ceu_check_get_c_compiler_info()
 #if defined(CEU_COMPILER_IS_PGIC)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_PGIC,
         __PGIC__, __PGIC_MINOR__, __PGIC_PATCHLEVEL__);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -284,9 +284,9 @@ char* ceu_check_get_c_compiler_info()
     int tcc_patchlevel = __TINYC__ % 100;
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d\n", CEU_COMPILER_NAME_TCC,
         tcc_major, tcc_minor, tcc_patchlevel);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -298,9 +298,9 @@ char* ceu_check_get_c_compiler_info()
     int edg_minor = (__EDG_VERSION__ - edg_major * 100);
     written = CEU_SNPRINTF(
         ptr, remaining, "\t%s compatible version number: %d.%d\n", CEU_COMPILER_NAME_EDG, edg_major, edg_minor);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -308,21 +308,29 @@ char* ceu_check_get_c_compiler_info()
 #endif
 
 #if defined(CEU_COMPILER_IS_BORLAND)
-    int borland_major = __BORLANDC__ / 256;
-    int borland_revision = (__BORLANDC__ - 256 * borland_major) / 16 + __BORLANDC__ % 16;
-    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d, with %s\n",
-        CEU_COMPILER_NAME_BORLAND, borland_major, borland_revision, CEU_CPPB_VERSION);
-    if (written > 0 && written < remaining) {
+/* Detection may trigger from __TURBOC__/__BCPLUSPLUS__ alone, where __BORLANDC__ is undeclared. */
+#ifdef __BORLANDC__
+    /* __BORLANDC__ packs the version as nibbles: 0x0551 is 5.5.1. */
+    int borland_major = (__BORLANDC__ >> 8) & 0xFF;
+    int borland_minor = (__BORLANDC__ >> 4) & 0xF;
+    int borland_patch = __BORLANDC__ & 0xF;
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %d.%d.%d, with %s\n",
+        CEU_COMPILER_NAME_BORLAND, borland_major, borland_minor, borland_patch, CEU_CPPB_VERSION);
+#else
+    written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: %s, with %s\n", CEU_COMPILER_NAME_BORLAND,
+        CEU_UNDEFINED, CEU_CPPB_VERSION);
+#endif
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
     }
     written = CEU_SNPRINTF(ptr, remaining, "\t\t__CODEGEARC_VERSION__=");
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -332,12 +340,12 @@ char* ceu_check_get_c_compiler_info()
     written = CEU_SNPRINTF(ptr, remaining, "%X.%X.%d\n", ((__CODEGEARC_VERSION__ & 0xFF000000) >> 24),
         ((__CODEGEARC_VERSION__ & 0x00FF0000) >> 16), ((__CODEGEARC_VERSION__ & 0x0000FFFF)));
 #else
-    written = CEU_SNPRINTF(ptr, remaining, "=UNDEFINED\n");
+    written = CEU_SNPRINTF(ptr, remaining, "UNDEFINED\n");
 #endif
 
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -346,9 +354,9 @@ char* ceu_check_get_c_compiler_info()
 
 #if defined(CEU_COMPILER_IS_CLANG)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_CLANG);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -359,9 +367,9 @@ char* ceu_check_get_c_compiler_info()
 #else
     written = CEU_SNPRINTF(ptr, remaining, "UNKNOWN");
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -369,11 +377,33 @@ char* ceu_check_get_c_compiler_info()
 
 #ifdef __clang_version__
     written = CEU_SNPRINTF(ptr, remaining, " (%s)", __clang_version__);
+    if (written > 0 && (size_t)written < remaining) {
+        ptr += written;
+        remaining -= (size_t)written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
 #endif
     written = CEU_SNPRINTF(ptr, remaining, "\n");
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
+    } else {
+        free(buffer);
+        return NULL;
+    }
+#endif
+
+#if defined(CEU_COMPILER_IS_APPLE_CLANG)
+    /* Apple numbers its Clang releases independently of upstream LLVM, so the version reported above does not
+     * identify an upstream LLVM release. */
+    written = CEU_SNPRINTF(ptr, remaining,
+        "\t%s build version: %d (the version number above follows Apple's numbering, not upstream LLVM's)\n",
+        CEU_COMPILER_NAME_APPLE_CLANG, __apple_build_version__);
+    if (written > 0 && (size_t)written < remaining) {
+        ptr += written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -382,9 +412,9 @@ char* ceu_check_get_c_compiler_info()
 
 #if defined(CEU_COMPILER_IS_GCC)
     written = CEU_SNPRINTF(ptr, remaining, "\t%s compatible version number: ", CEU_COMPILER_NAME_GCC);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         /** In case of snprintf error or truncation */
         free(buffer);
@@ -396,9 +426,9 @@ char* ceu_check_get_c_compiler_info()
 #else
     written = CEU_SNPRINTF(ptr, remaining, "%d.%d\n", __GNUC__, __GNUC_MINOR__);
 #endif
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;
@@ -407,9 +437,9 @@ char* ceu_check_get_c_compiler_info()
 
 #if defined(__VERSION__)
     written = CEU_SNPRINTF(ptr, remaining, "\t__VERSION__ string: %s\n", __VERSION__);
-    if (written > 0 && written < remaining) {
+    if (written > 0 && (size_t)written < remaining) {
         ptr += written;
-        remaining -= written;
+        remaining -= (size_t)written;
     } else {
         free(buffer);
         return NULL;

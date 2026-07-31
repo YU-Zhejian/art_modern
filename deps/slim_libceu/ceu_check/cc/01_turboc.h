@@ -15,7 +15,13 @@
 #endif
 
 #undef CEU_CPPB_VERSION
-#if __TURBOC__ < 0x0570
+/*
+ * Detection above may trigger from __BORLANDC__/__BCPLUSPLUS__/__CODEGEARC__/__TCPLUSPLUS__ alone,
+ * in which case __TURBOC__ is not defined and must not be compared against.
+ */
+#if !defined(__TURBOC__)
+#define CEU_CPPB_VERSION "unknown (__TURBOC__ undefined)"
+#elif __TURBOC__ < 0x0570
 #define CEU_CPPB_VERSION "unknown before Developer Studio 2006"
 #elif __TURBOC__ == 0x0570
 #define CEU_CPPB_VERSION "Developer Studio 2006"
@@ -69,6 +75,9 @@
 #define CEU_CPPB_VERSION "C++Builder Alexandria"
 #elif __TURBOC__ > 0x0760
 #define CEU_CPPB_VERSION "unknown after C++Builder Alexandria"
+#else
+/* Values inside 0x0570..0x0760 that match none of the branches above (e.g. 0x0580). */
+#define CEU_CPPB_VERSION "unknown C++Builder release"
 #endif
 #endif
 #endif /* CEU_CC_TURBOC_H */

@@ -33,7 +33,8 @@
 #define CEU_C_STD "11"
 #elif CEU_C_STD_VERSION_MACRO == 201710L
 #define CEU_C_STD "17"
-#elif CEU_C_STD_VERSION_MACRO == 202311L
+/* GCC through 14 and Clang through 17 report 202000L for -std=c2x; 202311L is the ratified value. */
+#elif CEU_C_STD_VERSION_MACRO == 202000L || CEU_C_STD_VERSION_MACRO == 202311L
 #define CEU_C_STD "23"
 #elif CEU_C_STD_VERSION_MACRO > 202311L
 #define CEU_C_STD "post-23"

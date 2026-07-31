@@ -22,7 +22,7 @@ import logging
 from elftools.elf.elffile import ELFFile
 from elftools.elf.dynamic import DynamicSection
 
-from typing import List, Optional, Tuple, Dict, Set, IO
+from typing import List, Optional, Tuple, Dict, Set, IO, TypeAlias
 
 THIS_PID = os.getpid()
 
@@ -31,9 +31,10 @@ MAKE = shutil.which("make")
 CMAKE = shutil.which("cmake")
 CTEST = shutil.which("ctest")
 BASH = shutil.which("bash")
+PIXI = shutil.which("pixi")
 CMAKE_GENERATOR = "Ninja" if shutil.which("ninja") is not None else "Unix Makefiles"
 SHDIR = os.path.dirname(os.path.abspath(__file__))
-LOG_DIR = os.environ.get("TEST_BUILD_LOG_DI", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
+LOG_DIR = os.environ.get("TEST_BUILD_LOG_DIR", os.path.abspath(f"test-build-{THIS_PID}.log.d"))
 PKG_CONFIG_PATH = shutil.which("pkgconf")
 if PKG_CONFIG_PATH is None:
     PKG_CONFIG_PATH = shutil.which("pkg-config")
@@ -41,24 +42,35 @@ if PKG_CONFIG_PATH is None:
     raise RuntimeError("pkg-config or pkgconf not found in PATH")
 ASSERT_USING_LLVM_CXXSTDLIB = os.environ.get("ASSERT_USING_LLVM_CXXSTDLIB", None) == "1"
 
+# Per-stage timeouts in seconds. A stage that exceeds its own is killed and the job marked FAILED.
+TIMEOUT_BUILD = 360
+TIMEOUT_CTEST = 60
+TIMEOUT_INSTALL = 60
+TIMEOUT_TESTSMALL = 1200
+# Grace period between terminate() and kill() for a stage that timed out.
+TIMEOUT_TERMINATE_GRACE = 3
+
 IO_MUTEX = threading.Lock()
 SUCCESS_ID = []
 FAILED_ID = []
 
 
-def probe_using_cmake_script(cmake_file_path: str) -> bool:
-    # Dummy implementation for MKL probing
-    with open(os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log"), "wb") as log_file:
-        result = subprocess.run(
-            [CMAKE, "-P", os.path.join(SHDIR, "test-build.d", cmake_file_path)],
-            stdout=log_file,
-            stderr=log_file,
-        )
-    return result.returncode == 0
+def close_logger(lh: logging.Logger) -> None:
+    """
+    Detaches and closes every handler of a logger, releasing its file descriptors.
+
+    Assigning to ``Logger.handlers`` only drops the references; the underlying files stay open, and
+    the logger objects themselves live on in the logging module's global registry.
+    """
+    for handler_ in list(lh.handlers):
+        lh.removeHandler(handler_)
+        handler_.close()
 
 
 def probe_using_cmake_project(cmake_file_path: str) -> bool:
-    log_path = os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log")
+    assert CMAKE is not None, "CMake not found in PATH"
+    # os.devnull under --dry-run, where LOG_DIR does not exist.
+    log_path = os.devnull if DRY_RUN else os.path.join(LOG_DIR, f"probe-{os.path.basename(cmake_file_path)}.log")
     with (
         tempfile.TemporaryDirectory() as proj_dir,
         tempfile.TemporaryDirectory() as build_dir,
@@ -74,12 +86,13 @@ def probe_using_cmake_project(cmake_file_path: str) -> bool:
             stdout=log_file,
             stderr=log_file,
         )
-    if result.returncode == 0:
+    if result.returncode == 0 and not DRY_RUN:
         os.unlink(log_path)
     return result.returncode == 0
 
 
 def probe_pkg_config(package_name: str) -> bool:
+    assert PKG_CONFIG_PATH is not None, "pkg-config or pkgconf not found in PATH"
     result = subprocess.run(
         [PKG_CONFIG_PATH, "--exists", package_name],
         stdout=subprocess.DEVNULL,
@@ -118,7 +131,7 @@ def probe_pcg_random_hpp() -> Optional[str]:
     return None
 
 
-def peobe_mkl_using_pkgconf() -> List[str]:
+def probe_mkl_using_pkgconf() -> List[str]:
     retl = []
     for p in ["mkl-sdl", "mkl-sdl-lp64"]:
         if probe_pkg_config(p):
@@ -127,6 +140,7 @@ def peobe_mkl_using_pkgconf() -> List[str]:
 
 
 def probe_ncbi_ngs() -> bool:
+    assert BASH is not None, "Bash not found in PATH"
     p = subprocess.run(
         [BASH, os.path.join(SHDIR, "test-build.d", "have_ncbi_ngs.sh")],
         stdin=subprocess.DEVNULL,
@@ -136,7 +150,7 @@ def probe_ncbi_ngs() -> bool:
     return p.returncode == 0
 
 
-LDD_CACHE = Dict[str, List[Tuple[str, Optional[str]]]]
+LDD_CACHE: TypeAlias = Dict[str, List[Tuple[str, Optional[str]]]]
 
 
 class PyLddSearch:
@@ -164,14 +178,15 @@ class PyLddSearch:
 
     def __init__(self, ld_so_conf_path: str = "/etc/ld.so.conf"):
         self.lh = logging.getLogger(self.__class__.__name__)
-        self.lh.handlers = []
+        close_logger(self.lh)
         self.lh.setLevel(logging.INFO)
         stream_handler = logging.StreamHandler(sys.stderr)
         stream_handler.setLevel(logging.WARNING if not (_args.ldd_run or _args.ldd_run_sa) else logging.INFO)
         self.lh.addHandler(stream_handler)
-        file_handler = logging.FileHandler(os.path.join(LOG_DIR, "pyldd.log"), "w", "utf-8")
-        file_handler.setLevel(logging.INFO)
-        self.lh.addHandler(file_handler)
+        if not DRY_RUN:
+            file_handler = logging.FileHandler(os.path.join(LOG_DIR, "pyldd.log"), "w", "utf-8")
+            file_handler.setLevel(logging.INFO)
+            self.lh.addHandler(file_handler)
 
         for handler_ in self.lh.handlers:
             handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
@@ -263,12 +278,12 @@ class PyLddSearch:
                     # DT_NEEDED entries contain the names of required libraries
                     for tag in section.iter_tags():
                         if tag.entry.d_tag == "DT_NEEDED":
-                            required_libs.append(tag.needed)
+                            required_libs.append(tag.needed)  # type: ignore
                         elif tag.entry.d_tag == "DT_RPATH":
-                            dt_rpath.extend(tag.rpath.split(":"))
+                            dt_rpath.extend(tag.rpath.split(":"))  # type: ignore
                         # RUNPATH (New style)
                         elif tag.entry.d_tag == "DT_RUNPATH":
-                            dt_runpath.extend(tag.runpath.split(":"))
+                            dt_runpath.extend(tag.runpath.split(":"))  # type: ignore
         dt_rpath = self._filter_ld_path(dt_rpath, f"{path}: RPATH")
         dt_runpath = self._filter_ld_path(dt_runpath, f"{path}: RUNPATH")
         self.lh.info("%s RPATH: %s", path, ":".join(dt_rpath))
@@ -305,7 +320,7 @@ class PyLddSearch:
         ldd_cache: Optional[LDD_CACHE] = None,
         n_tabs: int = 0,
         already_printed: Optional[Set[str]] = None,
-        lib_name: str = None,
+        lib_name: Optional[str] = None,
         file: IO[str] = sys.stdout,
     ):
         ldd_cache = ldd_cache if ldd_cache is not None else self.ldd_full(path)
@@ -336,32 +351,45 @@ class PyLddSearch:
             flattened_list.extend(libs)
         return list(set(flattened_list))
 
-    def check_missing_libs(self, path: str, libs_flattened: List[Tuple[str, Optional[str]]]) -> None:
+    def check_missing_libs(
+        self,
+        path: str,
+        libs_flattened: List[Tuple[str, Optional[str]]],
+        lh: Optional[logging.Logger] = None,
+    ) -> List[str]:
+        """
+        Reports every resolved library and returns the names that could not be resolved.
+
+        :param lh: Where to report. Defaults to this instance's own logger; per-job callers should
+                   pass their own so that the report lands in the job's log rather than pyldd.log.
+        """
+        lh = lh if lh is not None else self.lh
         for lib, libpath in libs_flattened:
-            self.lh.info("%s: LIB %s => %s", path, lib, libpath)
-            missing_libs = [lib for lib, libpath in libs_flattened if libpath is None]
-            if missing_libs:
-                self.lh.error("%s: MISSING LIBS: %s", path, ":".join(missing_libs))
-                raise AssertionError()
+            lh.info("%s: LIB %s => %s", path, lib, libpath)
+        missing_libs = [lib for lib, libpath in libs_flattened if libpath is None]
+        if missing_libs:
+            lh.error("%s: MISSING LIBS: %s", path, ":".join(missing_libs))
+        return missing_libs
 
 
 class BuildConfig:
     def __init__(self, old_cmake_flags: List[str]):
-        self.USE_RANDOM_GENERATOR = "PCG"
-        self.USE_MALLOC = "AUTO"
-        self.USE_THREAD_PARALLEL = "ASIO"
-        self.USE_LIBFMT = None
-        self.USE_HTSLIB = None
-        self.USE_CONCURRENT_QUEUE = None
-        self.HELP_VERSION_ONLY = True
-        self.old_cmake_flags = old_cmake_flags
-        self.CMAKE_BUILD_TYPE = "Debug"
-        self.AM_NO_Q_REVERSE = False
-        self.FIND_RANDOM_MKL_THROUGH_PKGCONF = None
-        self.WITH_NCBI_NGS = False
+        self.USE_RANDOM_GENERATOR: str = "PCG"
+        self.USE_MALLOC: str = "AUTO"
+        self.USE_THREAD_PARALLEL: str = "ASIO"
+        self.USE_LIBFMT: Optional[str] = None
+        self.USE_HTSLIB: Optional[str] = None
+        self.USE_CONCURRENT_QUEUE: Optional[str] = None
+        self.HELP_VERSION_ONLY: bool = True
+        self.old_cmake_flags: List[str] = old_cmake_flags
+        self.CMAKE_BUILD_TYPE: str = "Debug"
+        self.AM_NO_Q_REVERSE: bool = False
+        self.FIND_RANDOM_MKL_THROUGH_PKGCONF: Optional[str] = None
+        self.WITH_NCBI_NGS: bool = False
 
     def generate_cmake_opts(self) -> List[str]:
-        cmake_flags = self.old_cmake_flags
+        # A copy: appending to self.old_cmake_flags would leave it holding this config's own flags.
+        cmake_flags = list(self.old_cmake_flags)
         cmake_flags.append(f"-DCMAKE_BUILD_TYPE={self.CMAKE_BUILD_TYPE}")
         cmake_flags.append(f"-DUSE_RANDOM_GENERATOR={self.USE_RANDOM_GENERATOR}")
         cmake_flags.append(f"-DUSE_MALLOC={self.USE_MALLOC}")
@@ -462,16 +490,21 @@ class BuildConfig:
 
 def do_build(config: BuildConfig, this_job_id: int) -> None:
     cmake_opts = config.generate_cmake_opts()
-    os.makedirs(os.path.join(LOG_DIR, str(this_job_id)))
-    build_dir = os.path.join(LOG_DIR, str(this_job_id), f"build")
-    install_dir = os.path.join(LOG_DIR, str(this_job_id), f"install")
+    if not DRY_RUN:
+        os.makedirs(os.path.join(LOG_DIR, str(this_job_id)), exist_ok=True)
+    build_dir = os.path.join(LOG_DIR, str(this_job_id), "build")
+    install_dir = os.path.join(LOG_DIR, str(this_job_id), "install")
     art_modern_path = os.path.join(install_dir, "bin", "art_modern" + ("-mpi" if WITH_MPI else ""))
     apb_path = os.path.join(install_dir, "bin", "art_profile_builder" + ("-mpi" if WITH_MPI else ""))
     amc_path = os.path.join(install_dir, "bin", "am_compress" + ("-mpi" if WITH_MPI else ""))
     do_build_lh = logging.getLogger(f"DO_BUILD {this_job_id}/{num_total_jobs}")
-    do_build_lh.handlers = []
+    close_logger(do_build_lh)
     log_path = os.path.join(LOG_DIR, str(this_job_id), "main.log")
-    do_build_lh.addHandler(logging.FileHandler(log_path, "w", "utf-8"))
+    # Under --dry-run there is no LOG_DIR to write into, so the trace goes to stderr instead.
+    if DRY_RUN:
+        do_build_lh.addHandler(logging.StreamHandler(sys.stderr))
+    else:
+        do_build_lh.addHandler(logging.FileHandler(log_path, "w", "utf-8"))
     do_build_lh.setLevel(logging.INFO)
     for handler_ in do_build_lh.handlers:
         handler_.setLevel(logging.INFO)
@@ -489,8 +522,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             FAILED_ID.append(this_job_id)
         main_lh.error("%s/%s: FAILED", this_job_id, num_total_jobs)
         do_build_lh.error("FAILED")
-        if _args.fast_fail:
-            raise AssertionError(f"{this_job_id} FAILED")
+        close_logger(do_build_lh)
 
     def run_wrapper(
         step_name_: str,
@@ -505,11 +537,12 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         env = dict(os.environ)
         if additional_env:
             env.update(additional_env)
-        with open(
-            os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.env.sh"), "wt", encoding="utf-8"
-        ) as env_file:
-            for k, v in env.items():
-                env_file.write(f"{k}='{v}'\n")
+        if not DRY_RUN:
+            with open(
+                os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.env.sh"), "wt", encoding="utf-8"
+            ) as env_file:
+                for k, v in env.items():
+                    env_file.write(f"{k}='{v}'\n")
         if DRY_RUN:
             do_build_lh.info("%s DRY RUN", step_name_)
         else:
@@ -529,7 +562,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 except subprocess.TimeoutExpired as e:
                     proc.terminate()
                     try:
-                        proc.wait(timeout=3)
+                        proc.wait(timeout=TIMEOUT_TERMINATE_GRACE)
                     except subprocess.TimeoutExpired:
                         proc.kill()
                         proc.wait()
@@ -549,32 +582,32 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             return True
 
         ldd_lh = logging.getLogger(f"LDD {this_job_id}/{num_total_jobs}")
-        ldd_lh.handlers = []
+        close_logger(ldd_lh)
         ldd_lh.setLevel(logging.INFO)
-        ldd_lh.addHandler(
-            logging.FileHandler(os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "w", "utf-8")
-        )
+        if DRY_RUN:
+            ldd_lh.addHandler(logging.StreamHandler(sys.stderr))
+        else:
+            ldd_lh.addHandler(
+                logging.FileHandler(os.path.join(LOG_DIR, str(this_job_id), f"{step_name_.lower()}.log"), "w", "utf-8")
+            )
         for ldd_lh_handler_ in ldd_lh.handlers:
             ldd_lh_handler_.setLevel(logging.INFO)
             ldd_lh_handler_.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
-        link_patterns = config.generate_link_patterns()
+        link_patterns, link_blacklists = config.generate_link_patterns()
         if DRY_RUN:
             do_build_lh.info("%s DRY RUN", step_name_)
-            # FIXME
-            # ldd_lh.info(
-            #     "Patterns: %s", "&".join("(" + "|".join(map(lambda x: x.pattern, lp)) + ")" for lp in link_patterns)
-            # )
+            ldd_lh.info(
+                "Patterns: %s", " & ".join("(" + " | ".join(p.pattern for p in lp) + ")" for lp in link_patterns)
+            )
+            ldd_lh.info("Blacklist: %s", " | ".join(p.pattern for p in link_blacklists))
         else:
             libs_flattened = list(
                 set(itertools.chain(pls.ldd_full_flattened(art_modern_path), pls.ldd_full_flattened(apb_path)))
             )
-            try:
-                pls.check_missing_libs("art_modern+apb", libs_flattened)
-            except AssertionError:
-                return False
-            ldd_failed = False
+            # Reported into ldd_lh, and not fatal on its own, so that the pattern checks below still
+            # run and a single lddtree dump can cover every problem found.
+            ldd_failed = bool(pls.check_missing_libs("art_modern+apb", libs_flattened, ldd_lh))
 
-            link_patterns, link_blacklists = config.generate_link_patterns()
             for link_pattern_group in link_patterns:
                 ldd_pattern_str = " | ".join(p.pattern for p in link_pattern_group)
                 found = False
@@ -582,7 +615,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                     if found:
                         break
                     for p in link_pattern_group:
-                        if p.search(path):
+                        if path is not None and p.search(path):
                             ldd_lh.info("FOUND: %s matches %s", lib, p.pattern)
                             found = True
                             break
@@ -594,7 +627,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                 for lib, path in libs_flattened:
                     if found:
                         break
-                    if blacklist_pattern.search(path):
+                    if path is not None and blacklist_pattern.search(path):
                         ldd_lh.error("%s matches %s", lib, blacklist_pattern.pattern)
                         ldd_failed = True
                         found = True
@@ -609,11 +642,18 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
                     pls.lddtree(apb_path, file=w)
                     pls.lddtree(amc_path, file=w)
                 ldd_lh.error("FAILED")
+                close_logger(ldd_lh)
                 return False
         ldd_lh.info("DONE")
+        close_logger(ldd_lh)
         do_build_lh.info("%s DONE", step_name_)
         return True
 
+    assert CMAKE is not None, "CMake not found in PATH"
+    assert BASH is not None, "Bash not found in PATH"
+    assert MAKE is not None, "make not found in PATH"
+    assert CTEST is not None, "ctest not found in PATH"
+    assert PIXI is not None, "pixi not found in PATH"
     if not run_wrapper(
         "CONFIG",
         [
@@ -643,7 +683,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
             "-j",
             str(4),
         ],
-        timeout=360,
+        timeout=TIMEOUT_BUILD,
     ):
         failed()
         return
@@ -651,7 +691,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         "CTEST",
         [CTEST, "--output-on-failure"],
         cwd=build_dir,
-        timeout=60,
+        timeout=TIMEOUT_CTEST,
     ):
         failed()
         return
@@ -659,7 +699,7 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
     if not run_wrapper(
         "INSTALL",
         [CMAKE, "--install", build_dir],
-        timeout=60,
+        timeout=TIMEOUT_INSTALL,
     ):
         failed()
         return
@@ -668,40 +708,49 @@ def do_build(config: BuildConfig, this_job_id: int) -> None:
         failed()
         return
 
+    # WITH_MPI carries the flag; MPIEXEC only names the launcher (resolved in __main__ when set).
     if not run_wrapper(
         "TESTSMALL",
-        [BASH, os.path.join(SHDIR, "test-small.sh")],
+        [PIXI, "run", "--frozen", BASH, os.path.join(SHDIR, "test-small.sh")],
         additional_env={
             **os.environ,
             "ART_MODERN_PATH": art_modern_path,
             "APB_PATH": apb_path,
             "AMC_PATH": amc_path,
             "HELP_VERSION_ONLY": "1" if config.HELP_VERSION_ONLY else "0",
-            "MPIEXEC": MPIEXEC if WITH_MPI else "",
+            "WITH_MPI": "1" if WITH_MPI else "0",
+            "MPIEXEC": MPIEXEC if WITH_MPI and MPIEXEC else "",
             "SAMTOOLS_THREADS": "4",
             "MPI_PARALLEL": "4",
             "PARALLEL": "2",
             "NO_FASTQC": "1",
-            "OUT_DIR": os.path.join(LOG_DIR, str(this_job_id), f"testmall.out.d"),
+            "OUT_DIR": os.path.join(LOG_DIR, str(this_job_id), "testsmall.out.d"),
             "SET_X": "1",
             "WITH_NCBI_NGS": "1" if config.WITH_NCBI_NGS else "0",
         },
-        timeout=1200,
+        timeout=TIMEOUT_TESTSMALL,
     ):
         failed()
         return
+    do_build_lh.info("SUCCESS")
+    close_logger(do_build_lh)
+    # Closed above, so the job's logs are released rather than deleted from under an open descriptor.
+    # Only failing jobs keep a directory, which is what makes a leftover one worth looking at.
     if not DRY_RUN:
         shutil.rmtree(build_dir)
         shutil.rmtree(install_dir)
         shutil.rmtree(os.path.join(LOG_DIR, str(this_job_id)))
     with IO_MUTEX:
         SUCCESS_ID.append(this_job_id)
-    do_build_lh.info("SUCCESS")
     main_lh.info("%s/%s: SUCCESS", this_job_id, num_total_jobs)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Test build script re-implementation.")
+    parser = argparse.ArgumentParser(
+        description="Test build script re-implementation.",
+        epilog="Everything after a '--' separator is passed through to CMake verbatim, "
+        "e.g. `%(prog)s --mpi -- -DBoost_DIR=/opt/boost/lib/cmake`.",
+    )
     parser.add_argument(
         "--dry-run",
         action="store_true",
@@ -728,9 +777,18 @@ if __name__ == "__main__":
         help="Do not automatically clear log dir on success.",
     )
     parser.add_argument("--ldd-run-sa", action="append", help="Run stand-alone Python LDD")
-    parser.add_argument("--fast-fail", action="store_true", help="Fail if any job fails")
 
-    _args, _old_cmake_flags = parser.parse_known_args()
+    # Split on '--' first, then parse_args() on the left. parse_known_args() over the whole argv
+    # would silently swallow any passthrough token colliding with one of the options above, and
+    # argparse's prefix matching makes even '--sm' collide with '--small'.
+    _argv = sys.argv[1:]
+    if "--" in _argv:
+        _sep = _argv.index("--")
+        _args = parser.parse_args(_argv[:_sep])
+        _old_cmake_flags = _argv[_sep + 1 :]
+    else:
+        _args = parser.parse_args(_argv)
+        _old_cmake_flags = []
     DRY_RUN = _args.dry_run
     WITH_MPI = _args.mpi
 
@@ -740,18 +798,15 @@ if __name__ == "__main__":
         if MPIEXEC is None:
             raise RuntimeError("MPIEXEC not found in environment and mpiexec not in PATH")
 
-    assert MAKE is not None, "make not found in PATH"
-    assert CMAKE is not None, "cmake not found in PATH"
-    assert CTEST is not None, "ctest not found in PATH"
-    assert BASH is not None, "bash not found in PATH"
-
-    if os.path.exists(LOG_DIR):
-        shutil.rmtree(LOG_DIR)
-    os.makedirs(LOG_DIR)
+    # A dry run writes nothing at all, so LOG_DIR is not created. A real run creates it without wiping
+    # an existing one, and removes it at the end only if every job succeeded.
+    if not DRY_RUN:
+        os.makedirs(LOG_DIR, exist_ok=True)
     main_lh = logging.getLogger("Main")
     main_lh.setLevel(logging.INFO)
     main_lh.addHandler(logging.StreamHandler(sys.stderr))
-    main_lh.addHandler(logging.FileHandler(os.path.join(LOG_DIR, "main.log")))
+    if not DRY_RUN:
+        main_lh.addHandler(logging.FileHandler(os.path.join(LOG_DIR, "main.log")))
     for handler in main_lh.handlers:
         handler.setLevel(logging.INFO)
         handler.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s"))
@@ -760,22 +815,24 @@ if __name__ == "__main__":
     if _args.ldd_run:
         exit(0)
     if _args.ldd_run_sa:
+        sa_missing = False
         for sa_ldd_run in _args.ldd_run_sa:
             cache = pls.ldd_full(sa_ldd_run)
             pls.lddtree(sa_ldd_run, ldd_cache=cache)
-            pls.check_missing_libs(sa_ldd_run, pls.ldd_full_flattened(sa_ldd_run, ldd_cache=cache))
-        exit(0)
+            if pls.check_missing_libs(sa_ldd_run, pls.ldd_full_flattened(sa_ldd_run, ldd_cache=cache)):
+                sa_missing = True
+        exit(1 if sa_missing else 0)
 
     RANDOM_GENERATORS = ["STL", "PCG", "BOOST"]
 
-    print(f"Probing for MKL through CMake...", end="")
+    print("Probing for MKL through CMake...", end="")
     if probe_using_cmake_project("test-mkl.cmake"):
         RANDOM_GENERATORS.append("ONEMKL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"Probing for concurrent queue...", end="")
+    print("Probing for concurrent queue...", end="")
     concurrent_queue_path = probe_concurrent_queue()
     if concurrent_queue_path:
         print(concurrent_queue_path)
@@ -783,53 +840,53 @@ if __name__ == "__main__":
         print("FAIL")
 
     MALLOCS = ["NOP"]
-    print(f"Probing for jemalloc...", end="")
+    print("Probing for jemalloc...", end="")
     if probe_pkg_config("jemalloc"):
         MALLOCS.append("JEMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"Probing for mimalloc...", end="")
+    print("Probing for mimalloc...", end="")
     if probe_using_cmake_project("test-mimalloc.cmake"):
         MALLOCS.append("MIMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"Probing for tcmalloc...", end="")
+    print("Probing for tcmalloc...", end="")
     if probe_pkg_config("libtcmalloc"):
         MALLOCS.append("TCMALLOC")
         print("SUCCESS")
     else:
         print("FAIL")
-    print(f"Probing for tcmalloc_minimal...", end="")
+    print("Probing for tcmalloc_minimal...", end="")
     if probe_pkg_config("libtcmalloc_minimal"):
         MALLOCS.append("TCMALLOC_MINIMAL")
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"Probing for HTSLib...", end="")
+    print("Probing for HTSLib...", end="")
     is_htslib_exist = probe_pkg_config("htslib")
     if is_htslib_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"Probing for " + "{fmt}" + "...", end="")
+    print("Probing for " + "{fmt}" + "...", end="")
     is_libfmt_exist = probe_pkg_config("fmt")
     if is_libfmt_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"Probing for " + "{fmt}" + " through CMake...", end="")
+    print("Probing for " + "{fmt}" + " through CMake...", end="")
     is_libfmt_cmake_exist = probe_using_cmake_project("test-fmt.cmake")
     if is_libfmt_cmake_exist:
         print("SUCCESS")
     else:
         print("FAIL")
 
-    print(f"Probing for <pcg_random.hpp>...", end="")
+    print("Probing for <pcg_random.hpp>...", end="")
     pcg_random_hpp_exist_path = probe_pcg_random_hpp()
     if pcg_random_hpp_exist_path:
         RANDOM_GENERATORS.append("SYSTEM_PCG")
@@ -837,8 +894,8 @@ if __name__ == "__main__":
     else:
         print("FAIL")
 
-    print(f"Probing for MKL found through pkg-config...", end="")
-    mkl_pc = peobe_mkl_using_pkgconf()
+    print("Probing for MKL found through pkg-config...", end="")
+    mkl_pc = probe_mkl_using_pkgconf()
     if mkl_pc:
         print(";".join(mkl_pc))
     else:
@@ -858,7 +915,12 @@ if __name__ == "__main__":
         print("libstdc++ (GNU)")
 
     cmake_build_types = ["Debug", "Release", "RelWithDebInfo"]
-    max_workers = min(5, os.cpu_count() // 4)
+    cpu_count = os.cpu_count()
+    if cpu_count is None:
+        cpu_count = 1
+    else:
+        cpu_count //= 4
+    max_workers = max(1, min(5, cpu_count))
     bcs = []
     for cmake_build_type in cmake_build_types:
         bc = BuildConfig(_old_cmake_flags)
@@ -916,24 +978,38 @@ if __name__ == "__main__":
             bcs.append(bc.copy())
             bc.WITH_NCBI_NGS = False
     num_total_jobs = len(bcs)
-    futures = []
+    # Keyed by future so that a worker that raised can be named and recorded as failed; do_build only
+    # appends to FAILED_ID on its own orderly failures.
+    futures = {}
     with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
         for job_id, bc in enumerate(bcs, 1):
-            futures.append(executor.submit(do_build, bc, job_id))
-        for future in futures:
+            futures[executor.submit(do_build, bc, job_id)] = job_id
+        for future, job_id in futures.items():
             try:
                 _ = future.result()
             except concurrent.futures.CancelledError:
                 # Ignore
                 pass
             except Exception as e:
-                main_lh.error("Exception inside TPE: %s: %s", str(e.__class__.__name__), str(e))
-
+                with IO_MUTEX:
+                    if job_id not in FAILED_ID:
+                        FAILED_ID.append(job_id)
+                main_lh.error(
+                    "%s/%s: Exception inside TPE: %s: %s",
+                    job_id,
+                    num_total_jobs,
+                    str(e.__class__.__name__),
+                    str(e),
+                    exc_info=True,
+                )
                 executor.shutdown(cancel_futures=True)
     SUCCESS_ID = sorted(SUCCESS_ID)
     FAILED_ID = sorted(FAILED_ID)
     main_lh.info("Successful builds: %s", ", ".join(map(str, SUCCESS_ID)))
     main_lh.info("Failed builds: %s", ", ".join(map(str, FAILED_ID)))
-    if not FAILED_ID and not _args.no_clear_on_success:
+    close_logger(main_lh)
+    close_logger(pls.lh)
+    # A successful run leaves nothing behind, so a surviving LOG_DIR means something failed.
+    if not DRY_RUN and not FAILED_ID and not _args.no_clear_on_success:
         shutil.rmtree(LOG_DIR)
     exit(1 if FAILED_ID else 0)

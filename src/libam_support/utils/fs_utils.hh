@@ -16,12 +16,16 @@
 
 #include "libam_support/Dtypes.h"
 
+#include <optional>
 #include <string>
 
 namespace labw::art_modern {
 void validate_input_filename(const std::string& input_file_path, const std::string& arg_name);
 
-am_filelen_t get_file_size(const std::string& file_path) noexcept;
+/**
+ * @return Size of the file, or an empty optional if it is not a regular file or could not be stat'ed.
+ */
+std::optional<am_filelen_t> get_file_size(const std::string& file_path) noexcept;
 
 void ensure_directory_exists(const std::string& dir_path);
 /**

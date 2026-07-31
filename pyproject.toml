@@ -1,0 +1,13 @@
+[tool.pyright]
+# Lets the IDE-embedded Pyright resolve imports without a `pixi run` activation.
+venvPath = ".pixi/envs"
+venv = "default"
+pythonVersion = "3.13"
+pythonPlatform = "Linux"
+# .cmake-format.py is excluded: cmake-format exec's it with `section` injected, so it cannot be checked standalone.
+include = ["sh.d", "src/cmake.d"]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "deps", "docs"]
+typeCheckingMode = "standard"
+
+[[tool.pyright.executionEnvironments]]
+root = "."

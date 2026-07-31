@@ -24,6 +24,11 @@
 #define CEU_ON_MINGW64
 #endif
 
+/*
+ * CEU_ON_MINGW32 means "is MinGW", not "is 32-bit": MinGW-w64 defines __MINGW32__ (and __WINNT__/__WINNT) on
+ * 64-bit targets too, so a 64-bit build sets both this and CEU_ON_MINGW64. That is intended -- the block above
+ * runs first, so CEU_PRIMARY_OS_TYPE still resolves to "MINGW64". Bitness comes from CEU_ARCHITECTURE_*.
+ */
 #if defined(__MINGW32__) || defined(__WINNT__) || defined(__WINNT)
 #ifndef CEU_PRIMARY_OS_TYPE
 #define CEU_PRIMARY_OS_TYPE "MINGW32"

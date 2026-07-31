@@ -74,7 +74,7 @@ void JobPool::prune_finished_jobs()
 #else
     const std::scoped_lock op_lock(operation_mutex_);
     std::vector<std::shared_ptr<JobExecutor>> passed_ajes_;
-    for (auto aje : executors_) {
+    for (auto& aje : executors_) {
         if (aje && aje->is_running()) {
             passed_ajes_.emplace_back(std::move(aje));
         }

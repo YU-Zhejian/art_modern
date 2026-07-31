@@ -31,6 +31,8 @@
 
 #ifdef CEU_ON_POSIX
 #include <pthread.h>
+// <csignal> does not provide the POSIX sigaction/sigemptyset used below.
+// NOLINTNEXTLINE(modernize-deprecated-headers,hicpp-deprecated-headers)
 #include <signal.h>
 #endif
 
@@ -116,13 +118,6 @@ void handle_dumps()
     std::string const possible_dump_filename = attach_mpi_rank_to_path(DUMP_BASE_FILENAME, "0");
     if (boost::filesystem::exists(possible_dump_filename)) {
         // there is a backtrace
-        if (is_on_mpi_main_process_or_nompi()) {
-            std::ifstream ifs(possible_dump_filename);
-            const boost::stacktrace::stacktrace st = boost::stacktrace::stacktrace::from_dump(ifs);
-            std::cout << "Previous run crashed:\n" << st << std::endl;
-            // cleaning up
-            ifs.close();
-        }
         boost::filesystem::remove(possible_dump_filename);
     }
 #endif

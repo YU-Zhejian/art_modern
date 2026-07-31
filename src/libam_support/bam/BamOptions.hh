@@ -16,6 +16,7 @@
 
 #include "art_modern_config.h"
 #include "libam_support/Constants.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <string>
 
@@ -24,6 +25,10 @@ namespace labw::art_modern {
 enum class BamOutputFormat : std::uint8_t { SAM, BAM, FASTA, FASTQ };
 class BamOptions {
 public:
+    DEFAULT_CONSTRUCTOR(BamOptions)
+    DEFAULT_COPY(BamOptions)
+    DEFAULT_MOVE(BamOptions)
+    DEFAULT_DESTRUCTOR(BamOptions)
     static constexpr char ALLOWED_COMPRESSION_LEVELS[] { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'u', 0 };
     /**
      * Format version. Accepted format: `/^[0-9]+\.[0-9]+$`.

@@ -20,6 +20,7 @@
 #include "art/lib/Rprob.hh"
 
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <htslib/hts.h>
 
@@ -32,8 +33,14 @@ namespace labw::art_modern {
 class ArtContig {
 
 public:
-    ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, std::size_t seq_id, const ArtParams& art_params,
-        Rprob& rprob);
+    ArtContig(
+        std::shared_ptr<BaseFastaFetch> fasta_fetch, std::size_t seq_id, const ArtParams& art_params, Rprob& rprob);
+
+    // This type borrows art_params_ and rprob_ by reference, so it is only ever valid for as long as the job
+    // that owns them. Copying or moving it is never wanted and would silently be assignment-less anyway.
+    DELETE_COPY(ArtContig)
+    DELETE_MOVE(ArtContig)
+    DEFAULT_DESTRUCTOR(ArtContig)
 
     void generate_read_se(bool is_plus_strand, ArtRead& read_1);
     void generate_read_pe(bool is_plus_strand, ArtRead& read_1, ArtRead& read_2);
@@ -47,7 +54,7 @@ private:
     [[nodiscard]] hts_pos_t generate_fragment_length() const;
     const hts_pos_t longer_size_between_r1_r2_;
     const ArtParams& art_params_;
-    const std::shared_ptr<BaseFastaFetch>& fasta_fetch_;
+    const std::shared_ptr<BaseFastaFetch> fasta_fetch_;
     Rprob& rprob_;
     const std::size_t seq_id_;
     const hts_pos_t valid_region_;

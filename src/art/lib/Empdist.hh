@@ -51,6 +51,9 @@ private:
 
 class Empdist {
 public:
+    DEFAULT_COPY(Empdist)
+    DEFAULT_MOVE(Empdist)
+    DEFAULT_DESTRUCTOR(Empdist)
     using dist_map_type = std::map<am_qual_count_t, am_qual_t, std::less<>>;
     using dist_type = std::vector<dist_map_type>;
     using dist_idx_type = std::vector<SlimEmpDistGslDiscrete>;

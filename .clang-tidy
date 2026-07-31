@@ -62,17 +62,28 @@ Checks:
   - -altera-unroll-loops
   - -altera-id-dependent-backward-branch
 
-  # TODO: No idea why const or ref data members are not recommended.
+  # Const and reference data members silently delete copy- and move-assignment, which is a real hazard for
+  # types that are expected to be assignable. The overwhelming majority of hits here are intentional `const`
+  # value members on types that already delete their copy and move operations, so this check is disabled and
+  # the reference-typed members are reviewed by hand instead. Note that the check already stays silent on
+  # classes that explicitly delete both copy and move.
   - -cppcoreguidelines-avoid-const-or-ref-data-members
 
-  # TODO: No idea why private member variables are not recommended.
-  - -*-non-private-member-variables-in-classes
+  # This check flags NON-private (i.e. public or protected) member variables; it recommends that members be
+  # private. It is left enabled, but configured below via
+  # misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic so that plain
+  # immutable data carriers such as PairwiseAlignment are not reported. What remains is protected state on
+  # base classes, which is the case C++ Core Guidelines C.133 actually cares about.
 
-  # TODO: No idea why static objects are not recommended.
+  # Globals with dynamic initialization have unspecified initialization order across translation units, and a
+  # throwing constructor on such an object cannot be caught. cert-err58-cpp is left enabled to keep header
+  # globals constexpr. fuchsia-statically-constructed-objects reports the same thing but more aggressively, so
+  # only the CERT one is kept.
   - -fuchsia-statically-constructed-objects
-  - -cert-err58-cpp
 
-  # TODO: No idea why implicit array to pointer conversions are not recommended.
+  # Decaying an array to a pointer loses the size, so nothing downstream can bounds-check. The prescribed fix
+  # is gsl::span, and we do not use GSL (see cppcoreguidelines-owning-memory below). Practically every hit is
+  # a string literal being passed to HTSLib or Boost.program_options, so this is permanently disabled.
   - -cppcoreguidelines-pro-bounds-array-to-pointer-decay
   - -*-no-array-decay
 
@@ -119,12 +130,23 @@ Checks:
   - -*-use-concise-preprocessor-directives
 
 WarningsAsErrors: ''
-HeaderFilterRegex: ''
-FormatStyle: webkit
+# Report diagnostics from our own headers too. Much of this project lives in .hh files (class definitions,
+# templates, constants), so leaving this empty would discard the majority of what the checks have to say.
+# Vendored third-party code under deps/ is excluded rather than filtered in.
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: '.*/deps/.*|.*/cmake-build-.*'
+# Use the project's .clang-format rather than plain webkit, so that clang-tidy's fixes agree with `make fmt`.
+# Plain webkit differs from our .clang-format in ColumnLimit (0 vs. 120) and InsertNewlineAtEOF (false vs. true).
+FormatStyle: file
 
 CheckOptions:
+  # Semicolon-separated list of regexes.
   - key: misc-include-cleaner.IgnoreHeaders
-    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*.cstdint;cstddef;fmt/format.h'
+    value: 'mkl.*\.h;boost/.*/details/.*;boost/test/.*;cstdint;cstddef;fmt/format.h'
+  # Types whose member variables are all public are plain data carriers (e.g. PairwiseAlignment); making them
+  # private would only add getters. Protected members, which this still reports, are the actual concern.
+  - key: misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic
+    value: 'true'
 
 HeaderFileExtensions:
   - h

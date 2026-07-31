@@ -29,9 +29,10 @@ public:
     DELETE_MOVE(BamLFIO)
     DELETE_COPY(BamLFIO)
     DEFAULT_DESTRUCTOR(BamLFIO)
-    void write(bam1_t_uptr ss) override;
     BamLFIO(std::string name, samFile* fp, const sam_hdr_t* h);
 
+protected:
+    void write(bam1_t_uptr ss) override;
     void flush_and_close() override;
 
 private:

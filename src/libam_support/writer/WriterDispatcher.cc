@@ -1,3 +1,17 @@
+/**
+ * Copyright 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
+ *
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ * version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along with this program. If not, see
+ * <https://www.gnu.org/licenses/>.
+ **/
+
 #include "art_modern_config.h" // NOLINT: for WITH_LIBDEFLATE
 
 #include "libam_support/writer/WriterDispatcher.hh"
@@ -110,8 +124,8 @@ std::unique_ptr<WriterInterface> WriterDispatcher::parse_args_for_fmt(
             }
             ctype = CompressionType::NONE;
         } else {
-            throw std::runtime_error(
-                fmt::format("Invalid compression type '{}'. Supported types are 'gzip' and 'none'.", ctype_str));
+            throw std::runtime_error(fmt::format(
+                "Invalid compression type '{}'. Supported types are 'bgzip', 'gzip' and 'none'.", ctype_str));
         }
     } else {
         BOOST_LOG_TRIVIAL(warning) << "Compression type for format '" << fmt_name

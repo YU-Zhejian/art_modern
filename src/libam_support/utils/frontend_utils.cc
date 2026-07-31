@@ -43,7 +43,7 @@ void print_help(const po::options_description& po_desc, const std::string& prefi
 }
 
 po::variables_map generate_vm_while_handling_help_version(const po::options_description& po_desc, const int argc,
-    char** argv, const std::string& prefix, const std::string& suffix)
+    char* const* argv, const std::string& prefix, const std::string& suffix)
 {
     if (argc == 1) {
         // No command line arguments.

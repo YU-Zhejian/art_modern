@@ -29,6 +29,7 @@
 #include <boost/timer/timer.hpp>
 #endif
 
+#include <cstddef>
 #include <cstdlib>
 #include <fstream>
 #include <ios>
@@ -36,6 +37,11 @@
 #include <vector>
 
 using namespace labw::art_modern;
+
+namespace {
+/** Default size (in bytes) of the input read buffer. */
+constexpr std::size_t DEFAULT_INPUT_BUFFER_SIZE = 4096;
+} // namespace
 
 int main(int argc, char** argv)
 {
@@ -62,7 +68,9 @@ int main(int argc, char** argv)
 
     WriterDispatcher::patch_options_for_fmt("compressed", od);
     od.add(general_options());
-    od.add_options()("i-file", boost::program_options::value<std::string>(), "Path to the input file.");
+    od.add_options()("i-file", boost::program_options::value<std::string>(), "Path to the input file.")("i-buffer_size",
+        boost::program_options::value<std::size_t>()->default_value(DEFAULT_INPUT_BUFFER_SIZE),
+        "Size (in bytes) of the buffer used to read the input file.");
     boost::program_options::variables_map vm;
     try {
         vm = generate_vm_while_handling_help_version(od, argc, argv);
@@ -101,8 +109,13 @@ int main(int argc, char** argv)
         exit_mpi();
         return EXIT_FAILURE;
     }
-    // TODO: Add option to specify input buffer size
-    std::vector<char> buffer(4096);
+    const auto buffer_size = vm["i-buffer_size"].as<std::size_t>();
+    if (buffer_size == 0) {
+        BOOST_LOG_TRIVIAL(fatal) << "Input buffer size must be greater than zero.";
+        exit_mpi();
+        return EXIT_FAILURE;
+    }
+    std::vector<char> buffer(buffer_size);
     while (input_file.read(buffer.data(), buffer.size()) || input_file.gcount() > 0) {
         writer->write(std::string(buffer.data(), input_file.gcount()));
     }

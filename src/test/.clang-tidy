@@ -1,0 +1,7 @@
+---
+# BOOST_AUTO_TEST_CASE expands to a struct at namespace scope; the check cannot see that it is
+# macro-generated and that Boost.Test relies on its auto-registration.
+InheritParentConfig: true
+Checks:
+  - -misc-use-internal-linkage
+...

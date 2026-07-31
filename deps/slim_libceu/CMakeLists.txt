@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.17)
-set(CEU_VERSION "2025.12.08")
+set(CEU_VERSION "2026.07.29")
 project(
     slim_libceu
     LANGUAGES C CXX
@@ -22,9 +22,12 @@ include(CheckSymbolExists)
 function(ceu_cm_set_static_target name)
     set_target_properties("${name}" PROPERTIES LINK_SEARCH_START_STATIC 1 LINK_SEARCH_END_STATIC 1 INSTALL_RPATH "")
     if(NOT (BORLAND OR MSVC))
-        target_link_options("${name}" PRIVATE -static)
-        target_link_options("${name}" PRIVATE $<$<COMPILE_LANGUAGE:C>:-static-libgcc>
-                            $<$<COMPILE_LANGUAGE:CXX>:-static-libstdc++>)
+        # NOTE: $<COMPILE_LANGUAGE:...> must not be used here. It is not evaluated per source language in a link
+        # context, so it silently dropped -static-libgcc from every C++-linked target. $<LINK_LANGUAGE:...> would be
+        # the precise tool, but it requires CMake >= 3.18. Both flags are safe to pass unconditionally instead:
+        # -static-libgcc is accepted by the C and the C++ link driver alike, and -static-libstdc++ is ignored by the
+        # C driver.
+        target_link_options("${name}" PRIVATE -static -static-libgcc -static-libstdc++)
     endif()
 endfunction()
 

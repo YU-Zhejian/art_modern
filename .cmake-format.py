@@ -25,7 +25,7 @@ with section("format"):
     line_width = 120
 
     # How many spaces to tab for indent
-    tab_size = 2
+    tab_size = 4
 
     # If an argument group contains more than this many sub-groups (parg or kwarg
     # groups) then force it to a vertical layout.

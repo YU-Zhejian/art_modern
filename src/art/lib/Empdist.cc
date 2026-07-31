@@ -22,7 +22,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
 #include "libam_support/utils/seq_utils.hh"
 
@@ -356,8 +355,8 @@ void Empdist::read_emp_dist_(std::istream& input, const bool is_first)
             qual.emplace_back(tmp_qual);
         }
 
-        qmin = am_min(qmin, *std::min_element(qual.begin(), qual.end()));
-        qmax = am_max(qmax, *std::max_element(qual.begin(), qual.end()));
+        qmin = std::min(qmin, *std::min_element(qual.begin(), qual.end()));
+        qmax = std::max(qmax, *std::max_element(qual.begin(), qual.end()));
 
         std::getline(input, line);
         actual_line_no++;

@@ -3,7 +3,7 @@ import gzip
 import os
 import sys
 
-SNAME_FILE_MAPPING = {
+SNAME_FILE_MAPPING: dict[str, tuple[str, ...]] = {
     # Genome Analyzers
     "GA1_36bp": ("Emp36R1.txt", "Emp36R2.txt"),
     "GA1_44bp": ("Emp44R1.txt", "Emp44R2.txt"),
@@ -97,8 +97,14 @@ if __name__ == "__main__":
                     slengths.append(len(data))
 
                     wh.write(f"extern {DTYPE} {sname}_{i}[{len(data)}];\n")
-                snames_constructed.append("{" + f"{sname}_0, " + ("NULL_PROFILE" if i == 0 else f"{sname}_1") + "}")
-                slengths_constructed.append("{" + f"{slengths[0]}, " + ("0" if i == 0 else f"{slengths[1]}") + "}")
+                # Single-end profiles have exactly one file, so there is no `_1` array to refer to. The test must
+                # be on whether a second file exists, not on whether the profile has no files at all.
+                snames_constructed.append(
+                    "{" + f"{sname}_0, " + ("NULL_PROFILE" if len(files) < 2 else f"{sname}_1") + "}"
+                )
+                slengths_constructed.append(
+                    "{" + f"{slengths[0]}, " + ("0" if len(files) < 2 else f"{slengths[1]}") + "}"
+                )
 
             wh.write(f"const int N_BUILTIN_PROFILE = {len(snames_constructed)};\n")
             wh.write("static " + DTYPE + "* ENCODED_BUILTIN_PROFILES[N_BUILTIN_PROFILE][2] = {\n")

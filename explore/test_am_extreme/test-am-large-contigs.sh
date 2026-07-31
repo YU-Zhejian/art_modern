@@ -8,6 +8,9 @@
 #SBATCH --output=log/%x.%j.out
 #SBATCH --error=log/%x.%j.err
 
+# The read-name deduplication check below the `exit` is deliberately not run; see the comment there.
+# shellcheck disable=SC2317
+
 module purge
 module load petagene
 module load slurm
@@ -43,6 +46,7 @@ srun --mpi=pmi2 \
     --o-hl_sam-num_threads "${NJOBS}" \
     --o-hl_sam-write_bam
 
+# TODO: Only the smoke test above is run. Re-enable the duplicate read-name check below.
 exit
 
 mkdir -p tmp

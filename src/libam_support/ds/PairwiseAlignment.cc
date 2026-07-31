@@ -24,20 +24,15 @@
 #include <htslib/hts.h>
 #include <htslib/sam.h>
 
-#include <stdexcept>
+#include <boost/log/trivial.hpp>
+
 #include <string>
 #include <utility>
 #include <vector>
 
-namespace labw::art_modern {
-class PWAException final : public std::runtime_error {
-public:
-    explicit PWAException(const std::string& message)
-        : std::runtime_error(message)
-    {
-    }
-};
+#include "libam_support/utils/mpi_utils.hh"
 
+namespace labw::art_modern {
 PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& contig_name, std::string&& query,
     std::string&& ref, std::string&& qual_str, std::vector<am_qual_t>&& qual_vec, std::string&& aligned_query,
     std::string&& aligned_ref, hts_pos_t const pos_on_contig, bool const is_plus_strand)
@@ -55,10 +50,16 @@ PairwiseAlignment::PairwiseAlignment(std::string&& read_name, std::string&& cont
     check_();
 }
 
+// This copying overload is deliberate and complements the by-rvalue-reference one above. Merging them into a
+// single by-value constructor as modernize-pass-by-value suggests would add a move of every string to
+// ArtRead::to_pwa(), which runs once per simulated read, and callers passing `const` lvalues (see
+// src/test/seq_utils.cc) cannot bind to the rvalue overload at all.
+// NOLINTBEGIN(modernize-pass-by-value)
 PairwiseAlignment::PairwiseAlignment(const std::string& read_name, const std::string& contig_name,
     const std::string& query, const std::string& ref, const std::string& qual_str,
     const std::vector<am_qual_t>& qual_vec, const std::string& aligned_query, const std::string& aligned_ref,
     const hts_pos_t pos_on_contig, const bool is_plus_strand)
+    // NOLINTEND(modernize-pass-by-value)
     : aln_query(aligned_query)
     , aln_ref(aligned_ref)
     , query(query)
@@ -119,13 +120,19 @@ void PairwiseAlignment::check_() const
 {
 #ifdef CEU_CM_IS_DEBUG
     if (this->aln_ref.length() != this->aln_query.length()) {
-        throw PWAException("Length of aligned query and ref inequal!");
+        BOOST_LOG_TRIVIAL(error) << "aln_ref len (" << this->aln_ref.length() << ") does not match query len ("
+                                 << this->aln_query.length() << ")";
+        abort_mpi();
     }
     if (this->qual_str.length() != this->query.length()) {
-        throw PWAException("Length of query and qual_ inequal!");
+        BOOST_LOG_TRIVIAL(error) << "qual_str len (" << this->qual_str.length() << ") does not match query len ("
+                                 << this->query.length() << ")";
+        abort_mpi();
     }
     if (this->qual_vec.size() != this->query.length()) {
-        throw PWAException("Length of query and qual_ inequal!");
+        BOOST_LOG_TRIVIAL(error) << "qual_vec len (" << this->qual_vec.size() << ") does not match query len ("
+                                 << this->query.length() << ")";
+        abort_mpi();
     }
 #endif
 }

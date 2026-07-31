@@ -22,7 +22,6 @@
 
 #include "libam_support/Constants.hh"
 #include "libam_support/ref/fetch/BaseFastaFetch.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 
 #include <htslib/hts.h>
 
@@ -121,16 +120,18 @@ void ArtContig::generate_read_pe(const bool is_plus_strand, ArtRead& read_1, Art
     read_2.ref2read(std::move(seq_ref_2), !is_plus_strand, pos_2);
 }
 
-ArtContig::ArtContig(const std::shared_ptr<BaseFastaFetch>& fasta_fetch, const std::size_t seq_id,
-    const ArtParams& art_params, Rprob& rprob)
+ArtContig::ArtContig(
+    std::shared_ptr<BaseFastaFetch> fasta_fetch, const std::size_t seq_id, const ArtParams& art_params, Rprob& rprob)
     : seq_name(fasta_fetch->seq_name(seq_id))
     , seq_size(fasta_fetch->seq_len(seq_id))
-    , longer_size_between_r1_r2_(static_cast<hts_pos_t>(am_max(art_params.read_len_1, art_params.read_len_2)))
+    , longer_size_between_r1_r2_(static_cast<hts_pos_t>(std::max(art_params.read_len_1, art_params.read_len_2)))
     , art_params_(art_params)
-    , fasta_fetch_(fasta_fetch)
+    // fasta_fetch is moved from here on; valid_region_ below is derived from seq_size instead, which holds the
+    // same fasta_fetch->seq_len(seq_id) value and is initialized first.
+    , fasta_fetch_(std::move(fasta_fetch))
     , rprob_(rprob)
     , seq_id_(seq_id)
-    , valid_region_(fasta_fetch->seq_len(seq_id) - (art_params.contig_len_threshold))
+    , valid_region_(seq_size - (art_params.contig_len_threshold))
 {
 }
 hts_pos_t ArtContig::generate_fragment_length() const

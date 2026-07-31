@@ -2,6 +2,23 @@
 
 ## Copying
 
+Except for the files listed in this section, everything here is by YU Zhejian under the MIT License; see [LICENSE](LICENSE).
+
+## Files Adapted From [CMake](https://cmake.org/)
+
+The following files are adapted from CMake version 3.28:
+
+- src/test_pthread.c
+- test_libpthread.cmake
+
+The copyright notice is as follows:
+
+```text
+Copyright 2024 Kitware, Inc. Distributed under the OSI-approved BSD 3-Clause License.
+```
+
+The full text of that license is distributed with CMake as `Copyright.txt`, and is available at <https://cmake.org/licensing/>.
+
 ## Files Adapted From [GNU AutoConf](https://www.gnu.org/software/autoconf/)
 
 The following files are adapted from GNU AutoConf Archive version [2.72](https://ftp.gnu.org/gnu/autoconf/autoconf-2.72.tar.xz).

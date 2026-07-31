@@ -28,7 +28,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/ds/CoverageInfo.hh"
 #include "libam_support/out/OutputDispatcher.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/frontend_utils.hh"
 #include "libam_support/utils/fs_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -161,7 +160,7 @@ namespace {
         art_opts.add_options()(
             ARG_INS_RATE_2, po::value<double>()->default_value(DEFAULT_INS_RATE_2), "the second-read insertion rate");
         art_opts.add_options()(
-            ARG_DEL_RATE_1, po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the second-read deletion rate");
+            ARG_DEL_RATE_1, po::value<double>()->default_value(DEFAULT_DEL_RATE_1), "the first-read deletion rate");
         art_opts.add_options()(
             ARG_DEL_RATE_2, po::value<double>()->default_value(DEFAULT_DEL_RATE_2), "the second-read deletion rate");
         art_opts.add_options()(ARG_SEP_FLAG,
@@ -277,7 +276,7 @@ namespace {
         }
         if (input_file_parser_str == INPUT_FILE_PARSER_AUTO) {
             const auto file_size = get_file_size(input_file_path);
-            const auto file_too_large = file_size == -1 || file_size > G_SIZE;
+            const auto file_too_large = !file_size.has_value() || file_size.value() > G_SIZE;
             if (simulation_mode == SIMULATION_MODE::WGS) {
                 if (file_too_large) {
                     return INPUT_FILE_PARSER::HTSLIB;
@@ -424,7 +423,7 @@ namespace {
             abort_mpi();
         }
 
-        if (pe_frag_dist_mean <= am_max(read_len_1, read_len_2)) {
+        if (pe_frag_dist_mean <= std::max(read_len_1, read_len_2)) {
             BOOST_LOG_TRIVIAL(fatal) << "The maximum read length must be shorter than the "
                                         "pe_frag_dist_mean fragment length specified.";
             abort_mpi();

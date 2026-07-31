@@ -32,7 +32,7 @@ void BaseFastaFetch::update_sam_header(sam_hdr_t* header) const
     for (std::size_t i = 0; i < seq_lengths_.size(); ++i) {
         auto seq_len_str = std::to_string(seq_lengths_[i]);
         CExceptionsProxy::assert_numeric(
-            sam_hdr_add_line(header, "SQ", "SN", seq_names_[i].c_str(), "LN", seq_len_str.c_str(), NULL),
+            sam_hdr_add_line(header, "SQ", "SN", seq_names_[i].c_str(), "LN", seq_len_str.c_str(), nullptr),
             USED_HTSLIB_NAME, "Failed to add SQ header line for contig '" + seq_names_[i] + "'", false,
             CExceptionsProxy::EXPECTATION::ZERO);
     }

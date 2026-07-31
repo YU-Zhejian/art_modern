@@ -77,11 +77,10 @@ void BamTags::add_int_i(const key_type& key, const std::int32_t value)
 {
     auto data = std::make_shared<std::string>();
     data->resize(TAG_SIZE);
+    // bam_aux_append() takes its payload in host byte order and performs the conversion to the little-endian
+    // on-disk representation itself (see aux_to_le() in htslib's sam.c), so the value must NOT be byte-swapped
+    // here: doing so would double-convert it on big-endian hosts.
     std::memcpy(data->data(), &value, TAG_SIZE);
-#ifdef HTS_LITTLE_ENDIAN
-#else
-    reverse(data.get(), TAG_SIZE);
-#endif
     tags_.emplace_back(key, 'i', TAG_SIZE, data);
     size_ += TAG_SIZE + size_of_tag_name_and_type;
 }

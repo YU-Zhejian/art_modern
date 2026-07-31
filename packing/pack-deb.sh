@@ -10,7 +10,8 @@ export OPENMPI_PACKAGE_FULL_NAME="art-modern-openmpi_${PACKAGE_VERSION}+dfsg"
 for name in debian-13 ubuntu-2404 ubuntu-2604; do
     rm -fr artifacts/build_deb-"${name}"
     mkdir -p artifacts/build_deb-"${name}"
-    singularity exec \
+    singularity exec --cleanenv \
+        --env PACKAGE_VERSION="${PACKAGE_VERSION}" \
         --bind "artifacts/build_orig_tgz/${PACKAGE_FULL_NAME}.orig.tar.gz":"/mnt/${PACKAGE_FULL_NAME}.orig.tar.gz" \
         --bind ../debian:/mnt/debian \
         --bind artifacts/build_deb-"${name}":/mnt/build_deb \

@@ -32,10 +32,43 @@
 #include <windows.h>
 #endif
 
+#include <cstdlib>
 #include <fstream>
+#include <iostream>
 #include <ostream>
 #include <sstream>
 #include <string>
+
+namespace {
+/** Abort the process if externally-sourced text carries a non-printable byte.
+ *
+ * A conforming os-release/lsb-release contains no non-printable characters (see os-release(5): "All strings should
+ * be in UTF-8 encoding, and non-printable characters should not be used"), and legitimate uname fields are
+ * printable as well. Finding one therefore means the data is malformed or hostile -- in the latter case an ESC
+ * byte would let the file rewrite this report inside the reader's terminal -- so refuse to emit it at all.
+ *
+ * Only C0 controls and DEL are rejected. Bytes >= 0x80 are left alone because the format mandates UTF-8; e.g.
+ * Fedora 19 legitimately ships PRETTY_NAME="Fedora 19 (Schroedinger's Cat)" with multi-byte characters.
+ *
+ * TAB is permitted. The LSB specification defines no character restrictions for lsb-release at all (it specifies
+ * only the lsb_release command), and os-release(5) bars it at SHOULD strength only, so a TAB is non-conforming
+ * rather than malformed. It is also harmless: it advances to the next tab stop and cannot reposition, erase or
+ * colour anything. CR stays rejected -- it returns the cursor to column 0 and enables line overwriting with no
+ * ESC involved.
+ */
+void ceu_abort_if_non_printable(const char* where, const std::string& value)
+{
+    for (std::string::size_type i = 0; i < value.size(); ++i) {
+        const unsigned char cur = static_cast<unsigned char>(value[i]);
+        if ((cur < 0x20U && cur != 0x09U) || cur == 0x7FU) {
+            static const char HEX[] = "0123456789ABCDEF";
+            std::cerr << "FATAL: slim_libceu: non-printable byte 0x" << HEX[(cur >> 4) & 0xFU] << HEX[cur & 0xFU]
+                      << " at offset " << i << " of " << where << "; refusing to emit untrusted data." << std::endl;
+            std::abort();
+        }
+    }
+}
+} // namespace
 
 std::string ceu_check_get_compile_time_os_info()
 {
@@ -120,13 +153,22 @@ std::string ceu_check_get_run_time_os_info()
 #ifdef CEU_ON_POSIX
 #if defined(CEU_HAVE_INCLUDE_SYS_UTSNAME_H) && CEU_HAVE_INCLUDE_SYS_UTSNAME_H == 1
     struct utsname ceu_utsname { };
-    uname(&ceu_utsname);
-    oss << "\tPOSIX UTSINFO:" << std::endl;
-    oss << "\t\tsysname=" << ceu_utsname.sysname << std::endl;
-    oss << "\t\tnodename=" << ceu_utsname.nodename << std::endl;
-    oss << "\t\trelease=" << ceu_utsname.release << std::endl;
-    oss << "\t\tversion=" << ceu_utsname.version << std::endl;
-    oss << "\t\tmachine=" << ceu_utsname.machine << std::endl;
+    /* POSIX: non-negative on success, -1 on failure. Without this check a failure prints empty fields. */
+    if (uname(&ceu_utsname) == -1) {
+        oss << "\tPOSIX UTSINFO: failed." << std::endl;
+    } else {
+        ceu_abort_if_non_printable("uname sysname", ceu_utsname.sysname);
+        ceu_abort_if_non_printable("uname nodename", ceu_utsname.nodename);
+        ceu_abort_if_non_printable("uname release", ceu_utsname.release);
+        ceu_abort_if_non_printable("uname version", ceu_utsname.version);
+        ceu_abort_if_non_printable("uname machine", ceu_utsname.machine);
+        oss << "\tPOSIX UTSINFO:" << std::endl;
+        oss << "\t\tsysname=" << ceu_utsname.sysname << std::endl;
+        oss << "\t\tnodename=" << ceu_utsname.nodename << std::endl;
+        oss << "\t\trelease=" << ceu_utsname.release << std::endl;
+        oss << "\t\tversion=" << ceu_utsname.version << std::endl;
+        oss << "\t\tmachine=" << ceu_utsname.machine << std::endl;
+    }
 #else
     oss << "\tPOSIX UTSINFO: " << CEU_UNDEFINED << std::endl;
 #endif
@@ -185,7 +227,7 @@ std::string ceu_check_get_run_time_os_info()
                         platform_id = "Windows 10 2004 (20H1, May 2020 Update)";
                     } else if (19042 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19043) {
                         platform_id = "Windows 10 20H2 (October 2020 Update)";
-                    } else if (19042 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19044) {
+                    } else if (19043 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19044) {
                         platform_id = "Windows 10 21H1 (21H1, May 2021 Update)";
                     } else if (19044 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 19045) {
                         platform_id = "Windows 10 21H2 (21H2, November 2021 Update)";
@@ -199,10 +241,12 @@ std::string ceu_check_get_run_time_os_info()
                         platform_id = "Windows 11 23H2 (Sun Valley 3, October 2023 Update)";
                     } else if (26100 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 26200) {
                         platform_id = "Windows 11 24H2 (Hudson Valley, October 2024 Update)";
-                    } else if (26200 <= osvi.dwBuildNumber) {
+                    } else if (26200 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 27000) {
                         platform_id = "Windows 11 25H2 (2025 Update)";
                     } else {
-                        platform_id = "Windows 10/11 unknown";
+                        // Bounding 25H2 above keeps this branch reachable: without it every future build number
+                        // would be reported as 25H2 rather than as unknown.
+                        platform_id = "Windows 10/11 unknown (build number later than 25H2)";
                     }
                 } else {
                     if (osvi.dwBuildNumber < 14393) {
@@ -212,7 +256,7 @@ std::string ceu_check_get_run_time_os_info()
                     } else if (17763 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 20348) {
                         platform_id = "Windows Server 2019 (1809)";
                     } else if (20348 <= osvi.dwBuildNumber && osvi.dwBuildNumber < 26100) {
-                        platform_id = "Windows Server 2022 (20H2)";
+                        platform_id = "Windows Server 2022 (21H2)";
                     } else if (26100 <= osvi.dwBuildNumber) {
                         platform_id = "Windows Server 2025 or later";
                     }
@@ -239,34 +283,37 @@ std::string ceu_check_get_run_time_os_info()
         oss << "failed." << std::endl;
     }
 #endif
-    // Probe lsb-release. Should be in /etc/os-release or /usr/lib/os-release in most modern Linux distros.
+    // Probe the distribution release file. Modern distros ship os-release; lsb-release is the legacy fallback.
 #ifdef CEU_ON_GNU_LINUX
-    oss << "\tLinux lsb-release info: ";
-    // See which file exists
-    const char* const lsb_files[] = { "/etc/lsb-release", "/usr/lib/lsb-release" };
-    const char* target_file = nullptr;
-    for (const auto& file : lsb_files) {
-        if (access(file, F_OK) != -1) {
-            target_file = file;
-            break;
+    oss << "\tLinux distribution info: ";
+    /*
+     * Try each candidate in order of preference, using the open itself as the existence test. A separate access()
+     * probe would add nothing that ifstream does not already report, would open a TOCTOU window (CWE-367), and
+     * would pin the choice to the first file that merely exists -- so an unreadable /etc/os-release would mask a
+     * perfectly readable /usr/lib/os-release instead of falling through to it.
+     */
+    const char* const release_files[]
+        = { "/etc/os-release", "/usr/lib/os-release", "/etc/lsb-release", "/usr/lib/lsb-release" };
+    bool release_file_found = false;
+    for (const auto& file : release_files) {
+        std::ifstream ifs(file);
+        if (!ifs.is_open()) {
+            continue;
         }
-    }
-    if (target_file != nullptr) {
-        oss << target_file << std::endl;
-        std::ifstream ifs(target_file);
-        if (ifs.is_open()) {
-            std::string line;
-            while (std::getline(ifs, line)) {
-                oss << "\t\t" << line << std::endl;
-            }
-            if (ifs.bad()) {
-                oss << "\t\tRead failure." << std::endl;
-            }
-            ifs.close();
-        } else {
+        release_file_found = true;
+        oss << file << std::endl;
+        std::string line;
+        while (std::getline(ifs, line)) {
+            ceu_abort_if_non_printable(file, line);
+            oss << "\t\t" << line << std::endl;
+        }
+        if (ifs.bad()) {
             oss << "\t\tRead failure." << std::endl;
         }
-    } else {
+        ifs.close();
+        break;
+    }
+    if (!release_file_found) {
         oss << "not found" << std::endl;
     }
 #endif

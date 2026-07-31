@@ -4,18 +4,20 @@ Upstream-Name: art_modern
 Upstream-Contact: YU Zhejian <yuzj25@seas.upenn.edu>
 Files-Excluded:
  .github/*
+ .idea/*
  .vscode/*
- bioconda/*
- chroot/*
  explore/*
- env/*
+ sh.d/*
+ deps/concurrentqueue/*
  deps/labw_slim_htslib/*
+ deps/slim_fmt/*
  deps/thread-pool/*
- sh.d/test-c.d/*
- sh.d/bench-art_profile_builder-se.sh
- sh.d/test-am-large-contigs.sh
- sh.d/test-am-many-contigs.sh
-Comment: Source files that are not used in this build are excluded.
+Comment: Source files that are not used in this build are excluded. The bundled
+ dependencies listed here are replaced by their Debian packages; see the
+ -DUSE_HTSLIB, -DUSE_LIBFMT and -DUSE_CONCURRENT_QUEUE flags in debian/rules.
+ This list must be kept in step with the filter in
+ packing/sh.d/prepare-orig-tgz-for-deb.sh, which is what actually builds the
+ orig tarball.
 
 Files: *
 Copyright: 2024-2026 YU Zhejian <yuzj25@seas.upenn.edu>
@@ -37,6 +39,56 @@ License: GPL-3+
 
 Files: deps/cmake_collections/* deps/slim_libceu/*
 Copyright: 2021-2026 YU Zhejian
+License: MIT
+Comment: See deps/cmake_collections/Readme.md, which is authoritative for the
+ adapted files carved out in the three stanzas below.
+
+Files:
+ deps/cmake_collections/src/test_pthread.c
+ deps/cmake_collections/test_libpthread.cmake
+Copyright: 2024 Kitware, Inc.
+License: BSD-3-clause
+Comment: Adapted from CMake 3.28.
+
+Files:
+ deps/cmake_collections/src/test_c89.c
+ deps/cmake_collections/src/test_c89_globals.h
+ deps/cmake_collections/src/test_c99.c
+ deps/cmake_collections/src/test_c99_globals.h
+ deps/cmake_collections/src/test_c11.c
+ deps/cmake_collections/src/test_c11_globals.h
+Copyright: 2001-2017, 2020-2021 Free Software Foundation, Inc.
+License: GPL-3+ with Autoconf exception
+Comment: Adapted from lib/autoconf/c.m4 of GNU Autoconf 2.72. Written by David
+ MacKenzie, with help from Akim Demaille, Paul Eggert, Francois Pinard, Karl
+ Berry, Richard Pixley, Ian Lance Taylor, Roland McGrath, Noah Friedman,
+ david d zuhn, and many others.
+
+Files:
+ deps/cmake_collections/src/test_cxx*.cc
+ deps/cmake_collections/src/test_cxx*.hh
+Copyright:
+ 2008 Benjamin Kosnik <bkoz@redhat.com>
+ 2012 Zack Weinberg <zackw@panix.com>
+ 2013 Roy Stogner <roystgnr@ices.utexas.edu>
+ 2014, 2015 Google Inc.; contributed by Alexey Sokolov <sokolov@google.com>
+ 2015 Paul Norman <penorman@mac.com>
+ 2015 Moritz Klammler <moritz@klammler.eu>
+ 2016, 2018 Krzesimir Nowak <qdlacz@gmail.com>
+ 2019 Enji Cooper <yaneurabeya@gmail.com>
+ 2020 Jason Merrill <jason@redhat.com>
+ 2021 Jorn Heusipp <osmanx@problemloesungsmaschine.de>
+ 2015, 2022, 2023, 2024 Olly Betts
+License: permissive-autoconf-archive
+Comment: Adapted from m4/ax_cxx_compile_stdcxx.m4 of the GNU Autoconf Archive
+ 2024.10.16.
+
+Files:
+ src/libam_support/seq/qreverse.c
+ src/libam_support/seq/qreverse.h
+Copyright:
+ 2017 Wunkolo
+ 2025-2026 YU Zhejian <yuzj25@seas.upenn.edu>
 License: MIT
 
 Files: src/art/exe/* src/art/lib/*
@@ -85,3 +137,53 @@ License: MIT
  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  SOFTWARE.
+
+License: BSD-3-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ .
+ * Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+ .
+ * Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+ .
+ * Neither the name of the copyright holder nor the names of its contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: GPL-3+ with Autoconf exception
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License as published by the Free Software
+ Foundation; either version 3 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ .
+ Under Section 7 of GPL version 3, you are granted additional permissions
+ described in the Autoconf Configure Script Exception, version 3.0, as
+ published by the Free Software Foundation.
+ .
+ On Debian systems, the complete text of the GNU General Public License version
+ 3 can be found in '/usr/share/common-licenses/GPL-3', and the complete text of
+ the Autoconf Configure Script Exception version 3.0 can be found in
+ '/usr/share/doc/autoconf/COPYING.EXCEPTION'.
+
+License: permissive-autoconf-archive
+ Copying and distribution of this file, with or without modification, are
+ permitted in any medium without royalty provided the copyright notice and this
+ notice are preserved. This file is offered as-is, without any warranty.

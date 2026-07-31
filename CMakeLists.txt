@@ -29,6 +29,11 @@ project(
     HOMEPAGE_URL "https://github.com/YU-Zhejian/art_modern/")
 set(ART_MODERN_URL "${PROJECT_HOMEPAGE_URL}")
 
+# Warn if CMake version <3.25
+if(${CMAKE_VERSION} VERSION_LESS 3.25)
+    message(WARNING "Support for CMake version <3.25 is deprecated. Please upgrade to CMake >=3.25.")
+endif()
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 set(CMAKE_C_EXTENSIONS OFF) # To make C standard conformance stricter.
@@ -70,6 +75,9 @@ if(NOT DEFINED CMAKE_INSTALL_PREFIX)
         CACHE PATH "Install path prefix, prepended onto install directories." FORCE)
 endif()
 set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/${CMAKE_INSTALL_LIBDIR}")
+# Also RPATH externals linked by absolute path (e.g. MKL from pkg-config under /opt/intel), whose
+# DT_NEEDED the loader could not otherwise resolve. Implicit system dirs are skipped by CMake.
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH ON)
 
 # Macros from LibCEU.
 set(LIBCEU_CMAKE_COLLECTION_DIR "${CMAKE_CURRENT_LIST_DIR}/deps/cmake_collections")
@@ -193,9 +201,12 @@ endif()
 
 # -----------------------------------------------------------------------------
 # Dealing with ${AM_SUPPORT_LIB}.
-# TODO: Make AM_MPI_POSTFIX adjustable.
 if(WITH_MPI)
-    set(AM_MPI_POSTFIX "-mpi")
+    if(NOT DEFINED AM_MPI_POSTFIX)
+        set(AM_MPI_POSTFIX "-mpi")
+    else()
+        message(WARNING "AM_MPI_POSTFIX is already defined. Using the existing value: ${AM_MPI_POSTFIX}")
+    endif()
 else()
     set(AM_MPI_POSTFIX "")
 endif()

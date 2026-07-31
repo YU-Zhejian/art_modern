@@ -17,6 +17,7 @@
 #include "libam_support/Constants.hh"
 #include "libam_support/Dtypes.h"
 #include "libam_support/ds/CoverageInfo.hh"
+#include "libam_support/utils/class_macros_utils.hh"
 
 #include <boost/program_options/variables_map.hpp>
 
@@ -28,6 +29,10 @@ namespace labw::art_modern {
 
 class ArtIOParams {
 public:
+    DEFAULT_CONSTRUCTOR(ArtIOParams)
+    DEFAULT_COPY(ArtIOParams)
+    DEFAULT_MOVE(ArtIOParams)
+    DEFAULT_DESTRUCTOR(ArtIOParams)
     const std::string input_file_name;
     const INPUT_FILE_TYPE art_input_file_type;
     const INPUT_FILE_PARSER art_input_file_parser;

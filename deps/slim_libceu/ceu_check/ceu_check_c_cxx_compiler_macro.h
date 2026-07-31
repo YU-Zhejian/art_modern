@@ -24,11 +24,12 @@
 #include "ceu_check/cc/04_arm_compiler_embedded.h" /* NOLINT */
 #include "ceu_check/cc/05_intel_clang.h" /* NOLINT */
 #include "ceu_check/cc/06_amd_clang.h" /* NOLINT */
-#include "ceu_check/cc/07_msvc.h" /* NOLINT */
-#include "ceu_check/cc/08_nvhpc.h" /* NOLINT */
-#include "ceu_check/cc/09_pgic.h" /* NOLINT */
-#include "ceu_check/cc/10_tcc.h" /* NOLINT */
-#include "ceu_check/cc/11_ti.h" /* NOLINT */
+#include "ceu_check/cc/07_apple_clang.h" /* NOLINT */
+#include "ceu_check/cc/08_msvc.h" /* NOLINT */
+#include "ceu_check/cc/09_nvhpc.h" /* NOLINT */
+#include "ceu_check/cc/10_pgic.h" /* NOLINT */
+#include "ceu_check/cc/11_tcc.h" /* NOLINT */
+#include "ceu_check/cc/12_ti.h" /* NOLINT */
 #include "ceu_check/cc/30_clang.h" /* NOLINT */
 #include "ceu_check/cc/40_gcc.h" /* NOLINT */
 #include "ceu_check/cc/50_edg.h" /* NOLINT */

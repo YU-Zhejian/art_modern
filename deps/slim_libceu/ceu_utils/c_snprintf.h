@@ -3,16 +3,6 @@
 
 #include "ceu_check/ceu_check_c_cxx_compiler_macro.h" /* NOLINT: For CEU_COMPILER_IS_MSVC */
 
-#ifdef CEU_COMPILER_IS_MSVC
-/**  Enable MSVC secure CRT functions */
-#ifndef _CRT_SECURE_NO_WARNINGS
-#define _CRT_SECURE_NO_WARNINGS /* NOLINT */
-#endif
-
-#ifndef _CRT_SECURE_NO_DEPRECATE
-#define _CRT_SECURE_NO_DEPRECATE /* NOLINT */
-#endif
-#endif
 #include <stdio.h> /* NOLINT: For snprintf or _snprintf_s */
 
 #ifdef CEU_COMPILER_IS_MSVC

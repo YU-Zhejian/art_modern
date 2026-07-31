@@ -21,7 +21,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string>
+#include <string_view>
 
 namespace labw::art_modern {
 
@@ -89,7 +89,7 @@ constexpr char INPUT_FILE_PARSER_STREAM[] = "stream";
 constexpr char INPUT_FILE_PARSER_AUTO[] = "auto";
 
 constexpr int MPI_MAIN_RANK = 0;
-const std::string MPI_MAIN_RANK_STR = "0";
+constexpr std::string_view MPI_MAIN_RANK_STR = "0";
 
 constexpr int MPI_UNAVAILABLE_RANK = -1;
 
@@ -124,5 +124,5 @@ constexpr std::size_t SI_UNITS_LENGTH = 8;
 /** ART nucleotides */
 constexpr char ART_ACGT[] = "ACGT";
 /** ART nucleotides as string */
-const std::string ART_ACGT_STR = "ACGT";
+constexpr std::string_view ART_ACGT_STR = "ACGT";
 } // namespace labw::art_modern

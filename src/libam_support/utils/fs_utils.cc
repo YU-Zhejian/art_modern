@@ -24,6 +24,7 @@
 #include <boost/filesystem/operations.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <optional>
 #include <string>
 
 #include "seq_utils.hh"
@@ -50,16 +51,16 @@ void validate_input_filename(const std::string& input_file_path, const std::stri
     }
 }
 
-am_filelen_t get_file_size(const std::string& file_path) noexcept
+std::optional<am_filelen_t> get_file_size(const std::string& file_path) noexcept
 {
     if (!boost::filesystem::is_regular_file(file_path)) {
-        return -1;
+        return std::nullopt;
     }
 
     try {
         return static_cast<am_filelen_t>(boost::filesystem::file_size(file_path));
     } catch (const boost::filesystem::filesystem_error&) {
-        return -1;
+        return std::nullopt;
     }
 }
 void ensure_directory_exists(const std::string& dir_path)

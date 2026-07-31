@@ -25,7 +25,6 @@
 #include "libam_support/Dtypes.h"
 #include "libam_support/jobs/Scheduler.hh"
 #include "libam_support/out/OutputDispatcher.hh"
-#include "libam_support/utils/arithmetic_utils.hh"
 #include "libam_support/utils/class_macros_utils.hh"
 #include "libam_support/utils/depth_utils.hh"
 #include "libam_support/utils/mpi_utils.hh"
@@ -72,7 +71,7 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
     current_contig_name_ = art_contig.seq_name;
     current_n_fails_ = 0;
     current_n_reads_generated_ = 0;
-    current_max_tolerence_ = am_max(static_cast<am_readnum_t>(5),
+    current_max_tolerence_ = std::max(static_cast<am_readnum_t>(5),
         static_cast<am_readnum_t>(static_cast<double>(targeted_num_reads) * MAX_TRIAL_RATIO_BEFORE_FAIL));
     current_n_reads_left_ = targeted_num_reads;
     while (current_n_reads_left_ > 0) {
@@ -96,6 +95,19 @@ void ArtJobExecutor::generate_(const am_readnum_t targeted_num_reads, const bool
             break;
         }
     }
+}
+
+ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
+    : art_params_(other.art_params_)
+    , job_(std::move(other.job_))
+    , mpi_rank_str_(other.mpi_rank_str_)
+    , mpi_rank_str_hex_(other.mpi_rank_str_hex_)
+    , output_dispatcher_(std::move(other.output_dispatcher_))
+    , num_reads_to_reduce_(other.num_reads_to_reduce_)
+    , require_alignment_(other.require_alignment_)
+    , seed_(other.seed_)
+    , token_ring_(std::move(other.token_ring_))
+{
 }
 
 bool ArtJobExecutor::generate_pe_(
@@ -185,6 +197,7 @@ void ArtJobExecutor::operator()()
     AJEReporter reporter(*this, art_params_.art_job_executor_reporting_interval_seconds);
     reporter.start();
     hts_pos_t accumulated_contig_len = 0;
+    std::size_t num_contigs_simulated = 0;
 
     Rprob rprob_(art_params_.pe_frag_dist_mean, art_params_.pe_frag_dist_std_dev, art_params_.read_len_1,
         art_params_.read_len_2, seed_);
@@ -201,6 +214,7 @@ void ArtJobExecutor::operator()()
             continue;
         }
         accumulated_contig_len += contig_size;
+        num_contigs_simulated += 1;
 
         ArtContig art_contig(job_.fasta_fetch, seq_id, art_params_, rprob_);
 
@@ -236,8 +250,13 @@ void ArtJobExecutor::operator()()
         // Calculate real coverage
         double real_coverage = 0;
         if (art_params_.art_simulation_mode == SIMULATION_MODE::TEMPLATE) {
-            // TODO: Still needs checking
-            real_coverage = total_num_reads_generated_;
+            // In TEMPLATE mode the requested coverage is a number of reads per template rather than a number of
+            // bases per position: calculate_num_reads_template() picks read counts summing to the requested
+            // coverage directly. The mean depth is therefore the read count averaged over the templates that
+            // were actually simulated, with no read-length term. Note that PE reads are counted individually
+            // here, matching how calculate_num_reads_template() rounds to a multiple of num_reads_to_reduce_.
+            real_coverage
+                = static_cast<double>(total_num_reads_generated_) / static_cast<double>(num_contigs_simulated);
         } else {
             if (art_params_.art_lib_const_mode == ART_LIB_CONST_MODE::SE) {
                 real_coverage = static_cast<double>(total_num_reads_generated_) * art_params_.read_len_1
@@ -254,18 +273,6 @@ void ArtJobExecutor::operator()()
     }
     reporter.stop();
     is_running_ = false;
-}
-ArtJobExecutor::ArtJobExecutor(ArtJobExecutor&& other) noexcept
-    : art_params_(other.art_params_)
-    , job_(std::move(other.job_))
-    , mpi_rank_str_(other.mpi_rank_str_)
-    , mpi_rank_str_hex_(other.mpi_rank_str_hex_)
-    , output_dispatcher_(std::move(other.output_dispatcher_))
-    , num_reads_to_reduce_(other.num_reads_to_reduce_)
-    , require_alignment_(other.require_alignment_)
-    , seed_(other.seed_)
-    , token_ring_(std::move(other.token_ring_))
-{
 }
 std::string ArtJobExecutor::thread_info() const
 {

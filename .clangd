@@ -1,3 +1,6 @@
+CompileFlags:
+  CompilationDatabase: cmake-build-clangd
+---
 If:
   PathMatch: deps/.*
 Diagnostics:

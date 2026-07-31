@@ -82,6 +82,8 @@ Although not tested, the following compilers can also theoretically be of use:
 
 **NOTE:** Lots of End-of-Life distributions do not ship with a recent version of CMake. You may download CMake 3.17 in a binary form for x86\_64 GNU/Linux or Mac OS X from [CMake's officially-built binaries](https://cmake.org/files/v3.17/).
 
+**NOTE:** In [1.5.1](#v-1.5.0-section), support over CMake earlier than [3.25](https://cmake.org/cmake/help/latest/release/3.25.html) is deprecated and will be removed in the next release.
+
 ### Dependencies of the CMake Build System
 
 CMake requires a [CMake Generator](https://cmake.org/cmake/help/latest/manual/cmake-generators.7.html), which is used to perform the build. Under GNU/Linux and other POSIX systems (e.g., Mac OS X, FreeBSD), [Ninja](https://ninja-build.org/) is preferred. [GNU Make](https://www.gnu.org/software/make) is also acceptable. BSD-flavored `make` will **NOT** work.
@@ -543,6 +545,18 @@ Whether to enable MPI-based parallelization.
 - `ON`: Will enable MPI-based parallelization.
 
 See [MPI Library](#mpi-section) for requirements.
+
+(am-mpi-postfix-section)=
+### `AM_MPI_POSTFIX`
+
+Available since [1.5.1](#v-1.5.1-section).
+
+Suffix appended to the name of every library, executable, test, and benchmark target, so that an MPI-enabled build can be installed alongside a non-MPI one. For example, the `art_modern` executable is named `art_modern-mpi` by default when [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`.
+
+- **Unset (DEFAULT): `-mpi` if [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`, empty otherwise.**
+- Any value `[val]`: Will use `[val]` as the suffix. A CMake warning is emitted to confirm that the default was overridden.
+
+This variable is only used when [CMake variable `WITH_MPI`](#with-mpi-section) is `ON`. Non-MPI builds always use an empty suffix, and any value set here is ignored.
 
 (find-random-mkl-through-pkgconf-section)=
 ### `FIND_RANDOM_MKL_THROUGH_PKGCONF`
