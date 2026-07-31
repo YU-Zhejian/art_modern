@@ -1,7 +1,7 @@
 # News \& Release Notes
 
 (v-1.5.1-section)=
-## v1.5.1 (Ongoing)
+## v1.5.1 (2026/07/31)
 
 - Software Engineering:
   - `Previous run crashed` removed from error messages. This message is not informative.

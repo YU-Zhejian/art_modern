@@ -60,7 +60,7 @@ make clean
 rm -fr test-build-*.log.d
 
 # Modify this line for whether to testsmall.
-TB_TARGET="testbuild" # -small
+TB_TARGET="testbuild-small" # 
 
 run_gcc make "${TB_TARGET}" || true
 run_gcc make "${TB_TARGET}"-mpi || true
